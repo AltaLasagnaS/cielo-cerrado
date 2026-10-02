@@ -1,7 +1,11 @@
-// Guerra electrónica: interferidores de ruido y supresión GNSS.
+// Guerra electrónica: interferidores de ruido contra radares y supresores/engañadores GNSS.
 // P = potencia relativa (parámetro de juego, no es una potencia física en watts).
+// spoofKm = desvío típico por ENGAÑO GNSS (km); sin él, el anti-GNSS solo interfiere (error menor).
+//
+// El efecto depende del ROL, no de la bandera: los interferidores de radar degradan los radares de la
+// defensa (herramienta del atacante) y los anti-GNSS desvían las armas del atacante (herramienta del
+// defensor). Así cada bando puede usar los suyos según le toque atacar o defender.
 import { WP, SRC } from './sources.js';
-
 
 export const JAMMERS = {
   soj: { name: 'Avión de interferencia stand-off (tipo Il-22PP)', short: 'Jammer aéreo', side: 'RU', air: true, alt: 8000, P: 3e5, bands: ['S', 'C', 'X'],
@@ -10,6 +14,21 @@ export const JAMMERS = {
     notes: ['Bandas X y Ku, alcance declarado ~300 km. Ucrania capturó uno en 2022.', 'Pensado contra radares aerotransportados y de control de tiro.'], sources: [WP('Krasukha_(electronic_warfare_system)')] },
   krasukha2: { name: 'Krasukha-2 (terrestre)', short: 'Krasukha-2', side: 'RU', air: false, mast: 6, P: 1e6, bands: ['S'],
     notes: ['Banda S, ~250 km: diseñado contra aviones AEW tipo E-3.'], sources: [WP('Krasukha_(electronic_warfare_system)')] },
-  gnss: { name: 'Supresor GNSS (tipo Pole-21 ruso / Pokrova ucraniano)', short: 'Anti-GNSS', side: 'both', air: false, gnssJam: true, radius: 25,
-    notes: ['No afecta radares: interfiere o engaña GPS-GLONASS. Las armas que dependen del satélite se desvían.', 'Pole-21 es ruso (≥25 km por módulo, montado en torres de celular); Pokrova es el sistema ucraniano de engaño GNSS contra Shahed.', 'Las antenas CRPA (Kometa) y la navegación por terreno/óptica reducen el efecto.'], sources: [SRC.topwar_pole21, SRC.kp_pokrova] }
+  // ---- anti-GNSS: siempre a favor del DEFENSOR (desvían las armas que navegan por satélite) ----
+  gnss: { name: 'Supresor GNSS ruso (tipo Pole-21)', short: 'Pole-21', side: 'RU', air: false, gnssJam: true, radius: 25,
+    notes: ['No afecta radares: interfiere GPS/GLONASS. Las armas que dependen del satélite pasan a navegación inercial y se desvían.', 'Pole-21: ≥25 km por módulo, montado en torres de celular (fuente rusa). Protege bases e infraestructura rusas.', 'Las antenas CRPA y la navegación por terreno u óptica reducen el efecto (en el juego, el campo gnss de cada arma).'],
+    sources: [SRC.topwar_pole21] },
+  pokrova: { name: 'Pokrova (red ucraniana de supresión y engaño GNSS)', short: 'Pokrova', side: 'UA', air: false, gnssJam: true, radius: 25, spoofKm: 5,
+    notes: ['Red nacional de estaciones anunciada en nov-2023 y operativa desde ene/feb-2024: suprime GPS/GLONASS o los engaña (spoofing) con coordenadas falsas.', 'Engañar no es lo mismo que meter ruido: el arma cree estar en otro lugar y se desvía kilómetros sin darse cuenta. Los primeros reportes hablaban de 5–10 km; en algunas noches de nov/dic-2024, la mitad de los Shahed terminó "perdida localmente" o en Bielorrusia (esa categoría mezcla GE, señuelos y fallas).', 'No hay datos públicos de potencia, frecuencias ni radio por nodo: el radio y el desvío son valores de juego.', 'Las antenas CRPA rusas (Kometa de 8/12/16 elementos; Kometa-M desde dic-2025) le restan mucho efecto.'],
+    sources: [SRC.kp_pokrova, SRC.dx_pokrova, SRC.forbes_pokrova, SRC.dpost_spoof, SRC.euronews_lost, SRC.dx_lost] },
+  lima: { name: 'Lima / Lima-Quant (estaciones anti-GNSS ucranianas)', short: 'Lima', side: 'UA', air: false, gnssJam: true, radius: 40, spoofKm: 3,
+    notes: ['Interferencia, engaño y "ataque digital" al receptor GNSS. En uso desde 2024 contra bombas planeadoras UMPK/KAB y Shahed; según sus operadores, también contra crucero y Kinzhal.', '~€58.000 por estación; una ciudad grande necesita 30–100, porque contra una antena CRPA hacen falta muchas fuentes desde distintos puntos.', 'Cifras del fabricante y de la unidad, sin verificación independiente: más de 20.000 Shahed afectados, 58–61 Kinzhal "neutralizados", alcance de 300 km contra Kinzhal. Forbes y JAPCC confirman de forma independiente que la precisión de los KAB cayó en 2025.', 'Rusia respondió con Kometa-M24 y con planeadoras de mayor alcance (UMPK-PD, lanzadas desde más de 95 km).'],
+    sources: [SRC.kp_lima, SRC.kp_lima2, SRC.nv_lima, SRC.forbes_kab25, SRC.japcc_kab, SRC.ki_kinzhal, SRC.forbes_limaq, SRC.mil_lima_half] },
+  bukovel: { name: 'Bukovel-AD (antidrón ucraniano: enlaces y GNSS)', short: 'Bukovel-AD', side: 'UA', air: false, gnssJam: true, radius: 15,
+    notes: ['De Proximus, en servicio desde 2016. Detecta en 320–6.000 MHz hasta 70–100 km e interfiere enlaces de datos hasta 16–20 km. El fabricante declara supresión GNSS hasta 35 km, con 10 W por antena.', 'El motor solo representa la parte GNSS: cortar el enlace de control no detiene a un Shahed autónomo (sí "aterrizó" un ZALA 421-16E2 ruso).', 'Con 10 W y frente a receptores con CRPA, el radio real es mucho menor que el declarado: valor de juego conservador.'],
+    sources: [WP('Bukovel_(counter_unmanned_aircraft_system)'), SRC.azov_bukovel, SRC.mil_bukovel] },
+  // ---- contra radares: siempre a favor del ATACANTE (degradan los radares de la defensa) ----
+  f16ecm: { name: 'F-16 ucraniano con pod de autoprotección (AN/ALQ-131)', short: 'F-16 ECM', side: 'UA', air: true, alt: 4000, P: 3e4, bands: ['C', 'X', 'Ku'],
+    notes: ['Los F-16 holandeses llegaron con AN/ALQ-131 y los daneses con ALQ-162 en pilones ECIPS; un escuadrón de guerra electrónica de la USAF los reprogramó contra amenazas rusas (ago-2024).', 'El ALQ-131 cubre 2–20 GHz en configuraciones de 1 a 3 bandas: no se sabe cuáles tiene Ucrania. Acá se asumen las bandas de control de tiro (C/X/Ku).', 'Es un pod de autoprotección, no un interferidor stand-off: en el juego representa una patrulla escoltando un ataque, con mucha menos potencia que un Il-22PP o un Krasukha. Confianza baja.'],
+    sources: [SRC.ng_alq131, SRC.fas_alq131, SRC.dx_f16nl, SRC.afm_f16ew] }
 };

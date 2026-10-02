@@ -18,7 +18,7 @@ export const PL = {
   'sam.ch': ['Canales simultáneos', ''], 'sam.mag': ['Munición de la unidad', ''], 'sam.cost': ['Costo por disparo', 'M US$'],
   'sam.pk.dron': ['Pk por disparo vs drones', ''], 'sam.pk.crucero': ['Pk por disparo vs crucero', ''], 'sam.pk.supersonico': ['Pk por disparo vs supersónicos', ''],
   'sam.pk.balistico': ['Pk por disparo vs balísticos', ''], 'sam.pk.hiper': ['Pk por disparo vs hipersónicos', ''],
-  alt: ['Altitud de patrulla', 'm'], radius: ['Radio de efecto', 'km'], P: ['Potencia relativa (juego)', '']
+  alt: ['Altitud de patrulla', 'm'], radius: ['Radio de efecto', 'km'], spoofKm: ['Desvío típico por engaño GNSS', 'km'], P: ['Potencia relativa (juego)', '']
 };
 export const RCS_NOTE = 'est: sin medición pública; analogía con la tabla de GlobalSecurity (Tomahawk 0,5 m², ALCM furtivo <0,05, Harpoon/Exocet 0,1) y tamaño/forma';
 export const VHF_NOTE = 'est: con λ≈1,5–2 m el cuerpo entra en zona de resonancia y el conformado furtivo pierde efecto';
@@ -362,6 +362,19 @@ export const UNC = {
     soj: { P: U(1e5, 3e5, 1e6, 'baja', [], 'parámetro de juego: bandas y potencia del Il-22PP no son públicas') },
     krasukha4: { P: U(3e5, 1e6, 3e6, 'baja', [], 'parámetro de juego') },
     krasukha2: { P: U(3e5, 1e6, 3e6, 'baja', [], 'parámetro de juego') },
-    gnss: { radius: U(15, 25, 50, 'media', S_('topwar_pole21'), '≥25 km por módulo (fuente rusa)') }
+    gnss: { radius: U(15, 25, 50, 'media', S_('topwar_pole21'), '≥25 km por módulo (fuente rusa)') },
+    pokrova: {
+      radius: U(10, 25, 50, 'baja', S_('dx_pokrova', 'kp_pokrova'), 'est: no hay radio por nodo publicado; mismo orden de magnitud que Pole-21. La red nacional son muchos nodos superpuestos'),
+      spoofKm: U(2, 5, 10, 'baja', S_('dx_pokrova', 'forbes_pokrova'), 'primeros reportes ucranianos de 2024: desvíos de 5–10 km')
+    },
+    lima: {
+      radius: U(20, 40, 100, 'baja', S_('kp_lima2', 'forbes_limaq', 'ki_kinzhal'), 'fabricante: CRPA a 50 km, KAB a más de 100 km, Kinzhal a 300 km. Que una ciudad necesite 30–100 estaciones sugiere un radio efectivo menor contra CRPA; est'),
+      spoofKm: U(1, 3, 10, 'baja', S_('forbes_kab25', 'nv_lima'), 'est: desvíos de km contra planeadoras (Forbes); sin cifra pública por arma')
+    },
+    bukovel: { radius: U(5, 15, 35, 'baja', S_('wp:Bukovel_(counter_unmanned_aircraft_system)', 'azov_bukovel'), 'fabricante: GNSS hasta 35 km con 10 W por antena; contra CRPA mucho menos; est') },
+    f16ecm: {
+      P: U(1e4, 3e4, 1e5, 'baja', S_('ng_alq131', 'fas_alq131'), 'parámetro de juego: potencia y bandas del pod no son públicas. Un orden de magnitud menos que el Il-22PP (3e5): un pod de caza tiene menos potencia y antenas mucho más chicas; est'),
+      alt: U(300, 4000, 8000, 'baja', [], 'est: los F-16 ucranianos vuelan bajo para sobrevivir y suben para lanzar; altura de patrulla de juego')
+    }
   }
 };

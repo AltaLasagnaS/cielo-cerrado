@@ -109,6 +109,26 @@ export const SRC = {
   keyaero_il22: ['Key.aero: Il-22PP', 'https://www.key.aero/article/ilyushin-il-22pp'],
   topwar_pole21: ['Topwar: Pole-21 (fuente rusa)', 'https://en.topwar.ru/182196-kompleksy-rjeb-pole-21-v-rossijskoj-armii.html'],
   kp_pokrova: ['Kyiv Post: sistema ucraniano Pokrova', 'https://www.kyivpost.com/post/28059'],
+  // guerra electrónica ucraniana y aliada (relevadas por buscador en oct-2026; ver docs/DATOS-Y-FUENTES.md)
+  dx_pokrova: ['Defense Express: Pokrova, la GE que inutiliza los receptores GPS (ene-2024)', 'https://en.defence-ua.com/events/pokrova_ew_system_is_a_real_game_changer_in_ukrainian_fight_against_shahed_136_drones_and_cruise_missiles_that_renders_gps_receivers_useless-8462.html'],
+  forbes_pokrova: ['Forbes (Hambling): Pokrova engaña a los Shahed (feb-2024)', 'https://www.forbes.com/sites/davidhambling/2024/02/12/ukraines-pokrova-spoofing-system-tells-shaheds-to-get-lost/'],
+  dpost_spoof: ['The Defense Post: Ucrania desvía casi 100 Shahed por spoofing (dic-2024)', 'https://thedefensepost.com/2024/12/05/ukraine-spoofs-shahed-drones/'],
+  euronews_lost: ['Euronews: cómo Ucrania desvía drones rusos hacia Bielorrusia (dic-2024)', 'https://www.euronews.com/my-europe/2024/12/04/lost-and-spoofed-how-ukraine-redirects-russian-drones-to-belarus'],
+  dx_lost: ['Defense Express: "perdidos localmente" o derribados, el Estado Mayor explica la estadística', 'https://en.defence-ua.com/analysis/lost_or_destroyed_ukraines_general_staff_explains_the_confusing_shahed_downing_statistics-12432.html'],
+  kp_lima: ['Kyiv Post: el interferidor Lima contra bombas planeadoras', 'https://www.kyivpost.com/post/50474'],
+  kp_lima2: ['Kyiv Post: Lima cuesta €58.000 por estación (2026)', 'https://www.kyivpost.com/post/76818'],
+  nv_lima: ['NV (resume Politico): Ucrania usa Lima para desviar misiles y drones (2026)', 'https://english.nv.ua/russian-war/ukraine-uses-lima-system-to-divert-russian-missiles-and-drones-politico-says-50610791.html'],
+  forbes_kab25: ['Forbes (Axe): los interferidores ucranianos confunden a las bombas planeadoras (mar-2025)', 'https://www.forbes.com/sites/davidaxe/2025/03/23/ukraines-jammers-are-confusing-russias-glide-bombs-watch-one-stray-off-course/'],
+  japcc_kab: ['JAPCC (OTAN): Countering Russia’s glide bomb warfare in Ukraine', 'https://www.japcc.org/articles/countering-russias-glide-bomb-warfare-in-ukraine/'],
+  ki_kinzhal: ['Kyiv Independent: Night Watch y Lima contra el Kinzhal (2026)', 'https://kyivindependent.com/patriots-or-no-patriots-ukraine-may-have-solved-the-problem-of-russias-kinzhal-missiles/'],
+  forbes_limaq: ['Forbes (Hambling): Lima-Quant contra las nuevas planeadoras (abr-2026; cifras del fabricante)', 'https://www.forbes.com/sites/davidhambling/2026/04/03/new-ukrainian-jammer-makes-russias-latest-glide-bombs-useless-again/'],
+  mil_lima_half: ['Militarnyi: según el comandante de Night Watch, Lima hace la mitad de la supresión de blancos aéreos', 'https://militarnyi.com/en/news/ew-system-lima-accounts-for-half-of-air-target-suppression-night-watch-commander-says/'],
+  azov_bukovel: ['azov.one: ficha técnica de Bukovel (datos del fabricante)', 'https://azov.one/en/blog/electronics-warfare-systems/electronic-warfare-system-bukovel'],
+  mil_bukovel: ['Militarnyi: Bukovel-AD "aterriza" un ZALA 421-16E2 ruso', 'https://militarnyi.com/en/news/ukrainian-bukovel-ad-ew-system-landed-russian-zala-421-16e2-uav/'],
+  ng_alq131: ['Northrop Grumman (fabricante): pod AN/ALQ-131(V)', 'https://www.northropgrumman.com/what-we-do/mission-solutions/electronic-warfare/an-alq-131v-electronic-countermeasures-ecm-pod'],
+  fas_alq131: ['FAS: AN/ALQ-131, pod de autoprotección', 'https://man.fas.org/dod-101/sys/ac/equip/an-alq-131.htm'],
+  dx_f16nl: ['Defense Express: qué traen distinto los F-16 holandeses (ALQ-131, ECIPS)', 'https://en.defence-ua.com/news/ukraines_new_f_16s_from_the_netherlands_whats_different_from_danish_version-12107.html'],
+  afm_f16ew: ['Air & Space Forces Magazine: la USAF reprogramó la GE de los F-16 ucranianos (ago-2024)', 'https://www.airandspaceforces.com/ukraine-f-16-electronic-warfare-us-air-force/'],
   rusi_storm: ['RUSI: Stormbreak (2023)', 'https://static.rusi.org/Stormbreak-Special-Report-web-final_0.pdf']
 };
 /** Azúcar para listas de claves de fuentes. */

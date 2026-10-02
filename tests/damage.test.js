@@ -54,3 +54,13 @@ test('debrief: metas evaluadas y explicaciones coherentes con la corrida', async
   assert.ok(d.why.length > 0);
   assert.ok(d.timeline.every((e, i, a) => !i || a[i - 1].t <= e.t));
 });
+
+test('engaño GNSS: Pokrova desvía kilómetros y el debrief cuenta las perdidas localmente', async () => {
+  const { buildDebrief, LOST_M } = await import('../src/sim/debrief.js');
+  const { addJam } = await import('../src/sim/setup.js');
+  runScenario('mb_noche', { seed: 3, prep: s => { s.setup.defs = []; s.setup.jams = []; addJam('pokrova', 55, 52); } });
+  const sh = S.arrivals.filter(a => a.type === 'shahed');
+  assert.ok(sh.some(a => a.nav > LOST_M), 'algún Shahed desviado más de 2 km');
+  assert.ok(sh.every(a => a.nav <= (1 - 0.5) * 5000 * 1.5 + 1e-6));   // (1 − gnss)·spoofKm·(0,5 + azar)
+  assert.equal(buildDebrief(S).attack.lostLocally, S.arrivals.filter(a => a.nav > LOST_M).length);
+});

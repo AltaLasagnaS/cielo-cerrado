@@ -98,7 +98,7 @@ export function openFicha(kind, k) {
     openModal(h, () => openFicha(kind, k)); if ($('#fCal')) $('#fCal').onclick = () => pushModalFn(openCal);
   } else {
     const j = JAMMERS[k];
-    openModal(`<header><div><span class="chip ew">Guerra electrónica</span><h2>${esc(j.name)}</h2></div><button class="btn x">Cerrar</button></header><div class="bd"><div class="specs">${j.gnssJam ? spec('Efecto', 'Interferencia GNSS') + spec('Radio', j.radius + ' km') : spec('Bandas', j.bands.join(', ')) + spec('Plataforma', j.air ? 'Aérea, ' + j.alt + ' m' : 'Terrestre, mástil ' + j.mast + ' m') + spec('Potencia relativa', j.P.toExponential(0))}</div><ul>${j.notes.map(n => `<li>${esc(n)}</li>`).join('')}</ul>${confTable('jam', k)}${srcs(j.sources)}</div>`, () => openFicha(kind, k));
+    openModal(`<header><div><span class="chip ew">Guerra electrónica</span><h2>${esc(j.name)}</h2></div><button class="btn x">Cerrar</button></header><div class="bd"><div class="specs">${j.gnssJam ? spec('Efecto ' + infoBtn('gnss'), j.spoofKm ? 'Engaño GNSS (spoofing)' : 'Interferencia GNSS') + spec('Radio', j.radius + ' km') + (j.spoofKm ? spec('Desvío típico', j.spoofKm + ' km') : '') + spec('Rol', 'Defensor: desvía armas atacantes') : spec('Bandas', j.bands.join(', ')) + spec('Plataforma', j.air ? 'Aérea, ' + j.alt + ' m' : 'Terrestre, mástil ' + j.mast + ' m') + spec('Potencia relativa', j.P.toExponential(0))}</div><ul>${j.notes.map(n => `<li>${esc(n)}</li>`).join('')}</ul>${confTable('jam', k)}${srcs(j.sources)}</div>`, () => openFicha(kind, k));
   }
 }
 export function cmpThreats() {

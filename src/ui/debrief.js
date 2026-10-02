@@ -26,7 +26,7 @@ export function openDebrief() {
       <div><h3>Ataque</h3><ul class="dblist">
         <li><b>${a.real}</b> armas lanzadas${a.decoys ? ` + <b>${a.decoys}</b> señuelos` : ''}</li>
         <li><b>${a.intercepted}</b> interceptadas (${pct(a.intercepted, a.real)})</li>
-        <li><b>${a.impacts}</b> impactos en el blanco · <b>${a.misses}</b> fuera</li>
+        <li><b>${a.impacts}</b> impactos en el blanco · <b>${a.misses}</b> fuera${a.lostLocally ? ` (<b>${a.lostLocally}</b> perdidas localmente por engaño GNSS)` : ''}</li>
         <li><b>${a.decoysKilled}</b> señuelos derribados</li></ul></div>
       <div><h3>Daño</h3><ul class="dblist">
         <li>Daño total: <b>${g.total}</b> HP</li>

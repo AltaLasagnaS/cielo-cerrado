@@ -63,7 +63,7 @@ export function step(dt) {
       event(label(th) + ' libera señuelos', 'decoys');
     }
     if (!th.gnssHit && th.T.gnss < 1) {
-      for (const j of S.jamsLive) { const J = JAMMERS[j.type]; if (!J.gnssJam || !j.on) continue; if (Math.hypot(p.x - j.x, p.y - j.y) <= J.radius) { th.gnssHit = true; th.navErr = (1 - th.T.gnss) * (300 + rnd() * 1500); if (th.navErr > 150) { log('w', label(th) + ' entra en zona anti-GNSS: error de navegación ≈' + Math.round(th.navErr) + ' m.'); event('Primera arma desviada por interferencia GNSS', 'gnss'); } break; } }
+      for (const j of S.jamsLive) { const J = JAMMERS[j.type]; if (!J.gnssJam || !j.on) continue; if (Math.hypot(p.x - j.x, p.y - j.y) <= J.radius) { th.gnssHit = true; th.navErr = (1 - th.T.gnss) * (J.spoofKm ? J.spoofKm * 1000 * (0.5 + rnd()) : 300 + rnd() * 1500); if (th.navErr > 150) { log('w', label(th) + (J.spoofKm ? ' es engañada por ' + J.short + ' (spoofing GNSS): desvío ≈' + (th.navErr / 1000).toFixed(1) + ' km.' : ' entra en zona anti-GNSS: error de navegación ≈' + Math.round(th.navErr) + ' m.')); event('Primera arma desviada por interferencia GNSS', 'gnss'); } break; } }
     }
   }
   // sensores

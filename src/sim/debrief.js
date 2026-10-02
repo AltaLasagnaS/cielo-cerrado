@@ -7,6 +7,9 @@ import { evaluateGoals } from './goals.js';
 
 const sum = (a, f) => a.reduce((s, x) => s + f(x), 0);
 
+/** Desvío a partir del cual un arma cuenta como "perdida localmente" (m). */
+export const LOST_M = 2000;
+
 export function buildDebrief(S) {
   const st = S.stats, real = S.threats.filter(t => !t.isDecoy), decoys = S.threats.filter(t => t.isDecoy);
   const arrivals = S.arrivals;
@@ -29,7 +32,7 @@ export function buildDebrief(S) {
   const attack = {
     launched: st.launched, real: real.length, decoys: st.decoys,
     intercepted: st.killed - st.decoysKilled, decoysKilled: st.decoysKilled,
-    impacts: st.hits, misses: st.misses, byType
+    impacts: st.hits, misses: st.misses, lostLocally: arrivals.filter(a => a.nav > LOST_M).length, byType
   };
   const damage = {
     total: st.damage, byWeapon: dmgSorted, top: dmgSorted[0] || null,
@@ -66,8 +69,9 @@ function explain(S, arrivals, decoys) {
   if (empty.length) out.push(`Se quedaron sin munición: ${empty.map(e => e.text.replace(' se queda sin munición', '')).join(', ')}. Sin recarga, la saturación agota los cargadores antes de que llegue lo más peligroso.`);
   const sat = Object.entries(st.satChannels).sort((a, b) => b[1] - a[1]);
   if (sat.length) out.push(`Saturación de canales de tiro: ${sat.slice(0, 3).map(([k, v]) => `${k} (${v} s)`).join(', ')} tuvo más blancos que canales simultáneos.`);
-  const gnss = real.filter(a => a.nav > 150);
+  const gnss = real.filter(a => a.nav > 150 && a.nav <= LOST_M), lostL = real.filter(a => a.nav > LOST_M);
   if (gnss.length) out.push(`${gnss.length} arma(s) fueron desviadas por interferencia GNSS (${list(gnss)}).`);
+  if (lostL.length) out.push(`${lostL.length} arma(s) quedaron "perdidas localmente": el engaño GNSS las desvió más de ${LOST_M / 1000} km (${list(lostL)}). Ojo al comparar con las cifras oficiales ucranianas: esa categoría real también incluye señuelos y fallas.`);
   if (S.units.some(u => !u.alive)) out.push(`Unidades perdidas: ${S.units.filter(u => !u.alive).map(u => u.name).join(', ')}. Una batería destruida deja un hueco de cobertura para lo que viene después.`);
   if (st.killed) out.push(`Economía: la defensa gastó US$${st.defCost.toFixed(1)} M y el ataque US$${st.atkCost.toFixed(1)} M. ${st.defCost > st.atkCost ? 'Defender costó más que atacar: es la lógica de los drones baratos y los señuelos.' : 'Defender costó menos que atacar.'}`);
   return out;
