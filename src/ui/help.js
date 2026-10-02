@@ -16,5 +16,5 @@ $('#helpBtn').onclick = () => openModal(`<header><h2>Cómo se usa</h2><button cl
   <p>Línea de vista radar sobre el relieve con refracción estándar (Tierra 4/3); ecuación del radar simplificada (R ∝ σ<sup>¼</sup>); RCS por banda; sectores de antena; interferencia de ruido con lóbulo principal/lateral y margen ECCM; red de mando integrada o baterías autónomas; tiempo de reacción, canales de tiro, munición, cinemática de intercepción y Pk por clase con modificadores; señuelos; desvío por GNSS; costos estimados.</p>
   <p>Datos: cada parámetro del catálogo tiene un rango (mín / probable / máx) con nivel de confianza y fuentes; la simulación usa el probable. Las Pk están calibradas contra tasas reportadas en Ucrania (pestaña Catálogo → Calibración de Pk).</p>
   <p>No modela: clutter de suelo, efecto Doppler, clima, multitrayecto, fatiga de operadores, recarga, ni guerra electrónica ofensiva contra buscadores. Es un juego educativo con datos públicos aproximados, no una herramienta de planificación.</p>
-</div>`);
+</div>`, () => $('#helpBtn').click());
 }

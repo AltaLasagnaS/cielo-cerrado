@@ -21,6 +21,7 @@ import { initModal } from './ui/fichas.js';
 import { initHelp } from './ui/help.js';
 import { initHgtImport } from './ui/hgt.js';
 import { initRelief } from './ui/relief.js';
+import { initAcademy } from './ui/academy.js';
 import { initTabs, renderAll } from './ui/panels/index.js';
 import { markLogDirty, renderStats } from './ui/panels/results.js';
 import { openDebrief } from './ui/debrief.js';
@@ -43,6 +44,7 @@ initModal();
 initHelp();
 initHgtImport();
 initRelief();
+initAcademy();
 
 const sc = $('#scenario');
 sc.innerHTML = Object.entries(SCENARIOS).map(([k, s]) => `<option value="${k}">${esc(s.name)}</option>`).join('');

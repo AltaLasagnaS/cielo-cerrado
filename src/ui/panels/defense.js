@@ -7,6 +7,7 @@ import { $ } from '../dom.js';
 import { schedCov } from '../coverage.js';
 import { setMode, toast } from '../modes.js';
 import { openFicha } from '../fichas.js';
+import { infoBtn } from '../academy.js';
 
 /** Botón de unidad con su "i" para abrir la ficha. */
 export function unitBtn(key, def, act, cls) { return `<button class="ub ${cls} ${act ? 'act' : ''}" data-k="${key}" title="${esc(def.name)}"><span>${esc(def.short)}</span><i data-info="${key}" role="button" aria-label="Ficha">i</i></button>`; }
@@ -17,11 +18,11 @@ export function renderDef() {
     ${grp('Ucrania / OTAN', d => (d.side === 'UA' || d.side === 'both') && d.kind !== 'sensor' && d.kind !== 'aew' && d.kind !== 'acoustic')}
     ${grp('Rusia', d => d.side === 'RU' && d.kind !== 'aew')}
     ${grp('Sensores', d => ['sensor', 'aew', 'acoustic'].includes(d.kind))}
-    <div class="grp"><h3>Mando y control</h3>
+    <div class="grp"><h3>Mando y control ${infoBtn('detect')} ${infoBtn('saturation')}</h3>
       <label class="check"><input type="checkbox" id="optNet" ${S.net ? 'checked' : ''}><span>Red integrada<br><span class="hint">Las pistas de cualquier sensor se comparten. Misiles activos/IR y drones interceptores pueden disparar con pista ajena, y se evita que dos baterías gasten misiles en el mismo blanco.</span></span></label>
       <div class="field"><label for="optDoc">Doctrina de tiro</label><select id="optDoc" class="sel"><option value="salva" ${S.doctrine === 'salva' ? 'selected' : ''}>Salva (según unidad)</option><option value="sls" ${S.doctrine === 'sls' ? 'selected' : ''}>Disparar-observar-disparar</option></select></div>
     </div>
-    <div class="grp"><h3>Cobertura de radar</h3>
+    <div class="grp"><h3>Cobertura de radar ${infoBtn('horizon')} ${infoBtn('los')}</h3>
       <label class="check"><input type="checkbox" id="optCov" ${S.showCov ? 'checked' : ''}> Mostrar cobertura sobre el mapa</label>
       <div class="field"><label for="optRef">Contra</label><select id="optRef" class="sel">${Object.entries(THREATS).map(([k, t]) => `<option value="${k}" ${k === S.covRef ? 'selected' : ''}>${esc(t.short)} (RCS ${t.rcs} m²)</option>`).join('')}</select></div>
       <div class="field"><label for="optAgl">Altura del blanco sobre el terreno</label><span class="val" id="aglVal">${S.covAgl} m</span><input type="range" id="optAgl" min="10" max="10000" step="10" value="${S.covAgl}"></div>

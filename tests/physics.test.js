@@ -128,3 +128,15 @@ test('incertidumbre: el muestreo triangular queda en [min, max] y su moda es el 
   const mean = xs.reduce((a, b) => a + b, 0) / xs.length;
   assert.ok(Math.abs(mean - (u.min + u.p + u.max) / 3) < 0.005);   // media de la triangular
 });
+
+test('RCS por banda: la tabla de BANDS reproduce exactamente la fórmula original', () => {
+  const legacy = (th, band) => {   // physics/radar.js#rcsAt hasta v0.2.0
+    const b = th.rcs;
+    if (band === 'VHF') return th.rcsVHF ?? b * (th.lo ? 12 : (b < 0.05 ? 4 : 2));
+    if (band === 'L') return b * (th.lo ? 3 : 1.4);
+    if (band === 'Ku') return b * (th.cls === 'dron' ? 1.6 : 1);
+    return b;
+  };
+  const probes = [...Object.values(THREATS), { rcs: 0.02, lo: true }, { rcs: 0.02 }, { rcs: 0.3, cls: 'dron', lo: true }];
+  for (const th of probes) for (const band of ['VHF', 'L', 'S', 'C', 'X', 'Ku', 'ACU', 'OPT']) assert.equal(rcsAt(th, band), legacy(th, band), `${th.short || th.rcs} en ${band}`);
+});

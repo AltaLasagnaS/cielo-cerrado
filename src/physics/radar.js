@@ -7,16 +7,18 @@ import { HORIZON_K } from './constants.js';
 import { surf, los } from './terrain.js';
 
 /**
- * RCS (m²) de una amenaza en una banda. th.rcs = frontal en X/S. En VHF se usa th.rcsVHF
- * (estimación por resonancia); si falta, se aplica el multiplicador genérico.
- * El aspecto (frente/costado) está en UNC (rcsSide) pero el motor usa el frontal.
+ * RCS (m²) de una amenaza en una banda. th.rcs = frontal en X/S; las reglas por banda están en
+ * data/bands.js (BANDS[band].rcs). El aspecto (frente/costado) está en UNC (rcsSide) pero el
+ * motor usa el frontal.
  */
 export function rcsAt(th, band) {
-  const b = th.rcs;
-  if (band === 'VHF') return th.rcsVHF ?? b * (th.lo ? 12 : (b < 0.05 ? 4 : 2));
-  if (band === 'L') return b * (th.lo ? 3 : 1.4);
-  if (band === 'Ku') return b * (th.cls === 'dron' ? 1.6 : 1);
-  return b;
+  const b = th.rcs, m = BANDS[band]?.rcs;
+  if (!m) return b;
+  if (m.own && th[m.own] != null) return th[m.own];
+  if (m.lo && th.lo) return b * m.lo;
+  if (m.dron && th.cls === 'dron') return b * m.dron;
+  if (m.smallBelow && b < m.smallBelow) return b * m.small;
+  return b * (m.other ?? 1);
 }
 
 /** Altura de la antena sobre el nivel del mar (m): terreno + mástil, o altitud de vuelo si es AEW. */
