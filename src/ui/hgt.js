@@ -19,7 +19,7 @@ export function initHgtImport() {
     const res = hgtToMap(await f.arrayBuffer(), tile, f.name);
     if (!res) { toast('Formato no reconocido: se esperan 1201² o 3601² muestras.'); return; }
     const { map, kmx, kmy } = res;
-    resetSim(); S.setup = { defs: [], salvos: [], jams: [] }; S.sel = null;
+    resetSim(); S.setup = { objs: [], defs: [], salvos: [], jams: [] }; S.sel = null; S.scen = null;
     applyMap(map);
     const sc = $('#scenario'); if (![...sc.options].some(o => o.value === 'hgt')) sc.insertAdjacentHTML('beforeend', '<option value="hgt">Relieve cargado: ' + esc(f.name) + '</option>'); sc.value = 'hgt';
     renderAll(); schedCov(); log('d', 'Relieve cargado: ' + f.name + ' (' + (kmx).toFixed(0) + ' × ' + kmy + ' km). Escenario vacío.');

@@ -73,12 +73,13 @@ canvas#map{position:absolute;inset:0;width:100%;height:100%;touch-action:none;di
 .simbar{position:absolute;left:10px;top:10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:rgba(12,18,25,.88);border:1px solid var(--line2);border-radius:6px;padding:6px 8px;max-width:calc(100% - 20px)}
 .clock{font-family:var(--f-mono);font-size:15px;color:var(--accent);min-width:78px}
 .speeds{display:flex;gap:2px}
+.tscale{font-family:var(--f-mono);font-size:11px;color:var(--muted);order:9;flex-basis:100%}
 .speeds button{background:var(--panel2);border:1px solid var(--line2);padding:2px 6px;font-family:var(--f-mono);font-size:11px;border-radius:3px}
 .speeds button.act{border-color:var(--accent);color:var(--accent)}
 .zoom{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:4px}
 .zoom button{width:30px;height:30px;background:rgba(12,18,25,.88);border:1px solid var(--line2);border-radius:4px;font-size:16px}
 .modebar{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);background:rgba(30,22,8,.94);border:1px solid var(--accent);color:var(--fg);border-radius:6px;padding:7px 12px;display:flex;gap:10px;align-items:center;max-width:calc(100% - 24px);font-size:12px}
-.relief{position:absolute;right:10px;bottom:40px;display:flex;flex-wrap:wrap;gap:2px;align-items:center;background:rgba(12,18,25,.88);border:1px solid var(--line2);border-radius:6px;padding:4px 6px;font-size:11px;max-width:calc(100% - 20px)}
+.relief{position:absolute;right:10px;bottom:58px;display:flex;flex-wrap:wrap;gap:2px;align-items:center;background:rgba(12,18,25,.88);border:1px solid var(--line2);border-radius:6px;padding:4px 6px;font-size:11px;max-width:calc(100% - 20px)}
 .relief span{color:var(--muted);margin-right:4px;font-family:var(--f-disp);font-size:13px;letter-spacing:.05em;text-transform:uppercase}
 .relief button{background:var(--panel2);border:1px solid var(--line2);border-radius:3px;padding:2px 7px;font-size:11px}
 .relief button.act{border-color:var(--accent);color:var(--accent)}

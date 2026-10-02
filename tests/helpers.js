@@ -15,7 +15,7 @@ export function useMap(key, { flat = false } = {}) {
 /** Deja el estado limpio con un setup vacío. */
 export function clearSetup() {
   resetState();
-  S.setup = { defs: [], salvos: [], jams: [] }; S.sel = null; S.mode = 'select';
+  S.setup = { objs: [], defs: [], salvos: [], jams: [] }; S.sel = null; S.mode = 'select';
   S.net = true; S.doctrine = 'salva';
 }
 

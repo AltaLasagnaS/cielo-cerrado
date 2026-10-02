@@ -17,6 +17,20 @@
     "NASAMS-1": 15,
     "Interceptores-1": 1,
     "Patriot-1": 16
+   },
+   "damage": 422,
+   "dmgByWeapon": {
+    "Kalibr": 422
+   },
+   "missSum": 14.443023252592532,
+   "missN": 1,
+   "objsDestroyed": 0,
+   "satChannels": {
+    "Patriot-1": 1
+   },
+   "satMag": {
+    "IRIS-T-1": 1,
+    "Patriot-1": 1
    }
   },
   "impacts": [
@@ -148,7 +162,7 @@
     19
    ]
   ],
-  "log": 167
+  "log": 170
  },
  "mb_noche_s42": {
   "t": 1550,
@@ -167,6 +181,17 @@
     "IRIS-T-1": 24,
     "NASAMS-1": 16,
     "Patriot-1": 16
+   },
+   "damage": 0,
+   "dmgByWeapon": {},
+   "missSum": 0,
+   "missN": 0,
+   "objsDestroyed": 0,
+   "satChannels": {
+    "Patriot-1": 1
+   },
+   "satMag": {
+    "Patriot-1": 1
    }
   },
   "impacts": [
@@ -283,7 +308,7 @@
     20
    ]
   ],
-  "log": 164
+  "log": 166
  },
  "mb_noche_sls_sin_red": {
   "t": 1550,
@@ -305,7 +330,18 @@
     "Gepard-1": 2,
     "Gepard-2": 9,
     "Patriot-1": 16
-   }
+   },
+   "damage": 422,
+   "dmgByWeapon": {
+    "Kalibr": 422
+   },
+   "missSum": 19.880556882503807,
+   "missN": 1,
+   "objsDestroyed": 0,
+   "satChannels": {
+    "Gepard-2": 1
+   },
+   "satMag": {}
   },
   "impacts": [
    [
@@ -426,7 +462,7 @@
     20
    ]
   ],
-  "log": 195
+  "log": 198
  },
  "mb_noche_plano": {
   "t": 1550,
@@ -447,6 +483,18 @@
     "Interceptores-1": 1,
     "Gepard-1": 4,
     "Patriot-1": 16
+   },
+   "damage": 0,
+   "dmgByWeapon": {},
+   "missSum": 0,
+   "missN": 0,
+   "objsDestroyed": 0,
+   "satChannels": {
+    "Patriot-1": 2
+   },
+   "satMag": {
+    "IRIS-T-1": 1,
+    "Patriot-1": 1
    }
   },
   "impacts": [
@@ -558,7 +606,7 @@
     19
    ]
   ],
-  "log": 164
+  "log": 166
  },
  "gb_ruso_s1": {
   "t": 1481,
@@ -577,6 +625,18 @@
     "Tor-M2": 16,
     "S-400": 29,
     "Pantsir-1": 5
+   },
+   "damage": 0,
+   "dmgByWeapon": {},
+   "missSum": 0,
+   "missN": 0,
+   "objsDestroyed": 0,
+   "satChannels": {
+    "Tor-M2": 12,
+    "Pantsir-1": 1
+   },
+   "satMag": {
+    "Tor-M2": 1
    }
   },
   "impacts": [],
@@ -612,7 +672,7 @@
     0
    ]
   ],
-  "log": 133
+  "log": 134
  },
  "gb_ruso_s9": {
   "t": 1496,
@@ -630,7 +690,16 @@
    "byUnit": {
     "Tor-M2": 16,
     "S-400": 32
-   }
+   },
+   "damage": 0,
+   "dmgByWeapon": {},
+   "missSum": 799.944047766309,
+   "missN": 2,
+   "objsDestroyed": 0,
+   "satChannels": {
+    "Tor-M2": 9
+   },
+   "satMag": {}
   },
   "impacts": [
    [
@@ -676,6 +745,6 @@
     0
    ]
   ],
-  "log": 130
+  "log": 132
  }
 }

@@ -127,11 +127,21 @@ export function draw() {
 
 /** Etiqueta con fondo oscuro a la derecha de un símbolo. */
 export function labelAt(sx, sy, txt, c) { ctx.font = '500 11px "IBM Plex Sans", sans-serif'; const w = ctx.measureText(txt).width; ctx.fillStyle = 'rgba(8,13,20,.72)'; ctx.fillRect(sx + 10, sy - 7, w + 6, 14); ctx.fillStyle = c; ctx.fillText(txt, sx + 13, sy + 4); }
-/** Barra de escala en km (abajo a la derecha). */
+/**
+ * Barra de escala en km (abajo a la derecha) con cuánto tarda en recorrerla un dron y un misil de
+ * crucero: ayuda a leer las distancias en tiempo (1× es tiempo real).
+ */
 export function drawScale(w, h) {
   const targets = [1, 2, 5, 10, 20, 50]; let km = 10; for (const t of targets) if (t * V.s > 70) { km = t; break; }
-  const x = w - 20 - km * V.s, y = h - 18; ctx.strokeStyle = '#d9e2ec'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + km * V.s, y); ctx.moveTo(x, y - 4); ctx.lineTo(x, y + 2); ctx.moveTo(x + km * V.s, y - 4); ctx.lineTo(x + km * V.s, y + 2); ctx.stroke();
-  ctx.fillStyle = '#d9e2ec'; ctx.font = '11px "IBM Plex Mono", monospace'; ctx.fillText(km + ' km', x, y - 6);
+  const len = km * V.s, dur = v => { const s = km * 1000 / v; return s >= 60 ? Math.round(s / 60) + ' min' : Math.round(s) + ' s'; };
+  const hint = 'Shahed ' + dur(THREATS.shahed.v) + ' · Kh-101 ' + dur(THREATS.kh101.v);
+  ctx.font = '11px "IBM Plex Mono", monospace';
+  const bw = Math.max(len, ctx.measureText(hint).width) + 16, x0 = w - 10 - bw, y0 = h - 50;
+  ctx.fillStyle = 'rgba(12,18,25,.85)'; ctx.fillRect(x0, y0, bw, 42);
+  const x = w - 18 - len, y = h - 30;
+  ctx.strokeStyle = '#d9e2ec'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + len, y); ctx.moveTo(x, y - 4); ctx.lineTo(x, y + 2); ctx.moveTo(x + len, y - 4); ctx.lineTo(x + len, y + 2); ctx.stroke();
+  ctx.fillStyle = '#d9e2ec'; ctx.font = '600 11px "IBM Plex Mono", monospace'; ctx.fillText(km + ' km', x, y - 6);
+  ctx.fillStyle = '#8a9aac'; ctx.font = '10px "IBM Plex Mono", monospace'; ctx.fillText(hint, x0 + 8, y + 15);
 }
 /** Ruta de una salva: línea, flecha, retícula sobre el blanco y etiqueta. */
 export function drawRoute(sv, hi) {

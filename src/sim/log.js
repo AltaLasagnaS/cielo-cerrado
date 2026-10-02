@@ -14,3 +14,12 @@ export function label(th) { return (th.isDecoyChild ? 'Señuelo de ' : '') + th.
 
 /** Nombre de una unidad de defensa. */
 export function uLabel(u) { return u.name || D(u).short; }
+
+/**
+ * Evento clave para la línea de tiempo del debrief. Con key, solo se registra la primera vez
+ * (por ejemplo 'firstDet' o 'empty:Patriot-1').
+ */
+export function event(text, key) {
+  if (key && S.events.some(e => e.key === key)) return;
+  S.events.push({ t: S.t, text, key: key || null });
+}

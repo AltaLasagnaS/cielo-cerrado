@@ -22,6 +22,6 @@ export function resetSim() { resetState(); markLogDirty(); updatePlay(); schedCo
 export function loadScenario(key) {
   resetSim();
   const sc = SCENARIOS[key]; if (MAP?.key !== sc.map) applyMap(builtinMap(sc.map));
-  S.setup = { defs: [], salvos: [], jams: [] }; S.sel = null; S.mode = 'select';
+  S.setup = { objs: [], defs: [], salvos: [], jams: [] }; S.sel = null; S.mode = 'select';
   applyScenario(sc); renderAll(); schedCov();
 }

@@ -20,6 +20,7 @@ export { JAMMERS } from './jammers.js';
 export { U, PL, RCS_NOTE, VHF_NOTE, PK_NOTE, UNC } from './uncertainty.js';
 export { CAL } from './calibration.js';
 export { SCENARIOS } from './scenarios.js';
+export { TARGET_TYPES, TARGET_STATUS, DAMAGED_AT, DAMAGE } from './targets.js';
 export { TERRAIN } from './terrain/index.js';
 
 /** Ficha de catálogo de una unidad desplegada (u.type → DEFENSES[u.type]). */

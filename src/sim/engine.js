@@ -2,7 +2,7 @@
 // Bucle de paso fijo: la interfaz llama a step(dt) con dt ≤ 0,25 s de tiempo simulado.
 // Cada paso: lanzamientos → movimiento/señuelos/GNSS → barridos de sensores → decisiones de tiro
 // → resolución de interceptores → fin de corrida. Ver docs/ARQUITECTURA.md.
-import { D, JAMMERS } from '../data/index.js';
+import { D, JAMMERS, TARGET_STATUS } from '../data/index.js';
 import { money } from '../util/format.js';
 import { nextId } from '../util/ids.js';
 import { rnd } from '../util/rng.js';
@@ -10,16 +10,18 @@ import { surf, los } from '../physics/terrain.js';
 import { antZ, detR, inSector, jamJ } from '../physics/radar.js';
 import { buildThreat, posAt, speedAt } from '../physics/kinematics.js';
 import { RADAR_GUID, isTBM, trackOK, solve, calcPk } from '../physics/engagement.js';
+import { damageAt, targetStatus } from '../physics/damage.js';
 import { azOf } from '../util/math.js';
 import { S, newStats } from './state.js';
 import { hooks } from './hooks.js';
-import { log, label, uLabel } from './log.js';
+import { log, event, label, uLabel } from './log.js';
 
 /** Arma la corrida a partir de S.setup: copia unidades y jammers y programa todos los lanzamientos. */
 export function startSim() {
   S.units = S.setup.defs.map(d => ({ ...d, alive: true, magLeft: d.mag, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
   S.jamsLive = S.setup.jams.map(j => ({ ...j, _losMap: {} }));
-  S.threats = []; S.ints = []; S.fx = []; S.impacts = []; S.stats = newStats(); S.log = [];
+  S.objs = S.setup.objs.map(g => ({ ...g, hp: g.maxHp, status: 'operational', hits: 0, dmgBy: {} }));
+  S.threats = []; S.ints = []; S.fx = []; S.impacts = []; S.stats = newStats(); S.log = []; S.events = []; S.arrivals = [];
   S.pending = [];
   for (const sv of S.setup.salvos) {
     let t0 = sv.tStart || 0;
@@ -32,7 +34,7 @@ export function startSim() {
 }
 
 /** Vuelve al modo edición: descarta la corrida (el setup queda intacto). */
-export function resetState() { S.running = false; S.started = false; S.t = 0; S.units = []; S.jamsLive = []; S.pending = []; S.threats = []; S.ints = []; S.fx = []; S.impacts = []; S.stats = newStats(); S.log = []; }
+export function resetState() { S.autoPhase = 'calm'; S.running = false; S.started = false; S.t = 0; S.units = []; S.jamsLive = []; S.objs = []; S.events = []; S.arrivals = []; S.pending = []; S.threats = []; S.ints = []; S.fx = []; S.impacts = []; S.stats = newStats(); S.log = []; }
 
 /** Avanza la simulación dt segundos. */
 export function step(dt) {
@@ -41,6 +43,7 @@ export function step(dt) {
   while (S.pending.length && S.pending[0].tLaunch <= t) {
     const th = S.pending.shift(); th.alive = true; S.threats.push(th);
     S.stats.launched++; if (th.isDecoy) S.stats.decoys++; S.stats.atkCost += th.T.cost;
+    event('Primer lanzamiento: ' + label(th), 'launch');
   }
   // movimiento, impactos, señuelos, GNSS
   for (const th of S.threats) {
@@ -57,9 +60,10 @@ export function step(dt) {
         S.threats.push(dc); S.stats.decoys++; S.stats.launched++;
       }
       log('w', label(th) + ' libera ' + th.decoyRel + ' señuelos a ' + p.rem.toFixed(0) + ' km del blanco.');
+      event(label(th) + ' libera señuelos', 'decoys');
     }
     if (!th.gnssHit && th.T.gnss < 1) {
-      for (const j of S.jamsLive) { const J = JAMMERS[j.type]; if (!J.gnssJam || !j.on) continue; if (Math.hypot(p.x - j.x, p.y - j.y) <= J.radius) { th.gnssHit = true; th.navErr = (1 - th.T.gnss) * (300 + rnd() * 1500); if (th.navErr > 150) log('w', label(th) + ' entra en zona anti-GNSS: error de navegación ≈' + Math.round(th.navErr) + ' m.'); break; } }
+      for (const j of S.jamsLive) { const J = JAMMERS[j.type]; if (!J.gnssJam || !j.on) continue; if (Math.hypot(p.x - j.x, p.y - j.y) <= J.radius) { th.gnssHit = true; th.navErr = (1 - th.T.gnss) * (300 + rnd() * 1500); if (th.navErr > 150) { log('w', label(th) + ' entra en zona anti-GNSS: error de navegación ≈' + Math.round(th.navErr) + ' m.'); event('Primera arma desviada por interferencia GNSS', 'gnss'); } break; } }
     }
   }
   // sensores
@@ -85,7 +89,7 @@ export function step(dt) {
       }
       if (ok) {
         th.det[u.id] = t; th.lastNet = t;
-        if (th.firstDet === null) { th.firstDet = t; log('l', 'Primera detección: ' + label(th) + ' por ' + uLabel(u) + ' a ' + Math.hypot(p.x - u.x, p.y - u.y).toFixed(1) + ' km, ' + Math.round(p.z - surf(p.x, p.y)) + ' m AGL.'); }
+        if (th.firstDet === null) { th.firstDet = t; th.detKm = p.rem; log('l', 'Primera detección: ' + label(th) + ' por ' + uLabel(u) + ' a ' + Math.hypot(p.x - u.x, p.y - u.y).toFixed(1) + ' km, ' + Math.round(p.z - surf(p.x, p.y)) + ' m AGL.'); event('Primera detección: ' + label(th) + ' por ' + uLabel(u), 'firstDet'); }
       }
     }
   }
@@ -106,6 +110,7 @@ export function step(dt) {
       th.alive = false; th.killed = true; S.stats.killed++; if (th.isDecoy) S.stats.decoysKilled++;
       const p = th.p || it; S.fx.push({ x: p.x, y: p.y, rt: performance.now(), c: '#6fd08c' });
       log('k', uLabel(u) + ' derriba ' + label(th) + (th.isDecoy ? ' (era señuelo)' : '') + ' — Pk ' + Math.round(pk * 100) + '%.');
+      event('Primer derribo: ' + uLabel(u) + ' derriba ' + label(th), 'firstKill');
     } else {
       log('x', it.shot + ' de ' + uLabel(u) + ' falla contra ' + label(th) + ' (Pk ' + Math.round(pk * 100) + '%).');
       S.fx.push({ x: it.px, y: it.py, rt: performance.now(), c: '#8a9aac' });
@@ -114,6 +119,7 @@ export function step(dt) {
   if (S.ints.length > 400) S.ints = S.ints.filter(i => !i.done || t - i.tH < 3);
   // fin
   if (!S.pending.length && S.threats.every(th => !th.alive) && S.ints.every(i => i.done) && S.started) {
+    event('Fin: no quedan amenazas en vuelo', 'end');
     if (S.running) { S.running = false; hooks.onEnd(); const st = S.stats; log('d', `Fin: ${st.killed} derribos, ${st.hits} impactos en blanco, ${st.misses} fuera de blanco. Costo defensa ${money(st.defCost)} vs ataque ${money(st.atkCost)}.`); }
   }
 }
@@ -143,7 +149,7 @@ export function engage(u, t) {
   }
   cand.sort((a, b) => a[1] - b[1]);
   for (const [th] of cand) {
-    if (u.active >= ch || u.magLeft <= 0) break;
+    if (u.active >= ch || u.magLeft <= 0) { const k = uLabel(u), sat = u.magLeft <= 0 ? S.stats.satMag : S.stats.satChannels; sat[k] = (sat[k] || 0) + 1; break; }
     const sol = solve(u, th, t); if (!sol) continue;
     const v = speedAt(th, t + sol.tau); if (v > sm.vmaxT) continue;
     if (RADAR_GUID.includes(sm.guid) && sm.guid !== 'cañón' && !los(u.x, u.y, antZ(u), sol.p.x, sol.p.y, sol.p.z)) continue;
@@ -154,13 +160,17 @@ export function engage(u, t) {
       u.magLeft--; u.active++; S.stats.shots++; S.stats.defCost += sm.cost;
       S.stats.byUnit[uLabel(u)] = (S.stats.byUnit[uLabel(u)] || 0) + 1;
     }
+    event('Primer interceptor lanzado: ' + uLabel(u) + ' contra ' + label(th), 'firstShot');
+    if (u.magLeft === 0) { log('w', uLabel(u) + ' se queda sin munición.'); event(uLabel(u) + ' se queda sin munición', 'empty:' + u.id); }
     log('l', uLabel(u) + ' dispara ' + n + '× ' + sm.shot + ' contra ' + (th.isDecoy && hooks.defenderView() ? 'pista #' + th.id : label(th)) + ' — intercepción a ' + sol.r.toFixed(1) + ' km en ' + sol.tau.toFixed(0) + ' s.');
   }
 }
 
 /**
  * Llegada al blanco: punto de caída con dispersión circular normal (CEP → σ = CEP / 1,1774) más el
- * error de navegación por interferencia GNSS. Impacta si cae a menos de 20 m (drones) o 50 m (misiles).
+ * error de navegación por interferencia GNSS. Cuenta como impacto en el blanco si cae a menos de
+ * 20 m (drones) o 50 m (misiles) del punto apuntado. Además, cada objetivo cercano recibe daño
+ * según la distancia y la ojiva (physics/damage.js), haya sido "impacto" o no.
  */
 export function impact(th) {
   th.alive = false; th.done = true;
@@ -172,14 +182,42 @@ export function impact(th) {
   x += Math.cos(ang) * r / 1000; y += Math.sin(ang) * r / 1000;
   if (th.isDecoy) { S.impacts.push({ x, y, k: 'decoy' }); log('d', label(th) + ' cae sin efecto.'); return; }
   const hit = r <= (th.T.hitR || (th.cls === 'dron' ? 20 : 50));
+  const dmg = applyDamage(th, x, y), total = dmg.reduce((a, d) => a + d.dmg, 0);
+  S.stats.missSum += r; S.stats.missN++;
+  S.arrivals.push({ t: S.t, id: th.id, type: th.type, name: label(th), cls: th.cls, det: th.firstDet, detKm: th.detKm ?? null, shots: (th.fly || []).length, miss: r, hit, dmg: total, nav: th.navErr, target: dmg[0]?.g.name ?? null });
+  const dtxt = dmg.map(d => ` · −${d.dmg} HP a ${d.g.name} (${Math.max(0, d.g.hp)}/${d.g.maxHp})`).join('');
   if (hit) {
     S.stats.hits++; S.impacts.push({ x, y, k: 'hit' });
     S.fx.push({ x, y, rt: performance.now(), c: '#ff5b4d', big: true });
     let msg = label(th) + ' impacta en el blanco';
-    if (th.targetUnit) { const u = S.units.find(v => v.id === th.targetUnit && v.alive); if (u) { u.alive = false; S.stats.lost++; msg += ' y destruye ' + uLabel(u); hooks.onUnitLost(); } }
-    log('x', msg + '.');
+    if (th.targetUnit) { const u = S.units.find(v => v.id === th.targetUnit && v.alive); if (u) { u.alive = false; S.stats.lost++; msg += ' y destruye ' + uLabel(u); hooks.onUnitLost(); event(uLabel(u) + ' destruida por ' + label(th), 'lost:' + u.id); } }
+    log('x', msg + dtxt + '.');
   } else {
     S.stats.misses++; S.impacts.push({ x, y, k: 'miss' });
-    log('w', label(th) + ' cae a ' + Math.round(r) + ' m del blanco' + (th.navErr > 150 ? ' (desviado por interferencia GNSS)' : '') + '.');
+    log('w', label(th) + ' cae a ' + Math.round(r) + ' m del blanco' + (th.navErr > 150 ? ' (desviado por interferencia GNSS)' : '') + dtxt + '.');
   }
+  for (const d of dmg) {
+    event('Primer impacto con daño: ' + label(th) + ' sobre ' + d.g.name, 'firstDmg');
+    if (d.g.status !== d.before) {
+      const st = TARGET_STATUS[d.g.status].toUpperCase();
+      log(d.g.status === 'destroyed' ? 'x' : 'w', d.g.name + ': ' + st + '.');
+      event(d.g.name + ' ' + st.toLowerCase(), d.g.status + ':' + d.g.id);
+      if (d.g.status === 'destroyed') S.stats.objsDestroyed++;
+    }
+  }
+}
+
+/** Reparte el daño de un impacto en (x, y) km entre los objetivos alcanzados. */
+function applyDamage(th, x, y) {
+  const out = [];
+  for (const g of S.objs) {
+    if (g.status === 'destroyed') continue;
+    const dist = Math.hypot(x - g.x, y - g.y) * 1000;
+    const res = damageAt(th.T, g.type, dist); if (!res.dmg) continue;
+    const before = g.status, dmg = Math.min(Math.round(res.dmg), g.hp);
+    g.hp -= dmg; g.hits++; g.dmgBy[th.T.short] = (g.dmgBy[th.T.short] || 0) + dmg; g.status = targetStatus(g.hp, g.maxHp);
+    S.stats.damage += dmg; S.stats.dmgByWeapon[th.T.short] = (S.stats.dmgByWeapon[th.T.short] || 0) + dmg;
+    out.push({ g, dmg, dist, before });
+  }
+  return out;
 }

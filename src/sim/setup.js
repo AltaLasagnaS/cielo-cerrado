@@ -1,6 +1,6 @@
 // ---------------- ARMADO DEL ESCENARIO ----------------
 // Funciones para agregar defensas, salvas y jammers a S.setup (antes de iniciar la corrida).
-import { DEFENSES, THREATS, JAMMERS } from '../data/index.js';
+import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES } from '../data/index.js';
 import { azOf } from '../util/math.js';
 import { nextId } from '../util/ids.js';
 import { S } from './state.js';
@@ -21,24 +21,43 @@ export function defaultAz(x, y) {
   return Math.round(azOf(-1, 0));
 }
 
-/** Programa una salva. Si o.targetUnit es el nombre de una defensa, la ruta termina sobre ella. */
+/**
+ * Programa una salva. Si o.targetUnit es el nombre de una defensa (o o.targetObj el de un objetivo),
+ * la ruta termina sobre ella. También se aceptan ids numéricos (lo que usa la interfaz).
+ */
 export function addSalvo(o) {
   const T = THREATS[o.type];
-  const sv = { id: nextId(), type: o.type, count: o.count || 1, interval: o.interval ?? 20, tStart: o.tStart || 0, sync: !!o.sync, tArrive: o.tArrive || 0, agl: o.agl ?? T.agl, launchDist: o.launchDist ?? T.launchDist, maneuver: o.maneuver ?? T.maneuver, decoys: !!o.decoys, pts: o.pts, targetUnit: null };
-  if (o.targetUnit) { const u = S.setup.defs.find(d => d.name === o.targetUnit); if (u) { sv.targetUnit = u.id; sv.pts[sv.pts.length - 1] = [u.x, u.y]; } }
+  const sv = { id: nextId(), type: o.type, count: o.count || 1, interval: o.interval ?? 20, tStart: o.tStart || 0, sync: !!o.sync, tArrive: o.tArrive || 0, agl: o.agl ?? T.agl, launchDist: o.launchDist ?? T.launchDist, maneuver: o.maneuver ?? T.maneuver, decoys: !!o.decoys, pts: o.pts, targetUnit: null, targetObj: null };
+  const find = (list, ref) => list.find(v => v.name === ref || v.id === ref);
+  if (o.targetUnit) { const u = find(S.setup.defs, o.targetUnit); if (u) { sv.targetUnit = u.id; sv.pts[sv.pts.length - 1] = [u.x, u.y]; } }
+  else if (o.targetObj) { const g = find(S.setup.objs, o.targetObj); if (g) { sv.targetObj = g.id; sv.pts[sv.pts.length - 1] = [g.x, g.y]; } }
   S.setup.salvos.push(sv); return sv;
 }
+
+/** Ubica un objetivo. o = { name?, hp?, desc? }. */
+export function addObj(type, x, y, o = {}) {
+  const tt = TARGET_TYPES[type];
+  const n = S.setup.objs.filter(g => g.type === type).length + 1;
+  const g = { id: nextId(), type, x, y, name: o.name || tt.name + ' ' + n, maxHp: o.hp || tt.hp, desc: o.desc || '' };
+  S.setup.objs.push(g); return g;
+}
+
+/** Nombre de un objetivo o defensa por id (para listas y rutas). */
+export const targetName = sv => sv.targetUnit ? S.setup.defs.find(u => u.id === sv.targetUnit)?.name : sv.targetObj ? S.setup.objs.find(g => g.id === sv.targetObj)?.name : null;
 
 /** Despliega un interferidor. o = { alt? } para los aéreos. */
 export function addJam(type, x, y, o = {}) { const J = JAMMERS[type]; const j = { id: nextId(), type, x, y, alt: o.alt ?? J.alt, on: true }; S.setup.jams.push(j); return j; }
 
 /**
- * Despliega un escenario declarativo (ver data/scenarios.js) sobre el setup actual.
- * Se clona para que las ediciones del jugador no modifiquen los datos originales.
+ * Despliega un escenario declarativo (ver data/scenarios.js) sobre el setup actual y aplica sus
+ * reglas. Se clona para que las ediciones del jugador no modifiquen los datos originales.
  */
 export function applyScenario(sc) {
-  const { defs = [], salvos = [], jams = [] } = structuredClone({ defs: sc.defs, salvos: sc.salvos, jams: sc.jams });
+  const { objectives = [], defs = [], salvos = [], jams = [] } = structuredClone({ objectives: sc.objectives, defs: sc.defs, salvos: sc.salvos, jams: sc.jams });
+  for (const g of objectives) addObj(g.type, g.x, g.y, g);
   for (const d of defs) addDef(d.type, d.x, d.y, d);
   for (const o of salvos) addSalvo(o);
   for (const j of jams) addJam(j.type, j.x, j.y, j);
+  if (sc.rules) { if (sc.rules.net !== undefined) S.net = sc.rules.net; if (sc.rules.doctrine) S.doctrine = sc.rules.doctrine; }
+  S.scen = sc;
 }

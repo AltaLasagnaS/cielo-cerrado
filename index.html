@@ -86,12 +86,13 @@ canvas#map{position:absolute;inset:0;width:100%;height:100%;touch-action:none;di
 .simbar{position:absolute;left:10px;top:10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:rgba(12,18,25,.88);border:1px solid var(--line2);border-radius:6px;padding:6px 8px;max-width:calc(100% - 20px)}
 .clock{font-family:var(--f-mono);font-size:15px;color:var(--accent);min-width:78px}
 .speeds{display:flex;gap:2px}
+.tscale{font-family:var(--f-mono);font-size:11px;color:var(--muted);order:9;flex-basis:100%}
 .speeds button{background:var(--panel2);border:1px solid var(--line2);padding:2px 6px;font-family:var(--f-mono);font-size:11px;border-radius:3px}
 .speeds button.act{border-color:var(--accent);color:var(--accent)}
 .zoom{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:4px}
 .zoom button{width:30px;height:30px;background:rgba(12,18,25,.88);border:1px solid var(--line2);border-radius:4px;font-size:16px}
 .modebar{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);background:rgba(30,22,8,.94);border:1px solid var(--accent);color:var(--fg);border-radius:6px;padding:7px 12px;display:flex;gap:10px;align-items:center;max-width:calc(100% - 24px);font-size:12px}
-.relief{position:absolute;right:10px;bottom:40px;display:flex;flex-wrap:wrap;gap:2px;align-items:center;background:rgba(12,18,25,.88);border:1px solid var(--line2);border-radius:6px;padding:4px 6px;font-size:11px;max-width:calc(100% - 20px)}
+.relief{position:absolute;right:10px;bottom:58px;display:flex;flex-wrap:wrap;gap:2px;align-items:center;background:rgba(12,18,25,.88);border:1px solid var(--line2);border-radius:6px;padding:4px 6px;font-size:11px;max-width:calc(100% - 20px)}
 .relief span{color:var(--muted);margin-right:4px;font-family:var(--f-disp);font-size:13px;letter-spacing:.05em;text-transform:uppercase}
 .relief button{background:var(--panel2);border:1px solid var(--line2);border-radius:3px;padding:2px 7px;font-size:11px}
 .relief button.act{border-color:var(--accent);color:var(--accent)}
@@ -195,6 +196,7 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
         <button id="play" class="btn pri sm">▶ Iniciar</button>
         <button id="reset" class="btn sm">↺ Reiniciar</button>
         <span class="clock" id="clock">T+00:00</span>
+        <span class="tscale" id="tscale"></span>
         <div class="speeds" id="speeds"></div>
         <label class="check" style="font-size:12px"><input type="checkbox" id="defView"> Vista del defensor</label>
       </div>
@@ -1532,6 +1534,21 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     mb_noche: {
       map: "monterey",
       name: "Monterey · noche de ataque combinado (defensa ucraniana)",
+      player: "defensa",
+      time: "02:40 hora local · noche",
+      description: "Una oleada combinada al estilo de las que sufre Ucrania: drones Shahed y señuelos Gerbera abren el ataque para saturar la defensa y gastar munición; detrás llegan misiles de crucero rasantes y dos Iskander-M con maniobra terminal y señuelos contra la batería Patriot. El blanco principal es el depósito de combustible de Salinas.",
+      forces: {
+        defensa: "Defensa por capas: radar 3D y VHF de alerta, Patriot (sector orientado al noroeste), IRIS-T, NASAMS, dos Gepard, grupos móviles, red acústica y drones interceptores. Red de mando integrada.",
+        ataque: "20 Shahed, 8 Gerbera, 4 Kh-101, 3 Kalibr y 2 Iskander-M. Un avión de interferencia stand-off acompaña desde el noroeste."
+      },
+      conditions: "Noche despejada. El motor no modela clima ni luz: la noche solo explica por qué los grupos móviles dependen de la alerta acústica.",
+      rules: { net: true, doctrine: "salva" },
+      rulesText: ["Red integrada activa y doctrina de salva.", "No hay recarga: cada unidad cuenta solo con la munición inicial.", "Los Kh-101, Kalibr e Iskander están sincronizados para llegar casi juntos (T+24:40 a T+25:30)."],
+      objectives: [
+        { type: "fuel", name: "Depósito de combustible Salinas", x: 63.5, y: 55.8, desc: "Abastece a la región: es el blanco principal del ataque." },
+        { type: "infra", name: "Puerto de Monterey", x: 42.2, y: 64.3, desc: "Terminal portuaria, blanco de los Kalibr lanzados desde el mar." },
+        { type: "airbase", name: "Aeródromo de Marina", x: 51.5, y: 55.5, desc: "Base de la aviación de defensa. No está atacada al comienzo: protegela si agregás ataques." }
+      ],
       defs: [
         { type: "ewr", x: 85.4, y: 53.2, name: "Radar 3D (cerro Gabilan)" },
         { type: "p18", x: 70, y: 40, name: "Radar VHF" },
@@ -1549,20 +1566,44 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
         { type: "intdrone", x: 60, y: 54, name: "Interceptores-1" }
       ],
       salvos: [
-        { type: "shahed", count: 14, interval: 25, tStart: 0, agl: 800, pts: [[2, 28], [34, 44], [63.5, 55.8]] },
+        { type: "shahed", count: 14, interval: 25, tStart: 0, agl: 800, pts: [[2, 28], [34, 44], [63.5, 55.8]], targetObj: "Depósito de combustible Salinas" },
         { type: "gerbera", count: 8, interval: 30, tStart: 60, agl: 900, pts: [[2, 36], [36, 50], [62, 56]] },
-        { type: "shahed", count: 6, interval: 40, tStart: 200, agl: 2200, pts: [[88, 108], [70, 70], [63.5, 55.8]] },
-        { type: "kh101", count: 4, interval: 15, sync: true, tArrive: 1500, agl: 40, pts: [[88, 110], [80, 85], [73, 70], [63.5, 55.8]] },
-        { type: "kalibr", count: 3, interval: 10, sync: true, tArrive: 1480, agl: 25, pts: [[0, 75], [30, 70], [42.2, 64.3]] },
+        { type: "shahed", count: 6, interval: 40, tStart: 200, agl: 2200, pts: [[88, 108], [70, 70], [63.5, 55.8]], targetObj: "Depósito de combustible Salinas" },
+        { type: "kh101", count: 4, interval: 15, sync: true, tArrive: 1500, agl: 40, pts: [[88, 110], [80, 85], [73, 70], [63.5, 55.8]], targetObj: "Depósito de combustible Salinas" },
+        { type: "kalibr", count: 3, interval: 10, sync: true, tArrive: 1480, agl: 25, pts: [[0, 75], [30, 70], [42.2, 64.3]], targetObj: "Puerto de Monterey" },
         { type: "isk_m", count: 2, interval: 20, sync: true, tArrive: 1530, launchDist: 300, maneuver: true, decoys: true, pts: [[60, 0], [58.2, 58]], targetUnit: "Patriot-1" }
       ],
       jams: [
         { type: "soj", x: 4, y: 18, alt: 8e3 }
-      ]
+      ],
+      goals: [
+        { side: "ataque", primary: true, kind: "destroy", target: "Depósito de combustible Salinas", text: "Destruir el depósito de combustible de Salinas" },
+        { side: "ataque", primary: false, kind: "damage", target: "Puerto de Monterey", min: 0.3, text: "Degradar el puerto de Monterey (≥ 30% de daño)" },
+        { side: "ataque", primary: false, kind: "killUnit", target: "Patriot-1", text: "Destruir la batería Patriot-1" },
+        { side: "defensa", primary: true, kind: "survive", target: "Depósito de combustible Salinas", text: "Que el depósito de combustible no sea destruido" },
+        { side: "defensa", primary: false, kind: "keepUnit", target: "Patriot-1", text: "Conservar la batería Patriot-1" },
+        { side: "defensa", primary: false, kind: "protect", target: "Aeródromo de Marina", text: "Mantener operativo el aeródromo de Marina" }
+      ],
+      success: "Defensa: el depósito sigue en pie al terminar la oleada.",
+      failure: "Defensa: el depósito de combustible queda destruido."
     },
     gb_ruso: {
       map: "goteborg",
       name: "Gotemburgo · ataque ucraniano contra base con defensa rusa",
+      player: "ataque",
+      time: "04:15 hora local · antes del amanecer",
+      description: "Ataque de largo alcance contra una base defendida por una batería S-400 y defensas de punto. Storm Shadow y drones Liutyi van contra el depósito de munición; Neptune y ATACMS buscan destruir la S-400. Un supresor GNSS ruso protege la base.",
+      forces: {
+        defensa: "S-400 (sector hacia el sudoeste), dos Pantsir, Tor-M2, Buk-M1 y un radar VHF de alerta.",
+        ataque: "6 Storm Shadow, 16 Liutyi, 2 Neptune y 4 ATACMS lanzados desde 220 km, todo sincronizado para llegar en menos de un minuto."
+      },
+      conditions: "Despejado. El motor no modela clima ni luz.",
+      rules: { net: true, doctrine: "salva" },
+      rulesText: ["Red integrada activa y doctrina de salva para la defensa rusa.", "El supresor GNSS desvía a las armas que dependen del satélite (los ATACMS y los Liutyi son los más sensibles).", "Llegada sincronizada entre T+24:00 y T+24:50 para saturar canales de tiro."],
+      objectives: [
+        { type: "ammo", name: "Depósito de munición", x: 57.8, y: 32.5, desc: "Arsenal de la base: blanco principal." },
+        { type: "airbase", name: "Base aérea de Säve", x: 52, y: 25, desc: "Aeródromo cercano: objetivo secundario si querés agregar ataques." }
+      ],
       defs: [
         { type: "s400", x: 52, y: 28, az: 240, name: "S-400" },
         { type: "pantsir", x: 54, y: 30, name: "Pantsir-1" },
@@ -1572,18 +1613,42 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
         { type: "p18", x: 58, y: 14, name: "Radar VHF" }
       ],
       salvos: [
-        { type: "storm", count: 6, interval: 6, sync: true, tArrive: 1480, agl: 35, pts: [[0, 60], [30, 46], [44, 38], [57.8, 32.5]] },
+        { type: "storm", count: 6, interval: 6, sync: true, tArrive: 1480, agl: 35, pts: [[0, 60], [30, 46], [44, 38], [57.8, 32.5]], targetObj: "Depósito de munición" },
         { type: "neptune", count: 2, interval: 10, sync: true, tArrive: 1485, agl: 12, pts: [[0, 20], [36, 30], [52.5, 28]], targetUnit: "S-400" },
-        { type: "lyutyi", count: 16, interval: 6, sync: true, tArrive: 1440, agl: 200, pts: [[40, 110.8], [50, 70], [57.8, 32.5]] },
+        { type: "lyutyi", count: 16, interval: 6, sync: true, tArrive: 1440, agl: 200, pts: [[40, 110.8], [50, 70], [57.8, 32.5]], targetObj: "Depósito de munición" },
         { type: "atacms", count: 4, interval: 6, sync: true, tArrive: 1490, launchDist: 220, pts: [[40, 111], [52.2, 28]], targetUnit: "S-400" }
       ],
       jams: [
         { type: "gnss", x: 56, y: 30 }
-      ]
+      ],
+      goals: [
+        { side: "ataque", primary: true, kind: "destroy", target: "Depósito de munición", text: "Destruir el depósito de munición" },
+        { side: "ataque", primary: false, kind: "killUnit", target: "S-400", text: "Destruir la batería S-400" },
+        { side: "ataque", primary: false, kind: "damage", target: "Base aérea de Säve", min: 0.3, text: "Degradar la base aérea de Säve (≥ 30% de daño)" },
+        { side: "defensa", primary: true, kind: "survive", target: "Depósito de munición", text: "Que el depósito de munición no sea destruido" },
+        { side: "defensa", primary: true, kind: "keepUnit", target: "S-400", text: "Conservar la batería S-400" }
+      ],
+      success: "Ataque: el depósito de munición queda destruido.",
+      failure: "Ataque: el depósito sigue en pie al terminar la oleada."
     },
-    mb_vacio: { map: "monterey", name: "Monterey · vacío", defs: [], salvos: [], jams: [] },
-    gb_vacio: { map: "goteborg", name: "Gotemburgo · vacío", defs: [], salvos: [], jams: [] }
+    mb_vacio: { map: "monterey", name: "Monterey · vacío", player: "defensa", description: "Mapa libre para armar tu propio escenario: ubicá objetivos, defensas, ataques y guerra electrónica.", objectives: [], defs: [], salvos: [], jams: [], goals: [] },
+    gb_vacio: { map: "goteborg", name: "Gotemburgo · vacío", player: "defensa", description: "Mapa libre para armar tu propio escenario: ubicá objetivos, defensas, ataques y guerra electrónica.", objectives: [], defs: [], salvos: [], jams: [], goals: [] }
   };
+
+  // src/data/targets.js
+  var TARGET_TYPES = {
+    storage: { name: "Depósito logístico", icon: "D", hp: 1e3, radius: 40, vuln: 1, desc: "Galpones y playones de almacenamiento. Estructura liviana pero extensa." },
+    fuel: { name: "Depósito de combustible", icon: "F", hp: 800, radius: 50, vuln: 1.3, desc: "Tanques de combustible: inflamables, el fuego propaga el daño." },
+    airbase: { name: "Base aérea", icon: "A", hp: 2500, radius: 300, vuln: 0.6, desc: "Pista, calles de rodaje y refugios dispersos en un área grande: hacen falta muchos impactos para inutilizarla." },
+    radar: { name: "Sitio de radar", icon: "R", hp: 600, radius: 25, vuln: 1.2, desc: "Antenas y shelters livianos, muy sensibles a esquirlas." },
+    command: { name: "Puesto de mando", icon: "C", hp: 900, radius: 20, vuln: 0.8, desc: "Estructura reforzada o semienterrada." },
+    ammo: { name: "Depósito de munición", icon: "M", hp: 900, radius: 40, vuln: 1.4, desc: "Las explosiones secundarias amplifican el daño de cada impacto." },
+    comms: { name: "Sitio de comunicaciones", icon: "T", hp: 500, radius: 15, vuln: 1.1, desc: "Torres y equipos de enlace: blancos chicos y frágiles." },
+    infra: { name: "Infraestructura", icon: "I", hp: 1500, radius: 60, vuln: 0.9, desc: "Puerto, puente, subestación eléctrica o similar." }
+  };
+  var TARGET_STATUS = { operational: "Operativo", damaged: "Dañado", destroyed: "Destruido" };
+  var DAMAGED_AT = 0.2;
+  var DAMAGE = { K: 12, EXP: 0.6, R50K: 4, CUTOFF: 0.02 };
 
   // src/data/terrain/monterey.js
   var monterey_default = {
@@ -1774,7 +1839,9 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
   // src/sim/state.js
   var S = {
     // escenario armado por el jugador
-    setup: { defs: [], salvos: [], jams: [] },
+    setup: { objs: [], defs: [], salvos: [], jams: [] },
+    // escenario cargado (data/scenarios.js) o null si es un relieve importado
+    scen: null,
     // opciones de mando y de visualización
     net: true,
     doctrine: "salva",
@@ -1788,9 +1855,12 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     running: false,
     started: false,
     speed: 15,
+    auto: true,
+    autoPhase: "calm",
     // corrida en curso
     units: [],
     jamsLive: [],
+    objs: [],
     pending: [],
     threats: [],
     ints: [],
@@ -1798,6 +1868,9 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     impacts: [],
     log: [],
     stats: null,
+    // eventos clave para la línea de tiempo del debrief y detalle de cada arma que llegó al blanco
+    events: [],
+    arrivals: [],
     // interfaz: selección, modo de edición, ruta en trazado y salva en preparación
     sel: null,
     mode: "select",
@@ -1809,7 +1882,28 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     covStat: null
   };
   function newStats() {
-    return { launched: 0, killed: 0, hits: 0, misses: 0, decoys: 0, decoysKilled: 0, shots: 0, defCost: 0, atkCost: 0, lost: 0, byUnit: {} };
+    return {
+      launched: 0,
+      killed: 0,
+      hits: 0,
+      misses: 0,
+      decoys: 0,
+      decoysKilled: 0,
+      shots: 0,
+      defCost: 0,
+      atkCost: 0,
+      lost: 0,
+      byUnit: {},
+      // daño a objetivos
+      damage: 0,
+      dmgByWeapon: {},
+      missSum: 0,
+      missN: 0,
+      objsDestroyed: 0,
+      // saturación: veces que una unidad tenía blancos pero no le quedaban canales o munición
+      satChannels: {},
+      satMag: {}
+    };
   }
   S.stats = newStats();
 
@@ -1970,6 +2064,7 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
       navErr: 0,
       gnssHit: false,
       targetUnit: sv.targetUnit ?? null,
+      targetObj: sv.targetObj ?? null,
       cls: T.cls,
       isDecoy: !!T.decoy,
       phase: rnd() * 6.28
@@ -2110,6 +2205,23 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     return clamp(pk, 0, 0.98);
   }
 
+  // src/physics/damage.js
+  var warheadKg = (T) => T.info?.warheadKg ?? 0;
+  var directDamage = (T) => DAMAGE.K * Math.pow(warheadKg(T), DAMAGE.EXP) * (T.dmgMult ?? 1);
+  var radius50 = (T) => DAMAGE.R50K * Math.cbrt(warheadKg(T));
+  function damageAt(T, type, dist) {
+    const tt = TARGET_TYPES[type], W = warheadKg(T);
+    if (!W || !tt) return { dmg: 0, factor: 0, edge: dist };
+    const edge = Math.max(0, dist - tt.radius);
+    const factor = 1 / (1 + (edge / radius50(T)) ** 2);
+    if (factor < DAMAGE.CUTOFF) return { dmg: 0, factor: 0, edge };
+    return { dmg: directDamage(T) * tt.vuln * factor, factor, edge };
+  }
+  function targetStatus(hp, maxHp) {
+    if (hp <= 0) return "destroyed";
+    return (maxHp - hp) / maxHp >= DAMAGED_AT ? "damaged" : "operational";
+  }
+
   // src/sim/log.js
   function log(cls, msg) {
     S.log.unshift({ t: S.t, cls, msg });
@@ -2122,17 +2234,24 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
   function uLabel(u) {
     return u.name || D(u).short;
   }
+  function event(text, key) {
+    if (key && S.events.some((e) => e.key === key)) return;
+    S.events.push({ t: S.t, text, key: key || null });
+  }
 
   // src/sim/engine.js
   function startSim() {
     S.units = S.setup.defs.map((d) => ({ ...d, alive: true, magLeft: d.mag, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
     S.jamsLive = S.setup.jams.map((j) => ({ ...j, _losMap: {} }));
+    S.objs = S.setup.objs.map((g) => ({ ...g, hp: g.maxHp, status: "operational", hits: 0, dmgBy: {} }));
     S.threats = [];
     S.ints = [];
     S.fx = [];
     S.impacts = [];
     S.stats = newStats();
     S.log = [];
+    S.events = [];
+    S.arrivals = [];
     S.pending = [];
     for (const sv of S.setup.salvos) {
       let t0 = sv.tStart || 0;
@@ -2148,11 +2267,15 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     log("d", "Inicio de la simulación: " + S.pending.length + " amenazas programadas, " + S.units.length + " unidades de defensa.");
   }
   function resetState() {
+    S.autoPhase = "calm";
     S.running = false;
     S.started = false;
     S.t = 0;
     S.units = [];
     S.jamsLive = [];
+    S.objs = [];
+    S.events = [];
+    S.arrivals = [];
     S.pending = [];
     S.threats = [];
     S.ints = [];
@@ -2171,6 +2294,7 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
       S.stats.launched++;
       if (th.isDecoy) S.stats.decoys++;
       S.stats.atkCost += th.T.cost;
+      event("Primer lanzamiento: " + label(th), "launch");
     }
     for (const th of S.threats) {
       if (!th.alive) continue;
@@ -2194,6 +2318,7 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
           S.stats.launched++;
         }
         log("w", label(th) + " libera " + th.decoyRel + " señuelos a " + p.rem.toFixed(0) + " km del blanco.");
+        event(label(th) + " libera señuelos", "decoys");
       }
       if (!th.gnssHit && th.T.gnss < 1) {
         for (const j of S.jamsLive) {
@@ -2202,7 +2327,10 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
           if (Math.hypot(p.x - j.x, p.y - j.y) <= J.radius) {
             th.gnssHit = true;
             th.navErr = (1 - th.T.gnss) * (300 + rnd() * 1500);
-            if (th.navErr > 150) log("w", label(th) + " entra en zona anti-GNSS: error de navegación ≈" + Math.round(th.navErr) + " m.");
+            if (th.navErr > 150) {
+              log("w", label(th) + " entra en zona anti-GNSS: error de navegación ≈" + Math.round(th.navErr) + " m.");
+              event("Primera arma desviada por interferencia GNSS", "gnss");
+            }
             break;
           }
         }
@@ -2239,7 +2367,9 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
           th.lastNet = t;
           if (th.firstDet === null) {
             th.firstDet = t;
+            th.detKm = p.rem;
             log("l", "Primera detección: " + label(th) + " por " + uLabel(u) + " a " + Math.hypot(p.x - u.x, p.y - u.y).toFixed(1) + " km, " + Math.round(p.z - surf(p.x, p.y)) + " m AGL.");
+            event("Primera detección: " + label(th) + " por " + uLabel(u), "firstDet");
           }
         }
       }
@@ -2269,6 +2399,7 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
         const p = th.p || it;
         S.fx.push({ x: p.x, y: p.y, rt: performance.now(), c: "#6fd08c" });
         log("k", uLabel(u) + " derriba " + label(th) + (th.isDecoy ? " (era señuelo)" : "") + " — Pk " + Math.round(pk * 100) + "%.");
+        event("Primer derribo: " + uLabel(u) + " derriba " + label(th), "firstKill");
       } else {
         log("x", it.shot + " de " + uLabel(u) + " falla contra " + label(th) + " (Pk " + Math.round(pk * 100) + "%).");
         S.fx.push({ x: it.px, y: it.py, rt: performance.now(), c: "#8a9aac" });
@@ -2276,6 +2407,7 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     }
     if (S.ints.length > 400) S.ints = S.ints.filter((i) => !i.done || t - i.tH < 3);
     if (!S.pending.length && S.threats.every((th) => !th.alive) && S.ints.every((i) => i.done) && S.started) {
+      event("Fin: no quedan amenazas en vuelo", "end");
       if (S.running) {
         S.running = false;
         hooks.onEnd();
@@ -2308,7 +2440,11 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     }
     cand.sort((a, b) => a[1] - b[1]);
     for (const [th] of cand) {
-      if (u.active >= ch || u.magLeft <= 0) break;
+      if (u.active >= ch || u.magLeft <= 0) {
+        const k = uLabel(u), sat = u.magLeft <= 0 ? S.stats.satMag : S.stats.satChannels;
+        sat[k] = (sat[k] || 0) + 1;
+        break;
+      }
       const sol = solve(u, th, t);
       if (!sol) continue;
       const v = speedAt(th, t + sol.tau);
@@ -2324,6 +2460,11 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
         S.stats.shots++;
         S.stats.defCost += sm.cost;
         S.stats.byUnit[uLabel(u)] = (S.stats.byUnit[uLabel(u)] || 0) + 1;
+      }
+      event("Primer interceptor lanzado: " + uLabel(u) + " contra " + label(th), "firstShot");
+      if (u.magLeft === 0) {
+        log("w", uLabel(u) + " se queda sin munición.");
+        event(uLabel(u) + " se queda sin munición", "empty:" + u.id);
       }
       log("l", uLabel(u) + " dispara " + n + "× " + sm.shot + " contra " + (th.isDecoy && hooks.defenderView() ? "pista #" + th.id : label(th)) + " — intercepción a " + sol.r.toFixed(1) + " km en " + sol.tau.toFixed(0) + " s.");
     }
@@ -2348,6 +2489,11 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
       return;
     }
     const hit = r <= (th.T.hitR || (th.cls === "dron" ? 20 : 50));
+    const dmg = applyDamage(th, x, y), total = dmg.reduce((a, d) => a + d.dmg, 0);
+    S.stats.missSum += r;
+    S.stats.missN++;
+    S.arrivals.push({ t: S.t, id: th.id, type: th.type, name: label(th), cls: th.cls, det: th.firstDet, detKm: th.detKm ?? null, shots: (th.fly || []).length, miss: r, hit, dmg: total, nav: th.navErr, target: dmg[0]?.g.name ?? null });
+    const dtxt = dmg.map((d) => ` · −${d.dmg} HP a ${d.g.name} (${Math.max(0, d.g.hp)}/${d.g.maxHp})`).join("");
     if (hit) {
       S.stats.hits++;
       S.impacts.push({ x, y, k: "hit" });
@@ -2360,14 +2506,42 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
           S.stats.lost++;
           msg += " y destruye " + uLabel(u);
           hooks.onUnitLost();
+          event(uLabel(u) + " destruida por " + label(th), "lost:" + u.id);
         }
       }
-      log("x", msg + ".");
+      log("x", msg + dtxt + ".");
     } else {
       S.stats.misses++;
       S.impacts.push({ x, y, k: "miss" });
-      log("w", label(th) + " cae a " + Math.round(r) + " m del blanco" + (th.navErr > 150 ? " (desviado por interferencia GNSS)" : "") + ".");
+      log("w", label(th) + " cae a " + Math.round(r) + " m del blanco" + (th.navErr > 150 ? " (desviado por interferencia GNSS)" : "") + dtxt + ".");
     }
+    for (const d of dmg) {
+      event("Primer impacto con daño: " + label(th) + " sobre " + d.g.name, "firstDmg");
+      if (d.g.status !== d.before) {
+        const st = TARGET_STATUS[d.g.status].toUpperCase();
+        log(d.g.status === "destroyed" ? "x" : "w", d.g.name + ": " + st + ".");
+        event(d.g.name + " " + st.toLowerCase(), d.g.status + ":" + d.g.id);
+        if (d.g.status === "destroyed") S.stats.objsDestroyed++;
+      }
+    }
+  }
+  function applyDamage(th, x, y) {
+    const out = [];
+    for (const g of S.objs) {
+      if (g.status === "destroyed") continue;
+      const dist = Math.hypot(x - g.x, y - g.y) * 1e3;
+      const res = damageAt(th.T, g.type, dist);
+      if (!res.dmg) continue;
+      const before = g.status, dmg = Math.min(Math.round(res.dmg), g.hp);
+      g.hp -= dmg;
+      g.hits++;
+      g.dmgBy[th.T.short] = (g.dmgBy[th.T.short] || 0) + dmg;
+      g.status = targetStatus(g.hp, g.maxHp);
+      S.stats.damage += dmg;
+      S.stats.dmgByWeapon[th.T.short] = (S.stats.dmgByWeapon[th.T.short] || 0) + dmg;
+      out.push({ g, dmg, dist, before });
+    }
+    return out;
   }
 
   // src/sim/setup.js
@@ -2391,16 +2565,30 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
   }
   function addSalvo(o) {
     const T = THREATS[o.type];
-    const sv = { id: nextId(), type: o.type, count: o.count || 1, interval: o.interval ?? 20, tStart: o.tStart || 0, sync: !!o.sync, tArrive: o.tArrive || 0, agl: o.agl ?? T.agl, launchDist: o.launchDist ?? T.launchDist, maneuver: o.maneuver ?? T.maneuver, decoys: !!o.decoys, pts: o.pts, targetUnit: null };
+    const sv = { id: nextId(), type: o.type, count: o.count || 1, interval: o.interval ?? 20, tStart: o.tStart || 0, sync: !!o.sync, tArrive: o.tArrive || 0, agl: o.agl ?? T.agl, launchDist: o.launchDist ?? T.launchDist, maneuver: o.maneuver ?? T.maneuver, decoys: !!o.decoys, pts: o.pts, targetUnit: null, targetObj: null };
+    const find = (list, ref) => list.find((v) => v.name === ref || v.id === ref);
     if (o.targetUnit) {
-      const u = S.setup.defs.find((d) => d.name === o.targetUnit);
+      const u = find(S.setup.defs, o.targetUnit);
       if (u) {
         sv.targetUnit = u.id;
         sv.pts[sv.pts.length - 1] = [u.x, u.y];
       }
+    } else if (o.targetObj) {
+      const g = find(S.setup.objs, o.targetObj);
+      if (g) {
+        sv.targetObj = g.id;
+        sv.pts[sv.pts.length - 1] = [g.x, g.y];
+      }
     }
     S.setup.salvos.push(sv);
     return sv;
+  }
+  function addObj(type, x, y, o = {}) {
+    const tt = TARGET_TYPES[type];
+    const n = S.setup.objs.filter((g2) => g2.type === type).length + 1;
+    const g = { id: nextId(), type, x, y, name: o.name || tt.name + " " + n, maxHp: o.hp || tt.hp, desc: o.desc || "" };
+    S.setup.objs.push(g);
+    return g;
   }
   function addJam(type, x, y, o = {}) {
     const J = JAMMERS[type];
@@ -2409,10 +2597,16 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     return j;
   }
   function applyScenario(sc2) {
-    const { defs = [], salvos = [], jams = [] } = structuredClone({ defs: sc2.defs, salvos: sc2.salvos, jams: sc2.jams });
+    const { objectives = [], defs = [], salvos = [], jams = [] } = structuredClone({ objectives: sc2.objectives, defs: sc2.defs, salvos: sc2.salvos, jams: sc2.jams });
+    for (const g of objectives) addObj(g.type, g.x, g.y, g);
     for (const d of defs) addDef(d.type, d.x, d.y, d);
     for (const o of salvos) addSalvo(o);
     for (const j of jams) addJam(j.type, j.x, j.y, j);
+    if (sc2.rules) {
+      if (sc2.rules.net !== void 0) S.net = sc2.rules.net;
+      if (sc2.rules.doctrine) S.doctrine = sc2.rules.doctrine;
+    }
+    S.scen = sc2;
   }
 
   // src/ui/dom.js
@@ -3083,20 +3277,32 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
       km = t;
       break;
     }
-    const x = w - 20 - km * V.s, y = h - 18;
+    const len = km * V.s, dur = (v) => {
+      const s = km * 1e3 / v;
+      return s >= 60 ? Math.round(s / 60) + " min" : Math.round(s) + " s";
+    };
+    const hint = "Shahed " + dur(THREATS.shahed.v) + " · Kh-101 " + dur(THREATS.kh101.v);
+    ctx.font = '11px "IBM Plex Mono", monospace';
+    const bw = Math.max(len, ctx.measureText(hint).width) + 16, x0 = w - 10 - bw, y0 = h - 50;
+    ctx.fillStyle = "rgba(12,18,25,.85)";
+    ctx.fillRect(x0, y0, bw, 42);
+    const x = w - 18 - len, y = h - 30;
     ctx.strokeStyle = "#d9e2ec";
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(x, y);
-    ctx.lineTo(x + km * V.s, y);
+    ctx.lineTo(x + len, y);
     ctx.moveTo(x, y - 4);
     ctx.lineTo(x, y + 2);
-    ctx.moveTo(x + km * V.s, y - 4);
-    ctx.lineTo(x + km * V.s, y + 2);
+    ctx.moveTo(x + len, y - 4);
+    ctx.lineTo(x + len, y + 2);
     ctx.stroke();
     ctx.fillStyle = "#d9e2ec";
-    ctx.font = '11px "IBM Plex Mono", monospace';
+    ctx.font = '600 11px "IBM Plex Mono", monospace';
     ctx.fillText(km + " km", x, y - 6);
+    ctx.fillStyle = "#8a9aac";
+    ctx.font = '10px "IBM Plex Mono", monospace';
+    ctx.fillText(hint, x0 + 8, y + 15);
   }
   function drawRoute(sv, hi) {
     const T = THREATS[sv.type];
@@ -3236,14 +3442,36 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     return cov;
   }
 
+  // src/sim/pace.js
+  var AUTO_PHASES = {
+    calm: { speed: 60, text: "calma" },
+    approach: { speed: 30, text: "amenazas en vuelo, sin detectar" },
+    tracked: { speed: 15, text: "pistas en seguimiento" },
+    action: { speed: 5, text: "combate" }
+  };
+  var ACTION_WINDOW = 90;
+  function autoPhase(S2) {
+    if (!S2.started) return "calm";
+    if (S2.ints.some((i) => !i.done && S2.t >= i.tL)) return "action";
+    const alive = S2.threats.filter((t) => t.alive && t.p);
+    const eta = (t) => t.p.rem * 1e3 / Math.max(1, t.T.vDive || t.T.vLow || t.T.v);
+    if (alive.some((t) => eta(t) < (t.firstDet !== null ? ACTION_WINDOW : ACTION_WINDOW / 2))) return "action";
+    if (alive.some((t) => t.firstDet !== null)) return "tracked";
+    return alive.length ? "approach" : "calm";
+  }
+
   // src/ui/controls.js
   var SPEEDS = [1, 5, 15, 30, 60];
   function initControls() {
-    $("#speeds").innerHTML = SPEEDS.map((s) => `<button data-s="${s}">${s}×</button>`).join("");
+    $("#speeds").innerHTML = `<button data-s="auto" title="Rápido cuando no pasa nada, lento cuando hay combate">Auto</button>` + SPEEDS.map((s) => `<button data-s="${s}">${s}×</button>`).join("");
     $("#speeds").onclick = (e) => {
       const b = e.target.closest("button");
       if (!b) return;
-      S.speed = +b.dataset.s;
+      if (b.dataset.s === "auto") S.auto = true;
+      else {
+        S.auto = false;
+        S.speed = +b.dataset.s;
+      }
       updatePlay();
     };
     $("#play").onclick = togglePlay;
@@ -3271,8 +3499,15 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
   }
   function updatePlay() {
     $("#play").textContent = S.running ? "❚❚ Pausa" : S.started ? S.pending.length || S.threats.some((t) => t.alive) ? "▶ Seguir" : "↺ Nueva corrida" : "▶ Iniciar";
-    for (const b of $("#speeds").children) b.classList.toggle("act", +b.dataset.s === S.speed);
+    for (const b of $("#speeds").children) b.classList.toggle("act", S.auto ? b.dataset.s === "auto" : +b.dataset.s === S.speed);
     $("#clock").textContent = fmtT(S.t);
+    renderTimeScale();
+  }
+  var currentSpeed = () => S.auto ? AUTO_PHASES[S.autoPhase].speed : S.speed;
+  var span = (s) => s < 60 ? s + " s" : s / 60 + " min";
+  function renderTimeScale() {
+    const sp = currentSpeed();
+    $("#tscale").textContent = (S.auto ? "Auto " + sp + "× (" + AUTO_PHASES[S.autoPhase].text + ")" : sp + "×") + " · 1 s real = " + span(sp) + (sp === 1 ? " (tiempo real)" : " simulados");
   }
 
   // src/ui/fichas.js
@@ -3897,7 +4132,7 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     resetSim();
     const sc2 = SCENARIOS[key];
     if (MAP?.key !== sc2.map) applyMap(builtinMap(sc2.map));
-    S.setup = { defs: [], salvos: [], jams: [] };
+    S.setup = { objs: [], defs: [], salvos: [], jams: [] };
     S.sel = null;
     S.mode = "select";
     applyScenario(sc2);
@@ -4138,8 +4373,9 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
       }
       const { map, kmx, kmy } = res;
       resetSim();
-      S.setup = { defs: [], salvos: [], jams: [] };
+      S.setup = { objs: [], defs: [], salvos: [], jams: [] };
       S.sel = null;
+      S.scen = null;
       applyMap(map);
       const sc2 = $("#scenario");
       if (![...sc2.options].some((o) => o.value === "hgt")) sc2.insertAdjacentHTML("beforeend", '<option value="hgt">Relieve cargado: ' + esc(f.name) + "</option>");
@@ -4178,11 +4414,25 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
   var STEP = 0.25;
   var last = performance.now();
   var uiTick = 0;
+  var holdUntil = 0;
+  function updateAutoPhase(now) {
+    const want = autoPhase(S);
+    if (want === S.autoPhase) {
+      holdUntil = now + 2500;
+      return;
+    }
+    if (AUTO_PHASES[want].speed < AUTO_PHASES[S.autoPhase].speed || now >= holdUntil) {
+      S.autoPhase = want;
+      holdUntil = now + 2500;
+      renderTimeScale();
+    }
+  }
   function loop(now) {
     const dtr = Math.min(0.1, (now - last) / 1e3);
     last = now;
     if (S.running) {
-      let adv = dtr * S.speed;
+      if (S.auto) updateAutoPhase(now);
+      let adv = dtr * currentSpeed();
       while (adv > 0) {
         const d = Math.min(STEP, adv);
         step(d);
