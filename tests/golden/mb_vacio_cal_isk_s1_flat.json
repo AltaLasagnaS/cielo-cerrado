@@ -1,0 +1,739 @@
+{
+ "key": "mb_vacio",
+ "seed": 1,
+ "flat": true,
+ "net": true,
+ "doctrine": "salva",
+ "steps": 1604,
+ "t": 401,
+ "ended": true,
+ "stats": {
+  "launched": 56,
+  "killed": 5,
+  "hits": 7,
+  "misses": 0,
+  "decoys": 48,
+  "decoysKilled": 4,
+  "shots": 16,
+  "defCost": 67.2,
+  "atkCost": 21.6,
+  "lost": 0,
+  "byUnit": {
+   "Patriot-1": 16
+  }
+ },
+ "units": [
+  [
+   "Patriot-1",
+   true,
+   0
+  ]
+ ],
+ "log": [
+  [
+   0,
+   "d",
+   "Inicio de la simulación: 8 amenazas programadas, 1 unidades de defensa."
+  ],
+  [
+   219.5,
+   "l",
+   "Primera detección: Iskander-M #24 por Patriot-1 a 46.6 km, 24018 m AGL."
+  ],
+  [
+   226.25,
+   "w",
+   "Iskander-M #24 libera 6 señuelos a 40 km del blanco."
+  ],
+  [
+   227.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #32 por Patriot-1 a 37.3 km, 20091 m AGL."
+  ],
+  [
+   227.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #33 por Patriot-1 a 37.4 km, 20091 m AGL."
+  ],
+  [
+   227.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #34 por Patriot-1 a 37.3 km, 20091 m AGL."
+  ],
+  [
+   227.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #35 por Patriot-1 a 37.3 km, 20091 m AGL."
+  ],
+  [
+   227.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #36 por Patriot-1 a 37.4 km, 20091 m AGL."
+  ],
+  [
+   227.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #37 por Patriot-1 a 37.4 km, 20091 m AGL."
+  ],
+  [
+   229.25,
+   "l",
+   "Patriot-1 dispara 2× PAC-3 MSE contra Iskander-M #24 — intercepción a 19.8 km en 16 s."
+  ],
+  [
+   237.25,
+   "l",
+   "Patriot-1 dispara 2× PAC-3 MSE contra Señuelo de Iskander-M #32 — intercepción a 14.6 km en 12 s."
+  ],
+  [
+   237.25,
+   "l",
+   "Patriot-1 dispara 2× PAC-3 MSE contra Señuelo de Iskander-M #33 — intercepción a 14.6 km en 12 s."
+  ],
+  [
+   237.25,
+   "l",
+   "Patriot-1 dispara 2× PAC-3 MSE contra Señuelo de Iskander-M #34 — intercepción a 14.3 km en 12 s."
+  ],
+  [
+   237.5,
+   "l",
+   "Primera detección: Iskander-M #25 por Patriot-1 a 48.9 km, 24950 m AGL."
+  ],
+  [
+   245.25,
+   "x",
+   "PAC-3 MSE de Patriot-1 falla contra Iskander-M #24 (Pk 42%)."
+  ],
+  [
+   246,
+   "x",
+   "PAC-3 MSE de Patriot-1 falla contra Iskander-M #24 (Pk 42%)."
+  ],
+  [
+   246.25,
+   "w",
+   "Iskander-M #25 libera 6 señuelos a 40 km del blanco."
+  ],
+  [
+   246.25,
+   "l",
+   "Patriot-1 dispara 2× PAC-3 MSE contra Iskander-M #24 — intercepción a 8.7 km en 8 s."
+  ],
+  [
+   247.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #38 por Patriot-1 a 37.4 km, 20091 m AGL."
+  ],
+  [
+   247.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #39 por Patriot-1 a 37.4 km, 20091 m AGL."
+  ],
+  [
+   247.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #40 por Patriot-1 a 37.4 km, 20091 m AGL."
+  ],
+  [
+   247.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #41 por Patriot-1 a 37.4 km, 20091 m AGL."
+  ],
+  [
+   247.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #42 por Patriot-1 a 37.3 km, 20091 m AGL."
+  ],
+  [
+   247.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #43 por Patriot-1 a 37.4 km, 20091 m AGL."
+  ],
+  [
+   248.75,
+   "k",
+   "Patriot-1 derriba Señuelo de Iskander-M #32 (era señuelo) — Pk 42%."
+  ],
+  [
+   248.75,
+   "x",
+   "PAC-3 MSE de Patriot-1 falla contra Señuelo de Iskander-M #34 (Pk 42%)."
+  ],
+  [
+   249.25,
+   "l",
+   "Patriot-1 dispara 2× PAC-3 MSE contra Señuelo de Iskander-M #35 — intercepción a 6.5 km en 6 s."
+  ],
+  [
+   249.25,
+   "x",
+   "PAC-3 MSE de Patriot-1 falla contra Señuelo de Iskander-M #33 (Pk 42%)."
+  ],
+  [
+   249.5,
+   "d",
+   "PAC-3 MSE de Patriot-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   249.5,
+   "x",
+   "PAC-3 MSE de Patriot-1 falla contra Señuelo de Iskander-M #34 (Pk 42%)."
+  ],
+  [
+   250,
+   "k",
+   "Patriot-1 derriba Señuelo de Iskander-M #33 (era señuelo) — Pk 42%."
+  ],
+  [
+   250.25,
+   "l",
+   "Patriot-1 dispara 2× PAC-3 MSE contra Señuelo de Iskander-M #34 — intercepción a 5.8 km en 5 s."
+  ],
+  [
+   250.25,
+   "l",
+   "Patriot-1 dispara 2× PAC-3 MSE contra Señuelo de Iskander-M #36 — intercepción a 6.2 km en 6 s."
+  ],
+  [
+   253.75,
+   "x",
+   "PAC-3 MSE de Patriot-1 falla contra Iskander-M #24 (Pk 42%)."
+  ],
+  [
+   254.5,
+   "k",
+   "Patriot-1 derriba Iskander-M #24 — Pk 42%."
+  ],
+  [
+   254.75,
+   "x",
+   "PAC-3 MSE de Patriot-1 falla contra Señuelo de Iskander-M #35 (Pk 42%)."
+  ],
+  [
+   255.25,
+   "x",
+   "PAC-3 MSE de Patriot-1 falla contra Señuelo de Iskander-M #34 (Pk 42%)."
+  ],
+  [
+   255.5,
+   "x",
+   "PAC-3 MSE de Patriot-1 falla contra Señuelo de Iskander-M #35 (Pk 42%)."
+  ],
+  [
+   255.75,
+   "k",
+   "Patriot-1 derriba Señuelo de Iskander-M #36 (era señuelo) — Pk 42%."
+  ],
+  [
+   256,
+   "k",
+   "Patriot-1 derriba Señuelo de Iskander-M #34 (era señuelo) — Pk 42%."
+  ],
+  [
+   256.5,
+   "d",
+   "PAC-3 MSE de Patriot-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   261,
+   "d",
+   "Señuelo de Iskander-M #35 cae sin efecto."
+  ],
+  [
+   261,
+   "d",
+   "Señuelo de Iskander-M #37 cae sin efecto."
+  ],
+  [
+   261.5,
+   "l",
+   "Primera detección: Iskander-M #26 por Patriot-1 a 44.3 km, 23065 m AGL."
+  ],
+  [
+   266.25,
+   "w",
+   "Iskander-M #26 libera 6 señuelos a 40 km del blanco."
+  ],
+  [
+   267.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #44 por Patriot-1 a 37.3 km, 20091 m AGL."
+  ],
+  [
+   267.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #45 por Patriot-1 a 37.3 km, 20091 m AGL."
+  ],
+  [
+   267.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #46 por Patriot-1 a 37.3 km, 20091 m AGL."
+  ],
+  [
+   267.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #48 por Patriot-1 a 37.5 km, 20091 m AGL."
+  ],
+  [
+   267.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #49 por Patriot-1 a 37.4 km, 20091 m AGL."
+  ],
+  [
+   269.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #47 por Patriot-1 a 35.1 km, 19070 m AGL."
+  ],
+  [
+   279.5,
+   "l",
+   "Primera detección: Iskander-M #27 por Patriot-1 a 46.6 km, 24018 m AGL."
+  ],
+  [
+   281,
+   "x",
+   "Iskander-M #25 impacta en el blanco."
+  ],
+  [
+   281,
+   "d",
+   "Señuelo de Iskander-M #38 cae sin efecto."
+  ],
+  [
+   281,
+   "d",
+   "Señuelo de Iskander-M #39 cae sin efecto."
+  ],
+  [
+   281,
+   "d",
+   "Señuelo de Iskander-M #40 cae sin efecto."
+  ],
+  [
+   281,
+   "d",
+   "Señuelo de Iskander-M #41 cae sin efecto."
+  ],
+  [
+   281,
+   "d",
+   "Señuelo de Iskander-M #42 cae sin efecto."
+  ],
+  [
+   281,
+   "d",
+   "Señuelo de Iskander-M #43 cae sin efecto."
+  ],
+  [
+   286.25,
+   "w",
+   "Iskander-M #27 libera 6 señuelos a 40 km del blanco."
+  ],
+  [
+   287.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #50 por Patriot-1 a 37.4 km, 20091 m AGL."
+  ],
+  [
+   287.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #51 por Patriot-1 a 37.3 km, 20091 m AGL."
+  ],
+  [
+   287.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #52 por Patriot-1 a 37.3 km, 20091 m AGL."
+  ],
+  [
+   287.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #53 por Patriot-1 a 37.4 km, 20091 m AGL."
+  ],
+  [
+   287.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #54 por Patriot-1 a 37.4 km, 20091 m AGL."
+  ],
+  [
+   287.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #55 por Patriot-1 a 37.3 km, 20091 m AGL."
+  ],
+  [
+   299.5,
+   "l",
+   "Primera detección: Iskander-M #28 por Patriot-1 a 46.6 km, 24018 m AGL."
+  ],
+  [
+   301,
+   "x",
+   "Iskander-M #26 impacta en el blanco."
+  ],
+  [
+   301,
+   "d",
+   "Señuelo de Iskander-M #44 cae sin efecto."
+  ],
+  [
+   301,
+   "d",
+   "Señuelo de Iskander-M #45 cae sin efecto."
+  ],
+  [
+   301,
+   "d",
+   "Señuelo de Iskander-M #46 cae sin efecto."
+  ],
+  [
+   301,
+   "d",
+   "Señuelo de Iskander-M #47 cae sin efecto."
+  ],
+  [
+   301,
+   "d",
+   "Señuelo de Iskander-M #48 cae sin efecto."
+  ],
+  [
+   301,
+   "d",
+   "Señuelo de Iskander-M #49 cae sin efecto."
+  ],
+  [
+   306.25,
+   "w",
+   "Iskander-M #28 libera 6 señuelos a 40 km del blanco."
+  ],
+  [
+   307.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #57 por Patriot-1 a 37.3 km, 20091 m AGL."
+  ],
+  [
+   307.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #58 por Patriot-1 a 37.4 km, 20091 m AGL."
+  ],
+  [
+   307.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #59 por Patriot-1 a 37.5 km, 20091 m AGL."
+  ],
+  [
+   307.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #60 por Patriot-1 a 37.3 km, 20091 m AGL."
+  ],
+  [
+   307.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #61 por Patriot-1 a 37.4 km, 20091 m AGL."
+  ],
+  [
+   309.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #56 por Patriot-1 a 35.2 km, 19070 m AGL."
+  ],
+  [
+   321,
+   "x",
+   "Iskander-M #27 impacta en el blanco."
+  ],
+  [
+   321,
+   "d",
+   "Señuelo de Iskander-M #50 cae sin efecto."
+  ],
+  [
+   321,
+   "d",
+   "Señuelo de Iskander-M #51 cae sin efecto."
+  ],
+  [
+   321,
+   "d",
+   "Señuelo de Iskander-M #52 cae sin efecto."
+  ],
+  [
+   321,
+   "d",
+   "Señuelo de Iskander-M #53 cae sin efecto."
+  ],
+  [
+   321,
+   "d",
+   "Señuelo de Iskander-M #54 cae sin efecto."
+  ],
+  [
+   321,
+   "d",
+   "Señuelo de Iskander-M #55 cae sin efecto."
+  ],
+  [
+   323.5,
+   "l",
+   "Primera detección: Iskander-M #29 por Patriot-1 a 42.0 km, 22091 m AGL."
+  ],
+  [
+   326.25,
+   "w",
+   "Iskander-M #29 libera 6 señuelos a 40 km del blanco."
+  ],
+  [
+   327.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #62 por Patriot-1 a 37.4 km, 20091 m AGL."
+  ],
+  [
+   327.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #63 por Patriot-1 a 37.4 km, 20091 m AGL."
+  ],
+  [
+   327.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #64 por Patriot-1 a 37.3 km, 20091 m AGL."
+  ],
+  [
+   327.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #65 por Patriot-1 a 37.4 km, 20091 m AGL."
+  ],
+  [
+   327.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #66 por Patriot-1 a 37.3 km, 20091 m AGL."
+  ],
+  [
+   329.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #67 por Patriot-1 a 34.9 km, 19070 m AGL."
+  ],
+  [
+   339.5,
+   "l",
+   "Primera detección: Iskander-M #30 por Patriot-1 a 46.6 km, 24018 m AGL."
+  ],
+  [
+   341,
+   "x",
+   "Iskander-M #28 impacta en el blanco."
+  ],
+  [
+   341,
+   "d",
+   "Señuelo de Iskander-M #56 cae sin efecto."
+  ],
+  [
+   341,
+   "d",
+   "Señuelo de Iskander-M #57 cae sin efecto."
+  ],
+  [
+   341,
+   "d",
+   "Señuelo de Iskander-M #58 cae sin efecto."
+  ],
+  [
+   341,
+   "d",
+   "Señuelo de Iskander-M #59 cae sin efecto."
+  ],
+  [
+   341,
+   "d",
+   "Señuelo de Iskander-M #60 cae sin efecto."
+  ],
+  [
+   341,
+   "d",
+   "Señuelo de Iskander-M #61 cae sin efecto."
+  ],
+  [
+   346.25,
+   "w",
+   "Iskander-M #30 libera 6 señuelos a 40 km del blanco."
+  ],
+  [
+   347.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #68 por Patriot-1 a 37.3 km, 20091 m AGL."
+  ],
+  [
+   347.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #69 por Patriot-1 a 37.2 km, 20091 m AGL."
+  ],
+  [
+   347.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #70 por Patriot-1 a 37.3 km, 20091 m AGL."
+  ],
+  [
+   347.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #71 por Patriot-1 a 37.5 km, 20091 m AGL."
+  ],
+  [
+   347.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #72 por Patriot-1 a 37.3 km, 20091 m AGL."
+  ],
+  [
+   347.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #73 por Patriot-1 a 37.3 km, 20091 m AGL."
+  ],
+  [
+   357.5,
+   "l",
+   "Primera detección: Iskander-M #31 por Patriot-1 a 48.9 km, 24950 m AGL."
+  ],
+  [
+   361,
+   "x",
+   "Iskander-M #29 impacta en el blanco."
+  ],
+  [
+   361,
+   "d",
+   "Señuelo de Iskander-M #62 cae sin efecto."
+  ],
+  [
+   361,
+   "d",
+   "Señuelo de Iskander-M #63 cae sin efecto."
+  ],
+  [
+   361,
+   "d",
+   "Señuelo de Iskander-M #64 cae sin efecto."
+  ],
+  [
+   361,
+   "d",
+   "Señuelo de Iskander-M #65 cae sin efecto."
+  ],
+  [
+   361,
+   "d",
+   "Señuelo de Iskander-M #66 cae sin efecto."
+  ],
+  [
+   361,
+   "d",
+   "Señuelo de Iskander-M #67 cae sin efecto."
+  ],
+  [
+   366.25,
+   "w",
+   "Iskander-M #31 libera 6 señuelos a 40 km del blanco."
+  ],
+  [
+   367.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #74 por Patriot-1 a 37.5 km, 20091 m AGL."
+  ],
+  [
+   367.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #75 por Patriot-1 a 37.4 km, 20091 m AGL."
+  ],
+  [
+   367.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #76 por Patriot-1 a 37.5 km, 20091 m AGL."
+  ],
+  [
+   367.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #77 por Patriot-1 a 37.4 km, 20091 m AGL."
+  ],
+  [
+   367.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #78 por Patriot-1 a 37.4 km, 20091 m AGL."
+  ],
+  [
+   367.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #79 por Patriot-1 a 37.4 km, 20091 m AGL."
+  ],
+  [
+   381,
+   "x",
+   "Iskander-M #30 impacta en el blanco."
+  ],
+  [
+   381,
+   "d",
+   "Señuelo de Iskander-M #68 cae sin efecto."
+  ],
+  [
+   381,
+   "d",
+   "Señuelo de Iskander-M #69 cae sin efecto."
+  ],
+  [
+   381,
+   "d",
+   "Señuelo de Iskander-M #70 cae sin efecto."
+  ],
+  [
+   381,
+   "d",
+   "Señuelo de Iskander-M #71 cae sin efecto."
+  ],
+  [
+   381,
+   "d",
+   "Señuelo de Iskander-M #72 cae sin efecto."
+  ],
+  [
+   381,
+   "d",
+   "Señuelo de Iskander-M #73 cae sin efecto."
+  ],
+  [
+   401,
+   "x",
+   "Iskander-M #31 impacta en el blanco."
+  ],
+  [
+   401,
+   "d",
+   "Señuelo de Iskander-M #74 cae sin efecto."
+  ],
+  [
+   401,
+   "d",
+   "Señuelo de Iskander-M #75 cae sin efecto."
+  ],
+  [
+   401,
+   "d",
+   "Señuelo de Iskander-M #76 cae sin efecto."
+  ],
+  [
+   401,
+   "d",
+   "Señuelo de Iskander-M #77 cae sin efecto."
+  ],
+  [
+   401,
+   "d",
+   "Señuelo de Iskander-M #78 cae sin efecto."
+  ],
+  [
+   401,
+   "d",
+   "Señuelo de Iskander-M #79 cae sin efecto."
+  ],
+  [
+   401,
+   "d",
+   "Fin: 5 derribos, 7 impactos en blanco, 0 fuera de blanco. Costo defensa US$67 M vs ataque US$22 M."
+  ]
+ ]
+}

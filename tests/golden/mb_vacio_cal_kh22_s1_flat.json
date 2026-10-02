@@ -1,0 +1,107 @@
+{
+ "key": "mb_vacio",
+ "seed": 1,
+ "flat": true,
+ "net": true,
+ "doctrine": "salva",
+ "steps": 1737,
+ "t": 434.25,
+ "ended": true,
+ "stats": {
+  "launched": 6,
+  "killed": 0,
+  "hits": 1,
+  "misses": 5,
+  "decoys": 0,
+  "decoysKilled": 0,
+  "shots": 0,
+  "defCost": 0,
+  "atkCost": 6,
+  "lost": 0,
+  "byUnit": {}
+ },
+ "units": [
+  [
+   "IRIS-T-1",
+   true,
+   24
+  ],
+  [
+   "NASAMS-1",
+   true,
+   18
+  ]
+ ],
+ "log": [
+  [
+   0,
+   "d",
+   "Inicio de la simulación: 6 amenazas programadas, 2 unidades de defensa."
+  ],
+  [
+   324.5,
+   "l",
+   "Primera detección: Kh-22 #25 por IRIS-T-1 a 91.6 km, 27000 m AGL."
+  ],
+  [
+   325.5,
+   "l",
+   "Primera detección: Kh-22 #26 por IRIS-T-1 a 96.0 km, 27000 m AGL."
+  ],
+  [
+   332.5,
+   "l",
+   "Primera detección: Kh-22 #27 por IRIS-T-1 a 93.8 km, 27000 m AGL."
+  ],
+  [
+   335.5,
+   "l",
+   "Primera detección: Kh-22 #28 por IRIS-T-1 a 96.0 km, 27000 m AGL."
+  ],
+  [
+   340.5,
+   "l",
+   "Primera detección: Kh-22 #29 por IRIS-T-1 a 96.0 km, 27000 m AGL."
+  ],
+  [
+   345.5,
+   "l",
+   "Primera detección: Kh-22 #30 por IRIS-T-1 a 96.0 km, 27000 m AGL."
+  ],
+  [
+   409.25,
+   "x",
+   "Kh-22 #25 impacta en el blanco."
+  ],
+  [
+   414.25,
+   "w",
+   "Kh-22 #26 cae a 56 m del blanco."
+  ],
+  [
+   419.25,
+   "w",
+   "Kh-22 #27 cae a 300 m del blanco."
+  ],
+  [
+   424.25,
+   "w",
+   "Kh-22 #28 cae a 188 m del blanco."
+  ],
+  [
+   429.25,
+   "w",
+   "Kh-22 #29 cae a 181 m del blanco."
+  ],
+  [
+   434.25,
+   "w",
+   "Kh-22 #30 cae a 151 m del blanco."
+  ],
+  [
+   434.25,
+   "d",
+   "Fin: 0 derribos, 1 impactos en blanco, 5 fuera de blanco. Costo defensa US$0k vs ataque US$6.0 M."
+  ]
+ ]
+}

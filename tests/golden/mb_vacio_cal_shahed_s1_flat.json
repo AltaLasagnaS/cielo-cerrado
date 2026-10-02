@@ -1,0 +1,691 @@
+{
+ "key": "mb_vacio",
+ "seed": 1,
+ "flat": true,
+ "net": true,
+ "doctrine": "salva",
+ "steps": 5047,
+ "t": 1261.75,
+ "ended": true,
+ "stats": {
+  "launched": 30,
+  "killed": 30,
+  "hits": 0,
+  "misses": 0,
+  "decoys": 10,
+  "decoysKilled": 10,
+  "shots": 45,
+  "defCost": 0.21,
+  "atkCost": 0.8,
+  "lost": 0,
+  "byUnit": {
+   "Interceptores-1": 20,
+   "Interceptores-2": 20,
+   "Gepard-1": 5
+  }
+ },
+ "units": [
+  [
+   "Gepard-1",
+   true,
+   15
+  ],
+  [
+   "Gepard-2",
+   true,
+   20
+  ],
+  [
+   "Grupo móvil-1",
+   true,
+   30
+  ],
+  [
+   "Grupo móvil-2",
+   true,
+   30
+  ],
+  [
+   "Grupo móvil-3",
+   true,
+   30
+  ],
+  [
+   "Interceptores-1",
+   true,
+   0
+  ],
+  [
+   "Interceptores-2",
+   true,
+   0
+  ],
+  [
+   "Acústico-1",
+   true,
+   0
+  ],
+  [
+   "Acústico-2",
+   true,
+   0
+  ],
+  [
+   "Acústico-3",
+   true,
+   0
+  ]
+ ],
+ "log": [
+  [
+   0,
+   "d",
+   "Inicio de la simulación: 30 amenazas programadas, 10 unidades de defensa."
+  ],
+  [
+   755.5,
+   "l",
+   "Primera detección: Shahed #34 por Acústico-1 a 4.9 km, 500 m AGL."
+  ],
+  [
+   759.5,
+   "l",
+   "Primera detección: Shahed #35 por Acústico-1 a 4.9 km, 500 m AGL."
+  ],
+  [
+   763.5,
+   "l",
+   "Primera detección: Shahed #36 por Acústico-1 a 5.0 km, 500 m AGL."
+  ],
+  [
+   767.5,
+   "l",
+   "Primera detección: Shahed #37 por Acústico-1 a 5.0 km, 500 m AGL."
+  ],
+  [
+   771.5,
+   "l",
+   "Primera detección: Shahed #38 por Acústico-1 a 5.0 km, 500 m AGL."
+  ],
+  [
+   775.5,
+   "l",
+   "Primera detección: Shahed #39 por Acústico-1 a 5.0 km, 500 m AGL."
+  ],
+  [
+   776.25,
+   "l",
+   "Interceptores-1 dispara 1× dron interceptor contra Shahed #34 — intercepción a 8.3 km en 98 s."
+  ],
+  [
+   780.25,
+   "l",
+   "Interceptores-1 dispara 1× dron interceptor contra Shahed #35 — intercepción a 8.3 km en 100 s."
+  ],
+  [
+   781.5,
+   "l",
+   "Primera detección: Shahed #40 por Acústico-1 a 4.9 km, 500 m AGL."
+  ],
+  [
+   784.25,
+   "l",
+   "Interceptores-1 dispara 1× dron interceptor contra Shahed #36 — intercepción a 8.4 km en 100 s."
+  ],
+  [
+   785.5,
+   "l",
+   "Primera detección: Shahed #41 por Acústico-1 a 5.0 km, 500 m AGL."
+  ],
+  [
+   788.25,
+   "l",
+   "Interceptores-1 dispara 1× dron interceptor contra Shahed #37 — intercepción a 8.5 km en 100 s."
+  ],
+  [
+   789.5,
+   "l",
+   "Primera detección: Shahed #42 por Acústico-1 a 5.0 km, 500 m AGL."
+  ],
+  [
+   792.25,
+   "l",
+   "Interceptores-2 dispara 1× dron interceptor contra Shahed #38 — intercepción a 5.7 km en 70 s."
+  ],
+  [
+   795.5,
+   "l",
+   "Primera detección: Shahed #43 por Acústico-1 a 4.9 km, 500 m AGL."
+  ],
+  [
+   796.25,
+   "l",
+   "Interceptores-2 dispara 1× dron interceptor contra Shahed #39 — intercepción a 5.8 km en 70 s."
+  ],
+  [
+   799.5,
+   "l",
+   "Primera detección: Shahed #44 por Acústico-1 a 4.9 km, 500 m AGL."
+  ],
+  [
+   802.25,
+   "l",
+   "Interceptores-2 dispara 1× dron interceptor contra Shahed #40 — intercepción a 5.8 km en 70 s."
+  ],
+  [
+   803.5,
+   "l",
+   "Primera detección: Shahed #45 por Acústico-1 a 5.0 km, 500 m AGL."
+  ],
+  [
+   806.25,
+   "l",
+   "Interceptores-2 dispara 1× dron interceptor contra Shahed #41 — intercepción a 5.9 km en 70 s."
+  ],
+  [
+   809.5,
+   "l",
+   "Primera detección: Shahed #46 por Acústico-1 a 4.9 km, 500 m AGL."
+  ],
+  [
+   813.5,
+   "l",
+   "Primera detección: Shahed #47 por Acústico-1 a 5.0 km, 500 m AGL."
+  ],
+  [
+   817.5,
+   "l",
+   "Primera detección: Shahed #48 por Acústico-1 a 5.0 km, 500 m AGL."
+  ],
+  [
+   823.5,
+   "l",
+   "Primera detección: Shahed #49 por Acústico-1 a 4.9 km, 500 m AGL."
+  ],
+  [
+   827.5,
+   "l",
+   "Primera detección: Shahed #50 por Acústico-1 a 5.0 km, 500 m AGL."
+  ],
+  [
+   833.5,
+   "l",
+   "Primera detección: Shahed #51 por Acústico-1 a 4.9 km, 500 m AGL."
+  ],
+  [
+   837.5,
+   "l",
+   "Primera detección: Shahed #52 por Acústico-1 a 5.0 km, 500 m AGL."
+  ],
+  [
+   843.5,
+   "l",
+   "Primera detección: Shahed #53 por Acústico-1 a 4.9 km, 500 m AGL."
+  ],
+  [
+   862.25,
+   "x",
+   "dron interceptor de Interceptores-2 falla contra Shahed #38 (Pk 60%)."
+  ],
+  [
+   863.25,
+   "l",
+   "Interceptores-2 dispara 1× dron interceptor contra Shahed #38 — intercepción a 3.5 km en 42 s."
+  ],
+  [
+   866.25,
+   "k",
+   "Interceptores-2 derriba Shahed #39 — Pk 60%."
+  ],
+  [
+   867.25,
+   "l",
+   "Interceptores-2 dispara 1× dron interceptor contra Shahed #42 — intercepción a 4.1 km en 50 s."
+  ],
+  [
+   872.25,
+   "k",
+   "Interceptores-2 derriba Shahed #40 — Pk 60%."
+  ],
+  [
+   873.25,
+   "l",
+   "Interceptores-2 dispara 1× dron interceptor contra Shahed #43 — intercepción a 4.1 km en 50 s."
+  ],
+  [
+   874.25,
+   "k",
+   "Interceptores-1 derriba Shahed #34 — Pk 60%."
+  ],
+  [
+   876.25,
+   "k",
+   "Interceptores-2 derriba Shahed #41 — Pk 60%."
+  ],
+  [
+   877.25,
+   "l",
+   "Interceptores-2 dispara 1× dron interceptor contra Shahed #44 — intercepción a 4.2 km en 50 s."
+  ],
+  [
+   880.25,
+   "x",
+   "dron interceptor de Interceptores-1 falla contra Shahed #35 (Pk 60%)."
+  ],
+  [
+   881.25,
+   "l",
+   "Interceptores-1 dispara 1× dron interceptor contra Shahed #35 — intercepción a 5.3 km en 62 s."
+  ],
+  [
+   884.25,
+   "x",
+   "dron interceptor de Interceptores-1 falla contra Shahed #36 (Pk 60%)."
+  ],
+  [
+   885.25,
+   "l",
+   "Interceptores-1 dispara 1× dron interceptor contra Shahed #36 — intercepción a 5.3 km en 64 s."
+  ],
+  [
+   888.25,
+   "x",
+   "dron interceptor de Interceptores-1 falla contra Shahed #37 (Pk 60%)."
+  ],
+  [
+   889.25,
+   "l",
+   "Interceptores-1 dispara 1× dron interceptor contra Shahed #37 — intercepción a 5.3 km en 64 s."
+  ],
+  [
+   895.25,
+   "l",
+   "Interceptores-1 dispara 1× dron interceptor contra Shahed #45 — intercepción a 6.6 km en 78 s."
+  ],
+  [
+   905.25,
+   "k",
+   "Interceptores-2 derriba Shahed #38 — Pk 60%."
+  ],
+  [
+   906.25,
+   "l",
+   "Interceptores-2 dispara 1× dron interceptor contra Shahed #46 — intercepción a 3.6 km en 44 s."
+  ],
+  [
+   917.25,
+   "k",
+   "Interceptores-2 derriba Shahed #42 — Pk 60%."
+  ],
+  [
+   918.25,
+   "l",
+   "Interceptores-2 dispara 1× dron interceptor contra Shahed #47 — intercepción a 3.4 km en 42 s."
+  ],
+  [
+   923.25,
+   "x",
+   "dron interceptor de Interceptores-2 falla contra Shahed #43 (Pk 60%)."
+  ],
+  [
+   924.25,
+   "l",
+   "Interceptores-2 dispara 1× dron interceptor contra Shahed #43 — intercepción a 2.5 km en 30 s."
+  ],
+  [
+   927.25,
+   "x",
+   "dron interceptor de Interceptores-2 falla contra Shahed #44 (Pk 60%)."
+  ],
+  [
+   928.25,
+   "l",
+   "Interceptores-2 dispara 1× dron interceptor contra Shahed #44 — intercepción a 2.5 km en 32 s."
+  ],
+  [
+   943.25,
+   "k",
+   "Interceptores-1 derriba Shahed #35 — Pk 60%."
+  ],
+  [
+   944.25,
+   "l",
+   "Interceptores-1 dispara 1× dron interceptor contra Shahed #48 — intercepción a 5.6 km en 68 s."
+  ],
+  [
+   949.25,
+   "k",
+   "Interceptores-1 derriba Shahed #36 — Pk 60%."
+  ],
+  [
+   950.25,
+   "l",
+   "Interceptores-1 dispara 1× dron interceptor contra Shahed #49 — intercepción a 5.6 km en 68 s."
+  ],
+  [
+   950.25,
+   "x",
+   "dron interceptor de Interceptores-2 falla contra Shahed #46 (Pk 60%)."
+  ],
+  [
+   951.25,
+   "l",
+   "Interceptores-2 dispara 1× dron interceptor contra Shahed #46 — intercepción a 2.2 km en 27 s."
+  ],
+  [
+   953.25,
+   "k",
+   "Interceptores-1 derriba Shahed #37 — Pk 60%."
+  ],
+  [
+   954.25,
+   "l",
+   "Interceptores-1 dispara 1× dron interceptor contra Shahed #50 — intercepción a 5.7 km en 68 s."
+  ],
+  [
+   954.25,
+   "k",
+   "Interceptores-2 derriba Shahed #43 — Pk 60%."
+  ],
+  [
+   955.25,
+   "l",
+   "Interceptores-2 dispara 1× dron interceptor contra Shahed #51 — intercepción a 3.0 km en 38 s."
+  ],
+  [
+   960.25,
+   "k",
+   "Interceptores-2 derriba Shahed #47 — Pk 60%."
+  ],
+  [
+   960.25,
+   "x",
+   "dron interceptor de Interceptores-2 falla contra Shahed #44 (Pk 60%)."
+  ],
+  [
+   961.25,
+   "l",
+   "Gepard-1 dispara 1× ráfaga 35 mm contra Shahed #44 — intercepción a 4.0 km en 6 s."
+  ],
+  [
+   961.25,
+   "l",
+   "Interceptores-2 dispara 1× dron interceptor contra Shahed #52 — intercepción a 3.0 km en 38 s."
+  ],
+  [
+   961.25,
+   "l",
+   "Interceptores-2 dispara 1× dron interceptor contra Shahed #53 — intercepción a 3.2 km en 40 s."
+  ],
+  [
+   967.25,
+   "k",
+   "Gepard-1 derriba Shahed #44 — Pk 55%."
+  ],
+  [
+   973.25,
+   "k",
+   "Interceptores-1 derriba Shahed #45 — Pk 60%."
+  ],
+  [
+   978.25,
+   "k",
+   "Interceptores-2 derriba Shahed #46 — Pk 60%."
+  ],
+  [
+   993.25,
+   "k",
+   "Interceptores-2 derriba Shahed #51 — Pk 60%."
+  ],
+  [
+   999.25,
+   "k",
+   "Interceptores-2 derriba Shahed #52 — Pk 60%."
+  ],
+  [
+   1001.25,
+   "k",
+   "Interceptores-2 derriba Shahed #53 — Pk 60%."
+  ],
+  [
+   1012.25,
+   "k",
+   "Interceptores-1 derriba Shahed #48 — Pk 60%."
+  ],
+  [
+   1018.25,
+   "x",
+   "dron interceptor de Interceptores-1 falla contra Shahed #49 (Pk 60%)."
+  ],
+  [
+   1019.25,
+   "l",
+   "Gepard-1 dispara 1× ráfaga 35 mm contra Shahed #49 — intercepción a 2.7 km en 3 s."
+  ],
+  [
+   1021.75,
+   "k",
+   "Gepard-1 derriba Shahed #49 — Pk 55%."
+  ],
+  [
+   1022.25,
+   "x",
+   "dron interceptor de Interceptores-1 falla contra Shahed #50 (Pk 60%)."
+  ],
+  [
+   1023.25,
+   "l",
+   "Gepard-1 dispara 1× ráfaga 35 mm contra Shahed #50 — intercepción a 2.8 km en 3 s."
+  ],
+  [
+   1026.25,
+   "k",
+   "Gepard-1 derriba Shahed #50 — Pk 55%."
+  ],
+  [
+   1049,
+   "l",
+   "Primera detección: Gerbera #54 por Acústico-2 a 5.0 km, 600 m AGL."
+  ],
+  [
+   1051.5,
+   "l",
+   "Primera detección: Gerbera #56 por Acústico-1 a 5.0 km, 600 m AGL."
+  ],
+  [
+   1051.5,
+   "l",
+   "Primera detección: Gerbera #57 por Acústico-1 a 5.0 km, 600 m AGL."
+  ],
+  [
+   1053.5,
+   "l",
+   "Primera detección: Gerbera #58 por Acústico-1 a 5.0 km, 600 m AGL."
+  ],
+  [
+   1057,
+   "l",
+   "Primera detección: Gerbera #55 por Acústico-2 a 5.0 km, 600 m AGL."
+  ],
+  [
+   1057.5,
+   "l",
+   "Primera detección: Gerbera #59 por Acústico-1 a 5.0 km, 600 m AGL."
+  ],
+  [
+   1061.5,
+   "l",
+   "Primera detección: Gerbera #60 por Acústico-1 a 5.0 km, 600 m AGL."
+  ],
+  [
+   1065.5,
+   "l",
+   "Primera detección: Gerbera #61 por Acústico-1 a 5.0 km, 600 m AGL."
+  ],
+  [
+   1069.25,
+   "l",
+   "Interceptores-1 dispara 1× dron interceptor contra Gerbera #54 — intercepción a 6.1 km en 72 s."
+  ],
+  [
+   1069.5,
+   "l",
+   "Primera detección: Gerbera #62 por Acústico-1 a 5.0 km, 600 m AGL."
+  ],
+  [
+   1072.25,
+   "l",
+   "Interceptores-1 dispara 1× dron interceptor contra Gerbera #56 — intercepción a 6.4 km en 76 s."
+  ],
+  [
+   1072.25,
+   "l",
+   "Interceptores-1 dispara 1× dron interceptor contra Gerbera #57 — intercepción a 6.6 km en 80 s."
+  ],
+  [
+   1073.5,
+   "l",
+   "Primera detección: Gerbera #63 por Acústico-1 a 5.0 km, 600 m AGL."
+  ],
+  [
+   1074.25,
+   "l",
+   "Interceptores-1 dispara 1× dron interceptor contra Gerbera #58 — intercepción a 6.8 km en 82 s."
+  ],
+  [
+   1077.25,
+   "l",
+   "Interceptores-2 dispara 1× dron interceptor contra Gerbera #55 — intercepción a 3.3 km en 40 s."
+  ],
+  [
+   1078.25,
+   "l",
+   "Interceptores-2 dispara 1× dron interceptor contra Gerbera #59 — intercepción a 4.2 km en 50 s."
+  ],
+  [
+   1082.25,
+   "l",
+   "Interceptores-2 dispara 1× dron interceptor contra Gerbera #60 — intercepción a 4.3 km en 52 s."
+  ],
+  [
+   1086.25,
+   "l",
+   "Interceptores-2 dispara 1× dron interceptor contra Gerbera #61 — intercepción a 4.3 km en 54 s."
+  ],
+  [
+   1117.25,
+   "x",
+   "dron interceptor de Interceptores-2 falla contra Gerbera #55 (Pk 60%)."
+  ],
+  [
+   1128.25,
+   "k",
+   "Interceptores-2 derriba Gerbera #59 (era señuelo) — Pk 60%."
+  ],
+  [
+   1134.25,
+   "x",
+   "dron interceptor de Interceptores-2 falla contra Gerbera #60 (Pk 60%)."
+  ],
+  [
+   1140.25,
+   "x",
+   "dron interceptor de Interceptores-2 falla contra Gerbera #61 (Pk 60%)."
+  ],
+  [
+   1141.25,
+   "k",
+   "Interceptores-1 derriba Gerbera #54 (era señuelo) — Pk 60%."
+  ],
+  [
+   1142.25,
+   "l",
+   "Interceptores-1 dispara 1× dron interceptor contra Gerbera #55 — intercepción a 4.4 km en 54 s."
+  ],
+  [
+   1148.25,
+   "k",
+   "Interceptores-1 derriba Gerbera #56 (era señuelo) — Pk 60%."
+  ],
+  [
+   1149.25,
+   "l",
+   "Interceptores-1 dispara 1× dron interceptor contra Gerbera #60 — intercepción a 5.3 km en 64 s."
+  ],
+  [
+   1152.25,
+   "k",
+   "Interceptores-1 derriba Gerbera #57 (era señuelo) — Pk 60%."
+  ],
+  [
+   1153.25,
+   "l",
+   "Interceptores-1 dispara 1× dron interceptor contra Gerbera #61 — intercepción a 5.4 km en 66 s."
+  ],
+  [
+   1156.25,
+   "k",
+   "Interceptores-1 derriba Gerbera #58 (era señuelo) — Pk 60%."
+  ],
+  [
+   1157.25,
+   "l",
+   "Interceptores-1 dispara 1× dron interceptor contra Gerbera #62 — intercepción a 5.6 km en 66 s."
+  ],
+  [
+   1196.25,
+   "k",
+   "Interceptores-1 derriba Gerbera #55 (era señuelo) — Pk 60%."
+  ],
+  [
+   1197.25,
+   "l",
+   "Interceptores-1 dispara 1× dron interceptor contra Gerbera #63 — intercepción a 4.7 km en 58 s."
+  ],
+  [
+   1213.25,
+   "k",
+   "Interceptores-1 derriba Gerbera #60 (era señuelo) — Pk 60%."
+  ],
+  [
+   1219.25,
+   "k",
+   "Interceptores-1 derriba Gerbera #61 (era señuelo) — Pk 60%."
+  ],
+  [
+   1223.25,
+   "k",
+   "Interceptores-1 derriba Gerbera #62 (era señuelo) — Pk 60%."
+  ],
+  [
+   1255.25,
+   "x",
+   "dron interceptor de Interceptores-1 falla contra Gerbera #63 (Pk 60%)."
+  ],
+  [
+   1256.25,
+   "l",
+   "Gepard-1 dispara 1× ráfaga 35 mm contra Gerbera #63 — intercepción a 2.6 km en 3 s."
+  ],
+  [
+   1258.75,
+   "x",
+   "ráfaga 35 mm de Gepard-1 falla contra Gerbera #63 (Pk 55%)."
+  ],
+  [
+   1259.25,
+   "l",
+   "Gepard-1 dispara 1× ráfaga 35 mm contra Gerbera #63 — intercepción a 2.5 km en 3 s."
+  ],
+  [
+   1261.75,
+   "k",
+   "Gepard-1 derriba Gerbera #63 (era señuelo) — Pk 55%."
+  ],
+  [
+   1261.75,
+   "d",
+   "Fin: 30 derribos, 0 impactos en blanco, 0 fuera de blanco. Costo defensa US$210k vs ataque US$800k."
+  ]
+ ]
+}

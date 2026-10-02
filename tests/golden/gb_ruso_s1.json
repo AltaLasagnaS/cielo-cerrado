@@ -1,0 +1,731 @@
+{
+ "key": "gb_ruso",
+ "seed": 1,
+ "flat": false,
+ "net": true,
+ "doctrine": "salva",
+ "steps": 5924,
+ "t": 1481,
+ "ended": true,
+ "stats": {
+  "launched": 28,
+  "killed": 28,
+  "hits": 0,
+  "misses": 0,
+  "decoys": 0,
+  "decoysKilled": 0,
+  "shots": 50,
+  "defCost": 49.05,
+  "atkCost": 27.2,
+  "lost": 0,
+  "byUnit": {
+   "Tor-M2": 16,
+   "S-400": 29,
+   "Pantsir-1": 5
+  }
+ },
+ "units": [
+  [
+   "S-400",
+   true,
+   3
+  ],
+  [
+   "Pantsir-1",
+   true,
+   7
+  ],
+  [
+   "Pantsir-2",
+   true,
+   12
+  ],
+  [
+   "Tor-M2",
+   true,
+   0
+  ],
+  [
+   "Buk-M1",
+   true,
+   12
+  ],
+  [
+   "Radar VHF",
+   true,
+   0
+  ]
+ ],
+ "log": [
+  [
+   0,
+   "d",
+   "Inicio de la simulación: 28 amenazas programadas, 6 unidades de defensa."
+  ],
+  [
+   1041,
+   "l",
+   "Primera detección: Liutyi #44 por Tor-M2 a 18.5 km, 200 m AGL."
+  ],
+  [
+   1043,
+   "l",
+   "Primera detección: Liutyi #45 por Tor-M2 a 18.4 km, 200 m AGL."
+  ],
+  [
+   1043,
+   "l",
+   "Primera detección: Liutyi #47 por Tor-M2 a 18.5 km, 200 m AGL."
+  ],
+  [
+   1045,
+   "l",
+   "Primera detección: Liutyi #46 por Tor-M2 a 18.3 km, 200 m AGL."
+  ],
+  [
+   1046,
+   "l",
+   "Primera detección: Liutyi #48 por Tor-M2 a 18.4 km, 200 m AGL."
+  ],
+  [
+   1046,
+   "l",
+   "Primera detección: Liutyi #49 por Tor-M2 a 18.4 km, 200 m AGL."
+  ],
+  [
+   1047,
+   "l",
+   "Primera detección: Liutyi #50 por Tor-M2 a 18.4 km, 200 m AGL."
+  ],
+  [
+   1049,
+   "l",
+   "Primera detección: Liutyi #52 por Tor-M2 a 18.4 km, 200 m AGL."
+  ],
+  [
+   1051,
+   "l",
+   "Primera detección: Liutyi #51 por Tor-M2 a 18.2 km, 200 m AGL."
+  ],
+  [
+   1051,
+   "l",
+   "Primera detección: Liutyi #53 por Tor-M2 a 18.3 km, 200 m AGL."
+  ],
+  [
+   1051,
+   "l",
+   "Primera detección: Liutyi #54 por Tor-M2 a 18.4 km, 200 m AGL."
+  ],
+  [
+   1051,
+   "l",
+   "Primera detección: Liutyi #55 por Tor-M2 a 18.4 km, 200 m AGL."
+  ],
+  [
+   1051,
+   "l",
+   "Primera detección: Liutyi #56 por Tor-M2 a 18.5 km, 200 m AGL."
+  ],
+  [
+   1054,
+   "l",
+   "Primera detección: Liutyi #58 por Tor-M2 a 18.4 km, 200 m AGL."
+  ],
+  [
+   1055,
+   "l",
+   "Primera detección: Liutyi #59 por Tor-M2 a 18.4 km, 200 m AGL."
+  ],
+  [
+   1058,
+   "l",
+   "Primera detección: Liutyi #57 por Tor-M2 a 18.1 km, 200 m AGL."
+  ],
+  [
+   1065,
+   "w",
+   "Liutyi #44 entra en zona anti-GNSS: error de navegación ≈311 m."
+  ],
+  [
+   1065.75,
+   "w",
+   "Liutyi #45 entra en zona anti-GNSS: error de navegación ≈353 m."
+  ],
+  [
+   1066.75,
+   "w",
+   "Liutyi #46 entra en zona anti-GNSS: error de navegación ≈467 m."
+  ],
+  [
+   1067.5,
+   "w",
+   "Liutyi #47 entra en zona anti-GNSS: error de navegación ≈243 m."
+  ],
+  [
+   1068.5,
+   "w",
+   "Liutyi #48 entra en zona anti-GNSS: error de navegación ≈738 m."
+  ],
+  [
+   1069.25,
+   "w",
+   "Liutyi #49 entra en zona anti-GNSS: error de navegación ≈309 m."
+  ],
+  [
+   1070.25,
+   "w",
+   "Liutyi #50 entra en zona anti-GNSS: error de navegación ≈572 m."
+  ],
+  [
+   1071.25,
+   "w",
+   "Liutyi #51 entra en zona anti-GNSS: error de navegación ≈463 m."
+  ],
+  [
+   1072.25,
+   "w",
+   "Liutyi #52 entra en zona anti-GNSS: error de navegación ≈780 m."
+  ],
+  [
+   1073.5,
+   "w",
+   "Liutyi #53 entra en zona anti-GNSS: error de navegación ≈353 m."
+  ],
+  [
+   1074.5,
+   "w",
+   "Liutyi #54 entra en zona anti-GNSS: error de navegación ≈345 m."
+  ],
+  [
+   1075.75,
+   "w",
+   "Liutyi #55 entra en zona anti-GNSS: error de navegación ≈583 m."
+  ],
+  [
+   1076.75,
+   "w",
+   "Liutyi #56 entra en zona anti-GNSS: error de navegación ≈441 m."
+  ],
+  [
+   1078,
+   "w",
+   "Liutyi #57 entra en zona anti-GNSS: error de navegación ≈748 m."
+  ],
+  [
+   1079.25,
+   "w",
+   "Liutyi #58 entra en zona anti-GNSS: error de navegación ≈686 m."
+  ],
+  [
+   1080.25,
+   "l",
+   "Tor-M2 dispara 1× 9M338 contra Liutyi #44 — intercepción a 15.0 km en 24 s."
+  ],
+  [
+   1080.25,
+   "l",
+   "Tor-M2 dispara 1× 9M338 contra Liutyi #45 — intercepción a 15.0 km en 24 s."
+  ],
+  [
+   1080.5,
+   "w",
+   "Liutyi #59 entra en zona anti-GNSS: error de navegación ≈688 m."
+  ],
+  [
+   1082.25,
+   "l",
+   "Tor-M2 dispara 1× 9M338 contra Liutyi #47 — intercepción a 15.0 km en 24 s."
+  ],
+  [
+   1082.25,
+   "l",
+   "Tor-M2 dispara 1× 9M338 contra Liutyi #48 — intercepción a 15.0 km en 24 s."
+  ],
+  [
+   1103.75,
+   "k",
+   "Tor-M2 derriba Liutyi #44 — Pk 75%."
+  ],
+  [
+   1104.25,
+   "l",
+   "Tor-M2 dispara 1× 9M338 contra Liutyi #46 — intercepción a 13.9 km en 20 s."
+  ],
+  [
+   1104.25,
+   "k",
+   "Tor-M2 derriba Liutyi #45 — Pk 75%."
+  ],
+  [
+   1105.25,
+   "l",
+   "Tor-M2 dispara 1× 9M338 contra Liutyi #49 — intercepción a 14.0 km en 20 s."
+  ],
+  [
+   1105.75,
+   "k",
+   "Tor-M2 derriba Liutyi #47 — Pk 75%."
+  ],
+  [
+   1106.25,
+   "l",
+   "Tor-M2 dispara 1× 9M338 contra Liutyi #50 — intercepción a 14.0 km en 20 s."
+  ],
+  [
+   1106.25,
+   "k",
+   "Tor-M2 derriba Liutyi #48 — Pk 75%."
+  ],
+  [
+   1107.25,
+   "l",
+   "Tor-M2 dispara 1× 9M338 contra Liutyi #51 — intercepción a 13.9 km en 20 s."
+  ],
+  [
+   1124.25,
+   "k",
+   "Tor-M2 derriba Liutyi #46 — Pk 75%."
+  ],
+  [
+   1125.25,
+   "l",
+   "Tor-M2 dispara 1× 9M338 contra Liutyi #52 — intercepción a 13.0 km en 19 s."
+  ],
+  [
+   1125.25,
+   "k",
+   "Tor-M2 derriba Liutyi #49 — Pk 75%."
+  ],
+  [
+   1126.25,
+   "l",
+   "Tor-M2 dispara 1× 9M338 contra Liutyi #53 — intercepción a 13.0 km en 19 s."
+  ],
+  [
+   1126.25,
+   "k",
+   "Tor-M2 derriba Liutyi #50 — Pk 75%."
+  ],
+  [
+   1127.25,
+   "l",
+   "Tor-M2 dispara 1× 9M338 contra Liutyi #54 — intercepción a 13.0 km en 19 s."
+  ],
+  [
+   1127.25,
+   "k",
+   "Tor-M2 derriba Liutyi #51 — Pk 75%."
+  ],
+  [
+   1128.25,
+   "l",
+   "Tor-M2 dispara 1× 9M338 contra Liutyi #55 — intercepción a 13.0 km en 19 s."
+  ],
+  [
+   1144.25,
+   "k",
+   "Tor-M2 derriba Liutyi #52 — Pk 75%."
+  ],
+  [
+   1145.25,
+   "l",
+   "Tor-M2 dispara 1× 9M338 contra Liutyi #56 — intercepción a 12.2 km en 18 s."
+  ],
+  [
+   1145.25,
+   "k",
+   "Tor-M2 derriba Liutyi #53 — Pk 75%."
+  ],
+  [
+   1146.25,
+   "l",
+   "Tor-M2 dispara 1× 9M338 contra Liutyi #57 — intercepción a 12.2 km en 18 s."
+  ],
+  [
+   1146.25,
+   "x",
+   "9M338 de Tor-M2 falla contra Liutyi #54 (Pk 75%)."
+  ],
+  [
+   1147.25,
+   "l",
+   "Tor-M2 dispara 1× 9M338 contra Liutyi #54 — intercepción a 12.0 km en 18 s."
+  ],
+  [
+   1147.25,
+   "k",
+   "Tor-M2 derriba Liutyi #55 — Pk 75%."
+  ],
+  [
+   1148.25,
+   "l",
+   "Tor-M2 dispara 1× 9M338 contra Liutyi #58 — intercepción a 12.2 km en 18 s."
+  ],
+  [
+   1162.75,
+   "x",
+   "9M338 de Tor-M2 falla contra Liutyi #56 (Pk 75%)."
+  ],
+  [
+   1163.75,
+   "k",
+   "Tor-M2 derriba Liutyi #57 — Pk 75%."
+  ],
+  [
+   1164.75,
+   "x",
+   "9M338 de Tor-M2 falla contra Liutyi #54 (Pk 75%)."
+  ],
+  [
+   1165.75,
+   "k",
+   "Tor-M2 derriba Liutyi #58 — Pk 75%."
+  ],
+  [
+   1293.5,
+   "l",
+   "Primera detección: Storm Shadow #34 por S-400 a 48.3 km, 35 m AGL."
+  ],
+  [
+   1297.5,
+   "l",
+   "Primera detección: Storm Shadow #35 por S-400 a 48.5 km, 35 m AGL."
+  ],
+  [
+   1301.5,
+   "l",
+   "Primera detección: Storm Shadow #36 por S-400 a 48.7 km, 35 m AGL."
+  ],
+  [
+   1307.5,
+   "l",
+   "Primera detección: Storm Shadow #37 por S-400 a 48.4 km, 35 m AGL."
+  ],
+  [
+   1311.5,
+   "l",
+   "Primera detección: Storm Shadow #38 por S-400 a 48.6 km, 35 m AGL."
+  ],
+  [
+   1315.5,
+   "l",
+   "Primera detección: Storm Shadow #39 por S-400 a 48.9 km, 35 m AGL."
+  ],
+  [
+   1371.25,
+   "l",
+   "S-400 dispara 2× 48N6 contra Storm Shadow #34 — intercepción a 23.0 km en 16 s."
+  ],
+  [
+   1373.25,
+   "l",
+   "S-400 dispara 2× 48N6 contra Storm Shadow #35 — intercepción a 23.7 km en 16 s."
+  ],
+  [
+   1375.25,
+   "l",
+   "S-400 dispara 2× 48N6 contra Storm Shadow #36 — intercepción a 24.3 km en 17 s."
+  ],
+  [
+   1377.25,
+   "l",
+   "S-400 dispara 2× 48N6 contra Storm Shadow #37 — intercepción a 25.0 km en 17 s."
+  ],
+  [
+   1379.25,
+   "l",
+   "S-400 dispara 2× 48N6 contra Storm Shadow #38 — intercepción a 25.7 km en 18 s."
+  ],
+  [
+   1386.75,
+   "k",
+   "S-400 derriba Storm Shadow #34 — Pk 52%."
+  ],
+  [
+   1387.25,
+   "l",
+   "S-400 dispara 1× 48N6 contra Storm Shadow #39 — intercepción a 25.0 km en 17 s."
+  ],
+  [
+   1387.5,
+   "d",
+   "48N6 de S-400: blanco ya destruido, autodestrucción."
+  ],
+  [
+   1389.25,
+   "x",
+   "48N6 de S-400 falla contra Storm Shadow #35 (Pk 52%)."
+  ],
+  [
+   1390,
+   "x",
+   "48N6 de S-400 falla contra Storm Shadow #35 (Pk 52%)."
+  ],
+  [
+   1390.25,
+   "l",
+   "S-400 dispara 2× 48N6 contra Storm Shadow #35 — intercepción a 19.8 km en 14 s."
+  ],
+  [
+   1391.5,
+   "l",
+   "Primera detección: ATACMS #61 por S-400 a 98.5 km, 39578 m AGL."
+  ],
+  [
+   1391.75,
+   "k",
+   "S-400 derriba Storm Shadow #36 — Pk 52%."
+  ],
+  [
+   1392,
+   "w",
+   "Storm Shadow #35 entra en zona anti-GNSS: error de navegación ≈256 m."
+  ],
+  [
+   1392.5,
+   "d",
+   "48N6 de S-400: blanco ya destruido, autodestrucción."
+  ],
+  [
+   1394.25,
+   "x",
+   "48N6 de S-400 falla contra Storm Shadow #37 (Pk 52%)."
+  ],
+  [
+   1395,
+   "k",
+   "S-400 derriba Storm Shadow #37 — Pk 52%."
+  ],
+  [
+   1395.5,
+   "l",
+   "Primera detección: ATACMS #62 por S-400 a 100.5 km, 39717 m AGL."
+  ],
+  [
+   1396.75,
+   "x",
+   "48N6 de S-400 falla contra Storm Shadow #38 (Pk 52%)."
+  ],
+  [
+   1397.5,
+   "l",
+   "Primera detección: ATACMS #63 por S-400 a 104.5 km, 39915 m AGL."
+  ],
+  [
+   1397.5,
+   "k",
+   "S-400 derriba Storm Shadow #38 — Pk 52%."
+  ],
+  [
+   1403.5,
+   "w",
+   "Neptune #41 entra en zona anti-GNSS: error de navegación ≈427 m."
+  ],
+  [
+   1403.75,
+   "k",
+   "S-400 derriba Storm Shadow #35 — Pk 52%."
+  ],
+  [
+   1404.25,
+   "x",
+   "48N6 de S-400 falla contra Storm Shadow #39 (Pk 52%)."
+  ],
+  [
+   1404.5,
+   "d",
+   "48N6 de S-400: blanco ya destruido, autodestrucción."
+  ],
+  [
+   1405.25,
+   "l",
+   "S-400 dispara 2× 48N6 contra ATACMS #61 — intercepción a 53.9 km en 38 s."
+  ],
+  [
+   1405.25,
+   "l",
+   "S-400 dispara 2× 48N6 contra Storm Shadow #39 — intercepción a 20.9 km en 15 s."
+  ],
+  [
+   1405.5,
+   "l",
+   "Primera detección: Neptune #41 por S-400 a 20.4 km, 12 m AGL."
+  ],
+  [
+   1407.5,
+   "l",
+   "Primera detección: ATACMS #64 por S-400 a 100.5 km, 39717 m AGL."
+  ],
+  [
+   1409.25,
+   "l",
+   "Pantsir-1 dispara 2× 57E6 contra Liutyi #54 — intercepción a 6.8 km en 8 s."
+  ],
+  [
+   1411.25,
+   "l",
+   "Pantsir-1 dispara 1× 57E6 contra Liutyi #56 — intercepción a 6.8 km en 8 s."
+  ],
+  [
+   1411.75,
+   "w",
+   "Storm Shadow #39 entra en zona anti-GNSS: error de navegación ≈248 m."
+  ],
+  [
+   1412.75,
+   "w",
+   "Neptune #42 entra en zona anti-GNSS: error de navegación ≈508 m."
+  ],
+  [
+   1413.25,
+   "l",
+   "S-400 dispara 2× 48N6 contra ATACMS #62 — intercepción a 53.9 km en 36 s."
+  ],
+  [
+   1415.5,
+   "l",
+   "Primera detección: Neptune #42 por S-400 a 20.3 km, 12 m AGL."
+  ],
+  [
+   1417.25,
+   "k",
+   "Pantsir-1 derriba Liutyi #54 — Pk 65%."
+  ],
+  [
+   1418,
+   "d",
+   "57E6 de Pantsir-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   1418.25,
+   "l",
+   "Pantsir-1 dispara 2× 57E6 contra Liutyi #59 — intercepción a 6.7 km en 8 s."
+  ],
+  [
+   1419.25,
+   "l",
+   "S-400 dispara 2× 48N6 contra ATACMS #63 — intercepción a 53.9 km en 36 s."
+  ],
+  [
+   1419.25,
+   "k",
+   "Pantsir-1 derriba Liutyi #56 — Pk 65%."
+  ],
+  [
+   1419.75,
+   "k",
+   "S-400 derriba Storm Shadow #39 — Pk 52%."
+  ],
+  [
+   1420.5,
+   "d",
+   "48N6 de S-400: blanco ya destruido, autodestrucción."
+  ],
+  [
+   1425.75,
+   "x",
+   "57E6 de Pantsir-1 falla contra Liutyi #59 (Pk 65%)."
+  ],
+  [
+   1426.5,
+   "k",
+   "Pantsir-1 derriba Liutyi #59 — Pk 65%."
+  ],
+  [
+   1427.25,
+   "l",
+   "S-400 dispara 2× 48N6 contra ATACMS #64 — intercepción a 51.7 km en 36 s."
+  ],
+  [
+   1443.25,
+   "x",
+   "48N6 de S-400 falla contra ATACMS #61 (Pk 50%)."
+  ],
+  [
+   1444,
+   "k",
+   "S-400 derriba ATACMS #61 — Pk 50%."
+  ],
+  [
+   1449.25,
+   "x",
+   "48N6 de S-400 falla contra ATACMS #62 (Pk 50%)."
+  ],
+  [
+   1450,
+   "k",
+   "S-400 derriba ATACMS #62 — Pk 50%."
+  ],
+  [
+   1455.25,
+   "x",
+   "48N6 de S-400 falla contra ATACMS #63 (Pk 50%)."
+  ],
+  [
+   1456,
+   "k",
+   "S-400 derriba ATACMS #63 — Pk 50%."
+  ],
+  [
+   1461.25,
+   "l",
+   "S-400 dispara 2× 48N6 contra Neptune #41 — intercepción a 4.6 km en 6 s."
+  ],
+  [
+   1463.25,
+   "k",
+   "S-400 derriba ATACMS #64 — Pk 50%."
+  ],
+  [
+   1464,
+   "d",
+   "48N6 de S-400: blanco ya destruido, autodestrucción."
+  ],
+  [
+   1467.25,
+   "k",
+   "S-400 derriba Neptune #41 — Pk 49%."
+  ],
+  [
+   1468,
+   "d",
+   "48N6 de S-400: blanco ya destruido, autodestrucción."
+  ],
+  [
+   1471.25,
+   "l",
+   "S-400 dispara 2× 48N6 contra Neptune #42 — intercepción a 4.7 km en 5 s."
+  ],
+  [
+   1476.25,
+   "x",
+   "48N6 de S-400 falla contra Neptune #42 (Pk 49%)."
+  ],
+  [
+   1477,
+   "x",
+   "48N6 de S-400 falla contra Neptune #42 (Pk 49%)."
+  ],
+  [
+   1477.25,
+   "l",
+   "S-400 dispara 2× 48N6 contra Neptune #42 — intercepción a 3.7 km en 3 s."
+  ],
+  [
+   1480.25,
+   "x",
+   "48N6 de S-400 falla contra Neptune #42 (Pk 49%)."
+  ],
+  [
+   1481,
+   "k",
+   "S-400 derriba Neptune #42 — Pk 49%."
+  ],
+  [
+   1481,
+   "d",
+   "Fin: 28 derribos, 0 impactos en blanco, 0 fuera de blanco. Costo defensa US$49 M vs ataque US$27 M."
+  ]
+ ]
+}

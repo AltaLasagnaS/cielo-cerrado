@@ -1,0 +1,15 @@
+{
+  "name": "cielo-cerrado",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Simulador educativo de defensa aérea (datos públicos aproximados). Abre con doble clic en index.html.",
+  "scripts": {
+    "test": "node tests/run.cjs",
+    "golden": "git show main:index.html > .original.html && node tests/make-golden.cjs .original.html",
+    "equiv": "git show main:index.html > .original.html && node tests/equiv-original.cjs .original.html"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.1"
+  },
+  "license": "UNLICENSED"
+}

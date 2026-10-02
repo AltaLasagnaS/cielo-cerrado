@@ -1,0 +1,325 @@
+{
+ "key": "mb_vacio",
+ "seed": 1,
+ "flat": true,
+ "net": true,
+ "doctrine": "salva",
+ "steps": 941,
+ "t": 235.25,
+ "ended": true,
+ "stats": {
+  "launched": 16,
+  "killed": 16,
+  "hits": 0,
+  "misses": 0,
+  "decoys": 0,
+  "decoysKilled": 0,
+  "shots": 19,
+  "defCost": 11.78,
+  "atkCost": 35.2,
+  "lost": 0,
+  "byUnit": {
+   "IRIS-T-1": 15,
+   "NASAMS-1": 4
+  }
+ },
+ "units": [
+  [
+   "IRIS-T-1",
+   true,
+   9
+  ],
+  [
+   "NASAMS-1",
+   true,
+   14
+  ],
+  [
+   "Radar 3D-1",
+   true,
+   0
+  ]
+ ],
+ "log": [
+  [
+   0,
+   "d",
+   "Inicio de la simulación: 16 amenazas programadas, 3 unidades de defensa."
+  ],
+  [
+   91.25,
+   "l",
+   "Primera detección: Kh-101 #26 por Radar 3D-1 a 37.9 km, 50 m AGL."
+  ],
+  [
+   94.5,
+   "l",
+   "Primera detección: Kh-101 #27 por IRIS-T-1 a 33.8 km, 50 m AGL."
+  ],
+  [
+   97.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Kh-101 #26 — intercepción a 25.3 km en 36 s."
+  ],
+  [
+   98.5,
+   "l",
+   "Primera detección: Kh-101 #28 por IRIS-T-1 a 33.7 km, 50 m AGL."
+  ],
+  [
+   101.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Kh-101 #27 — intercepción a 25.2 km en 36 s."
+  ],
+  [
+   102.5,
+   "l",
+   "Primera detección: Kh-101 #29 por IRIS-T-1 a 33.6 km, 50 m AGL."
+  ],
+  [
+   105.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Kh-101 #28 — intercepción a 25.2 km en 36 s."
+  ],
+  [
+   105.5,
+   "l",
+   "Primera detección: Kh-101 #30 por IRIS-T-1 a 33.8 km, 50 m AGL."
+  ],
+  [
+   109.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Kh-101 #29 — intercepción a 25.5 km en 34 s."
+  ],
+  [
+   109.5,
+   "l",
+   "Primera detección: Kh-101 #31 por IRIS-T-1 a 33.7 km, 50 m AGL."
+  ],
+  [
+   112.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Kh-101 #30 — intercepción a 25.2 km en 36 s."
+  ],
+  [
+   113.5,
+   "l",
+   "Primera detección: Kh-101 #32 por IRIS-T-1 a 33.7 km, 50 m AGL."
+  ],
+  [
+   116.25,
+   "l",
+   "Primera detección: Kh-101 #33 por Radar 3D-1 a 38.0 km, 50 m AGL."
+  ],
+  [
+   116.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Kh-101 #31 — intercepción a 25.2 km en 36 s."
+  ],
+  [
+   120.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Kh-101 #32 — intercepción a 25.1 km en 36 s."
+  ],
+  [
+   120.5,
+   "l",
+   "Primera detección: Kh-101 #34 por IRIS-T-1 a 33.8 km, 50 m AGL."
+  ],
+  [
+   122.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Kh-101 #33 — intercepción a 25.5 km en 36 s."
+  ],
+  [
+   124.5,
+   "l",
+   "Primera detección: Kh-101 #35 por IRIS-T-1 a 33.7 km, 50 m AGL."
+  ],
+  [
+   127.25,
+   "l",
+   "NASAMS-1 dispara 1× AIM-120 contra Kh-101 #34 — intercepción a 28.1 km en 32 s."
+  ],
+  [
+   128.5,
+   "l",
+   "Primera detección: Kh-101 #36 por IRIS-T-1 a 33.7 km, 50 m AGL."
+  ],
+  [
+   131.25,
+   "l",
+   "Primera detección: Kh-101 #37 por Radar 3D-1 a 38.0 km, 50 m AGL."
+  ],
+  [
+   131.25,
+   "l",
+   "NASAMS-1 dispara 1× AIM-120 contra Kh-101 #35 — intercepción a 28.0 km en 32 s."
+  ],
+  [
+   133.25,
+   "k",
+   "IRIS-T-1 derriba Kh-101 #26 — Pk 75%."
+  ],
+  [
+   135.25,
+   "l",
+   "NASAMS-1 dispara 1× AIM-120 contra Kh-101 #36 — intercepción a 28.0 km en 32 s."
+  ],
+  [
+   135.5,
+   "l",
+   "Primera detección: Kh-101 #38 por IRIS-T-1 a 33.8 km, 50 m AGL."
+  ],
+  [
+   137.25,
+   "l",
+   "NASAMS-1 dispara 1× AIM-120 contra Kh-101 #37 — intercepción a 28.4 km en 32 s."
+  ],
+  [
+   137.25,
+   "k",
+   "IRIS-T-1 derriba Kh-101 #27 — Pk 75%."
+  ],
+  [
+   139.5,
+   "l",
+   "Primera detección: Kh-101 #39 por IRIS-T-1 a 33.7 km, 50 m AGL."
+  ],
+  [
+   141.25,
+   "k",
+   "IRIS-T-1 derriba Kh-101 #28 — Pk 75%."
+  ],
+  [
+   142.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Kh-101 #38 — intercepción a 25.2 km en 36 s."
+  ],
+  [
+   143.25,
+   "k",
+   "IRIS-T-1 derriba Kh-101 #29 — Pk 75%."
+  ],
+  [
+   143.5,
+   "l",
+   "Primera detección: Kh-101 #40 por IRIS-T-1 a 33.7 km, 50 m AGL."
+  ],
+  [
+   146.25,
+   "l",
+   "Primera detección: Kh-101 #41 por Radar 3D-1 a 38.0 km, 50 m AGL."
+  ],
+  [
+   146.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Kh-101 #39 — intercepción a 25.2 km en 36 s."
+  ],
+  [
+   148.25,
+   "k",
+   "IRIS-T-1 derriba Kh-101 #30 — Pk 75%."
+  ],
+  [
+   150.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Kh-101 #40 — intercepción a 25.2 km en 36 s."
+  ],
+  [
+   152.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Kh-101 #41 — intercepción a 25.5 km en 36 s."
+  ],
+  [
+   152.25,
+   "k",
+   "IRIS-T-1 derriba Kh-101 #31 — Pk 75%."
+  ],
+  [
+   156.25,
+   "k",
+   "IRIS-T-1 derriba Kh-101 #32 — Pk 75%."
+  ],
+  [
+   158.25,
+   "k",
+   "IRIS-T-1 derriba Kh-101 #33 — Pk 75%."
+  ],
+  [
+   159.25,
+   "x",
+   "AIM-120 de NASAMS-1 falla contra Kh-101 #34 (Pk 75%)."
+  ],
+  [
+   160.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Kh-101 #34 — intercepción a 20.3 km en 28 s."
+  ],
+  [
+   163.25,
+   "k",
+   "NASAMS-1 derriba Kh-101 #35 — Pk 75%."
+  ],
+  [
+   167.25,
+   "k",
+   "NASAMS-1 derriba Kh-101 #36 — Pk 75%."
+  ],
+  [
+   169.25,
+   "k",
+   "NASAMS-1 derriba Kh-101 #37 — Pk 75%."
+  ],
+  [
+   178.25,
+   "k",
+   "IRIS-T-1 derriba Kh-101 #38 — Pk 75%."
+  ],
+  [
+   182.25,
+   "k",
+   "IRIS-T-1 derriba Kh-101 #39 — Pk 75%."
+  ],
+  [
+   186.25,
+   "x",
+   "IRIS-T SL de IRIS-T-1 falla contra Kh-101 #40 (Pk 75%)."
+  ],
+  [
+   187.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Kh-101 #40 — intercepción a 19.7 km en 27 s."
+  ],
+  [
+   187.75,
+   "k",
+   "IRIS-T-1 derriba Kh-101 #34 — Pk 75%."
+  ],
+  [
+   188.25,
+   "k",
+   "IRIS-T-1 derriba Kh-101 #41 — Pk 75%."
+  ],
+  [
+   213.75,
+   "x",
+   "IRIS-T SL de IRIS-T-1 falla contra Kh-101 #40 (Pk 75%)."
+  ],
+  [
+   214.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Kh-101 #40 — intercepción a 15.4 km en 21 s."
+  ],
+  [
+   235.25,
+   "k",
+   "IRIS-T-1 derriba Kh-101 #40 — Pk 75%."
+  ],
+  [
+   235.25,
+   "d",
+   "Fin: 16 derribos, 0 impactos en blanco, 0 fuera de blanco. Costo defensa US$12 M vs ataque US$35 M."
+  ]
+ ]
+}

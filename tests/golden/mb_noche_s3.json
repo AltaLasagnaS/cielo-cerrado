@@ -1,0 +1,968 @@
+{
+ "key": "mb_noche",
+ "seed": 3,
+ "flat": false,
+ "net": true,
+ "doctrine": "salva",
+ "steps": 6200,
+ "t": 1550,
+ "ended": true,
+ "stats": {
+  "launched": 49,
+  "killed": 42,
+  "hits": 0,
+  "misses": 0,
+  "decoys": 20,
+  "decoysKilled": 13,
+  "shots": 60,
+  "defCost": 96.347,
+  "atkCost": 20.98,
+  "lost": 0,
+  "byUnit": {
+   "IRIS-T-1": 24,
+   "NASAMS-1": 16,
+   "Interceptores-1": 3,
+   "Patriot-1": 16,
+   "Gepard-1": 1
+  }
+ },
+ "units": [
+  [
+   "Radar 3D (cerro Gabilan)",
+   true,
+   0
+  ],
+  [
+   "Radar VHF",
+   true,
+   0
+  ],
+  [
+   "Patriot-1",
+   true,
+   0
+  ],
+  [
+   "IRIS-T-1",
+   true,
+   0
+  ],
+  [
+   "NASAMS-1",
+   true,
+   2
+  ],
+  [
+   "Gepard-1",
+   true,
+   19
+  ],
+  [
+   "Gepard-2",
+   true,
+   20
+  ],
+  [
+   "Grupo móvil 1",
+   true,
+   30
+  ],
+  [
+   "Grupo móvil 2",
+   true,
+   30
+  ],
+  [
+   "Grupo móvil 3",
+   true,
+   30
+  ],
+  [
+   "Acústico 1",
+   true,
+   0
+  ],
+  [
+   "Acústico 2",
+   true,
+   0
+  ],
+  [
+   "Acústico 3",
+   true,
+   0
+  ],
+  [
+   "Interceptores-1",
+   true,
+   17
+  ]
+ ],
+ "log": [
+  [
+   0,
+   "d",
+   "Inicio de la simulación: 37 amenazas programadas, 14 unidades de defensa."
+  ],
+  [
+   0.25,
+   "l",
+   "Primera detección: Shahed #43 por Radar VHF a 70.4 km, 800 m AGL."
+  ],
+  [
+   30.25,
+   "l",
+   "Primera detección: Shahed #44 por Radar VHF a 69.9 km, 800 m AGL."
+  ],
+  [
+   54.25,
+   "l",
+   "Primera detección: Shahed #45 por Radar VHF a 69.8 km, 800 m AGL."
+  ],
+  [
+   60.25,
+   "l",
+   "Primera detección: Gerbera #57 por Radar VHF a 68.9 km, 900 m AGL."
+  ],
+  [
+   90.25,
+   "l",
+   "Primera detección: Shahed #46 por Radar VHF a 69.0 km, 800 m AGL."
+  ],
+  [
+   90.25,
+   "l",
+   "Primera detección: Gerbera #58 por Radar VHF a 68.7 km, 900 m AGL."
+  ],
+  [
+   102.25,
+   "l",
+   "Primera detección: Shahed #47 por Radar VHF a 69.5 km, 800 m AGL."
+  ],
+  [
+   126.25,
+   "l",
+   "Primera detección: Gerbera #59 por Radar VHF a 68.2 km, 900 m AGL."
+  ],
+  [
+   126.25,
+   "l",
+   "Primera detección: Shahed #48 por Radar VHF a 69.3 km, 800 m AGL."
+  ],
+  [
+   150.25,
+   "l",
+   "Primera detección: Shahed #49 por Radar VHF a 69.1 km, 800 m AGL."
+  ],
+  [
+   150.25,
+   "l",
+   "Primera detección: Gerbera #60 por Radar VHF a 68.2 km, 900 m AGL."
+  ],
+  [
+   180.25,
+   "l",
+   "Primera detección: Shahed #50 por Radar VHF a 68.7 km, 800 m AGL."
+  ],
+  [
+   180.25,
+   "l",
+   "Primera detección: Gerbera #61 por Radar VHF a 68.0 km, 900 m AGL."
+  ],
+  [
+   204.25,
+   "l",
+   "Primera detección: Shahed #51 por Radar VHF a 68.5 km, 800 m AGL."
+  ],
+  [
+   204.25,
+   "l",
+   "Primera detección: Shahed #65 por Radar VHF a 70.6 km, 2200 m AGL."
+  ],
+  [
+   210.25,
+   "l",
+   "Primera detección: Gerbera #62 por Radar VHF a 67.8 km, 900 m AGL."
+  ],
+  [
+   228.25,
+   "l",
+   "Primera detección: Shahed #52 por Radar VHF a 68.4 km, 800 m AGL."
+  ],
+  [
+   240.25,
+   "l",
+   "Primera detección: Gerbera #63 por Radar VHF a 67.5 km, 900 m AGL."
+  ],
+  [
+   240.25,
+   "l",
+   "Primera detección: Shahed #66 por Radar VHF a 70.6 km, 2200 m AGL."
+  ],
+  [
+   252.25,
+   "l",
+   "Primera detección: Shahed #53 por Radar VHF a 68.2 km, 800 m AGL."
+  ],
+  [
+   270.25,
+   "l",
+   "Primera detección: Gerbera #64 por Radar VHF a 67.3 km, 900 m AGL."
+  ],
+  [
+   276.25,
+   "l",
+   "Primera detección: Shahed #54 por Radar VHF a 68.1 km, 800 m AGL."
+  ],
+  [
+   281.5,
+   "l",
+   "Primera detección: Shahed #67 por Radar 3D (cerro Gabilan) a 54.9 km, 2200 m AGL."
+  ],
+  [
+   300.25,
+   "l",
+   "Primera detección: Shahed #55 por Radar VHF a 67.9 km, 800 m AGL."
+  ],
+  [
+   312.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Shahed #43 — intercepción a 40.0 km en 56 s."
+  ],
+  [
+   321.5,
+   "l",
+   "Primera detección: Shahed #68 por Radar 3D (cerro Gabilan) a 54.7 km, 2200 m AGL."
+  ],
+  [
+   328.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Gerbera #57 — intercepción a 40.0 km en 56 s."
+  ],
+  [
+   330.25,
+   "l",
+   "Primera detección: Shahed #56 por Radar VHF a 67.5 km, 800 m AGL."
+  ],
+  [
+   335.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Shahed #44 — intercepción a 40.0 km en 56 s."
+  ],
+  [
+   356.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Gerbera #58 — intercepción a 40.0 km en 56 s."
+  ],
+  [
+   359.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Shahed #45 — intercepción a 40.0 km en 56 s."
+  ],
+  [
+   360.25,
+   "l",
+   "Primera detección: Shahed #69 por Radar VHF a 70.1 km, 2200 m AGL."
+  ],
+  [
+   368.25,
+   "k",
+   "IRIS-T-1 derriba Shahed #43 — Pk 90%."
+  ],
+  [
+   383.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Shahed #46 — intercepción a 40.0 km en 56 s."
+  ],
+  [
+   384.25,
+   "k",
+   "IRIS-T-1 derriba Gerbera #57 (era señuelo) — Pk 90%."
+  ],
+  [
+   385.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Gerbera #59 — intercepción a 40.0 km en 56 s."
+  ],
+  [
+   391.25,
+   "k",
+   "IRIS-T-1 derriba Shahed #44 — Pk 90%."
+  ],
+  [
+   401.5,
+   "l",
+   "Primera detección: Shahed #70 por Radar 3D (cerro Gabilan) a 54.2 km, 2200 m AGL."
+  ],
+  [
+   407.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Shahed #47 — intercepción a 40.0 km en 56 s."
+  ],
+  [
+   412.25,
+   "x",
+   "IRIS-T SL de IRIS-T-1 falla contra Gerbera #58 (Pk 90%)."
+  ],
+  [
+   413.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Gerbera #58 — intercepción a 38.0 km en 52 s."
+  ],
+  [
+   413.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Gerbera #60 — intercepción a 40.0 km en 56 s."
+  ],
+  [
+   415.25,
+   "x",
+   "IRIS-T SL de IRIS-T-1 falla contra Shahed #45 (Pk 90%)."
+  ],
+  [
+   416.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Shahed #45 — intercepción a 37.6 km en 52 s."
+  ],
+  [
+   431.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Shahed #48 — intercepción a 40.0 km en 56 s."
+  ],
+  [
+   439.25,
+   "k",
+   "IRIS-T-1 derriba Shahed #46 — Pk 90%."
+  ],
+  [
+   441.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Gerbera #61 — intercepción a 40.0 km en 56 s."
+  ],
+  [
+   441.25,
+   "k",
+   "IRIS-T-1 derriba Gerbera #59 (era señuelo) — Pk 90%."
+  ],
+  [
+   455.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Shahed #49 — intercepción a 40.0 km en 56 s."
+  ],
+  [
+   463.25,
+   "k",
+   "IRIS-T-1 derriba Shahed #47 — Pk 90%."
+  ],
+  [
+   465.25,
+   "x",
+   "IRIS-T SL de IRIS-T-1 falla contra Gerbera #58 (Pk 90%)."
+  ],
+  [
+   466.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Gerbera #58 — intercepción a 36.1 km en 50 s."
+  ],
+  [
+   468.25,
+   "k",
+   "IRIS-T-1 derriba Shahed #45 — Pk 90%."
+  ],
+  [
+   469.25,
+   "k",
+   "IRIS-T-1 derriba Gerbera #60 (era señuelo) — Pk 90%."
+  ],
+  [
+   470.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Gerbera #62 — intercepción a 40.0 km en 56 s."
+  ],
+  [
+   480.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Shahed #50 — intercepción a 40.0 km en 56 s."
+  ],
+  [
+   487.25,
+   "k",
+   "IRIS-T-1 derriba Shahed #48 — Pk 90%."
+  ],
+  [
+   497.25,
+   "k",
+   "IRIS-T-1 derriba Gerbera #61 (era señuelo) — Pk 90%."
+  ],
+  [
+   498.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Gerbera #63 — intercepción a 40.0 km en 56 s."
+  ],
+  [
+   504.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Shahed #51 — intercepción a 40.0 km en 56 s."
+  ],
+  [
+   511.25,
+   "k",
+   "IRIS-T-1 derriba Shahed #49 — Pk 90%."
+  ],
+  [
+   516.25,
+   "k",
+   "IRIS-T-1 derriba Gerbera #58 (era señuelo) — Pk 90%."
+  ],
+  [
+   526.25,
+   "k",
+   "IRIS-T-1 derriba Gerbera #62 (era señuelo) — Pk 90%."
+  ],
+  [
+   527.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Gerbera #64 — intercepción a 40.0 km en 56 s."
+  ],
+  [
+   528.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Shahed #52 — intercepción a 40.0 km en 56 s."
+  ],
+  [
+   536.25,
+   "x",
+   "IRIS-T SL de IRIS-T-1 falla contra Shahed #50 (Pk 90%)."
+  ],
+  [
+   537.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Shahed #50 — intercepción a 37.5 km en 52 s."
+  ],
+  [
+   553.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Shahed #53 — intercepción a 40.0 km en 56 s."
+  ],
+  [
+   554.25,
+   "x",
+   "IRIS-T SL de IRIS-T-1 falla contra Gerbera #63 (Pk 90%)."
+  ],
+  [
+   555.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Gerbera #63 — intercepción a 38.0 km en 52 s."
+  ],
+  [
+   560.25,
+   "k",
+   "IRIS-T-1 derriba Shahed #51 — Pk 90%."
+  ],
+  [
+   583.25,
+   "k",
+   "IRIS-T-1 derriba Gerbera #64 (era señuelo) — Pk 90%."
+  ],
+  [
+   584.25,
+   "k",
+   "IRIS-T-1 derriba Shahed #52 — Pk 90%."
+  ],
+  [
+   588.25,
+   "l",
+   "NASAMS-1 dispara 1× AIM-120 contra Shahed #65 — intercepción a 35.0 km en 40 s."
+  ],
+  [
+   589.25,
+   "k",
+   "IRIS-T-1 derriba Shahed #50 — Pk 90%."
+  ],
+  [
+   607.25,
+   "k",
+   "IRIS-T-1 derriba Gerbera #63 (era señuelo) — Pk 90%."
+  ],
+  [
+   609.25,
+   "k",
+   "IRIS-T-1 derriba Shahed #53 — Pk 90%."
+  ],
+  [
+   627.25,
+   "l",
+   "NASAMS-1 dispara 1× AIM-120 contra Shahed #66 — intercepción a 35.0 km en 40 s."
+  ],
+  [
+   628.25,
+   "k",
+   "NASAMS-1 derriba Shahed #65 — Pk 85%."
+  ],
+  [
+   666.25,
+   "l",
+   "NASAMS-1 dispara 1× AIM-120 contra Shahed #67 — intercepción a 35.0 km en 40 s."
+  ],
+  [
+   667.25,
+   "k",
+   "NASAMS-1 derriba Shahed #66 — Pk 85%."
+  ],
+  [
+   705.25,
+   "l",
+   "NASAMS-1 dispara 1× AIM-120 contra Shahed #68 — intercepción a 35.0 km en 40 s."
+  ],
+  [
+   706.25,
+   "k",
+   "NASAMS-1 derriba Shahed #67 — Pk 85%."
+  ],
+  [
+   728.25,
+   "l",
+   "Interceptores-1 dispara 1× dron interceptor contra Shahed #54 — intercepción a 25.0 km en 296 s."
+  ],
+  [
+   744.25,
+   "l",
+   "NASAMS-1 dispara 1× AIM-120 contra Shahed #69 — intercepción a 35.0 km en 40 s."
+  ],
+  [
+   745.25,
+   "k",
+   "NASAMS-1 derriba Shahed #68 — Pk 85%."
+  ],
+  [
+   751.25,
+   "l",
+   "Interceptores-1 dispara 1× dron interceptor contra Shahed #55 — intercepción a 25.0 km en 296 s."
+  ],
+  [
+   774.25,
+   "l",
+   "Interceptores-1 dispara 1× dron interceptor contra Shahed #56 — intercepción a 25.0 km en 296 s."
+  ],
+  [
+   783.25,
+   "l",
+   "NASAMS-1 dispara 1× AIM-120 contra Shahed #70 — intercepción a 35.0 km en 40 s."
+  ],
+  [
+   784.25,
+   "k",
+   "NASAMS-1 derriba Shahed #69 — Pk 85%."
+  ],
+  [
+   823.25,
+   "k",
+   "NASAMS-1 derriba Shahed #70 — Pk 85%."
+  ],
+  [
+   1024.25,
+   "x",
+   "dron interceptor de Interceptores-1 falla contra Shahed #54 (Pk 60%)."
+  ],
+  [
+   1025.25,
+   "l",
+   "NASAMS-1 dispara 1× AIM-120 contra Shahed #54 — intercepción a 24.3 km en 28 s."
+  ],
+  [
+   1047.25,
+   "x",
+   "dron interceptor de Interceptores-1 falla contra Shahed #55 (Pk 60%)."
+  ],
+  [
+   1048.25,
+   "l",
+   "NASAMS-1 dispara 1× AIM-120 contra Shahed #55 — intercepción a 24.3 km en 28 s."
+  ],
+  [
+   1052.75,
+   "x",
+   "AIM-120 de NASAMS-1 falla contra Shahed #54 (Pk 85%)."
+  ],
+  [
+   1053.25,
+   "l",
+   "NASAMS-1 dispara 1× AIM-120 contra Shahed #54 — intercepción a 23.0 km en 26 s."
+  ],
+  [
+   1070.25,
+   "k",
+   "Interceptores-1 derriba Shahed #56 — Pk 60%."
+  ],
+  [
+   1075.75,
+   "x",
+   "AIM-120 de NASAMS-1 falla contra Shahed #55 (Pk 85%)."
+  ],
+  [
+   1076.25,
+   "l",
+   "NASAMS-1 dispara 1× AIM-120 contra Shahed #55 — intercepción a 23.0 km en 26 s."
+  ],
+  [
+   1079.25,
+   "k",
+   "NASAMS-1 derriba Shahed #54 — Pk 85%."
+  ],
+  [
+   1102.25,
+   "k",
+   "NASAMS-1 derriba Shahed #55 — Pk 85%."
+  ],
+  [
+   1201.5,
+   "l",
+   "Primera detección: Kh-101 #72 por Radar 3D (cerro Gabilan) a 56.9 km, 40 m AGL."
+  ],
+  [
+   1211.25,
+   "l",
+   "Patriot-1 dispara 2× PAC-3 MSE contra Kh-101 #72 — intercepción a 50.1 km en 40 s."
+  ],
+  [
+   1251.25,
+   "k",
+   "Patriot-1 derriba Kh-101 #72 — Pk 77%."
+  ],
+  [
+   1252,
+   "d",
+   "PAC-3 MSE de Patriot-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   1296.25,
+   "l",
+   "Primera detección: Kalibr #77 por Radar VHF a 78.6 km, 25 m AGL."
+  ],
+  [
+   1306.5,
+   "l",
+   "Primera detección: Kalibr #78 por Radar 3D (cerro Gabilan) a 88.1 km, 25 m AGL."
+  ],
+  [
+   1316.5,
+   "l",
+   "Primera detección: Kh-101 #73 por Radar 3D (cerro Gabilan) a 37.7 km, 158 m AGL."
+  ],
+  [
+   1316.5,
+   "l",
+   "Primera detección: Kalibr #79 por Radar 3D (cerro Gabilan) a 87.8 km, 25 m AGL."
+  ],
+  [
+   1323.25,
+   "l",
+   "NASAMS-1 dispara 1× AIM-120 contra Kh-101 #73 — intercepción a 30.8 km en 36 s."
+  ],
+  [
+   1331.5,
+   "l",
+   "Primera detección: Kh-101 #74 por Radar 3D (cerro Gabilan) a 37.5 km, 155 m AGL."
+  ],
+  [
+   1338.25,
+   "l",
+   "NASAMS-1 dispara 1× AIM-120 contra Kh-101 #74 — intercepción a 30.7 km en 36 s."
+  ],
+  [
+   1344.25,
+   "l",
+   "Primera detección: Kh-101 #75 por Radar VHF a 52.1 km, 71 m AGL."
+  ],
+  [
+   1350.25,
+   "l",
+   "NASAMS-1 dispara 1× AIM-120 contra Kh-101 #75 — intercepción a 31.2 km en 36 s."
+  ],
+  [
+   1359.25,
+   "k",
+   "NASAMS-1 derriba Kh-101 #73 — Pk 75%."
+  ],
+  [
+   1374.25,
+   "k",
+   "NASAMS-1 derriba Kh-101 #74 — Pk 75%."
+  ],
+  [
+   1386.25,
+   "k",
+   "NASAMS-1 derriba Kh-101 #75 — Pk 75%."
+  ],
+  [
+   1414.25,
+   "l",
+   "NASAMS-1 dispara 1× AIM-120 contra Kalibr #77 — intercepción a 22.9 km en 28 s."
+  ],
+  [
+   1423.25,
+   "l",
+   "NASAMS-1 dispara 1× AIM-120 contra Kalibr #78 — intercepción a 22.8 km en 28 s."
+  ],
+  [
+   1428.25,
+   "l",
+   "Primera detección: Iskander-M #81 por Radar VHF a 99.3 km, 42829 m AGL."
+  ],
+  [
+   1432.25,
+   "l",
+   "NASAMS-1 dispara 1× AIM-120 contra Kalibr #79 — intercepción a 22.8 km en 28 s."
+  ],
+  [
+   1440.25,
+   "l",
+   "Primera detección: Iskander-M #82 por Radar VHF a 108.4 km, 43873 m AGL."
+  ],
+  [
+   1442.25,
+   "x",
+   "AIM-120 de NASAMS-1 falla contra Kalibr #77 (Pk 88%)."
+  ],
+  [
+   1451.25,
+   "k",
+   "NASAMS-1 derriba Kalibr #78 — Pk 88%."
+  ],
+  [
+   1460.25,
+   "k",
+   "NASAMS-1 derriba Kalibr #79 — Pk 88%."
+  ],
+  [
+   1468.25,
+   "l",
+   "Patriot-1 dispara 2× PAC-3 MSE contra Iskander-M #81 — intercepción a 38.7 km en 32 s."
+  ],
+  [
+   1469.25,
+   "l",
+   "Gepard-1 dispara 1× ráfaga 35 mm contra Kalibr #77 — intercepción a 3.1 km en 3 s."
+  ],
+  [
+   1472.25,
+   "k",
+   "Gepard-1 derriba Kalibr #77 — Pk 35%."
+  ],
+  [
+   1488.25,
+   "l",
+   "Patriot-1 dispara 2× PAC-3 MSE contra Iskander-M #82 — intercepción a 38.7 km en 32 s."
+  ],
+  [
+   1495.25,
+   "w",
+   "Iskander-M #81 libera 6 señuelos a 40 km del blanco."
+  ],
+  [
+   1495.25,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #83 por IRIS-T-1 a 51.3 km, 20329 m AGL."
+  ],
+  [
+   1495.25,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #86 por IRIS-T-1 a 51.3 km, 20329 m AGL."
+  ],
+  [
+   1496.25,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #84 por IRIS-T-1 a 50.3 km, 19806 m AGL."
+  ],
+  [
+   1496.25,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #85 por IRIS-T-1 a 50.2 km, 19800 m AGL."
+  ],
+  [
+   1496.25,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #88 por IRIS-T-1 a 50.2 km, 19815 m AGL."
+  ],
+  [
+   1496.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #87 por Radar 3D (cerro Gabilan) a 42.6 km, 19718 m AGL."
+  ],
+  [
+   1500.25,
+   "k",
+   "Patriot-1 derriba Iskander-M #81 — Pk 70%."
+  ],
+  [
+   1501,
+   "d",
+   "PAC-3 MSE de Patriot-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   1504.25,
+   "l",
+   "Patriot-1 dispara 2× PAC-3 MSE contra Señuelo de Iskander-M #83 — intercepción a 16.3 km en 13 s."
+  ],
+  [
+   1504.25,
+   "l",
+   "Patriot-1 dispara 2× PAC-3 MSE contra Señuelo de Iskander-M #86 — intercepción a 17.5 km en 14 s."
+  ],
+  [
+   1505.25,
+   "l",
+   "Patriot-1 dispara 2× PAC-3 MSE contra Señuelo de Iskander-M #84 — intercepción a 16.8 km en 14 s."
+  ],
+  [
+   1515.25,
+   "w",
+   "Iskander-M #82 libera 6 señuelos a 40 km del blanco."
+  ],
+  [
+   1515.25,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #92 por IRIS-T-1 a 51.3 km, 20329 m AGL."
+  ],
+  [
+   1515.25,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #94 por IRIS-T-1 a 51.3 km, 20329 m AGL."
+  ],
+  [
+   1516.25,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #91 por IRIS-T-1 a 50.2 km, 19803 m AGL."
+  ],
+  [
+   1516.25,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #93 por IRIS-T-1 a 50.3 km, 19809 m AGL."
+  ],
+  [
+   1516.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #89 por Radar 3D (cerro Gabilan) a 42.6 km, 19713 m AGL."
+  ],
+  [
+   1516.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #90 por Radar 3D (cerro Gabilan) a 42.6 km, 19709 m AGL."
+  ],
+  [
+   1517.25,
+   "k",
+   "Patriot-1 derriba Señuelo de Iskander-M #83 (era señuelo) — Pk 42%."
+  ],
+  [
+   1517.75,
+   "k",
+   "Patriot-1 derriba Señuelo de Iskander-M #86 (era señuelo) — Pk 42%."
+  ],
+  [
+   1518,
+   "d",
+   "PAC-3 MSE de Patriot-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   1518.25,
+   "l",
+   "Patriot-1 dispara 2× PAC-3 MSE contra Señuelo de Iskander-M #85 — intercepción a 7.6 km en 6 s."
+  ],
+  [
+   1518.25,
+   "l",
+   "Patriot-1 dispara 1× PAC-3 MSE contra Señuelo de Iskander-M #87 — intercepción a 6.6 km en 6 s."
+  ],
+  [
+   1518.5,
+   "d",
+   "PAC-3 MSE de Patriot-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   1518.75,
+   "k",
+   "Patriot-1 derriba Señuelo de Iskander-M #84 (era señuelo) — Pk 42%."
+  ],
+  [
+   1519.25,
+   "l",
+   "Patriot-1 dispara 1× PAC-3 MSE contra Señuelo de Iskander-M #88 — intercepción a 7.2 km en 6 s."
+  ],
+  [
+   1519.5,
+   "d",
+   "PAC-3 MSE de Patriot-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   1520.25,
+   "k",
+   "Patriot-1 derriba Iskander-M #82 — Pk 70%."
+  ],
+  [
+   1521,
+   "d",
+   "PAC-3 MSE de Patriot-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   1524.25,
+   "k",
+   "Patriot-1 derriba Señuelo de Iskander-M #85 (era señuelo) — Pk 42%."
+  ],
+  [
+   1524.25,
+   "x",
+   "PAC-3 MSE de Patriot-1 falla contra Señuelo de Iskander-M #87 (Pk 42%)."
+  ],
+  [
+   1525,
+   "d",
+   "PAC-3 MSE de Patriot-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   1525.25,
+   "k",
+   "Patriot-1 derriba Señuelo de Iskander-M #88 (era señuelo) — Pk 42%."
+  ],
+  [
+   1530,
+   "d",
+   "Señuelo de Iskander-M #87 cae sin efecto."
+  ],
+  [
+   1550,
+   "d",
+   "Señuelo de Iskander-M #89 cae sin efecto."
+  ],
+  [
+   1550,
+   "d",
+   "Señuelo de Iskander-M #90 cae sin efecto."
+  ],
+  [
+   1550,
+   "d",
+   "Señuelo de Iskander-M #91 cae sin efecto."
+  ],
+  [
+   1550,
+   "d",
+   "Señuelo de Iskander-M #92 cae sin efecto."
+  ],
+  [
+   1550,
+   "d",
+   "Señuelo de Iskander-M #93 cae sin efecto."
+  ],
+  [
+   1550,
+   "d",
+   "Señuelo de Iskander-M #94 cae sin efecto."
+  ],
+  [
+   1550,
+   "d",
+   "Fin: 42 derribos, 0 impactos en blanco, 0 fuera de blanco. Costo defensa US$96 M vs ataque US$21 M."
+  ]
+ ]
+}

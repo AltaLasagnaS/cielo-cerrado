@@ -1,0 +1,42 @@
+[
+ {
+  "key": "mb_noche",
+  "ref": "kh101",
+  "agl": 50,
+  "hash": "43393c9f",
+  "sum": 179994,
+  "pct": 44
+ },
+ {
+  "key": "mb_noche",
+  "ref": "shahed",
+  "agl": 2000,
+  "hash": "7d7ed6bb",
+  "sum": 618264,
+  "pct": 99
+ },
+ {
+  "key": "mb_noche",
+  "ref": "isk_m",
+  "agl": 10000,
+  "hash": "92072e96",
+  "sum": 850039,
+  "pct": 100
+ },
+ {
+  "key": "gb_ruso",
+  "ref": "storm",
+  "agl": 35,
+  "hash": "f3e5a991",
+  "sum": 27786,
+  "pct": 16
+ },
+ {
+  "key": "gb_ruso",
+  "ref": "lyutyi",
+  "agl": 200,
+  "hash": "81beb43",
+  "sum": 118196,
+  "pct": 55
+ }
+]

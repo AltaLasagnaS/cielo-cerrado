@@ -1,0 +1,1723 @@
+{
+ "key": "mb_vacio",
+ "seed": 3,
+ "flat": false,
+ "net": false,
+ "doctrine": "sls",
+ "steps": 3960,
+ "t": 990,
+ "ended": true,
+ "stats": {
+  "launched": 58,
+  "killed": 51,
+  "hits": 0,
+  "misses": 6,
+  "decoys": 18,
+  "decoysKilled": 17,
+  "shots": 114,
+  "defCost": 186.586,
+  "atkCost": 59.05,
+  "lost": 0,
+  "byUnit": {
+   "IRIS-T-1": 20,
+   "S-300P-1": 4,
+   "Tor-M2-1": 9,
+   "S-400-1": 32,
+   "Buk-M1-1": 3,
+   "SAMP/T-1": 26,
+   "Pantsir-1": 1,
+   "Gepard-1": 2,
+   "Patriot-1": 16,
+   "Patriot GEM-T-1": 1
+  }
+ },
+ "units": [
+  [
+   "Radar 3D-1",
+   true,
+   0
+  ],
+  [
+   "Radar VHF-1",
+   true,
+   0
+  ],
+  [
+   "Saab AEW-1",
+   true,
+   0
+  ],
+  [
+   "Acústico-1",
+   true,
+   0
+  ],
+  [
+   "Acústico-2",
+   true,
+   0
+  ],
+  [
+   "Patriot-1",
+   true,
+   0
+  ],
+  [
+   "Patriot GEM-T-1",
+   true,
+   15
+  ],
+  [
+   "SAMP/T-1",
+   true,
+   6
+  ],
+  [
+   "IRIS-T-1",
+   true,
+   4
+  ],
+  [
+   "NASAMS-1",
+   true,
+   18
+  ],
+  [
+   "S-300P-1",
+   true,
+   12
+  ],
+  [
+   "Buk-M1-1",
+   true,
+   9
+  ],
+  [
+   "Gepard-1",
+   true,
+   18
+  ],
+  [
+   "Grupo móvil-1",
+   true,
+   30
+  ],
+  [
+   "MANPADS-1",
+   true,
+   4
+  ],
+  [
+   "Interceptores-1",
+   true,
+   20
+  ],
+  [
+   "Pantsir-1",
+   true,
+   11
+  ],
+  [
+   "Tor-M2-1",
+   true,
+   7
+  ],
+  [
+   "S-400-1",
+   true,
+   0
+  ],
+  [
+   "A-50U-1",
+   true,
+   0
+  ]
+ ],
+ "log": [
+  [
+   0,
+   "d",
+   "Inicio de la simulación: 46 amenazas programadas, 20 unidades de defensa."
+  ],
+  [
+   0.25,
+   "l",
+   "Primera detección: Shahed #62 por Radar VHF-1 a 69.5 km, 800 m AGL."
+  ],
+  [
+   13,
+   "l",
+   "Primera detección: Gerbera #72 por Saab AEW-1 a 58.0 km, 900 m AGL."
+  ],
+  [
+   20.75,
+   "l",
+   "Primera detección: Shahed #63 por S-400-1 a 72.8 km, 800 m AGL."
+  ],
+  [
+   25,
+   "l",
+   "Primera detección: Gerbera #73 por Saab AEW-1 a 58.1 km, 900 m AGL."
+  ],
+  [
+   30.25,
+   "l",
+   "Primera detección: Geran-3 #68 por Radar VHF-1 a 68.4 km, 1500 m AGL."
+  ],
+  [
+   40.75,
+   "l",
+   "Primera detección: Shahed #64 por S-400-1 a 72.7 km, 800 m AGL."
+  ],
+  [
+   41,
+   "l",
+   "Primera detección: Gerbera #74 por Saab AEW-1 a 58.1 km, 900 m AGL."
+  ],
+  [
+   45,
+   "l",
+   "Primera detección: Geran-3 #69 por Saab AEW-1 a 55.2 km, 1500 m AGL."
+  ],
+  [
+   57,
+   "l",
+   "Primera detección: Gerbera #75 por Saab AEW-1 a 58.1 km, 900 m AGL."
+  ],
+  [
+   60.25,
+   "l",
+   "Primera detección: Shahed #65 por Radar VHF-1 a 68.9 km, 800 m AGL."
+  ],
+  [
+   60.25,
+   "l",
+   "Primera detección: Geran-3 #70 por Radar VHF-1 a 67.9 km, 1500 m AGL."
+  ],
+  [
+   61,
+   "l",
+   "Primera detección: Liutyi #78 por Saab AEW-1 a 51.8 km, 482 m AGL."
+  ],
+  [
+   71.5,
+   "l",
+   "Primera detección: Liutyi #79 por A-50U-1 a 58.1 km, 424 m AGL."
+  ],
+  [
+   72.25,
+   "l",
+   "Primera detección: Gerbera #76 por Radar VHF-1 a 67.7 km, 900 m AGL."
+  ],
+  [
+   77,
+   "l",
+   "Primera detección: Geran-3 #71 por Saab AEW-1 a 55.0 km, 1500 m AGL."
+  ],
+  [
+   80.75,
+   "l",
+   "Primera detección: Shahed #66 por S-400-1 a 72.6 km, 800 m AGL."
+  ],
+  [
+   81,
+   "l",
+   "Primera detección: Liutyi #80 por Saab AEW-1 a 52.0 km, 370 m AGL."
+  ],
+  [
+   85,
+   "l",
+   "Primera detección: Gerbera #77 por Saab AEW-1 a 58.2 km, 900 m AGL."
+  ],
+  [
+   88.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Geran-3 #68 — intercepción a 39.9 km en 56 s."
+  ],
+  [
+   91.5,
+   "l",
+   "Primera detección: Liutyi #81 por Radar 3D-1 a 46.4 km, 445 m AGL."
+  ],
+  [
+   100.75,
+   "l",
+   "Primera detección: Shahed #67 por S-400-1 a 72.5 km, 800 m AGL."
+  ],
+  [
+   102.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Geran-3 #69 — intercepción a 39.9 km en 56 s."
+  ],
+  [
+   120.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Geran-3 #70 — intercepción a 39.7 km en 54 s."
+  ],
+  [
+   135.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Geran-3 #71 — intercepción a 39.7 km en 54 s."
+  ],
+  [
+   144.25,
+   "k",
+   "IRIS-T-1 derriba Geran-3 #68 — Pk 90%."
+  ],
+  [
+   158.25,
+   "k",
+   "IRIS-T-1 derriba Geran-3 #69 — Pk 90%."
+  ],
+  [
+   174.25,
+   "k",
+   "IRIS-T-1 derriba Geran-3 #70 — Pk 90%."
+  ],
+  [
+   189.25,
+   "k",
+   "IRIS-T-1 derriba Geran-3 #71 — Pk 90%."
+  ],
+  [
+   312.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Shahed #62 — intercepción a 39.8 km en 54 s."
+  ],
+  [
+   341.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Shahed #63 — intercepción a 39.4 km en 54 s."
+  ],
+  [
+   352.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Shahed #64 — intercepción a 39.8 km en 54 s."
+  ],
+  [
+   366.25,
+   "k",
+   "IRIS-T-1 derriba Shahed #62 — Pk 90%."
+  ],
+  [
+   367.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Shahed #65 — intercepción a 40.0 km en 54 s."
+  ],
+  [
+   395.25,
+   "k",
+   "IRIS-T-1 derriba Shahed #63 — Pk 90%."
+  ],
+  [
+   406.25,
+   "x",
+   "IRIS-T SL de IRIS-T-1 falla contra Shahed #64 (Pk 90%)."
+  ],
+  [
+   421.25,
+   "k",
+   "IRIS-T-1 derriba Shahed #65 — Pk 90%."
+  ],
+  [
+   424.5,
+   "w",
+   "Gerbera #72 entra en zona anti-GNSS: error de navegación ≈371 m."
+  ],
+  [
+   426.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Gerbera #73 — intercepción a 35.2 km en 48 s."
+  ],
+  [
+   434.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Gerbera #74 — intercepción a 35.3 km en 48 s."
+  ],
+  [
+   435.5,
+   "w",
+   "Shahed #64 entra en zona anti-GNSS: error de navegación ≈860 m."
+  ],
+  [
+   436,
+   "w",
+   "Gerbera #73 entra en zona anti-GNSS: error de navegación ≈1139 m."
+  ],
+  [
+   436.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Gerbera #72 — intercepción a 34.4 km en 46 s."
+  ],
+  [
+   447.5,
+   "w",
+   "Gerbera #74 entra en zona anti-GNSS: error de navegación ≈1034 m."
+  ],
+  [
+   459.25,
+   "w",
+   "Gerbera #75 entra en zona anti-GNSS: error de navegación ≈889 m."
+  ],
+  [
+   471,
+   "w",
+   "Gerbera #76 entra en zona anti-GNSS: error de navegación ≈284 m."
+  ],
+  [
+   472.25,
+   "w",
+   "Shahed #66 entra en zona anti-GNSS: error de navegación ≈241 m."
+  ],
+  [
+   473.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Shahed #64 — intercepción a 34.5 km en 48 s."
+  ],
+  [
+   474.25,
+   "k",
+   "IRIS-T-1 derriba Gerbera #73 (era señuelo) — Pk 90%."
+  ],
+  [
+   475.25,
+   "l",
+   "S-300P-1 dispara 1× 5V55R contra Shahed #67 — intercepción a 42.9 km en 34 s."
+  ],
+  [
+   479.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Gerbera #77 — intercepción a 35.1 km en 48 s."
+  ],
+  [
+   482.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Gerbera #75 — intercepción a 34.1 km en 46 s."
+  ],
+  [
+   482.25,
+   "k",
+   "IRIS-T-1 derriba Gerbera #74 (era señuelo) — Pk 90%."
+  ],
+  [
+   482.25,
+   "k",
+   "IRIS-T-1 derriba Gerbera #72 (era señuelo) — Pk 90%."
+  ],
+  [
+   482.75,
+   "w",
+   "Gerbera #77 entra en zona anti-GNSS: error de navegación ≈704 m."
+  ],
+  [
+   485.25,
+   "l",
+   "S-300P-1 dispara 1× 5V55R contra Shahed #64 — intercepción a 39.9 km en 32 s."
+  ],
+  [
+   488.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Gerbera #76 — intercepción a 34.4 km en 46 s."
+  ],
+  [
+   490.75,
+   "w",
+   "Shahed #67 entra en zona anti-GNSS: error de navegación ≈398 m."
+  ],
+  [
+   502.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Shahed #66 — intercepción a 34.9 km en 48 s."
+  ],
+  [
+   505.25,
+   "l",
+   "S-300P-1 dispara 1× 5V55R contra Shahed #66 — intercepción a 40.6 km en 32 s."
+  ],
+  [
+   509.25,
+   "k",
+   "S-300P-1 derriba Shahed #67 — Pk 50%."
+  ],
+  [
+   517.25,
+   "x",
+   "5V55R de S-300P-1 falla contra Shahed #64 (Pk 50%)."
+  ],
+  [
+   521.25,
+   "k",
+   "IRIS-T-1 derriba Shahed #64 — Pk 90%."
+  ],
+  [
+   527.25,
+   "k",
+   "IRIS-T-1 derriba Gerbera #77 (era señuelo) — Pk 90%."
+  ],
+  [
+   528.25,
+   "k",
+   "IRIS-T-1 derriba Gerbera #75 (era señuelo) — Pk 90%."
+  ],
+  [
+   534.25,
+   "x",
+   "IRIS-T SL de IRIS-T-1 falla contra Gerbera #76 (Pk 90%)."
+  ],
+  [
+   537.25,
+   "k",
+   "S-300P-1 derriba Shahed #66 — Pk 50%."
+  ],
+  [
+   539.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Gerbera #76 — intercepción a 32.6 km en 44 s."
+  ],
+  [
+   550.25,
+   "d",
+   "IRIS-T SL de IRIS-T-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   583.25,
+   "k",
+   "IRIS-T-1 derriba Gerbera #76 (era señuelo) — Pk 90%."
+  ],
+  [
+   588.25,
+   "l",
+   "Tor-M2-1 dispara 1× 9M338 contra Liutyi #78 — intercepción a 15.0 km en 24 s."
+  ],
+  [
+   591.5,
+   "l",
+   "Primera detección: Kh-101 #83 por A-50U-1 a 59.5 km, 40 m AGL."
+  ],
+  [
+   601,
+   "l",
+   "Primera detección: Kh-101 #84 por Saab AEW-1 a 56.4 km, 40 m AGL."
+  ],
+  [
+   601.25,
+   "l",
+   "Tor-M2-1 dispara 1× 9M338 contra Liutyi #79 — intercepción a 14.8 km en 22 s."
+  ],
+  [
+   612.25,
+   "l",
+   "Tor-M2-1 dispara 1× 9M338 contra Liutyi #81 — intercepción a 15.0 km en 24 s."
+  ],
+  [
+   612.25,
+   "k",
+   "Tor-M2-1 derriba Liutyi #78 — Pk 75%."
+  ],
+  [
+   613,
+   "l",
+   "Primera detección: Kh-101 #85 por Saab AEW-1 a 56.2 km, 50 m AGL."
+  ],
+  [
+   614.25,
+   "l",
+   "Tor-M2-1 dispara 1× 9M338 contra Liutyi #80 — intercepción a 14.6 km en 21 s."
+  ],
+  [
+   622.75,
+   "x",
+   "9M338 de Tor-M2-1 falla contra Liutyi #79 (Pk 75%)."
+  ],
+  [
+   623.25,
+   "l",
+   "Tor-M2-1 dispara 1× 9M338 contra Liutyi #79 — intercepción a 13.7 km en 20 s."
+  ],
+  [
+   635.25,
+   "k",
+   "Tor-M2-1 derriba Liutyi #80 — Pk 75%."
+  ],
+  [
+   636.25,
+   "k",
+   "Tor-M2-1 derriba Liutyi #81 — Pk 75%."
+  ],
+  [
+   638.75,
+   "l",
+   "Primera detección: Flamingo #100 por S-400-1 a 84.7 km, 35 m AGL."
+  ],
+  [
+   643.25,
+   "k",
+   "Tor-M2-1 derriba Liutyi #79 — Pk 75%."
+  ],
+  [
+   644.75,
+   "l",
+   "Primera detección: Flamingo #101 por S-400-1 a 84.6 km, 35 m AGL."
+  ],
+  [
+   648.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Flamingo #100 — intercepción a 70.6 km en 48 s."
+  ],
+  [
+   654.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Flamingo #101 — intercepción a 70.6 km en 48 s."
+  ],
+  [
+   661,
+   "l",
+   "Primera detección: 9M728 #91 por Saab AEW-1 a 44.3 km, 30 m AGL."
+  ],
+  [
+   669,
+   "l",
+   "Primera detección: 9M728 #92 por Saab AEW-1 a 43.9 km, 30 m AGL."
+  ],
+  [
+   696.25,
+   "k",
+   "S-400-1 derriba Flamingo #100 — Pk 70%."
+  ],
+  [
+   702.25,
+   "k",
+   "S-400-1 derriba Flamingo #101 — Pk 70%."
+  ],
+  [
+   710.75,
+   "l",
+   "Primera detección: Neptune #97 por S-400-1 a 78.5 km, 12 m AGL."
+  ],
+  [
+   716.75,
+   "l",
+   "Primera detección: Neptune #98 por S-400-1 a 78.4 km, 12 m AGL."
+  ],
+  [
+   726.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Neptune #98 — intercepción a 64.6 km en 44 s."
+  ],
+  [
+   728.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Neptune #97 — intercepción a 62.6 km en 44 s."
+  ],
+  [
+   731.5,
+   "l",
+   "Primera detección: Kalibr #87 por Radar 3D-1 a 86.3 km, 25 m AGL."
+  ],
+  [
+   731.5,
+   "l",
+   "Primera detección: Kalibr #88 por Radar 3D-1 a 87.9 km, 25 m AGL."
+  ],
+  [
+   741.5,
+   "l",
+   "Primera detección: Kalibr #89 por Radar 3D-1 a 87.1 km, 25 m AGL."
+  ],
+  [
+   749,
+   "l",
+   "Primera detección: Storm Shadow #94 por Saab AEW-1 a 43.9 km, 35 m AGL."
+  ],
+  [
+   751.5,
+   "l",
+   "Primera detección: Storm Shadow #95 por A-50U-1 a 46.1 km, 35 m AGL."
+  ],
+  [
+   753,
+   "l",
+   "Primera detección: Oniks #116 por Saab AEW-1 a 158.4 km, 14000 m AGL."
+  ],
+  [
+   761,
+   "l",
+   "Primera detección: Oniks #115 por Saab AEW-1 a 145.0 km, 14000 m AGL."
+  ],
+  [
+   770.25,
+   "x",
+   "48N6 de S-400-1 falla contra Neptune #98 (Pk 70%)."
+  ],
+  [
+   771.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Neptune #98 — intercepción a 54.6 km en 38 s."
+  ],
+  [
+   772.25,
+   "k",
+   "S-400-1 derriba Neptune #97 — Pk 70%."
+  ],
+  [
+   800.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Oniks #115 — intercepción a 89.9 km en 60 s."
+  ],
+  [
+   802.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Neptune #98 — intercepción a 33.2 km en 46 s."
+  ],
+  [
+   803.5,
+   "w",
+   "Storm Shadow #94 entra en zona anti-GNSS: error de navegación ≈202 m."
+  ],
+  [
+   808.5,
+   "w",
+   "Storm Shadow #95 entra en zona anti-GNSS: error de navegación ≈189 m."
+  ],
+  [
+   809.25,
+   "k",
+   "S-400-1 derriba Neptune #98 — Pk 43%."
+  ],
+  [
+   810.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Oniks #116 — intercepción a 89.9 km en 60 s."
+  ],
+  [
+   811.5,
+   "l",
+   "Primera detección: Kh-22 #112 por A-50U-1 a 133.3 km, 27000 m AGL."
+  ],
+  [
+   811.5,
+   "l",
+   "Primera detección: Kh-22 #113 por A-50U-1 a 144.3 km, 27000 m AGL."
+  ],
+  [
+   824,
+   "w",
+   "Kalibr #87 entra en zona anti-GNSS: error de navegación ≈498 m."
+  ],
+  [
+   825.25,
+   "l",
+   "Tor-M2-1 dispara 1× 9M338 contra Kh-101 #83 — intercepción a 6.6 km en 10 s."
+  ],
+  [
+   831.25,
+   "l",
+   "Tor-M2-1 dispara 1× 9M338 contra Kh-101 #84 — intercepción a 7.0 km en 11 s."
+  ],
+  [
+   834.75,
+   "k",
+   "Tor-M2-1 derriba Kh-101 #83 — Pk 52%."
+  ],
+  [
+   836.75,
+   "w",
+   "9M728 #92 entra en zona anti-GNSS: error de navegación ≈351 m."
+  ],
+  [
+   838.25,
+   "w",
+   "Kalibr #89 entra en zona anti-GNSS: error de navegación ≈386 m."
+  ],
+  [
+   840.25,
+   "l",
+   "Primera detección: Iskander-M #103 por Radar VHF-1 a 108.4 km, 43873 m AGL."
+  ],
+  [
+   841.75,
+   "x",
+   "9M338 de Tor-M2-1 falla contra Kh-101 #84 (Pk 52%)."
+  ],
+  [
+   842.25,
+   "l",
+   "Tor-M2-1 dispara 1× 9M338 contra Kh-101 #84 — intercepción a 5.6 km en 8 s."
+  ],
+  [
+   844.25,
+   "l",
+   "Tor-M2-1 dispara 1× 9M338 contra Kh-101 #85 — intercepción a 6.5 km en 10 s."
+  ],
+  [
+   848.25,
+   "d",
+   "IRIS-T SL de IRIS-T-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   850.25,
+   "k",
+   "Tor-M2-1 derriba Kh-101 #84 — Pk 52%."
+  ],
+  [
+   852.25,
+   "l",
+   "Primera detección: ATACMS #109 por Radar VHF-1 a 100.8 km, 40125 m AGL."
+  ],
+  [
+   853.75,
+   "k",
+   "Tor-M2-1 derriba Kh-101 #85 — Pk 52%."
+  ],
+  [
+   858.25,
+   "l",
+   "Primera detección: Kinzhal #106 por Radar VHF-1 a 103.0 km, 36574 m AGL."
+  ],
+  [
+   860.25,
+   "x",
+   "48N6 de S-400-1 falla contra Oniks #115 (Pk 60%)."
+  ],
+  [
+   861.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Oniks #115 — intercepción a 59.5 km en 40 s."
+  ],
+  [
+   864.25,
+   "l",
+   "Primera detección: Iskander-M #104 por Radar VHF-1 a 103.8 km, 43393 m AGL."
+  ],
+  [
+   864.25,
+   "l",
+   "Primera detección: ATACMS #110 por Radar VHF-1 a 98.8 km, 40151 m AGL."
+  ],
+  [
+   865.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Oniks #115 — intercepción a 33.7 km en 46 s."
+  ],
+  [
+   866.25,
+   "l",
+   "Buk-M1-1 dispara 1× 9M38 contra Storm Shadow #94 — intercepción a 10.6 km en 17 s."
+  ],
+  [
+   868.25,
+   "l",
+   "Buk-M1-1 dispara 1× 9M38 contra Storm Shadow #95 — intercepción a 11.3 km en 18 s."
+  ],
+  [
+   870.25,
+   "l",
+   "Primera detección: Kinzhal #107 por Radar VHF-1 a 106.8 km, 37212 m AGL."
+  ],
+  [
+   870.25,
+   "k",
+   "S-400-1 derriba Oniks #116 — Pk 60%."
+  ],
+  [
+   881,
+   "l",
+   "Primera detección: Tsirkon #118 por Saab AEW-1 a 127.7 km, 30000 m AGL."
+  ],
+  [
+   881.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra ATACMS #109 — intercepción a 52.8 km en 38 s."
+  ],
+  [
+   883.25,
+   "k",
+   "Buk-M1-1 derriba Storm Shadow #94 — Pk 45%."
+  ],
+  [
+   885.75,
+   "x",
+   "9M38 de Buk-M1-1 falla contra Storm Shadow #95 (Pk 45%)."
+  ],
+  [
+   886.25,
+   "l",
+   "Buk-M1-1 dispara 1× 9M38 contra Storm Shadow #95 — intercepción a 7.7 km en 13 s."
+  ],
+  [
+   887.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Iskander-M #103 — intercepción a 47.3 km en 32 s."
+  ],
+  [
+   889,
+   "l",
+   "Primera detección: Tsirkon #119 por Saab AEW-1 a 130.6 km, 30000 m AGL."
+  ],
+  [
+   890.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra Storm Shadow #95 — intercepción a 14.3 km en 16 s."
+  ],
+  [
+   890.25,
+   "l",
+   "Pantsir-1 dispara 1× 57E6 contra Storm Shadow #95 — intercepción a 9.4 km en 11 s."
+  ],
+  [
+   891.25,
+   "l",
+   "Gepard-1 dispara 1× ráfaga 35 mm contra Storm Shadow #95 — intercepción a 4.0 km en 7 s."
+  ],
+  [
+   891.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra ATACMS #110 — intercepción a 52.8 km en 38 s."
+  ],
+  [
+   892.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra 9M728 #91 — intercepción a 5.6 km en 6 s."
+  ],
+  [
+   894.25,
+   "l",
+   "IRIS-T-1 dispara 1× IRIS-T SL contra Storm Shadow #95 — intercepción a 8.7 km en 12 s."
+  ],
+  [
+   897.75,
+   "x",
+   "ráfaga 35 mm de Gepard-1 falla contra Storm Shadow #95 (Pk 35%)."
+  ],
+  [
+   897.75,
+   "k",
+   "SAMP/T-1 derriba 9M728 #91 — Pk 62%."
+  ],
+  [
+   898.25,
+   "l",
+   "Gepard-1 dispara 1× ráfaga 35 mm contra Storm Shadow #95 — intercepción a 3.9 km en 4 s."
+  ],
+  [
+   898.75,
+   "k",
+   "Buk-M1-1 derriba Storm Shadow #95 — Pk 45%."
+  ],
+  [
+   899.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra 9M728 #92 — intercepción a 5.5 km en 6 s."
+  ],
+  [
+   900.75,
+   "d",
+   "57E6 de Pantsir-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   901.25,
+   "x",
+   "48N6 de S-400-1 falla contra Oniks #115 (Pk 60%)."
+  ],
+  [
+   902.25,
+   "d",
+   "ráfaga 35 mm de Gepard-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   904.75,
+   "x",
+   "Aster 30 de SAMP/T-1 falla contra 9M728 #92 (Pk 62%)."
+  ],
+  [
+   906.25,
+   "d",
+   "Aster 30 de SAMP/T-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   906.25,
+   "d",
+   "IRIS-T SL de IRIS-T-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   907.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Iskander-M #104 — intercepción a 47.3 km en 32 s."
+  ],
+  [
+   910,
+   "w",
+   "Kalibr #87 cae a 512 m del blanco (desviado por interferencia GNSS)."
+  ],
+  [
+   911.25,
+   "k",
+   "IRIS-T-1 derriba Oniks #115 — Pk 20%."
+  ],
+  [
+   914.5,
+   "w",
+   "ATACMS #109 entra en zona anti-GNSS: error de navegación ≈481 m."
+  ],
+  [
+   915.25,
+   "w",
+   "Iskander-M #103 libera 6 señuelos a 40 km del blanco."
+  ],
+  [
+   915.75,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #125 por IRIS-T-1 a 50.8 km, 20022 m AGL."
+  ],
+  [
+   916.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #120 por Radar 3D-1 a 42.6 km, 19720 m AGL."
+  ],
+  [
+   916.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #121 por Radar 3D-1 a 42.7 km, 19702 m AGL."
+  ],
+  [
+   916.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #122 por Radar 3D-1 a 42.6 km, 19720 m AGL."
+  ],
+  [
+   916.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #123 por Radar 3D-1 a 42.6 km, 19713 m AGL."
+  ],
+  [
+   916.5,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #124 por Radar 3D-1 a 42.6 km, 19713 m AGL."
+  ],
+  [
+   917,
+   "w",
+   "Kalibr #88 cae a 130 m del blanco."
+  ],
+  [
+   917.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra Kh-22 #112 — intercepción a 30.1 km en 30 s."
+  ],
+  [
+   918.25,
+   "l",
+   "Patriot-1 dispara 1× PAC-3 MSE contra Iskander-M #103 — intercepción a 20.8 km en 16 s."
+  ],
+  [
+   918.25,
+   "l",
+   "Patriot-1 dispara 1× PAC-3 MSE contra ATACMS #109 — intercepción a 24.7 km en 20 s."
+  ],
+  [
+   919.25,
+   "k",
+   "S-400-1 derriba ATACMS #109 — Pk 50%."
+  ],
+  [
+   919.25,
+   "k",
+   "S-400-1 derriba Iskander-M #103 — Pk 50%."
+  ],
+  [
+   923.75,
+   "w",
+   "Kalibr #89 cae a 401 m del blanco (desviado por interferencia GNSS)."
+  ],
+  [
+   924.5,
+   "w",
+   "ATACMS #110 entra en zona anti-GNSS: error de navegación ≈349 m."
+  ],
+  [
+   926.25,
+   "l",
+   "Patriot-1 dispara 1× PAC-3 MSE contra Señuelo de Iskander-M #120 — intercepción a 15.5 km en 12 s."
+  ],
+  [
+   926.25,
+   "l",
+   "Patriot-1 dispara 1× PAC-3 MSE contra Señuelo de Iskander-M #121 — intercepción a 15.8 km en 13 s."
+  ],
+  [
+   926.25,
+   "l",
+   "Patriot-1 dispara 1× PAC-3 MSE contra Señuelo de Iskander-M #122 — intercepción a 15.0 km en 12 s."
+  ],
+  [
+   926.25,
+   "l",
+   "Patriot-1 dispara 1× PAC-3 MSE contra Señuelo de Iskander-M #123 — intercepción a 14.8 km en 12 s."
+  ],
+  [
+   926.25,
+   "l",
+   "Patriot-1 dispara 1× PAC-3 MSE contra Señuelo de Iskander-M #124 — intercepción a 15.4 km en 12 s."
+  ],
+  [
+   926.25,
+   "l",
+   "Patriot-1 dispara 1× PAC-3 MSE contra Señuelo de Iskander-M #125 — intercepción a 16.4 km en 13 s."
+  ],
+  [
+   926.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Señuelo de Iskander-M #120 — intercepción a 20.6 km en 14 s."
+  ],
+  [
+   926.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Señuelo de Iskander-M #121 — intercepción a 21.4 km en 15 s."
+  ],
+  [
+   926.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Señuelo de Iskander-M #122 — intercepción a 20.1 km en 14 s."
+  ],
+  [
+   926.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Señuelo de Iskander-M #123 — intercepción a 20.6 km en 14 s."
+  ],
+  [
+   926.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Señuelo de Iskander-M #124 — intercepción a 20.5 km en 15 s."
+  ],
+  [
+   926.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Señuelo de Iskander-M #125 — intercepción a 21.9 km en 15 s."
+  ],
+  [
+   926.75,
+   "w",
+   "9M728 #92 cae a 354 m del blanco (desviado por interferencia GNSS)."
+  ],
+  [
+   927.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra Kh-22 #113 — intercepción a 30.1 km en 30 s."
+  ],
+  [
+   929.25,
+   "x",
+   "48N6 de S-400-1 falla contra ATACMS #110 (Pk 50%)."
+  ],
+  [
+   930,
+   "w",
+   "Señuelo de Iskander-M #124 entra en zona anti-GNSS: error de navegación ≈163 m."
+  ],
+  [
+   930.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra Señuelo de Iskander-M #120 — intercepción a 14.4 km en 14 s."
+  ],
+  [
+   930.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra Señuelo de Iskander-M #125 — intercepción a 15.6 km en 16 s."
+  ],
+  [
+   930.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra ATACMS #110 — intercepción a 29.4 km en 20 s."
+  ],
+  [
+   932.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra Señuelo de Iskander-M #121 — intercepción a 14.1 km en 14 s."
+  ],
+  [
+   932.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra Señuelo de Iskander-M #122 — intercepción a 13.0 km en 13 s."
+  ],
+  [
+   932.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra Señuelo de Iskander-M #123 — intercepción a 12.4 km en 13 s."
+  ],
+  [
+   934.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra Señuelo de Iskander-M #124 — intercepción a 11.5 km en 12 s."
+  ],
+  [
+   934.25,
+   "d",
+   "PAC-3 MSE de Patriot-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   935.25,
+   "w",
+   "Iskander-M #104 libera 6 señuelos a 40 km del blanco."
+  ],
+  [
+   935.75,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #127 por IRIS-T-1 a 50.7 km, 20015 m AGL."
+  ],
+  [
+   935.75,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #128 por IRIS-T-1 a 50.8 km, 20028 m AGL."
+  ],
+  [
+   935.75,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #130 por IRIS-T-1 a 50.7 km, 20014 m AGL."
+  ],
+  [
+   935.75,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #131 por IRIS-T-1 a 50.7 km, 20011 m AGL."
+  ],
+  [
+   936.25,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #126 por Radar VHF-1 a 23.4 km, 19797 m AGL."
+  ],
+  [
+   936.25,
+   "l",
+   "Primera detección: Señuelo de Iskander-M #129 por Radar VHF-1 a 23.3 km, 19808 m AGL."
+  ],
+  [
+   937.75,
+   "d",
+   "PAC-3 MSE de Patriot-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   938.25,
+   "l",
+   "Patriot GEM-T-1 dispara 1× PAC-2 GEM-T contra ATACMS #110 — intercepción a 17.1 km en 19 s."
+  ],
+  [
+   938.25,
+   "x",
+   "PAC-3 MSE de Patriot-1 falla contra Señuelo de Iskander-M #120 (Pk 42%)."
+  ],
+  [
+   938.25,
+   "x",
+   "PAC-3 MSE de Patriot-1 falla contra Señuelo de Iskander-M #122 (Pk 42%)."
+  ],
+  [
+   938.25,
+   "x",
+   "PAC-3 MSE de Patriot-1 falla contra Señuelo de Iskander-M #123 (Pk 42%)."
+  ],
+  [
+   938.25,
+   "k",
+   "Patriot-1 derriba Señuelo de Iskander-M #124 (era señuelo) — Pk 42%."
+  ],
+  [
+   939.25,
+   "l",
+   "Patriot-1 dispara 1× PAC-3 MSE contra Señuelo de Iskander-M #120 — intercepción a 6.9 km en 6 s."
+  ],
+  [
+   939.25,
+   "l",
+   "Patriot-1 dispara 1× PAC-3 MSE contra Señuelo de Iskander-M #122 — intercepción a 6.3 km en 6 s."
+  ],
+  [
+   939.25,
+   "l",
+   "Patriot-1 dispara 1× PAC-3 MSE contra Señuelo de Iskander-M #123 — intercepción a 6.3 km en 6 s."
+  ],
+  [
+   939.25,
+   "x",
+   "48N6 de S-400-1 falla contra Iskander-M #104 (Pk 50%)."
+  ],
+  [
+   939.25,
+   "k",
+   "Patriot-1 derriba Señuelo de Iskander-M #121 (era señuelo) — Pk 42%."
+  ],
+  [
+   939.25,
+   "x",
+   "PAC-3 MSE de Patriot-1 falla contra Señuelo de Iskander-M #125 (Pk 42%)."
+  ],
+  [
+   940.25,
+   "l",
+   "Patriot-1 dispara 1× PAC-3 MSE contra Señuelo de Iskander-M #125 — intercepción a 7.2 km en 7 s."
+  ],
+  [
+   940.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Iskander-M #104 — intercepción a 24.6 km en 17 s."
+  ],
+  [
+   940.25,
+   "k",
+   "S-400-1 derriba Señuelo de Iskander-M #120 (era señuelo) — Pk 30%."
+  ],
+  [
+   940.25,
+   "k",
+   "S-400-1 derriba Señuelo de Iskander-M #122 (era señuelo) — Pk 30%."
+  ],
+  [
+   940.25,
+   "x",
+   "48N6 de S-400-1 falla contra Señuelo de Iskander-M #123 (Pk 30%)."
+  ],
+  [
+   940.75,
+   "d",
+   "48N6 de S-400-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   941.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Señuelo de Iskander-M #123 — intercepción a 10.8 km en 8 s."
+  ],
+  [
+   941.25,
+   "d",
+   "48N6 de S-400-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   941.25,
+   "k",
+   "S-400-1 derriba Señuelo de Iskander-M #125 (era señuelo) — Pk 30%."
+  ],
+  [
+   944.25,
+   "l",
+   "Patriot-1 dispara 1× PAC-3 MSE contra Iskander-M #104 — intercepción a 16.9 km en 13 s."
+  ],
+  [
+   944.25,
+   "l",
+   "Patriot-1 dispara 1× PAC-3 MSE contra ATACMS #110 — intercepción a 15.6 km en 12 s."
+  ],
+  [
+   944.25,
+   "d",
+   "Aster 30 de SAMP/T-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   944.75,
+   "d",
+   "Aster 30 de SAMP/T-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   944.75,
+   "x",
+   "Aster 30 de SAMP/T-1 falla contra Señuelo de Iskander-M #123 (Pk 36%)."
+  ],
+  [
+   944.75,
+   "d",
+   "PAC-3 MSE de Patriot-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   944.75,
+   "d",
+   "PAC-3 MSE de Patriot-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   944.75,
+   "x",
+   "PAC-3 MSE de Patriot-1 falla contra Señuelo de Iskander-M #123 (Pk 42%)."
+  ],
+  [
+   945.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra Kinzhal #106 — intercepción a 10.8 km en 11 s."
+  ],
+  [
+   945.75,
+   "d",
+   "Aster 30 de SAMP/T-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   946.25,
+   "l",
+   "Patriot-1 dispara 1× PAC-3 MSE contra Señuelo de Iskander-M #126 — intercepción a 15.5 km en 13 s."
+  ],
+  [
+   946.25,
+   "l",
+   "Patriot-1 dispara 1× PAC-3 MSE contra Señuelo de Iskander-M #127 — intercepción a 15.2 km en 13 s."
+  ],
+  [
+   946.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Señuelo de Iskander-M #126 — intercepción a 21.4 km en 15 s."
+  ],
+  [
+   946.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Señuelo de Iskander-M #127 — intercepción a 20.8 km en 15 s."
+  ],
+  [
+   946.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Señuelo de Iskander-M #128 — intercepción a 20.9 km en 15 s."
+  ],
+  [
+   946.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Señuelo de Iskander-M #129 — intercepción a 19.8 km en 14 s."
+  ],
+  [
+   946.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Señuelo de Iskander-M #130 — intercepción a 20.0 km en 14 s."
+  ],
+  [
+   946.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Señuelo de Iskander-M #131 — intercepción a 20.4 km en 15 s."
+  ],
+  [
+   946.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Kh-22 #112 — intercepción a 19.5 km en 13 s."
+  ],
+  [
+   946.25,
+   "d",
+   "Aster 30 de SAMP/T-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   946.25,
+   "d",
+   "Aster 30 de SAMP/T-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   946.75,
+   "x",
+   "Aster 30 de SAMP/T-1 falla contra Kh-22 #112 (Pk 60%)."
+  ],
+  [
+   946.75,
+   "d",
+   "PAC-3 MSE de Patriot-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   947.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra Kh-22 #112 — intercepción a 12.2 km en 13 s."
+  ],
+  [
+   947.25,
+   "l",
+   "S-300P-1 dispara 1× 5V55R contra ATACMS #110 — intercepción a 14.9 km en 12 s."
+  ],
+  [
+   948.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra ATACMS #110 — intercepción a 12.9 km en 13 s."
+  ],
+  [
+   949.25,
+   "k",
+   "S-400-1 derriba Señuelo de Iskander-M #123 (era señuelo) — Pk 30%."
+  ],
+  [
+   949.5,
+   "w",
+   "Señuelo de Iskander-M #126 entra en zona anti-GNSS: error de navegación ≈153 m."
+  ],
+  [
+   949.5,
+   "w",
+   "Señuelo de Iskander-M #131 entra en zona anti-GNSS: error de navegación ≈153 m."
+  ],
+  [
+   950.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra Señuelo de Iskander-M #126 — intercepción a 14.6 km en 14 s."
+  ],
+  [
+   950.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra Señuelo de Iskander-M #127 — intercepción a 14.6 km en 14 s."
+  ],
+  [
+   950.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra Señuelo de Iskander-M #129 — intercepción a 13.5 km en 14 s."
+  ],
+  [
+   950.25,
+   "x",
+   "48N6 de S-400-1 falla contra ATACMS #110 (Pk 50%)."
+  ],
+  [
+   951.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra Iskander-M #104 — intercepción a 13.8 km en 14 s."
+  ],
+  [
+   951.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra ATACMS #110 — intercepción a 15.4 km en 11 s."
+  ],
+  [
+   952.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra Señuelo de Iskander-M #130 — intercepción a 12.0 km en 13 s."
+  ],
+  [
+   953.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra Tsirkon #118 — intercepción a 14.5 km en 15 s."
+  ],
+  [
+   955.75,
+   "k",
+   "SAMP/T-1 derriba Kinzhal #106 — Pk 48%."
+  ],
+  [
+   956.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra Señuelo de Iskander-M #128 — intercepción a 11.7 km en 12 s."
+  ],
+  [
+   956.25,
+   "k",
+   "Patriot-1 derriba ATACMS #110 — Pk 46%."
+  ],
+  [
+   956.75,
+   "x",
+   "Aster 30 de SAMP/T-1 falla contra Kh-22 #113 (Pk 60%)."
+  ],
+  [
+   957.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra Señuelo de Iskander-M #131 — intercepción a 9.8 km en 10 s."
+  ],
+  [
+   957.25,
+   "d",
+   "PAC-2 GEM-T de Patriot GEM-T-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   957.25,
+   "k",
+   "S-400-1 derriba Iskander-M #104 — Pk 30%."
+  ],
+  [
+   957.25,
+   "d",
+   "PAC-3 MSE de Patriot-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   958.75,
+   "k",
+   "Patriot-1 derriba Señuelo de Iskander-M #126 (era señuelo) — Pk 42%."
+  ],
+  [
+   958.75,
+   "k",
+   "Patriot-1 derriba Señuelo de Iskander-M #127 (era señuelo) — Pk 42%."
+  ],
+  [
+   959.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Kh-22 #113 — intercepción a 17.0 km en 12 s."
+  ],
+  [
+   959.25,
+   "x",
+   "48N6 de S-400-1 falla contra Kh-22 #112 (Pk 60%)."
+  ],
+  [
+   959.25,
+   "d",
+   "5V55R de S-300P-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   959.75,
+   "k",
+   "SAMP/T-1 derriba Kh-22 #112 — Pk 60%."
+  ],
+  [
+   960.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra Kinzhal #107 — intercepción a 10.9 km en 11 s."
+  ],
+  [
+   960.25,
+   "x",
+   "48N6 de S-400-1 falla contra Señuelo de Iskander-M #129 (Pk 30%)."
+  ],
+  [
+   960.25,
+   "x",
+   "48N6 de S-400-1 falla contra Señuelo de Iskander-M #130 (Pk 30%)."
+  ],
+  [
+   960.75,
+   "d",
+   "48N6 de S-400-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   960.75,
+   "d",
+   "48N6 de S-400-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   960.75,
+   "x",
+   "48N6 de S-400-1 falla contra Señuelo de Iskander-M #128 (Pk 30%)."
+  ],
+  [
+   960.75,
+   "x",
+   "48N6 de S-400-1 falla contra Señuelo de Iskander-M #131 (Pk 30%)."
+  ],
+  [
+   961.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Señuelo de Iskander-M #128 — intercepción a 10.8 km en 8 s."
+  ],
+  [
+   961.25,
+   "l",
+   "S-400-1 dispara 1× 48N6 contra Señuelo de Iskander-M #129 — intercepción a 9.9 km en 8 s."
+  ],
+  [
+   961.25,
+   "d",
+   "Aster 30 de SAMP/T-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   962.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra Kh-22 #113 — intercepción a 9.5 km en 10 s."
+  ],
+  [
+   962.25,
+   "d",
+   "48N6 de S-400-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   963.75,
+   "x",
+   "Aster 30 de SAMP/T-1 falla contra Señuelo de Iskander-M #129 (Pk 36%)."
+  ],
+  [
+   964.25,
+   "d",
+   "Aster 30 de SAMP/T-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   964.25,
+   "d",
+   "Aster 30 de SAMP/T-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   964.75,
+   "d",
+   "Aster 30 de SAMP/T-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   964.75,
+   "k",
+   "SAMP/T-1 derriba Señuelo de Iskander-M #130 (era señuelo) — Pk 36%."
+  ],
+  [
+   966.25,
+   "w",
+   "Kinzhal #107 entra en zona anti-GNSS: error de navegación ≈175 m."
+  ],
+  [
+   967.25,
+   "k",
+   "SAMP/T-1 derriba Señuelo de Iskander-M #131 (era señuelo) — Pk 36%."
+  ],
+  [
+   967.75,
+   "k",
+   "SAMP/T-1 derriba Tsirkon #118 — Pk 34%."
+  ],
+  [
+   968.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra Tsirkon #119 — intercepción a 11.5 km en 12 s."
+  ],
+  [
+   968.25,
+   "k",
+   "SAMP/T-1 derriba Señuelo de Iskander-M #128 (era señuelo) — Pk 36%."
+  ],
+  [
+   968.75,
+   "x",
+   "48N6 de S-400-1 falla contra Señuelo de Iskander-M #129 (Pk 30%)."
+  ],
+  [
+   969.25,
+   "d",
+   "48N6 de S-400-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   970,
+   "d",
+   "Señuelo de Iskander-M #129 cae sin efecto."
+  ],
+  [
+   970.75,
+   "x",
+   "Aster 30 de SAMP/T-1 falla contra Kinzhal #107 (Pk 48%)."
+  ],
+  [
+   971.25,
+   "k",
+   "S-400-1 derriba Kh-22 #113 — Pk 60%."
+  ],
+  [
+   971.75,
+   "d",
+   "Aster 30 de SAMP/T-1: blanco ya destruido, autodestrucción."
+  ],
+  [
+   975,
+   "w",
+   "Kinzhal #107 cae a 207 m del blanco (desviado por interferencia GNSS)."
+  ],
+  [
+   980.25,
+   "x",
+   "Aster 30 de SAMP/T-1 falla contra Tsirkon #119 (Pk 34%)."
+  ],
+  [
+   981.25,
+   "l",
+   "SAMP/T-1 dispara 1× Aster 30 contra Tsirkon #119 — intercepción a 6.7 km en 7 s."
+  ],
+  [
+   987.75,
+   "x",
+   "Aster 30 de SAMP/T-1 falla contra Tsirkon #119 (Pk 34%)."
+  ],
+  [
+   990,
+   "w",
+   "Tsirkon #119 cae a 73 m del blanco."
+  ],
+  [
+   990,
+   "d",
+   "Fin: 51 derribos, 0 impactos en blanco, 6 fuera de blanco. Costo defensa US$187 M vs ataque US$59 M."
+  ]
+ ]
+}
