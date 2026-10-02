@@ -41,3 +41,16 @@ test('una corrida sin defensas destruye el objetivo y registra la línea de tiem
   assert.ok(S.arrivals.length > 0);
   assert.equal(S.stats.dmgByWeapon.Shahed > 0, true);
 });
+
+test('debrief: metas evaluadas y explicaciones coherentes con la corrida', async () => {
+  const { buildDebrief } = await import('../src/sim/debrief.js');
+  runScenario('mb_noche', { seed: 5, prep: s => { s.setup.defs = s.setup.defs.filter(d => d.name === 'Patriot-1'); s.setup.jams = []; } });
+  const d = buildDebrief(S);
+  const destroy = d.goals.find(g => g.kind === 'destroy');
+  assert.equal(destroy.met, S.objs[0].status === 'destroyed');
+  assert.equal(d.outcome.side, 'defensa');
+  assert.ok(['exito', 'parcial', 'fracaso'].includes(d.outcome.result));
+  assert.equal(d.attack.real + d.attack.decoys, d.attack.launched);
+  assert.ok(d.why.length > 0);
+  assert.ok(d.timeline.every((e, i, a) => !i || a[i - 1].t <= e.t));
+});

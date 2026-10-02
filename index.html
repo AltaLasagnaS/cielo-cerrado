@@ -147,6 +147,15 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
 .refs a{color:var(--blue)}
 .conf-sec{display:flex;flex-direction:column;gap:8px}
 .formula{font-family:var(--f-mono);font-size:15px;color:var(--accent);background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:10px 12px;max-width:none}
+.debrief .dbres{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:5px;background:var(--panel2);border:1px solid var(--line2);border-left-width:4px}
+.debrief .dbres.st-operational{border-left-color:var(--ok);background:#13241b} .debrief .dbres.st-damaged{border-left-color:var(--accent);background:#241d10} .debrief .dbres.st-destroyed{border-left-color:var(--red);background:#2a1513}
+.debrief .dbres b{font-family:var(--f-disp);font-size:20px;letter-spacing:.04em} .debrief .dbres span{color:var(--muted);font-size:12px}
+.dbobj{display:grid;grid-template-columns:1fr auto auto;gap:4px 10px;align-items:center;margin-bottom:8px}.dbobj .hpbar{grid-column:1/-1}.dbobj .n{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.dbcols{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.dblist{list-style:none;padding:0!important;display:flex;flex-direction:column;gap:4px} .dblist b{font-family:var(--f-mono);font-weight:500;color:var(--fg)}
+.dbgoals{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px} .goals{list-style:none;padding:0!important;margin-top:4px!important} .goals .ok{color:var(--ok)} .goals .no{color:#e58b83}
+.why li{margin-bottom:6px}
+.timeline{list-style:none;padding:0!important;font-family:var(--f-mono);font-size:12px;line-height:1.7;max-height:260px;overflow:auto} .timeline time{color:var(--accent)}
 .warn{border:1px solid #5a4520;background:#1f1a10;border-radius:4px;padding:8px 10px;color:#e9cf9a;font-size:12px;line-height:1.5}
 @media (max-width:1150px){
   .main{grid-template-columns:280px minmax(0,1fr)}
@@ -4068,6 +4077,162 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     $("#calB").onclick = openCal;
   }
 
+  // src/sim/goals.js
+  function goalMet(g, S2) {
+    const obj = S2.objs.find((o) => o.name === g.target), unit = S2.units.find((u) => u.name === g.target);
+    const frac = obj ? (obj.maxHp - obj.hp) / obj.maxHp : 0;
+    switch (g.kind) {
+      case "destroy":
+        return !!obj && obj.status === "destroyed";
+      case "damage":
+        return !!obj && frac >= (g.min ?? DAMAGED_AT);
+      case "protect":
+        return !!obj && obj.status === "operational";
+      case "survive":
+        return !!obj && obj.status !== "destroyed";
+      case "killUnit":
+        return !!unit && !unit.alive;
+      case "keepUnit":
+        return !!unit && unit.alive;
+      default:
+        return false;
+    }
+  }
+  function evaluateGoals(sc2, S2) {
+    const goals = (sc2?.goals || []).map((g) => ({ ...g, met: goalMet(g, S2) }));
+    const side = sc2?.player || null, mine = goals.filter((g) => g.side === side), prim = mine.filter((g) => g.primary);
+    let result = null;
+    if (prim.length) {
+      const n = prim.filter((g) => g.met).length;
+      result = n === prim.length ? "exito" : n ? "parcial" : "fracaso";
+    }
+    const sec = mine.filter((g) => !g.primary);
+    const text = result ? { exito: "Éxito", parcial: "Éxito parcial", fracaso: "Fracaso" }[result] + (sec.length ? ` · secundarias ${sec.filter((g) => g.met).length}/${sec.length}` : "") : "Sin metas definidas";
+    return { goals, outcome: { side, result, text } };
+  }
+
+  // src/sim/debrief.js
+  var sum = (a, f) => a.reduce((s, x) => s + f(x), 0);
+  function buildDebrief(S2) {
+    const st = S2.stats, real = S2.threats.filter((t) => !t.isDecoy), decoys = S2.threats.filter((t) => t.isDecoy);
+    const arrivals = S2.arrivals;
+    const { goals, outcome } = evaluateGoals(S2.scen, S2);
+    const byType = {};
+    for (const t of S2.threats) {
+      const k = t.isDecoyChild ? t.T.short + " (señuelo)" : t.T.short;
+      const b = byType[k] || (byType[k] = { launched: 0, killed: 0, arrived: 0, shotsAt: 0 });
+      b.launched++;
+      if (t.killed) b.killed++;
+      else if (t.done) b.arrived++;
+      b.shotsAt += (t.fly || []).length;
+    }
+    const objectives = S2.objs.map((o) => ({ name: o.name, type: o.type, status: o.status, dmg: o.maxHp - o.hp, maxHp: o.maxHp, hits: o.hits, dmgBy: o.dmgBy }));
+    const dmgSorted = Object.entries(st.dmgByWeapon).sort((a, b) => b[1] - a[1]);
+    const magTotal = sum(S2.units, (u) => u.mag || 0), magLeft = sum(S2.units, (u) => DEFENSES[u.type].sam ? u.magLeft : 0);
+    const lost = S2.units.filter((u) => !u.alive).map((u) => u.name);
+    const detected = real.filter((t) => t.firstDet !== null && t.detKm != null);
+    const attack = {
+      launched: st.launched,
+      real: real.length,
+      decoys: st.decoys,
+      intercepted: st.killed - st.decoysKilled,
+      decoysKilled: st.decoysKilled,
+      impacts: st.hits,
+      misses: st.misses,
+      byType
+    };
+    const damage = {
+      total: st.damage,
+      byWeapon: dmgSorted,
+      top: dmgSorted[0] || null,
+      avgMiss: st.missN ? st.missSum / st.missN : null,
+      objsDestroyed: st.objsDestroyed,
+      objsSurviving: S2.objs.filter((o) => o.status !== "destroyed").length
+    };
+    const defense = {
+      shots: st.shots,
+      magLeft,
+      magTotal,
+      defCost: st.defCost,
+      atkCost: st.atkCost,
+      lost,
+      byUnit: st.byUnit,
+      perKill: st.killed ? st.shots / st.killed : null,
+      avgDetKm: detected.length ? sum(detected, (t) => t.detKm) / detected.length : null
+    };
+    const timeline = [...S2.events].sort((a, b) => a.t - b.t);
+    return { scen: S2.scen, t: S2.t, goals, outcome, objectives, attack, damage, defense, timeline, why: explain(S2, arrivals, decoys) };
+  }
+  function explain(S2, arrivals, decoys) {
+    const out = [], st = S2.stats, list = (a) => [...new Set(a.map((x) => THREATS[x.type].short))].join(", ");
+    const real = arrivals;
+    if (!S2.threats.length) return ["No hubo ataques: agregá salvas en la pestaña Ataque."];
+    if (!real.length) out.push("Ninguna arma real llegó a su blanco: todas fueron derribadas o eran señuelos. La defensa por capas cubrió las rutas de ataque.");
+    const never = real.filter((a) => a.det === null);
+    if (never.length) out.push(`${never.length} arma(s) llegaron sin haber sido detectadas nunca (${list(never)}). Típico de blancos rasantes: el horizonte de radar y el relieve los ocultan. Probá subir mástiles, sumar un AEW o ubicar sensores sobre cotas altas (capa "Puntos altos").`);
+    const unengaged = real.filter((a) => a.det !== null && a.shots === 0);
+    if (unengaged.length) {
+      const lead = unengaged.reduce((s, a) => s + (a.t - a.det), 0) / unengaged.length;
+      out.push(`${unengaged.length} arma(s) fueron detectadas pero nadie les disparó (${list(unengaged)}), en promedio ${Math.round(lead)} s antes de llegar. Causas posibles: fuera del alcance o de la envolvente de altura, tiempo de reacción mayor que la ventana, clase no enfrentable (p. ej. IRIS-T o NASAMS contra balísticos), canales ocupados o sin munición.`);
+    }
+    const survived = real.filter((a) => a.shots > 0);
+    if (survived.length) out.push(`${survived.length} arma(s) sobrevivieron a ${survived.reduce((s, a) => s + a.shots, 0)} interceptor(es) disparados contra ellas (${list(survived)}): la Pk por disparo nunca es 100% y baja con maniobra terminal, baja firma, bengalas o interferencia.`);
+    const decoyShots = decoys.reduce((s, t) => s + (t.fly || []).length, 0);
+    if (decoyShots) out.push(`Los señuelos consumieron ${decoyShots} interceptor(es) que no se usaron contra armas reales. La "vista del defensor" muestra cómo los ve el operador: iguales a las armas.`);
+    const empty = S2.events.filter((e) => e.key && e.key.startsWith("empty:"));
+    if (empty.length) out.push(`Se quedaron sin munición: ${empty.map((e) => e.text.replace(" se queda sin munición", "")).join(", ")}. Sin recarga, la saturación agota los cargadores antes de que llegue lo más peligroso.`);
+    const sat = Object.entries(st.satChannels).sort((a, b) => b[1] - a[1]);
+    if (sat.length) out.push(`Saturación de canales de tiro: ${sat.slice(0, 3).map(([k, v]) => `${k} (${v} s)`).join(", ")} tuvo más blancos que canales simultáneos.`);
+    const gnss = real.filter((a) => a.nav > 150);
+    if (gnss.length) out.push(`${gnss.length} arma(s) fueron desviadas por interferencia GNSS (${list(gnss)}).`);
+    if (S2.units.some((u) => !u.alive)) out.push(`Unidades perdidas: ${S2.units.filter((u) => !u.alive).map((u) => u.name).join(", ")}. Una batería destruida deja un hueco de cobertura para lo que viene después.`);
+    if (st.killed) out.push(`Economía: la defensa gastó US$${st.defCost.toFixed(1)} M y el ataque US$${st.atkCost.toFixed(1)} M. ${st.defCost > st.atkCost ? "Defender costó más que atacar: es la lógica de los drones baratos y los señuelos." : "Defender costó menos que atacar."}`);
+    return out;
+  }
+
+  // src/ui/debrief.js
+  var pct = (a, b) => b ? Math.round(100 * a / b) + "%" : "—";
+  var SIDE = { ataque: "Ataque", defensa: "Defensa" };
+  function openDebrief() {
+    const d = buildDebrief(S), a = d.attack, g = d.damage, f = d.defense;
+    const res = d.outcome.result, resCls = { exito: "st-operational", parcial: "st-damaged", fracaso: "st-destroyed" }[res] || "";
+    const objRows = d.objectives.map((o) => `<div class="dbobj"><span class="t">${esc(TARGET_TYPES[o.type].icon)} · ${esc(o.name)}</span><span class="chip st-${o.status}">${TARGET_STATUS[o.status].toUpperCase()}</span><span class="n">${o.dmg} / ${o.maxHp} de daño</span><div class="hpbar"><i class="st-${o.status}" style="width:${(100 * (o.maxHp - o.dmg) / o.maxHp).toFixed(1)}%"></i></div></div>`).join("") || '<p class="hint">El escenario no tiene objetivos: las armas caen sobre puntos del mapa.</p>';
+    const goalRows = ["ataque", "defensa"].map((side) => {
+      const gs = d.goals.filter((x) => x.side === side);
+      if (!gs.length) return "";
+      return `<div><b>${SIDE[side]}${d.outcome.side === side ? " (vos)" : ""}</b><ul class="goals">${gs.map((x) => `<li class="${x.met ? "ok" : "no"}">${x.met ? "✔" : "✘"} ${x.primary ? "<b>Principal:</b> " : "Secundaria: "}${esc(x.text)}</li>`).join("")}</ul></div>`;
+    }).join("");
+    const typeRows = Object.entries(a.byType).map(([k, b]) => `<tr><td>${esc(k)}</td><td>${b.launched}</td><td>${b.killed}</td><td>${b.arrived}</td><td>${b.shotsAt}</td></tr>`).join("");
+    const tl = d.timeline.map((e) => `<li><time>${fmtT(e.t)}</time> — ${esc(e.text)}</li>`).join("") || "<li>Sin eventos.</li>";
+    openModal(`<header><div><span class="chip">${esc(d.scen?.name || "Escenario libre")}</span><h2>Debrief</h2></div><button class="btn x">Cerrar</button></header><div class="bd debrief">
+    <div class="dbres ${resCls}"><b>${esc(d.outcome.side ? SIDE[d.outcome.side] + ": " : "")}${esc(d.outcome.text)}</b><span>Duración ${fmtT(d.t).slice(2)} de tiempo simulado</span></div>
+    ${goalRows ? `<div><h3>Metas del escenario</h3><div class="dbgoals">${goalRows}</div></div>` : ""}
+    <div><h3>Objetivos</h3>${objRows}</div>
+    <div class="dbcols">
+      <div><h3>Ataque</h3><ul class="dblist">
+        <li><b>${a.real}</b> armas lanzadas${a.decoys ? ` + <b>${a.decoys}</b> señuelos` : ""}</li>
+        <li><b>${a.intercepted}</b> interceptadas (${pct(a.intercepted, a.real)})</li>
+        <li><b>${a.impacts}</b> impactos en el blanco · <b>${a.misses}</b> fuera</li>
+        <li><b>${a.decoysKilled}</b> señuelos derribados</li></ul></div>
+      <div><h3>Daño</h3><ul class="dblist">
+        <li>Daño total: <b>${g.total}</b> HP</li>
+        <li>Mayor fuente de daño: <b>${g.top ? esc(g.top[0]) + " (" + g.top[1] + " HP)" : "—"}</b></li>
+        <li>Distancia media de caída al punto apuntado: <b>${g.avgMiss == null ? "—" : Math.round(g.avgMiss) + " m"}</b></li>
+        <li>Objetivos destruidos: <b>${g.objsDestroyed}</b> · en pie: <b>${g.objsSurviving}</b></li></ul></div>
+      <div><h3>Defensa</h3><ul class="dblist">
+        <li>Interceptores lanzados: <b>${f.shots}</b>${f.perKill ? ` (${f.perKill.toFixed(1)} por derribo)` : ""}</li>
+        <li>Munición restante: <b>${f.magLeft}</b> de ${f.magTotal}</li>
+        <li>Gasto en munición: <b>${money(f.defCost)}</b> (ataque: ${money(f.atkCost)})</li>
+        <li>Unidades perdidas: <b>${f.lost.length ? esc(f.lost.join(", ")) : "ninguna"}</b></li>
+        ${f.avgDetKm != null ? `<li>Primera detección, en promedio: <b>${f.avgDetKm.toFixed(0)} km</b> antes del blanco</li>` : ""}</ul></div>
+    </div>
+    <div><h3>¿Por qué pasó lo que pasó?</h3><ul class="why">${d.why.map((w) => `<li>${esc(w)}</li>`).join("")}</ul></div>
+    <div><h3>Línea de tiempo</h3><ol class="timeline">${tl}</ol></div>
+    <div><h3>Por tipo de arma</h3><div class="tblwrap"><table class="t"><thead><tr><th>Arma</th><th>Lanzadas</th><th>Derribadas</th><th>Llegaron</th><th>Interceptores recibidos</th></tr></thead><tbody>${typeRows}</tbody></table></div></div>
+    <p class="hint">Todo lo de arriba sale de lo que registró el motor durante la corrida. Corré de nuevo con otra disposición: el azar (detección, Pk, dispersión) cambia el resultado de una corrida a otra.</p>
+  </div>`);
+  }
+
   // src/ui/panels/results.js
   var logDirty = true;
   function markLogDirty() {
@@ -4088,7 +4253,11 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     <div class="stat"><b>${s.decoysKilled}</b><small>Señuelos derribados</small></div>
     <div class="stat"><b>${money(s.defCost)}</b><small>Gasto defensa</small></div>
     <div class="stat"><b>${money(s.atkCost)}</b><small>Gasto ataque</small></div>
-    ${s.lost ? `<div class="stat r"><b>${s.lost}</b><small>Unidades perdidas</small></div>` : ""}`;
+    ${s.lost ? `<div class="stat r"><b>${s.lost}</b><small>Unidades perdidas</small></div>` : ""}
+    ${S.objs.length ? `<div class="stat ${s.damage ? "r" : ""}"><b>${s.damage}</b><small>Daño a objetivos (HP)</small></div><div class="stat"><b>${s.objsDestroyed}/${S.objs.length}</b><small>Objetivos destruidos</small></div>` : ""}
+    ${S.started && !S.running && !S.pending.length && S.threats.length && S.threats.every((t) => !t.alive) ? '<button class="btn pri" id="dbBtn" style="grid-column:1/-1">Ver debrief</button>' : ""}`;
+    const b = $("#dbBtn");
+    if (b) b.onclick = openDebrief;
   }
   function renderLog() {
     logDirty = false;
@@ -4666,7 +4835,11 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
   window.DEFENSES_REF = DEFENSES;
   window.CC_DATA = { SRC, UNC, OBS, CAL, PL, applyProbable, applySample, sampleU };
   hooks.onLog = markLogDirty;
-  hooks.onEnd = updatePlay;
+  hooks.onEnd = () => {
+    updatePlay();
+    renderStats();
+    openDebrief();
+  };
   hooks.onUnitLost = schedCov;
   hooks.defenderView = isDefenderView;
   initView($("#map"));
@@ -4706,7 +4879,7 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     MAP.max = 0;
     MAP.min = 0;
     buildBase();
-  }, computeCov, draw, addDef, addSalvo, addJam, startSim, step, resetSim, loadScenario, renderAll };
+  }, computeCov, draw, addDef, addSalvo, addJam, startSim, step, resetSim, loadScenario, renderAll, openDebrief };
 })();
 </script>
 </body>

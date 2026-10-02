@@ -134,6 +134,15 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
 .refs a{color:var(--blue)}
 .conf-sec{display:flex;flex-direction:column;gap:8px}
 .formula{font-family:var(--f-mono);font-size:15px;color:var(--accent);background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:10px 12px;max-width:none}
+.debrief .dbres{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:5px;background:var(--panel2);border:1px solid var(--line2);border-left-width:4px}
+.debrief .dbres.st-operational{border-left-color:var(--ok);background:#13241b} .debrief .dbres.st-damaged{border-left-color:var(--accent);background:#241d10} .debrief .dbres.st-destroyed{border-left-color:var(--red);background:#2a1513}
+.debrief .dbres b{font-family:var(--f-disp);font-size:20px;letter-spacing:.04em} .debrief .dbres span{color:var(--muted);font-size:12px}
+.dbobj{display:grid;grid-template-columns:1fr auto auto;gap:4px 10px;align-items:center;margin-bottom:8px}.dbobj .hpbar{grid-column:1/-1}.dbobj .n{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.dbcols{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.dblist{list-style:none;padding:0!important;display:flex;flex-direction:column;gap:4px} .dblist b{font-family:var(--f-mono);font-weight:500;color:var(--fg)}
+.dbgoals{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px} .goals{list-style:none;padding:0!important;margin-top:4px!important} .goals .ok{color:var(--ok)} .goals .no{color:#e58b83}
+.why li{margin-bottom:6px}
+.timeline{list-style:none;padding:0!important;font-family:var(--f-mono);font-size:12px;line-height:1.7;max-height:260px;overflow:auto} .timeline time{color:var(--accent)}
 .warn{border:1px solid #5a4520;background:#1f1a10;border-radius:4px;padding:8px 10px;color:#e9cf9a;font-size:12px;line-height:1.5}
 @media (max-width:1150px){
   .main{grid-template-columns:280px minmax(0,1fr)}

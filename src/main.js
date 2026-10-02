@@ -22,7 +22,8 @@ import { initHelp } from './ui/help.js';
 import { initHgtImport } from './ui/hgt.js';
 import { initRelief } from './ui/relief.js';
 import { initTabs, renderAll } from './ui/panels/index.js';
-import { markLogDirty } from './ui/panels/results.js';
+import { markLogDirty, renderStats } from './ui/panels/results.js';
+import { openDebrief } from './ui/debrief.js';
 import { startLoop } from './ui/loop.js';
 
 // Acceso desde la consola del navegador (depuración y herramientas externas).
@@ -30,7 +31,7 @@ window.DEFENSES_REF = DEFENSES; window.CC_DATA = { SRC, UNC, OBS, CAL, PL, apply
 
 // La simulación avisa a la interfaz a través de estos enganches.
 hooks.onLog = markLogDirty;
-hooks.onEnd = updatePlay;
+hooks.onEnd = () => { updatePlay(); renderStats(); openDebrief(); };
 hooks.onUnitLost = schedCov;
 hooks.defenderView = isDefenderView;
 
@@ -55,4 +56,4 @@ loadScenario('mb_noche');
 resize(); fitView();
 startLoop();
 
-window.__S = S; window.__dbg = { flat: () => { MAP.data = new Int16Array(MAP.data.length); MAP.key = 'flat'; MAP.max = 0; MAP.min = 0; buildBase(); }, computeCov, draw, addDef, addSalvo, addJam, startSim, step, resetSim, loadScenario, renderAll };
+window.__S = S; window.__dbg = { flat: () => { MAP.data = new Int16Array(MAP.data.length); MAP.key = 'flat'; MAP.max = 0; MAP.min = 0; buildBase(); }, computeCov, draw, addDef, addSalvo, addJam, startSim, step, resetSim, loadScenario, renderAll, openDebrief };
