@@ -1,6 +1,6 @@
 // Tarjeta "Selección": detalle y parámetros editables de lo que esté seleccionado en el mapa
 // (defensa, jammer, salva o amenaza en vuelo).
-import { THREATS, JAMMERS, D } from '../../data/index.js';
+import { THREATS, JAMMERS, TARGET_TYPES, TARGET_STATUS, D } from '../../data/index.js';
 import { esc, fmtT, kmh, money } from '../../util/format.js';
 import { releaseId } from '../../util/ids.js';
 import { surf, latlon } from '../../physics/terrain.js';
@@ -8,10 +8,12 @@ import { antZ, horizon } from '../../physics/radar.js';
 import { buildThreat, speedAt } from '../../physics/kinematics.js';
 import { S } from '../../sim/state.js';
 import { label } from '../../sim/log.js';
+import { targetName } from '../../sim/setup.js';
+import { warheadKg, directDamage } from '../../physics/damage.js';
 import { $ } from '../dom.js';
 import { schedCov } from '../coverage.js';
 import { openFicha } from '../fichas.js';
-import { renderAtk } from './attack.js';
+import { renderAtk, removeObj } from './attack.js';
 import { renderEW } from './ew.js';
 
 /** live = refresco periódico durante la corrida (no pisa un campo que el jugador está editando). */
@@ -57,10 +59,21 @@ export function renderSel(live) {
   } else if (sel.kind === 'salvo') {
     const sv = S.setup.salvos.find(v => v.id === sel.id); if (!sv) { S.sel = null; return renderSel(); }
     const T = THREATS[sv.type]; const probe = buildThreat(sv, 0, 0); releaseId();
-    el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${sv.count}× ${esc(T.name)}</b><dl class="kv"><dt>Recorrido</dt><dd>${probe.L.toFixed(0)} km</dd><dt>Tiempo de vuelo</dt><dd>${fmtT(probe.ft).slice(2)}</dd><dt>${sv.sync ? 'Llegada' : 'Lanzamiento'}</dt><dd>T+${sv.sync ? sv.tArrive : sv.tStart} s</dd>${T.aglRange ? '<dt>Altura</dt><dd>' + sv.agl + ' m AGL</dd>' : ''}<dt>Maniobra</dt><dd>${sv.maneuver ? 'sí' : 'no'}</dd><dt>Costo salva</dt><dd>${money(T.cost * sv.count)}</dd></dl>
+    el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${sv.count}× ${esc(T.name)}</b><dl class="kv"><dt>Blanco</dt><dd>${esc(targetName(sv) || 'punto del mapa')}</dd><dt>Ojiva</dt><dd>${warheadKg(T) ? warheadKg(T) + ' kg · ' + Math.round(directDamage(T)) + ' HP por impacto directo' : 'sin ojiva'}</dd><dt>Recorrido</dt><dd>${probe.L.toFixed(0)} km</dd><dt>Tiempo de vuelo</dt><dd>${fmtT(probe.ft).slice(2)}</dd><dt>${sv.sync ? 'Llegada' : 'Lanzamiento'}</dt><dd>T+${sv.sync ? sv.tArrive : sv.tStart} s</dd>${T.aglRange ? '<dt>Altura</dt><dd>' + sv.agl + ' m AGL</dd>' : ''}<dt>Maniobra</dt><dd>${sv.maneuver ? 'sí' : 'no'}</dd><dt>Costo salva</dt><dd>${money(T.cost * sv.count)}</dd></dl>
       <div class="row"><button class="btn sm" id="vInfo">Ficha</button>${!S.started ? '<button class="btn sm danger" id="vDel">Eliminar</button>' : ''}</div>`;
     $('#vInfo').onclick = () => openFicha('thr', sv.type);
     if ($('#vDel')) $('#vDel').onclick = () => { S.setup.salvos = S.setup.salvos.filter(v => v.id !== sv.id); S.sel = null; renderSel(); renderAtk(); };
+  } else if (sel.kind === 'obj') {
+    const g = (S.started ? S.objs : S.setup.objs).find(v => v.id === sel.id); if (!g) { S.sel = null; return renderSel(); }
+    const tt = TARGET_TYPES[g.type], hp = g.hp ?? g.maxHp, st = g.status || 'operational', ll = latlon(g.x, g.y);
+    const dmgBy = Object.entries(g.dmgBy || {}).sort((a, b) => b[1] - a[1]).map(([k, v]) => esc(k) + ' ' + v).join(', ');
+    el.innerHTML = `<h3>Selección</h3><div class="row" style="justify-content:space-between"><b style="font-size:15px">OBJETIVO: ${esc(g.name)}</b><span class="chip st-${st}">${TARGET_STATUS[st]}</span></div>
+      <div class="hpbar"><i class="st-${st}" style="width:${Math.max(0, 100 * hp / g.maxHp).toFixed(1)}%"></i></div>
+      <dl class="kv"><dt>HP</dt><dd>${hp} / ${g.maxHp}</dd><dt>Tipo</dt><dd>${esc(tt.name)}</dd><dt>Posición</dt><dd>${g.x.toFixed(1)}, ${g.y.toFixed(1)} km</dd><dt>Lat/Lon</dt><dd>${ll[0].toFixed(3)}°, ${ll[1].toFixed(3)}°</dd><dt>Huella</dt><dd>${tt.radius} m de radio</dd><dt>Vulnerabilidad</dt><dd>×${tt.vuln}</dd>${S.started ? `<dt>Impactos con daño</dt><dd>${g.hits}</dd>${dmgBy ? `<dt>Daño por arma</dt><dd>${dmgBy}</dd>` : ''}` : ''}</dl>
+      <p class="hint">${esc(g.desc || tt.desc)}</p>
+      ${!S.started ? `<div class="field"><label for="oHp">Vida máxima</label><input id="oHp" class="inp" type="number" min="50" max="20000" step="50" value="${g.maxHp}"></div><div class="row"><button class="btn sm danger" id="oDel">Eliminar</button></div>` : ''}`;
+    if ($('#oHp')) $('#oHp').onchange = e => { g.maxHp = Math.max(1, +e.target.value || tt.hp); };
+    if ($('#oDel')) $('#oDel').onclick = () => removeObj(g.id);
   } else if (sel.kind === 'thr') {
     const th = S.threats.find(t => t.id === sel.id); if (!th || !th.p) { el.innerHTML = '<h3>Selección</h3><p class="hint">La amenaza ya no está en vuelo.</p>'; return; }
     const p = th.p, v = speedAt(th, S.t);

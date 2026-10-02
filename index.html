@@ -80,7 +80,12 @@ h3{font-family:var(--f-disp);font-weight:600;font-size:15px;letter-spacing:.08em
 .item .t{font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .item .s{grid-column:1/2;color:var(--muted);font-size:12px;font-family:var(--f-mono)}
 .item .a{grid-row:1/3;grid-column:2;display:flex;gap:4px}
-.item.red{border-left:3px solid var(--red)} .item.vio{border-left:3px solid var(--violet)}
+.item.red{border-left:3px solid var(--red)} .item.obj{border-left:3px solid #f2d48a}
+.ub.obj{border-left-color:#f2d48a}
+.hpbar{height:6px;background:#2a323c;border-radius:3px;overflow:hidden}.hpbar i{display:block;height:100%}
+.st-operational{background:var(--ok)} .st-damaged{background:var(--accent)} .st-destroyed{background:var(--red)}
+.chip.st-operational,.chip.st-damaged,.chip.st-destroyed{background:none} .chip.st-operational{color:var(--ok)} .chip.st-damaged{color:var(--accent)} .chip.st-destroyed{color:var(--red)}
+.modebar .dim{color:var(--muted);font-family:var(--f-mono);font-size:11px} .item.vio{border-left:3px solid var(--violet)}
 .mapwrap{position:relative;min-height:0;min-width:0;background:#081018;overflow:hidden}
 canvas#map{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
 .simbar{position:absolute;left:10px;top:10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:rgba(12,18,25,.88);border:1px solid var(--line2);border-radius:6px;padding:6px 8px;max-width:calc(100% - 20px)}
@@ -2590,6 +2595,7 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     S.setup.objs.push(g);
     return g;
   }
+  var targetName = (sv) => sv.targetUnit ? S.setup.defs.find((u) => u.id === sv.targetUnit)?.name : sv.targetObj ? S.setup.objs.find((g) => g.id === sv.targetObj)?.name : null;
   function addJam(type, x, y, o = {}) {
     const J = JAMMERS[type];
     const j = { id: nextId(), type, x, y, alt: o.alt ?? J.alt, on: true };
@@ -3100,6 +3106,7 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     }
     if (!S.started || !S.running) for (const sv of S.setup.salvos) drawRoute(sv, S.sel && S.sel.kind === "salvo" && S.sel.id === sv.id);
     if (S.route) drawRoute({ type: S.atk.type, pts: S.route.pts, preview: true }, true);
+    for (const g of S.started ? S.objs : S.setup.objs) drawObjective(g, S.sel && S.sel.kind === "obj" && S.sel.id === g.id);
     for (const j of jams) {
       const J = JAMMERS[j.type], [sx, sy] = toS(j.x, j.y);
       const isSel = S.sel && S.sel.kind === "jam" && S.sel.id === j.id;
@@ -3169,6 +3176,7 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
       const ammo = S.started && d.sam && u.alive ? " " + u.magLeft : "";
       labelAt(sx, sy, (u.name || d.short) + ammo, dead ? "#6b7888" : "#e6eef6");
     }
+    if (S.preview) drawPreview(S.preview);
     for (const im of S.impacts) {
       const [sx, sy] = toS(im.x, im.y);
       ctx.strokeStyle = im.k === "hit" ? "#ff5b4d" : im.k === "miss" ? "#e6a53c" : "#6b7888";
@@ -3346,6 +3354,87 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
       ctx.fillStyle = "#ff5b4d";
       ctx.fillRect(x - 2, y - 2, 4, 4);
     }
+  }
+  var STATUS_COLOR = { operational: "#6fd08c", damaged: "#e6a53c", destroyed: "#ff5b4d" };
+  function drawObjective(g, isSel) {
+    const tt = TARGET_TYPES[g.type], [sx, sy] = toS(g.x, g.y), hp = g.hp ?? g.maxHp, st = g.status || "operational", col = STATUS_COLOR[st];
+    const rpx = tt.radius / 1e3 * V.s;
+    if (rpx > 4) {
+      ctx.strokeStyle = "rgba(242,212,138,.35)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(sx, sy, rpx, 0, 7);
+      ctx.stroke();
+    }
+    ctx.fillStyle = st === "destroyed" ? "#3a2422" : "#1f2630";
+    ctx.strokeStyle = isSel ? "#e6a53c" : col;
+    ctx.lineWidth = isSel ? 2.2 : 1.6;
+    ctx.beginPath();
+    ctx.rect(sx - 8, sy - 8, 16, 16);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = "#f2e6c9";
+    ctx.font = '700 10px "IBM Plex Mono", monospace';
+    ctx.textAlign = "center";
+    ctx.fillText(tt.icon, sx, sy + 3.5);
+    ctx.textAlign = "left";
+    if (st === "destroyed") {
+      ctx.strokeStyle = "#ff5b4d";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(sx - 9, sy - 9);
+      ctx.lineTo(sx + 9, sy + 9);
+      ctx.moveTo(sx + 9, sy - 9);
+      ctx.lineTo(sx - 9, sy + 9);
+      ctx.stroke();
+    }
+    ctx.font = '600 11px "IBM Plex Sans", sans-serif';
+    const txt = g.name, tw = Math.max(ctx.measureText(txt).width, 48);
+    ctx.fillStyle = "rgba(8,13,20,.78)";
+    ctx.fillRect(sx + 11, sy - 11, tw + 8, 22);
+    ctx.fillStyle = "#f2e6c9";
+    ctx.fillText(txt, sx + 15, sy + 1);
+    const bw = tw, f = Math.max(0, hp / g.maxHp);
+    ctx.fillStyle = "#2a323c";
+    ctx.fillRect(sx + 15, sy + 4, bw, 4);
+    ctx.fillStyle = col;
+    ctx.fillRect(sx + 15, sy + 4, bw * f, 4);
+  }
+  function drawPreview(p) {
+    const [sx, sy] = toS(p.x, p.y);
+    ctx.save();
+    ctx.globalAlpha = 0.85;
+    ctx.strokeStyle = "#e6a53c";
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 3]);
+    ctx.beginPath();
+    ctx.arc(sx, sy, 13, 0, 7);
+    ctx.stroke();
+    if (p.mode === "placeDef") {
+      const d = DEFENSES[p.type];
+      if (d.sam) {
+        ctx.beginPath();
+        ctx.arc(sx, sy, d.sam.maxR * V.s, 0, 7);
+        ctx.stroke();
+      }
+      if (d.radar && d.radar.band !== "ACU" && d.radar.band !== "OPT") {
+        const hz = horizon(d.kind === "aew" ? d.alt : d.radar.mast + 0, 50);
+        ctx.strokeStyle = "rgba(79,209,197,.8)";
+        ctx.setLineDash([2, 4]);
+        ctx.beginPath();
+        ctx.arc(sx, sy, hz * V.s, 0, 7);
+        ctx.stroke();
+        labelAt(sx + hz * V.s * 0.71 - 10, sy - hz * V.s * 0.71, "horizonte vs 50 m: " + hz.toFixed(0) + " km", "#9ee7df");
+      }
+    }
+    ctx.setLineDash([]);
+    ctx.fillStyle = "rgba(230,165,60,.55)";
+    ctx.beginPath();
+    ctx.arc(sx, sy, 6, 0, 7);
+    ctx.fill();
+    ctx.restore();
+    const name = p.mode === "placeDef" ? DEFENSES[p.type].short : p.mode === "placeJam" ? JAMMERS[p.type].short : TARGET_TYPES[p.type].name;
+    labelAt(sx, sy + 16, "¿" + name + " aquí? · " + Math.round(surf(p.x, p.y)) + " m", "#f2d48a");
   }
 
   // src/render/view.js
@@ -3788,7 +3877,7 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
       const T = THREATS[sv.type];
       const probe = buildThreat(sv, 0, 0);
       releaseId();
-      el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${sv.count}× ${esc(T.name)}</b><dl class="kv"><dt>Recorrido</dt><dd>${probe.L.toFixed(0)} km</dd><dt>Tiempo de vuelo</dt><dd>${fmtT(probe.ft).slice(2)}</dd><dt>${sv.sync ? "Llegada" : "Lanzamiento"}</dt><dd>T+${sv.sync ? sv.tArrive : sv.tStart} s</dd>${T.aglRange ? "<dt>Altura</dt><dd>" + sv.agl + " m AGL</dd>" : ""}<dt>Maniobra</dt><dd>${sv.maneuver ? "sí" : "no"}</dd><dt>Costo salva</dt><dd>${money(T.cost * sv.count)}</dd></dl>
+      el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${sv.count}× ${esc(T.name)}</b><dl class="kv"><dt>Blanco</dt><dd>${esc(targetName(sv) || "punto del mapa")}</dd><dt>Ojiva</dt><dd>${warheadKg(T) ? warheadKg(T) + " kg · " + Math.round(directDamage(T)) + " HP por impacto directo" : "sin ojiva"}</dd><dt>Recorrido</dt><dd>${probe.L.toFixed(0)} km</dd><dt>Tiempo de vuelo</dt><dd>${fmtT(probe.ft).slice(2)}</dd><dt>${sv.sync ? "Llegada" : "Lanzamiento"}</dt><dd>T+${sv.sync ? sv.tArrive : sv.tStart} s</dd>${T.aglRange ? "<dt>Altura</dt><dd>" + sv.agl + " m AGL</dd>" : ""}<dt>Maniobra</dt><dd>${sv.maneuver ? "sí" : "no"}</dd><dt>Costo salva</dt><dd>${money(T.cost * sv.count)}</dd></dl>
       <div class="row"><button class="btn sm" id="vInfo">Ficha</button>${!S.started ? '<button class="btn sm danger" id="vDel">Eliminar</button>' : ""}</div>`;
       $("#vInfo").onclick = () => openFicha("thr", sv.type);
       if ($("#vDel")) $("#vDel").onclick = () => {
@@ -3797,6 +3886,23 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
         renderSel();
         renderAtk();
       };
+    } else if (sel.kind === "obj") {
+      const g = (S.started ? S.objs : S.setup.objs).find((v) => v.id === sel.id);
+      if (!g) {
+        S.sel = null;
+        return renderSel();
+      }
+      const tt = TARGET_TYPES[g.type], hp = g.hp ?? g.maxHp, st = g.status || "operational", ll = latlon(g.x, g.y);
+      const dmgBy = Object.entries(g.dmgBy || {}).sort((a, b) => b[1] - a[1]).map(([k, v]) => esc(k) + " " + v).join(", ");
+      el.innerHTML = `<h3>Selección</h3><div class="row" style="justify-content:space-between"><b style="font-size:15px">OBJETIVO: ${esc(g.name)}</b><span class="chip st-${st}">${TARGET_STATUS[st]}</span></div>
+      <div class="hpbar"><i class="st-${st}" style="width:${Math.max(0, 100 * hp / g.maxHp).toFixed(1)}%"></i></div>
+      <dl class="kv"><dt>HP</dt><dd>${hp} / ${g.maxHp}</dd><dt>Tipo</dt><dd>${esc(tt.name)}</dd><dt>Posición</dt><dd>${g.x.toFixed(1)}, ${g.y.toFixed(1)} km</dd><dt>Lat/Lon</dt><dd>${ll[0].toFixed(3)}°, ${ll[1].toFixed(3)}°</dd><dt>Huella</dt><dd>${tt.radius} m de radio</dd><dt>Vulnerabilidad</dt><dd>×${tt.vuln}</dd>${S.started ? `<dt>Impactos con daño</dt><dd>${g.hits}</dd>${dmgBy ? `<dt>Daño por arma</dt><dd>${dmgBy}</dd>` : ""}` : ""}</dl>
+      <p class="hint">${esc(g.desc || tt.desc)}</p>
+      ${!S.started ? `<div class="field"><label for="oHp">Vida máxima</label><input id="oHp" class="inp" type="number" min="50" max="20000" step="50" value="${g.maxHp}"></div><div class="row"><button class="btn sm danger" id="oDel">Eliminar</button></div>` : ""}`;
+      if ($("#oHp")) $("#oHp").onchange = (e) => {
+        g.maxHp = Math.max(1, +e.target.value || tt.hp);
+      };
+      if ($("#oDel")) $("#oDel").onclick = () => removeObj(g.id);
     } else if (sel.kind === "thr") {
       const th = S.threats.find((t) => t.id === sel.id);
       if (!th || !th.p) {
@@ -3816,7 +3922,13 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     const a = S.atk, T = THREATS[a.type];
     const off = isOffmap(T);
     const opts = (side) => Object.entries(THREATS).filter(([, t]) => t.side === side).map(([k, t]) => `<option value="${k}" ${k === a.type ? "selected" : ""}>${esc(t.name)}</option>`).join("");
+    const objs = S.setup.objs;
     el.innerHTML = `
+    <div class="grp"><h3>Objetivos (${objs.length})</h3>
+      <div class="list" id="objList">${objs.map((g) => `<div class="item obj"><span class="t">${esc(TARGET_TYPES[g.type].icon)} · ${esc(g.name)}</span><span class="s">${esc(TARGET_TYPES[g.type].name)} · HP ${g.maxHp}</span><span class="a"><button class="btn sm" data-osel="${g.id}">Ver</button><button class="btn sm danger" data-odel="${g.id}" aria-label="Borrar">✕</button></span></div>`).join("") || '<p class="hint">Sin objetivos: las armas caen sobre un punto, sin daño. Agregá uno.</p>'}</div>
+      <div class="unitgrid" id="objTypes">${Object.entries(TARGET_TYPES).map(([k, t]) => `<button class="ub obj ${S.mode === "placeObj" && S.placeType === k ? "act" : ""}" data-ot="${k}" title="${esc(t.desc)}"><span>${esc(t.icon)} · ${esc(t.name)}</span></button>`).join("")}</div>
+      <p class="hint">Elegí un tipo y tocá el mapa para ubicarlo. Al trazar una ruta, terminala sobre un objetivo para apuntarle.</p>
+    </div>
     <div class="grp"><h3>Nueva salva</h3>
       <div class="row"><select id="aType" class="sel" style="flex:1;min-width:0"><optgroup label="Rusia">${opts("RU")}</optgroup><optgroup label="Ucrania / OTAN">${opts("UA")}</optgroup></select><button class="btn sm" id="aInfo">Ficha</button></div>
       <p class="hint">${esc(CLS_NAME[T.cls])} · ${kmh(T.v)} (${mach(T.v)}) · RCS ≈${T.rcs} m² · ${money(T.cost)} c/u</p>
@@ -3833,8 +3945,8 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     </div>
     <div class="grp"><h3>Salvas programadas (${S.setup.salvos.length})</h3><div class="list" id="svList">${S.setup.salvos.map((sv) => {
       const t = THREATS[sv.type];
-      const tgt = sv.targetUnit ? S.setup.defs.find((u) => u.id === sv.targetUnit) : null;
-      return `<div class="item red"><span class="t">${sv.count}× ${esc(t.short)}${tgt ? " → " + esc(tgt.name) : ""}</span><span class="s">${sv.sync ? "llega T+" + sv.tArrive + "s" : "sale T+" + sv.tStart + "s"} · c/${sv.interval}s</span><span class="a"><button class="btn sm" data-sel="${sv.id}">Ver</button><button class="btn sm danger" data-del="${sv.id}" aria-label="Borrar">✕</button></span></div>`;
+      const tgt = targetName(sv);
+      return `<div class="item red"><span class="t">${sv.count}× ${esc(t.short)}${tgt ? " → " + esc(tgt) : ""}</span><span class="s">${sv.sync ? "llega T+" + sv.tArrive + "s" : "sale T+" + sv.tStart + "s"} · c/${sv.interval}s</span><span class="a"><button class="btn sm" data-sel="${sv.id}">Ver</button><button class="btn sm danger" data-del="${sv.id}" aria-label="Borrar">✕</button></span></div>`;
     }).join("") || '<p class="hint">Todavía no hay ataques.</p>'}</div></div>`;
     $("#aType").onchange = (e) => {
       S.atk = defaultAtk(e.target.value, S.atk);
@@ -3878,6 +3990,31 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
       updateModebar();
       renderAtk();
     };
+    $("#objTypes").onclick = (e) => {
+      const b = e.target.closest("[data-ot]");
+      if (!b) return;
+      if (S.started) {
+        toast("Reiniciá para editar el escenario.");
+        return;
+      }
+      if (S.mode === "placeObj" && S.placeType === b.dataset.ot) setMode("select");
+      else setMode("placeObj", b.dataset.ot);
+      renderAtk();
+    };
+    $("#objList").onclick = (e) => {
+      const d = e.target.closest("[data-odel]"), s = e.target.closest("[data-osel]");
+      if (d) {
+        if (S.started) {
+          toast("Reiniciá para editar.");
+          return;
+        }
+        removeObj(+d.dataset.odel);
+      }
+      if (s) {
+        S.sel = { kind: "obj", id: +s.dataset.osel };
+        renderSel();
+      }
+    };
     $("#svList").onclick = (e) => {
       const d = e.target.closest("[data-del]"), s = e.target.closest("[data-sel]");
       if (d) {
@@ -3899,6 +4036,14 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
   function defaultAtk(type, prev) {
     const T = THREATS[type];
     return { type, count: prev ? prev.count : T.cls === "dron" ? 8 : 2, interval: T.cls === "dron" ? 20 : 10, tStart: 0, sync: prev ? prev.sync : false, tArrive: prev ? prev.tArrive : 900, agl: T.agl ?? 0, launchDist: T.launchDist, maneuver: !!T.maneuver, decoys: !!T.decoys };
+  }
+  function removeObj(id) {
+    S.setup.objs = S.setup.objs.filter((g) => g.id !== id);
+    for (const sv of S.setup.salvos) if (sv.targetObj === id) sv.targetObj = null;
+    if (S.sel && S.sel.kind === "obj" && S.sel.id === id) S.sel = null;
+    renderAtk();
+    renderSel();
+    schedCov();
   }
 
   // src/ui/panels/catalog.js
@@ -3974,12 +4119,42 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
   }
 
   // src/ui/modes.js
+  var PLACE = {
+    placeDef: { cat: DEFENSES, add: addDef, sel: "def", name: (t) => DEFENSES[t].short },
+    placeJam: { cat: JAMMERS, add: addJam, sel: "jam", name: (t) => JAMMERS[t].short },
+    placeObj: { cat: TARGET_TYPES, add: addObj, sel: "obj", name: (t) => TARGET_TYPES[t].name }
+  };
   function setMode(m, type) {
     S.mode = m;
     S.placeType = type || null;
+    S.preview = null;
     if (m !== "route") S.route = null;
     updateModebar();
     renderTabs();
+    draw();
+  }
+  function proposePlacement(x, y) {
+    S.preview = { mode: S.mode, type: S.placeType, x: +x.toFixed(2), y: +y.toFixed(2) };
+    updateModebar();
+    draw();
+  }
+  function confirmPlacement() {
+    const p = S.preview;
+    if (!p) return;
+    const P = PLACE[p.mode], o = P.add(p.type, p.x, p.y);
+    S.preview = null;
+    S.sel = { kind: P.sel, id: o.id };
+    renderSel();
+    renderTabs();
+    renderAtk();
+    schedCov();
+    updateModebar();
+    draw();
+  }
+  function cancelPlacement() {
+    S.preview = null;
+    updateModebar();
+    draw();
   }
   function updateModebar() {
     const mb = $("#modebar");
@@ -3988,28 +4163,45 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
       return;
     }
     mb.hidden = false;
-    let html = "";
-    if (S.mode === "placeDef") html = "Tocá el mapa para ubicar <b>" + esc(DEFENSES[S.placeType].short) + "</b>.";
-    else if (S.mode === "placeJam") html = "Tocá el mapa para ubicar <b>" + esc(JAMMERS[S.placeType].short) + "</b>.";
-    else if (S.mode === "route") {
-      const T = THREATS[S.atk.type];
-      const off = isOffmap(T);
-      html = off ? S.route.pts.length ? "Ahora tocá el <b>blanco</b>." : "Tocá un punto en la <b>dirección de lanzamiento</b>." : "Tocá el inicio, waypoints y el <b>blanco</b> (último punto). Puntos: " + S.route.pts.length;
-      if (!off) html += ' <button class="btn sm pri" id="mbOk">Confirmar ruta</button>';
+    let html = "", ok = null, cancel = () => setMode("select"), cancelTxt = "Salir";
+    const P = PLACE[S.mode];
+    if (P && S.preview) {
+      const p = S.preview, e = Math.round(surf(p.x, p.y));
+      html = `¿Colocar <b>${esc(P.name(p.type))}</b> aquí? <span class="dim">${p.x.toFixed(1)}, ${p.y.toFixed(1)} km · ${e} m · ${esc(terrainClass(p.x, p.y))}</span>`;
+      ok = confirmPlacement;
+      cancel = cancelPlacement;
+      cancelTxt = "Cancelar";
+    } else if (P) {
+      html = `Tocá el mapa donde quieras ubicar <b>${esc(P.name(S.placeType))}</b>; vas a poder confirmar o cancelar.`;
+    } else if (S.mode === "route") {
+      const T = THREATS[S.atk.type], off = isOffmap(T), n = S.route.pts.length;
+      if (off) {
+        if (n >= 2) {
+          html = `¿Lanzar <b>${S.atk.count}× ${esc(T.short)}</b> desde ${S.atk.launchDist} km hacia este blanco?`;
+          ok = finishRoute;
+          cancel = () => {
+            S.route.pts = [];
+            S.route.targetUnit = S.route.targetObj = null;
+            updateModebar();
+            draw();
+          };
+          cancelTxt = "Cancelar";
+        } else html = n ? "Ahora tocá el <b>blanco</b> (un objetivo o una defensa para apuntarle)." : "Tocá un punto en la <b>dirección de lanzamiento</b>.";
+      } else {
+        html = "Tocá el inicio, los waypoints y el <b>blanco</b> (último punto). Puntos: " + n;
+        if (n >= 2) ok = finishRoute;
+      }
     }
-    mb.innerHTML = html + ' <button class="btn sm" id="mbX">Cancelar</button>';
-    $("#mbX").onclick = () => setMode("select");
-    const ok = $("#mbOk");
-    if (ok) ok.onclick = finishRoute;
+    mb.innerHTML = html + (ok ? ' <button class="btn sm pri" id="mbOk">Confirmar</button>' : "") + ` <button class="btn sm" id="mbX">${cancelTxt}</button>`;
+    $("#mbX").onclick = cancel;
+    if (ok) $("#mbOk").onclick = ok;
   }
   function finishRoute() {
     if (!S.route || S.route.pts.length < 2) {
       toast("La ruta necesita al menos 2 puntos.");
       return;
     }
-    const a = S.atk;
-    const sv = addSalvo({ ...a, pts: S.route.pts });
-    sv.targetUnit = S.route.targetUnit;
+    const sv = addSalvo({ ...S.atk, pts: S.route.pts, targetUnit: S.route.targetUnit, targetObj: S.route.targetObj });
     S.sel = { kind: "salvo", id: sv.id };
     setMode("select");
     renderAtk();
@@ -4141,9 +4333,9 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
   }
 
   // src/ui/input.js
-  var drag = null;
+  var DRAG_PX = 6;
   function hitTest(sx, sy) {
-    const units = S.started ? S.units : S.setup.defs, jams = S.started ? S.jamsLive : S.setup.jams;
+    const units = S.started ? S.units : S.setup.defs, jams = S.started ? S.jamsLive : S.setup.jams, objs = S.started ? S.objs : S.setup.objs;
     if (S.started) for (const th of S.threats) {
       if (!th.alive || !th.p) continue;
       const [a, b] = toS(th.p.x, th.p.y);
@@ -4156,6 +4348,10 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     for (const j of jams) {
       const [a, b] = toS(j.x, j.y);
       if (Math.hypot(a - sx, b - sy) < 11) return { kind: "jam", id: j.id };
+    }
+    for (const g of objs) {
+      const [a, b] = toS(g.x, g.y);
+      if (Math.hypot(a - sx, b - sy) < 11) return { kind: "obj", id: g.id };
     }
     if (!S.started) for (const sv of S.setup.salvos) {
       for (let i = 1; i < sv.pts.length; i++) {
@@ -4171,6 +4367,41 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
   }
   var pointers = /* @__PURE__ */ new Map();
   var pinch = null;
+  var gesture = null;
+  var SETUP_LIST = { def: () => S.setup.defs, jam: () => S.setup.jams, obj: () => S.setup.objs };
+  function click(g) {
+    const [wx, wy] = toW(g.sx, g.sy);
+    if (S.mode === "placeDef" || S.mode === "placeJam" || S.mode === "placeObj") {
+      if (S.started) {
+        toast("Reiniciá la simulación para editar el escenario.");
+        return;
+      }
+      proposePlacement(wx, wy);
+      return;
+    }
+    if (S.mode === "route") {
+      const T = THREATS[S.atk.type];
+      if (isOffmap(T) && S.route.pts.length >= 2) return;
+      let p = [+wx.toFixed(2), +wy.toFixed(2)];
+      S.route.targetUnit = S.route.targetObj = null;
+      if (g.hit && g.hit.kind === "def") {
+        const u = S.setup.defs.find((v) => v.id === g.hit.id);
+        p = [u.x, u.y];
+        S.route.targetUnit = u.id;
+      } else if (g.hit && g.hit.kind === "obj") {
+        const o = S.setup.objs.find((v) => v.id === g.hit.id);
+        p = [o.x, o.y];
+        S.route.targetObj = o.id;
+      }
+      S.route.pts.push(p);
+      updateModebar();
+      return;
+    }
+    if (g.hit) {
+      S.sel = g.hit;
+      renderSel();
+    }
+  }
   function initInput() {
     cv.addEventListener("pointerdown", (e) => {
       cv.setPointerCapture(e.pointerId);
@@ -4178,50 +4409,12 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
       if (pointers.size === 2) {
         const [p1, p2] = [...pointers.values()];
         pinch = { d: Math.hypot(p1[0] - p2[0], p1[1] - p2[1]), s: V.s };
-        drag = null;
+        gesture = null;
         return;
       }
-      const [sx, sy] = evPos(e), [wx, wy] = toW(sx, sy);
-      if (S.mode === "placeDef" || S.mode === "placeJam") {
-        if (S.started) {
-          toast("Reiniciá la simulación para editar el escenario.");
-          return;
-        }
-        if (S.mode === "placeDef") {
-          const u = addDef(S.placeType, +wx.toFixed(2), +wy.toFixed(2));
-          S.sel = { kind: "def", id: u.id };
-        } else {
-          const j = addJam(S.placeType, +wx.toFixed(2), +wy.toFixed(2));
-          S.sel = { kind: "jam", id: j.id };
-        }
-        renderSel();
-        renderTabs();
-        schedCov();
-        return;
-      }
-      if (S.mode === "route") {
-        let p = [+wx.toFixed(2), +wy.toFixed(2)];
-        const h2 = hitTest(sx, sy);
-        if (h2 && h2.kind === "def") {
-          const u = S.setup.defs.find((v) => v.id === h2.id);
-          p = [u.x, u.y];
-          S.route.targetUnit = u.id;
-        } else S.route.targetUnit = null;
-        S.route.pts.push(p);
-        updateModebar();
-        const T = THREATS[S.atk.type];
-        if (isOffmap(T) && S.route.pts.length >= 2) finishRoute();
-        return;
-      }
-      const h = hitTest(sx, sy);
-      if (h) {
-        S.sel = h;
-        renderSel();
-        if (!S.started && (h.kind === "def" || h.kind === "jam")) drag = { kind: h.kind, id: h.id, moved: false };
-        else drag = null;
-      } else {
-        drag = { pan: true, sx, sy, cx: V.cx, cy: V.cy, moved: false };
-      }
+      if (pointers.size > 2) return;
+      const [sx, sy] = evPos(e);
+      gesture = { sx, sy, cx: V.cx, cy: V.cy, kind: null, hit: hitTest(sx, sy) };
     });
     cv.addEventListener("pointermove", (e) => {
       if (pointers.has(e.pointerId)) pointers.set(e.pointerId, evPos(e));
@@ -4231,21 +4424,27 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
         V.s = clamp(pinch.s * d / pinch.d, 1, 80);
         return;
       }
-      const [sx, sy] = evPos(e);
-      if (drag && drag.pan) {
-        V.cx = drag.cx - (sx - drag.sx) / V.s;
-        V.cy = drag.cy - (sy - drag.sy) / V.s;
-        drag.moved = true;
-        return;
-      }
-      if (drag && (drag.kind === "def" || drag.kind === "jam")) {
-        const [wx, wy] = toW(sx, sy);
-        const o = drag.kind === "def" ? S.setup.defs.find((u) => u.id === drag.id) : S.setup.jams.find((u) => u.id === drag.id);
+      const [sx, sy] = evPos(e), g = gesture;
+      if (g) {
+        if (!g.kind) {
+          if (Math.hypot(sx - g.sx, sy - g.sy) < DRAG_PX) return;
+          const movable = S.mode === "select" && !S.started && g.hit && SETUP_LIST[g.hit.kind];
+          g.kind = movable ? "move" : "pan";
+          if (movable) {
+            S.sel = g.hit;
+            renderSel();
+          }
+        }
+        if (g.kind === "pan") {
+          V.cx = g.cx - (sx - g.sx) / V.s;
+          V.cy = g.cy - (sy - g.sy) / V.s;
+          return;
+        }
+        const [wx, wy] = toW(sx, sy), o = SETUP_LIST[g.hit.kind]().find((v) => v.id === g.hit.id);
         if (o) {
           o.x = +wx.toFixed(2);
           o.y = +wy.toFixed(2);
-          drag.moved = true;
-          for (const sv of S.setup.salvos) if (sv.targetUnit === o.id) sv.pts[sv.pts.length - 1] = [o.x, o.y];
+          for (const sv of S.setup.salvos) if (g.hit.kind === "def" && sv.targetUnit === o.id || g.hit.kind === "obj" && sv.targetObj === o.id) sv.pts[sv.pts.length - 1] = [o.x, o.y];
         }
         return;
       }
@@ -4254,11 +4453,14 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     const endPtr = (e) => {
       pointers.delete(e.pointerId);
       if (pointers.size < 2) pinch = null;
-      if (drag && drag.moved && drag.kind) {
+      const g = gesture;
+      gesture = null;
+      if (!g || e.type === "pointercancel") return;
+      if (!g.kind) click(g);
+      else if (g.kind === "move") {
         schedCov();
         renderSel();
       }
-      drag = null;
     };
     cv.addEventListener("pointerup", endPtr);
     cv.addEventListener("pointercancel", endPtr);
@@ -4275,7 +4477,7 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
       V.cy += wy - ny;
     }, { passive: false });
     cv.addEventListener("dblclick", (e) => {
-      if (S.mode === "route") {
+      if (S.mode === "route" && !isOffmap(THREATS[S.atk.type])) {
         e.preventDefault();
         finishRoute();
       }
@@ -4291,9 +4493,13 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
       if (e.target.matches("input,select,textarea")) return;
       if (e.key === "Escape") {
         if (!$("#modal").hidden) closeModal();
+        else if (S.preview) cancelPlacement();
         else setMode("select");
       }
-      if (e.key === "Enter" && S.mode === "route") finishRoute();
+      if (e.key === "Enter") {
+        if (S.preview) confirmPlacement();
+        else if (S.mode === "route") finishRoute();
+      }
       if (e.key === " ") {
         e.preventDefault();
         togglePlay();
@@ -4314,6 +4520,9 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     } else if (h && h.kind === "def") {
       const u = (S.started ? S.units : S.setup.defs).find((u2) => u2.id === h.id);
       txt = (u.name || D(u).short) + "\n" + D(u).name;
+    } else if (h && h.kind === "obj") {
+      const g = (S.started ? S.objs : S.setup.objs).find((v) => v.id === h.id), hp = g.hp ?? g.maxHp;
+      txt = "OBJETIVO: " + g.name + "\n" + TARGET_TYPES[g.type].name + "\nHP " + hp + " / " + g.maxHp + " · " + TARGET_STATUS[g.status || "operational"];
     } else if (MAP && wx >= 0 && wy >= 0 && wx <= MAP.wKm && wy <= MAP.hKm) {
       const e = elev(wx, wy), ll = latlon(wx, wy);
       txt = wx.toFixed(1) + " / " + wy.toFixed(1) + " km · " + ll[0].toFixed(3) + "°, " + ll[1].toFixed(3) + "°\n";

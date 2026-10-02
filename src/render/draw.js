@@ -1,10 +1,11 @@
 // ---------------- DIBUJO ----------------
 // Redibuja todo el mapa en cada cuadro: relieve, cobertura, grilla, anillos de alcance, sectores,
 // "strobes" de interferencia, rutas, jammers, unidades, impactos, amenazas, interceptores y explosiones.
-import { THREATS, JAMMERS, D } from '../data/index.js';
+import { THREATS, JAMMERS, DEFENSES, TARGET_TYPES, D } from '../data/index.js';
 import { azOf, clamp } from '../util/math.js';
 import { MAP } from '../physics/terrain.js';
-import { jamJ } from '../physics/radar.js';
+import { jamJ, horizon } from '../physics/radar.js';
+import { surf } from '../physics/terrain.js';
 import { isOffmap, posAt } from '../physics/kinematics.js';
 import { S } from '../sim/state.js';
 import { isDefenderView } from '../ui/dom.js';
@@ -63,6 +64,8 @@ export function draw() {
   // rutas de salvas (setup)
   if (!S.started || !S.running) for (const sv of S.setup.salvos) drawRoute(sv, S.sel && S.sel.kind === 'salvo' && S.sel.id === sv.id);
   if (S.route) drawRoute({ type: S.atk.type, pts: S.route.pts, preview: true }, true);
+  // objetivos (debajo de las unidades)
+  for (const g of S.started ? S.objs : S.setup.objs) drawObjective(g, S.sel && S.sel.kind === 'obj' && S.sel.id === g.id);
   // jammers
   for (const j of jams) {
     const J = JAMMERS[j.type], [sx, sy] = toS(j.x, j.y); const isSel = S.sel && S.sel.kind === 'jam' && S.sel.id === j.id;
@@ -88,6 +91,8 @@ export function draw() {
     const ammo = S.started && d.sam && u.alive ? ' ' + u.magLeft : '';
     labelAt(sx, sy, (u.name || d.short) + ammo, dead ? '#6b7888' : '#e6eef6');
   }
+  // posición propuesta, pendiente de confirmar
+  if (S.preview) drawPreview(S.preview);
   // impactos
   for (const im of S.impacts) { const [sx, sy] = toS(im.x, im.y); ctx.strokeStyle = im.k === 'hit' ? '#ff5b4d' : im.k === 'miss' ? '#e6a53c' : '#6b7888'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(sx - 5, sy - 5); ctx.lineTo(sx + 5, sy + 5); ctx.moveTo(sx + 5, sy - 5); ctx.lineTo(sx - 5, sy + 5); ctx.stroke(); }
   // amenazas
@@ -158,4 +163,47 @@ export function drawRoute(sv, hi) {
   const [a, b] = toS(...pts[0]);
   if (!sv.preview) labelAt(a, b, (sv.count > 1 ? sv.count + '× ' : '') + T.short + (off ? ' (desde ' + (sv.launchDist || T.launchDist) + ' km)' : ''), '#ffb3aa');
   for (const p of pts) { const [x, y] = toS(p[0], p[1]); ctx.fillStyle = '#ff5b4d'; ctx.fillRect(x - 2, y - 2, 4, 4); }
+}
+
+const STATUS_COLOR = { operational: '#6fd08c', damaged: '#e6a53c', destroyed: '#ff5b4d' };
+
+/** Objetivo: ícono cuadrado con la letra del tipo, nombre y barra de vida. */
+function drawObjective(g, isSel) {
+  const tt = TARGET_TYPES[g.type], [sx, sy] = toS(g.x, g.y), hp = g.hp ?? g.maxHp, st = g.status || 'operational', col = STATUS_COLOR[st];
+  // huella real del objetivo cuando el zoom la hace visible
+  const rpx = tt.radius / 1000 * V.s; if (rpx > 4) { ctx.strokeStyle = 'rgba(242,212,138,.35)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(sx, sy, rpx, 0, 7); ctx.stroke(); }
+  ctx.fillStyle = st === 'destroyed' ? '#3a2422' : '#1f2630'; ctx.strokeStyle = isSel ? '#e6a53c' : col; ctx.lineWidth = isSel ? 2.2 : 1.6;
+  ctx.beginPath(); ctx.rect(sx - 8, sy - 8, 16, 16); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#f2e6c9'; ctx.font = '700 10px "IBM Plex Mono", monospace'; ctx.textAlign = 'center'; ctx.fillText(tt.icon, sx, sy + 3.5); ctx.textAlign = 'left';
+  if (st === 'destroyed') { ctx.strokeStyle = '#ff5b4d'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(sx - 9, sy - 9); ctx.lineTo(sx + 9, sy + 9); ctx.moveTo(sx + 9, sy - 9); ctx.lineTo(sx - 9, sy + 9); ctx.stroke(); }
+  // nombre + barra de vida
+  ctx.font = '600 11px "IBM Plex Sans", sans-serif';
+  const txt = g.name, tw = Math.max(ctx.measureText(txt).width, 48);
+  ctx.fillStyle = 'rgba(8,13,20,.78)'; ctx.fillRect(sx + 11, sy - 11, tw + 8, 22);
+  ctx.fillStyle = '#f2e6c9'; ctx.fillText(txt, sx + 15, sy + 1);
+  const bw = tw, f = Math.max(0, hp / g.maxHp);
+  ctx.fillStyle = '#2a323c'; ctx.fillRect(sx + 15, sy + 4, bw, 4);
+  ctx.fillStyle = col; ctx.fillRect(sx + 15, sy + 4, bw * f, 4);
+}
+
+/** Posición propuesta: marcador translúcido, alcance de tiro y horizonte de radar contra 50 m. */
+function drawPreview(p) {
+  const [sx, sy] = toS(p.x, p.y);
+  ctx.save(); ctx.globalAlpha = 0.85;
+  ctx.strokeStyle = '#e6a53c'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 3]);
+  ctx.beginPath(); ctx.arc(sx, sy, 13, 0, 7); ctx.stroke();
+  if (p.mode === 'placeDef') {
+    const d = DEFENSES[p.type];
+    if (d.sam) { ctx.beginPath(); ctx.arc(sx, sy, d.sam.maxR * V.s, 0, 7); ctx.stroke(); }
+    if (d.radar && d.radar.band !== 'ACU' && d.radar.band !== 'OPT') {
+      const hz = horizon(d.kind === 'aew' ? d.alt : d.radar.mast + 0, 50);
+      ctx.strokeStyle = 'rgba(79,209,197,.8)'; ctx.setLineDash([2, 4]); ctx.beginPath(); ctx.arc(sx, sy, hz * V.s, 0, 7); ctx.stroke();
+      labelAt(sx + hz * V.s * 0.71 - 10, sy - hz * V.s * 0.71, 'horizonte vs 50 m: ' + hz.toFixed(0) + ' km', '#9ee7df');
+    }
+  }
+  ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(230,165,60,.55)'; ctx.beginPath(); ctx.arc(sx, sy, 6, 0, 7); ctx.fill();
+  ctx.restore();
+  const name = p.mode === 'placeDef' ? DEFENSES[p.type].short : p.mode === 'placeJam' ? JAMMERS[p.type].short : TARGET_TYPES[p.type].name;
+  labelAt(sx, sy + 16, '¿' + name + ' aquí? · ' + Math.round(surf(p.x, p.y)) + ' m', '#f2d48a');
 }
