@@ -4,7 +4,7 @@ import { setMap, builtinMap, MAP } from '../physics/terrain.js';
 import { S } from '../sim/state.js';
 import { resetState } from '../sim/engine.js';
 import { applyScenario } from '../sim/setup.js';
-import { buildBase } from '../render/basemap.js';
+import { buildBase } from '../render/terrain.js';
 import { fitView } from '../render/view.js';
 import { schedCov } from './coverage.js';
 import { updatePlay } from './controls.js';

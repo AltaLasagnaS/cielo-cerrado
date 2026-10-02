@@ -91,6 +91,10 @@ canvas#map{position:absolute;inset:0;width:100%;height:100%;touch-action:none;di
 .zoom{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:4px}
 .zoom button{width:30px;height:30px;background:rgba(12,18,25,.88);border:1px solid var(--line2);border-radius:4px;font-size:16px}
 .modebar{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);background:rgba(30,22,8,.94);border:1px solid var(--accent);color:var(--fg);border-radius:6px;padding:7px 12px;display:flex;gap:10px;align-items:center;max-width:calc(100% - 24px);font-size:12px}
+.relief{position:absolute;right:10px;bottom:40px;display:flex;flex-wrap:wrap;gap:2px;align-items:center;background:rgba(12,18,25,.88);border:1px solid var(--line2);border-radius:6px;padding:4px 6px;font-size:11px;max-width:calc(100% - 20px)}
+.relief span{color:var(--muted);margin-right:4px;font-family:var(--f-disp);font-size:13px;letter-spacing:.05em;text-transform:uppercase}
+.relief button{background:var(--panel2);border:1px solid var(--line2);border-radius:3px;padding:2px 7px;font-size:11px}
+.relief button.act{border-color:var(--accent);color:var(--accent)}
 .legend{position:absolute;left:10px;bottom:12px;background:rgba(12,18,25,.86);border:1px solid var(--line);border-radius:6px;padding:6px 9px;font-size:11px;color:var(--muted);display:flex;flex-direction:column;gap:3px}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .sw{width:12px;height:8px;border-radius:2px;display:inline-block}
@@ -194,6 +198,7 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
         <div class="speeds" id="speeds"></div>
         <label class="check" style="font-size:12px"><input type="checkbox" id="defView"> Vista del defensor</label>
       </div>
+      <div class="relief" id="relief" role="group" aria-label="Lectura del relieve"><span>Relieve</span></div>
       <div class="zoom"><button id="zin" aria-label="Acercar">+</button><button id="zout" aria-label="Alejar">−</button><button id="zfit" aria-label="Encuadrar" style="font-size:12px">⤢</button></div>
       <div class="legend" id="legend">
         <span><i class="sw" style="background:#62b6ff"></i>Defensa (Ucrania/OTAN)</span>
@@ -1777,6 +1782,7 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     covRef: "kh101",
     covAgl: 50,
     strobes: true,
+    relief: "normal",
     // reloj y control de la corrida
     t: 0,
     running: false,
@@ -2413,79 +2419,377 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
   var $ = (s) => document.querySelector(s);
   var isDefenderView = () => $("#defView").checked;
 
-  // src/render/basemap.js
-  var baseCanvas = document.createElement("canvas");
-  function buildBase() {
-    const W = MAP.W, H = MAP.H, d = MAP.data;
-    baseCanvas.width = W;
-    baseCanvas.height = H;
-    const cx = baseCanvas.getContext("2d"), img = cx.createImageData(W, H), px = img.data;
-    const maxE = Math.max(50, MAP.max), ci = maxE > 600 ? 100 : maxE > 200 ? 50 : 20;
-    const stops = [[0, [64, 78, 62]], [0.15, [86, 98, 70]], [0.35, [118, 112, 80]], [0.6, [140, 122, 96]], [0.85, [160, 150, 136]], [1, [196, 196, 192]]];
-    const col = (t) => {
-      for (let i = 1; i < stops.length; i++) if (t <= stops[i][0]) {
-        const a = stops[i - 1], b = stops[i], f = (t - a[0]) / (b[0] - a[0]);
-        return a[1].map((v, k) => v + (b[1][k] - v) * f);
+  // src/physics/terrain-analysis.js
+  var RELIEF_RADIUS_KM = 5;
+  var cache = /* @__PURE__ */ new WeakMap();
+  function analysis(map = MAP) {
+    let a = cache.get(map);
+    if (!a || a.data !== map.data) {
+      a = analyze(map);
+      cache.set(map, a);
+    }
+    return a;
+  }
+  function analyze(map) {
+    const { W, H, data } = map;
+    const I = new Float64Array((W + 1) * (H + 1));
+    for (let i = 0; i < H; i++) {
+      let row = 0;
+      for (let j = 0; j < W; j++) {
+        row += Math.max(0, data[i * W + j]);
+        I[(i + 1) * (W + 1) + j + 1] = I[i * (W + 1) + j + 1] + row;
       }
-      return stops[stops.length - 1][1];
-    };
-    const cell = MAP.cell;
+    }
+    const R = Math.max(1, Math.round(RELIEF_RADIUS_KM / map.cellKm));
+    const mean = new Float32Array(W * H);
     for (let i = 0; i < H; i++) for (let j = 0; j < W; j++) {
-      const k = i * W + j, e = d[k], o = k * 4;
-      const eL = d[i * W + Math.max(0, j - 1)], eR = d[i * W + Math.min(W - 1, j + 1)], eU = d[Math.max(0, i - 1) * W + j], eD = d[Math.min(H - 1, i + 1) * W + j];
+      const i0 = Math.max(0, i - R), i1 = Math.min(H, i + R + 1), j0 = Math.max(0, j - R), j1 = Math.min(W, j + R + 1);
+      const s = I[i1 * (W + 1) + j1] - I[i0 * (W + 1) + j1] - I[i1 * (W + 1) + j0] + I[i0 * (W + 1) + j0];
+      mean[i * W + j] = s / ((i1 - i0) * (j1 - j0));
+    }
+    return { data: map.data, mean, peaks: findPeaks(map), contours: null };
+  }
+  function sampleGrid(map, g, x, y) {
+    const c = map.cellKm, fx = clamp(x / c - 0.5, 0, map.W - 1.001), fy = clamp(y / c - 0.5, 0, map.H - 1.001);
+    const j = fx | 0, i = fy | 0, tx = fx - j, ty = fy - i, W = map.W, k = i * W + j;
+    return (g[k] * (1 - tx) + g[k + 1] * tx) * (1 - ty) + (g[k + W] * (1 - tx) + g[k + W + 1] * tx) * ty;
+  }
+  function relativeRelief(x, y) {
+    return surf(x, y) - sampleGrid(MAP, analysis().mean, x, y);
+  }
+  function slopeAt(x, y) {
+    const c = MAP.cellKm, m = c * 2e3;
+    return 100 * Math.hypot((surf(x + c, y) - surf(x - c, y)) / m, (surf(x, y + c) - surf(x, y - c)) / m);
+  }
+  function terrainClass(x, y) {
+    if (surf(x, y) <= 0) return "Mar";
+    const rel = relativeRelief(x, y), sl = slopeAt(x, y);
+    if (rel >= 80) return sl < 15 ? "Cota dominante" : "Ladera alta";
+    if (rel <= -60) return "Valle / hondonada";
+    if (sl >= 12) return "Ladera";
+    return Math.abs(rel) > 25 ? "Terreno ondulado" : "Llano";
+  }
+  function findPeaks(map) {
+    const { W, H, data, cellKm: c } = map;
+    let maxE = 0;
+    for (let k = 0; k < data.length; k++) if (data[k] > maxE) maxE = data[k];
+    const minRelief = Math.max(25, 0.04 * maxE);
+    const rMax = Math.max(1, Math.round(1 / c)), rMin = Math.max(2, Math.round(3 / c));
+    const cand = [];
+    for (let i = 1; i < H - 1; i++) for (let j = 1; j < W - 1; j++) {
+      const k = i * W + j, e = data[k];
+      if (e <= 0) continue;
+      let ok = true;
+      for (let di = -1; di <= 1 && ok; di++) for (let dj = -1; dj <= 1; dj++) {
+        if (!di && !dj) continue;
+        const n = data[k + di * W + dj];
+        if (n > e || n === e && (di < 0 || di === 0 && dj < 0)) {
+          ok = false;
+          break;
+        }
+      }
+      if (ok) cand.push(k);
+    }
+    const peaks = [];
+    for (const k of cand) {
+      const i = k / W | 0, j = k - i * W, e = data[k];
+      let dom = true;
+      for (let di = -rMax; di <= rMax && dom; di++) for (let dj = -rMax; dj <= rMax; dj++) {
+        const ii = i + di, jj = j + dj;
+        if (ii < 0 || jj < 0 || ii >= H || jj >= W) continue;
+        if (data[ii * W + jj] > e) {
+          dom = false;
+          break;
+        }
+      }
+      if (!dom) continue;
+      let lo = e;
+      for (let di = -rMin; di <= rMin; di++) for (let dj = -rMin; dj <= rMin; dj++) {
+        const ii = i + di, jj = j + dj;
+        if (ii < 0 || jj < 0 || ii >= H || jj >= W) continue;
+        const v = Math.max(0, data[ii * W + jj]);
+        if (v < lo) lo = v;
+      }
+      if (e - lo >= minRelief) peaks.push({ x: (j + 0.5) * c, y: (i + 0.5) * c, e, relief: e - lo });
+    }
+    peaks.sort((a, b) => b.relief - a.relief || b.e - a.e);
+    const out = [];
+    for (const p of peaks) {
+      if (out.every((q) => Math.hypot(q.x - p.x, q.y - p.y) >= 1.5)) out.push(p);
+      if (out.length >= 400) break;
+    }
+    return out;
+  }
+  var contourInterval = (maxE) => maxE > 600 ? 100 : maxE > 200 ? 50 : 20;
+  function contourLines(map = MAP) {
+    const a = analysis(map);
+    if (a.contours) return a.contours;
+    const { W, H, data, cellKm: c } = map;
+    let maxE = 0;
+    for (let k = 0; k < data.length; k++) if (data[k] > maxE) maxE = data[k];
+    const interval = contourInterval(Math.max(50, maxE));
+    const res = { interval, coast: [], minor: [], index: [] };
+    const levels = [0.5];
+    for (let L = interval; L < maxE; L += interval) levels.push(L);
+    for (const L of levels) {
+      const out = L === 0.5 ? res.coast : Math.round(L / interval) % 5 === 0 ? res.index : res.minor;
+      for (let i = 0; i < H - 1; i++) for (let j = 0; j < W - 1; j++) {
+        const k = i * W + j;
+        const v0 = data[k], v1 = data[k + 1], v2 = data[k + W + 1], v3 = data[k + W];
+        const idx = (v0 > L ? 8 : 0) | (v1 > L ? 4 : 0) | (v2 > L ? 2 : 0) | (v3 > L ? 1 : 0);
+        if (idx === 0 || idx === 15) continue;
+        const x0 = (j + 0.5) * c, y0 = (i + 0.5) * c;
+        const e = [
+          // puntos de cruce en cada lado: arriba, derecha, abajo, izquierda
+          () => [x0 + c * (L - v0) / (v1 - v0), y0],
+          () => [x0 + c, y0 + c * (L - v1) / (v2 - v1)],
+          () => [x0 + c * (L - v3) / (v2 - v3), y0 + c],
+          () => [x0, y0 + c * (L - v0) / (v3 - v0)]
+        ];
+        const seg = (p, q) => {
+          const A = e[p](), B = e[q]();
+          out.push(A[0], A[1], B[0], B[1]);
+        };
+        const mid = (v0 + v1 + v2 + v3) / 4 > L;
+        switch (idx) {
+          case 1:
+          case 14:
+            seg(3, 2);
+            break;
+          case 2:
+          case 13:
+            seg(2, 1);
+            break;
+          case 3:
+          case 12:
+            seg(3, 1);
+            break;
+          case 4:
+          case 11:
+            seg(0, 1);
+            break;
+          case 6:
+          case 9:
+            seg(0, 2);
+            break;
+          case 7:
+          case 8:
+            seg(3, 0);
+            break;
+          case 5:
+            if (mid) {
+              seg(3, 0);
+              seg(2, 1);
+            } else {
+              seg(3, 2);
+              seg(0, 1);
+            }
+            break;
+          case 10:
+            if (mid) {
+              seg(0, 1);
+              seg(3, 2);
+            } else {
+              seg(3, 0);
+              seg(2, 1);
+            }
+            break;
+        }
+      }
+    }
+    a.contours = res;
+    return res;
+  }
+
+  // src/render/terrain.js
+  var RELIEF_MODES = { normal: "Normal", peaks: "Puntos altos", contours: "Curvas de nivel", shade: "Sombreado" };
+  var MAX_PX = 32e5;
+  var rasters = {};
+  var paths = null;
+  function buildBase() {
+    for (const k in rasters) delete rasters[k];
+    paths = null;
+    analysis();
+  }
+  var STOPS = [[0, [64, 78, 62]], [0.15, [86, 98, 70]], [0.35, [118, 112, 80]], [0.6, [140, 122, 96]], [0.85, [160, 150, 136]], [1, [196, 196, 192]]];
+  var tint = (t) => {
+    for (let i = 1; i < STOPS.length; i++) if (t <= STOPS[i][0]) {
+      const a = STOPS[i - 1], b = STOPS[i], f = (t - a[0]) / (b[0] - a[0]);
+      return a[1].map((v, k) => v + (b[1][k] - v) * f);
+    }
+    return STOPS[STOPS.length - 1][1];
+  };
+  function lambert(gx, gy, az, alt) {
+    const a = az * Math.PI / 180, h = alt * Math.PI / 180;
+    const lx = Math.sin(a) * Math.cos(h), ly = Math.cos(a) * Math.cos(h), lz = Math.sin(h);
+    const nx = -gx, ny = gy, n = Math.hypot(nx, ny, 1);
+    return Math.max(0, (nx * lx + ny * ly + lz) / n);
+  }
+  function buildRaster(mode) {
+    const { W, H, data } = MAP;
+    const k = clamp(Math.floor(Math.sqrt(MAX_PX / (W * H))), 1, 4), RW = W * k, RH = H * k;
+    const E = new Float32Array(RW * RH);
+    for (let py = 0; py < RH; py++) {
+      const fy = clamp((py + 0.5) / k - 0.5, 0, H - 1.001), i = fy | 0, ty = fy - i;
+      for (let px2 = 0; px2 < RW; px2++) {
+        const fx = clamp((px2 + 0.5) / k - 0.5, 0, W - 1.001), j = fx | 0, tx = fx - j, q = i * W + j;
+        E[py * RW + px2] = (data[q] * (1 - tx) + data[q + 1] * tx) * (1 - ty) + (data[q + W] * (1 - tx) + data[q + W + 1] * tx) * ty;
+      }
+    }
+    const cv2 = document.createElement("canvas");
+    cv2.width = RW;
+    cv2.height = RH;
+    const cx = cv2.getContext("2d"), img = cx.createImageData(RW, RH), px = img.data;
+    const maxE = Math.max(50, MAP.max), step2 = MAP.cell / k, zf = mode === "shade" ? 3 : 2;
+    for (let y = 0; y < RH; y++) for (let x = 0; x < RW; x++) {
+      const o = y * RW + x, e = E[o];
       let r, g, b;
       if (e <= 0) {
         const t = clamp(-e / 2500, 0, 1);
         r = 22 - 12 * t;
         g = 44 - 22 * t;
         b = 62 - 22 * t;
-        if (eL > 0 || eR > 0 || eU > 0 || eD > 0) {
-          r = 140;
-          g = 170;
-          b = 180;
+        if (mode === "shade" || mode === "contours") {
+          r *= 0.8;
+          g *= 0.8;
+          b *= 0.85;
         }
       } else {
-        const c = col(Math.pow(e / maxE, 0.7));
-        const sx = (Math.max(0, eR) - Math.max(0, eL)) / (2 * cell), sy = (Math.max(0, eD) - Math.max(0, eU)) / (2 * cell);
-        const sh = clamp(1 - (sx - sy) * 1.6 * 0.7, 0.45, 1.35);
-        r = c[0] * sh * 0.78;
-        g = c[1] * sh * 0.78;
-        b = c[2] * sh * 0.78;
-        const q = Math.floor(e / ci);
-        if (Math.floor(Math.max(0, eR) / ci) !== q || Math.floor(Math.max(0, eD) / ci) !== q) {
-          const strong = q % 5 === 0;
-          r *= strong ? 0.62 : 0.8;
-          g *= strong ? 0.62 : 0.8;
-          b *= strong ? 0.62 : 0.8;
+        const eL = Math.max(0, E[o - (x > 0 ? 1 : 0)]), eR = Math.max(0, E[o + (x < RW - 1 ? 1 : 0)]);
+        const eU = Math.max(0, E[o - (y > 0 ? RW : 0)]), eD = Math.max(0, E[o + (y < RH - 1 ? RW : 0)]);
+        const gx = zf * (eR - eL) / (2 * step2), gy = zf * (eD - eU) / (2 * step2);
+        const c = tint(Math.pow(e / maxE, 0.7));
+        if (mode === "shade") {
+          const hs = 0.6 * lambert(gx, gy, 315, 40) + 0.25 * lambert(gx, gy, 270, 40) + 0.15 * lambert(gx, gy, 0, 40);
+          const f = 0.15 + 0.95 * hs, gray = 168;
+          r = (gray * 0.75 + c[0] * 0.25) * f;
+          g = (gray * 0.75 + c[1] * 0.25) * f;
+          b = (gray * 0.78 + c[2] * 0.22) * f;
+        } else {
+          const hs = lambert(gx, gy, 315, 45) / Math.SQRT1_2;
+          const f = 0.78 * (0.55 + 0.45 * hs);
+          const mute = mode === "contours" ? 0.62 : 1;
+          r = c[0] * f * mute;
+          g = c[1] * f * mute;
+          b = c[2] * f * mute;
         }
       }
-      px[o] = r;
-      px[o + 1] = g;
-      px[o + 2] = b;
-      px[o + 3] = 255;
+      const p = o * 4;
+      px[p] = r;
+      px[p + 1] = g;
+      px[p + 2] = b;
+      px[p + 3] = 255;
     }
     cx.putImageData(img, 0, 0);
-    MAP.ci = ci;
+    return cv2;
+  }
+  function toPath(segs) {
+    const p = new Path2D();
+    for (let i = 0; i < segs.length; i += 4) {
+      p.moveTo(segs[i], segs[i + 1]);
+      p.lineTo(segs[i + 2], segs[i + 3]);
+    }
+    return p;
+  }
+  function getPaths() {
+    if (!paths) {
+      const c = contourLines();
+      paths = { interval: c.interval, coast: toPath(c.coast), minor: toPath(c.minor), index: toPath(c.index) };
+    }
+    return paths;
+  }
+  function drawTerrain(view, mode = "normal") {
+    var _a;
+    const { ctx: ctx2, dpr: dpr2, s, ox, oy } = view;
+    const ras = rasters[_a = mode === "peaks" ? "normal" : mode] || (rasters[_a] = buildRaster(mode === "peaks" ? "normal" : mode));
+    ctx2.imageSmoothingEnabled = true;
+    ctx2.imageSmoothingQuality = "high";
+    ctx2.drawImage(ras, ox, oy, MAP.wKm * s, MAP.hKm * s);
+    const P = getPaths();
+    ctx2.save();
+    ctx2.setTransform(dpr2 * s, 0, 0, dpr2 * s, dpr2 * ox, dpr2 * oy);
+    const lw = (px) => px / s;
+    ctx2.lineJoin = "round";
+    if (mode === "contours") {
+      ctx2.strokeStyle = "rgba(232,214,170,.38)";
+      ctx2.lineWidth = lw(0.8);
+      ctx2.stroke(P.minor);
+      ctx2.strokeStyle = "rgba(240,222,176,.8)";
+      ctx2.lineWidth = lw(1.4);
+      ctx2.stroke(P.index);
+    } else if (mode !== "shade") {
+      if (s > 9) {
+        ctx2.strokeStyle = "rgba(20,24,18,.18)";
+        ctx2.lineWidth = lw(0.7);
+        ctx2.stroke(P.minor);
+      }
+      ctx2.strokeStyle = "rgba(20,24,18,.3)";
+      ctx2.lineWidth = lw(0.9);
+      ctx2.stroke(P.index);
+    }
+    ctx2.strokeStyle = "rgba(150,182,194,.85)";
+    ctx2.lineWidth = lw(1.1);
+    ctx2.stroke(P.coast);
+    ctx2.restore();
+    return mode === "contours" ? P.interval : null;
+  }
+  function drawPeaks(ctx2, toS2, w, h) {
+    const shown = [], MIN = 74, MAXN = 45;
+    for (const p of analysis().peaks) {
+      const [sx, sy] = toS2(p.x, p.y);
+      if (sx < -20 || sy < -20 || sx > w + 20 || sy > h + 20) continue;
+      if (shown.some((q) => Math.abs(q[0] - sx) < MIN && Math.abs(q[1] - sy) < MIN * 0.45)) continue;
+      shown.push([sx, sy, p]);
+      if (shown.length >= MAXN) break;
+    }
+    ctx2.font = '600 11px "IBM Plex Mono", monospace';
+    for (const [sx, sy, p] of shown) {
+      const txt = Math.round(p.e).toLocaleString("es-AR") + " m", tw = ctx2.measureText(txt).width;
+      ctx2.fillStyle = "rgba(8,12,18,.72)";
+      ctx2.fillRect(sx + 6, sy - 8, tw + 6, 15);
+      ctx2.beginPath();
+      ctx2.moveTo(sx, sy - 6);
+      ctx2.lineTo(sx + 5.2, sy + 3);
+      ctx2.lineTo(sx - 5.2, sy + 3);
+      ctx2.closePath();
+      ctx2.fillStyle = "#f2d48a";
+      ctx2.strokeStyle = "#1b1305";
+      ctx2.lineWidth = 1.2;
+      ctx2.fill();
+      ctx2.stroke();
+      ctx2.fillStyle = "#f6e7c1";
+      ctx2.fillText(txt, sx + 9, sy + 3.5);
+    }
+    return shown.map((q) => q[2]);
   }
 
   // src/render/coverage.js
   var covCanvas = document.createElement("canvas");
+  var MAX_PX2 = 24e5;
+  var smooth = (f) => {
+    const t = clamp((f - 0.35) / 0.3, 0, 1);
+    return t * t * (3 - 2 * t);
+  };
   function paintCoverage(cov, W, H) {
-    covCanvas.width = W;
-    covCanvas.height = H;
-    const cx = covCanvas.getContext("2d"), img = cx.createImageData(W, H), px = img.data;
-    for (let k = 0; k < W * H; k++) {
-      const v = cov[k], o = k * 4;
-      if (v === 0) {
-        px[o] = 10;
-        px[o + 1] = 4;
-        px[o + 2] = 12;
-        px[o + 3] = 150;
-      } else {
-        px[o] = 79;
-        px[o + 1] = 209;
-        px[o + 2] = 197;
-        px[o + 3] = v === 1 ? 62 : 105;
+    const k = clamp(Math.floor(Math.sqrt(MAX_PX2 / (W * H))), 1, 3), RW = W * k, RH = H * k;
+    covCanvas.width = RW;
+    covCanvas.height = RH;
+    const cx = covCanvas.getContext("2d"), img = cx.createImageData(RW, RH), px = img.data;
+    const at = (g, fx, fy) => {
+      const j = fx | 0, i = fy | 0, tx = fx - j, ty = fy - i, q = i * W + j;
+      return (g(q) * (1 - tx) + g(q + 1) * tx) * (1 - ty) + (g(q + W) * (1 - tx) + g(q + W + 1) * tx) * ty;
+    };
+    const one = (q) => cov[q] > 0 ? 1 : 0, two = (q) => cov[q] > 1 ? 1 : 0;
+    for (let y = 0; y < RH; y++) {
+      const fy = clamp((y + 0.5) / k - 0.5, 0, H - 1.001);
+      for (let x = 0; x < RW; x++) {
+        const fx = clamp((x + 0.5) / k - 0.5, 0, W - 1.001);
+        const a1 = smooth(at(one, fx, fy)), a2 = smooth(at(two, fx, fy)), o = (y * RW + x) * 4;
+        const aCov = 62 + 43 * a2;
+        px[o] = 10 + 69 * a1;
+        px[o + 1] = 4 + 205 * a1;
+        px[o + 2] = 12 + 185 * a1;
+        px[o + 3] = 150 + (aCov - 150) * a1;
       }
     }
     cx.putImageData(img, 0, 0);
@@ -2499,10 +2803,10 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     ctx.fillStyle = "#0a1520";
     ctx.fillRect(0, 0, w, h);
     const [ox, oy] = toS(0, 0), mw = MAP.wKm * V.s, mh = MAP.hKm * V.s;
-    ctx.imageSmoothingEnabled = V.s < MAP.W / MAP.wKm * 1.5;
-    ctx.drawImage(baseCanvas, ox, oy, mw, mh);
+    drawTerrain({ ctx, dpr, s: V.s, ox, oy }, S.relief);
     if (S.showCov && covCanvas.width) {
-      ctx.imageSmoothingEnabled = false;
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
       ctx.drawImage(covCanvas, ox, oy, mw, mh);
     }
     ctx.strokeStyle = "rgba(230,165,60,.5)";
@@ -2529,6 +2833,7 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
       if (y % 10 === 0 && y) ctx.fillText(y + "", ox + 2, sy - 2);
     }
     drawScale(w, h);
+    if (S.relief === "peaks") drawPeaks(ctx, toS, w, h);
     ctx.font = '600 12px "IBM Plex Sans", sans-serif';
     for (const p of MAP.places || []) {
       const [sx, sy] = toS(p[1], p[2]);
@@ -3776,7 +4081,12 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
       txt = (u.name || D(u).short) + "\n" + D(u).name;
     } else if (MAP && wx >= 0 && wy >= 0 && wx <= MAP.wKm && wy <= MAP.hKm) {
       const e = elev(wx, wy), ll = latlon(wx, wy);
-      txt = wx.toFixed(1) + " / " + wy.toFixed(1) + " km\n" + (e <= 0 ? "Mar" + (e < -5 ? " (prof. " + Math.round(-e) + " m)" : "") : "Elev. " + Math.round(e) + " m") + "\n" + ll[0].toFixed(3) + "°, " + ll[1].toFixed(3) + "°";
+      txt = wx.toFixed(1) + " / " + wy.toFixed(1) + " km · " + ll[0].toFixed(3) + "°, " + ll[1].toFixed(3) + "°\n";
+      if (e <= 0) txt += "Mar" + (e < -5 ? " (prof. " + Math.round(-e) + " m)" : "");
+      else {
+        const rel = Math.round(relativeRelief(wx, wy));
+        txt += "Elevación: " + Math.round(e) + " m\nRelieve relativo: " + (rel >= 0 ? "+" : "") + rel + " m (vs. " + RELIEF_RADIUS_KM + " km alrededor)\nLectura: " + terrainClass(wx, wy) + " · pendiente " + Math.round(slopeAt(wx, wy)) + "%";
+      }
     }
     if (!txt) {
       tip.hidden = true;
@@ -3786,7 +4096,7 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     tip.hidden = false;
     const r = $("#mapwrap").getBoundingClientRect();
     let x = sx + 14, y = sy + 14;
-    if (x > r.width - 220) x = sx - 220;
+    if (x > r.width - 330) x = sx - 330;
     if (y > r.height - 110) y = sy - 110;
     tip.style.left = x + "px";
     tip.style.top = y + "px";
@@ -3841,6 +4151,29 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     };
   }
 
+  // src/ui/relief.js
+  var HELP = {
+    normal: "Colores por altura con sombreado suave y curvas maestras.",
+    peaks: "Marca los puntos altos que dominan su entorno (▲ y cota). Útil para ubicar radares y puestos de observación.",
+    contours: "Curvas de nivel nítidas; cada 5ª curva es más gruesa (curva maestra).",
+    shade: "Sombreado del relieve iluminado desde el noroeste: resalta crestas, valles y laderas."
+  };
+  function initRelief() {
+    const el = $("#relief");
+    el.insertAdjacentHTML("beforeend", Object.entries(RELIEF_MODES).map(([k, n]) => `<button data-relief="${k}" title="${HELP[k]}">${n}</button>`).join(""));
+    el.onclick = (e) => {
+      const b = e.target.closest("[data-relief]");
+      if (!b) return;
+      S.relief = b.dataset.relief;
+      updateRelief();
+      draw();
+    };
+    updateRelief();
+  }
+  function updateRelief() {
+    for (const b of $("#relief").querySelectorAll("[data-relief]")) b.classList.toggle("act", b.dataset.relief === S.relief);
+  }
+
   // src/ui/loop.js
   var STEP = 0.25;
   var last = performance.now();
@@ -3884,6 +4217,7 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
   initModal();
   initHelp();
   initHgtImport();
+  initRelief();
   var sc = $("#scenario");
   sc.innerHTML = Object.entries(SCENARIOS).map(([k, s]) => `<option value="${k}">${esc(s.name)}</option>`).join("");
   sc.onchange = (e) => {
@@ -3897,6 +4231,11 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
       fitted = true;
     }
   }).observe($("#mapwrap"));
+  var watchDpr = () => matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`).addEventListener("change", () => {
+    resize();
+    watchDpr();
+  }, { once: true });
+  watchDpr();
   loadScenario("mb_noche");
   resize();
   fitView();
@@ -3907,6 +4246,7 @@ table.t sup{color:var(--blue);font-size:10px;margin-right:1px}
     MAP.key = "flat";
     MAP.max = 0;
     MAP.min = 0;
+    buildBase();
   }, computeCov, draw, addDef, addSalvo, addJam, startSim, step, resetSim, loadScenario, renderAll };
 })();
 </script>

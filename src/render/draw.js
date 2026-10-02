@@ -9,7 +9,7 @@ import { isOffmap, posAt } from '../physics/kinematics.js';
 import { S } from '../sim/state.js';
 import { isDefenderView } from '../ui/dom.js';
 import { cv, ctx, dpr, V, toS } from './view.js';
-import { baseCanvas } from './basemap.js';
+import { drawTerrain, drawPeaks } from './terrain.js';
 import { covCanvas } from './coverage.js';
 
 export function draw() {
@@ -17,11 +17,10 @@ export function draw() {
   const w = cv.width / dpr, h = cv.height / dpr;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.fillStyle = '#0a1520'; ctx.fillRect(0, 0, w, h);
-  // océano fuera del mapa: grilla
+  // relieve (raster suavizado + vectores) y cobertura (interpolada, sin bloques)
   const [ox, oy] = toS(0, 0), mw = MAP.wKm * V.s, mh = MAP.hKm * V.s;
-  ctx.imageSmoothingEnabled = V.s < MAP.W / MAP.wKm * 1.5;
-  ctx.drawImage(baseCanvas, ox, oy, mw, mh);
-  if (S.showCov && covCanvas.width) { ctx.imageSmoothingEnabled = false; ctx.drawImage(covCanvas, ox, oy, mw, mh); }
+  drawTerrain({ ctx, dpr, s: V.s, ox, oy }, S.relief);
+  if (S.showCov && covCanvas.width) { ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high'; ctx.drawImage(covCanvas, ox, oy, mw, mh); }
   ctx.strokeStyle = 'rgba(230,165,60,.5)'; ctx.lineWidth = 1; ctx.strokeRect(ox, oy, mw, mh);
   // grilla km
   ctx.font = '10px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(200,215,230,.55)'; ctx.strokeStyle = 'rgba(200,215,230,.08)';
@@ -30,6 +29,8 @@ export function draw() {
   for (let y = 0; y <= MAP.hKm; y += gs) { const [, sy] = toS(0, y); ctx.beginPath(); ctx.moveTo(ox, sy); ctx.lineTo(ox + mw, sy); ctx.stroke(); if (y % 10 === 0 && y) ctx.fillText(y + '', ox + 2, sy - 2); }
   // escala
   drawScale(w, h);
+  // puntos altos (capa de lectura del relieve)
+  if (S.relief === 'peaks') drawPeaks(ctx, toS, w, h);
   // lugares
   ctx.font = '600 12px "IBM Plex Sans", sans-serif';
   for (const p of MAP.places || []) { const [sx, sy] = toS(p[1], p[2]); ctx.fillStyle = 'rgba(10,15,22,.75)'; ctx.fillRect(sx - 2, sy - 2, 4, 4); ctx.fillStyle = 'rgba(235,240,245,.85)'; ctx.fillText(p[0], sx + 5, sy + 4); }

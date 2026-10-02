@@ -6,6 +6,7 @@ import { clamp, segDist } from '../util/math.js';
 import { kmh, mach } from '../util/format.js';
 import { MAP, elev, surf, latlon } from '../physics/terrain.js';
 import { isOffmap, speedAt } from '../physics/kinematics.js';
+import { relativeRelief, slopeAt, terrainClass, RELIEF_RADIUS_KM } from '../physics/terrain-analysis.js';
 import { S } from '../sim/state.js';
 import { addDef, addJam } from '../sim/setup.js';
 import { label, uLabel } from '../sim/log.js';
@@ -93,9 +94,11 @@ function showTip(sx, sy) {
     const u = (S.started ? S.units : S.setup.defs).find(u => u.id === h.id); txt = (u.name || D(u).short) + '\n' + D(u).name;
   } else if (MAP && wx >= 0 && wy >= 0 && wx <= MAP.wKm && wy <= MAP.hKm) {
     const e = elev(wx, wy), ll = latlon(wx, wy);
-    txt = wx.toFixed(1) + ' / ' + wy.toFixed(1) + ' km\n' + (e <= 0 ? 'Mar' + (e < -5 ? ' (prof. ' + Math.round(-e) + ' m)' : '') : 'Elev. ' + Math.round(e) + ' m') + '\n' + ll[0].toFixed(3) + '°, ' + ll[1].toFixed(3) + '°';
+    txt = wx.toFixed(1) + ' / ' + wy.toFixed(1) + ' km · ' + ll[0].toFixed(3) + '°, ' + ll[1].toFixed(3) + '°\n';
+    if (e <= 0) txt += 'Mar' + (e < -5 ? ' (prof. ' + Math.round(-e) + ' m)' : '');
+    else { const rel = Math.round(relativeRelief(wx, wy)); txt += 'Elevación: ' + Math.round(e) + ' m\nRelieve relativo: ' + (rel >= 0 ? '+' : '') + rel + ' m (vs. ' + RELIEF_RADIUS_KM + ' km alrededor)\nLectura: ' + terrainClass(wx, wy) + ' · pendiente ' + Math.round(slopeAt(wx, wy)) + '%'; }
   }
   if (!txt) { tip.hidden = true; return; }
   tip.textContent = txt; tip.hidden = false;
-  const r = $('#mapwrap').getBoundingClientRect(); let x = sx + 14, y = sy + 14; if (x > r.width - 220) x = sx - 220; if (y > r.height - 110) y = sy - 110; tip.style.left = x + 'px'; tip.style.top = y + 'px';
+  const r = $('#mapwrap').getBoundingClientRect(); let x = sx + 14, y = sy + 14; if (x > r.width - 330) x = sx - 330; if (y > r.height - 110) y = sy - 110; tip.style.left = x + 'px'; tip.style.top = y + 'px';
 }

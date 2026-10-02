@@ -11,6 +11,7 @@ import { startSim, step } from './sim/engine.js';
 import { addDef, addSalvo, addJam } from './sim/setup.js';
 import { initView, resize, fitView } from './render/view.js';
 import { draw } from './render/draw.js';
+import { buildBase } from './render/terrain.js';
 import { $, isDefenderView } from './ui/dom.js';
 import { loadScenario, resetSim } from './ui/app.js';
 import { schedCov, computeCov } from './ui/coverage.js';
@@ -19,6 +20,7 @@ import { initInput } from './ui/input.js';
 import { initModal } from './ui/fichas.js';
 import { initHelp } from './ui/help.js';
 import { initHgtImport } from './ui/hgt.js';
+import { initRelief } from './ui/relief.js';
 import { initTabs, renderAll } from './ui/panels/index.js';
 import { markLogDirty } from './ui/panels/results.js';
 import { startLoop } from './ui/loop.js';
@@ -39,14 +41,18 @@ initTabs();
 initModal();
 initHelp();
 initHgtImport();
+initRelief();
 
 const sc = $('#scenario');
 sc.innerHTML = Object.entries(SCENARIOS).map(([k, s]) => `<option value="${k}">${esc(s.name)}</option>`).join('');
 sc.onchange = e => { if (e.target.value !== 'hgt') loadScenario(e.target.value); };
 let fitted = false;
 new ResizeObserver(() => { resize(); if (!fitted) { fitView(); fitted = true; } }).observe($('#mapwrap'));
+// si cambia la densidad de píxeles (zoom del navegador, otro monitor) se rehace el canvas
+const watchDpr = () => matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`).addEventListener('change', () => { resize(); watchDpr(); }, { once: true });
+watchDpr();
 loadScenario('mb_noche');
 resize(); fitView();
 startLoop();
 
-window.__S = S; window.__dbg = { flat: () => { MAP.data = new Int16Array(MAP.data.length); MAP.key = 'flat'; MAP.max = 0; MAP.min = 0; }, computeCov, draw, addDef, addSalvo, addJam, startSim, step, resetSim, loadScenario, renderAll };
+window.__S = S; window.__dbg = { flat: () => { MAP.data = new Int16Array(MAP.data.length); MAP.key = 'flat'; MAP.max = 0; MAP.min = 0; buildBase(); }, computeCov, draw, addDef, addSalvo, addJam, startSim, step, resetSim, loadScenario, renderAll };
