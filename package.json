@@ -1,0 +1,21 @@
+{
+  "name": "cielo-cerrado",
+  "version": "0.2.0",
+  "description": "Simulador táctico de defensa aérea para el navegador, con datos públicos aproximados y fuentes citadas.",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/",
+    "docs": "node scripts/gen-catalog-doc.mjs",
+    "check": "npm test && npm run build && npm run docs && git diff --exit-code -- index.html docs/CATALOGO.md"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

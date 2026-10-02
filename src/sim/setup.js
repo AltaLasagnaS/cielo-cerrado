@@ -1,0 +1,44 @@
+// ---------------- ARMADO DEL ESCENARIO ----------------
+// Funciones para agregar defensas, salvas y jammers a S.setup (antes de iniciar la corrida).
+import { DEFENSES, THREATS, JAMMERS } from '../data/index.js';
+import { azOf } from '../util/math.js';
+import { nextId } from '../util/ids.js';
+import { S } from './state.js';
+
+/** Despliega una defensa del tipo dado en (x, y) km. o = { name?, az? }. */
+export function addDef(type, x, y, o = {}) {
+  const d = DEFENSES[type];
+  const u = { id: nextId(), type, x, y, az: o.az ?? defaultAz(x, y), mast: d.radar ? (d.kind === 'aew' ? 0 : d.radar.mast) : 2, alt: d.alt, mag: d.sam ? d.sam.mag : 0, salvo: d.sam ? d.sam.salvo : 0, noDrones: d.sam ? !!d.sam.noDrones : false, name: o.name || nextName(type) };
+  S.setup.defs.push(u); return u;
+}
+
+/** Nombre automático: "Patriot-2", "Gepard-3"... */
+export function nextName(type) { const n = S.setup.defs.filter(u => u.type === type).length + 1; return DEFENSES[type].short + '-' + n; }
+
+/** Orientación por defecto de un radar sectorial: hacia el origen de la primera salva (o al oeste). */
+export function defaultAz(x, y) {
+  const sv = S.setup.salvos[0]; if (sv) { const p = sv.pts[0]; return Math.round(azOf(p[0] - x, p[1] - y)); }
+  return Math.round(azOf(-1, 0));
+}
+
+/** Programa una salva. Si o.targetUnit es el nombre de una defensa, la ruta termina sobre ella. */
+export function addSalvo(o) {
+  const T = THREATS[o.type];
+  const sv = { id: nextId(), type: o.type, count: o.count || 1, interval: o.interval ?? 20, tStart: o.tStart || 0, sync: !!o.sync, tArrive: o.tArrive || 0, agl: o.agl ?? T.agl, launchDist: o.launchDist ?? T.launchDist, maneuver: o.maneuver ?? T.maneuver, decoys: !!o.decoys, pts: o.pts, targetUnit: null };
+  if (o.targetUnit) { const u = S.setup.defs.find(d => d.name === o.targetUnit); if (u) { sv.targetUnit = u.id; sv.pts[sv.pts.length - 1] = [u.x, u.y]; } }
+  S.setup.salvos.push(sv); return sv;
+}
+
+/** Despliega un interferidor. o = { alt? } para los aéreos. */
+export function addJam(type, x, y, o = {}) { const J = JAMMERS[type]; const j = { id: nextId(), type, x, y, alt: o.alt ?? J.alt, on: true }; S.setup.jams.push(j); return j; }
+
+/**
+ * Despliega un escenario declarativo (ver data/scenarios.js) sobre el setup actual.
+ * Se clona para que las ediciones del jugador no modifiquen los datos originales.
+ */
+export function applyScenario(sc) {
+  const { defs = [], salvos = [], jams = [] } = structuredClone({ defs: sc.defs, salvos: sc.salvos, jams: sc.jams });
+  for (const d of defs) addDef(d.type, d.x, d.y, d);
+  for (const o of salvos) addSalvo(o);
+  for (const j of jams) addJam(j.type, j.x, j.y, j);
+}

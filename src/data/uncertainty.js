@@ -3,7 +3,6 @@
 // min y max quedan para el modo Monte Carlo (applySample).
 import { S_ } from './sources.js';
 
-
 // U(min, probable, max, confianza, [fuentes], nota). Confianza: 'alta' | 'media' | 'baja'.
 // "est" en la nota = estimación propia (física o analogía), sin dato público directo.
 export const U = (min, p, max, c, src, nota) => ({ min, p, max, c, src: src || [], nota: nota || '' });
