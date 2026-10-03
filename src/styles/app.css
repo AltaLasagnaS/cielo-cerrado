@@ -153,6 +153,11 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
 .concept code{font-family:var(--f-mono);font-size:12px;color:#9fd2ff;background:#0b1520;border-radius:3px;padding:0 4px}
 .widget{display:flex;flex-direction:column;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:10px 12px}.widget .wout{margin:0;font-family:var(--f-mono)}
 .sheet header .back{margin-right:4px}
+.sobjs{display:flex;flex-direction:column;gap:6px}
+.sobj{display:grid;grid-template-columns:1fr auto;gap:3px 8px;align-items:center;cursor:pointer}.sobj .hpbar{grid-column:1/-1}.sobj .t{font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sobj .n{grid-column:1/-1;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.sgoals{margin:0;padding-left:16px;font-size:12px;color:var(--muted);line-height:1.45}.sgoals b{color:var(--fg);font-weight:500}
+.okbox{border:1px solid #2f5e3f;background:#13241b;border-radius:4px;padding:8px 10px;color:#bfe8cb;font-size:12px;line-height:1.5}
+.dim{color:var(--muted)}
 .warn{border:1px solid #5a4520;background:#1f1a10;border-radius:4px;padding:8px 10px;color:#e9cf9a;font-size:12px;line-height:1.5}
 @media (max-width:1150px){
   .main{grid-template-columns:300px minmax(0,1fr)}

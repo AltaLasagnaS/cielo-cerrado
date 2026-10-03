@@ -8,6 +8,7 @@ import { draw } from '../render/draw.js';
 import { $ } from './dom.js';
 import { renderStats, renderLogIfDirty } from './panels/results.js';
 import { renderSel } from './panels/selection.js';
+import { renderScenario } from './panels/scenario.js';
 import { autoPhase, AUTO_PHASES } from '../sim/pace.js';
 import { currentSpeed, renderTimeScale } from './controls.js';
 
@@ -31,7 +32,7 @@ function loop(now) {
     $('#clock').textContent = fmtT(S.t);
   }
   draw();
-  if (++uiTick % 10 === 0) { renderStats(); renderLogIfDirty(); if (S.sel && S.started) renderSel(true); }
+  if (++uiTick % 10 === 0) { renderStats(); renderLogIfDirty(); if (S.sel && S.started) renderSel(true); if (S.started && S.objs.length) renderScenario(); }
   requestAnimationFrame(loop);
 }
 

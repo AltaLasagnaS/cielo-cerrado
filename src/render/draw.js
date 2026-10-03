@@ -176,14 +176,14 @@ function drawObjective(g, isSel) {
   ctx.beginPath(); ctx.rect(sx - 8, sy - 8, 16, 16); ctx.fill(); ctx.stroke();
   ctx.fillStyle = '#f2e6c9'; ctx.font = '700 10px "IBM Plex Mono", monospace'; ctx.textAlign = 'center'; ctx.fillText(tt.icon, sx, sy + 3.5); ctx.textAlign = 'left';
   if (st === 'destroyed') { ctx.strokeStyle = '#ff5b4d'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(sx - 9, sy - 9); ctx.lineTo(sx + 9, sy + 9); ctx.moveTo(sx + 9, sy - 9); ctx.lineTo(sx - 9, sy + 9); ctx.stroke(); }
-  // nombre + barra de vida
-  ctx.font = '600 11px "IBM Plex Sans", sans-serif';
-  const txt = g.name, tw = Math.max(ctx.measureText(txt).width, 48);
-  ctx.fillStyle = 'rgba(8,13,20,.78)'; ctx.fillRect(sx + 11, sy - 11, tw + 8, 22);
-  ctx.fillStyle = '#f2e6c9'; ctx.fillText(txt, sx + 15, sy + 1);
-  const bw = tw, f = Math.max(0, hp / g.maxHp);
-  ctx.fillStyle = '#2a323c'; ctx.fillRect(sx + 15, sy + 4, bw, 4);
-  ctx.fillStyle = col; ctx.fillRect(sx + 15, sy + 4, bw * f, 4);
+  // nombre corto + barra de vida, centrados debajo del ícono (no compiten con las etiquetas de unidades)
+  ctx.font = '600 10.5px "IBM Plex Sans", sans-serif';
+  const txt = g.short || g.name, tw = Math.max(ctx.measureText(txt).width, 40), x0 = sx - tw / 2;
+  ctx.fillStyle = 'rgba(8,13,20,.8)'; ctx.fillRect(x0 - 4, sy + 10, tw + 8, 20);
+  ctx.fillStyle = '#f2e6c9'; ctx.fillText(txt, x0, sy + 21);
+  const f = Math.max(0, hp / g.maxHp);
+  ctx.fillStyle = '#2a323c'; ctx.fillRect(x0, sy + 24, tw, 3);
+  ctx.fillStyle = col; ctx.fillRect(x0, sy + 24, tw * f, 3);
 }
 
 /** Posición propuesta: marcador translúcido, alcance de tiro y horizonte de radar contra 50 m. */

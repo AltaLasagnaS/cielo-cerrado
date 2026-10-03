@@ -8,6 +8,7 @@ import { renderAtk } from './attack.js';
 import { renderEW } from './ew.js';
 import { renderCat } from './catalog.js';
 import { renderAcademy } from './academy.js';
+import { renderScenario } from './scenario.js';
 import { renderSel } from './selection.js';
 import { renderStats, renderLog } from './results.js';
 
@@ -15,7 +16,7 @@ import { renderStats, renderLog } from './results.js';
 export function renderTabs() { renderDef(); renderEW(); }
 
 /** Todo el panel. */
-export function renderAll() { renderTabs(); renderAtk(); renderCat(); renderAcademy(); renderSel(); renderStats(); renderLog(); updatePlay(); }
+export function renderAll() { renderTabs(); renderAtk(); renderCat(); renderAcademy(); renderScenario(); renderSel(); renderStats(); renderLog(); updatePlay(); }
 
 /** Cambio de pestaña (Defensa / Ataque / Guerra E. / Catálogo). */
 export function initTabs() {

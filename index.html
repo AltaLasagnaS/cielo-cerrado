@@ -166,6 +166,11 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
 .concept code{font-family:var(--f-mono);font-size:12px;color:#9fd2ff;background:#0b1520;border-radius:3px;padding:0 4px}
 .widget{display:flex;flex-direction:column;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:10px 12px}.widget .wout{margin:0;font-family:var(--f-mono)}
 .sheet header .back{margin-right:4px}
+.sobjs{display:flex;flex-direction:column;gap:6px}
+.sobj{display:grid;grid-template-columns:1fr auto;gap:3px 8px;align-items:center;cursor:pointer}.sobj .hpbar{grid-column:1/-1}.sobj .t{font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sobj .n{grid-column:1/-1;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.sgoals{margin:0;padding-left:16px;font-size:12px;color:var(--muted);line-height:1.45}.sgoals b{color:var(--fg);font-weight:500}
+.okbox{border:1px solid #2f5e3f;background:#13241b;border-radius:4px;padding:8px 10px;color:#bfe8cb;font-size:12px;line-height:1.5}
+.dim{color:var(--muted)}
 .warn{border:1px solid #5a4520;background:#1f1a10;border-radius:4px;padding:8px 10px;color:#e9cf9a;font-size:12px;line-height:1.5}
 @media (max-width:1150px){
   .main{grid-template-columns:300px minmax(0,1fr)}
@@ -239,6 +244,7 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
       <div class="tip" id="tip" hidden></div>
     </section>
     <aside class="right">
+      <div class="card" id="scenCard"></div>
       <div class="card" id="selCard"><h3>Selección</h3><p class="hint">Tocá una unidad en el mapa para ver y ajustar sus parámetros.</p></div>
       <div class="card"><h3>Resultado</h3><div class="stats" id="stats"></div></div>
       <div class="card"><h3>Registro</h3><div class="log" id="log"></div></div>
@@ -1741,9 +1747,9 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
       rules: { net: true, doctrine: "salva" },
       rulesText: ["Red integrada activa y doctrina de salva.", "No hay recarga: cada unidad cuenta solo con la munición inicial.", "Los Kh-101, Kalibr e Iskander están sincronizados para llegar casi juntos (T+24:40 a T+25:30)."],
       objectives: [
-        { type: "fuel", name: "Depósito de combustible Salinas", x: 63.5, y: 55.8, desc: "Abastece a la región: es el blanco principal del ataque." },
-        { type: "infra", name: "Puerto de Monterey", x: 42.2, y: 64.3, desc: "Terminal portuaria, blanco de los Kalibr lanzados desde el mar." },
-        { type: "airbase", name: "Aeródromo de Marina", x: 51.5, y: 55.5, desc: "Base de la aviación de defensa. No está atacada al comienzo: protegela si agregás ataques." }
+        { type: "fuel", name: "Depósito de combustible Salinas", short: "Combustible Salinas", x: 63.5, y: 55.8, desc: "Abastece a la región: es el blanco principal del ataque." },
+        { type: "infra", name: "Puerto de Monterey", short: "Puerto Monterey", x: 42.2, y: 64.3, desc: "Terminal portuaria, blanco de los Kalibr lanzados desde el mar." },
+        { type: "airbase", name: "Aeródromo de Marina", short: "Aeródromo Marina", x: 51.5, y: 55.5, desc: "Base de la aviación de defensa. No está atacada al comienzo: protegela si agregás ataques." }
       ],
       defs: [
         { type: "ewr", x: 85.4, y: 53.2, name: "Radar 3D (cerro Gabilan)" },
@@ -1797,8 +1803,8 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
       rules: { net: true, doctrine: "salva" },
       rulesText: ["Red integrada activa y doctrina de salva para la defensa rusa.", "El supresor GNSS desvía a las armas que dependen del satélite (los ATACMS y los Liutyi son los más sensibles).", "Llegada sincronizada entre T+24:00 y T+24:50 para saturar canales de tiro."],
       objectives: [
-        { type: "ammo", name: "Depósito de munición", x: 57.8, y: 32.5, desc: "Arsenal de la base: blanco principal." },
-        { type: "airbase", name: "Base aérea de Säve", x: 52, y: 25, desc: "Aeródromo cercano: objetivo secundario si querés agregar ataques." }
+        { type: "ammo", name: "Depósito de munición", short: "Depósito munición", x: 57.8, y: 32.5, desc: "Arsenal de la base: blanco principal." },
+        { type: "airbase", name: "Base aérea de Säve", short: "Base Säve", x: 52, y: 25, desc: "Aeródromo cercano: objetivo secundario si querés agregar ataques." }
       ],
       defs: [
         { type: "s400", x: 52, y: 28, az: 240, name: "S-400" },
@@ -2784,7 +2790,7 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
   function addObj(type, x, y, o = {}) {
     const tt = TARGET_TYPES[type];
     const n2 = S.setup.objs.filter((g2) => g2.type === type).length + 1;
-    const g = { id: nextId(), type, x, y, name: o.name || tt.name + " " + n2, maxHp: o.hp || tt.hp, desc: o.desc || "" };
+    const g = { id: nextId(), type, x, y, name: o.name || tt.name + " " + n2, short: o.short || "", maxHp: o.hp || tt.hp, desc: o.desc || "" };
     S.setup.objs.push(g);
     return g;
   }
@@ -3581,17 +3587,17 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
       ctx.lineTo(sx - 9, sy + 9);
       ctx.stroke();
     }
-    ctx.font = '600 11px "IBM Plex Sans", sans-serif';
-    const txt = g.name, tw = Math.max(ctx.measureText(txt).width, 48);
-    ctx.fillStyle = "rgba(8,13,20,.78)";
-    ctx.fillRect(sx + 11, sy - 11, tw + 8, 22);
+    ctx.font = '600 10.5px "IBM Plex Sans", sans-serif';
+    const txt = g.short || g.name, tw = Math.max(ctx.measureText(txt).width, 40), x0 = sx - tw / 2;
+    ctx.fillStyle = "rgba(8,13,20,.8)";
+    ctx.fillRect(x0 - 4, sy + 10, tw + 8, 20);
     ctx.fillStyle = "#f2e6c9";
-    ctx.fillText(txt, sx + 15, sy + 1);
-    const bw = tw, f = Math.max(0, hp / g.maxHp);
+    ctx.fillText(txt, x0, sy + 21);
+    const f = Math.max(0, hp / g.maxHp);
     ctx.fillStyle = "#2a323c";
-    ctx.fillRect(sx + 15, sy + 4, bw, 4);
+    ctx.fillRect(x0, sy + 24, tw, 3);
     ctx.fillStyle = col;
-    ctx.fillRect(sx + 15, sy + 4, bw * f, 4);
+    ctx.fillRect(x0, sy + 24, tw * f, 3);
   }
   function drawPreview(p) {
     const [sx, sy] = toS(p.x, p.y);
@@ -4560,6 +4566,52 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
     ${CONCEPT_GROUPS.map((g) => `<div class="grp"><h3>${esc(g)}</h3>${g === "Radar y bandas" ? `<div class="row">${Object.keys(BANDS).map((b) => `<button class="chip" data-concept="band:${b}" title="${esc(BANDS[b].name + " · " + BANDS[b].freq)}">${esc(b)}</button>`).join("")}</div>` : ""}<div class="list">${CONCEPTS.filter((c) => c.group === g && !c.id.startsWith("band:")).map(item).join("")}</div></div>`).join("")}`;
   }
 
+  // src/ui/panels/scenario.js
+  var SIDE = { ataque: "Ataque", defensa: "Defensa" };
+  var KIND = { destroy: "destruir", damage: "dañar", protect: "proteger", survive: "que sobreviva", killUnit: "destruir unidad", keepUnit: "conservar unidad" };
+  var objRow = (g) => {
+    const hp = g.hp ?? g.maxHp, st = g.status || "operational";
+    return `<div class="sobj" data-oid="${g.id}"><span class="t">${esc(TARGET_TYPES[g.type].icon)} · ${esc(g.name)}</span><span class="chip st-${st}">${TARGET_STATUS[st]}</span><div class="hpbar"><i class="st-${st}" style="width:${(100 * Math.max(0, hp) / g.maxHp).toFixed(1)}%"></i></div><span class="n">HP ${Math.max(0, hp)} / ${g.maxHp}</span></div>`;
+  };
+  function renderScenario() {
+    const el = $("#scenCard"), sc2 = S.scen;
+    if (!sc2) {
+      el.innerHTML = `<h3>Escenario</h3><p class="hint">Relieve importado: escenario libre. Ubicá objetivos en la pestaña Ataque.</p>`;
+      return;
+    }
+    const objs = S.started ? S.objs : S.setup.objs;
+    const mine = (sc2.goals || []).filter((g) => g.side === sc2.player);
+    el.innerHTML = `<div class="row" style="justify-content:space-between"><h3>Escenario</h3><button class="btn sm" id="briefBtn">Briefing</button></div>
+    <p class="hint">${sc2.time ? esc(sc2.time) + " · " : ""}Jugás: <b>${SIDE[sc2.player] || "—"}</b></p>
+    ${objs.length ? `<div class="sobjs">${objs.map(objRow).join("")}</div>` : '<p class="hint">Sin objetivos: agregalos en la pestaña Ataque.</p>'}
+    ${mine.length ? `<ul class="sgoals">${mine.map((g) => `<li>${g.primary ? "<b>Principal:</b> " : ""}${esc(g.text)}</li>`).join("")}</ul>` : ""}`;
+    $("#briefBtn").onclick = openBriefing;
+    el.onclick = (e) => {
+      const r = e.target.closest("[data-oid]");
+      if (r) {
+        S.sel = { kind: "obj", id: +r.dataset.oid };
+        renderSel();
+      }
+    };
+  }
+  function openBriefing() {
+    const sc2 = S.scen;
+    if (!sc2) return;
+    const goals = (side) => (sc2.goals || []).filter((g) => g.side === side);
+    const goalList = (side) => goals(side).length ? `<div><b>${SIDE[side]}${sc2.player === side ? " (vos)" : ""}</b><ul class="goals">${goals(side).map((g) => `<li>${g.primary ? "<b>Principal:</b> " : "Secundaria: "}${esc(g.text)} <span class="dim">(${KIND[g.kind]})</span></li>`).join("")}</ul></div>` : "";
+    openModal(`<header><div><span class="chip">Briefing · ${esc(TERRAIN[sc2.map]?.name || MAP?.name || "")}</span><h2>${esc(sc2.name)}</h2></div><button class="btn x">Cerrar</button></header><div class="bd">
+    <div class="specs">${[["Hora", sc2.time || "—"], ["Jugás", SIDE[sc2.player] || "—"], ["Mapa", TERRAIN[sc2.map]?.name || "—"]].map(([a, b]) => `<div class="spec"><small>${a}</small><b>${esc(b)}</b></div>`).join("")}</div>
+    <p>${esc(sc2.description || "")}</p>
+    ${sc2.forces ? `<div class="dbcols"><div><h3>Defensa</h3><p>${esc(sc2.forces.defensa)}</p></div><div><h3>Ataque</h3><p>${esc(sc2.forces.ataque)}</p></div></div>` : ""}
+    ${sc2.conditions ? `<div><h3>Condiciones iniciales</h3><p>${esc(sc2.conditions)}</p></div>` : ""}
+    ${sc2.rulesText?.length ? `<div><h3>Reglas especiales</h3><ul>${sc2.rulesText.map((r) => `<li>${esc(r)}</li>`).join("")}</ul></div>` : ""}
+    ${sc2.objectives?.length ? `<div><h3>Objetivos</h3><ul>${sc2.objectives.map((o) => `<li><b>${esc(o.name)}</b> — ${esc(TARGET_TYPES[o.type].name)}, ${o.hp || TARGET_TYPES[o.type].hp} HP. ${esc(o.desc || "")}</li>`).join("")}</ul></div>` : ""}
+    ${(sc2.goals || []).length ? `<div><h3>Metas</h3><div class="dbgoals">${goalList("defensa")}${goalList("ataque")}</div></div>` : ""}
+    ${sc2.success || sc2.failure ? `<div class="dbcols">${sc2.success ? `<div class="okbox"><h3>Éxito</h3><p>${esc(sc2.success)}</p></div>` : ""}${sc2.failure ? `<div class="warn"><h3>Fracaso</h3><p>${esc(sc2.failure)}</p></div>` : ""}</div>` : ""}
+    <p class="hint">Podés cambiar todo: mover defensas, agregar ataques u objetivos. Al terminar, el debrief evalúa estas metas.</p>
+  </div>`, openBriefing);
+  }
+
   // src/sim/goals.js
   function goalMet(g, S2) {
     const obj = S2.objs.find((o) => o.name === g.target), unit = S2.units.find((u) => u.name === g.target);
@@ -4678,7 +4730,7 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
 
   // src/ui/debrief.js
   var pct = (a, b) => b ? Math.round(100 * a / b) + "%" : "—";
-  var SIDE = { ataque: "Ataque", defensa: "Defensa" };
+  var SIDE2 = { ataque: "Ataque", defensa: "Defensa" };
   function openDebrief() {
     const d = buildDebrief(S), a = d.attack, g = d.damage, f = d.defense;
     const res = d.outcome.result, resCls = { exito: "st-operational", parcial: "st-damaged", fracaso: "st-destroyed" }[res] || "";
@@ -4686,12 +4738,12 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
     const goalRows = ["ataque", "defensa"].map((side) => {
       const gs = d.goals.filter((x) => x.side === side);
       if (!gs.length) return "";
-      return `<div><b>${SIDE[side]}${d.outcome.side === side ? " (vos)" : ""}</b><ul class="goals">${gs.map((x) => `<li class="${x.met ? "ok" : "no"}">${x.met ? "✔" : "✘"} ${x.primary ? "<b>Principal:</b> " : "Secundaria: "}${esc(x.text)}</li>`).join("")}</ul></div>`;
+      return `<div><b>${SIDE2[side]}${d.outcome.side === side ? " (vos)" : ""}</b><ul class="goals">${gs.map((x) => `<li class="${x.met ? "ok" : "no"}">${x.met ? "✔" : "✘"} ${x.primary ? "<b>Principal:</b> " : "Secundaria: "}${esc(x.text)}</li>`).join("")}</ul></div>`;
     }).join("");
     const typeRows = Object.entries(a.byType).map(([k, b]) => `<tr><td>${esc(k)}</td><td>${b.launched}</td><td>${b.killed}</td><td>${b.arrived}</td><td>${b.shotsAt}</td></tr>`).join("");
     const tl = d.timeline.map((e) => `<li><time>${fmtT(e.t)}</time> — ${esc(e.text)}</li>`).join("") || "<li>Sin eventos.</li>";
     openModal(`<header><div><span class="chip">${esc(d.scen?.name || "Escenario libre")}</span><h2>Debrief</h2></div><button class="btn x">Cerrar</button></header><div class="bd debrief">
-    <div class="dbres ${resCls}"><b>${esc(d.outcome.side ? SIDE[d.outcome.side] + ": " : "")}${esc(d.outcome.text)}</b><span>Duración ${fmtT(d.t).slice(2)} de tiempo simulado</span></div>
+    <div class="dbres ${resCls}"><b>${esc(d.outcome.side ? SIDE2[d.outcome.side] + ": " : "")}${esc(d.outcome.text)}</b><span>Duración ${fmtT(d.t).slice(2)} de tiempo simulado</span></div>
     ${goalRows ? `<div><h3>Metas del escenario</h3><div class="dbgoals">${goalRows}</div></div>` : ""}
     <div><h3>Objetivos</h3>${objRows}</div>
     <div class="dbcols">
@@ -4760,6 +4812,7 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
     renderAtk();
     renderCat();
     renderAcademy();
+    renderScenario();
     renderSel();
     renderStats();
     renderLog();
@@ -5311,6 +5364,7 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
       renderStats();
       renderLogIfDirty();
       if (S.sel && S.started) renderSel(true);
+      if (S.started && S.objs.length) renderScenario();
     }
     requestAnimationFrame(loop);
   }
@@ -5341,7 +5395,10 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
   var sc = $("#scenario");
   sc.innerHTML = Object.entries(SCENARIOS).map(([k, s]) => `<option value="${k}">${esc(s.name)}</option>`).join("");
   sc.onchange = (e) => {
-    if (e.target.value !== "hgt") loadScenario(e.target.value);
+    if (e.target.value !== "hgt") {
+      loadScenario(e.target.value);
+      openBriefing();
+    }
   };
   var fitted = false;
   new ResizeObserver(() => {

@@ -25,6 +25,7 @@ import { initAcademy } from './ui/academy.js';
 import { initTabs, renderAll } from './ui/panels/index.js';
 import { markLogDirty, renderStats } from './ui/panels/results.js';
 import { openDebrief } from './ui/debrief.js';
+import { openBriefing } from './ui/panels/scenario.js';
 import { startLoop } from './ui/loop.js';
 
 // Acceso desde la consola del navegador (depuración y herramientas externas).
@@ -48,7 +49,7 @@ initAcademy();
 
 const sc = $('#scenario');
 sc.innerHTML = Object.entries(SCENARIOS).map(([k, s]) => `<option value="${k}">${esc(s.name)}</option>`).join('');
-sc.onchange = e => { if (e.target.value !== 'hgt') loadScenario(e.target.value); };
+sc.onchange = e => { if (e.target.value !== 'hgt') { loadScenario(e.target.value); openBriefing(); } };
 let fitted = false;
 new ResizeObserver(() => { resize(); if (!fitted) { fitView(); fitted = true; } }).observe($('#mapwrap'));
 // si cambia la densidad de píxeles (zoom del navegador, otro monitor) se rehace el canvas

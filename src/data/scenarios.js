@@ -2,7 +2,7 @@
 // objetivos, defensas, salvas e interferidores (el orden define los ids).
 //
 // Coordenadas en km desde la esquina noroeste del mapa (x hacia el este, y hacia el sur).
-// Objetivo: { type, name, x, y, hp?, desc? }               (type = clave de TARGET_TYPES)
+// Objetivo: { type, name, short?, x, y, hp?, desc? }       (type = clave de TARGET_TYPES; short = etiqueta del mapa)
 // Defensa:  { type, x, y, name?, az? }                      (type = clave de DEFENSES)
 // Salva:    { type, count, interval, tStart?, sync?, tArrive?, agl?, launchDist?, maneuver?, decoys?,
 //             pts: [[x, y], ...] (el último punto es el blanco),
@@ -29,9 +29,9 @@ export const SCENARIOS = {
     rules: { net: true, doctrine: 'salva' },
     rulesText: ['Red integrada activa y doctrina de salva.', 'No hay recarga: cada unidad cuenta solo con la munición inicial.', 'Los Kh-101, Kalibr e Iskander están sincronizados para llegar casi juntos (T+24:40 a T+25:30).'],
     objectives: [
-      { type: 'fuel', name: 'Depósito de combustible Salinas', x: 63.5, y: 55.8, desc: 'Abastece a la región: es el blanco principal del ataque.' },
-      { type: 'infra', name: 'Puerto de Monterey', x: 42.2, y: 64.3, desc: 'Terminal portuaria, blanco de los Kalibr lanzados desde el mar.' },
-      { type: 'airbase', name: 'Aeródromo de Marina', x: 51.5, y: 55.5, desc: 'Base de la aviación de defensa. No está atacada al comienzo: protegela si agregás ataques.' }
+      { type: 'fuel', name: 'Depósito de combustible Salinas', short: 'Combustible Salinas', x: 63.5, y: 55.8, desc: 'Abastece a la región: es el blanco principal del ataque.' },
+      { type: 'infra', name: 'Puerto de Monterey', short: 'Puerto Monterey', x: 42.2, y: 64.3, desc: 'Terminal portuaria, blanco de los Kalibr lanzados desde el mar.' },
+      { type: 'airbase', name: 'Aeródromo de Marina', short: 'Aeródromo Marina', x: 51.5, y: 55.5, desc: 'Base de la aviación de defensa. No está atacada al comienzo: protegela si agregás ataques.' }
     ],
     defs: [
       { type: 'ewr', x: 85.4, y: 53.2, name: 'Radar 3D (cerro Gabilan)' },
@@ -84,8 +84,8 @@ export const SCENARIOS = {
     rules: { net: true, doctrine: 'salva' },
     rulesText: ['Red integrada activa y doctrina de salva para la defensa rusa.', 'El supresor GNSS desvía a las armas que dependen del satélite (los ATACMS y los Liutyi son los más sensibles).', 'Llegada sincronizada entre T+24:00 y T+24:50 para saturar canales de tiro.'],
     objectives: [
-      { type: 'ammo', name: 'Depósito de munición', x: 57.8, y: 32.5, desc: 'Arsenal de la base: blanco principal.' },
-      { type: 'airbase', name: 'Base aérea de Säve', x: 52, y: 25, desc: 'Aeródromo cercano: objetivo secundario si querés agregar ataques.' }
+      { type: 'ammo', name: 'Depósito de munición', short: 'Depósito munición', x: 57.8, y: 32.5, desc: 'Arsenal de la base: blanco principal.' },
+      { type: 'airbase', name: 'Base aérea de Säve', short: 'Base Säve', x: 52, y: 25, desc: 'Aeródromo cercano: objetivo secundario si querés agregar ataques.' }
     ],
     defs: [
       { type: 's400', x: 52, y: 28, az: 240, name: 'S-400' },

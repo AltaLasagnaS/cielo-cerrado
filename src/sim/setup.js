@@ -34,11 +34,11 @@ export function addSalvo(o) {
   S.setup.salvos.push(sv); return sv;
 }
 
-/** Ubica un objetivo. o = { name?, hp?, desc? }. */
+/** Ubica un objetivo. o = { name?, short?, hp?, desc? }. */
 export function addObj(type, x, y, o = {}) {
   const tt = TARGET_TYPES[type];
   const n = S.setup.objs.filter(g => g.type === type).length + 1;
-  const g = { id: nextId(), type, x, y, name: o.name || tt.name + ' ' + n, maxHp: o.hp || tt.hp, desc: o.desc || '' };
+  const g = { id: nextId(), type, x, y, name: o.name || tt.name + ' ' + n, short: o.short || '', maxHp: o.hp || tt.hp, desc: o.desc || '' };
   S.setup.objs.push(g); return g;
 }
 
