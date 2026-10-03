@@ -7,6 +7,13 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 ## [Sin publicar]
 
 ### Agregado
+- **Bomba planeadora FAB-500 con UMPK** (Rusia): perfil de vuelo nuevo `glide`. Se suelta fuera del mapa a ≈10 km de altura y 40–100 km del blanco, y baja planeando a ≈250 m/s. Es barata (≈US$30 mil), casi no tiene firma infrarroja (×0,3 de Pk para buscadores IR) y su RCS sale de la base de CMO y de la forma.
+- **Tres defensas que usa Ucrania**, con datos del DB3K de CMO y de fuentes abiertas:
+  - **MIM-23B I-Hawk (Fase III):** 40 km, dos canales, piso de 60 m. Una unidad reclamó 14 misiles de crucero y 40 Shahed.
+  - **S-125 Pechora / Newa-SC modernizado:** 25 km, un solo canal, muy bueno a baja altura.
+  - **S-200V Vega:** 250 km, piso de 300 m, un canal y reacción lenta. Pensado contra aviones grandes (A-50, Tu-22M3), que el juego todavía no tiene.
+
+### Agregado
 - **Mando y control, segunda parte:**
   - **Enlace de datos por unidad** (casilla en el panel de selección): sin enlace, la unidad no comparte lo que ve ni recibe pistas ni alertas.
   - **Mejor tirador y defensa por capas** en el nivel integrado: cada blanco va a la batería más conveniente, y los drones se le dejan a una capa más barata que los espera más adelante (en una prueba, NASAMS + Gepard pasan de gastar US$6,4 M a US$0,13 M con los mismos derribos).

@@ -93,6 +93,30 @@ export const DEFENSES = {
     notes: ['No tiene sensor propio: necesita pista de la red (radar o acústica). Sin red, no sirve.', 'Sting cuesta ~US$2.100. Interceptores: >70% de los Shahed derribados sobre Kyiv en feb-2026 y ~1/3 de los blancos a nivel nacional en mar-2026, con >60% de éxito por salida.', 'Contra un Geran-3 (≈300–370 km/h) solo funciona de frente: el primer derribo fue en nov-2025.'],
     sources: [WP('Sting_(drone)'), SRC.ukr_sting, SRC.dn_interceptors, SRC.mil_geran3]
   },
+  hawk: {
+    name: 'MIM-23B I-Hawk (Fase III)', short: 'Hawk', side: 'UA', kind: 'sam', color: '#62b6ff',
+    radar: { name: 'AN/MPQ-61 HPIR (+ AN/MPQ-50 PAR, AN/MPQ-62 CWAR)', band: 'X', R1: 70, mast: 4, mastRange: [4, 4], mastNote: 'Fija: radares sobre remolques (altura estimada).', sector: 360, eccm: 5, scan: 2 },
+    sam: { maxR: 40, maxRtbm: 0, minR: 1.5, altMin: 60, altMax: 17700, vInt: 700, vmaxT: 820, react: 15, ch: 2, mag: 9, salvo: 2, guid: 'SARH', shot: 'MIM-23B', cost: 0.3, pk: { dron: 0.6, crucero: 0.7, supersonico: 0.4, balistico: 0, hiper: 0 } },
+    range: '1,5–40 km, techo ≈17 km', interceptor: 'MIM-23B: ≈Mach 2,5, semiactivo: el HPIR ilumina el blanco hasta el impacto',
+    notes: ['España entregó baterías Fase III desde fines de 2022 (21 lanzadores, radares MPQ-61 y MPQ-62) y más lanzadores en 2023–24; EE. UU. aportó misiles.', 'Una sola unidad ucraniana reclamó 14 misiles de crucero y 40 Shahed derribados.', 'Cada HPIR guía contra un blanco a la vez: dos secciones de fuego = dos canales.'],
+    sources: [WP('MIM-23_Hawk'), SRC.mil_hawk, SRC.db_hawk, SRC.cmo_db3k_sam]
+  },
+  s125: {
+    name: 'S-125 Pechora / Newa-SC (modernizado)', short: 'S-125', side: 'UA', kind: 'sam', color: '#62b6ff',
+    radar: { name: 'SNR-125 "Low Blow" (+ P-18/P-19 de búsqueda)', band: 'X', R1: 40, mast: 4, mastRange: [4, 6], mastNote: 'Cabina de radar sobre remolque; la versión polaca Newa-SC va sobre chasis MAZ-543 (≈4–6 m, estimado).', sector: 360, eccm: 3, scan: 2 },
+    sam: { maxR: 25, maxRtbm: 0, minR: 2.5, altMin: 25, altMax: 18000, vInt: 600, vmaxT: 700, react: 25, ch: 1, mag: 8, salvo: 2, guid: 'mando', shot: '5V27', cost: 0.15, pk: { dron: 0.45, crucero: 0.55, supersonico: 0.3, balistico: 0, hiper: 0 } },
+    range: '2,5–25 km, techo 18 km', interceptor: '5V27: guiado por radiocomando desde el SNR-125 (un blanco a la vez)',
+    notes: ['Sistema de los años 60, modernizado en Ucrania y en Polonia (Newa-SC, digital y sobre chasis con orugas o ruedas).', 'En su primer combate un S-125 ucraniano derribó un Kalibr; muy bueno a baja altura para su edad.', 'Un solo canal: se satura enseguida con oleadas.'],
+    sources: [WP('S-125_Neva/Pechora'), SRC.mil_newa, SRC.kp_s125, SRC.cmo_db3k_sam]
+  },
+  s200: {
+    name: 'S-200V Vega (5V28)', short: 'S-200', side: 'UA', kind: 'sam', color: '#62b6ff',
+    radar: { name: '5N62 "Square Pair" (iluminación; búsqueda con P-14/radar de la red)', band: 'C', R1: 250, mast: 8, mastRange: [8, 8], mastNote: 'Fija: antena del 5N62 sobre su base (altura estimada).', sector: 120, eccm: 3, scan: 4 },
+    sam: { maxR: 250, maxRtbm: 0, minR: 17, altMin: 300, altMax: 40000, vInt: 1100, vmaxT: 1180, react: 60, ch: 1, mag: 6, salvo: 2, guid: 'SARH', shot: '5V28', cost: 0.6, pk: { dron: 0.2, crucero: 0.25, supersonico: 0.2, balistico: 0, hiper: 0 } },
+    range: '17–250 km, techo ≈40 km; no baja de 300 m', interceptor: '5V28: misil de 7 t con cohetes aceleradores, semiactivo (el 5N62 ilumina hasta el impacto)',
+    notes: ['Ucrania lo reactivó en 2022 (con aporte polaco) para cazar aviones: se le atribuyen un A-50 y un Tu-22M3 a ≈300 km. También se adaptó como misil de ataque a tierra.', 'Contra drones y misiles de crucero es un desperdicio: lento para reaccionar, un solo canal y piso de 300 m.', 'El juego todavía no tiene aviones como blanco: acá solo puede enfrentar drones altos, planeadoras y misiles.'],
+    sources: [WP('S-200_(missile)'), SRC.twz_s200, SRC.dua_s200, SRC.cmo_db3k_sam]
+  },
   pantsir: {
     name: 'Pantsir-S1', short: 'Pantsir', side: 'RU', kind: 'sam', color: '#ff9f5a',
     radar: { name: '1RS1 búsqueda (S) + 1RS2 seguimiento (Ku)', band: 'S', R1: 30, mast: 6, mastRange: [6, 6], mastNote: 'Fija: radares sobre el camión (altura estimada).', sector: 360, eccm: 5, scan: 1 },

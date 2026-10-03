@@ -80,6 +80,15 @@ export const THREATS = {
     notes: ['Primer derribo confirmado por Patriot sobre Kyiv el 4/5/2023.', '111 lanzados y 28 interceptados (25%) hasta ago-2024.', 'Técnicamente es un balístico aerolanzado, no un hipersónico maniobrable.'],
     sources: [WP('Kh-47M2_Kinzhal'), SRC.csis_kinzhal, SRC.syrskyi, SRC.costs_leak]
   },
+  kab: {
+    name: 'FAB-500M-62 con UMPK (bomba planeadora)', short: 'UMPK', side: 'RU', cls: 'crucero', prof: 'glide',
+    v: 250, cruiseAlt: 10000, launchDist: 60, cold: true, rcs: 0.037, rcsSide: 0.12, rcsRear: 0.037, rcsVHF: 0.064, gnss: 0.5, cep: 15, warhead: '500 kg (≈200 kg de explosivo)', range: '40–70 km (UMPK); 95–100 km las versiones nuevas soltadas a 12 km',
+    cost: 0.03, costNote: 'Bomba FAB-500 de stock más kit UMPK de ≈US$20–30 mil (JAPCC)', maneuver: false,
+    guidance: 'INS + GLONASS con antena CRPA Kometa; alas desplegables', engine: 'Ninguno: planea (hay versiones nuevas con turborreactor)',
+    profile: 'Un Su-34 la suelta a 9–12 km de altura y a ~1.000 km/h a 50–70 km de la línea del frente, fuera del alcance de casi toda la defensa. Planea sin motor y llega a ~700–800 km/h. No deja estela térmica y llegan muchas juntas.',
+    notes: ['El arma rusa más usada contra el frente y Járkov desde 2024: miles por mes.', 'Interceptarla con Patriot o NASAMS es posible pero insostenible (US$4–7 M contra US$25 mil): la respuesta habitual es derribar al avión o interferir su GLONASS.', 'En el juego usa la Pk de la clase "crucero" (blanco subsónico sin maniobra).'],
+    sources: [WP('UMPK_(bomb_kit)'), SRC.japcc_kab, SRC.forbes_kab25]
+  },
   kh22: {
     name: 'Kh-22 / Kh-32 (supersónico pesado)', short: 'Kh-22', side: 'RU', cls: 'supersonico', prof: 'highdive',
     v: 1100, vDive: 1100, cruiseAlt: 27000, diveDist: 35, launchDist: 450, rcs: 0.73, rcsSide: 3.2, rcsRear: 1, rcsVHF: 1.3, gnss: 1, cep: 150, warhead: '≈950–1.000 kg (Kh-32: ≈500 kg)', range: '≈600 km (Kh-32: hasta 1.000 km)',

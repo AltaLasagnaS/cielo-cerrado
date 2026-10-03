@@ -8,7 +8,7 @@ import { S_ } from './sources.js';
 export const U = (min, p, max, c, src, nota) => ({ min, p, max, c, src: src || [], nota: nota || '' });
 export const PL = {
   v: ['Velocidad de crucero', 'm/s'], vDive: ['Velocidad terminal (picada)', 'm/s'], vLow: ['Velocidad rasante final', 'm/s'],
-  agl: ['Altura de vuelo', 'm AGL'], seekerKm: ['Ventana que corrige el buscador terminal', 'km'], cruiseAlt: ['Altura de crucero', 'm'], apogee: ['Apogeo', 'km'],
+  agl: ['Altura de vuelo', 'm AGL'], launchDist: ['Distancia de lanzamiento', 'km'], seekerKm: ['Ventana que corrige el buscador terminal', 'km'], cruiseAlt: ['Altura de crucero', 'm'], apogee: ['Apogeo', 'km'],
   rcs: ['RCS frontal (X/S)', 'm²'], rcsSide: ['RCS lateral (X/S)', 'm²'], rcsRear: ['RCS de cola (X/S)', 'm²'], rcsVHF: ['RCS en VHF', 'm²'], cep: ['CEP', 'm'], cost: ['Costo unitario', 'M US$'],
   decoys: ['Señuelos por misil', ''], manPk: ['Efecto de su maniobra terminal sobre la Pk', '×'],
   'info.rangeKm': ['Alcance', 'km'], 'info.warheadKg': ['Ojiva', 'kg'],
@@ -126,6 +126,19 @@ export const UNC = {
       manPk: U(0.6, 0.8, 0.9, 'baja', S_('ft_aerotime'), 'calibrado'),
       'info.rangeKm': U(460, 470, 480, 'media', S_('wp:Kh-47M2_Kinzhal'), ''),
       'info.warheadKg': U(480, 480, 500, 'media', S_('csis_kinzhal'), '')
+    },
+    kab: {
+      v: U(200, 250, 330, 'media', S_('japcc_kab', 'wp:UMPK_(bomb_kit)'), 'suelta a ~280 m/s (1.000 km/h), llega a 200–220 m/s (700–800 km/h); JAPCC habla de 300–400 m/s'),
+      cruiseAlt: U(9000, 10000, 12000, 'media', S_('wp:UMPK_(bomb_kit)'), 'Su-34 a 9–12 km'),
+      rcs: U(0.0135, 0.037, 0.1, 'baja', S_('cmo_db3k'), 'est por forma 0,1 m² (cuerpo de 0,4 m con alas); CMO (DB3K, UMPK FAB-500M-62): −18,7 dBsm ≈ 0,0135 m² de frente. Probable = media geométrica'),
+      rcsSide: U(0.029, 0.12, 0.5, 'baja', S_('cmo_db3k'), 'est por forma 0,5 m²; CMO (DB3K): −15,4 dBsm ≈ 0,029 m² de costado. Probable = media geométrica'),
+      rcsRear: U(0.0135, 0.037, 0.1, 'baja', S_('cmo_db3k'), 'est por forma 0,1 m²; CMO (DB3K): cola = frente. Probable = media geométrica'),
+      rcsVHF: U(0.0135, 0.064, 0.3, 'baja', S_('cmo_db3k'), 'est por resonancia 0,3 m²; CMO (DB3K): −18,7 dBsm ≈ 0,0135 m² en bandas A–D. Probable = media geométrica'),
+      cep: U(5, 15, 50, 'baja', S_('japcc_kab'), 'est: guiado satelital; el engaño GNSS la empeora mucho'),
+      cost: U(0.02, 0.03, 0.05, 'media', S_('japcc_kab'), 'kit ≈US$20–30 mil + bomba de stock'),
+      launchDist: U(40, 60, 100, 'media', S_('wp:UMPK_(bomb_kit)'), '40–70 km el UMPK clásico; 95–100 km las versiones nuevas'),
+      'info.rangeKm': U(40, 60, 100, 'media', S_('wp:UMPK_(bomb_kit)'), ''),
+      'info.warheadKg': U(450, 500, 520, 'alta', S_('wp:UMPK_(bomb_kit)'), 'FAB-500M-62')
     },
     kh22: {
       v: U(1030, 1100, 1360, 'media', S_('wp:Kh-22', 'wp:Kh-32'), 'Mach 3,5–4,6'),
@@ -347,6 +360,33 @@ export const UNC = {
       'sam.react': U(10, 20, 40, 'baja', [], 'est: despegue y aproximación'),
       'sam.cost': U(0.002, 0.003, 0.005, 'media', S_('wp:Sting_(drone)', 'dn_interceptors'), ''),
       'sam.pk.dron': U(0.4, 0.6, 0.75, 'media', S_('dn_interceptors'), '>60% de éxito por salida')
+    },
+    hawk: {
+      'radar.R1': U(50, 70, 100, 'baja', S_('cmo_db3k_sam'), 'CMO: HPIR 45 nmi (83 km) y PAR 54 nmi (100 km) de alcance instrumentado; est contra 1 m²'),
+      'sam.maxR': U(35, 40, 50, 'media', S_('cmo_db3k_sam', 'db_hawk'), 'CMO 22 nmi ≈ 40 km; OSINT 35–50 km'),
+      'sam.vInt': U(600, 700, 850, 'baja', S_('db_hawk'), 'Mach 2,5 máx.; est media'),
+      'sam.vmaxT': U(700, 820, 900, 'baja', S_('cmo_db3k_sam'), 'CMO: blancos hasta 1.600 nudos'),
+      'sam.react': U(10, 15, 30, 'baja', [], 'est'),
+      'sam.cost': U(0.2, 0.3, 0.5, 'baja', [], 'est: misil viejo de stock reacondicionado'),
+      'sam.pk.crucero': U(0.5, 0.7, 0.85, 'baja', S_('db_hawk'), 'analistas occidentales hablan de ~85%; est más conservadora. ' + PK_NOTE),
+      'sam.pk.dron': U(0.4, 0.6, 0.8, 'baja', S_('db_hawk'), PK_NOTE)
+    },
+    s125: {
+      'radar.R1': U(30, 40, 60, 'baja', S_('cmo_db3k_sam'), 'CMO: SNR-125 32 nmi (59 km) instrumentado; est contra 1 m²'),
+      'sam.maxR': U(18, 25, 30, 'media', S_('mil_newa', 'cmo_db3k_sam'), 'Newa-SC con 5V27: 25 km; CMO 10–16 nmi'),
+      'sam.vInt': U(500, 600, 900, 'baja', [], 'est'),
+      'sam.react': U(15, 25, 40, 'baja', [], 'est'),
+      'sam.cost': U(0.1, 0.15, 0.3, 'baja', [], 'est'),
+      'sam.pk.crucero': U(0.35, 0.55, 0.7, 'baja', S_('kp_s125'), PK_NOTE)
+    },
+    s200: {
+      'radar.R1': U(150, 250, 400, 'baja', S_('cmo_db3k_sam'), 'CMO: 5N62 220 nmi (≈400 km) contra blancos grandes; est contra 1 m²'),
+      'sam.maxR': U(150, 250, 300, 'media', S_('cmo_db3k_sam', 'dua_s200'), '5V28 ≈250 km, 5V28M ≈300 km; derribo a ≈308 km reclamado'),
+      'sam.altMin': U(200, 300, 300, 'media', S_('cmo_db3k_sam'), 'CMO 198 m; fuentes clásicas 300 m'),
+      'sam.vInt': U(900, 1100, 1300, 'baja', [], 'est: ≈Mach 4 máx.'),
+      'sam.react': U(40, 60, 120, 'baja', [], 'est: sistema de los 60, mucha preparación'),
+      'sam.cost': U(0.3, 0.6, 1, 'baja', [], 'est'),
+      'sam.pk.crucero': U(0.1, 0.25, 0.4, 'baja', [], 'est: pensado contra aviones grandes. ' + PK_NOTE)
     },
     pantsir: {
       'radar.R1': U(25, 30, 36, 'media', S_('apa_pantsir'), '36 km vs 2 m²'),

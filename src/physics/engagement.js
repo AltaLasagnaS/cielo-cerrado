@@ -87,7 +87,7 @@ export function solve(u, th, t) {
  * Probabilidad de derribo de un interceptor de u contra th en el instante t:
  *   Pk = Pk_base[clase] × modificadores, acotada a [0, 0,98]
  * Modificadores: maniobra terminal (×manPk del blanco, ×0,85 contra cañones), bengalas contra IR
- * (×0,85), baja firma (×0,85 buscador activo, ×0,75 guiado desde tierra), interferencia sobre el
+ * (×0,85), blanco sin motor contra IR (×0,3, T.cold: planeadoras), baja firma (×0,85 buscador activo, ×0,75 guiado desde tierra), interferencia sobre el
  * radar de la batería (×1/(1+0,08·J), mín. ×0,5) y blanco a más del 80% de vmaxT (×0,8).
  * jams = interferidores activos de la corrida.
  */
@@ -96,6 +96,7 @@ export function calcPk(u, th, t, jams) {
   const p = th.p; if (!p) return 0;
   if (th.maneuver && p.rem < termZone(th)) pk *= sm.guid === 'cañón' ? 0.85 : (th.T.manPk ?? 0.7);
   if (th.T.ir && (sm.guid === 'IR')) pk *= 0.85;
+  if (th.T.cold && sm.guid === 'IR') pk *= 0.3;   // sin motor (planeadora): casi no hay calor para el buscador IR
   if (th.T.lo && sm.guid !== 'IR' && sm.guid !== 'cañón') pk *= sm.guid === 'activo' ? 0.85 : 0.75;
   if (RADAR_GUID.includes(sm.guid) || sm.guid === 'activo') { const J = jamJ(u, azOf(p.x - u.x, p.y - u.y), jams); if (J > 1) pk *= Math.max(0.5, 1 / (1 + 0.08 * J)); }
   const v = speedAt(th, t); if (v > 0.8 * sm.vmaxT) pk *= 0.8;

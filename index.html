@@ -294,6 +294,13 @@ table.t.mc td.pc{white-space:nowrap}
     cmo_cwdb: ["Base de datos de Command: Modern Operations (CWDB 514): en 452 armas guiadas, costado = frente +3 dB y cola = frente (regla del juego, no medición)", "https://www.matrixgames.com/game/command-modern-operations"],
     dua_mesh: ["Defense Express: los Shahed rusos llevan módems mesh y cámaras (análisis de restos)", "https://en.defence-ua.com/weapon_and_tech/russian_shahed_droness_now_equipped_with_mesh_modems_and_cameras_wreckage_analysis_shows-15781.html"],
     mil_sim: ["Militär Aktuell: qué hace la tarjeta SIM en el Shahed", "https://militaeraktuell.at/en/what-is-the-sim-card-doing-in-the-shahed-drone/"],
+    mil_hawk: ["Militarnyi: MIM-23 Hawk, un veterano al servicio de Ucrania", "https://militarnyi.com/en/articles/mim-23-hawk-air-defense-veteran-in-the-service-of-the-armed-forces-of-ukraine/"],
+    db_hawk: ["Defence Blog: el veterano Hawk resulta eficaz contra misiles rusos (una unidad: 14 crucero y 40 Shahed)", "https://defence-blog.com/vintage-hawk-system-proves-effective-against-russian-missiles/"],
+    twz_s200: ["The War Zone: el S-200 reactivado por Ucrania en acción", "https://www.twz.com/air/our-best-look-at-ukraines-reactivated-s-200-air-defense-system-in-action"],
+    dua_s200: ["Defense Express: Polonia reconoce la entrega de S-200 a Ucrania (A-50 y Tu-22M3 derribados)", "https://en.defence-ua.com/news/poland_officially_acknowledges_transfer_of_s_200_systems_to_ukraine_used_to_shoot_down_russian_a_50_tu_22m3_aircraft-19061.html"],
+    mil_newa: ["Militarnyi: los S-125 Newa-SC polacos ya operan en Ucrania", "https://militarnyi.com/en/news/polish-s-125-newa-sc-sam-are-already-operating-in-ukraine/"],
+    kp_s125: ["Kyiv Post: Ucrania saca provecho de material soviético viejo (S-125 derriba un Kalibr)", "https://www.kyivpost.com/post/35197"],
+    cmo_db3k_sam: ["Base de datos de Command: Modern Operations (DB3000 515): alcances, techos y velocidades de MIM-23, 5V28 y 5V27 (estimaciones de juego, en millas náuticas)", "https://www.matrixgames.com/game/command-modern-operations"],
     cmo_db3k: ["Base de datos de Command: Modern Operations (DB3000 515): firma radar por arma (frente, costado y cola en bandas A–D y E–M). Son estimaciones del juego, no mediciones; se citan valor por valor", "https://www.matrixgames.com/game/command-modern-operations"],
     cmo_isk: ["Foro Matrix Games, base DB3000 de CMO: RCS del Iskander-E −9,8 dBsm (estimación de juego)", "https://forums.matrixgames.com/viewtopic.php?t=243914&start=1820"],
     uav_rcs: ["Rosamilia et al. (Cranfield): mediciones de RCS de UAV por aspecto en 8–18 GHz", "https://dspace.lib.cranfield.ac.uk/server/api/core/bitstreams/b70b94cb-9ed7-4067-a2ae-913fa1950b41/content"],
@@ -644,6 +651,33 @@ table.t.mc td.pc{white-space:nowrap}
       profile: 'Lanzado desde MiG-31K. Rusia lo vende como "Mach 10", pero un operador de Patriot midió ≈1.240 m/s (Mach 3,6) en el momento de la intercepción.',
       notes: ["Primer derribo confirmado por Patriot sobre Kyiv el 4/5/2023.", "111 lanzados y 28 interceptados (25%) hasta ago-2024.", "Técnicamente es un balístico aerolanzado, no un hipersónico maniobrable."],
       sources: [WP("Kh-47M2_Kinzhal"), SRC.csis_kinzhal, SRC.syrskyi, SRC.costs_leak]
+    },
+    kab: {
+      name: "FAB-500M-62 con UMPK (bomba planeadora)",
+      short: "UMPK",
+      side: "RU",
+      cls: "crucero",
+      prof: "glide",
+      v: 250,
+      cruiseAlt: 1e4,
+      launchDist: 60,
+      cold: true,
+      rcs: 0.037,
+      rcsSide: 0.12,
+      rcsRear: 0.037,
+      rcsVHF: 0.064,
+      gnss: 0.5,
+      cep: 15,
+      warhead: "500 kg (≈200 kg de explosivo)",
+      range: "40–70 km (UMPK); 95–100 km las versiones nuevas soltadas a 12 km",
+      cost: 0.03,
+      costNote: "Bomba FAB-500 de stock más kit UMPK de ≈US$20–30 mil (JAPCC)",
+      maneuver: false,
+      guidance: "INS + GLONASS con antena CRPA Kometa; alas desplegables",
+      engine: "Ninguno: planea (hay versiones nuevas con turborreactor)",
+      profile: "Un Su-34 la suelta a 9–12 km de altura y a ~1.000 km/h a 50–70 km de la línea del frente, fuera del alcance de casi toda la defensa. Planea sin motor y llega a ~700–800 km/h. No deja estela térmica y llegan muchas juntas.",
+      notes: ["El arma rusa más usada contra el frente y Járkov desde 2024: miles por mes.", "Interceptarla con Patriot o NASAMS es posible pero insostenible (US$4–7 M contra US$25 mil): la respuesta habitual es derribar al avión o interferir su GLONASS.", 'En el juego usa la Pk de la clase "crucero" (blanco subsónico sin maniobra).'],
+      sources: [WP("UMPK_(bomb_kit)"), SRC.japcc_kab, SRC.forbes_kab25]
     },
     kh22: {
       name: "Kh-22 / Kh-32 (supersónico pesado)",
@@ -1017,6 +1051,45 @@ table.t.mc td.pc{white-space:nowrap}
       notes: ["No tiene sensor propio: necesita pista de la red (radar o acústica). Sin red, no sirve.", "Sting cuesta ~US$2.100. Interceptores: >70% de los Shahed derribados sobre Kyiv en feb-2026 y ~1/3 de los blancos a nivel nacional en mar-2026, con >60% de éxito por salida.", "Contra un Geran-3 (≈300–370 km/h) solo funciona de frente: el primer derribo fue en nov-2025."],
       sources: [WP("Sting_(drone)"), SRC.ukr_sting, SRC.dn_interceptors, SRC.mil_geran3]
     },
+    hawk: {
+      name: "MIM-23B I-Hawk (Fase III)",
+      short: "Hawk",
+      side: "UA",
+      kind: "sam",
+      color: "#62b6ff",
+      radar: { name: "AN/MPQ-61 HPIR (+ AN/MPQ-50 PAR, AN/MPQ-62 CWAR)", band: "X", R1: 70, mast: 4, mastRange: [4, 4], mastNote: "Fija: radares sobre remolques (altura estimada).", sector: 360, eccm: 5, scan: 2 },
+      sam: { maxR: 40, maxRtbm: 0, minR: 1.5, altMin: 60, altMax: 17700, vInt: 700, vmaxT: 820, react: 15, ch: 2, mag: 9, salvo: 2, guid: "SARH", shot: "MIM-23B", cost: 0.3, pk: { dron: 0.6, crucero: 0.7, supersonico: 0.4, balistico: 0, hiper: 0 } },
+      range: "1,5–40 km, techo ≈17 km",
+      interceptor: "MIM-23B: ≈Mach 2,5, semiactivo: el HPIR ilumina el blanco hasta el impacto",
+      notes: ["España entregó baterías Fase III desde fines de 2022 (21 lanzadores, radares MPQ-61 y MPQ-62) y más lanzadores en 2023–24; EE. UU. aportó misiles.", "Una sola unidad ucraniana reclamó 14 misiles de crucero y 40 Shahed derribados.", "Cada HPIR guía contra un blanco a la vez: dos secciones de fuego = dos canales."],
+      sources: [WP("MIM-23_Hawk"), SRC.mil_hawk, SRC.db_hawk, SRC.cmo_db3k_sam]
+    },
+    s125: {
+      name: "S-125 Pechora / Newa-SC (modernizado)",
+      short: "S-125",
+      side: "UA",
+      kind: "sam",
+      color: "#62b6ff",
+      radar: { name: 'SNR-125 "Low Blow" (+ P-18/P-19 de búsqueda)', band: "X", R1: 40, mast: 4, mastRange: [4, 6], mastNote: "Cabina de radar sobre remolque; la versión polaca Newa-SC va sobre chasis MAZ-543 (≈4–6 m, estimado).", sector: 360, eccm: 3, scan: 2 },
+      sam: { maxR: 25, maxRtbm: 0, minR: 2.5, altMin: 25, altMax: 18e3, vInt: 600, vmaxT: 700, react: 25, ch: 1, mag: 8, salvo: 2, guid: "mando", shot: "5V27", cost: 0.15, pk: { dron: 0.45, crucero: 0.55, supersonico: 0.3, balistico: 0, hiper: 0 } },
+      range: "2,5–25 km, techo 18 km",
+      interceptor: "5V27: guiado por radiocomando desde el SNR-125 (un blanco a la vez)",
+      notes: ["Sistema de los años 60, modernizado en Ucrania y en Polonia (Newa-SC, digital y sobre chasis con orugas o ruedas).", "En su primer combate un S-125 ucraniano derribó un Kalibr; muy bueno a baja altura para su edad.", "Un solo canal: se satura enseguida con oleadas."],
+      sources: [WP("S-125_Neva/Pechora"), SRC.mil_newa, SRC.kp_s125, SRC.cmo_db3k_sam]
+    },
+    s200: {
+      name: "S-200V Vega (5V28)",
+      short: "S-200",
+      side: "UA",
+      kind: "sam",
+      color: "#62b6ff",
+      radar: { name: '5N62 "Square Pair" (iluminación; búsqueda con P-14/radar de la red)', band: "C", R1: 250, mast: 8, mastRange: [8, 8], mastNote: "Fija: antena del 5N62 sobre su base (altura estimada).", sector: 120, eccm: 3, scan: 4 },
+      sam: { maxR: 250, maxRtbm: 0, minR: 17, altMin: 300, altMax: 4e4, vInt: 1100, vmaxT: 1180, react: 60, ch: 1, mag: 6, salvo: 2, guid: "SARH", shot: "5V28", cost: 0.6, pk: { dron: 0.2, crucero: 0.25, supersonico: 0.2, balistico: 0, hiper: 0 } },
+      range: "17–250 km, techo ≈40 km; no baja de 300 m",
+      interceptor: "5V28: misil de 7 t con cohetes aceleradores, semiactivo (el 5N62 ilumina hasta el impacto)",
+      notes: ["Ucrania lo reactivó en 2022 (con aporte polaco) para cazar aviones: se le atribuyen un A-50 y un Tu-22M3 a ≈300 km. También se adaptó como misil de ataque a tierra.", "Contra drones y misiles de crucero es un desperdicio: lento para reaccionar, un solo canal y piso de 300 m.", "El juego todavía no tiene aviones como blanco: acá solo puede enfrentar drones altos, planeadoras y misiles."],
+      sources: [WP("S-200_(missile)"), SRC.twz_s200, SRC.dua_s200, SRC.cmo_db3k_sam]
+    },
     pantsir: {
       name: "Pantsir-S1",
       short: "Pantsir",
@@ -1215,6 +1288,7 @@ table.t.mc td.pc{white-space:nowrap}
     vDive: ["Velocidad terminal (picada)", "m/s"],
     vLow: ["Velocidad rasante final", "m/s"],
     agl: ["Altura de vuelo", "m AGL"],
+    launchDist: ["Distancia de lanzamiento", "km"],
     seekerKm: ["Ventana que corrige el buscador terminal", "km"],
     cruiseAlt: ["Altura de crucero", "m"],
     apogee: ["Apogeo", "km"],
@@ -1357,6 +1431,19 @@ table.t.mc td.pc{white-space:nowrap}
         manPk: U(0.6, 0.8, 0.9, "baja", S_("ft_aerotime"), "calibrado"),
         "info.rangeKm": U(460, 470, 480, "media", S_("wp:Kh-47M2_Kinzhal"), ""),
         "info.warheadKg": U(480, 480, 500, "media", S_("csis_kinzhal"), "")
+      },
+      kab: {
+        v: U(200, 250, 330, "media", S_("japcc_kab", "wp:UMPK_(bomb_kit)"), "suelta a ~280 m/s (1.000 km/h), llega a 200–220 m/s (700–800 km/h); JAPCC habla de 300–400 m/s"),
+        cruiseAlt: U(9e3, 1e4, 12e3, "media", S_("wp:UMPK_(bomb_kit)"), "Su-34 a 9–12 km"),
+        rcs: U(0.0135, 0.037, 0.1, "baja", S_("cmo_db3k"), "est por forma 0,1 m² (cuerpo de 0,4 m con alas); CMO (DB3K, UMPK FAB-500M-62): −18,7 dBsm ≈ 0,0135 m² de frente. Probable = media geométrica"),
+        rcsSide: U(0.029, 0.12, 0.5, "baja", S_("cmo_db3k"), "est por forma 0,5 m²; CMO (DB3K): −15,4 dBsm ≈ 0,029 m² de costado. Probable = media geométrica"),
+        rcsRear: U(0.0135, 0.037, 0.1, "baja", S_("cmo_db3k"), "est por forma 0,1 m²; CMO (DB3K): cola = frente. Probable = media geométrica"),
+        rcsVHF: U(0.0135, 0.064, 0.3, "baja", S_("cmo_db3k"), "est por resonancia 0,3 m²; CMO (DB3K): −18,7 dBsm ≈ 0,0135 m² en bandas A–D. Probable = media geométrica"),
+        cep: U(5, 15, 50, "baja", S_("japcc_kab"), "est: guiado satelital; el engaño GNSS la empeora mucho"),
+        cost: U(0.02, 0.03, 0.05, "media", S_("japcc_kab"), "kit ≈US$20–30 mil + bomba de stock"),
+        launchDist: U(40, 60, 100, "media", S_("wp:UMPK_(bomb_kit)"), "40–70 km el UMPK clásico; 95–100 km las versiones nuevas"),
+        "info.rangeKm": U(40, 60, 100, "media", S_("wp:UMPK_(bomb_kit)"), ""),
+        "info.warheadKg": U(450, 500, 520, "alta", S_("wp:UMPK_(bomb_kit)"), "FAB-500M-62")
       },
       kh22: {
         v: U(1030, 1100, 1360, "media", S_("wp:Kh-22", "wp:Kh-32"), "Mach 3,5–4,6"),
@@ -1578,6 +1665,33 @@ table.t.mc td.pc{white-space:nowrap}
         "sam.react": U(10, 20, 40, "baja", [], "est: despegue y aproximación"),
         "sam.cost": U(2e-3, 3e-3, 5e-3, "media", S_("wp:Sting_(drone)", "dn_interceptors"), ""),
         "sam.pk.dron": U(0.4, 0.6, 0.75, "media", S_("dn_interceptors"), ">60% de éxito por salida")
+      },
+      hawk: {
+        "radar.R1": U(50, 70, 100, "baja", S_("cmo_db3k_sam"), "CMO: HPIR 45 nmi (83 km) y PAR 54 nmi (100 km) de alcance instrumentado; est contra 1 m²"),
+        "sam.maxR": U(35, 40, 50, "media", S_("cmo_db3k_sam", "db_hawk"), "CMO 22 nmi ≈ 40 km; OSINT 35–50 km"),
+        "sam.vInt": U(600, 700, 850, "baja", S_("db_hawk"), "Mach 2,5 máx.; est media"),
+        "sam.vmaxT": U(700, 820, 900, "baja", S_("cmo_db3k_sam"), "CMO: blancos hasta 1.600 nudos"),
+        "sam.react": U(10, 15, 30, "baja", [], "est"),
+        "sam.cost": U(0.2, 0.3, 0.5, "baja", [], "est: misil viejo de stock reacondicionado"),
+        "sam.pk.crucero": U(0.5, 0.7, 0.85, "baja", S_("db_hawk"), "analistas occidentales hablan de ~85%; est más conservadora. " + PK_NOTE),
+        "sam.pk.dron": U(0.4, 0.6, 0.8, "baja", S_("db_hawk"), PK_NOTE)
+      },
+      s125: {
+        "radar.R1": U(30, 40, 60, "baja", S_("cmo_db3k_sam"), "CMO: SNR-125 32 nmi (59 km) instrumentado; est contra 1 m²"),
+        "sam.maxR": U(18, 25, 30, "media", S_("mil_newa", "cmo_db3k_sam"), "Newa-SC con 5V27: 25 km; CMO 10–16 nmi"),
+        "sam.vInt": U(500, 600, 900, "baja", [], "est"),
+        "sam.react": U(15, 25, 40, "baja", [], "est"),
+        "sam.cost": U(0.1, 0.15, 0.3, "baja", [], "est"),
+        "sam.pk.crucero": U(0.35, 0.55, 0.7, "baja", S_("kp_s125"), PK_NOTE)
+      },
+      s200: {
+        "radar.R1": U(150, 250, 400, "baja", S_("cmo_db3k_sam"), "CMO: 5N62 220 nmi (≈400 km) contra blancos grandes; est contra 1 m²"),
+        "sam.maxR": U(150, 250, 300, "media", S_("cmo_db3k_sam", "dua_s200"), "5V28 ≈250 km, 5V28M ≈300 km; derribo a ≈308 km reclamado"),
+        "sam.altMin": U(200, 300, 300, "media", S_("cmo_db3k_sam"), "CMO 198 m; fuentes clásicas 300 m"),
+        "sam.vInt": U(900, 1100, 1300, "baja", [], "est: ≈Mach 4 máx."),
+        "sam.react": U(40, 60, 120, "baja", [], "est: sistema de los 60, mucha preparación"),
+        "sam.cost": U(0.3, 0.6, 1, "baja", [], "est"),
+        "sam.pk.crucero": U(0.1, 0.25, 0.4, "baja", [], "est: pensado contra aviones grandes. " + PK_NOTE)
       },
       pantsir: {
         "radar.R1": U(25, 30, 36, "media", S_("apa_pantsir"), "36 km vs 2 m²"),
@@ -2693,7 +2807,7 @@ table.t.mc td.pc{white-space:nowrap}
   }
 
   // src/physics/kinematics.js
-  var OFFMAP_PROFILES = ["ballistic", "highdive", "hilo"];
+  var OFFMAP_PROFILES = ["ballistic", "highdive", "hilo", "glide"];
   var isOffmap = (T) => OFFMAP_PROFILES.includes(T.prof);
   function buildThreat(sv, k, tLaunch) {
     const T = THREATS[sv.type];
@@ -2827,6 +2941,10 @@ table.t.mc td.pc{white-space:nowrap}
         z = rem > dd ? T.cruiseAlt : th.gT + (T.cruiseAlt - th.gT) * rem / dd;
         break;
       }
+      case "glide": {
+        z = th.gT + (T.cruiseAlt - th.gT) * Math.pow(rem / L, 0.7);
+        break;
+      }
       case "hilo": {
         const low = ahead([0, 0.5, 1]) + th.agl;
         z = rem > 60 ? T.cruiseAlt : rem > 40 ? low + (T.cruiseAlt - low) * (rem - 40) / 20 : low;
@@ -2916,6 +3034,7 @@ table.t.mc td.pc{white-space:nowrap}
     if (!p) return 0;
     if (th.maneuver && p.rem < termZone(th)) pk *= sm.guid === "cañón" ? 0.85 : th.T.manPk ?? 0.7;
     if (th.T.ir && sm.guid === "IR") pk *= 0.85;
+    if (th.T.cold && sm.guid === "IR") pk *= 0.3;
     if (th.T.lo && sm.guid !== "IR" && sm.guid !== "cañón") pk *= sm.guid === "activo" ? 0.85 : 0.75;
     if (RADAR_GUID.includes(sm.guid) || sm.guid === "activo") {
       const J = jamJ(u, azOf(p.x - u.x, p.y - u.y), jams);
@@ -5064,8 +5183,8 @@ table.t.mc td.pc{white-space:nowrap}
       ${T.aglRange ? `<div class="field"><label for="aAgl">Altura de vuelo sobre el terreno</label><span class="val" id="aAglV">${a.agl} m</span><input id="aAgl" type="range" min="${T.aglRange[0]}" max="${T.aglRange[1]}" step="1" value="${a.agl}"></div>
       <div class="row" id="aAglModes"><button class="btn sm" data-agl="${T.agl}">Típica${(T.aglModes || []).filter(([, h]) => h === T.agl).map(([n2]) => " · " + esc(n2)).join("")} (${T.agl} m)</button>${(T.aglModes || []).filter(([, h]) => h !== T.agl).map(([n2, h]) => `<button class="btn sm" data-agl="${h}">${esc(n2)} (${h} m)</button>`).join("")}</div>
       <p class="hint">Límite real: ${T.aglRange[0]}–${T.aglRange[1]} m. ${esc(T.aglNote || "")}</p>` : ""}
-      ${off ? `<div class="field"><label for="aDist">Distancia real de lanzamiento (km)</label><input id="aDist" class="inp" type="number" min="60" max="1500" value="${a.launchDist}"></div>` : ""}
-      ${T.maneuver || T.prof === "ballistic" || T.cls === "crucero" ? `<label class="check"><input type="checkbox" id="aMan" ${a.maneuver ? "checked" : ""}> Maniobra evasiva terminal</label>` : ""}
+      ${off ? `<div class="field"><label for="aDist">Distancia real de lanzamiento (km)</label><input id="aDist" class="inp" type="number" min="20" max="1500" value="${a.launchDist}"></div>` : ""}
+      ${(T.maneuver || T.prof === "ballistic" || T.cls === "crucero") && T.prof !== "glide" ? `<label class="check"><input type="checkbox" id="aMan" ${a.maneuver ? "checked" : ""}> Maniobra evasiva terminal</label>` : ""}
       ${T.decoys ? `<label class="check"><input type="checkbox" id="aDec" ${a.decoys ? "checked" : ""}> Liberar ${T.decoys} señuelos en fase terminal</label>` : ""}
       ${T.datalink ? `<label class="check" title="${esc(T.datalink)}: el operador ve la posición real y descarta el engaño GNSS, salvo dentro del radio de un antidrón que corta enlaces (Bukovel-AD)"><input type="checkbox" id="aLink" ${a.link ? "checked" : ""}> Enlace de datos (${esc(T.datalink)})</label>` : ""}
       <button class="btn pri" id="aRoute">${S.mode === "route" ? "Trazando…" : "Trazar ruta en el mapa"}</button>
