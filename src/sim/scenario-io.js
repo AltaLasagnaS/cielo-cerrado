@@ -7,7 +7,7 @@
 // objetivos que existan en el catálogo, mapa conocido, posiciones dentro del mapa, números
 // finitos y en rango, y blancos de las salvas que existan. Solo se copian los campos conocidos.
 // Formato: ver docs/ARQUITECTURA.md § "Archivo de escenario".
-import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES, TERRAIN, SCENARIOS, C2_LEVELS, c2FromNet, WEATHER, CRPA_SIZES } from '../data/index.js';
+import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES, TERRAIN, SCENARIOS, C2_LEVELS, c2FromNet, WEATHER, CRPA_SIZES, JAM_MODES } from '../data/index.js';
 import { MAP } from '../physics/terrain.js';
 import { S } from './state.js';
 import { addObj, addDef, addSalvo, addJam } from './setup.js';
@@ -26,7 +26,7 @@ const pick = (o, keys) => { const r = {}; for (const k of keys) if (o[k] !== und
 const OBJ_KEYS = ['id', 'type', 'x', 'y', 'name', 'short', 'maxHp', 'desc'];
 const DEF_KEYS = ['id', 'type', 'x', 'y', 'name', 'az', 'mast', 'alt', 'mag', 'salvo', 'noDrones', 'link', 'reserve'];
 const SALVO_KEYS = ['id', 'type', 'count', 'interval', 'tStart', 'sync', 'tArrive', 'agl', 'launchDist', 'maneuver', 'decoys', 'link', 'crpa', 'pts', 'targetUnit', 'targetObj'];
-const JAM_KEYS = ['id', 'type', 'x', 'y', 'alt', 'on'];
+const JAM_KEYS = ['id', 'type', 'x', 'y', 'alt', 'on', 'mode', 'target'];
 const META_KEYS = ['name', 'player', 'time', 'description', 'forces', 'conditions', 'rulesText', 'goals', 'success', 'failure'];
 
 /** Clave del escenario incluido del que salió sc (o null si no es uno de ellos). */
@@ -164,7 +164,9 @@ export function validateScenario(raw) {
     const w = `Interferidor ${i + 1}`;
     if (!JAMMERS[j.type]) { err(`${w}: tipo desconocido "${String(j.type)}". Válidos: ${Object.keys(JAMMERS).join(', ')}.`); return null; }
     pos(w, j.x, j.y);
-    return { id: id(w, j.id), type: j.type, x: j.x, y: j.y, alt: num(w + ' · alt', j.alt, 0, 20000, { opt: true }), on: bool(w + ' · on', j.on) };
+    if (j.mode !== undefined && !JAM_MODES[j.mode]) err(`${w} · mode: "${String(j.mode)}" no es un modo válido (${Object.keys(JAM_MODES).join(', ')}).`);
+    if (j.target != null && !defIds.has(j.target)) err(`${w}: apunta su ruido puntual a la defensa con id ${JSON.stringify(j.target)}, que no está en el archivo.`);
+    return { id: id(w, j.id), type: j.type, x: j.x, y: j.y, alt: num(w + ' · alt', j.alt, 0, 20000, { opt: true }), on: bool(w + ' · on', j.on), mode: j.mode, target: j.target ?? undefined };
   });
 
   // reglas
@@ -231,7 +233,7 @@ export function loadScenarioData(data) {
     const o = structuredClone(sv); delete o.id;
     addSalvo({ ...o, targetUnit: sv.targetUnit != null ? defId.get(sv.targetUnit) : null, targetObj: sv.targetObj != null ? objId.get(sv.targetObj) : null });
   }
-  for (const j of data.setup.jams) { const jj = addJam(j.type, j.x, j.y, { alt: j.alt }); if (j.on !== undefined) jj.on = j.on; }
+  for (const j of data.setup.jams) { const jj = addJam(j.type, j.x, j.y, { alt: j.alt, mode: j.mode, target: j.target != null ? defId.get(j.target) : null }); if (j.on !== undefined) jj.on = j.on; }
   if (data.rules.c2) S.c2 = data.rules.c2;
   S.weather = data.rules.weather || 'despejado';
   S.ignoreDecoys = !!data.rules.ignoreDecoys;

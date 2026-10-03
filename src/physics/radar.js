@@ -1,7 +1,7 @@
 // ---------------- RADAR / DETECCIÓN ----------------
 // Ecuación del radar simplificada (R ∝ σ^¼), sectores de antena, horizonte e interferencia de ruido.
 // Ver docs/FISICA.md §2–§4.
-import { BANDS, JAMMERS, D, UNIT_DAMAGE } from '../data/index.js';
+import { BANDS, JAMMERS, JAM_MODES, D, UNIT_DAMAGE } from '../data/index.js';
 import { angDiff, azOf } from '../util/math.js';
 import { HORIZON_K } from './constants.js';
 import { surf, los } from './terrain.js';
@@ -73,17 +73,50 @@ export function inSector(u, az) {
 /** Posición [x km, y km, z m] de la antena de un interferidor. */
 export function jamPos(j) { const J = JAMMERS[j.type]; return [j.x, j.y, J.air ? j.alt : surf(j.x, j.y) + J.mast]; }
 
+/** Ganancia de los lóbulos laterales (cerca: hasta 3 anchos de haz; lejos: más afuera). */
+export const SIDELOBES = { near: 0.05, far: 0.003 };
+/** Antena de lóbulos bajos (radar.lowSL): −20 dB cerca y −30 dB lejos. */
+export const LOW_SIDELOBES = { near: 0.01, far: 0.001 };
+/** Lo que queda de un jammer anulado por un cancelador de lóbulos laterales (−15 dB). */
+export const SLC_RESIDUAL = 0.03;
+
+/**
+ * J/N de UN jammer de potencia P a dkm km de un radar r, sin relieve (fichas y Academia).
+ * lobe: 'main' | 'near' | 'far' (por dónde entra); mg = factor del modo (barrera 1, puntual 10 o 0,1).
+ * Aplica los lóbulos del radar, un cancelador si tiene (solo por los laterales) y su eccm.
+ */
+export function singleJam(r, P, dkm, lobe, mg = 1) {
+  const sl = r.lowSL ? LOW_SIDELOBES : SIDELOBES;
+  let G = lobe === 'main' ? 1 : sl[lobe];
+  if (lobe !== 'main' && r.slc) G *= SLC_RESIDUAL;
+  return P * G * mg / ((dkm + 1) ** 2) * Math.pow(10, -(r.eccm || 0) / 10);
+}
+
+/** Alcance (km) de un radar contra 1 m² con interferencia J/N = J (distancia de quemado contra ese jammer). */
+export const burnThrough = (r, J) => r.R1 * Math.pow(1 / (1 + J), 0.25);
+
+/** Factor del modo del jammer j (data/jammers.js#JAM_MODES) contra el radar r de la unidad u. */
+export function modeGain(j, u, r) {
+  const M = JAM_MODES[j.mode] || JAM_MODES.barrage; if (!M.agileGain) return M.gain;
+  if (j.target !== u.id) return 0;   // ruido puntual: solo en la frecuencia del radar elegido
+  return r.agile ? M.agileGain : M.gain;
+}
+
 /**
  * Relación interferencia/ruido (J/N, adimensional) que recibe el radar de u mirando hacia az.
  * Suma los interferidores activos de la misma banda con línea de vista:
- *   J = Σ P · G(ángulo) / d²   con G = 1 en el lóbulo principal, 0,05 en los primeros lóbulos
- *   laterales (≤ 3 anchos de haz) y 0,003 fuera; ×0,1 extra si el jammer está fuera del sector.
- * El resultado se atenúa por el margen ECCM del radar (dB).
+ *   J = Σ P · G(ángulo) · modo / d²   con G = 1 en el lóbulo principal y la de los lóbulos laterales
+ *   (SIDELOBES, o LOW_SIDELOBES si radar.lowSL) hasta 3 anchos de haz y más afuera; ×0,1 extra si el
+ *   jammer está fuera del sector. modo = modeGain (barrera o puntual, con agilidad de frecuencia).
+ * ECCM (docs/FISICA.md §4): un cancelador de lóbulos laterales (radar.slc = N) anula los N jammers
+ * más fuertes que entran por los lóbulos laterales (×SLC_RESIDUAL); contra uno en el lóbulo principal
+ * no puede. El resultado se atenúa por el margen ECCM restante del radar (radar.eccm, dB:
+ * procesamiento, compresión de pulso, operador).
  * La línea de vista radar-jammer se cachea en j._losMap (depende solo de las posiciones).
  */
 export function jamJ(u, az, list) {
   const r = D(u).radar; if (!r || r.band === 'ACU' || r.band === 'OPT') return 0;
-  let J = 0; const bw = BANDS[r.band].bw, uz = antZ(u);
+  let J = 0; const bw = BANDS[r.band].bw, uz = antZ(u), sl = r.lowSL ? LOW_SIDELOBES : SIDELOBES, side = r.slc ? [] : null;
   for (const j of list) {
     const JJ = JAMMERS[j.type]; if (!j.on || j.dead || JJ.gnssJam || !JJ.bands.includes(r.band)) continue;
     const key = u.id + '|' + u.x.toFixed(2) + '|' + u.y.toFixed(2) + '|' + j.x.toFixed(2) + '|' + j.y.toFixed(2) + '|' + (u.mast || 0) + '|' + (u.alt || 0) + '|' + (j.alt || 0);
@@ -92,10 +125,13 @@ export function jamJ(u, az, list) {
     if (!j._losMap[key]) continue;
     const p = jamPos(j); const dkm = Math.hypot(p[0] - u.x, p[1] - u.y, (p[2] - uz) / 1000) + 1;
     const jaz = azOf(p[0] - u.x, p[1] - u.y), dd = angDiff(jaz, az);
-    let G = dd <= bw ? 1 : dd <= 3 * bw ? 0.05 : 0.003;
+    const main = dd <= bw;
+    let G = main ? 1 : dd <= 3 * bw ? sl.near : sl.far;
     if (!inSector(u, jaz)) G *= 0.1;
-    J += JJ.P * G / (dkm * dkm);
+    const v = JJ.P * G * modeGain(j, u, r) / (dkm * dkm);
+    if (side && !main) side.push(v); else J += v;
   }
+  if (side) { side.sort((a, b) => b - a); side.forEach((v, k) => { J += k < r.slc ? v * SLC_RESIDUAL : v; }); }
   return J * Math.pow(10, -(r.eccm || 0) / 10);
 }
 

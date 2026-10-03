@@ -43,3 +43,17 @@ export const JAMMERS = {
  * ni 104 alcanzaron.
  */
 export const CRPA_SIZES = [0, 4, 8, 12, 16];
+
+/**
+ * Modos del ruido contra radares (docs/FISICA.md §4). El jammer reparte su potencia:
+ *   barrera: en toda la banda; afecta por igual a todos los radares de sus bandas (×1).
+ *   puntual: concentrada en la frecuencia de UN radar elegido (j.target): ×gain contra ese radar,
+ *            nada contra los demás. Un radar con agilidad de frecuencia (radar.agile) salta de
+ *            frecuencia pulso a pulso y le deja solo ×agileGain: contra él hay que usar barrera.
+ * gain 10 (10 dB) es un valor de juego: la ganancia real es el cociente entre el ancho de la banda
+ * barrida y el del radar, y puede ser mucho mayor.
+ */
+export const JAM_MODES = {
+  barrage: { name: 'Barrera (toda la banda)', gain: 1 },
+  spot: { name: 'Puntual (contra un radar)', gain: 10, agileGain: 0.1 }
+};

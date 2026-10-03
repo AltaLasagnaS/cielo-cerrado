@@ -16,7 +16,7 @@ export { BANDS } from './bands.js';
 export { CLS_NAME, THREATS } from './threats.js';
 export { OBS } from './observed.js';
 export { DEFENSES } from './defenses.js';
-export { JAMMERS, CRPA_SIZES } from './jammers.js';
+export { JAMMERS, CRPA_SIZES, JAM_MODES } from './jammers.js';
 export { U, PL, RCS_NOTE, VHF_NOTE, PK_NOTE, UNC } from './uncertainty.js';
 export { CAL } from './calibration.js';
 export { SCENARIOS } from './scenarios.js';

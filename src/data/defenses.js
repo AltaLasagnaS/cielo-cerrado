@@ -3,12 +3,17 @@ import { WP, SRC } from './sources.js';
 
 // kind: sam | gun | sensor | aew | acoustic
 // radar: band, mti ('none' | 'mti' | 'pd': procesamiento contra clutter, ver physics/radar.js), R1 (km para 1 m²: Pd 50%), mast (m), mastRange [mín, máx] (m; iguales = fija), mastNote, sector (°), eccm (dB), scan (s)
+//        ECCM (physics/radar.js#jamJ, docs/FISICA.md §4): agile (agilidad de frecuencia: anula el ruido puntual), lowSL (lóbulos
+//        laterales bajos), slc (cantidad de canceladores de lóbulos laterales). Patriot: agilidad y al menos un SLC (Radartutorial,
+//        MDAA); 30N6: lóbulos muy bajos y agilidad (Air Power Australia). El resto son estimaciones por generación y tipo de antena
+//        (AESA/PESA modernos: agilidad y lóbulos bajos; soviéticos de los 60–70: nada). eccm (dB) queda como lo demás
+//        (procesamiento, compresión de pulso, operador).
 // sam: maxR, maxRtbm, minR (km), altMin, altMax (m), vInt (m/s promedio), vmaxT (m/s), react (s), ch, mag (listos),
 //      reserve (en vehículos de recarga), reloadS (s para recargar toda la batería), salvo, guid, pk{}, cost (M$ por disparo)
 export const DEFENSES = {
   patriot: {
     name: 'Patriot (PAC-3 MSE)', short: 'Patriot', side: 'UA', kind: 'sam', color: '#62b6ff',
-    radar: { name: 'AN/MPQ-65', band: 'C', mti: 'pd', R1: 100, mast: 4, mastRange: [4, 4], mastNote: 'Fija: la antena va sobre el semirremolque M860, inclinada a 67,5°. El mástil de ≈30 m de la batería (AMG) es de comunicaciones, no del radar (FM 3-01.85).', sector: 90, eccm: 10, scan: 2 },
+    radar: { name: 'AN/MPQ-65', agile: true, slc: 1, band: 'C', mti: 'pd', R1: 100, mast: 4, mastRange: [4, 4], mastNote: 'Fija: la antena va sobre el semirremolque M860, inclinada a 67,5°. El mástil de ≈30 m de la batería (AMG) es de comunicaciones, no del radar (FM 3-01.85).', sector: 90, eccm: 10, scan: 2 },
     sam: { maxR: 100, maxRtbm: 40, minR: 3, altMin: 50, altMax: 36000, vInt: 1300, vmaxT: 3000, react: 9, ch: 8, mag: 16, reserve: 16, reloadS: 2400, salvo: 2, guid: 'activo', shot: 'PAC-3 MSE', noDrones: true, cost: 4.2, pk: { dron: 0.9, crucero: 0.9, supersonico: 0.6, balistico: 0.7, hiper: 0.5 } },
     range: '≈40 km vs balísticos (estimado), ≈100 km vs aeronaves', interceptor: 'PAC-3 MSE: hit-to-kill, buscador activo, motor de doble pulso, techo ≈36 km',
     notes: ['El AN/MPQ-65 busca en un sector de ~90° (sigue en ~120°): hay que orientarlo hacia la amenaza. El LTAMDS nuevo tiene 3 paneles y 360°.', 'El radar guía hasta ~9 misiles a la vez.', 'Lanzador M903: hasta 12 MSE (o 16 CRI); una batería tiene 6–8 lanzadores.', 'Costo: US$4,19 M por misil en el presupuesto FY2025; el contrato plurianual de 2025 da ≈4,97 M con costos asociados.'],
@@ -16,7 +21,7 @@ export const DEFENSES = {
   },
   patriot2: {
     name: 'Patriot (PAC-2 GEM-T)', short: 'Patriot GEM-T', side: 'UA', kind: 'sam', color: '#62b6ff',
-    radar: { name: 'AN/MPQ-65', band: 'C', mti: 'pd', R1: 100, mast: 4, mastRange: [4, 4], mastNote: 'Fija: la antena va sobre el semirremolque M860. El mástil de ≈30 m (AMG) es de comunicaciones, no del radar.', sector: 90, eccm: 10, scan: 2 },
+    radar: { name: 'AN/MPQ-65', agile: true, slc: 1, band: 'C', mti: 'pd', R1: 100, mast: 4, mastRange: [4, 4], mastNote: 'Fija: la antena va sobre el semirremolque M860. El mástil de ≈30 m (AMG) es de comunicaciones, no del radar.', sector: 90, eccm: 10, scan: 2 },
     sam: { maxR: 160, maxRtbm: 20, minR: 3, altMin: 60, altMax: 24000, vInt: 900, vmaxT: 2500, react: 9, ch: 8, mag: 16, reserve: 16, reloadS: 2400, salvo: 2, guid: 'TVM', shot: 'PAC-2 GEM-T', noDrones: true, cost: 3, pk: { dron: 0.8, crucero: 0.85, supersonico: 0.55, balistico: 0.4, hiper: 0.25 } },
     range: '≈160 km vs aeronaves, ≈20 km vs balísticos', interceptor: 'GEM-T: fragmentación, guiado TVM (necesita que el radar propio vea el blanco), Mach ≈3,5',
     notes: ['Mayor alcance contra aviones y misiles de crucero que el MSE, pero peor contra balísticos.', '4 misiles por lanzador M901/M903.', 'Precio unitario no publicado: US$2–4 M según estimaciones de prensa.'],
@@ -24,7 +29,7 @@ export const DEFENSES = {
   },
   sampt: {
     name: 'SAMP/T (Aster 30 B1)', short: 'SAMP/T', side: 'UA', kind: 'sam', color: '#62b6ff',
-    radar: { name: 'Arabel', band: 'X', mti: 'pd', R1: 80, mast: 5, mastRange: [5, 5], mastNote: 'Fija: Arabel montado sobre camión (altura estimada).', sector: 360, eccm: 10, scan: 1 },
+    radar: { name: 'Arabel', agile: true, lowSL: true, slc: 1, band: 'X', mti: 'pd', R1: 80, mast: 5, mastRange: [5, 5], mastNote: 'Fija: Arabel montado sobre camión (altura estimada).', sector: 360, eccm: 10, scan: 1 },
     sam: { maxR: 100, maxRtbm: 25, minR: 3, altMin: 50, altMax: 20000, vInt: 1050, vmaxT: 2500, react: 8, ch: 10, mag: 32, reserve: 16, reloadS: 2400, salvo: 2, guid: 'activo', shot: 'Aster 30', noDrones: true, cost: 2, pk: { dron: 0.85, crucero: 0.88, supersonico: 0.6, balistico: 0.6, hiper: 0.4 } },
     range: '≈100 km vs aeronaves (50 km por debajo de 3 km de altura), 20–35 km vs balísticos', interceptor: 'Aster 30: 1,4 km/s, buscador activo, control "PIF-PAF" (toberas laterales para maniobra final)',
     notes: ['Radar Arabel en banda X, giratorio a 60 rpm (refresco 1 s), ~100 km de alcance.', '8 misiles por lanzador vertical, 4–6 lanzadores por batería; 10 blancos simultáneos.', 'En Ucrania tuvo problemas de software contra algunos balísticos y escasez de misiles (2025). La afirmación de que superó al Patriot contra Iskander es de baja confianza.'],
@@ -32,7 +37,7 @@ export const DEFENSES = {
   },
   irist: {
     name: 'IRIS-T SLM', short: 'IRIS-T', side: 'UA', kind: 'sam', color: '#62b6ff',
-    radar: { name: 'Hensoldt TRML-4D', band: 'C', mti: 'pd', R1: 100, mast: 6, mastRange: [4, 12], mastNote: 'Mástil hidráulico sobre el camión: la antena llega hasta 12 m (Hensoldt). Retraído ≈4 m (estimado).', sector: 360, eccm: 10, scan: 1 },
+    radar: { name: 'Hensoldt TRML-4D', agile: true, lowSL: true, slc: 2, band: 'C', mti: 'pd', R1: 100, mast: 6, mastRange: [4, 12], mastNote: 'Mástil hidráulico sobre el camión: la antena llega hasta 12 m (Hensoldt). Retraído ≈4 m (estimado).', sector: 360, eccm: 10, scan: 1 },
     sam: { maxR: 40, maxRtbm: 0, minR: 1, altMin: 10, altMax: 20000, vInt: 750, vmaxT: 1200, react: 6, ch: 8, mag: 24, reserve: 8, reloadS: 1200, salvo: 1, guid: 'IR', shot: 'IRIS-T SL', cost: 0.5, pk: { dron: 0.9, crucero: 0.88, supersonico: 0.2, balistico: 0, hiper: 0 } },
     range: '40 km, techo 20 km (SLX: 80 km)', interceptor: 'IRIS-T SL: guiado inercial + datalink, buscador IR de imagen terminal, ≈Mach 3',
     notes: ['El TRML-4D es banda C (G OTAN): 250 km instrumentados, cazas a más de 120 km, misiles supersónicos a más de 60 km, 1.500 pistas.', 'Diehl y operadores ucranianos reclaman "casi 100%" (≈240 derribos a jun-2024), sobre todo contra crucero y drones. No hay datos contra balísticos.', 'Al ser IR, puede atacar con pista de la red sin que el radar propio vea el blanco en el último tramo; las bengalas del Kh-101 son justamente contra este tipo de buscador.'],
@@ -40,7 +45,7 @@ export const DEFENSES = {
   },
   nasams: {
     name: 'NASAMS (AIM-120 AMRAAM)', short: 'NASAMS', side: 'UA', kind: 'sam', color: '#62b6ff',
-    radar: { name: 'AN/MPQ-64 Sentinel', band: 'X', mti: 'pd', R1: 60, mast: 4, mastRange: [4, 4], mastNote: 'Fija: Sentinel sobre remolque (altura estimada).', sector: 360, eccm: 8, scan: 2 },
+    radar: { name: 'AN/MPQ-64 Sentinel', agile: true, lowSL: true, band: 'X', mti: 'pd', R1: 60, mast: 4, mastRange: [4, 4], mastNote: 'Fija: Sentinel sobre remolque (altura estimada).', sector: 360, eccm: 8, scan: 2 },
     sam: { maxR: 35, maxRtbm: 0, minR: 1, altMin: 30, altMax: 15000, vInt: 900, vmaxT: 1000, react: 6, ch: 6, mag: 18, reserve: 12, reloadS: 1800, salvo: 1, guid: 'activo', shot: 'AIM-120', cost: 1.07, pk: { dron: 0.85, crucero: 0.88, supersonico: 0.4, balistico: 0, hiper: 0 } },
     range: '≈35–40 km (AMRAAM-ER: 50–60 km)', interceptor: 'AIM-120: misil aire-aire adaptado, buscador radar activo',
     notes: ['Noruega reclamó 94% de éxito en Ucrania (feb-2025, ~900 AMRAAM); no se aclara si es por disparo o por blanco y ~60% de los blancos eran crucero.', 'Sentinel: banda X, 30 rpm (refresco 2 s); 40 km el modelo básico, 120 km el F1.', '3 lanzadores de 6 misiles por unidad de fuego. No sirve contra balísticos.'],
@@ -48,7 +53,7 @@ export const DEFENSES = {
   },
   s300: {
     name: 'S-300PS/PT (5V55R)', short: 'S-300P', side: 'UA', kind: 'sam', color: '#62b6ff',
-    radar: { name: '30N6 Flap Lid (en torre 40V6)', band: 'X', mti: 'pd', R1: 100, mast: 25, mastRange: [7, 39], mastNote: 'Sin torre, la antena queda a ≈7 m sobre su vehículo (estimado); en la torre 40V6M a ≈25 m y en la 40V6MD a ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h, no se cambia durante el combate.', sector: 90, eccm: 3, scan: 2 },
+    radar: { name: '30N6 Flap Lid (en torre 40V6)', agile: true, lowSL: true, band: 'X', mti: 'pd', R1: 100, mast: 25, mastRange: [7, 39], mastNote: 'Sin torre, la antena queda a ≈7 m sobre su vehículo (estimado); en la torre 40V6M a ≈25 m y en la 40V6MD a ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h, no se cambia durante el combate.', sector: 90, eccm: 3, scan: 2 },
     sam: { maxR: 75, maxRtbm: 25, minR: 5, altMin: 25, altMax: 27000, vInt: 1300, vmaxT: 1300, react: 12, ch: 4, mag: 16, reserve: 12, reloadS: 2400, salvo: 2, guid: 'TVM', shot: '5V55R', cost: 0.5, pk: { dron: 0.5, crucero: 0.6, supersonico: 0.4, balistico: 0.15, hiper: 0.05 } },
     range: '47 km (5V55K) / 75 km (5V55R), techo 27 km', interceptor: '5V55: hasta 2.000 m/s, guiado por mando (K) o TVM (R)',
     notes: ['Ucrania tenía 35 batallones S-300PS/PT en feb-2022 (RUSI), ~250 lanzadores: fue la columna vertebral de su defensa en 2022.', 'El 30N6 puede ir sobre la torre 40V6M (antena a ~24 m) o 40V6MD (~39 m): con 24 m ve un blanco a 25 m de altura a ~41 km.', 'Misiles soviéticos escasos: no hay producción nueva.'],
@@ -120,7 +125,7 @@ export const DEFENSES = {
   },
   pantsir: {
     name: 'Pantsir-S1', short: 'Pantsir', side: 'RU', kind: 'sam', color: '#ff9f5a',
-    radar: { name: '1RS1 búsqueda (S) + 1RS2 seguimiento (Ku)', band: 'S', mti: 'pd', R1: 30, mast: 6, mastRange: [6, 6], mastNote: 'Fija: radares sobre el camión (altura estimada).', sector: 360, eccm: 5, scan: 1 },
+    radar: { name: '1RS1 búsqueda (S) + 1RS2 seguimiento (Ku)', agile: true, band: 'S', mti: 'pd', R1: 30, mast: 6, mastRange: [6, 6], mastNote: 'Fija: radares sobre el camión (altura estimada).', sector: 360, eccm: 5, scan: 1 },
     sam: { maxR: 18, maxRtbm: 5, minR: 1, altMin: 5, altMax: 15000, vInt: 900, vmaxT: 1000, react: 5, ch: 3, mag: 12, reserve: 12, reloadS: 1800, salvo: 2, guid: 'mando', shot: '57E6', cost: 0.15, pk: { dron: 0.65, crucero: 0.6, supersonico: 0.3, balistico: 0.1, hiper: 0 } },
     range: '18–20 km misil, 4 km cañones', interceptor: '57E6: 1.300 m/s al apagar el motor, ≈900 m/s promedio a 12 km; guiado por mando radio, ojiva de varillas',
     notes: ['Radar de búsqueda: 36 km contra 2 m², 20 km contra un misil de crucero de 0,1 m².', 'Defensa de punto de las baterías S-400.', 'Recibió parches de software para HIMARS y Storm Shadow; aun así se registraron muchas pérdidas.'],
@@ -128,7 +133,7 @@ export const DEFENSES = {
   },
   tor: {
     name: 'Tor-M2', short: 'Tor-M2', side: 'RU', kind: 'sam', color: '#ff9f5a',
-    radar: { name: 'Búsqueda (banda F ≈ S) + seguimiento (G/H y Ku)', band: 'S', mti: 'pd', R1: 25, mast: 4, mastRange: [4, 4], mastNote: 'Fija: radar sobre el vehículo de orugas (altura estimada).', sector: 360, eccm: 5, scan: 1 },
+    radar: { name: 'Búsqueda (banda F ≈ S) + seguimiento (G/H y Ku)', agile: true, band: 'S', mti: 'pd', R1: 25, mast: 4, mastRange: [4, 4], mastNote: 'Fija: radar sobre el vehículo de orugas (altura estimada).', sector: 360, eccm: 5, scan: 1 },
     sam: { maxR: 15, maxRtbm: 5, minR: 1, altMin: 10, altMax: 10000, vInt: 700, vmaxT: 700, react: 6, ch: 4, mag: 16, reserve: 8, reloadS: 1080, salvo: 1, guid: 'mando', shot: '9M338', cost: 0.3, pk: { dron: 0.75, crucero: 0.7, supersonico: 0.35, balistico: 0.1, hiper: 0 } },
     range: '15–16 km, techo 10 km', interceptor: '9M338: lanzamiento vertical, guiado por mando',
     notes: ['Defensa de punto contra drones, bombas planeadoras y misiles de crucero.', '4 blancos y 8 misiles simultáneos; 16 misiles en el M2 (8 en el M2E).'],
@@ -136,7 +141,7 @@ export const DEFENSES = {
   },
   s400: {
     name: 'S-400 (48N6DM)', short: 'S-400', side: 'RU', kind: 'sam', color: '#ff9f5a',
-    radar: { name: '92N6 Grave Stone (en torre 40V6M)', band: 'X', mti: 'pd', R1: 200, mast: 25, mastRange: [7, 39], mastNote: 'Sin torre, la antena queda a ≈7 m sobre su vehículo (estimado); en la torre 40V6M a ≈25 m y en la 40V6MD a ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h, no se cambia durante el combate.', sector: 120, eccm: 8, scan: 2 },
+    radar: { name: '92N6 Grave Stone (en torre 40V6M)', agile: true, lowSL: true, slc: 1, band: 'X', mti: 'pd', R1: 200, mast: 25, mastRange: [7, 39], mastNote: 'Sin torre, la antena queda a ≈7 m sobre su vehículo (estimado); en la torre 40V6M a ≈25 m y en la 40V6MD a ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h, no se cambia durante el combate.', sector: 120, eccm: 8, scan: 2 },
     sam: { maxR: 250, maxRtbm: 60, minR: 3, altMin: 10, altMax: 27000, vInt: 1500, vmaxT: 4800, react: 9, ch: 10, mag: 32, reserve: 16, reloadS: 2400, salvo: 2, guid: 'TVM', shot: '48N6', noDrones: true, cost: 1.5, pk: { dron: 0.75, crucero: 0.7, supersonico: 0.6, balistico: 0.5, hiper: 0.3 } },
     range: '48N6DM: 240–250 km; 40N6: hasta 380–400 km', interceptor: '48N6: ≈2.000 m/s, guiado TVM; 9M96E2 (activo) para corto/medio alcance',
     notes: ['Ucrania destruyó varios radares (92N6, 96L6, 91N6) y lanzadores con ATACMS, Neptune y drones.', 'Contra blancos rasantes su alcance real lo pone el horizonte de radar, no el misil.', 'Precio por misil no publicado: estimación US$1–2 M.'],
@@ -144,7 +149,7 @@ export const DEFENSES = {
   },
   ewr: {
     name: 'Radar de vigilancia 3D (36D6 / ST-68UM)', short: 'Radar 3D', side: 'both', kind: 'sensor', color: '#62b6ff',
-    radar: { name: '36D6 "Tin Shield"', band: 'S', mti: 'mti', R1: 175, mast: 10, mastRange: [10, 39], mastNote: 'Sobre su remolque ≈10 m (estimado); puede ir en la torre 40V6M/MD hasta ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h.', sector: 360, eccm: 3, scan: 5 },
+    radar: { name: '36D6 "Tin Shield"', slc: 2, band: 'S', mti: 'mti', R1: 175, mast: 10, mastRange: [10, 39], mastNote: 'Sobre su remolque ≈10 m (estimado); puede ir en la torre 40V6M/MD hasta ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h.', sector: 360, eccm: 3, scan: 5 },
     range: '200 km instrumentados; contra 1 m² a 50 m de altura ≈110–115 km con mástil', notes: ['Radar de alerta y adquisición que alimenta a las baterías S-300. Rota a 6 o 12 rpm.', 'Podés subirle el mástil (torre 40V6M) para ver más lejos a baja cota.'],
     sources: [SRC.rt_36d6, SRC.uos_36d6]
   },
@@ -162,7 +167,7 @@ export const DEFENSES = {
   },
   aew_s340: {
     name: 'Saab 340 AEW (ASC 890, Erieye)', short: 'Saab AEW', side: 'UA', kind: 'aew', color: '#62b6ff', alt: 6000,
-    radar: { name: 'Erieye (AESA, lateral)', band: 'S', mti: 'pd', R1: 240, mast: 6000, sector: 150, side: true, eccm: 10, scan: 4 },
+    radar: { name: 'Erieye (AESA, lateral)', agile: true, lowSL: true, band: 'S', mti: 'pd', R1: 240, mast: 6000, sector: 150, side: true, eccm: 10, scan: 4 },
     range: '≈330–350 km contra cazas; 450 km instrumentados', notes: ['Suecia lo anunció en mayo de 2024; la transferencia se confirmó en agosto de 2025 y opera en combate desde marzo de 2026.', 'Antena lateral "tabla": ve a ambos costados (~150° c/u) y tiene zonas ciegas adelante y atrás. Orientá el rumbo de vuelo.', 'Desde 6 km de altura ve misiles rasantes a más de 100 km, donde un radar terrestre no llega.'],
     sources: [WP('Saab_340_AEW&C'), WP('Erieye'), SRC.dx_saab, SRC.gs_erieye]
   },

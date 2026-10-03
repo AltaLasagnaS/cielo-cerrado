@@ -45,8 +45,16 @@ export function addObj(type, x, y, o = {}) {
 /** Nombre de un objetivo o defensa por id (para listas y rutas). */
 export const targetName = sv => sv.targetUnit ? S.setup.defs.find(u => u.id === sv.targetUnit)?.name : sv.targetObj ? S.setup.objs.find(g => g.id === sv.targetObj)?.name : null;
 
-/** Despliega un interferidor. o = { alt? } para los aéreos. */
-export function addJam(type, x, y, o = {}) { const J = JAMMERS[type]; const j = { id: nextId(), type, x, y, alt: o.alt ?? J.alt, on: true }; S.setup.jams.push(j); return j; }
+/**
+ * Despliega un interferidor. o = { alt? (aéreos), mode? ('barrage' | 'spot', data/jammers.js#JAM_MODES),
+ * target? (ruido puntual: nombre o id de la defensa cuyo radar interfiere) }.
+ */
+export function addJam(type, x, y, o = {}) {
+  const J = JAMMERS[type], u = o.target != null ? S.setup.defs.find(v => v.name === o.target || v.id === o.target) : null;
+  const j = { id: nextId(), type, x, y, alt: o.alt ?? J.alt, on: true };
+  if (J.bands) { j.mode = o.mode === 'spot' ? 'spot' : 'barrage'; j.target = u ? u.id : null; }
+  S.setup.jams.push(j); return j;
+}
 
 /**
  * Despliega un escenario declarativo (ver data/scenarios.js) sobre el setup actual y aplica sus
