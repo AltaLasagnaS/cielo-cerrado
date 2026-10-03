@@ -15,8 +15,7 @@ Son ideas ordenadas por prioridad, no promesas. Cada ítem que cambie resultados
 Propuesta detallada, con orden, dificultad, datos y pruebas: [docs/investigacion/mejoras-fisica.md](docs/investigacion/mejoras-fisica.md).
 
 
-- Clutter de suelo y mar para blancos rasantes, según el tipo de radar.
-- Fluctuación de RCS (Swerling) en la probabilidad de detección.
+- Detección, segunda parte: Swerling 3 (verificar la fórmula), clutter de mar según el estado del mar y de lluvia, visibilidad sub-clutter por radar con datos.
 - Discriminación de señuelos según la banda y el tiempo de seguimiento.
 - CRPA explícita contra la cantidad de fuentes GNSS (propuesta en `docs/investigacion/`).
 - Recarga de munición con tiempos y depósitos como objetivos.

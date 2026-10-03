@@ -35,14 +35,23 @@ detR = R1 · σ(banda, aspecto)^¼ · (1 / (1 + J))^¼        (physics/radar.js#
 
 ### Barridos y probabilidad de detección
 
-Cada radar barre cada `radar.scan` segundos. Si el blanco está dentro del alcance, del sector y con línea de vista (§8), la probabilidad de detectarlo en ese barrido es:
+Cada radar barre cada `radar.scan` segundos. Si el blanco está dentro del sector y con línea de vista (§8), la probabilidad de detectarlo en ese barrido sale de la **relación señal/ruido** con fluctuación **Swerling 1** (la RCS "titila" de barrido a barrido; `physics/radar.js#pdScan`):
 
 ```
-Pd = 0,95                                   si r < 0,8·R
-Pd = 0,95 − (r − 0,8·R)/(0,2·R) · 0,65       entre 0,8·R y R  (cae a 0,30 en el límite)
+R   = detR(...)                    alcance del catálogo = el de Pd 50% con PFA = 10⁻⁶
+SNR = SNR50 · (R/r)⁴ / 10^(clutter/10)        SNR50 = ln(PFA)/ln(0,5) − 1 ≈ 18,9 (12,8 dB)
+Pd  = PFA^(1/(1+SNR))                          (Swerling 1, un pulso)
 ```
 
-Es una aproximación a la curva de Swerling: lejos del límite casi siempre detecta; cerca del borde, a veces sí y a veces no.
+| r / R | 0,3 | 0,5 | 0,8 | 1,0 | 1,2 |
+|---|---|---|---|---|---|
+| Pd | 0,99 | 0,96 | 0,75 | 0,50 | 0,26 |
+
+Más allá de **1,2·R** no se sortea: con menos de 26% por barrido los ecos sueltos no alcanzan para confirmar una pista (regla "M de N"). Con varios barridos seguidos la detección acumulada sube rápido. Todos los blancos usan Swerling 1; el caso 3 (un reflector dominante) queda pendiente hasta verificar su fórmula.
+
+**Clutter** (eco del suelo): si el blanco vuela a menos de 300 m sobre el terreno, la SNR pierde hasta `CLUTTER_DB[radar.mti]` dB: 20 sin filtro de blancos móviles (`'none'`, S-125), 10 con MTI clásico (`'mti'`: Buk, 36D6, P-18) y 3 con pulso-Doppler (`'pd'`: Patriot, IRIS-T, NASAMS, S-300/400, Pantsir, Tor, Gepard, Hawk, AEW). La pérdida escala con lo rasante (0 a 300 m, máxima a 0 m) y con la rugosidad del suelo (pendiente local: ×0,5 en el llano a ×1,5 en zonas quebradas; ×0,7 sobre el mar). Valores estimados.
+
+**Notch Doppler:** los radares con filtro Doppler (`'mti'`, `'pd'`) borran lo que no se acerca ni se aleja: si la velocidad radial del blanco (|v|·cos del aspecto) es menor que 15 m/s (MTI) u 8 m/s (pulso-Doppler), ese barrido no lo ve. Choca de lleno con el aspecto (§3): de costado la RCS es máxima, pero un radar Doppler lo puede perder. Los sensores ópticos y acústicos no tienen clutter ni notch.
 
 ### Sectores
 
@@ -294,10 +303,10 @@ Es un modelo de juego: no representa estructuras, incendios, penetración ni sub
 | Simplificación | Efecto | Mejora posible |
 |---|---|---|
 | RCS con tres aspectos | Sin aspecto arriba/abajo ni detalle angular fino | Tabla por ángulo (como el "3D radar splat" de CMO PE) |
-| Sin clutter ni Doppler | Los blancos rasantes sobre tierra son más fáciles de lo real (solo los esconde el relieve) | Factor de clutter según el AGL y el tipo de radar |
+| Clutter y Doppler simples | Pérdida de SNR por clutter según el procesamiento del radar y la rugosidad, y notch por velocidad radial | Clutter de lluvia y de mar por estado del mar; visibilidad sub-clutter por radar con datos |
 | Clima simple | Lluvia (ITU-R P.838-3), techo de nubes y factores ópticos/acústicos fijos por escenario | Día y noche, clutter de lluvia, viento, clima que cambia durante el escenario |
 | Sin recarga | Las baterías quedan vacías | Recarga con tiempo y depósito de munición como objetivo |
-| Pd por barrido simplificada | Sin fluctuación de RCS (Swerling) | Modelo Swerling 1/3 |
+| Swerling 1 para todos | Sin el caso 3 (reflector dominante) ni integración de pulsos | Swerling 3 verificado; integración no coherente |
 | Interceptor en línea recta a velocidad media | Sin energía ni geometría de persecución | Perfil de velocidad y límite de g |
 | Discriminación de señuelos | El radar nunca distingue señuelos | Probabilidad de discriminación por banda y tiempo de seguimiento |
 | GNSS sin CRPA explícita | `gnss` resume toda la resistencia | Número de elementos de la CRPA frente al número de fuentes (ver `docs/investigacion/`) |

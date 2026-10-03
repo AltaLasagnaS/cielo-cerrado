@@ -175,7 +175,7 @@ export const SCENARIOS = {
     description: 'Ejercicio hipotético inspirado en los ataques ucranianos a los puentes de Chonhar y Crimea: la autopista 1 cruza el estero Elkhorn en Moss Landing por un puente costero, con un puente ferroviario al lado. Por ahí pasa toda la logística del frente. Una defensa rusa con S-400, Pantsir, Tor y Buk lo protege. Tu tarea: cortar el puente carretero.',
     forces: {
       defensa: 'S-400 sobre las lomas del este (sector hacia el sudoeste), dos Pantsir y un Tor junto a los puentes, un Buk-M1, radar 3D y radar VHF de alerta. Red integrada.',
-      ataque: '9 Storm Shadow y 2 Flamingo contra el puente carretero, 4 ATACMS contra el puente ferroviario, 2 Neptune contra el S-400 y 30 drones Liutyi contra la central eléctrica, que llegan un par de minutos antes para gastar la munición de la defensa de punto.'
+      ataque: '10 Storm Shadow y 2 Flamingo contra el puente carretero, 4 ATACMS contra el puente ferroviario, 2 Neptune contra el S-400 y 30 drones Liutyi contra la central eléctrica, que llegan un par de minutos antes para gastar la munición de la defensa de punto.'
     },
     conditions: 'Despejado. El motor no modela la luz. Probá cambiar el clima en la pestaña Defensa.',
     rules: { c2: 'coordinada', doctrine: 'salva', weather: 'despejado' },
@@ -195,7 +195,7 @@ export const SCENARIOS = {
       { type: 'p18', x: 58, y: 40, name: 'Radar VHF' }
     ],
     salvos: [
-      { type: 'storm', count: 9, interval: 5, sync: true, tArrive: 1500, agl: 35, pts: [[0, 58], [30, 52], [44, 45], [51.8, 40.9]], targetObj: 'Puente de la autopista 1' },
+      { type: 'storm', count: 10, interval: 5, sync: true, tArrive: 1500, agl: 35, pts: [[0, 58], [30, 52], [44, 45], [51.8, 40.9]], targetObj: 'Puente de la autopista 1' },
       { type: 'flamingo', count: 2, interval: 10, sync: true, tArrive: 1510, agl: 35, pts: [[0, 30], [35, 37], [51.8, 40.9]], targetObj: 'Puente de la autopista 1' },
       { type: 'atacms', count: 4, interval: 6, sync: true, tArrive: 1490, launchDist: 250, pts: [[52, 111], [52.4, 40.7]], targetObj: 'Puente ferroviario del estero Elkhorn' },
       { type: 'neptune', count: 2, interval: 10, sync: true, tArrive: 1480, agl: 12, pts: [[0, 66], [40, 58], [62, 48]], targetUnit: 'S-400' },
