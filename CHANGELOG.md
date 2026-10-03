@@ -7,6 +7,10 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 ## [Sin publicar]
 
 ### Agregado
+- **`npm run mc`**: Monte Carlo de escenarios en Node (40 noches con los valores probables por defecto; `SAMPLE=1` para sortear parámetros, `N=` para otra cantidad). Es la vara de todas las cifras de balance.
+- **Revisión de tres valores estimados** (`docs/investigacion/valores-estimados.md`): `remotePk` 0,97, recarga del NASAMS de 30 min y corte de la detección a 1,2·R, con su sensibilidad medida en Kiev. La recarga del NASAMS tiene un efecto umbral (con 15 min Kiev pasa de 68% a 98%) y el corte pesa mucho (con 1,5·R, 88%).
+
+### Agregado
 - **[sim]** **ECM y ECCM contra radares, primera parte** (docs/FISICA.md §4):
   - **Ruido de barrera o puntual** (panel de selección del jammer): la barrera reparte la potencia en toda la banda; el puntual la concentra en **un** radar elegido (×10), salvo que ese radar tenga **agilidad de frecuencia** (×0,1). Por defecto, barrera, como antes.
   - **ECCM por radar** en lugar de un solo número: agilidad de frecuencia, **lóbulos laterales bajos** y **canceladores de lóbulos laterales** (anulan los N jammers más fuertes que entran de costado, nunca el del lóbulo principal). Patriot y S-300 con fuentes; el resto, estimaciones documentadas. El `eccm` en dB queda para lo demás (procesamiento).
