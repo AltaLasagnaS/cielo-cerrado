@@ -548,7 +548,9 @@ La diferencia frente–costado es la parte más incierta. Por eso el Monte Carlo
 4. Rango = desde la menor hasta la mayor estimación razonable; probable = la mediana o la más justificada; confianza baja salvo que dos fuentes independientes coincidan.
 5. Todo con fuente en `SRC` y razonamiento en la nota de `UNC`, como el resto del catálogo.
 
-**Qué hace falta para avanzar más rápido:** leer cmo-db.com y los papers de RCS de drones. Hoy la red del entorno los bloquea. Hay dos caminos: habilitar esos dominios, o que me pases capturas o exportaciones de las fichas de CMO de las armas que nos interesan (Shahed, Geran-3, Gerbera, Kh-101, Kalibr, Iskander, Kinzhal, Kh-22, Oniks, Tsirkon, Storm Shadow, ATACMS, Neptune, Liutyi y Flamingo).
+**Hecho (base DB3K 515 de CMO).** Con la base moderna se tomó el valor de CMO arma por arma (frente, costado y cola en E–M, y frente en A–D) y el probable pasó a ser la **media geométrica** con la estimación por forma u OSINT; el rango cubre a las dos. Resultado principal: CMO trata al **Kh-101** (−40 dBsm de frente) y al **Storm Shadow** (−44 dBsm) como muy furtivos, así que bajaron de 0,03 y 0,05 m² a ≈0,0017 y 0,0014 m² (un radar los detecta a la mitad de distancia que antes, porque R ∝ σ^¼). Iskander, Kinzhal y Zircon subieron un poco; Kh-22, Kalibr, ATACMS y Neptune bajaron un poco. Sin entrada en la base: Gerbera, Liutyi y Flamingo (quedan con la regla general). Para unidades futuras la base también trae, por ejemplo, UMPK FAB-500 (−18,7 dBsm), KAB-1500 (−12,2), Kh-59M (−10,6), Lancet-3M (−29,8) y Harop (−19).
+
+**Qué hacía falta para avanzar más rápido:** leer cmo-db.com y los papers de RCS de drones. Hoy la red del entorno los bloquea. Hay dos caminos: habilitar esos dominios, o que me pases capturas o exportaciones de las fichas de CMO de las armas que nos interesan (Shahed, Geran-3, Gerbera, Kh-101, Kalibr, Iskander, Kinzhal, Kh-22, Oniks, Tsirkon, Storm Shadow, ATACMS, Neptune, Liutyi y Flamingo).
 
 ---
 

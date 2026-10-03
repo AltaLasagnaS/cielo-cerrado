@@ -6,6 +6,10 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 
 ## [Sin publicar]
 
+### Cambiado
+- **[sim]** **RCS con la base moderna de CMO (DB3K):** para 13 armas, la RCS de frente, costado, cola y en bandas bajas es ahora la media geométrica entre la estimación por forma/OSINT y el valor de CMO para esa arma (antes el costado y la cola usaban una regla general). Lo más fuerte: **Kh-101** frente 0,03 → 0,0017 m² y **Storm Shadow** 0,05 → 0,0014 m² (se detectan a la mitad de distancia); Shahed y Geran-3 en VHF 0,12 → 0,064 m²; Geran-3 frente 0,03 → 0,023; Iskander-M y Kinzhal 0,1 → 0,14; Kalibr 0,1 → 0,072; Kh-22 1 → 0,73.
+- **[sim]** Rebalanceo con Monte Carlo (40 noches por escenario) para que sigan siendo desafiantes: Kiev 10 → 8 Kh-101 (la defensa gana ≈6 de cada 10), refinería de Gotemburgo 3 → 2 Kh-101 (≈5 de cada 10), puente de Monterey 12 → 9 Storm Shadow (el ataque gana ≈5 de cada 10).
+
 ### Agregado
 - **Altura de aproximación con límites reales** (pestaña Ataque): al elegir un arma, la altura arranca en la típica; el deslizador solo deja elegir dentro de lo que el arma vuela de verdad, con botones de perfiles conocidos (Shahed bajo 2022–23 / alto desde 2025; Kh-101 e Iskander-K rasante o crucero a ≈6 km; Kalibr y Neptune sobre el mar o sobre tierra) y la fuente de cada dato. Cambian algunos límites: Kh-101 30–300 → 30–6.000 m, Iskander-K 20–1.000 → 6–6.000 m, Neptune 5–300 → 3–300 m.
 - **Altura de antena real de cada radar** (panel de selección): los radares montados sobre vehículo o remolque (Patriot, SAMP/T, NASAMS, Buk, Tor, Pantsir, Gepard, P-18) tienen la antena fija y ya no se puede subir; IRIS-T regula 4–12 m (mástil del TRML-4D); S-300, S-400 y el 36D6 van de su vehículo hasta ≈39 m con la torre 40V6MD. Cada uno explica de dónde sale. El "mástil de 30 m" del Patriot era el de comunicaciones, no el del radar.
