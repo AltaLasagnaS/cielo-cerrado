@@ -74,6 +74,8 @@ Ejemplos de cómo se trató esto:
 
 Los dos relieves incluidos (Monterey y Gotemburgo) son grillas de 200 m con batimetría. **La fuente exacta del raster no quedó documentada en la versión original**; por la resolución y el formato, probablemente sean SRTM para tierra y una batimetría pública para el mar. Documentarla está pendiente (ver ROADMAP). Los relieves que carga el jugador son tiles SRTM `.hgt` (NASA, dominio público).
 
+**Kiev** se genera con `scripts/gen-terrain.mjs` a partir del tile SRTM N50E030 (NASA, dominio público), bajado de las *Terrain Tiles* de Mapzen/AWS (formato skadi; atribución en <https://github.com/tilezen/joerd/blob/master/docs/attribution.md>). Cada celda de 200 m es el promedio de las muestras de 1" que contiene. Trae una **máscara de ríos y lagos** detectada en el propio SRTM (los espejos de agua están aplanados): solo sirve para el dibujo y la lectura del terreno, la física usa la elevación real. Las posiciones de los objetivos del escenario salen de Global Energy Monitor (centrales CHP-5 y CHP-6) y Wikipedia (represa de Kiev); las de las defensas son ilustrativas.
+
 ## 7. Investigación de guerra electrónica ucraniana
 
 En la versión 0.3.0 se sumaron sistemas ucranianos (Pokrova, Lima, Bukovel-AD) y el pod del F-16, para equilibrar un catálogo de EW que era casi todo ruso. El informe completo, con tabla de sistemas, propuesta de mecánicas y advertencias, está en [investigacion/guerra-electronica-ucraniana.md](investigacion/guerra-electronica-ucraniana.md).

@@ -7,6 +7,14 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 ## [Sin publicar]
 
 ### Agregado
+- **Mapa de Kiev** sobre el relieve real (SRTM N50E030, celdas de 200 m) con el Dniéper, el embalse de Kiev y el Desná, generado por `scripts/gen-terrain.mjs` (reproducible).
+- **Escenario "Kiev · noche contra la energía"** (jugás la defensa): Shahed, Gerbera, Kh-101, Kalibr, Iskander-M y Kinzhal contra las centrales CHP-5 y CHP-6 y la represa de Kiev. Con la disposición inicial la defensa gana ≈3 de cada 4 noches. Y "Kiev · vacío" para armar a mano.
+- **Ríos y lagos en el mapa**: máscara de agua detectada en el SRTM, solo para el dibujo y la lectura del terreno ("Río o lago"); la física no cambia.
+
+### Cambiado
+- Las tintas del relieve arrancan en la tierra más baja del mapa en lugar de 0 m: los mapas sin mar (Kiev, relieves .hgt del interior) ya no salen de un solo color. Monterey y Gotemburgo no cambian.
+
+### Agregado
 - **RCS según el aspecto** **[sim]**: cada amenaza tiene RCS de frente, de costado y de cola (bandas X/S), y cada radar la ve según el ángulo desde el que mira el arma, interpolando en decibeles. En VHF y L el contraste es la mitad (resonancia). Datos de OSINT y de la base de CMO; donde difieren, el probable es la media geométrica y el rango cubre a las dos. Cambios de datos: Shahed frente 0,05 → 0,02 m², costado 1 → 0,14 m², VHF 0,3 → 0,12 m²; Geran-3 frente 0,05 → 0,03 m² y VHF 0,3 → 0,12 m²; costado y cola nuevos para todas las armas. Las fichas suman la RCS de costado y una columna "De costado"; la Academia, una calculadora por ángulo.
 
 ### Corregido

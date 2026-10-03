@@ -98,7 +98,10 @@ test('escenarios jugables: briefing completo y al menos una meta principal por b
 });
 
 test('relieves: tamaño de la grilla coherente con los datos', () => {
-  for (const [k, t] of Object.entries(TERRAIN)) assert.equal(atob(t.b64).length, t.W * t.H * 2, k);
+  for (const [k, t] of Object.entries(TERRAIN)) {
+    assert.equal(atob(t.b64).length, t.W * t.H * 2, k);
+    if (t.water) assert.equal(atob(t.water).length, Math.ceil(t.W * t.H / 8), k + ': máscara de agua');
+  }
 });
 
 test('los valores escritos en el catálogo coinciden con el probable de UNC (lectura cómoda)', async () => {

@@ -57,18 +57,24 @@ function buildRaster(mode) {
   // 2) color + sombreado
   const cv = document.createElement('canvas'); cv.width = RW; cv.height = RH;
   const cx = cv.getContext('2d'), img = cx.createImageData(RW, RH), px = img.data;
-  const maxE = Math.max(50, MAP.max), step = MAP.cell / k, zf = mode === 'shade' ? 3 : 2;
+  // escala de tintas desde la tierra más baja del mapa (en mapas sin mar, como Kiev, todo está a
+  // 80–200 m: sin esto saldría casi de un solo color). Con mar, la base es 0 m como siempre.
+  const base = Math.max(0, MAP.min), maxE = Math.max(base + 50, MAP.max), step = MAP.cell / k, zf = mode === 'shade' ? 3 : 2;
+  const water = MAP.water;
   for (let y = 0; y < RH; y++) for (let x = 0; x < RW; x++) {
     const o = y * RW + x, e = E[o];
     let r, g, b;
-    if (e <= 0) {
-      const t = clamp(-e / 2500, 0, 1); r = 22 - 12 * t; g = 44 - 22 * t; b = 62 - 22 * t;
+    // máscara de ríos y lagos (solo dibujo): celda de la grilla que contiene al píxel
+    const wet = water && water[Math.min(H - 1, (y / k) | 0) * W + Math.min(W - 1, (x / k) | 0)] === 1;
+    if (e <= 0 || wet) {
+      const t = wet ? 0.05 : clamp(-e / 2500, 0, 1); r = 22 - 12 * t; g = 44 - 22 * t; b = 62 - 22 * t;
+      if (wet) { r += 8; g += 14; b += 22; }
       if (mode === 'shade' || mode === 'contours') { r *= 0.8; g *= 0.8; b *= 0.85; }
     } else {
       const eL = Math.max(0, E[o - (x > 0 ? 1 : 0)]), eR = Math.max(0, E[o + (x < RW - 1 ? 1 : 0)]);
       const eU = Math.max(0, E[o - (y > 0 ? RW : 0)]), eD = Math.max(0, E[o + (y < RH - 1 ? RW : 0)]);
       const gx = zf * (eR - eL) / (2 * step), gy = zf * (eD - eU) / (2 * step);
-      const c = tint(Math.pow(e / maxE, 0.7));
+      const c = tint(Math.pow(clamp((e - base) / (maxE - base), 0, 1), 0.7));
       if (mode === 'shade') {
         // multidireccional (NO, O, N) para no esconder laderas orientadas al sol
         const hs = 0.6 * lambert(gx, gy, 315, 40) + 0.25 * lambert(gx, gy, 270, 40) + 0.15 * lambert(gx, gy, 0, 40);

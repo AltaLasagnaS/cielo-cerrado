@@ -3,7 +3,7 @@
 // Usa exactamente la misma grilla que surf() y los cálculos de línea de vista, pero NO modifica el
 // relieve físico: solo deriva información para mostrar. Ver docs/FISICA.md §9.
 import { clamp } from '../util/math.js';
-import { MAP, surf } from './terrain.js';
+import { MAP, surf, isWater } from './terrain.js';
 
 /** Radio (km) del entorno contra el que se mide el "relieve relativo". */
 export const RELIEF_RADIUS_KM = 5;
@@ -51,9 +51,10 @@ export function slopeAt(x, y) {
   return 100 * Math.hypot((surf(x + c, y) - surf(x - c, y)) / m, (surf(x, y + c) - surf(x, y - c)) / m);
 }
 
-/** Lectura táctica simple del punto: cota dominante, ladera, valle, llano o mar. */
+/** Lectura táctica simple del punto: cota dominante, ladera, valle, llano, río o lago, o mar. */
 export function terrainClass(x, y) {
   if (surf(x, y) <= 0) return 'Mar';
+  if (isWater(x, y)) return 'Río o lago';
   const rel = relativeRelief(x, y), sl = slopeAt(x, y);
   if (rel >= 80) return sl < 15 ? 'Cota dominante' : 'Ladera alta';
   if (rel <= -60) return 'Valle / hondonada';
