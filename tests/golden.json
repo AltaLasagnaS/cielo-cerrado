@@ -1259,5 +1259,95 @@
    ]
   ],
   "log": 279
+ },
+ "kh_umpk_s1": {
+  "t": 1223.25,
+  "stats": {
+   "launched": 42,
+   "killed": 42,
+   "hits": 0,
+   "misses": 0,
+   "decoys": 0,
+   "decoysKilled": 0,
+   "shots": 75,
+   "defCost": 98.7659999999999,
+   "atkCost": 1.320000000000001,
+   "lost": 0,
+   "byUnit": {
+    "Patriot-1": 16,
+    "IRIS-T-1": 24,
+    "NASAMS-1": 18,
+    "Gepard-1": 17
+   },
+   "damage": 0,
+   "dmgByWeapon": {},
+   "missSum": 0,
+   "missN": 0,
+   "objsDestroyed": 0,
+   "satChannels": {
+    "IRIS-T-1": 2,
+    "Gepard-1": 16
+   },
+   "satMag": {
+    "IRIS-T-1": 1,
+    "NASAMS-1": 1
+   },
+   "reloads": 0,
+   "unitsDamaged": 0
+  },
+  "impacts": [],
+  "units": [
+   [
+    "Radar 3D",
+    true,
+    0
+   ],
+   [
+    "Radar VHF",
+    true,
+    0
+   ],
+   [
+    "Patriot-1",
+    true,
+    0
+   ],
+   [
+    "IRIS-T-1",
+    true,
+    0
+   ],
+   [
+    "NASAMS-1",
+    true,
+    0
+   ],
+   [
+    "Gepard-1",
+    true,
+    3
+   ],
+   [
+    "Grupo móvil 1",
+    true,
+    30
+   ],
+   [
+    "Grupo móvil 2",
+    true,
+    30
+   ],
+   [
+    "Acústico 1",
+    true,
+    0
+   ],
+   [
+    "Acústico 2",
+    true,
+    0
+   ]
+  ],
+  "log": 229
  }
 }

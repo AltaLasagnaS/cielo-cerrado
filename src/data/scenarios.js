@@ -270,6 +270,56 @@ export const SCENARIOS = {
     success: 'Defensa: las dos centrales siguen en pie al terminar la noche.',
     failure: 'Defensa: alguna de las centrales queda destruida.'
   },
+  kh_umpk: {
+    map: 'kharkiv', name: 'Járkov · bombas planeadoras (defensa ucraniana)',
+    player: 'defensa',
+    time: '06:10 hora local · madrugada',
+    description: 'Járkov está a 30 km de la frontera rusa: los Su-34 sueltan bombas FAB-500 con kit UMPK desde Belgorod, a 9–12 km de altura y a 50–70 km del blanco, sin entrar al alcance de casi ninguna defensa. Las bombas planean sin motor, casi no tienen firma infrarroja y llegan muchas juntas. Esta mañana van contra la central CHP-5 de Podvirky (ya dañada en marzo de 2024) y el centro de la ciudad, mezcladas con Shahed para gastar munición. Las bombas traen antenas CRPA Kometa de 12 elementos: las dos estaciones Lima de la ciudad no les alcanzan. Las posiciones de las defensas son ilustrativas.',
+    forces: {
+      defensa: 'Radar 3D y radar VHF de alerta, una batería Patriot al sur de la ciudad (sector hacia el norte), IRIS-T junto a la CHP-5, NASAMS, un Gepard, dos grupos móviles, red acústica y dos estaciones anti-GNSS Lima. Red de mando coordinada.',
+      ataque: '30 bombas UMPK en tres oleadas de 10 (CRPA Kometa de 12 elementos) y 12 Shahed.'
+    },
+    conditions: 'Madrugada despejada. Para probar la guerra electrónica: en la pestaña Ataque, sin CRPA las bombas se desvían por las dos estaciones Lima; una CRPA de 4 elementos anula hasta 3 y todavía alcanza, pero no contra 4 estaciones repartidas alrededor de la ciudad (pestaña EW). Contra la de 12 harían falta 12 direcciones distintas. También probá la doctrina de alcance (pestaña Defensa).',
+    rules: { c2: 'coordinada', doctrine: 'salva', weather: 'despejado' },
+    rulesText: ['Red coordinada y doctrina de salva.', 'Cada batería recarga desde su reserva cuando se vacía, pero una recarga lleva de 2 min (grupos móviles) a 40 min (Patriot).', 'Las bombas se sueltan fuera del mapa, al norte, a ≈60 km del blanco: no hay forma de tocar al avión en este escenario.', 'Interceptar una bomba de US$30 mil con un misil Patriot de US$4 M es posible pero caro: mirá el costo en el debrief.'],
+    objectives: [
+      { type: 'infra', name: 'Central CHP-5', short: 'CHP-5', x: 7.2, y: 58.7, hp: 1500, desc: 'Central de cogeneración de 540 MW en Podvirky, al oeste de la ciudad (Global Energy Monitor). Gravemente dañada el 22 de marzo de 2024.' },
+      { type: 'infra', name: 'Centro de Járkov', short: 'Centro', x: 16.5, y: 56.3, hp: 2500, desc: 'Edificios administrativos, oficinas y viviendas del distrito Shevchenkivskyi.' },
+      { type: 'infra', name: 'Central de Zmiiv', short: 'Zmiiv', x: 38, y: 101.3, hp: 2000, desc: 'Central térmica de Zmiiv (Slobozhanske), al sur. Destruida en marzo de 2024; acá está en pie y no la atacan esta mañana.' }
+    ],
+    defs: [
+      { type: 'ewr', x: 22, y: 66, name: 'Radar 3D' },
+      { type: 'p18', x: 30, y: 60, name: 'Radar VHF' },
+      { type: 'patriot', x: 14, y: 68, az: 0, name: 'Patriot-1' },
+      { type: 'irist', x: 9, y: 61, name: 'IRIS-T-1' },
+      { type: 'nasams', x: 19, y: 59, name: 'NASAMS-1' },
+      { type: 'gepard', x: 8, y: 57, name: 'Gepard-1' },
+      { type: 'mfg', x: 18, y: 48, name: 'Grupo móvil 1' },
+      { type: 'mfg', x: 28, y: 52, name: 'Grupo móvil 2' },
+      { type: 'acoustic', x: 20, y: 40, name: 'Acústico 1' },
+      { type: 'acoustic', x: 34, y: 45, name: 'Acústico 2' }
+    ],
+    salvos: [
+      { type: 'shahed', count: 12, interval: 25, tStart: 0, agl: 1500, pts: [[60, 0], [40, 30], [16.5, 56.3]], targetObj: 'Centro de Járkov' },
+      { type: 'kab', count: 10, interval: 4, sync: true, tArrive: 600, crpa: 12, pts: [[8, 0], [7.2, 58.7]], targetObj: 'Central CHP-5' },
+      { type: 'kab', count: 10, interval: 4, sync: true, tArrive: 900, crpa: 12, pts: [[20, 0], [16.5, 56.3]], targetObj: 'Centro de Járkov' },
+      { type: 'kab', count: 10, interval: 4, sync: true, tArrive: 1200, crpa: 12, pts: [[12, 0], [7.2, 58.7]], targetObj: 'Central CHP-5' }
+    ],
+    jams: [
+      { type: 'lima', x: 12, y: 54 },
+      { type: 'lima', x: 22, y: 60 }
+    ],
+    goals: [
+      { side: 'ataque', primary: true, kind: 'destroy', target: 'Central CHP-5', text: 'Destruir la central CHP-5' },
+      { side: 'ataque', primary: false, kind: 'damage', target: 'Centro de Járkov', min: 0.3, text: 'Dañar el centro de la ciudad (≥ 30%)' },
+      { side: 'defensa', primary: true, kind: 'survive', target: 'Central CHP-5', text: 'Que la central CHP-5 no sea destruida' },
+      { side: 'defensa', primary: false, kind: 'protect', target: 'Centro de Járkov', text: 'Mantener operativo el centro de la ciudad' },
+      { side: 'defensa', primary: false, kind: 'keepUnit', target: 'Patriot-1', text: 'Conservar la batería Patriot-1' }
+    ],
+    success: 'Defensa: la central CHP-5 sigue en pie al terminar el ataque.',
+    failure: 'Defensa: la central CHP-5 queda destruida.'
+  },
+  kh_vacio: { map: 'kharkiv', name: 'Járkov · vacío', player: 'defensa', description: 'Mapa libre sobre el relieve real de Járkov (SRTM): ubicá objetivos, defensas, ataques y guerra electrónica.', objectives: [], defs: [], salvos: [], jams: [], goals: [] },
   kv_vacio: { map: 'kyiv', name: 'Kiev · vacío', player: 'defensa', description: 'Mapa libre sobre el relieve real de Kiev (SRTM): ubicá objetivos, defensas, ataques y guerra electrónica.', objectives: [], defs: [], salvos: [], jams: [], goals: [] },
   mb_vacio: { map: 'monterey', name: 'Monterey · vacío', player: 'defensa', description: 'Mapa libre para armar tu propio escenario: ubicá objetivos, defensas, ataques y guerra electrónica.', objectives: [], defs: [], salvos: [], jams: [], goals: [] },
   gb_vacio: { map: 'goteborg', name: 'Gotemburgo · vacío', player: 'defensa', description: 'Mapa libre para armar tu propio escenario: ubicá objetivos, defensas, ataques y guerra electrónica.', objectives: [], defs: [], salvos: [], jams: [], goals: [] }
