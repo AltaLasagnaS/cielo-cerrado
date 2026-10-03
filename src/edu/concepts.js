@@ -4,7 +4,7 @@
 // desde el catálogo (no hay valores copiados a mano: si cambia un dato, cambia la explicación).
 //
 // Cada concepto: { id, group, title, body() → HTML, engine() → HTML, widget? { html(), mount(el) } }
-import { BANDS, THREATS, DEFENSES, JAMMERS, UNC, CLS_NAME, TARGET_TYPES, DAMAGE, C2_LEVELS, WEATHER } from '../data/index.js';
+import { BANDS, THREATS, DEFENSES, JAMMERS, UNC, CLS_NAME, TARGET_TYPES, DAMAGE, C2_LEVELS, WEATHER, UNIT_TARGET, UNIT_DAMAGE, UNIT_COMP_AT } from '../data/index.js';
 import { esc, kmh } from '../util/format.js';
 import { KR, HORIZON_K, LOS_MARGIN } from '../physics/constants.js';
 import { rcsAt, horizon } from '../physics/radar.js';
@@ -226,8 +226,8 @@ export const CONCEPTS = [
   },
   {
     id: 'damage', group: 'Enfrentamiento', title: 'Daño a objetivos',
-    body: () => `<p>Cuando un arma llega, cae con dispersión alrededor del punto apuntado (CEP: el radio que contiene la mitad de los impactos). El daño depende de la ojiva y de la distancia: un impacto dentro de la huella del objetivo es directo; uno cercano hace menos daño, y la distancia de efecto crece con la raíz cúbica de la carga (ley de escala de Hopkinson-Cranz).</p>`,
-    engine: () => `<p class="formula">daño = ${DAMAGE.K} · W^${DAMAGE.EXP} · vulnerabilidad · 1/(1 + (d/R50)²),  R50 = ${DAMAGE.R50K} · W^⅓ m</p><p>W = ojiva del catálogo (${code('info.warheadKg')}), d = distancia fuera de la huella. Ejemplos de impacto directo con vulnerabilidad 1: ${['shahed', 'kh101', 'flamingo'].map(k => `${esc(THREATS[k].short)} (${warheadKg(THREATS[k])} kg): ${n(directDamage(THREATS[k]))} HP, R50 ${n(radius50(THREATS[k]))} m`).join(' · ')}. Vida por tipo de objetivo: ${Object.values(TARGET_TYPES).map(t => esc(t.name) + ' ' + t.hp).join(', ')}.</p><div class="warn">Es un modelo de juego, simple y consistente: no representa estructuras, incendios ni penetración.</div>`
+    body: () => `<p>Cuando un arma llega, cae con dispersión alrededor del punto apuntado (CEP: el radio que contiene la mitad de los impactos). El daño depende de la ojiva y de la distancia: un impacto dentro de la huella del objetivo es directo; uno cercano hace menos daño, y la distancia de efecto crece con la raíz cúbica de la carga (ley de escala de Hopkinson-Cranz).</p><p><b>Las defensas también reciben daño.</b> Una explosión cerca de una batería puede dejarla en pie pero rota: con el radar dañado ve menos y reacciona más lento; con el lanzador dañado no dispara aunque le queden misiles. Por eso no alcanza con contar baterías "vivas".</p>`,
+    engine: () => `<p class="formula">daño = ${DAMAGE.K} · W^${DAMAGE.EXP} · vulnerabilidad · 1/(1 + (d/R50)²),  R50 = ${DAMAGE.R50K} · W^⅓ m</p><p>W = ojiva del catálogo (${code('info.warheadKg')}), d = distancia fuera de la huella. Ejemplos de impacto directo con vulnerabilidad 1: ${['shahed', 'kh101', 'flamingo'].map(k => `${esc(THREATS[k].short)} (${warheadKg(THREATS[k])} kg): ${n(directDamage(THREATS[k]))} HP, R50 ${n(radius50(THREATS[k]))} m`).join(' · ')}. Vida por tipo de objetivo: ${Object.values(TARGET_TYPES).map(t => esc(t.name) + ' ' + t.hp).join(', ')}.</p><div class="warn">Es un modelo de juego, simple y consistente: no representa estructuras, incendios ni penetración.</div><p>Daño funcional (${code('damageUnits()')}): cada unidad en tierra es un blanco de ${UNIT_TARGET.hp} HP, huella ${UNIT_TARGET.radius} m y vulnerabilidad ${UNIT_TARGET.vuln}. Al perder el ${UNIT_COMP_AT.map(a => Math.round(a * 100) + '%').join(' y el ')} de la vida pierde un componente (si tiene los dos, se sortea): radar ×${UNIT_DAMAGE.radarR} de alcance y ×${UNIT_DAMAGE.react} de tiempo de reacción, o lanzador fuera de servicio. Un impacto directo en una unidad apuntada la destruye, como antes.</p>`
   },
   {
     id: 'time', group: 'Enfrentamiento', title: 'Escalas de tiempo y distancia',

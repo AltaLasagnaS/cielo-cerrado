@@ -35,11 +35,14 @@ export function runScenario(key, opts = {}) {
   return runCurrent(opts.seed ?? 1);
 }
 
-/** Corre lo que haya en S.setup con la semilla dada (máx. 10.000 s simulados). */
-export function runCurrent(seed) {
+/**
+ * Corre lo que haya en S.setup con la semilla dada (máx. 10.000 s simulados). afterStart(S), si se
+ * pasa, se llama con la corrida ya armada y antes del primer paso (para tocar S.units).
+ */
+export function runCurrent(seed, afterStart = null) {
   setRandom(seeded(seed));
   try {
-    startSim();
+    startSim(); if (afterStart) afterStart(S);
     for (let n = 0; n < 40000; n++) {
       step(0.25);
       if (!S.pending.length && S.threats.every(t => !t.alive) && S.ints.every(i => i.done)) break;

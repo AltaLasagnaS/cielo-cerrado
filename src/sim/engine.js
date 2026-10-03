@@ -2,7 +2,7 @@
 // Bucle de paso fijo: la interfaz llama a step(dt) con dt ≤ 0,25 s de tiempo simulado.
 // Cada paso: lanzamientos → movimiento/señuelos/GNSS → barridos de sensores → decisiones de tiro
 // → resolución de interceptores → fin de corrida. Ver docs/ARQUITECTURA.md.
-import { BANDS, D, JAMMERS, TARGET_STATUS, WEATHER } from '../data/index.js';
+import { BANDS, D, JAMMERS, TARGET_STATUS, WEATHER, UNIT_TARGET, UNIT_DAMAGE, UNIT_COMP_AT } from '../data/index.js';
 import { classify, classifyGain } from '../physics/decoys.js';
 import { money } from '../util/format.js';
 import { nextId } from '../util/ids.js';
@@ -21,7 +21,7 @@ import { log, event, label, uLabel } from './log.js';
 
 /** Arma la corrida a partir de S.setup: copia unidades y jammers y programa todos los lanzamientos. */
 export function startSim() {
-  S.units = S.setup.defs.map(d => ({ ...d, alive: true, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
+  S.units = S.setup.defs.map(d => ({ ...d, alive: true, hp: UNIT_TARGET.hp, dmgRadar: false, dmgLauncher: false, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
   S.jamsLive = S.setup.jams.map(j => ({ ...j, _losMap: {} }));
   S.objs = S.setup.objs.map(g => ({ ...g, hp: g.maxHp, status: 'operational', hits: 0, dmgBy: {} }));
   S.threats = []; S.ints = []; S.fx = []; S.impacts = []; S.stats = newStats(); S.log = []; S.events = []; S.arrivals = [];
@@ -123,7 +123,7 @@ export function step(dt) {
   }
   // enfrentamientos (cada 1 s simulado por unidad)
   for (const u of S.units) {
-    if (!u.alive || !D(u).sam || u.magLeft <= 0) continue;
+    if (!u.alive || !D(u).sam || u.dmgLauncher || u.magLeft <= 0) continue;
     if (t < u.nextEval) continue; u.nextEval = t + 1;
     engage(u, t);
   }
@@ -160,7 +160,7 @@ export function step(dt) {
  */
 function canEngage(u, th, t, c2, probe) {
   const d = D(u), sm = d.sam;
-  if (!u.alive || !sm || u.magLeft <= 0 || u.active >= sm.ch) return null;
+  if (!u.alive || !sm || u.dmgLauncher || u.magLeft <= 0 || u.active >= sm.ch) return null;   // lanzador dañado: no lanza
   if (!th.alive || !th.p || th.firstDet === null) return null;
   const maxR = isTBM(th) ? sm.maxRtbm : sm.maxR; if (!maxR) return null;
   if (u.noDrones && th.cls === 'dron') return null;
@@ -168,7 +168,7 @@ function canEngage(u, th, t, c2, probe) {
   if (!trackOK(u, th, t, c2)) { if (!probe) delete u.avail[th.id]; return null; }
   let av = u.avail[th.id];
   if (av === undefined) { av = reactionStart(th, t, c2, u); if (!probe) u.avail[th.id] = av; }
-  if (t - av < sm.react) return null;
+  if (t - av < sm.react * (u.dmgRadar ? UNIT_DAMAGE.react : 1)) return null;   // radar de tiro dañado: reacción más lenta
   const flying = (th.fly || []).filter(i => !i.done);
   if (C2_LEVELS[c2].deconf ? flying.length : flying.some(i => i.u === u)) return null;
   if (S.ignoreDecoys && th.clsAs === 'señuelo') return null;   // doctrina: no gastar en pistas clasificadas como señuelo
@@ -306,6 +306,7 @@ export function impact(th) {
     S.stats.misses++; S.impacts.push({ x, y, k: 'miss' });
     log('w', label(th) + ' cae a ' + Math.round(r) + ' m del blanco' + (th.navErr > 150 ? ' (desviado por interferencia GNSS)' : '') + dtxt + '.');
   }
+  damageUnits(th.T, x, y);
   for (const d of dmg) {
     event('Primer impacto con daño: ' + label(th) + ' sobre ' + d.g.name, 'firstDmg');
     if (d.g.status !== d.before) {
@@ -330,4 +331,35 @@ function applyDamage(th, x, y) {
     out.push({ g, dmg, dist, before });
   }
   return out;
+}
+
+/**
+ * Daño funcional (docs/FISICA.md §10): cada unidad en tierra cerca de la caída (x, y) km pierde vida
+ * como un objetivo UNIT_TARGET. A 0 queda destruida; al cruzar cada umbral de UNIT_COMP_AT pierde un
+ * componente: el radar (alcance ×UNIT_DAMAGE.radarR, reacción ×UNIT_DAMAGE.react) o el lanzador (no
+ * lanza). Si le quedan los dos, se sortea cuál (un número al azar solo en ese caso).
+ */
+export function damageUnits(T, x, y) {
+  for (const u of S.units) {
+    const d = D(u); if (!u.alive || d.kind === 'aew') continue;
+    const res = damageAt(T, UNIT_TARGET, Math.hypot(x - u.x, y - u.y) * 1000); if (!res.dmg) continue;
+    u.hp -= Math.round(res.dmg);
+    if (u.hp <= 0) {
+      u.alive = false; S.stats.lost++; hooks.onUnitLost();
+      log('x', uLabel(u) + ' queda destruida por la explosión de ' + T.short + ' a ' + Math.round(res.edge + UNIT_TARGET.radius) + ' m.');
+      event(uLabel(u) + ' destruida por ' + T.short, 'lost:' + u.id);
+      continue;
+    }
+    const frac = 1 - u.hp / UNIT_TARGET.hp;
+    while ((u.dmgRadar ? 1 : 0) + (u.dmgLauncher ? 1 : 0) < UNIT_COMP_AT.filter(a => frac >= a).length) {
+      const comps = [];
+      if (d.radar && !u.dmgRadar) comps.push('radar');
+      if (d.sam && !u.dmgLauncher) comps.push('launcher');
+      if (!comps.length) break;
+      const c = comps.length > 1 ? comps[rnd() < 0.5 ? 0 : 1] : comps[0];
+      if (c === 'radar') { u.dmgRadar = true; log('w', uLabel(u) + ' dañada: el radar pierde alcance (×' + UNIT_DAMAGE.radarR + ') y reacciona más lento.'); }
+      else { u.dmgLauncher = true; log('w', uLabel(u) + ' dañada: el lanzador queda fuera de servicio.'); }
+      S.stats.unitsDamaged++; event(uLabel(u) + ' dañada por ' + T.short, 'dmgUnit:' + u.id + ':' + c);
+    }
+  }
 }

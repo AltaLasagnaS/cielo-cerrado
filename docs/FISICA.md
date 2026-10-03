@@ -320,6 +320,21 @@ Por debajo de un factor de 0,02 no hay daño. Ejemplos de impacto directo con vu
 
 **Estados:** *operativo* → *dañado* (≥ 20% de vida perdida) → *destruido* (0 HP).
 
+**Daño funcional de las unidades** (`sim/engine.js#damageUnits`, parámetros en `data/targets.js`): cada caída también daña a las unidades de defensa en tierra que estén cerca (no a los aviones AEW), con la misma fórmula y un blanco `UNIT_TARGET` = 300 HP, huella de 30 m y vulnerabilidad 1,2 (una batería con radar, lanzadores y vehículos, sensible a esquirlas como un sitio de radar).
+
+| Vida perdida | Efecto |
+|---|---|
+| ≥ 20% | pierde un componente |
+| ≥ 50% | pierde el otro |
+| 100% | destruida |
+
+- **Radar dañado** (`u.dmgRadar`): alcance de detección ×0,7 (radar, óptico o acústico) y tiempo de reacción ×1,5.
+- **Lanzador dañado** (`u.dmgLauncher`): no lanza aunque tenga misiles; el sensor sigue viendo y alimentando la red.
+- Si la unidad tiene los dos componentes, se sortea cuál cae primero (un número al azar solo en ese caso, para no cambiar la secuencia cuando no hay daño).
+- Un impacto *directo* de un arma apuntada a la unidad la destruye, como antes.
+
+Los valores (300 HP, ×0,7, ×1,5, umbrales 20% y 50%) son de juego, sin fuente directa. El debrief nombra las unidades dañadas y el panel de selección muestra qué perdió cada una.
+
 Es un modelo de juego: no representa estructuras, incendios, penetración ni submuniciones.
 
 ---
@@ -336,7 +351,7 @@ Es un modelo de juego: no representa estructuras, incendios, penetración ni sub
 | Interceptor en línea recta a velocidad media | Energía resumida en dos factores (alcance según el aspecto y Pk según la fracción del alcance); el tiempo de vuelo sigue siendo r / vInt | Perfil de velocidad (motor y planeo) y límite de g (paso B de la propuesta) |
 | Discriminación de señuelos | Por banda y tiempo de seguimiento, con un umbral fijo por pista | Discriminación por características (RCS, velocidad, trayectoria) |
 | GNSS sin CRPA explícita | `gnss` resume toda la resistencia | Número de elementos de la CRPA frente al número de fuentes (ver `docs/investigacion/`) |
-| Daño simple | Sin efectos funcionales (un radar dañado sigue funcionando) | Degradación de capacidades según el estado |
+| Daño funcional en dos componentes | Radar (alcance y reacción) o lanzador; sin reparación ni daño parcial de lanzadores | Componentes por lanzador, reparación con el tiempo, objetivos con capacidades (una base que no lanza aviones) |
 
 La propuesta detallada de cada mejora (qué cambia, dificultad, datos, pruebas y cómo lo resuelven *Command: Modern Operations* y *Fleet Command*) está en [investigacion/mejoras-fisica.md](investigacion/mejoras-fisica.md).
 

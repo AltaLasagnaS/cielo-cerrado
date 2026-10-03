@@ -76,6 +76,8 @@ function explain(S, arrivals, decoys) {
   const gnss = real.filter(a => a.nav > 150 && a.nav <= LOST_M), lostL = real.filter(a => a.nav > LOST_M);
   if (gnss.length) out.push(`${gnss.length} arma(s) fueron desviadas por interferencia GNSS (${list(gnss)}).`);
   if (lostL.length) out.push(`${lostL.length} arma(s) quedaron "perdidas localmente": el engaño GNSS las desvió más de ${LOST_M / 1000} km (${list(lostL)}). Ojo al comparar con las cifras oficiales ucranianas: esa categoría real también incluye señuelos y fallas.`);
+  const hurt = S.units.filter(u => u.alive && (u.dmgRadar || u.dmgLauncher));
+  if (hurt.length) out.push(`Unidades dañadas por explosiones cercanas: ${hurt.map(u => u.name + ' (' + [u.dmgRadar ? 'radar' : '', u.dmgLauncher ? 'lanzador' : ''].filter(Boolean).join(' y ') + ')').join(', ')}. Un radar dañado ve menos y reacciona más lento; un lanzador dañado no dispara aunque le queden misiles.`);
   if (S.units.some(u => !u.alive)) out.push(`Unidades perdidas: ${S.units.filter(u => !u.alive).map(u => u.name).join(', ')}. Una batería destruida deja un hueco de cobertura para lo que viene después.`);
   if (st.killed) out.push(`Economía: la defensa gastó US$${st.defCost.toFixed(1)} M y el ataque US$${st.atkCost.toFixed(1)} M. ${st.defCost > st.atkCost ? 'Defender costó más que atacar: es la lógica de los drones baratos y los señuelos.' : 'Defender costó menos que atacar.'}`);
   return out;

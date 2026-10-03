@@ -32,7 +32,8 @@
     "NASAMS-1": 1,
     "Patriot-1": 1
    },
-   "reloads": 0
+   "reloads": 0,
+   "unitsDamaged": 0
   },
   "impacts": [
    [
@@ -181,7 +182,8 @@
     "IRIS-T-1": 1,
     "Patriot-1": 1
    },
-   "reloads": 0
+   "reloads": 0,
+   "unitsDamaged": 0
   },
   "impacts": [
    [
@@ -343,7 +345,8 @@
    "objsDestroyed": 0,
    "satChannels": {},
    "satMag": {},
-   "reloads": 0
+   "reloads": 0,
+   "unitsDamaged": 0
   },
   "impacts": [
    [
@@ -484,7 +487,8 @@
     "IRIS-T-1": 1,
     "Patriot-1": 1
    },
-   "reloads": 0
+   "reloads": 0,
+   "unitsDamaged": 0
   },
   "impacts": [
    [
@@ -635,7 +639,8 @@
     "S-400": 1
    },
    "satMag": {},
-   "reloads": 0
+   "reloads": 0,
+   "unitsDamaged": 0
   },
   "impacts": [],
   "units": [
@@ -701,7 +706,8 @@
    "satMag": {
     "Tor-M2": 1
    },
-   "reloads": 0
+   "reloads": 0,
+   "unitsDamaged": 0
   },
   "impacts": [],
   "units": [
@@ -775,7 +781,8 @@
     "IRIS-T-1": 1,
     "RBS 70-1": 1
    },
-   "reloads": 0
+   "reloads": 0,
+   "unitsDamaged": 0
   },
   "impacts": [
    [
@@ -911,7 +918,8 @@
     "Tor-M2": 1,
     "S-400": 1
    },
-   "reloads": 0
+   "reloads": 0,
+   "unitsDamaged": 0
   },
   "impacts": [
    [
@@ -1033,7 +1041,8 @@
    "satMag": {
     "NASAMS-1": 1
    },
-   "reloads": 0
+   "reloads": 0,
+   "unitsDamaged": 0
   },
   "impacts": [
    [

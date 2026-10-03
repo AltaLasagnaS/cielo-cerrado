@@ -2362,6 +2362,9 @@ table.t.mc td.pc{white-space:nowrap}
   };
   var TARGET_STATUS = { operational: "Operativo", damaged: "Dañado", destroyed: "Destruido" };
   var DAMAGED_AT = 0.2;
+  var UNIT_TARGET = { hp: 300, radius: 30, vuln: 1.2 };
+  var UNIT_DAMAGE = { radarR: 0.7, react: 1.5 };
+  var UNIT_COMP_AT = [0.2, 0.5];
   var DAMAGE = { K: 12, EXP: 0.6, R50K: 4, CUTOFF: 0.02 };
 
   // src/data/terrain/monterey.js
@@ -2660,8 +2663,9 @@ table.t.mc td.pc{white-space:nowrap}
       // saturación: veces que una unidad tenía blancos pero no le quedaban canales o munición
       satChannels: {},
       satMag: {},
-      // recargas completadas
-      reloads: 0
+      // recargas completadas y componentes de unidades dañados (daño funcional)
+      reloads: 0,
+      unitsDamaged: 0
     };
   }
   S.stats = newStats();
@@ -3008,10 +3012,10 @@ table.t.mc td.pc{white-space:nowrap}
     return J * Math.pow(10, -(r.eccm || 0) / 10);
   }
   function detR(u, th, J, ca = 1, wx = null) {
-    const r = D(u).radar;
-    if (r.band === "ACU") return r.R1 * (wx ? wx.acu : 1);
-    if (r.band === "OPT") return r.R1 * (wx ? wx.opt : 1);
-    const R = r.R1 * Math.pow(rcsAt(th.T || th, r.band, ca), 0.25) * Math.pow(1 / (1 + J), 0.25);
+    const r = D(u).radar, dmg = u.dmgRadar ? UNIT_DAMAGE.radarR : 1;
+    if (r.band === "ACU") return r.R1 * (wx ? wx.acu : 1) * dmg;
+    if (r.band === "OPT") return r.R1 * (wx ? wx.opt : 1) * dmg;
+    const R = r.R1 * Math.pow(rcsAt(th.T || th, r.band, ca), 0.25) * Math.pow(1 / (1 + J), 0.25) * dmg;
     return wx && wx.rain ? rainRange(R, rainGamma(r.band, wx.rain), wx.rainKm) : R;
   }
   var belowCeiling = (r, wx, agl) => !(r.band === "OPT" && wx && wx.ceiling != null && agl > wx.ceiling);
@@ -3312,7 +3316,7 @@ table.t.mc td.pc{white-space:nowrap}
   var directDamage = (T) => DAMAGE.K * Math.pow(warheadKg(T), DAMAGE.EXP) * (T.dmgMult ?? 1);
   var radius50 = (T) => DAMAGE.R50K * Math.cbrt(warheadKg(T));
   function damageAt(T, type, dist) {
-    const tt = TARGET_TYPES[type], W = warheadKg(T);
+    const tt = typeof type === "string" ? TARGET_TYPES[type] : type, W = warheadKg(T);
     if (!W || !tt) return { dmg: 0, factor: 0, edge: dist };
     const edge = Math.max(0, dist - tt.radius);
     const factor = 1 / (1 + (edge / radius50(T)) ** 2);
@@ -3343,7 +3347,7 @@ table.t.mc td.pc{white-space:nowrap}
 
   // src/sim/engine.js
   function startSim() {
-    S.units = S.setup.defs.map((d) => ({ ...d, alive: true, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
+    S.units = S.setup.defs.map((d) => ({ ...d, alive: true, hp: UNIT_TARGET.hp, dmgRadar: false, dmgLauncher: false, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
     S.jamsLive = S.setup.jams.map((j) => ({ ...j, _losMap: {} }));
     S.objs = S.setup.objs.map((g) => ({ ...g, hp: g.maxHp, status: "operational", hits: 0, dmgBy: {} }));
     S.threats = [];
@@ -3507,7 +3511,7 @@ table.t.mc td.pc{white-space:nowrap}
       }
     }
     for (const u of S.units) {
-      if (!u.alive || !D(u).sam || u.magLeft <= 0) continue;
+      if (!u.alive || !D(u).sam || u.dmgLauncher || u.magLeft <= 0) continue;
       if (t < u.nextEval) continue;
       u.nextEval = t + 1;
       engage(u, t);
@@ -3550,7 +3554,7 @@ table.t.mc td.pc{white-space:nowrap}
   }
   function canEngage(u, th, t, c2, probe) {
     const d = D(u), sm = d.sam;
-    if (!u.alive || !sm || u.magLeft <= 0 || u.active >= sm.ch) return null;
+    if (!u.alive || !sm || u.dmgLauncher || u.magLeft <= 0 || u.active >= sm.ch) return null;
     if (!th.alive || !th.p || th.firstDet === null) return null;
     const maxR = isTBM(th) ? sm.maxRtbm : sm.maxR;
     if (!maxR) return null;
@@ -3565,7 +3569,7 @@ table.t.mc td.pc{white-space:nowrap}
       av = reactionStart(th, t, c2, u);
       if (!probe) u.avail[th.id] = av;
     }
-    if (t - av < sm.react) return null;
+    if (t - av < sm.react * (u.dmgRadar ? UNIT_DAMAGE.react : 1)) return null;
     const flying = (th.fly || []).filter((i) => !i.done);
     if (C2_LEVELS[c2].deconf ? flying.length : flying.some((i) => i.u === u)) return null;
     if (S.ignoreDecoys && th.clsAs === "señuelo") return null;
@@ -3708,6 +3712,7 @@ table.t.mc td.pc{white-space:nowrap}
       S.impacts.push({ x, y, k: "miss" });
       log("w", label(th) + " cae a " + Math.round(r) + " m del blanco" + (th.navErr > 150 ? " (desviado por interferencia GNSS)" : "") + dtxt + ".");
     }
+    damageUnits(th.T, x, y);
     for (const d of dmg) {
       event("Primer impacto con daño: " + label(th) + " sobre " + d.g.name, "firstDmg");
       if (d.g.status !== d.before) {
@@ -3735,6 +3740,40 @@ table.t.mc td.pc{white-space:nowrap}
       out.push({ g, dmg, dist, before });
     }
     return out;
+  }
+  function damageUnits(T, x, y) {
+    for (const u of S.units) {
+      const d = D(u);
+      if (!u.alive || d.kind === "aew") continue;
+      const res = damageAt(T, UNIT_TARGET, Math.hypot(x - u.x, y - u.y) * 1e3);
+      if (!res.dmg) continue;
+      u.hp -= Math.round(res.dmg);
+      if (u.hp <= 0) {
+        u.alive = false;
+        S.stats.lost++;
+        hooks.onUnitLost();
+        log("x", uLabel(u) + " queda destruida por la explosión de " + T.short + " a " + Math.round(res.edge + UNIT_TARGET.radius) + " m.");
+        event(uLabel(u) + " destruida por " + T.short, "lost:" + u.id);
+        continue;
+      }
+      const frac2 = 1 - u.hp / UNIT_TARGET.hp;
+      while ((u.dmgRadar ? 1 : 0) + (u.dmgLauncher ? 1 : 0) < UNIT_COMP_AT.filter((a) => frac2 >= a).length) {
+        const comps = [];
+        if (d.radar && !u.dmgRadar) comps.push("radar");
+        if (d.sam && !u.dmgLauncher) comps.push("launcher");
+        if (!comps.length) break;
+        const c = comps.length > 1 ? comps[rnd() < 0.5 ? 0 : 1] : comps[0];
+        if (c === "radar") {
+          u.dmgRadar = true;
+          log("w", uLabel(u) + " dañada: el radar pierde alcance (×" + UNIT_DAMAGE.radarR + ") y reacciona más lento.");
+        } else {
+          u.dmgLauncher = true;
+          log("w", uLabel(u) + " dañada: el lanzador queda fuera de servicio.");
+        }
+        S.stats.unitsDamaged++;
+        event(uLabel(u) + " dañada por " + T.short, "dmgUnit:" + u.id + ":" + c);
+      }
+    }
   }
 
   // src/sim/setup.js
@@ -4176,6 +4215,13 @@ table.t.mc td.pc{white-space:nowrap}
       ctx.stroke();
       if (d.kind === "aew") {
         ctx.strokeStyle = c;
+        ctx.beginPath();
+        ctx.arc(sx, sy, 12, 0, 7);
+        ctx.stroke();
+      }
+      if (S.started && !dead && (u.dmgRadar || u.dmgLauncher)) {
+        ctx.strokeStyle = "#e6a53c";
+        ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.arc(sx, sy, 12, 0, 7);
         ctx.stroke();
@@ -4890,8 +4936,8 @@ table.t.mc td.pc{white-space:nowrap}
       id: "damage",
       group: "Enfrentamiento",
       title: "Daño a objetivos",
-      body: () => `<p>Cuando un arma llega, cae con dispersión alrededor del punto apuntado (CEP: el radio que contiene la mitad de los impactos). El daño depende de la ojiva y de la distancia: un impacto dentro de la huella del objetivo es directo; uno cercano hace menos daño, y la distancia de efecto crece con la raíz cúbica de la carga (ley de escala de Hopkinson-Cranz).</p>`,
-      engine: () => `<p class="formula">daño = ${DAMAGE.K} · W^${DAMAGE.EXP} · vulnerabilidad · 1/(1 + (d/R50)²),  R50 = ${DAMAGE.R50K} · W^⅓ m</p><p>W = ojiva del catálogo (${code("info.warheadKg")}), d = distancia fuera de la huella. Ejemplos de impacto directo con vulnerabilidad 1: ${["shahed", "kh101", "flamingo"].map((k) => `${esc(THREATS[k].short)} (${warheadKg(THREATS[k])} kg): ${n(directDamage(THREATS[k]))} HP, R50 ${n(radius50(THREATS[k]))} m`).join(" · ")}. Vida por tipo de objetivo: ${Object.values(TARGET_TYPES).map((t) => esc(t.name) + " " + t.hp).join(", ")}.</p><div class="warn">Es un modelo de juego, simple y consistente: no representa estructuras, incendios ni penetración.</div>`
+      body: () => `<p>Cuando un arma llega, cae con dispersión alrededor del punto apuntado (CEP: el radio que contiene la mitad de los impactos). El daño depende de la ojiva y de la distancia: un impacto dentro de la huella del objetivo es directo; uno cercano hace menos daño, y la distancia de efecto crece con la raíz cúbica de la carga (ley de escala de Hopkinson-Cranz).</p><p><b>Las defensas también reciben daño.</b> Una explosión cerca de una batería puede dejarla en pie pero rota: con el radar dañado ve menos y reacciona más lento; con el lanzador dañado no dispara aunque le queden misiles. Por eso no alcanza con contar baterías "vivas".</p>`,
+      engine: () => `<p class="formula">daño = ${DAMAGE.K} · W^${DAMAGE.EXP} · vulnerabilidad · 1/(1 + (d/R50)²),  R50 = ${DAMAGE.R50K} · W^⅓ m</p><p>W = ojiva del catálogo (${code("info.warheadKg")}), d = distancia fuera de la huella. Ejemplos de impacto directo con vulnerabilidad 1: ${["shahed", "kh101", "flamingo"].map((k) => `${esc(THREATS[k].short)} (${warheadKg(THREATS[k])} kg): ${n(directDamage(THREATS[k]))} HP, R50 ${n(radius50(THREATS[k]))} m`).join(" · ")}. Vida por tipo de objetivo: ${Object.values(TARGET_TYPES).map((t) => esc(t.name) + " " + t.hp).join(", ")}.</p><div class="warn">Es un modelo de juego, simple y consistente: no representa estructuras, incendios ni penetración.</div><p>Daño funcional (${code("damageUnits()")}): cada unidad en tierra es un blanco de ${UNIT_TARGET.hp} HP, huella ${UNIT_TARGET.radius} m y vulnerabilidad ${UNIT_TARGET.vuln}. Al perder el ${UNIT_COMP_AT.map((a) => Math.round(a * 100) + "%").join(" y el ")} de la vida pierde un componente (si tiene los dos, se sortea): radar ×${UNIT_DAMAGE.radarR} de alcance y ×${UNIT_DAMAGE.react} de tiempo de reacción, o lanzador fuera de servicio. Un impacto directo en una unidad apuntada la destruye, como antes.</p>`
     },
     {
       id: "time",
@@ -5167,7 +5213,10 @@ table.t.mc td.pc{white-space:nowrap}
       }
       if (d.sam) html += `<dt>Alcance</dt><dd>${d.sam.maxR} km${d.sam.maxRtbm ? " (TBM " + d.sam.maxRtbm + ")" : ""}</dd><dt>Guiado</dt><dd>${d.sam.guid}</dd>`;
       if (S.started && d.sam) html += `<dt>Munición</dt><dd>${u.magLeft}/${u.mag} · reserva ${u.reserveLeft}</dd><dt>En vuelo</dt><dd>${u.active}/${d.sam.ch}</dd>${u.reloadUntil !== null ? `<dt>Recargando</dt><dd>faltan ${Math.ceil((u.reloadUntil - S.t) / 60)} min</dd>` : ""}`;
-      if (S.started) html += `<dt>Estado</dt><dd style="color:${u.alive ? "var(--ok)" : "var(--red)"}">${u.alive ? "Operativa" : "Destruida"}</dd>`;
+      if (S.started) {
+        const hurt = u.alive && (u.dmgRadar || u.dmgLauncher), what = [u.dmgRadar ? "radar: menos alcance y reacción más lenta" : "", u.dmgLauncher ? "lanzador fuera de servicio" : ""].filter(Boolean).join("; ");
+        html += `<dt>Estado</dt><dd style="color:${!u.alive ? "var(--red)" : hurt ? "var(--warn, #e6a53c)" : "var(--ok)"}">${!u.alive ? "Destruida" : hurt ? "Dañada (" + what + ")" : "Operativa"}${u.alive && u.hp < UNIT_TARGET.hp ? " · " + Math.max(0, u.hp) + "/" + UNIT_TARGET.hp + " HP" : ""}</dd>`;
+      }
       html += "</dl>";
       if (ed) {
         if (r && d.kind !== "aew" && r.band !== "ACU" && r.band !== "OPT") {
@@ -5618,6 +5667,8 @@ table.t.mc td.pc{white-space:nowrap}
     const gnss = real.filter((a) => a.nav > 150 && a.nav <= LOST_M), lostL = real.filter((a) => a.nav > LOST_M);
     if (gnss.length) out.push(`${gnss.length} arma(s) fueron desviadas por interferencia GNSS (${list(gnss)}).`);
     if (lostL.length) out.push(`${lostL.length} arma(s) quedaron "perdidas localmente": el engaño GNSS las desvió más de ${LOST_M / 1e3} km (${list(lostL)}). Ojo al comparar con las cifras oficiales ucranianas: esa categoría real también incluye señuelos y fallas.`);
+    const hurt = S2.units.filter((u) => u.alive && (u.dmgRadar || u.dmgLauncher));
+    if (hurt.length) out.push(`Unidades dañadas por explosiones cercanas: ${hurt.map((u) => u.name + " (" + [u.dmgRadar ? "radar" : "", u.dmgLauncher ? "lanzador" : ""].filter(Boolean).join(" y ") + ")").join(", ")}. Un radar dañado ve menos y reacciona más lento; un lanzador dañado no dispara aunque le queden misiles.`);
     if (S2.units.some((u) => !u.alive)) out.push(`Unidades perdidas: ${S2.units.filter((u) => !u.alive).map((u) => u.name).join(", ")}. Una batería destruida deja un hueco de cobertura para lo que viene después.`);
     if (st.killed) out.push(`Economía: la defensa gastó US$${st.defCost.toFixed(1)} M y el ataque US$${st.atkCost.toFixed(1)} M. ${st.defCost > st.atkCost ? "Defender costó más que atacar: es la lógica de los drones baratos y los señuelos." : "Defender costó menos que atacar."}`);
     return out;
