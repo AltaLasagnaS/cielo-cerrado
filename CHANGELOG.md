@@ -7,6 +7,7 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 ## [Sin publicar]
 
 ### Agregado
+- Investigación `docs/investigacion/mejoras-fisica.md` (sin implementar): RCS según el aspecto (prioridad), Swerling, clutter y Doppler, integración de la defensa aérea (niveles de C2 y enlaces de datos), estados de clima, discriminación de señuelos, recarga y energía del interceptor. Para cada una: qué cambia, dificultad, datos necesarios, cómo probarla y cómo la resuelven *Command: Modern Operations* y *Fleet Command* (mod NWP).
 - **Escenario "Gotemburgo · defensa de la refinería de Hisingen"** (jugás la defensa): oleada de Shahed, Gerbera, Geran-3, Kalibr, Kh-101 y Kinzhal contra la refinería, la terminal de Skarvik y el puerto. Con la disposición inicial la refinería sobrevive ≈40% de las veces (Monte Carlo, 40 corridas).
 - **Escenario "Monterey · ataque al puente de Moss Landing"** (jugás el ataque), inspirado en los ataques a los puentes de Chonhar y Crimea: Storm Shadow, Flamingo, ATACMS, Neptune y 30 Liutyi para gastar la munición de S-400, Pantsir, Tor y Buk. El puente cae ≈40% de las veces; el briefing propone sumar un supresor GNSS para ver su efecto.
 - Prueba de catálogo de escenarios: posiciones dentro del mapa, blancos y metas que existan y briefing completo en los escenarios jugables. Dos casos golden nuevos (las seis anteriores no cambian).
