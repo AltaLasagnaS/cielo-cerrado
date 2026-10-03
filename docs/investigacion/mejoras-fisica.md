@@ -476,13 +476,21 @@ Todo campo nuevo tiene que tener valor por defecto **neutro** (el que reproduce 
 5. **Calibración:** correr los casos de `CAL` (mejor con el arnés `npm run calibrar` del ROADMAP) y verificar que sigan dentro de su rango.
 6. **Academia y fichas:** cada mejora agrega o actualiza un concepto con su calculadora (por ejemplo, RCS con control de ángulo o atenuación por lluvia según la banda).
 
-## F) Preguntas abiertas para decidir antes de implementar
+## F) Decisiones tomadas y preguntas que siguen abiertas
 
-- **Niveles de C2:** ¿alcanzan los cuatro (desconectada, descoordinada, coordinada, integrada)? ¿Se eligen por bando, por unidad o por grupo de unidades?
-- **Enlaces:** ¿modelamos redes por nombre (Link 16, red nacional ucraniana, red rusa) o alcanza con "compatible / incompatible con pasarela"?
-- **Clima:** ¿presets fijos o también un modo "clima variable" que cambie durante la corrida?
-- **RCS:** ¿usamos cuatro aspectos (frente, costado, cola, abajo) o los seis de CMO?
+**Decidido (3-oct-2026):**
+- **C2: dos ejes separados.**
+  1. **Nivel de integración del bando**, uno de cuatro: desconectada, descoordinada, coordinada o integrada. Es cómo **circula la información en general**: voz, tabletas, sistema automatizado nacional.
+  2. **Enlace de datos por unidad**, un interruptor aparte. Dos unidades con enlace compatible encendido se pasan **pistas de calidad de tiro**, con poca demora, **aunque el resto de la defensa esté fuera del circuito**. Ejemplo: un avión o un radar con Link 16 que le pasa la pista a un Patriot mientras los Buk y los grupos móviles solo reciben alertas por tableta.
+  
+  Quién tiene enlace nativo y comprobable está en el anexo K: son pocos, casi todos occidentales.
+- **Clima:** estados **fijos** por escenario (sin clima que cambie durante la corrida).
+- **RCS:** se implementa primero. Los números salen como explica el anexo J.
+
+**Siguen abiertas:**
+- **RCS:** ¿cuatro aspectos (frente, costado, cola, abajo) o los seis de CMO? Propuesta: cuatro, en **dos rangos de frecuencia** como CMO (anexo J).
 - **Energía:** ¿alcanza el paso A o queremos el perfil completo del paso B?
+- **Enlaces de las armas atacantes** (anexo K): los Shahed con módem *mesh* y los Kh-101 que se pueden redirigir en vuelo. ¿Lo modelamos (por ejemplo, cambiar de blanco a mitad de camino) o queda para más adelante?
 
 ## G) Notas sobre las fuentes
 
@@ -493,11 +501,81 @@ Todo campo nuevo tiene que tener valor por defecto **neutro** (el que reproduce 
 
 ## H) Próximos pasos
 
-1. Decidir las preguntas abiertas (sección F).
-2. PR "RCS por aspecto": datos, física, pruebas, golden y Academia.
+1. PR "RCS por aspecto": tabla de RCS por arma (frente, costado, cola, abajo × banda baja y alta) con fuentes y rangos (anexo J), física, pruebas, golden y Academia.
+2. Cerrar las preguntas que siguen abiertas (sección F).
 3. Arnés de calibración reproducible (ROADMAP), antes de Swerling y clutter.
-4. PR "C2 nivel 1": niveles con demora y error, compatibles con `S.net`.
+4. PR "C2 nivel 1": niveles del bando con demora y error, compatibles con `S.net`. PR "C2 nivel 2": interruptor de enlace de datos por unidad (anexo K).
 5. Seguir el orden de la tabla A.
+
+---
+
+## J) Anexo: de dónde sacar los números de RCS
+
+**El problema.** Ningún país publica la RCS medida de sus armas. Hay que estimarla. La idea es no inventar un número, sino juntar **varias estimaciones independientes**, poner el rango que cubra a todas y dejar que el Monte Carlo muestre cuánto pesa la duda.
+
+**Cómo lo organiza CMO (y lo que conviene copiar).** Además de los seis aspectos, CMO guarda la firma de radar en **dos rangos de frecuencia** [cmo_rcs, cmo_db_bands]:
+- **"A–D"**: bandas bajas, hasta ~2 GHz (VHF, UHF y L). Ahí los blancos chicos y furtivos se ven más grandes por resonancia.
+- **"E–M"**: bandas altas, de ~2 GHz para arriba (S, C, X, Ku).
+
+Encaja con lo que ya tenemos: `BANDS` sigue diciendo qué banda usa cada radar, pero la RCS de cada arma pasa a ser una tabla de **2 rangos × 4 aspectos** en lugar de un número frontal más multiplicadores. Las reglas actuales por banda quedan como valor por defecto cuando falte el dato.
+
+**Ejemplo: el Shahed-136, según tres fuentes que no coinciden.**
+
+| Fuente | Banda alta (S–X), frente | Banda alta, costado | Banda alta, cola | Banda baja, frente / costado / cola |
+|---|---|---|---|---|
+| Catálogo actual de *Cielo Cerrado* | 0,05 m² (0,01–0,2) | 1 m² (0,3–3) | — | `rcsVHF` 0,3 m² |
+| Modelado académico de Járkov [kharkiv_rcs] | mediana 0,23 m² **en todos los aspectos**; de frente se detecta 1,7–2× más cerca que de costado (≈ 8–16× menos RCS) | | | — |
+| Pedido a la base de datos de CMO [cmo_req_shahed] | −21 dBsm ≈ **0,008 m²** | −17 dBsm ≈ 0,02 m² | −21 dBsm | −13 / −10 / −13 dBsm ≈ 0,05 / 0,1 / 0,05 m² |
+
+Las tres difieren **en un orden de magnitud**. El pedido de CMO saca el frente de "promedios de un modelo de RCS" y el costado y la cola **por analogía** con Harop/Harpy y Mobin. Lo honesto es un rango ancho:
+- frente: 0,008–0,2 m², probable 0,05;
+- costado: 0,02–3 m², probable alrededor de 0,5.
+
+La diferencia frente–costado es la parte más incierta. Por eso el Monte Carlo con sorteo de parámetros es clave para esta mejora.
+
+**Otras referencias útiles:**
+- **Drones chicos medidos en banda X:** entre −15 y −5 dBsm (0,03–0,3 m²), con picos de frente y de costado. Hay mediciones por aspecto, polarización y frecuencia de 8 a 18 GHz (Rosamilia y otros; Cranfield; OTAN STO-MP-MSG-SET-183) [uav_rcs].
+- **Misil de crucero tipo Tomahawk** (análogo del Kalibr): una simulación numérica (MLFMA) en **banda L** da una media de **1,41 m² de frente y 0,41 m² de cola**. En banda baja la cola puede ser *menor* que el frente [tomahawk_l]. GlobalSecurity cita ~0,5 m² para el Tomahawk y < 0,05 m² para el ALCM furtivo, ya usado en el catálogo [gs_rcs].
+- **Base de datos de CMO** (cmo-db.com, visor comunitario): trae valores por aspecto y por rango para casi todo el catálogo. Sirve como **segunda opinión**, citando cada valor como "estimación de juego". No conviene copiarla entera: es una base de terceros y sus valores también son estimados.
+- **Mod NWP de Fleet Command:** un solo valor por unidad. Además, los valores están en los binarios de la base, que la licencia no deja abrir. No sirve para esto.
+
+**Método propuesto para cada arma:**
+1. Buscar mediciones o modelados académicos (confianza media).
+2. Sumar la estimación de CMO como segunda opinión (confianza baja, "est. de juego").
+3. Chequear contra la física. Los blancos chicos frente a la longitud de onda (drones en VHF) están en resonancia: la RCS en banda baja no puede ser mucho menor que en banda alta para un objeto de ese tamaño. De costado, el fuselaje y las alas dan reflejos especulares grandes.
+4. Rango = desde la menor hasta la mayor estimación razonable; probable = la mediana o la más justificada; confianza baja salvo que dos fuentes independientes coincidan.
+5. Todo con fuente en `SRC` y razonamiento en la nota de `UNC`, como el resto del catálogo.
+
+**Qué hace falta para avanzar más rápido:** leer cmo-db.com y los papers de RCS de drones. Hoy la red del entorno los bloquea. Hay dos caminos: habilitar esos dominios, o que me pases capturas o exportaciones de las fichas de CMO de las armas que nos interesan (Shahed, Geran-3, Gerbera, Kh-101, Kalibr, Iskander, Kinzhal, Kh-22, Oniks, Tsirkon, Storm Shadow, ATACMS, Neptune, Liutyi y Flamingo).
+
+---
+
+## K) Anexo: quién tiene enlace de datos de verdad (para el interruptor por unidad)
+
+"Enlace de datos" acá quiere decir **intercambio digital de pistas de calidad de tiro entre sistemas**. No incluye una alerta por voz o tableta, que entra por el nivel del bando. Lo que encontré, con su confianza:
+
+| Sistema (en el catálogo) | Enlace | Qué dice la fuente | Confianza |
+|---|---|---|---|
+| **NASAMS** | Link 16 nativo | Diseñado para integrarse en red con Patriot [ua_layers] | Alta |
+| **Patriot** (Ucrania) | Link 16 (MIDS) | En 2025 Ucrania firmó el acuerdo CRC System Interface (CSI) para conectar por Link 16 F-16, Mirage 2000 y Patriot con plataformas aliadas. Hay reportes de que al principio el Link 16 y el IFF venían deshabilitados en los Patriot entregados [ua_l16] | Media |
+| **IRIS-T SLM** | Link 16 y SAMOC | El fabricante y la prensa lo presentan compatible con Link 16 y lo demostraron en el ejercicio OTAN JPOW [iris_l16] | Media |
+| **SAMP/T** | Probablemente Link 16 | No lo verifiqué en esta búsqueda | A verificar |
+| **Saab 340 AEW** (Ucrania) | Probablemente Link 16 | Está operando en Ucrania; su enlace no lo verifiqué [ua_saab] | A verificar |
+| **F-16 / Mirage 2000** (no están en el juego todavía) | Link 16 | Mismo acuerdo CSI [ua_l16] | Media |
+| **S-300P, Buk y radares soviéticos** (Ucrania) | Sin enlace OTAN nativo | Se integran a la imagen aérea nacional con "cajas negras" de conversión hechas por ingenieros ucranianos con ayuda de EE.UU. y Alemania. La información circula, pero no como pista de tiro [ua_mix] | Media |
+| **Gepard, grupos móviles, MANPADS, acústicos** (Ucrania) | Tabletas (Virazh-Planshet) | Reciben la imagen aérea para orientarse, no para guiar [ua_virazh] | Media |
+| **S-400, S-300, Buk, Tor, Pantsir** (Rusia) | Red automatizada propia | Polyana-D4M1, Baikal-1ME y Senezh integran brigadas mixtas y asignan blancos a las S-400 (fabricante) [ru_polyana] | Existencia alta; desempeño real desconocido |
+
+**Del lado atacante también hay enlaces** (es otra mejora posible, no la del interruptor):
+- **Shahed/Geran y Gerbera:** desde 2025 se ven módems *mesh* chinos (XK-F358, HX-50) con cámaras. Permiten telemetría, redirigirlos en vuelo y hasta guiarlos en vivo, a unos 100 km del frente [shahed_mesh].
+- **Kh-101:** varias fuentes dicen que se puede redirigir a otro blanco en vuelo. No encontré confirmación de un enlace satelital bidireccional [kh101_retarget].
+
+**Cómo queda en el juego:**
+- Cada defensa trae en el catálogo `links` (por ejemplo `['L16']`), con fuente y confianza.
+- En la tarjeta de la unidad, un interruptor **"Enlace de datos: Link 16 (encendido/apagado)"**. Sirve para escenarios donde el enlace está apagado, interferido o todavía no integrado, como el caso del IFF deshabilitado.
+- Las unidades con el mismo enlace encendido comparten pistas de tiro con 1–2 s de demora y error de decenas de metros, **cualquiera sea el nivel del bando**.
+- El resto recibe la información según el nivel del bando (sección C.4).
+- Con aviones propios (ROADMAP, "Plataformas aéreas propias"), el caso "F-16 que le pasa la pista a un Patriot" sale solo.
 
 ---
 
@@ -541,3 +619,17 @@ Claves usadas en el texto. Todas aparecieron en resultados de búsqueda del 3 de
 - **cec**: Wikipedia, "Cooperative Engagement Capability" — <https://en.wikipedia.org/wiki/Cooperative_Engagement_Capability>; DTIC, "The Cooperative Engagement Capability (CEC)" — <https://apps.dtic.mil/sti/pdfs/ADA471258.pdf>
 - **isk_decoys**: Kyiv Independent, "Russia upgrades Iskander ballistic missiles, more difficult for Ukraine's Patriots to intercept" — <https://kyivindependent.com/the-missile-no-longer-flies-straight-ukraine-says-russia-improved-its-ballistic-missiles/>; Kyiv Post, "Upgraded Russian Iskander Ballistic Missiles Outfox Patriots" — <https://www.kyivpost.com/post/53291>
 - **patriot_reload**: The Defense Watch, "Patriot PAC-3 Missile Defense System – Full Specifications" (30–60 min, 3–5 personas; fuente secundaria) — <https://thedefensewatch.com/defense-systems/patriot-pac-3-missile-system/>; CSIS Missile Threat, "Patriot" — <https://missilethreat.csis.org/system/patriot/>
+
+**RCS y enlaces (agregadas el 3-oct-2026)**
+- **cmo_db_bands**: visor comunitario de la base de CMO (rangos "A–D" y "E–M") — <https://www.cmo-db.com/en/cmo/sensor/5958>
+- **cmo_req_shahed**: pedido de alta del Shahed-136 en la base de CMO, con valores y razonamiento — <https://github.com/PygmalionOfCyprus/cmo-db-requests/issues/2214>
+- **kharkiv_rcs**: Sukharevsky y otros (Universidad de la Fuerza Aérea, Járkov, 2023), modelado de la RCS del Shahed-136, ya citado en el catálogo (`SRC.kharkiv_rcs`) — <https://fliphtml5.com/pdvau/uvoj/Shahed_136_UAV_RCS_measurements/>
+- **uav_rcs**: Rosamilia y otros, "RCS Measurements of UAVs and Their Statistical Analysis" (Cranfield) — <https://dspace.lib.cranfield.ac.uk/server/api/core/bitstreams/b70b94cb-9ed7-4067-a2ae-913fa1950b41/content>; OTAN STO-MP-MSG-SET-183, "Drone RCS Statistical Behaviour" — <https://publications.sto.nato.int/publications/STO%20Meeting%20Proceedings/STO-MP-MSG-SET-183/MP-MSG-SET-183-04.pdf>; "Low signature UAVs: radar cross section analysis, simulation, and measurement in X-band" (2025) — <https://link.springer.com/article/10.1007/s11760-025-04074-y>
+- **tomahawk_l**: "Predição Radar do Míssil de Cruzeiro Tomahawk em Banda L baseado na RCS Dinâmica" — <https://www.researchgate.net/publication/363731654_Predicao_Radar_do_Missil_de_Cruzeiro_Tomahawk_em_Banda_L_baseado_na_RCS_Dinamica>
+- **gs_rcs**: GlobalSecurity, "Radar Cross Section (RCS)" — <https://www.globalsecurity.org/military/world/stealth-aircraft-rcs.htm>
+- **ua_l16**: Defense Express, "Ukrainian Patriots, F-16s and Mirages to Join NATO's 'Military Wi-Fi' Network via Link-16 Integration" — <https://en.defence-ua.com/weapon_and_tech/ukrainian_patriots_f_16s_and_mirages_to_join_natos_military_wi_fi_network_via_link_16_integration-14708.html>; EADaily (fuente rusa, 31-may-2025) — <https://eadaily.com/en/news/2025/05/31/creeping-introduction-ukrainian-f-16-and-patriot-air-defense-systems-are-connected-to-natos-military-wi-fi>; Kyiv Post, "Ukrainian Air Superiority 2026 Status Update" — <https://www.kyivpost.com/post/67328>
+- **iris_l16**: Unmanned Airspace, "Diehl reports NATO interoperability of its IRIS-T SLM" — <https://www.unmannedairspace.info/counter-uas-systems-and-policies/diehl-reports-nato-interoperatility-of-its-iris-t-slm-air-defence-c-uas-system/>; Defence Industry EU, "IRIS-T SLM interoperability demonstrated during NATO exercise" — <https://defence-industry.eu/diehl-defence-iris-t-slm-interoperability-demonstrated-during-nato-exercise/>
+- **ua_saab**: TWZ, "Ukraine's Saab 340 Airborne Early Warning Radar Plane Spotted Operating Over The Country" — <https://www.twz.com/air/ukraines-saab-340-airborne-early-warning-radar-plane-spotted-operating-over-the-country>
+- **ua_mix**: IISS, "Ukraine's ground-based air defence: evolution, resilience and pressure" (feb-2025) — <https://www.iiss.org/online-analysis/military-balance/2025/02/ukraines-ground-based-air-defence-evolution-resilience-and-pressure/>; CSIS, "Does Ukraine Already Have Functional CJADC2 Technology?" — <https://www.csis.org/analysis/does-ukraine-already-have-functional-cjadc2-technology>; Ukraine War Analytics, "Radar Systems Supporting Ukrainian Air Defense" — <https://ukraine-war-analytics.com/air-defense/air-defense-radars-ukraine.html>
+- **shahed_mesh**: Fabian Hinz, "Networking the Shahed" — <https://luftlage.substack.com/p/networking-the-shahed>; NV / Defense Express, "Russia turns Shaheds into FPV drones with cameras and mesh modems" — <https://english.nv.ua/nation/russia-turns-shaheds-into-fpv-drones-with-cameras-and-mesh-modems-defense-express-50544076.html>; Calibre Defence, "Mesh networks" — <https://www.calibredefence.co.uk/mesh-networks-how-russia-is-increasing-the-range-of-its-drones/>
+- **kh101_retarget**: GlobalSecurity, "Kh-101 / Kh-102" — <https://www.globalsecurity.org/wmd/world/russia/kh-101.htm>; Missile Defense Advocacy Alliance, "KH-101/102" — <https://www.missiledefenseadvocacy.org/missile-threat-and-proliferation/todays-missile-threat/russia/kh-101102/>
