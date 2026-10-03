@@ -32,10 +32,10 @@ function loop(now) {
     $('#clock').textContent = fmtT(S.t);
   }
   draw();
-  // refresco de paneles cada 10 cuadros, salvo el panel que tiene el puntero sobre un botón: si el
-  // botón se reemplaza entre que se aprieta y se suelta, el clic se pierde (Ficha, Ver debrief, Briefing)
+  // refresco de paneles cada 10 cuadros, salvo el panel que tiene un botón apretado: si el botón se
+  // reemplaza entre que se aprieta y se suelta, el clic se pierde (Ficha, Ver debrief, Briefing)
   if (++uiTick % 10 === 0) {
-    const free = id => !document.querySelector(id + ' button:hover');
+    const free = id => !(pressedBtn && document.querySelector(id)?.contains(pressedBtn));
     if (free('#stats')) renderStats();
     renderLogIfDirty();
     if (S.sel && S.started && free('#selCard')) renderSel(true);
@@ -44,4 +44,15 @@ function loop(now) {
   requestAnimationFrame(loop);
 }
 
-export function startLoop() { requestAnimationFrame(loop); }
+// Botón apretado (entre pointerdown y el clic). Se suelta en la tarea siguiente al pointerup para que
+// el clic, que llega justo después, todavía encuentre el botón. A diferencia de :hover, no queda
+// "pegado" en pantallas táctiles después del toque.
+let pressedBtn = null;
+const release = () => setTimeout(() => { pressedBtn = null; }, 0);
+
+export function startLoop() {
+  document.addEventListener('pointerdown', e => { pressedBtn = e.target.closest?.('button') || null; }, true);
+  document.addEventListener('pointerup', release, true);
+  document.addEventListener('pointercancel', release, true);
+  requestAnimationFrame(loop);
+}

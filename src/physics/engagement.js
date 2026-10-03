@@ -18,11 +18,14 @@ export const isTBM = th => th.cls === 'balistico' || th.cls === 'hiper';
  * - Pista de red (niveles 'track' y 'fire'): algún sensor la vio en los últimos L.window s y ya pasó
  *   la demora L.lag desde la primera detección de la red.
  * Guiado por radar propio exige pista propia, salvo con C2 integrada ('fire': lanzamiento con pista
- * ajena); drones interceptores (operador) usan la de red; misiles activos/IR aceptan cualquiera.
+ * ajena, y el motor exige además que su radar cubra el punto de encuentro); los cañones apuntan
+ * siempre con su propio sensor; drones interceptores (operador) usan la de red; misiles activos/IR
+ * aceptan cualquiera.
  */
 export function trackOK(u, th, t, c2) {
   const d = D(u), L = C2_LEVELS[c2], own = d.radar ? (t - (th.det[u.id] ?? -1e9)) <= d.radar.scan * 2 + 0.6 : false;
   const netT = (L.share === 'track' || L.share === 'fire') && th.firstDet !== null && t - th.firstDet >= L.lag && (t - th.lastNet) <= L.window;
+  if (d.sam.guid === 'cañón') return own;
   if (RADAR_GUID.includes(d.sam.guid)) return own || (L.share === 'fire' && netT);
   if (d.sam.guid === 'operador') return netT;
   return own || netT;

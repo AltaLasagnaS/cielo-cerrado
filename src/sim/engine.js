@@ -164,7 +164,15 @@ export function engage(u, t) {
     if (u.active >= ch || u.magLeft <= 0) { const k = uLabel(u), sat = u.magLeft <= 0 ? S.stats.satMag : S.stats.satChannels; sat[k] = (sat[k] || 0) + 1; break; }
     const sol = solve(u, th, t); if (!sol) continue;
     const v = speedAt(th, t + sol.tau); if (v > sm.vmaxT) continue;
-    if (RADAR_GUID.includes(sm.guid) && sm.guid !== 'cañón' && !los(u.x, u.y, antZ(u), sol.p.x, sol.p.y, sol.p.z)) continue;
+    if (RADAR_GUID.includes(sm.guid) && sm.guid !== 'cañón') {
+      if (!los(u.x, u.y, antZ(u), sol.p.x, sol.p.y, sol.p.z)) continue;
+      // con pista ajena (C2 integrada), su radar tiene que cubrir el punto de encuentro: sector y alcance
+      const r = D(u).radar, ownT = t - (th.det[u.id] ?? -1e9) <= r.scan * 2 + 0.6;
+      if (!ownT) {
+        const az = azOf(sol.p.x - u.x, sol.p.y - u.y), dk = Math.hypot(sol.p.x - u.x, sol.p.y - u.y, (sol.p.z - antZ(u)) / 1000);
+        if (!inSector(u, az) || dk > detR(u, th, jamJ(u, az, S.jamsLive), 1, WEATHER[S.weather])) continue;
+      }
+    }
     const n = Math.min(S.doctrine === 'salva' ? (u.salvo || sm.salvo) : 1, u.magLeft, ch - u.active);
     for (let k = 0; k < n; k++) {
       const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false };
