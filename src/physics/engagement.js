@@ -1,6 +1,6 @@
 // ---------------- ENFRENTAMIENTO ----------------
 // Seguimiento, solución de tiro y probabilidad de derribo (Pk). Ver docs/FISICA.md §6–§7.
-import { D, C2_LEVELS } from '../data/index.js';
+import { D, C2_LEVELS, C2_ORDER, C2_NODES } from '../data/index.js';
 import { azOf, clamp } from '../util/math.js';
 import { surf } from './terrain.js';
 import { jamJ } from './radar.js';
@@ -15,8 +15,9 @@ export const isTBM = th => th.cls === 'balistico' || th.cls === 'hiper';
 /**
  * ¿La unidad u tiene una pista utilizable de th en el instante t, con el nivel de C2 c2 (data/c2.js)?
  * - Pista propia: su radar la vio en los últimos 2 barridos (+0,6 s).
- * - Pista de red (niveles 'track' y 'fire'): algún sensor la vio en los últimos L.window s y ya pasó
- *   la demora L.lag desde la primera detección de la red.
+ * - Pista de red (niveles 'track' y 'fire'): algún sensor con enlace la vio en los últimos L.window s
+ *   y ya pasó la demora L.lag desde la primera detección de la red (th.netFirst). Una unidad sin
+ *   enlace de datos (u.link === false) no recibe pistas de red.
  * Guiado por radar propio exige pista propia, salvo con C2 integrada ('fire': lanzamiento con pista
  * ajena, y el motor exige además que su radar cubra el punto de encuentro); los cañones apuntan
  * siempre con su propio sensor; drones interceptores (operador) usan la de red; misiles activos/IR
@@ -24,7 +25,7 @@ export const isTBM = th => th.cls === 'balistico' || th.cls === 'hiper';
  */
 export function trackOK(u, th, t, c2) {
   const d = D(u), L = C2_LEVELS[c2], own = d.radar ? (t - (th.det[u.id] ?? -1e9)) <= d.radar.scan * 2 + 0.6 : false;
-  const netT = (L.share === 'track' || L.share === 'fire') && th.firstDet !== null && t - th.firstDet >= L.lag && (t - th.lastNet) <= L.window;
+  const netT = u.link !== false && (L.share === 'track' || L.share === 'fire') && th.netFirst != null && t - th.netFirst >= L.lag && (t - th.lastNet) <= L.window;
   if (d.sam.guid === 'cañón') return own;
   if (RADAR_GUID.includes(d.sam.guid)) return own || (L.share === 'fire' && netT);
   if (d.sam.guid === 'operador') return netT;
@@ -36,10 +37,24 @@ export function trackOK(u, th, t, c2) {
  * alerta de la red (todos los niveles salvo 'desconectada' y 'coordinada', que conserva el
  * comportamiento histórico) desde que llegó la alerta, si fue antes.
  */
-export function reactionStart(th, t, c2) {
+export function reactionStart(th, t, c2, u = null) {
   const L = C2_LEVELS[c2];
-  if ((L.share === 'cue' || L.share === 'fire') && th.firstDet !== null) return Math.min(t, th.firstDet + L.lag);
+  if ((L.share === 'cue' || L.share === 'fire') && th.netFirst != null && u?.link !== false) return Math.min(t, th.netFirst + L.lag);
   return t;
+}
+
+/**
+ * Nivel de C2 efectivo: el elegido (c2) menos lo que se perdió con los objetivos de C2 destruidos
+ * (data/c2.js#C2_NODES): un puesto de mando destruido deja la defensa desconectada y cada sitio de
+ * comunicaciones destruido la baja un nivel.
+ */
+export function effectiveC2(c2, objs) {
+  let i = C2_ORDER.indexOf(c2);
+  for (const g of objs) {
+    const n = g.status === 'destroyed' && C2_NODES[g.type]; if (!n) continue;
+    i = n === 'all' ? 0 : i - n;
+  }
+  return C2_ORDER[Math.max(0, i)];
 }
 
 /**

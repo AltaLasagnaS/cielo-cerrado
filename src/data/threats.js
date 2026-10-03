@@ -10,7 +10,7 @@ export const CLS_NAME = { dron: 'Dron de ataque / señuelo', crucero: 'Misil de 
 export const THREATS = {
   shahed: {
     name: 'Shahed-136 / Geran-2', short: 'Shahed', side: 'RU', cls: 'dron', prof: 'drone',
-    v: 51, agl: 2000, aglRange: [50, 5000], aglModes: [['Bajo (2022–23)', 1000], ['Alto (desde 2025)', 3000]], aglNote: 'Volaba a 700–2.000 m en 2022–23; desde 2025, 2–5 km con picada final (Forbes, Ukrainska Pravda). Por debajo de ~50 m choca con el terreno y los cables.', rcs: 0.02, rcsSide: 0.14, rcsRear: 0.03, rcsVHF: 0.064, gnss: 0.5, cep: 15, warhead: '50 kg (BCh-50); 90 kg (BCh-90, 62 kg de explosivo)', range: '≈1.350–1.800 km típico; 2.500 km máx. declarado; ≈650 km con ojiva de 90 kg',
+    v: 51, agl: 2000, aglRange: [50, 5000], aglModes: [['Bajo (2022–23)', 1000], ['Alto (desde 2025)', 3000]], aglNote: 'Volaba a 700–2.000 m en 2022–23; desde 2025, 2–5 km con picada final (Forbes, Ukrainska Pravda). Por debajo de ~50 m choca con el terreno y los cables.', rcs: 0.02, rcsSide: 0.14, rcsRear: 0.03, rcsVHF: 0.064, datalink: 'módem 4G/mesh o Starlink en variantes de 2025–26', gnss: 0.5, cep: 15, warhead: '50 kg (BCh-50); 90 kg (BCh-90, 62 kg de explosivo)', range: '≈1.350–1.800 km típico; 2.500 km máx. declarado; ≈650 km con ojiva de 90 kg',
     cost: 0.035, costNote: 'Producción rusa US$20–80k (CSIS usa 35k); el precio de importación iraní era US$193k', maneuver: false,
     guidance: 'INS + GNSS con antena CRPA "Kometa-M" de 4–16 elementos', engine: 'Motor de pistón MD-550 (copia del Limbach L550E), hélice propulsora',
     profile: 'Vuela lento (≈185 km/h). Desde 2025 crucero a 2–5 km de altura para quedar fuera del alcance de ametralladoras y luego pica casi vertical sobre el blanco.',
@@ -19,7 +19,7 @@ export const THREATS = {
   },
   geran3: {
     name: 'Geran-3 (Shahed a reacción)', short: 'Geran-3', side: 'RU', cls: 'dron', prof: 'drone',
-    v: 92, agl: 1500, aglRange: [100, 5000], aglNote: 'Estimación: mismo envolvente que el Geran-2.', rcs: 0.023, rcsSide: 0.2, rcsRear: 0.05, rcsVHF: 0.064, gnss: 0.5, cep: 15, warhead: '≈50 kg termobárica-fragmentación (TBBCh-50)', range: '≈1.000 km (GUR)',
+    v: 92, agl: 1500, aglRange: [100, 5000], aglNote: 'Estimación: mismo envolvente que el Geran-2.', rcs: 0.023, rcsSide: 0.2, rcsRear: 0.05, rcsVHF: 0.064, datalink: 'módem 4G/mesh', gnss: 0.5, cep: 15, warhead: '≈50 kg termobárica-fragmentación (TBBCh-50)', range: '≈1.000 km (GUR)',
     cost: 0.07, costNote: 'Sin cifra oficial: ≈Geran-2 + 40% (el motor JT80 cuesta US$18–35k en el mercado civil)', maneuver: false,
     guidance: 'INS + GNSS con CRPA Kometa-M12', engine: 'Turbojet chino Telefly JT80 (confirmado por el GUR en un ejemplar capturado)',
     profile: 'Crucero ≈300 km/h, hasta ≈370 km/h al cruzar zonas defendidas (GUR). Los 550–600 km/h que circulan son del Shahed-238 iraní, no de este.',
@@ -28,7 +28,7 @@ export const THREATS = {
   },
   gerbera: {
     name: 'Gerbera (señuelo)', short: 'Gerbera', side: 'RU', cls: 'dron', prof: 'drone', decoy: true,
-    v: 40, agl: 1200, aglRange: [100, 3000], aglNote: 'Señuelo: vuela a la altura de los Shahed que acompaña.', rcs: 0.02, rcsSide: 0.05, rcsRear: 0.03, rcsVHF: 0.1, gnss: 0.3, cep: 50, warhead: 'Ninguna en la mayoría (algunas 2,5–5 kg o cámara)', range: '300–600 km',
+    v: 40, agl: 1200, aglRange: [100, 3000], aglNote: 'Señuelo: vuela a la altura de los Shahed que acompaña.', rcs: 0.02, rcsSide: 0.05, rcsRear: 0.03, rcsVHF: 0.1, datalink: 'módem mesh XK-F358 en algunos', gnss: 0.3, cep: 50, warhead: 'Ninguna en la mayoría (algunas 2,5–5 kg o cámara)', range: '300–600 km',
     cost: 0.01, costNote: '≈US$10k según funcionarios ucranianos: espuma y terciado, motor de aeromodelismo', maneuver: false,
     guidance: 'INS + GNSS', engine: 'Motor de pistón chico (DLE60 / 70 cc)',
     profile: 'Imita a un Shahed en trayecto. Su único trabajo es hacer gastar munición y saturar canales de tiro.',

@@ -195,7 +195,17 @@ r / vInt ≤ τ   (el interceptor llega a tiempo, con ≤ 3 s de holgura)
 | Coordinada | sí, vale 12 s | activos/IR e interceptores | desde la pista | sí |
 | Integrada | sí, 2 s de demora, vale 12 s | también guiados por radar, si su radar cubre el punto de encuentro (sector, alcance y línea de vista); los cañones siempre necesitan su propio sensor | desde la alerta | sí |
 
-"Coordinada" y "desconectada" son el viejo interruptor "red integrada" encendido y apagado (resultados idénticos).
+"Coordinada" y "desconectada" son el viejo interruptor "red integrada" encendido y apagado.
+
+**Error de posición de la pista de red:** un disparo hecho sin pista propia multiplica su Pk por `remotePk` del nivel (0,97 en coordinada: el buscador tiene que encontrar el blanco donde la red dice que está; 1 en integrada, pista compuesta de calidad de tiro. Estimación de juego: los escenarios son muy sensibles a este valor).
+
+**Enlace de datos por unidad** (`u.link`, casilla en el panel de selección): una unidad sin enlace no alimenta la red (sus detecciones no cuentan para `th.lastNet` ni `th.netFirst`) y no recibe pistas ni alertas de otros sensores. Pelea sola con su radar.
+
+**Mejor tirador y defensa por capas** (`best`, solo en integrada): antes de disparar, una batería con enlace cede el blanco si (1) otra batería con enlace también puede tirarle ahora y es mejor (contra drones, menor costo esperado por derribo = costo/Pk; contra el resto, mayor Pk), o (2) es un dron y su ruta pasa más adelante por la envolvente de una capa con munición al menos 2 veces más barata por derribo. Así un NASAMS le deja los Shahed al Gepard que los espera junto al objetivo.
+
+**Nodos de C2** (`effectiveC2`, `data/c2.js#C2_NODES`): si un objetivo **puesto de mando** de la defensa es destruido, el C2 efectivo cae a desconectada; cada **sitio de comunicaciones** destruido lo baja un nivel. El registro avisa cuando pasa.
+
+**Enlace de datos del atacante** (`sv.link`, armas con `T.datalink`: Shahed, Geran-3 y Gerbera con módem 4G/mesh o Starlink): el operador ve la posición real, así que el arma descarta el engaño GNSS como si tuviera corrección por terreno (§4). Dentro del radio de un antidrón que corta enlaces (`J.linkJam`, Bukovel-AD) pierde esa ventaja.
 
 **Doctrina:** con "salva" se disparan `u.salvo` interceptores por blanco (cada 0,6 s); con "disparar-observar-disparar", uno.
 
