@@ -64,5 +64,6 @@ export function applyScenario(sc) {
   }
   S.weather = WEATHER[sc.rules?.weather] ? sc.rules.weather : WEATHER_DEFAULT;
   S.ignoreDecoys = !!sc.rules?.ignoreDecoys;   // el clima es del escenario: sin dato, despejado
+  S.fireRange = sc.rules?.fireRange ?? 1;   // doctrina de alcance del escenario: sin dato, todo el alcance
   S.scen = sc;
 }
