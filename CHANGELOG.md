@@ -6,6 +6,9 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 
 ## [Sin publicar]
 
+### Agregado
+- **Publicación en GitHub Pages**: el workflow `pages.yml` sube el `index.html` de la raíz en cada push a `main` (o a mano desde Actions), después de verificar que esté al día con `src/`.
+
 ## [0.3.0] - 2026-10-03
 
 Del simulador a un **simulador táctico educativo**: objetivos concretos, daño, debrief, lectura del terreno y una Academia.
