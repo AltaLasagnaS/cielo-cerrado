@@ -13,7 +13,8 @@
 //   kind: destroy (objetivo destruido) · damage (daño ≥ min, por defecto 20%) ·
 //         protect (objetivo operativo) · survive (objetivo no destruido) ·
 //         killUnit (defensa destruida) · keepUnit (defensa sobrevive)
-// rules: opciones del motor que el escenario fija al cargarse (S.net, S.doctrine).
+// rules: opciones del motor que el escenario fija al cargarse: c2 (nivel de integración del mando y
+//   control, ver data/c2.js) y doctrine. Se acepta net: true|false (formato viejo).
 
 export const SCENARIOS = {
   mb_noche: {
@@ -26,7 +27,7 @@ export const SCENARIOS = {
       ataque: '20 Shahed, 8 Gerbera, 4 Kh-101, 3 Kalibr y 2 Iskander-M. Un avión de interferencia stand-off acompaña desde el noroeste.'
     },
     conditions: 'Noche despejada. El motor no modela clima ni luz: la noche solo explica por qué los grupos móviles dependen de la alerta acústica.',
-    rules: { net: true, doctrine: 'salva' },
+    rules: { c2: 'coordinada', doctrine: 'salva' },
     rulesText: ['Red integrada activa y doctrina de salva.', 'No hay recarga: cada unidad cuenta solo con la munición inicial.', 'Los Kh-101, Kalibr e Iskander están sincronizados para llegar casi juntos (T+24:40 a T+25:30).'],
     objectives: [
       { type: 'fuel', name: 'Depósito de combustible Salinas', short: 'Combustible Salinas', x: 63.5, y: 55.8, desc: 'Abastece a la región: es el blanco principal del ataque.' },
@@ -81,7 +82,7 @@ export const SCENARIOS = {
       ataque: '6 Storm Shadow, 16 Liutyi, 2 Neptune y 4 ATACMS lanzados desde 220 km, todo sincronizado para llegar en menos de un minuto.'
     },
     conditions: 'Despejado. El motor no modela clima ni luz.',
-    rules: { net: true, doctrine: 'salva' },
+    rules: { c2: 'coordinada', doctrine: 'salva' },
     rulesText: ['Red integrada activa y doctrina de salva para la defensa rusa.', 'El supresor GNSS desvía a las armas que dependen del satélite (los ATACMS y los Liutyi son los más sensibles).', 'Llegada sincronizada entre T+24:00 y T+24:50 para saturar canales de tiro.'],
     objectives: [
       { type: 'ammo', name: 'Depósito de munición', short: 'Depósito munición', x: 57.8, y: 32.5, desc: 'Arsenal de la base: blanco principal.' },
@@ -124,7 +125,7 @@ export const SCENARIOS = {
       ataque: '16 Shahed, 8 Gerbera, 6 Geran-3 (a reacción), 6 Kalibr, 3 Kh-101 y 2 Kinzhal, con un avión de interferencia stand-off sobre el Kattegat.'
     },
     conditions: 'Noche despejada sobre el mar. El motor no modela clima ni luz: la noche solo explica por qué los grupos móviles dependen de la alerta acústica y del radar.',
-    rules: { net: true, doctrine: 'salva' },
+    rules: { c2: 'coordinada', doctrine: 'salva' },
     rulesText: ['Red integrada activa y doctrina de salva.', 'No hay recarga: cada unidad cuenta solo con la munición inicial.', 'Los Kalibr y los Kh-101 llegan casi juntos (T+25:00 a T+25:10); los Kinzhal, medio minuto después.', 'El Patriot mira al oeste: lo que entra por el norte lo tienen que resolver el IRIS-T y la defensa de punto.'],
     objectives: [
       { type: 'fuel', name: 'Refinería de Hisingen', short: 'Refinería', x: 51.1, y: 34.4, hp: 1600, desc: 'Torres de destilación, tanques y cañerías sobre la costa norte del Göta älv. Blanco principal.' },
@@ -177,7 +178,7 @@ export const SCENARIOS = {
       ataque: '12 Storm Shadow y 2 Flamingo contra el puente carretero, 4 ATACMS contra el puente ferroviario, 2 Neptune contra el S-400 y 30 drones Liutyi contra la central eléctrica, que llegan un par de minutos antes para gastar la munición de la defensa de punto.'
     },
     conditions: 'Despejado. El motor no modela clima ni luz.',
-    rules: { net: true, doctrine: 'salva' },
+    rules: { c2: 'coordinada', doctrine: 'salva' },
     rulesText: ['Red integrada activa y doctrina de salva para la defensa rusa.', 'Un puente es un blanco duro y angosto: hace falta acertar varias ojivas grandes (la huella de "Infraestructura" es de 60 m).', 'Sin guerra electrónica al empezar. Probá agregar un supresor GNSS Pole-21 junto al puente (pestaña EW) y repetir con Monte Carlo: con un desvío de 100–500 m casi ninguna ojiva acierta un blanco tan angosto.', 'Los Liutyi llegan entre T+21:00 y T+23:00; los misiles, sincronizados entre T+24:40 y T+25:10.'],
     objectives: [
       { type: 'infra', name: 'Puente de la autopista 1', short: 'Puente Hwy 1', x: 51.8, y: 40.9, hp: 1200, desc: 'Puente carretero sobre la boca del estero Elkhorn. Blanco principal.' },
@@ -222,7 +223,7 @@ export const SCENARIOS = {
       ataque: '28 Shahed en dos oleadas, 10 Gerbera, 10 Kh-101, 6 Kalibr, 3 Iskander-M con señuelos y 2 Kinzhal.'
     },
     conditions: 'Noche de invierno. El motor no modela clima ni luz: la noche solo explica por qué los grupos móviles dependen de la alerta acústica y del radar.',
-    rules: { net: true, doctrine: 'salva' },
+    rules: { c2: 'coordinada', doctrine: 'salva' },
     rulesText: ['Red integrada activa y doctrina de salva.', 'No hay recarga: cada unidad cuenta solo con la munición inicial.', 'Los misiles de crucero y los balísticos llegan casi juntos (T+24:50 a T+25:30), después de una hora de drones.', 'Sin guerra electrónica al empezar. Probá agregar la red anti-GNSS Pokrova (pestaña EW) sobre la ciudad y repetí con Monte Carlo: en el modelo actual desvía casi todo lo que pasa la defensa (probablemente de más para los misiles de crucero, ver ROADMAP).'],
     objectives: [
       { type: 'infra', name: 'Central CHP-5', short: 'CHP-5', x: 40.3, y: 67.4, hp: 1500, desc: 'Central de cogeneración de ~700 MW: luz y calefacción para buena parte de la margen derecha y de Darnytsia.' },

@@ -145,7 +145,7 @@ Es un modelo **cinemático guiado por datos**: la amenaza recorre una ruta polig
 
 **Pista** (`trackOK`):
 - **Propia:** el radar de la batería vio el blanco en los últimos 2 barridos (+0,6 s).
-- **De red:** cualquier sensor lo vio en los últimos 12 s y la red integrada está activa.
+- **De red:** cualquier sensor lo vio en los últimos 12 s y el nivel de mando y control lo permite (ver abajo).
 
 | Guiado | Necesita |
 |---|---|
@@ -164,6 +164,17 @@ r / vInt ≤ τ   (el interceptor llega a tiempo, con ≤ 3 s de holgura)
 ```
 
 **Filtros de** `engage()`: el blanco no puede ir más rápido que `vmaxT`; los guiados por radar necesitan línea de vista al punto de encuentro; hay que tener canales (`sam.ch`) y munición libres. Con red, no se dispara a un blanco que ya tiene interceptores en vuelo. La prioridad es para el blanco que llega primero (`rem / v`).
+
+**Mando y control** (`S.c2`, niveles en `data/c2.js`):
+
+| Nivel | Pista de red | Quién tira con pista ajena | Reacción | No repetir blancos |
+|---|---|---|---|---|
+| Desconectada | no | nadie | desde la pista propia | no |
+| Descoordinada | solo alerta, 45 s de demora | nadie | desde la alerta | no |
+| Coordinada | sí, vale 12 s | activos/IR e interceptores | desde la pista | sí |
+| Integrada | sí, 2 s de demora, vale 12 s | también guiados por radar (si ven el punto de encuentro) | desde la alerta | sí |
+
+"Coordinada" y "desconectada" son el viejo interruptor "red integrada" encendido y apagado (resultados idénticos).
 
 **Doctrina:** con "salva" se disparan `u.salvo` interceptores por blanco (cada 0,6 s); con "disparar-observar-disparar", uno.
 

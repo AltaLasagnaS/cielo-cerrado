@@ -1,6 +1,6 @@
 // ---------------- ARMADO DEL ESCENARIO ----------------
 // Funciones para agregar defensas, salvas y jammers a S.setup (antes de iniciar la corrida).
-import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES } from '../data/index.js';
+import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES, C2_LEVELS, c2FromNet } from '../data/index.js';
 import { azOf } from '../util/math.js';
 import { nextId } from '../util/ids.js';
 import { S } from './state.js';
@@ -58,6 +58,9 @@ export function applyScenario(sc) {
   for (const d of defs) addDef(d.type, d.x, d.y, d);
   for (const o of salvos) addSalvo(o);
   for (const j of jams) addJam(j.type, j.x, j.y, j);
-  if (sc.rules) { if (sc.rules.net !== undefined) S.net = sc.rules.net; if (sc.rules.doctrine) S.doctrine = sc.rules.doctrine; }
+  if (sc.rules) {
+    if (sc.rules.c2 && C2_LEVELS[sc.rules.c2]) S.c2 = sc.rules.c2; else if (sc.rules.net !== undefined) S.c2 = c2FromNet(sc.rules.net);   // net: formato viejo
+    if (sc.rules.doctrine) S.doctrine = sc.rules.doctrine;
+  }
   S.scen = sc;
 }

@@ -7,6 +7,7 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 ## [Sin publicar]
 
 ### Agregado
+- **Niveles de integración de la defensa aérea** (pestaña Defensa → "Integración de la defensa"), en lugar del interruptor "red integrada": *desconectada*, *descoordinada* (solo alertas con ~45 s de demora que adelantan la reacción), *coordinada* (imagen común, el comportamiento de siempre) e *integrada* (pista de calidad de tiro: también los sistemas guiados por radar pueden lanzar con la pista de otro sensor). Los escenarios y los archivos guardados con `net: true|false` se leen como coordinada o desconectada. Concepto nuevo en la Academia. **[sim]** solo si se eligen los niveles nuevos: las golden no cambian.
 - **Mapa de Kiev** sobre el relieve real (SRTM N50E030, celdas de 200 m) con el Dniéper, el embalse de Kiev y el Desná, generado por `scripts/gen-terrain.mjs` (reproducible).
 - **Escenario "Kiev · noche contra la energía"** (jugás la defensa): Shahed, Gerbera, Kh-101, Kalibr, Iskander-M y Kinzhal contra las centrales CHP-5 y CHP-6 y la represa de Kiev. Con la disposición inicial la defensa gana ≈3 de cada 4 noches. Y "Kiev · vacío" para armar a mano.
 - **Ríos y lagos en el mapa**: máscara de agua detectada en el SRTM, solo para el dibujo y la lectura del terreno ("Río o lago"); la física no cambia.

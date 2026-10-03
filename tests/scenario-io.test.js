@@ -34,7 +34,7 @@ for (const key of ['mb_noche', 'gb_ruso']) {
 test('guardar y cargar conserva lo que edita el jugador (mástil, munición, reglas, jammer apagado)', () => {
   const file = exported('mb_noche', S => {
     const u = S.setup.defs.find(d => d.name === 'Patriot-1'); u.mast = 30; u.mag = 4; u.az = 10; u.noDrones = true;
-    S.setup.objs[0].maxHp = 1234; S.setup.jams[0].on = false; S.net = false; S.doctrine = 'sls';
+    S.setup.objs[0].maxHp = 1234; S.setup.jams[0].on = false; S.c2 = 'descoordinada'; S.doctrine = 'sls';
   });
   clearSetup();
   const res = validateScenario(file); assert.ok(res.ok, res.errors.join('\n'));
@@ -43,7 +43,7 @@ test('guardar y cargar conserva lo que edita el jugador (mástil, munición, reg
   assert.deepEqual([u.mast, u.mag, u.az, u.noDrones], [30, 4, 10, true]);
   assert.equal(S.setup.objs[0].maxHp, 1234);
   assert.equal(S.setup.jams[0].on, false);
-  assert.equal(S.net, false); assert.equal(S.doctrine, 'sls');
+  assert.equal(S.c2, 'descoordinada'); assert.equal(S.doctrine, 'sls');
   // las salvas siguen apuntando a la misma defensa aunque los ids cambien
   const isk = S.setup.salvos.find(sv => sv.type === 'isk_m');
   assert.equal(S.setup.defs.find(d => d.id === isk.targetUnit).name, 'Patriot-1');
@@ -94,6 +94,16 @@ test('validación: una meta sobre algo que ya no existe es un aviso, no un error
   const res = validateScenario(file);
   assert.ok(res.ok, res.errors.join('\n'));
   assert.ok(res.warnings.some(w => w.includes('Patriot-1')));
+});
+
+test('compatibilidad: un archivo viejo con rules.net se lee como nivel de C2', () => {
+  for (const [net, c2] of [[true, 'coordinada'], [false, 'desconectada']]) {
+    const file = exported('gb_ruso'); delete file.rules.c2; file.rules.net = net;
+    const res = validateScenario(file); assert.ok(res.ok, res.errors.join('\n'));
+    clearSetup(); loadScenarioData(res.data); assert.equal(S.c2, c2);
+  }
+  const bad = exported('gb_ruso'); bad.rules.c2 = 'telepatica';
+  assert.match(validateScenario(bad).errors.join('\n'), /rules.c2/);
 });
 
 test('validación: no copia campos desconocidos', () => {

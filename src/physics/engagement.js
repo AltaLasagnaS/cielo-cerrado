@@ -1,6 +1,6 @@
 // ---------------- ENFRENTAMIENTO ----------------
 // Seguimiento, solución de tiro y probabilidad de derribo (Pk). Ver docs/FISICA.md §6–§7.
-import { D } from '../data/index.js';
+import { D, C2_LEVELS } from '../data/index.js';
 import { azOf, clamp } from '../util/math.js';
 import { surf } from './terrain.js';
 import { jamJ } from './radar.js';
@@ -13,18 +13,30 @@ export const RADAR_GUID = ['TVM', 'SARH', 'mando', 'cañón'];
 export const isTBM = th => th.cls === 'balistico' || th.cls === 'hiper';
 
 /**
- * ¿La unidad u tiene una pista utilizable de th en el instante t?
+ * ¿La unidad u tiene una pista utilizable de th en el instante t, con el nivel de C2 c2 (data/c2.js)?
  * - Pista propia: su radar la vio en los últimos 2 barridos (+0,6 s).
- * - Pista de red: algún sensor la vio en los últimos 12 s y la red integrada está activa (net).
- * Guiado por radar propio exige pista propia; drones interceptores (operador) usan la de red;
- * misiles activos/IR aceptan cualquiera de las dos.
+ * - Pista de red (niveles 'track' y 'fire'): algún sensor la vio en los últimos L.window s y ya pasó
+ *   la demora L.lag desde la primera detección de la red.
+ * Guiado por radar propio exige pista propia, salvo con C2 integrada ('fire': lanzamiento con pista
+ * ajena); drones interceptores (operador) usan la de red; misiles activos/IR aceptan cualquiera.
  */
-export function trackOK(u, th, t, net) {
-  const d = D(u), own = d.radar ? (t - (th.det[u.id] ?? -1e9)) <= d.radar.scan * 2 + 0.6 : false;
-  const netT = net && (t - th.lastNet) <= 12;
-  if (RADAR_GUID.includes(d.sam.guid)) return own;
+export function trackOK(u, th, t, c2) {
+  const d = D(u), L = C2_LEVELS[c2], own = d.radar ? (t - (th.det[u.id] ?? -1e9)) <= d.radar.scan * 2 + 0.6 : false;
+  const netT = (L.share === 'track' || L.share === 'fire') && th.firstDet !== null && t - th.firstDet >= L.lag && (t - th.lastNet) <= L.window;
+  if (RADAR_GUID.includes(d.sam.guid)) return own || (L.share === 'fire' && netT);
   if (d.sam.guid === 'operador') return netT;
   return own || netT;
+}
+
+/**
+ * Desde cuándo cuenta el tiempo de reacción de u contra th: normalmente desde que tiene pista; con
+ * alerta de la red (todos los niveles salvo 'desconectada' y 'coordinada', que conserva el
+ * comportamiento histórico) desde que llegó la alerta, si fue antes.
+ */
+export function reactionStart(th, t, c2) {
+  const L = C2_LEVELS[c2];
+  if ((L.share === 'cue' || L.share === 'fire') && th.firstDet !== null) return Math.min(t, th.firstDet + L.lag);
+  return t;
 }
 
 /**

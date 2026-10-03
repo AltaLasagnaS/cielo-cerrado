@@ -7,7 +7,7 @@
 // objetivos que existan en el catálogo, mapa conocido, posiciones dentro del mapa, números
 // finitos y en rango, y blancos de las salvas que existan. Solo se copian los campos conocidos.
 // Formato: ver docs/ARQUITECTURA.md § "Archivo de escenario".
-import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES, TERRAIN, SCENARIOS } from '../data/index.js';
+import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES, TERRAIN, SCENARIOS, C2_LEVELS, c2FromNet } from '../data/index.js';
 import { MAP } from '../physics/terrain.js';
 import { S } from './state.js';
 import { addObj, addDef, addSalvo, addJam } from './setup.js';
@@ -44,7 +44,7 @@ export function exportScenario(now = new Date()) {
   return {
     format: FORMAT, version: VERSION, saved: now.toISOString(),
     map: mapRef(),
-    rules: { net: S.net, doctrine: S.doctrine },
+    rules: { c2: S.c2, doctrine: S.doctrine },
     scenario: S.scen ? { base: baseKey(S.scen), ...pick(S.scen, META_KEYS) } : null,
     setup: {
       objs: s.objs.map(g => pick(g, OBJ_KEYS)),
@@ -160,7 +160,10 @@ export function validateScenario(raw) {
 
   // reglas
   const r = raw.rules || {};
-  const rules = { net: bool('rules.net', r.net), doctrine: r.doctrine };
+  // c2 = nivel de integración (data/c2.js); net = formato viejo (true = coordinada, false = desconectada)
+  const net = bool('rules.net', r.net);
+  const rules = { c2: r.c2 ?? (net === undefined ? undefined : c2FromNet(net)), doctrine: r.doctrine };
+  if (r.c2 !== undefined && !C2_LEVELS[r.c2]) err(`rules.c2: "${String(r.c2)}" no es un nivel de mando y control válido (${Object.keys(C2_LEVELS).join(', ')}).`);
   if (r.doctrine !== undefined && !DOCTRINES.includes(r.doctrine)) err(`rules.doctrine: "${String(r.doctrine)}" no es ${DOCTRINES.join(' ni ')}.`);
 
   // datos del escenario (briefing y metas)
@@ -219,7 +222,7 @@ export function loadScenarioData(data) {
     addSalvo({ ...o, targetUnit: sv.targetUnit != null ? defId.get(sv.targetUnit) : null, targetObj: sv.targetObj != null ? objId.get(sv.targetObj) : null });
   }
   for (const j of data.setup.jams) { const jj = addJam(j.type, j.x, j.y, { alt: j.alt }); if (j.on !== undefined) jj.on = j.on; }
-  if (data.rules.net !== undefined) S.net = data.rules.net;
+  if (data.rules.c2) S.c2 = data.rules.c2;
   if (data.rules.doctrine) S.doctrine = data.rules.doctrine;
   S.scen = data.scenario ? {
     ...data.scenario, map: data.map.key,
