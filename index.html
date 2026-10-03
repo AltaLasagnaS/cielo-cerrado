@@ -292,6 +292,8 @@ table.t.mc td.pc{white-space:nowrap}
     kharkiv_rcs: ["Sukharevsky et al. (Univ. Fuerza Aérea, Járkov, 2023): modelado de RCS del Shahed-136", "https://fliphtml5.com/pdvau/uvoj/Shahed_136_UAV_RCS_measurements/"],
     cmo_req_shahed: ["Base de datos de Command: Modern Operations (pedido #2214): firma del Shahed-136 por aspecto en bandas A–D y E–M (estimación de juego)", "https://github.com/PygmalionOfCyprus/cmo-db-requests/issues/2214"],
     cmo_cwdb: ["Base de datos de Command: Modern Operations (CWDB 514): en 452 armas guiadas, costado = frente +3 dB y cola = frente (regla del juego, no medición)", "https://www.matrixgames.com/game/command-modern-operations"],
+    dua_mesh: ["Defense Express: los Shahed rusos llevan módems mesh y cámaras (análisis de restos)", "https://en.defence-ua.com/weapon_and_tech/russian_shahed_droness_now_equipped_with_mesh_modems_and_cameras_wreckage_analysis_shows-15781.html"],
+    mil_sim: ["Militär Aktuell: qué hace la tarjeta SIM en el Shahed", "https://militaeraktuell.at/en/what-is-the-sim-card-doing-in-the-shahed-drone/"],
     cmo_db3k: ["Base de datos de Command: Modern Operations (DB3000 515): firma radar por arma (frente, costado y cola en bandas A–D y E–M). Son estimaciones del juego, no mediciones; se citan valor por valor", "https://www.matrixgames.com/game/command-modern-operations"],
     cmo_isk: ["Foro Matrix Games, base DB3000 de CMO: RCS del Iskander-E −9,8 dBsm (estimación de juego)", "https://forums.matrixgames.com/viewtopic.php?t=243914&start=1820"],
     uav_rcs: ["Rosamilia et al. (Cranfield): mediciones de RCS de UAV por aspecto en 8–18 GHz", "https://dspace.lib.cranfield.ac.uk/server/api/core/bitstreams/b70b94cb-9ed7-4067-a2ae-913fa1950b41/content"],
@@ -424,6 +426,7 @@ table.t.mc td.pc{white-space:nowrap}
       rcsSide: 0.14,
       rcsRear: 0.03,
       rcsVHF: 0.064,
+      datalink: "módem 4G/mesh o Starlink en variantes de 2025–26",
       gnss: 0.5,
       cep: 15,
       warhead: "50 kg (BCh-50); 90 kg (BCh-90, 62 kg de explosivo)",
@@ -451,6 +454,7 @@ table.t.mc td.pc{white-space:nowrap}
       rcsSide: 0.2,
       rcsRear: 0.05,
       rcsVHF: 0.064,
+      datalink: "módem 4G/mesh",
       gnss: 0.5,
       cep: 15,
       warhead: "≈50 kg termobárica-fragmentación (TBBCh-50)",
@@ -479,6 +483,7 @@ table.t.mc td.pc{white-space:nowrap}
       rcsSide: 0.05,
       rcsRear: 0.03,
       rcsVHF: 0.1,
+      datalink: "módem mesh XK-F358 en algunos",
       gnss: 0.3,
       cep: 50,
       warhead: "Ninguna en la mayoría (algunas 2,5–5 kg o cámara)",
@@ -1184,6 +1189,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       air: false,
       gnssJam: true,
+      linkJam: true,
       radius: 15,
       notes: ["De Proximus, en servicio desde 2016. Detecta en 320–6.000 MHz hasta 70–100 km e interfiere enlaces de datos hasta 16–20 km. El fabricante declara supresión GNSS hasta 35 km, con 10 W por antena.", 'El motor solo representa la parte GNSS: cortar el enlace de control no detiene a un Shahed autónomo (sí "aterrizó" un ZALA 421-16E2 ruso).', "Con 10 W y frente a receptores con CRPA, el radio real es mucho menor que el declarado: valor de juego conservador."],
       sources: [WP("Bukovel_(counter_unmanned_aircraft_system)"), SRC.azov_bukovel, SRC.mil_bukovel]
@@ -2066,7 +2072,7 @@ table.t.mc td.pc{white-space:nowrap}
       description: "Una noche típica de la campaña rusa contra la energía ucraniana: oleadas de Shahed desde el norte y el este, señuelos Gerbera para gastar munición, misiles de crucero Kh-101 y Kalibr, y balísticos Iskander-M y Kinzhal al final, todo para llegar casi junto. Los blancos son las centrales de cogeneración que dan luz y calefacción a la ciudad y la represa de Kiev. Las posiciones de la defensa son ilustrativas, no las reales.",
       forces: {
         defensa: "Defensa por capas de la capital: radar 3D y radar VHF de alerta, Patriot (sector hacia el noreste), NASAMS, IRIS-T, dos Gepard junto a las centrales, tres grupos móviles, red acústica, drones interceptores y la red anti-GNSS Pokrova sobre la ciudad. Red de mando integrada.",
-        ataque: "28 Shahed en dos oleadas, 10 Gerbera, 8 Kh-101, 6 Kalibr, 3 Iskander-M con señuelos y 2 Kinzhal."
+        ataque: "28 Shahed en dos oleadas, 10 Gerbera, 7 Kh-101, 6 Kalibr, 3 Iskander-M con señuelos y 2 Kinzhal."
       },
       conditions: "Noche de invierno, despejada. El motor no modela la luz: la noche solo explica por qué los grupos móviles dependen de la alerta acústica y del radar. Probá un techo de nubes bajo (pestaña Defensa): los grupos móviles dejan de ver a los Shahed que vuelan arriba.",
       rules: { c2: "coordinada", doctrine: "salva", weather: "despejado" },
@@ -2096,7 +2102,7 @@ table.t.mc td.pc{white-space:nowrap}
         { type: "shahed", count: 18, interval: 20, tStart: 0, agl: 1500, pts: [[40, 0], [42, 30], [46.9, 52]], targetObj: "Central CHP-6" },
         { type: "gerbera", count: 10, interval: 25, tStart: 60, agl: 900, pts: [[70, 5], [50, 30], [44, 55]] },
         { type: "shahed", count: 10, interval: 30, tStart: 120, agl: 2e3, pts: [[70, 40], [55, 55], [40.3, 67.4]], targetObj: "Central CHP-5" },
-        { type: "kh101", count: 8, interval: 10, sync: true, tArrive: 1500, agl: 40, pts: [[0, 30], [20, 50], [40.3, 67.4]], targetObj: "Central CHP-5" },
+        { type: "kh101", count: 7, interval: 10, sync: true, tArrive: 1500, agl: 40, pts: [[0, 30], [20, 50], [40.3, 67.4]], targetObj: "Central CHP-5" },
         { type: "kalibr", count: 6, interval: 8, sync: true, tArrive: 1490, agl: 50, pts: [[45, 111], [42, 90], [40.3, 67.4]], targetObj: "Central CHP-5" },
         { type: "isk_m", count: 3, interval: 15, sync: true, tArrive: 1520, launchDist: 400, maneuver: true, decoys: true, pts: [[70, 0], [46.9, 52]], targetObj: "Central CHP-6" },
         { type: "kinzhal", count: 2, interval: 15, sync: true, tArrive: 1530, launchDist: 450, pts: [[70, 20], [36.3, 45.7]], targetObj: "Represa de Kiev" }
@@ -2129,6 +2135,8 @@ table.t.mc td.pc{white-space:nowrap}
       lag: 0,
       window: 0,
       deconf: false,
+      remotePk: 1,
+      best: false,
       desc: "Cada batería pelea sola con su radar. Nadie avisa ni reparte blancos: dos baterías pueden gastar misiles en el mismo blanco."
     },
     descoordinada: {
@@ -2137,6 +2145,8 @@ table.t.mc td.pc{white-space:nowrap}
       lag: 45,
       window: 12,
       deconf: false,
+      remotePk: 1,
+      best: false,
       desc: "Llegan alertas por voz o tableta con ~45 s de demora: la batería se prepara antes (arranca su tiempo de reacción), pero necesita su propia pista para disparar y no hay reparto de blancos."
     },
     coordinada: {
@@ -2145,6 +2155,8 @@ table.t.mc td.pc{white-space:nowrap}
       lag: 0,
       window: 12,
       deconf: true,
+      remotePk: 0.97,
+      best: false,
       desc: "Imagen aérea común: los misiles activos o IR y los drones interceptores pueden disparar con la pista de otro sensor, y una batería no repite un blanco que otra ya está enfrentando."
     },
     integrada: {
@@ -2153,9 +2165,13 @@ table.t.mc td.pc{white-space:nowrap}
       lag: 2,
       window: 12,
       deconf: true,
-      desc: "Pista compuesta de calidad de tiro (tipo IBCS o CEC): además, los sistemas guiados por radar pueden lanzar con la pista de otro sensor si su radar ve el punto de encuentro, y la alerta llega casi sin demora."
+      remotePk: 1,
+      best: true,
+      desc: "Pista compuesta de calidad de tiro (tipo IBCS o CEC): además, los sistemas guiados por radar pueden lanzar con la pista de otro sensor si su radar ve el punto de encuentro, la alerta llega casi sin demora y cada blanco se asigna al mejor tirador disponible."
     }
   };
+  var C2_ORDER = ["desconectada", "descoordinada", "coordinada", "integrada"];
+  var C2_NODES = { command: "all", comms: 1 };
   var c2FromNet = (net) => net ? "coordinada" : "desconectada";
 
   // src/data/weather.js
@@ -2725,6 +2741,7 @@ table.t.mc td.pc{white-space:nowrap}
       gT: surf(tg[0], tg[1]),
       agl: sv.agl ?? T.agl,
       maneuver: !!sv.maneuver,
+      link: !!(sv.link && T.datalink),
       decoyRel: sv.decoys ? T.decoys || 0 : 0,
       released: false,
       alive: false,
@@ -2732,6 +2749,7 @@ table.t.mc td.pc{white-space:nowrap}
       det: {},
       lastNet: -1e9,
       firstDet: null,
+      netFirst: null,
       trail: [],
       navErr: 0,
       gnssHit: false,
@@ -2833,10 +2851,11 @@ table.t.mc td.pc{white-space:nowrap}
 
   // src/physics/navigation.js
   var SEEKER_ACQ = 0.9;
-  function gnssNavError(T, J) {
+  function gnssNavError(T, J, link = false) {
     const dep = 1 - T.gnss, u = rnd();
-    const rejected = !!(J.spoofKm && T.navFix);
-    const spoofed = !!(J.spoofKm && !T.navFix);
+    const fix = !!(T.navFix || link);
+    const rejected = !!(J.spoofKm && fix);
+    const spoofed = !!(J.spoofKm && !fix);
     let err = dep * (spoofed ? J.spoofKm * 1e3 * (0.5 + u) : 300 + u * 1500);
     let corrected = false;
     if (err > 0 && T.seekerKm && err <= T.seekerKm * 1e3 && rnd() < SEEKER_ACQ) {
@@ -2851,16 +2870,25 @@ table.t.mc td.pc{white-space:nowrap}
   var isTBM = (th) => th.cls === "balistico" || th.cls === "hiper";
   function trackOK(u, th, t, c2) {
     const d = D(u), L = C2_LEVELS[c2], own = d.radar ? t - (th.det[u.id] ?? -1e9) <= d.radar.scan * 2 + 0.6 : false;
-    const netT = (L.share === "track" || L.share === "fire") && th.firstDet !== null && t - th.firstDet >= L.lag && t - th.lastNet <= L.window;
+    const netT = u.link !== false && (L.share === "track" || L.share === "fire") && th.netFirst != null && t - th.netFirst >= L.lag && t - th.lastNet <= L.window;
     if (d.sam.guid === "cañón") return own;
     if (RADAR_GUID.includes(d.sam.guid)) return own || L.share === "fire" && netT;
     if (d.sam.guid === "operador") return netT;
     return own || netT;
   }
-  function reactionStart(th, t, c2) {
+  function reactionStart(th, t, c2, u = null) {
     const L = C2_LEVELS[c2];
-    if ((L.share === "cue" || L.share === "fire") && th.firstDet !== null) return Math.min(t, th.firstDet + L.lag);
+    if ((L.share === "cue" || L.share === "fire") && th.netFirst != null && u?.link !== false) return Math.min(t, th.netFirst + L.lag);
     return t;
+  }
+  function effectiveC2(c2, objs) {
+    let i = C2_ORDER.indexOf(c2);
+    for (const g of objs) {
+      const n2 = g.status === "destroyed" && C2_NODES[g.type];
+      if (!n2) continue;
+      i = n2 === "all" ? 0 : i - n2;
+    }
+    return C2_ORDER[Math.max(0, i)];
   }
   function solve(u, th, t) {
     const sm = D(u).sam, tbm = isTBM(th);
@@ -3006,7 +3034,7 @@ table.t.mc td.pc{white-space:nowrap}
         th.released = true;
         for (let k = 0; k < th.decoyRel; k++) {
           const ang = rnd() * 6.28, dist = 1 + rnd() * 2.5;
-          const dc = { ...th, fly: [], id: nextId(), parent: th, isDecoy: true, isDecoyChild: true, decoyRel: 0, sRel: p.s, off: [Math.cos(ang) * dist, Math.sin(ang) * dist], det: {}, trail: [], lastNet: -1e9, firstDet: null, alive: true, targetUnit: null };
+          const dc = { ...th, fly: [], id: nextId(), parent: th, isDecoy: true, isDecoyChild: true, decoyRel: 0, sRel: p.s, off: [Math.cos(ang) * dist, Math.sin(ang) * dist], det: {}, trail: [], lastNet: -1e9, firstDet: null, netFirst: null, alive: true, targetUnit: null };
           S.threats.push(dc);
           S.stats.decoys++;
           S.stats.launched++;
@@ -3019,12 +3047,13 @@ table.t.mc td.pc{white-space:nowrap}
           const J = JAMMERS[j.type];
           if (!J.gnssJam || !j.on) continue;
           if (Math.hypot(p.x - j.x, p.y - j.y) > J.radius) continue;
-          const n2 = gnssNavError(th.T, J);
+          const link = th.link && !S.jamsLive.some((k) => JAMMERS[k.type].linkJam && k.on && Math.hypot(p.x - k.x, p.y - k.y) <= JAMMERS[k.type].radius);
+          const n2 = gnssNavError(th.T, J, link);
           th.gnssHit = true;
           th.navErr = n2.err;
           if (n2.corrected) log("w", label(th) + " pierde el GNSS en la zona de " + J.short + (n2.rejected ? " y descarta el engaño" : "") + ", pero su buscador terminal encuentra el blanco.");
           else if (th.navErr > 150) {
-            log("w", label(th) + (n2.spoofed ? " es engañada por " + J.short + " (spoofing GNSS): desvío ≈" + (th.navErr / 1e3).toFixed(1) + " km." : (n2.rejected ? " descarta el engaño de " + J.short + " con su corrección de terreno; sigue con inercial: error ≈" : " entra en zona anti-GNSS: error de navegación ≈") + Math.round(th.navErr) + " m."));
+            log("w", label(th) + (n2.spoofed ? " es engañada por " + J.short + " (spoofing GNSS): desvío ≈" + (th.navErr / 1e3).toFixed(1) + " km." : (n2.rejected ? " descarta el engaño de " + J.short + (link && !th.T.navFix ? " gracias a su enlace de datos" : " con su corrección de terreno") + "; sigue con inercial: error ≈" : " entra en zona anti-GNSS: error de navegación ≈") + Math.round(th.navErr) + " m."));
             event("Primera arma desviada por interferencia GNSS", "gnss");
           }
           break;
@@ -3060,7 +3089,10 @@ table.t.mc td.pc{white-space:nowrap}
         }
         if (ok) {
           th.det[u.id] = t;
-          th.lastNet = t;
+          if (u.link !== false) {
+            th.lastNet = t;
+            if (th.netFirst === null) th.netFirst = t;
+          }
           if (th.firstDet === null) {
             th.firstDet = t;
             th.detKm = p.rem;
@@ -3086,7 +3118,7 @@ table.t.mc td.pc{white-space:nowrap}
         log("d", it.shot + " de " + uLabel(u) + ": blanco ya destruido, autodestrucción.");
         continue;
       }
-      const pk = calcPk(u, th, t, S.jamsLive);
+      const pk = calcPk(u, th, t, S.jamsLive) * (it.remote ? C2_LEVELS[it.c2].remotePk : 1);
       if (rnd() < pk) {
         th.alive = false;
         th.killed = true;
@@ -3112,28 +3144,64 @@ table.t.mc td.pc{white-space:nowrap}
       }
     }
   }
+  function canEngage(u, th, t, c2, probe) {
+    const d = D(u), sm = d.sam;
+    if (!u.alive || !sm || u.magLeft <= 0 || u.active >= sm.ch) return null;
+    if (!th.alive || !th.p || th.firstDet === null) return null;
+    const maxR = isTBM(th) ? sm.maxRtbm : sm.maxR;
+    if (!maxR) return null;
+    if (u.noDrones && th.cls === "dron") return null;
+    if (Math.hypot(th.p.x - u.x, th.p.y - u.y) > maxR + 120) return null;
+    if (!trackOK(u, th, t, c2)) {
+      if (!probe) delete u.avail[th.id];
+      return null;
+    }
+    let av = u.avail[th.id];
+    if (av === void 0) {
+      av = reactionStart(th, t, c2, u);
+      if (!probe) u.avail[th.id] = av;
+    }
+    if (t - av < sm.react) return null;
+    const flying = (th.fly || []).filter((i) => !i.done);
+    if (C2_LEVELS[c2].deconf ? flying.length : flying.some((i) => i.u === u)) return null;
+    return { pre: true };
+  }
+  function solveFor(u, th, t) {
+    const sm = D(u).sam, r = D(u).radar;
+    const sol = solve(u, th, t);
+    if (!sol) return null;
+    if (speedAt(th, t + sol.tau) > sm.vmaxT) return null;
+    const remote = !(r && t - (th.det[u.id] ?? -1e9) <= r.scan * 2 + 0.6);
+    if (RADAR_GUID.includes(sm.guid) && sm.guid !== "cañón") {
+      if (!los(u.x, u.y, antZ(u), sol.p.x, sol.p.y, sol.p.z)) return null;
+      if (remote) {
+        const az = azOf(sol.p.x - u.x, sol.p.y - u.y), dk = Math.hypot(sol.p.x - u.x, sol.p.y - u.y, (sol.p.z - antZ(u)) / 1e3);
+        if (!inSector(u, az) || dk > detR(u, th, jamJ(u, az, S.jamsLive), 1, WEATHER[S.weather])) return null;
+      }
+    }
+    return { sol, remote };
+  }
+  function shooterScore(u, th, t) {
+    const pk = Math.max(0.01, calcPk(u, th, t, S.jamsLive));
+    return th.cls === "dron" ? -D(u).sam.cost / pk : pk;
+  }
+  var costPerKill = (u, th, t) => D(u).sam.cost / Math.max(0.01, calcPk(u, th, t, S.jamsLive));
+  function reaches(v, th, t) {
+    const sm = D(v).sam, lz = surf(v.x, v.y) + 2, tEnd = th.tLaunch + th.ft - 1;
+    for (let tt = t + 2; tt < tEnd; tt += 2) {
+      const p = posAt(th, tt);
+      if (!p) break;
+      if (Math.hypot(p.x - v.x, p.y - v.y) <= sm.maxR * 0.9 && p.z - lz <= sm.altMax && p.z - surf(p.x, p.y) >= sm.altMin) return true;
+    }
+    return false;
+  }
   function engage(u, t) {
     const d = D(u), sm = d.sam;
     const ch = sm.ch;
     if (u.active >= ch) return;
+    const c2 = effectiveC2(S.c2, S.objs), L = C2_LEVELS[c2];
     const cand = [];
-    for (const th of S.threats) {
-      if (!th.alive || !th.p || th.firstDet === null) continue;
-      const dh = Math.hypot(th.p.x - u.x, th.p.y - u.y);
-      const maxR = isTBM(th) ? sm.maxRtbm : sm.maxR;
-      if (!maxR) continue;
-      if (u.noDrones && th.cls === "dron") continue;
-      if (dh > maxR + 120) continue;
-      if (!trackOK(u, th, t, S.c2)) {
-        delete u.avail[th.id];
-        continue;
-      }
-      if (u.avail[th.id] === void 0) u.avail[th.id] = reactionStart(th, t, S.c2);
-      if (t - u.avail[th.id] < sm.react) continue;
-      const flying = (th.fly || []).filter((i) => !i.done);
-      if (C2_LEVELS[S.c2].deconf ? flying.length : flying.some((i) => i.u === u)) continue;
-      cand.push([th, th.p.rem / Math.max(1, th.T.v)]);
-    }
+    for (const th of S.threats) if (canEngage(u, th, t, c2, false)) cand.push([th, th.p.rem / Math.max(1, th.T.v)]);
     cand.sort((a, b) => a[1] - b[1]);
     for (const [th] of cand) {
       if (u.active >= ch || u.magLeft <= 0) {
@@ -3141,21 +3209,22 @@ table.t.mc td.pc{white-space:nowrap}
         sat[k] = (sat[k] || 0) + 1;
         break;
       }
-      const sol = solve(u, th, t);
-      if (!sol) continue;
-      const v = speedAt(th, t + sol.tau);
-      if (v > sm.vmaxT) continue;
-      if (RADAR_GUID.includes(sm.guid) && sm.guid !== "cañón") {
-        if (!los(u.x, u.y, antZ(u), sol.p.x, sol.p.y, sol.p.z)) continue;
-        const r = D(u).radar, ownT = t - (th.det[u.id] ?? -1e9) <= r.scan * 2 + 0.6;
-        if (!ownT) {
-          const az = azOf(sol.p.x - u.x, sol.p.y - u.y), dk = Math.hypot(sol.p.x - u.x, sol.p.y - u.y, (sol.p.z - antZ(u)) / 1e3);
-          if (!inSector(u, az) || dk > detR(u, th, jamJ(u, az, S.jamsLive), 1, WEATHER[S.weather])) continue;
+      const f = solveFor(u, th, t);
+      if (!f) continue;
+      if (L.best && u.link !== false) {
+        const mine = shooterScore(u, th, t);
+        const better = S.units.some((v) => v !== u && v.link !== false && canEngage(v, th, t, c2, true) && shooterScore(v, th, t) > mine * (th.cls === "dron" ? 0.999 : 1.001) && solveFor(v, th, t));
+        if (better) continue;
+        if (th.cls === "dron") {
+          const cpk = costPerKill(u, th, t);
+          const layer = S.units.some((v) => v !== u && v.alive && v.link !== false && D(v).sam && v.magLeft > 0 && !v.noDrones && D(v).sam.maxR > 0 && costPerKill(v, th, t) * 2 <= cpk && reaches(v, th, t));
+          if (layer) continue;
         }
       }
+      const { sol, remote } = f;
       const n2 = Math.min(S.doctrine === "salva" ? u.salvo || sm.salvo : 1, u.magLeft, ch - u.active);
       for (let k = 0; k < n2; k++) {
-        const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false };
+        const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2 };
         S.ints.push(it);
         (th.fly = th.fly || []).push(it);
         u.magLeft--;
@@ -3169,7 +3238,7 @@ table.t.mc td.pc{white-space:nowrap}
         log("w", uLabel(u) + " se queda sin munición.");
         event(uLabel(u) + " se queda sin munición", "empty:" + u.id);
       }
-      log("l", uLabel(u) + " dispara " + n2 + "× " + sm.shot + " contra " + (th.isDecoy && hooks.defenderView() ? "pista #" + th.id : label(th)) + " — intercepción a " + sol.r.toFixed(1) + " km en " + sol.tau.toFixed(0) + " s.");
+      log("l", uLabel(u) + " dispara " + n2 + "× " + sm.shot + " contra " + (th.isDecoy && hooks.defenderView() ? "pista #" + th.id : label(th)) + " — intercepción a " + sol.r.toFixed(1) + " km en " + sol.tau.toFixed(0) + " s" + (remote ? " (con pista de la red)" : "") + ".");
     }
   }
   function impact(th) {
@@ -3192,7 +3261,13 @@ table.t.mc td.pc{white-space:nowrap}
       return;
     }
     const hit = r <= (th.T.hitR || (th.cls === "dron" ? 20 : 50));
+    const c2Before = effectiveC2(S.c2, S.objs);
     const dmg = applyDamage(th, x, y), total = dmg.reduce((a, d) => a + d.dmg, 0);
+    const c2After = effectiveC2(S.c2, S.objs);
+    if (c2After !== c2Before) {
+      log("x", `La defensa pierde un nodo de mando y control: el C2 cae a "${C2_LEVELS[c2After].name}".`);
+      event("C2 degradado a " + C2_LEVELS[c2After].name, "c2:" + c2After);
+    }
     S.stats.missSum += r;
     S.stats.missN++;
     S.arrivals.push({ t: S.t, id: th.id, type: th.type, name: label(th), cls: th.cls, det: th.firstDet, detKm: th.detKm ?? null, shots: (th.fly || []).length, miss: r, hit, dmg: total, nav: th.navErr, target: dmg[0]?.g.name ?? null });
@@ -3250,7 +3325,7 @@ table.t.mc td.pc{white-space:nowrap}
   // src/sim/setup.js
   function addDef(type, x, y, o = {}) {
     const d = DEFENSES[type];
-    const u = { id: nextId(), type, x, y, az: o.az ?? defaultAz(x, y), mast: d.radar ? d.kind === "aew" ? 0 : d.radar.mast : 2, alt: d.alt, mag: d.sam ? d.sam.mag : 0, salvo: d.sam ? d.sam.salvo : 0, noDrones: d.sam ? !!d.sam.noDrones : false, name: o.name || nextName(type) };
+    const u = { id: nextId(), type, x, y, az: o.az ?? defaultAz(x, y), mast: d.radar ? d.kind === "aew" ? 0 : d.radar.mast : 2, alt: d.alt, mag: d.sam ? d.sam.mag : 0, salvo: d.sam ? d.sam.salvo : 0, noDrones: d.sam ? !!d.sam.noDrones : false, link: o.link ?? true, name: o.name || nextName(type) };
     S.setup.defs.push(u);
     return u;
   }
@@ -3268,7 +3343,7 @@ table.t.mc td.pc{white-space:nowrap}
   }
   function addSalvo(o) {
     const T = THREATS[o.type];
-    const sv = { id: nextId(), type: o.type, count: o.count || 1, interval: o.interval ?? 20, tStart: o.tStart || 0, sync: !!o.sync, tArrive: o.tArrive || 0, agl: o.agl ?? T.agl, launchDist: o.launchDist ?? T.launchDist, maneuver: o.maneuver ?? T.maneuver, decoys: !!o.decoys, pts: o.pts, targetUnit: null, targetObj: null };
+    const sv = { id: nextId(), type: o.type, count: o.count || 1, interval: o.interval ?? 20, tStart: o.tStart || 0, sync: !!o.sync, tArrive: o.tArrive || 0, agl: o.agl ?? T.agl, launchDist: o.launchDist ?? T.launchDist, maneuver: o.maneuver ?? T.maneuver, decoys: !!o.decoys, link: !!o.link, pts: o.pts, targetUnit: null, targetObj: null };
     const find = (list, ref) => list.find((v) => v.name === ref || v.id === ref);
     if (o.targetUnit) {
       const u = find(S.setup.defs, o.targetUnit);
@@ -4538,7 +4613,7 @@ table.t.mc td.pc{white-space:nowrap}
       <p>En Ucrania conviven niveles muy distintos: sistemas occidentales con enlace Link 16 (Patriot, NASAMS), sistemas soviéticos que entran a la imagen aérea nacional mediante "cajas negras" de conversión y unidades que reciben la situación aérea en tabletas (Virazh-Planshet). Del lado ruso, puestos automatizados como Polyana-D4M1 integran brigadas de S-300, Buk, Tor y Pantsir.</p>`,
       engine: () => `<p>El nivel se elige en la pestaña Defensa (${code("S.c2")}) y lo usan ${code("trackOK()")} y ${code("reactionStart()")}:</p>
       <div class="tblwrap"><table class="t"><thead><tr><th>Nivel</th><th>Demora de la red</th><th>Tira con pista ajena</th><th>Reparto de blancos</th></tr></thead><tbody>${Object.values(C2_LEVELS).map((L) => `<tr><td>${esc(L.name)}</td><td>${L.share === "none" ? "—" : L.lag + " s"}</td><td>${{ none: "no", cue: "no (solo alerta)", track: "activos/IR e interceptores", fire: "también guiados por radar" }[L.share]}</td><td>${L.deconf ? "sí" : "no"}</td></tr>`).join("")}</tbody></table></div>
-      <p>"Coordinada" y "desconectada" son el viejo interruptor "red integrada" encendido y apagado. Las demoras son estimaciones de juego. Todavía no se modelan el error de posición de las pistas de red ni los enlaces por sistema (Link 16 vs. red nacional): ver ROADMAP.</p>`
+      <p>Además: un disparo con pista ajena pierde un poco de Pk en coordinada (×${C2_LEVELS.coordinada.remotePk}, error de posición de la pista); cada unidad puede tener o no <b>enlace de datos</b> (casilla en el panel de selección); en integrada, cada blanco va al <b>mejor tirador</b> y los drones se dejan a la capa más barata que los espera más adelante; y si el atacante destruye un <b>puesto de mando</b> la defensa queda desconectada (cada sitio de comunicaciones destruido la baja un nivel). No se modelan los enlaces por sistema (Link 16 contra la red nacional): ver ROADMAP.</p>`
     },
     {
       id: "clima",
@@ -4859,6 +4934,7 @@ table.t.mc td.pc{white-space:nowrap}
         }
         if (d.kind === "aew") html += `<div class="field"><label for="sAlt">Altitud de vuelo</label><span class="val">${u.alt} m</span><input id="sAlt" type="range" min="2000" max="11000" step="250" value="${u.alt}"></div>`;
         if (r && r.sector < 360) html += `<div class="field"><label for="sAz">${r.side ? "Rumbo de vuelo" : "Orientación del sector"}</label><span class="val">${u.az}°</span><input id="sAz" type="range" min="0" max="359" value="${u.az}"></div>`;
+        if (d.sam || r) html += `<label class="check" title="Sin enlace no comparte lo que ve con la red ni recibe pistas ni alertas de otros sensores"><input type="checkbox" id="sLink" ${u.link !== false ? "checked" : ""}> Enlace de datos con la red</label>`;
         if (d.sam) html += `<label class="check"><input type="checkbox" id="sNoD" ${u.noDrones ? "checked" : ""}> No gastar en drones (reservar para misiles)</label><div class="field"><label for="sMag">Munición disponible</label><input id="sMag" class="inp" type="number" min="1" max="200" value="${u.mag}"></div><div class="field"><label for="sSal">Interceptores por blanco</label><input id="sSal" class="inp" type="number" min="1" max="4" value="${u.salvo}"></div>`;
       }
       html += `<div class="row"><button class="btn sm" id="sInfo">Ficha</button>${ed ? '<button class="btn sm danger" id="sDel">Eliminar</button>' : ""}</div>`;
@@ -4882,6 +4958,9 @@ table.t.mc td.pc{white-space:nowrap}
         bind("#sSal", "salvo");
         if ($("#sNoD")) $("#sNoD").onchange = (e) => {
           u.noDrones = e.target.checked;
+        };
+        if ($("#sLink")) $("#sLink").onchange = (e) => {
+          u.link = e.target.checked;
         };
         $("#sDel").onclick = () => {
           S.setup.defs = S.setup.defs.filter((v) => v.id !== u.id);
@@ -4988,6 +5067,7 @@ table.t.mc td.pc{white-space:nowrap}
       ${off ? `<div class="field"><label for="aDist">Distancia real de lanzamiento (km)</label><input id="aDist" class="inp" type="number" min="60" max="1500" value="${a.launchDist}"></div>` : ""}
       ${T.maneuver || T.prof === "ballistic" || T.cls === "crucero" ? `<label class="check"><input type="checkbox" id="aMan" ${a.maneuver ? "checked" : ""}> Maniobra evasiva terminal</label>` : ""}
       ${T.decoys ? `<label class="check"><input type="checkbox" id="aDec" ${a.decoys ? "checked" : ""}> Liberar ${T.decoys} señuelos en fase terminal</label>` : ""}
+      ${T.datalink ? `<label class="check" title="${esc(T.datalink)}: el operador ve la posición real y descarta el engaño GNSS, salvo dentro del radio de un antidrón que corta enlaces (Bukovel-AD)"><input type="checkbox" id="aLink" ${a.link ? "checked" : ""}> Enlace de datos (${esc(T.datalink)})</label>` : ""}
       <button class="btn pri" id="aRoute">${S.mode === "route" ? "Trazando…" : "Trazar ruta en el mapa"}</button>
       <p class="hint">${off ? "Tocá un punto en la dirección desde donde viene y después el blanco. Se lanza a la distancia indicada, fuera del mapa." : "Tocá el punto de entrada, los waypoints (usá valles para esconderte del radar) y el blanco. Si el último punto cae sobre una unidad de defensa, la apunta."}</p>
     </div>
@@ -5034,6 +5114,9 @@ table.t.mc td.pc{white-space:nowrap}
     };
     if ($("#aDec")) $("#aDec").onchange = (e) => {
       a.decoys = e.target.checked;
+    };
+    if ($("#aLink")) $("#aLink").onchange = (e) => {
+      a.link = e.target.checked;
     };
     $("#aRoute").onclick = () => {
       if (S.started) {
@@ -5090,7 +5173,7 @@ table.t.mc td.pc{white-space:nowrap}
   }
   function defaultAtk(type, prev) {
     const T = THREATS[type];
-    return { type, count: prev ? prev.count : T.cls === "dron" ? 8 : 2, interval: T.cls === "dron" ? 20 : 10, tStart: 0, sync: prev ? prev.sync : false, tArrive: prev ? prev.tArrive : 900, agl: T.agl ?? 0, launchDist: T.launchDist, maneuver: !!T.maneuver, decoys: !!T.decoys };
+    return { type, count: prev ? prev.count : T.cls === "dron" ? 8 : 2, interval: T.cls === "dron" ? 20 : 10, tStart: 0, sync: prev ? prev.sync : false, tArrive: prev ? prev.tArrive : 900, agl: T.agl ?? 0, launchDist: T.launchDist, maneuver: !!T.maneuver, decoys: !!T.decoys, link: false };
   }
   function removeObj(id) {
     S.setup.objs = S.setup.objs.filter((g) => g.id !== id);
@@ -6141,8 +6224,8 @@ table.t.mc td.pc{white-space:nowrap}
     return r;
   };
   var OBJ_KEYS = ["id", "type", "x", "y", "name", "short", "maxHp", "desc"];
-  var DEF_KEYS = ["id", "type", "x", "y", "name", "az", "mast", "alt", "mag", "salvo", "noDrones"];
-  var SALVO_KEYS = ["id", "type", "count", "interval", "tStart", "sync", "tArrive", "agl", "launchDist", "maneuver", "decoys", "pts", "targetUnit", "targetObj"];
+  var DEF_KEYS = ["id", "type", "x", "y", "name", "az", "mast", "alt", "mag", "salvo", "noDrones", "link"];
+  var SALVO_KEYS = ["id", "type", "count", "interval", "tStart", "sync", "tArrive", "agl", "launchDist", "maneuver", "decoys", "link", "pts", "targetUnit", "targetObj"];
   var JAM_KEYS = ["id", "type", "x", "y", "alt", "on"];
   var META_KEYS = ["name", "player", "time", "description", "forces", "conditions", "rulesText", "goals", "success", "failure"];
   var baseKey = (sc2) => sc2 ? sc2.base ?? Object.keys(SCENARIOS).find((k) => SCENARIOS[k] === sc2) ?? null : null;
@@ -6294,7 +6377,8 @@ table.t.mc td.pc{white-space:nowrap}
         alt: num2(w + " · alt", u.alt, 0, 2e4, { opt: true }),
         mag: num2(w + " · mag", u.mag, 0, 1e3, { int: true, opt: true }),
         salvo: num2(w + " · salvo", u.salvo, 0, 10, { int: true, opt: true }),
-        noDrones: bool(w + " · noDrones", u.noDrones)
+        noDrones: bool(w + " · noDrones", u.noDrones),
+        link: bool(w + " · link", u.link)
       };
     });
     const objIds = new Set(objs.filter(Boolean).map((g) => g.id)), defIds = new Set(defs.filter(Boolean).map((u) => u.id));
@@ -6326,7 +6410,8 @@ table.t.mc td.pc{white-space:nowrap}
         agl: inLimits(w + " · agl", num2(w + " · agl", sv.agl, 0, 3e4, { opt: true }), THREATS[sv.type].aglRange, "sus límites reales de vuelo"),
         launchDist: num2(w + " · launchDist", sv.launchDist, 1, 5e3, { opt: true }),
         maneuver: bool(w + " · maneuver", sv.maneuver),
-        decoys: bool(w + " · decoys", sv.decoys)
+        decoys: bool(w + " · decoys", sv.decoys),
+        link: bool(w + " · link", sv.link)
       };
     });
     const jams = list("jams", setup.jams).map((j, i) => {
@@ -6394,7 +6479,7 @@ table.t.mc td.pc{white-space:nowrap}
     for (const g of data.setup.objs) objId.set(g.id, addObj(g.type, g.x, g.y, { name: g.name, short: g.short, hp: g.maxHp, desc: g.desc }).id);
     for (const d of data.setup.defs) {
       const u = addDef(d.type, d.x, d.y, { name: d.name, az: d.az });
-      for (const k of ["mast", "alt", "mag", "salvo", "noDrones"]) if (d[k] !== void 0) u[k] = d[k];
+      for (const k of ["mast", "alt", "mag", "salvo", "noDrones", "link"]) if (d[k] !== void 0) u[k] = d[k];
       defId.set(d.id, u.id);
     }
     for (const sv of data.setup.salvos) {

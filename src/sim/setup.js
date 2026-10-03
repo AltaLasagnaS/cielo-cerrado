@@ -8,7 +8,7 @@ import { S } from './state.js';
 /** Despliega una defensa del tipo dado en (x, y) km. o = { name?, az? }. */
 export function addDef(type, x, y, o = {}) {
   const d = DEFENSES[type];
-  const u = { id: nextId(), type, x, y, az: o.az ?? defaultAz(x, y), mast: d.radar ? (d.kind === 'aew' ? 0 : d.radar.mast) : 2, alt: d.alt, mag: d.sam ? d.sam.mag : 0, salvo: d.sam ? d.sam.salvo : 0, noDrones: d.sam ? !!d.sam.noDrones : false, name: o.name || nextName(type) };
+  const u = { id: nextId(), type, x, y, az: o.az ?? defaultAz(x, y), mast: d.radar ? (d.kind === 'aew' ? 0 : d.radar.mast) : 2, alt: d.alt, mag: d.sam ? d.sam.mag : 0, salvo: d.sam ? d.sam.salvo : 0, noDrones: d.sam ? !!d.sam.noDrones : false, link: o.link ?? true, name: o.name || nextName(type) };
   S.setup.defs.push(u); return u;
 }
 
@@ -27,7 +27,7 @@ export function defaultAz(x, y) {
  */
 export function addSalvo(o) {
   const T = THREATS[o.type];
-  const sv = { id: nextId(), type: o.type, count: o.count || 1, interval: o.interval ?? 20, tStart: o.tStart || 0, sync: !!o.sync, tArrive: o.tArrive || 0, agl: o.agl ?? T.agl, launchDist: o.launchDist ?? T.launchDist, maneuver: o.maneuver ?? T.maneuver, decoys: !!o.decoys, pts: o.pts, targetUnit: null, targetObj: null };
+  const sv = { id: nextId(), type: o.type, count: o.count || 1, interval: o.interval ?? 20, tStart: o.tStart || 0, sync: !!o.sync, tArrive: o.tArrive || 0, agl: o.agl ?? T.agl, launchDist: o.launchDist ?? T.launchDist, maneuver: o.maneuver ?? T.maneuver, decoys: !!o.decoys, link: !!o.link, pts: o.pts, targetUnit: null, targetObj: null };
   const find = (list, ref) => list.find(v => v.name === ref || v.id === ref);
   if (o.targetUnit) { const u = find(S.setup.defs, o.targetUnit); if (u) { sv.targetUnit = u.id; sv.pts[sv.pts.length - 1] = [u.x, u.y]; } }
   else if (o.targetObj) { const g = find(S.setup.objs, o.targetObj); if (g) { sv.targetObj = g.id; sv.pts[sv.pts.length - 1] = [g.x, g.y]; } }

@@ -36,6 +36,7 @@ export function renderAtk() {
       ${off ? `<div class="field"><label for="aDist">Distancia real de lanzamiento (km)</label><input id="aDist" class="inp" type="number" min="60" max="1500" value="${a.launchDist}"></div>` : ''}
       ${T.maneuver || T.prof === 'ballistic' || T.cls === 'crucero' ? `<label class="check"><input type="checkbox" id="aMan" ${a.maneuver ? 'checked' : ''}> Maniobra evasiva terminal</label>` : ''}
       ${T.decoys ? `<label class="check"><input type="checkbox" id="aDec" ${a.decoys ? 'checked' : ''}> Liberar ${T.decoys} señuelos en fase terminal</label>` : ''}
+      ${T.datalink ? `<label class="check" title="${esc(T.datalink)}: el operador ve la posición real y descarta el engaño GNSS, salvo dentro del radio de un antidrón que corta enlaces (Bukovel-AD)"><input type="checkbox" id="aLink" ${a.link ? 'checked' : ''}> Enlace de datos (${esc(T.datalink)})</label>` : ''}
       <button class="btn pri" id="aRoute">${S.mode === 'route' ? 'Trazando…' : 'Trazar ruta en el mapa'}</button>
       <p class="hint">${off ? 'Tocá un punto en la dirección desde donde viene y después el blanco. Se lanza a la distancia indicada, fuera del mapa.' : 'Tocá el punto de entrada, los waypoints (usá valles para esconderte del radar) y el blanco. Si el último punto cae sobre una unidad de defensa, la apunta.'}</p>
     </div>
@@ -50,6 +51,7 @@ export function renderAtk() {
   if ($('#aAglModes')) $('#aAglModes').onclick = e => { const b = e.target.closest('[data-agl]'); if (!b) return; a.agl = +b.dataset.agl; $('#aAgl').value = a.agl; $('#aAglV').textContent = a.agl + ' m'; };
   if ($('#aMan')) $('#aMan').onchange = e => { a.maneuver = e.target.checked; };
   if ($('#aDec')) $('#aDec').onchange = e => { a.decoys = e.target.checked; };
+  if ($('#aLink')) $('#aLink').onchange = e => { a.link = e.target.checked; };
   $('#aRoute').onclick = () => { if (S.started) { toast('Reiniciá para editar el escenario.'); return; } S.route = { pts: [], targetUnit: null }; S.mode = 'route'; updateModebar(); renderAtk(); };
   $('#objTypes').onclick = e => { const b = e.target.closest('[data-ot]'); if (!b) return; if (S.started) { toast('Reiniciá para editar el escenario.'); return; } if (S.mode === 'placeObj' && S.placeType === b.dataset.ot) setMode('select'); else setMode('placeObj', b.dataset.ot); renderAtk(); };
   $('#objList').onclick = e => {
@@ -64,7 +66,7 @@ export function renderAtk() {
   };
 }
 /** Valores iniciales del formulario al elegir un arma (conserva cantidad y sincronización previas). */
-export function defaultAtk(type, prev) { const T = THREATS[type]; return { type, count: prev ? prev.count : (T.cls === 'dron' ? 8 : 2), interval: T.cls === 'dron' ? 20 : 10, tStart: 0, sync: prev ? prev.sync : false, tArrive: prev ? prev.tArrive : 900, agl: T.agl ?? 0, launchDist: T.launchDist, maneuver: !!T.maneuver, decoys: !!T.decoys }; }
+export function defaultAtk(type, prev) { const T = THREATS[type]; return { type, count: prev ? prev.count : (T.cls === 'dron' ? 8 : 2), interval: T.cls === 'dron' ? 20 : 10, tStart: 0, sync: prev ? prev.sync : false, tArrive: prev ? prev.tArrive : 900, agl: T.agl ?? 0, launchDist: T.launchDist, maneuver: !!T.maneuver, decoys: !!T.decoys, link: false }; }
 
 /** Borra un objetivo; las salvas que le apuntaban quedan apuntando al mismo punto, sin objetivo. */
 export function removeObj(id) {

@@ -7,6 +7,16 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 ## [Sin publicar]
 
 ### Agregado
+- **Mando y control, segunda parte:**
+  - **Enlace de datos por unidad** (casilla en el panel de selección): sin enlace, la unidad no comparte lo que ve ni recibe pistas ni alertas.
+  - **Mejor tirador y defensa por capas** en el nivel integrado: cada blanco va a la batería más conveniente, y los drones se le dejan a una capa más barata que los espera más adelante (en una prueba, NASAMS + Gepard pasan de gastar US$6,4 M a US$0,13 M con los mismos derribos).
+  - **Puesto de mando y comunicaciones como nodos de C2:** si el atacante destruye un objetivo "Puesto de mando", la defensa queda desconectada; cada "Sitio de comunicaciones" destruido la baja un nivel.
+  - **Enlace de datos del atacante** (Shahed, Geran-3, Gerbera con módem 4G/mesh o Starlink, casilla en la pestaña Ataque): descartan el engaño GNSS, salvo dentro del radio de un Bukovel-AD, que corta enlaces.
+
+### Cambiado
+- **[sim]** **Error de posición de la pista de red:** en el nivel coordinado, un disparo hecho sin pista propia tiene Pk ×0,97. Los escenarios son sensibles a esto (Kiev bajaba de ≈78% a ≈58%): Kiev pasa de 8 a 7 Kh-101 y vuelve a ≈75%; la refinería de Gotemburgo queda en ≈37%.
+
+### Agregado
 - **Clima** (pestaña Defensa → "Clima"), fijo durante todo el escenario: despejado, nublado con techo bajo, lluvia moderada, tormenta o niebla. La lluvia atenúa los radares según su banda con la fórmula oficial ITU-R P.838-3 (S y L casi no la notan; X y Ku pierden alcance, sobre todo en tormenta). Los sensores ópticos e infrarrojos (grupos móviles, MANPADS) pierden alcance con lluvia o niebla y no ven nada por encima del techo de nubes; la red acústica oye menos con lluvia. La cobertura del mapa refleja el clima. Se guarda en los archivos de escenario (`rules.weather`). Concepto nuevo en la Academia. Los escenarios incluidos siguen despejados: las golden no cambian.
 
 ### Corregido

@@ -10,7 +10,7 @@ import { surf, los } from '../physics/terrain.js';
 import { antZ, aspectCos, belowCeiling, detR, inSector, jamJ } from '../physics/radar.js';
 import { buildThreat, posAt, speedAt } from '../physics/kinematics.js';
 import { gnssNavError } from '../physics/navigation.js';
-import { RADAR_GUID, isTBM, trackOK, reactionStart, solve, calcPk } from '../physics/engagement.js';
+import { RADAR_GUID, isTBM, trackOK, reactionStart, solve, calcPk, effectiveC2 } from '../physics/engagement.js';
 import { C2_LEVELS } from '../data/index.js';
 import { damageAt, targetStatus } from '../physics/damage.js';
 import { azOf } from '../util/math.js';
@@ -60,7 +60,7 @@ export function step(dt) {
       th.released = true;
       for (let k = 0; k < th.decoyRel; k++) {
         const ang = rnd() * 6.28, dist = 1 + rnd() * 2.5;
-        const dc = { ...th, fly: [], id: nextId(), parent: th, isDecoy: true, isDecoyChild: true, decoyRel: 0, sRel: p.s, off: [Math.cos(ang) * dist, Math.sin(ang) * dist], det: {}, trail: [], lastNet: -1e9, firstDet: null, alive: true, targetUnit: null };
+        const dc = { ...th, fly: [], id: nextId(), parent: th, isDecoy: true, isDecoyChild: true, decoyRel: 0, sRel: p.s, off: [Math.cos(ang) * dist, Math.sin(ang) * dist], det: {}, trail: [], lastNet: -1e9, firstDet: null, netFirst: null, alive: true, targetUnit: null };
         S.threats.push(dc); S.stats.decoys++; S.stats.launched++;
       }
       log('w', label(th) + ' libera ' + th.decoyRel + ' señuelos a ' + p.rem.toFixed(0) + ' km del blanco.');
@@ -69,9 +69,10 @@ export function step(dt) {
     if (!th.gnssHit && th.T.gnss < 1) {
       for (const j of S.jamsLive) {
         const J = JAMMERS[j.type]; if (!J.gnssJam || !j.on) continue; if (Math.hypot(p.x - j.x, p.y - j.y) > J.radius) continue;
-        const n = gnssNavError(th.T, J); th.gnssHit = true; th.navErr = n.err;
+        const link = th.link && !S.jamsLive.some(k => JAMMERS[k.type].linkJam && k.on && Math.hypot(p.x - k.x, p.y - k.y) <= JAMMERS[k.type].radius);   // un antidrón le corta el enlace
+        const n = gnssNavError(th.T, J, link); th.gnssHit = true; th.navErr = n.err;
         if (n.corrected) log('w', label(th) + ' pierde el GNSS en la zona de ' + J.short + (n.rejected ? ' y descarta el engaño' : '') + ', pero su buscador terminal encuentra el blanco.');
-        else if (th.navErr > 150) { log('w', label(th) + (n.spoofed ? ' es engañada por ' + J.short + ' (spoofing GNSS): desvío ≈' + (th.navErr / 1000).toFixed(1) + ' km.' : (n.rejected ? ' descarta el engaño de ' + J.short + ' con su corrección de terreno; sigue con inercial: error ≈' : ' entra en zona anti-GNSS: error de navegación ≈') + Math.round(th.navErr) + ' m.')); event('Primera arma desviada por interferencia GNSS', 'gnss'); }
+        else if (th.navErr > 150) { log('w', label(th) + (n.spoofed ? ' es engañada por ' + J.short + ' (spoofing GNSS): desvío ≈' + (th.navErr / 1000).toFixed(1) + ' km.' : (n.rejected ? ' descarta el engaño de ' + J.short + (link && !th.T.navFix ? ' gracias a su enlace de datos' : ' con su corrección de terreno') + '; sigue con inercial: error ≈' : ' entra en zona anti-GNSS: error de navegación ≈') + Math.round(th.navErr) + ' m.')); event('Primera arma desviada por interferencia GNSS', 'gnss'); }
         break;
       }
     }
@@ -100,7 +101,8 @@ export function step(dt) {
         ok = los(u.x, u.y, uz, p.x, p.y, p.z);
       }
       if (ok) {
-        th.det[u.id] = t; th.lastNet = t;
+        th.det[u.id] = t;
+        if (u.link !== false) { th.lastNet = t; if (th.netFirst === null) th.netFirst = t; }   // solo los sensores con enlace alimentan la red
         if (th.firstDet === null) { th.firstDet = t; th.detKm = p.rem; log('l', 'Primera detección: ' + label(th) + ' por ' + uLabel(u) + ' a ' + Math.hypot(p.x - u.x, p.y - u.y).toFixed(1) + ' km, ' + Math.round(p.z - surf(p.x, p.y)) + ' m AGL.'); event('Primera detección: ' + label(th) + ' por ' + uLabel(u), 'firstDet'); }
       }
     }
@@ -117,7 +119,7 @@ export function step(dt) {
     it.done = true; const u = it.u; u.active = Math.max(0, u.active - 1);
     const th = it.th;
     if (!th.alive) { log('d', it.shot + ' de ' + uLabel(u) + ': blanco ya destruido, autodestrucción.'); continue; }
-    const pk = calcPk(u, th, t, S.jamsLive);
+    const pk = calcPk(u, th, t, S.jamsLive) * (it.remote ? C2_LEVELS[it.c2].remotePk : 1);   // error de posición de la pista de red
     if (rnd() < pk) {
       th.alive = false; th.killed = true; S.stats.killed++; if (th.isDecoy) S.stats.decoysKilled++;
       const p = th.p || it; S.fx.push({ x: p.x, y: p.y, rt: performance.now(), c: '#6fd08c' });
@@ -137,52 +139,109 @@ export function step(dt) {
 }
 
 /**
+ * ¿Puede u enfrentar a th ahora? Revisa pista (propia o de red), tiempo de reacción, coordinación,
+ * solución de tiro, velocidad máxima y, para los guiados por radar, que su radar cubra el punto de
+ * encuentro. probe = true: consulta sin efectos (para el reparto "mejor tirador"), no anota la hora
+ * de inicio de la reacción. → { sol, remote } o null.
+ */
+function canEngage(u, th, t, c2, probe) {
+  const d = D(u), sm = d.sam;
+  if (!u.alive || !sm || u.magLeft <= 0 || u.active >= sm.ch) return null;
+  if (!th.alive || !th.p || th.firstDet === null) return null;
+  const maxR = isTBM(th) ? sm.maxRtbm : sm.maxR; if (!maxR) return null;
+  if (u.noDrones && th.cls === 'dron') return null;
+  if (Math.hypot(th.p.x - u.x, th.p.y - u.y) > maxR + 120) return null;
+  if (!trackOK(u, th, t, c2)) { if (!probe) delete u.avail[th.id]; return null; }
+  let av = u.avail[th.id];
+  if (av === undefined) { av = reactionStart(th, t, c2, u); if (!probe) u.avail[th.id] = av; }
+  if (t - av < sm.react) return null;
+  const flying = (th.fly || []).filter(i => !i.done);
+  if (C2_LEVELS[c2].deconf ? flying.length : flying.some(i => i.u === u)) return null;
+  return { pre: true };
+}
+
+/** Segunda mitad de canEngage (lo caro): solución de tiro y cobertura del punto de encuentro. */
+function solveFor(u, th, t) {
+  const sm = D(u).sam, r = D(u).radar;
+  const sol = solve(u, th, t); if (!sol) return null;
+  if (speedAt(th, t + sol.tau) > sm.vmaxT) return null;
+  const remote = !(r && t - (th.det[u.id] ?? -1e9) <= r.scan * 2 + 0.6);
+  if (RADAR_GUID.includes(sm.guid) && sm.guid !== 'cañón') {
+    if (!los(u.x, u.y, antZ(u), sol.p.x, sol.p.y, sol.p.z)) return null;
+    // con pista ajena (C2 integrada), su radar tiene que cubrir el punto de encuentro: sector y alcance
+    if (remote) {
+      const az = azOf(sol.p.x - u.x, sol.p.y - u.y), dk = Math.hypot(sol.p.x - u.x, sol.p.y - u.y, (sol.p.z - antZ(u)) / 1000);
+      if (!inSector(u, az) || dk > detR(u, th, jamJ(u, az, S.jamsLive), 1, WEATHER[S.weather])) return null;
+    }
+  }
+  return { sol, remote };
+}
+
+/**
+ * Puntaje para el reparto "mejor tirador" (mayor = mejor): contra drones, el menor costo esperado por
+ * derribo (costo del disparo / Pk); contra el resto, la mayor Pk.
+ */
+function shooterScore(u, th, t) {
+  const pk = Math.max(0.01, calcPk(u, th, t, S.jamsLive));
+  return th.cls === 'dron' ? -D(u).sam.cost / pk : pk;
+}
+
+/** Costo esperado por derribo de u contra th (costo del disparo / Pk). */
+const costPerKill = (u, th, t) => D(u).sam.cost / Math.max(0.01, calcPk(u, th, t, S.jamsLive));
+
+/**
+ * ¿La ruta que le queda a th pasa por la envolvente de v (90% del alcance, entre su piso y su techo)
+ * antes de llegar? Muestrea cada 2 s. Sirve para dejarle un dron a una capa más barata.
+ */
+function reaches(v, th, t) {
+  const sm = D(v).sam, lz = surf(v.x, v.y) + 2, tEnd = th.tLaunch + th.ft - 1;
+  for (let tt = t + 2; tt < tEnd; tt += 2) {
+    const p = posAt(th, tt); if (!p) break;
+    if (Math.hypot(p.x - v.x, p.y - v.y) <= sm.maxR * 0.9 && p.z - lz <= sm.altMax && p.z - surf(p.x, p.y) >= sm.altMin) return true;
+  }
+  return false;
+}
+
+/**
  * Decisión de tiro de la unidad u: arma la lista de blancos con pista, fuera del tiempo de reacción
  * y no enfrentados por otra batería (con red) o por ella misma (sin red), los ordena por tiempo
- * restante hasta el blanco y dispara mientras tenga canales y munición.
+ * restante hasta el blanco y dispara mientras tenga canales y munición. Con reparto "mejor tirador"
+ * (C2 integrada), deja pasar un blanco si otra batería con enlace puede enfrentarlo ahora y es mejor.
  */
 export function engage(u, t) {
   const d = D(u), sm = d.sam; const ch = sm.ch;
   if (u.active >= ch) return;
+  const c2 = effectiveC2(S.c2, S.objs), L = C2_LEVELS[c2];
   const cand = [];
-  for (const th of S.threats) {
-    if (!th.alive || !th.p || th.firstDet === null) continue;
-    const dh = Math.hypot(th.p.x - u.x, th.p.y - u.y);
-    const maxR = isTBM(th) ? sm.maxRtbm : sm.maxR; if (!maxR) continue;
-    if (u.noDrones && th.cls === 'dron') continue;
-    if (dh > maxR + 120) continue;
-    if (!trackOK(u, th, t, S.c2)) { delete u.avail[th.id]; continue; }
-    if (u.avail[th.id] === undefined) u.avail[th.id] = reactionStart(th, t, S.c2);
-    if (t - u.avail[th.id] < sm.react) continue;
-    // coordinación
-    const flying = (th.fly || []).filter(i => !i.done);
-    if (C2_LEVELS[S.c2].deconf ? flying.length : flying.some(i => i.u === u)) continue;
-    cand.push([th, th.p.rem / Math.max(1, th.T.v)]);
-  }
+  for (const th of S.threats) if (canEngage(u, th, t, c2, false)) cand.push([th, th.p.rem / Math.max(1, th.T.v)]);
   cand.sort((a, b) => a[1] - b[1]);
   for (const [th] of cand) {
     if (u.active >= ch || u.magLeft <= 0) { const k = uLabel(u), sat = u.magLeft <= 0 ? S.stats.satMag : S.stats.satChannels; sat[k] = (sat[k] || 0) + 1; break; }
-    const sol = solve(u, th, t); if (!sol) continue;
-    const v = speedAt(th, t + sol.tau); if (v > sm.vmaxT) continue;
-    if (RADAR_GUID.includes(sm.guid) && sm.guid !== 'cañón') {
-      if (!los(u.x, u.y, antZ(u), sol.p.x, sol.p.y, sol.p.z)) continue;
-      // con pista ajena (C2 integrada), su radar tiene que cubrir el punto de encuentro: sector y alcance
-      const r = D(u).radar, ownT = t - (th.det[u.id] ?? -1e9) <= r.scan * 2 + 0.6;
-      if (!ownT) {
-        const az = azOf(sol.p.x - u.x, sol.p.y - u.y), dk = Math.hypot(sol.p.x - u.x, sol.p.y - u.y, (sol.p.z - antZ(u)) / 1000);
-        if (!inSector(u, az) || dk > detR(u, th, jamJ(u, az, S.jamsLive), 1, WEATHER[S.weather])) continue;
+    const f = solveFor(u, th, t); if (!f) continue;
+    if (L.best && u.link !== false) {
+      // mejor tirador ahora: otra batería con enlace que también puede tirar ya y es mejor
+      const mine = shooterScore(u, th, t);
+      const better = S.units.some(v => v !== u && v.link !== false && canEngage(v, th, t, c2, true) && shooterScore(v, th, t) > mine * (th.cls === 'dron' ? 0.999 : 1.001) && solveFor(v, th, t));
+      if (better) continue;
+      // defensa por capas: un dron se le deja a una capa al menos 2 veces más barata por derribo que
+      // tenga munición y por cuya envolvente vaya a pasar antes de llegar
+      if (th.cls === 'dron') {
+        const cpk = costPerKill(u, th, t);
+        const layer = S.units.some(v => v !== u && v.alive && v.link !== false && D(v).sam && v.magLeft > 0 && !v.noDrones && D(v).sam.maxR > 0 && costPerKill(v, th, t) * 2 <= cpk && reaches(v, th, t));
+        if (layer) continue;
       }
     }
+    const { sol, remote } = f;
     const n = Math.min(S.doctrine === 'salva' ? (u.salvo || sm.salvo) : 1, u.magLeft, ch - u.active);
     for (let k = 0; k < n; k++) {
-      const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false };
+      const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2 };
       S.ints.push(it); (th.fly = th.fly || []).push(it);
       u.magLeft--; u.active++; S.stats.shots++; S.stats.defCost += sm.cost;
       S.stats.byUnit[uLabel(u)] = (S.stats.byUnit[uLabel(u)] || 0) + 1;
     }
     event('Primer interceptor lanzado: ' + uLabel(u) + ' contra ' + label(th), 'firstShot');
     if (u.magLeft === 0) { log('w', uLabel(u) + ' se queda sin munición.'); event(uLabel(u) + ' se queda sin munición', 'empty:' + u.id); }
-    log('l', uLabel(u) + ' dispara ' + n + '× ' + sm.shot + ' contra ' + (th.isDecoy && hooks.defenderView() ? 'pista #' + th.id : label(th)) + ' — intercepción a ' + sol.r.toFixed(1) + ' km en ' + sol.tau.toFixed(0) + ' s.');
+    log('l', uLabel(u) + ' dispara ' + n + '× ' + sm.shot + ' contra ' + (th.isDecoy && hooks.defenderView() ? 'pista #' + th.id : label(th)) + ' — intercepción a ' + sol.r.toFixed(1) + ' km en ' + sol.tau.toFixed(0) + ' s' + (remote ? ' (con pista de la red)' : '') + '.');
   }
 }
 
@@ -202,7 +261,10 @@ export function impact(th) {
   x += Math.cos(ang) * r / 1000; y += Math.sin(ang) * r / 1000;
   if (th.isDecoy) { S.impacts.push({ x, y, k: 'decoy' }); log('d', label(th) + ' cae sin efecto.'); return; }
   const hit = r <= (th.T.hitR || (th.cls === 'dron' ? 20 : 50));
+  const c2Before = effectiveC2(S.c2, S.objs);
   const dmg = applyDamage(th, x, y), total = dmg.reduce((a, d) => a + d.dmg, 0);
+  const c2After = effectiveC2(S.c2, S.objs);
+  if (c2After !== c2Before) { log('x', `La defensa pierde un nodo de mando y control: el C2 cae a "${C2_LEVELS[c2After].name}".`); event('C2 degradado a ' + C2_LEVELS[c2After].name, 'c2:' + c2After); }
   S.stats.missSum += r; S.stats.missN++;
   S.arrivals.push({ t: S.t, id: th.id, type: th.type, name: label(th), cls: th.cls, det: th.firstDet, detKm: th.detKm ?? null, shots: (th.fly || []).length, miss: r, hit, dmg: total, nav: th.navErr, target: dmg[0]?.g.name ?? null });
   const dtxt = dmg.map(d => ` · −${d.dmg} HP a ${d.g.name} (${Math.max(0, d.g.hp)}/${d.g.maxHp})`).join('');

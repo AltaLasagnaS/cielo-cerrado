@@ -1,6 +1,7 @@
 // Guerra electrónica: interferidores de ruido contra radares y supresores/engañadores GNSS.
 // P = potencia relativa (parámetro de juego, no es una potencia física en watts).
 // spoofKm = desvío típico por ENGAÑO GNSS (km); sin él, el anti-GNSS solo interfiere (error menor).
+// linkJam = además corta los enlaces de datos (módem/mesh) de las armas dentro de su radio.
 //
 // El efecto depende del ROL, no de la bandera: los interferidores de radar degradan los radares de la
 // defensa (herramienta del atacante) y los anti-GNSS desvían las armas del atacante (herramienta del
@@ -24,7 +25,7 @@ export const JAMMERS = {
   lima: { name: 'Lima / Lima-Quant (estaciones anti-GNSS ucranianas)', short: 'Lima', side: 'UA', air: false, gnssJam: true, radius: 40, spoofKm: 3,
     notes: ['Interferencia, engaño y "ataque digital" al receptor GNSS. En uso desde 2024 contra bombas planeadoras UMPK/KAB y Shahed; según sus operadores, también contra crucero y Kinzhal.', '~€58.000 por estación; una ciudad grande necesita 30–100, porque contra una antena CRPA hacen falta muchas fuentes desde distintos puntos.', 'Cifras del fabricante y de la unidad, sin verificación independiente: más de 20.000 Shahed afectados, 58–61 Kinzhal "neutralizados", alcance de 300 km contra Kinzhal. Forbes y JAPCC confirman de forma independiente que la precisión de los KAB cayó en 2025.', 'Rusia respondió con Kometa-M24 y con planeadoras de mayor alcance (UMPK-PD, lanzadas desde más de 95 km).'],
     sources: [SRC.kp_lima, SRC.kp_lima2, SRC.nv_lima, SRC.forbes_kab25, SRC.japcc_kab, SRC.ki_kinzhal, SRC.forbes_limaq, SRC.mil_lima_half] },
-  bukovel: { name: 'Bukovel-AD (antidrón ucraniano: enlaces y GNSS)', short: 'Bukovel-AD', side: 'UA', air: false, gnssJam: true, radius: 15,
+  bukovel: { name: 'Bukovel-AD (antidrón ucraniano: enlaces y GNSS)', short: 'Bukovel-AD', side: 'UA', air: false, gnssJam: true, linkJam: true, radius: 15,
     notes: ['De Proximus, en servicio desde 2016. Detecta en 320–6.000 MHz hasta 70–100 km e interfiere enlaces de datos hasta 16–20 km. El fabricante declara supresión GNSS hasta 35 km, con 10 W por antena.', 'El motor solo representa la parte GNSS: cortar el enlace de control no detiene a un Shahed autónomo (sí "aterrizó" un ZALA 421-16E2 ruso).', 'Con 10 W y frente a receptores con CRPA, el radio real es mucho menor que el declarado: valor de juego conservador.'],
     sources: [WP('Bukovel_(counter_unmanned_aircraft_system)'), SRC.azov_bukovel, SRC.mil_bukovel] },
   // ---- contra radares: siempre a favor del ATACANTE (degradan los radares de la defensa) ----
