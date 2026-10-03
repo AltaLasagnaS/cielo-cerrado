@@ -8,8 +8,6 @@ Desplegás radares, baterías antiaéreas y guerra electrónica sobre relieve re
 
 **Abrí `index.html` en el navegador** (doble clic). Es un único archivo autocontenido: no necesita instalación ni conexión. Con internet carga tipografías más lindas; sin internet usa las del sistema.
 
-También se publica en **GitHub Pages** en cada cambio de la rama `main` (workflow `.github/workflows/pages.yml`): <https://altalasagnas.github.io/cielo-cerrado/>.
-
 Primeros pasos:
 1. Elegí un escenario arriba a la derecha y leé el **briefing**. Hay cuatro jugables: la noche de ataque combinado sobre Monterey, el ataque a la base con S-400 en Gotemburgo, la **defensa de la refinería de Hisingen** (Gotemburgo) y el **ataque al puente de Moss Landing** (Monterey).
 2. Tocá **▶ Iniciar**. La velocidad **Auto** acelera cuando no pasa nada y frena cuando hay combate.

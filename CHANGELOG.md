@@ -14,7 +14,6 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 - Prueba de catálogo de escenarios: posiciones dentro del mapa, blancos y metas que existan y briefing completo en los escenarios jugables. Dos casos golden nuevos (las seis anteriores no cambian).
 - **Modo Monte Carlo** (botón *Monte Carlo* sobre el mapa y en el debrief): corre la misma situación 10 a 100 veces con semillas distintas y, si se pide, sorteando cada parámetro del catálogo dentro de su rango (`applySample`). El debrief Monte Carlo muestra la probabilidad de éxito, de que cada objetivo sobreviva o siga operativo, de cumplir cada meta y de perder cada unidad (con intervalo de confianza del 95%), percentiles de interceptación, impactos, daño y costos, y un histograma. Corre en tramos para no congelar la página y se puede cancelar. No cambia la simulación: las golden siguen iguales.
 - **Guardar y cargar escenarios** en JSON (botones *Guardar* y *Cargar* de la barra superior): objetivos, defensas con sus ajustes, salvas, jammers, reglas, briefing y metas. Al cargar se valida el formato, el mapa, que las armas, defensas, jammers y objetivos existan en el catálogo, que las posiciones estén dentro del mapa y que los blancos de las salvas existan; si algo falla no se toca lo armado. Formato en `docs/ARQUITECTURA.md`.
-- **Publicación en GitHub Pages**: el workflow `pages.yml` sube el `index.html` de la raíz en cada push a `main` (o a mano desde Actions), después de verificar que esté al día con `src/`.
 
 ## [0.3.0] - 2026-10-03
 
