@@ -44,7 +44,7 @@ export function exportScenario(now = new Date()) {
   return {
     format: FORMAT, version: VERSION, saved: now.toISOString(),
     map: mapRef(),
-    rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather },
+    rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather, ignoreDecoys: S.ignoreDecoys },
     scenario: S.scen ? { base: baseKey(S.scen), ...pick(S.scen, META_KEYS) } : null,
     setup: {
       objs: s.objs.map(g => pick(g, OBJ_KEYS)),
@@ -169,7 +169,7 @@ export function validateScenario(raw) {
   const r = raw.rules || {};
   // c2 = nivel de integración (data/c2.js); net = formato viejo (true = coordinada, false = desconectada)
   const net = bool('rules.net', r.net);
-  const rules = { c2: r.c2 ?? (net === undefined ? undefined : c2FromNet(net)), doctrine: r.doctrine, weather: r.weather };
+  const rules = { c2: r.c2 ?? (net === undefined ? undefined : c2FromNet(net)), doctrine: r.doctrine, weather: r.weather, ignoreDecoys: bool('rules.ignoreDecoys', r.ignoreDecoys) };
   if (r.weather !== undefined && !WEATHER[r.weather]) err(`rules.weather: "${String(r.weather)}" no es un clima válido (${Object.keys(WEATHER).join(', ')}).`);
   if (r.c2 !== undefined && !C2_LEVELS[r.c2]) err(`rules.c2: "${String(r.c2)}" no es un nivel de mando y control válido (${Object.keys(C2_LEVELS).join(', ')}).`);
   if (r.doctrine !== undefined && !DOCTRINES.includes(r.doctrine)) err(`rules.doctrine: "${String(r.doctrine)}" no es ${DOCTRINES.join(' ni ')}.`);
@@ -232,6 +232,7 @@ export function loadScenarioData(data) {
   for (const j of data.setup.jams) { const jj = addJam(j.type, j.x, j.y, { alt: j.alt }); if (j.on !== undefined) jj.on = j.on; }
   if (data.rules.c2) S.c2 = data.rules.c2;
   S.weather = data.rules.weather || 'despejado';
+  S.ignoreDecoys = !!data.rules.ignoreDecoys;
   if (data.rules.doctrine) S.doctrine = data.rules.doctrine;
   S.scen = data.scenario ? {
     ...data.scenario, map: data.map.key,

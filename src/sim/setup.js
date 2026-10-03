@@ -62,6 +62,7 @@ export function applyScenario(sc) {
     if (sc.rules.c2 && C2_LEVELS[sc.rules.c2]) S.c2 = sc.rules.c2; else if (sc.rules.net !== undefined) S.c2 = c2FromNet(sc.rules.net);   // net: formato viejo
     if (sc.rules.doctrine) S.doctrine = sc.rules.doctrine;
   }
-  S.weather = WEATHER[sc.rules?.weather] ? sc.rules.weather : WEATHER_DEFAULT;   // el clima es del escenario: sin dato, despejado
+  S.weather = WEATHER[sc.rules?.weather] ? sc.rules.weather : WEATHER_DEFAULT;
+  S.ignoreDecoys = !!sc.rules?.ignoreDecoys;   // el clima es del escenario: sin dato, despejado
   S.scen = sc;
 }

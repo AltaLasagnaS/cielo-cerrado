@@ -22,6 +22,7 @@ export function renderDef() {
       <div class="field"><label for="optC2">Integración de la defensa ${infoBtn('c2')}</label><select id="optC2" class="sel">${Object.entries(C2_LEVELS).map(([k, L]) => `<option value="${k}" ${S.c2 === k ? 'selected' : ''}>${esc(L.name)}</option>`).join('')}</select></div>
       <p class="hint" id="c2Info">${esc(C2_LEVELS[S.c2].desc)}</p>
       <div class="field"><label for="optDoc">Doctrina de tiro</label><select id="optDoc" class="sel"><option value="salva" ${S.doctrine === 'salva' ? 'selected' : ''}>Salva (según unidad)</option><option value="sls" ${S.doctrine === 'sls' ? 'selected' : ''}>Disparar-observar-disparar</option></select></div>
+      <label class="check" title="Los radares de tiro (S, C, X, Ku) aprenden a distinguir señuelos con el tiempo de seguimiento. Con esta opción no se dispara a pistas clasificadas como señuelo: ahorra munición, pero a veces un arma real se clasifica mal."><input type="checkbox" id="optDecoy" ${S.ignoreDecoys ? 'checked' : ''}> No tirarle a pistas clasificadas como señuelo</label>
     </div>
     <div class="grp"><h3>Clima ${infoBtn('clima')}</h3>
       <div class="field"><label for="optWx">Tiempo</label><select id="optWx" class="sel">${Object.entries(WEATHER).map(([k, W]) => `<option value="${k}" ${S.weather === k ? 'selected' : ''}>${esc(W.name)}</option>`).join('')}</select></div>
@@ -40,6 +41,7 @@ export function renderDef() {
   };
   $('#optC2').onchange = e => { if (S.started) { toast('Reiniciá para cambiar el mando y control.'); e.target.value = S.c2; return; } S.c2 = e.target.value; $('#c2Info').textContent = C2_LEVELS[S.c2].desc; };
   $('#optDoc').onchange = e => { S.doctrine = e.target.value; };
+  $('#optDecoy').onchange = e => { S.ignoreDecoys = e.target.checked; };
   $('#optWx').onchange = e => { if (S.started) { toast('Reiniciá para cambiar el clima.'); e.target.value = S.weather; return; } S.weather = e.target.value; $('#wxInfo').textContent = WEATHER[S.weather].desc; schedCov(); };
   $('#optCov').onchange = e => { S.showCov = e.target.checked; draw(); };
   $('#optRef').onchange = e => { S.covRef = e.target.value; const T = THREATS[S.covRef]; S.covAgl = T.agl ?? (T.prof === 'ballistic' ? 10000 : (T.prof === 'hilo' ? 15 : 5000)); $('#optAgl').value = S.covAgl; $('#aglVal').textContent = S.covAgl + ' m'; schedCov(); };

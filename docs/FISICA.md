@@ -217,6 +217,8 @@ r / vInt ≤ τ   (el interceptor llega a tiempo, con ≤ 3 s de holgura)
 
 **Enlace de datos del atacante** (`sv.link`, armas con `T.datalink`: Shahed, Geran-3 y Gerbera con módem 4G/mesh o Starlink): el operador ve la posición real, así que el arma descarta el engaño GNSS como si tuviera corrección por terreno (§4). Dentro del radio de un antidrón que corta enlaces (`J.linkJam`, Bukovel-AD) pierde esa ventaja.
 
+**Señuelos** (`physics/decoys.js`): cada barrido de un radar de tiro (bandas con `decoyTau`: S 60 s, C 25 s, X 18 s, Ku 12 s; VHF y L no clasifican) que ve una pista suma `radar.scan` segundos de seguimiento. La pista queda clasificada cuando `1 − exp(−t/τ)` supera un umbral fijo de esa pista (sale de `th.phase`, ya sorteado: no cambia la secuencia de azar). τ es el de la banda más rápida que la siguió, ×4 para los señuelos que suelta un balístico (acompañan al misil). Un arma real se toma por señuelo con probabilidad 3%. Con la opción **"no tirarle a pistas clasificadas como señuelo"** (pestaña Defensa) se ahorra munición con ese riesgo; el debrief cuenta los señuelos reconocidos y las armas mal clasificadas.
+
 **Doctrina:** con "salva" se disparan `u.salvo` interceptores por blanco (cada 0,6 s); con "disparar-observar-disparar", uno.
 
 ---

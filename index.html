@@ -1795,6 +1795,7 @@ table.t.mc td.pc{white-space:nowrap}
     S: {
       name: "Banda S (E/F OTAN)",
       ghz: 3,
+      decoyTau: 60,
       bw: 2,
       note: "Buen compromiso alcance/clima; típica en radares de vigilancia 3D y AEW.",
       freq: "2–4 GHz",
@@ -1808,6 +1809,7 @@ table.t.mc td.pc{white-space:nowrap}
     C: {
       name: "Banda C (G/H OTAN)",
       ghz: 5.5,
+      decoyTau: 25,
       bw: 1.5,
       note: "Radares multifunción de defensa aérea (Patriot, TRML-4D del IRIS-T).",
       freq: "4–8 GHz",
@@ -1821,6 +1823,7 @@ table.t.mc td.pc{white-space:nowrap}
     X: {
       name: "Banda X (I/J OTAN)",
       ghz: 9.5,
+      decoyTau: 18,
       bw: 1,
       note: "Control de tiro: buena resolución, menos alcance y más afectada por lluvia.",
       freq: "8–12 GHz",
@@ -1834,6 +1837,7 @@ table.t.mc td.pc{white-space:nowrap}
     Ku: {
       name: "Banda Ku/Ka",
       ghz: 15,
+      decoyTau: 12,
       bw: 0.8,
       note: "Seguimiento de alta precisión a corto alcance, buscadores de misiles.",
       freq: "12–18 GHz (Ku) y 27–40 GHz (Ka)",
@@ -2588,6 +2592,7 @@ table.t.mc td.pc{white-space:nowrap}
     c2: "coordinada",
     doctrine: "salva",
     weather: "despejado",
+    ignoreDecoys: false,
     showCov: true,
     covRef: "kh101",
     covAgl: 50,
@@ -2664,6 +2669,20 @@ table.t.mc td.pc{white-space:nowrap}
     /** ¿El jugador está en "vista del defensor"? (solo cambia el texto del registro). */
     defenderView: () => false
   };
+
+  // src/physics/decoys.js
+  var DECOY_HARD = 4;
+  var MISCLASS = 0.03;
+  var frac = (x) => x - Math.floor(x);
+  var classifyGain = (r) => BANDS[r.band]?.decoyTau ? r.scan : 0;
+  function classify(th) {
+    if (!th.clsT || !th.clsTau) return null;
+    const tau = th.clsTau * (th.isDecoyChild ? DECOY_HARD : 1);
+    const u = frac(th.phase * 977.13);
+    if (1 - Math.exp(-th.clsT / tau) < u) return null;
+    if (th.isDecoy) return "señuelo";
+    return frac(th.phase * 7919.7) < MISCLASS ? "señuelo" : "arma";
+  }
 
   // src/util/ids.js
   var next = 1;
@@ -3072,6 +3091,9 @@ table.t.mc td.pc{white-space:nowrap}
       lastNet: -1e9,
       firstDet: null,
       netFirst: null,
+      clsT: 0,
+      clsTau: null,
+      clsAs: null,
       trail: [],
       navErr: 0,
       gnssHit: false,
@@ -3361,7 +3383,7 @@ table.t.mc td.pc{white-space:nowrap}
         th.released = true;
         for (let k = 0; k < th.decoyRel; k++) {
           const ang = rnd() * 6.28, dist = 1 + rnd() * 2.5;
-          const dc = { ...th, fly: [], id: nextId(), parent: th, isDecoy: true, isDecoyChild: true, decoyRel: 0, sRel: p.s, off: [Math.cos(ang) * dist, Math.sin(ang) * dist], det: {}, trail: [], lastNet: -1e9, firstDet: null, netFirst: null, alive: true, targetUnit: null };
+          const dc = { ...th, fly: [], id: nextId(), parent: th, isDecoy: true, isDecoyChild: true, decoyRel: 0, sRel: p.s, off: [Math.cos(ang) * dist, Math.sin(ang) * dist], det: {}, trail: [], lastNet: -1e9, firstDet: null, netFirst: null, clsT: 0, clsTau: null, clsAs: null, phase: th.phase + (k + 1) * 1.6180339, alive: true, targetUnit: null };
           S.threats.push(dc);
           S.stats.decoys++;
           S.stats.launched++;
@@ -3415,6 +3437,16 @@ table.t.mc td.pc{white-space:nowrap}
         }
         if (ok) {
           th.det[u.id] = t;
+          const g = classifyGain(r);
+          if (g) {
+            th.clsT = (th.clsT || 0) + g;
+            th.clsTau = Math.min(th.clsTau ?? Infinity, BANDS[r.band].decoyTau);
+            const c = classify(th);
+            if (c && !th.clsAs) {
+              th.clsAs = c;
+              if (c === "señuelo" && S.ignoreDecoys) log("d", "Pista #" + th.id + " clasificada como señuelo por " + uLabel(u) + (th.isDecoy ? "." : " (¡error: era " + th.T.short + "!)."));
+            }
+          }
           if (u.link !== false) {
             th.lastNet = t;
             if (th.netFirst === null) th.netFirst = t;
@@ -3490,6 +3522,7 @@ table.t.mc td.pc{white-space:nowrap}
     if (t - av < sm.react) return null;
     const flying = (th.fly || []).filter((i) => !i.done);
     if (C2_LEVELS[c2].deconf ? flying.length : flying.some((i) => i.u === u)) return null;
+    if (S.ignoreDecoys && th.clsAs === "señuelo") return null;
     return { pre: true };
   }
   function solveFor(u, th, t) {
@@ -3713,6 +3746,7 @@ table.t.mc td.pc{white-space:nowrap}
       if (sc2.rules.doctrine) S.doctrine = sc2.rules.doctrine;
     }
     S.weather = WEATHER[sc2.rules?.weather] ? sc2.rules.weather : WEATHER_DEFAULT;
+    S.ignoreDecoys = !!sc2.rules?.ignoreDecoys;
     S.scen = sc2;
   }
 
@@ -5405,12 +5439,12 @@ table.t.mc td.pc{white-space:nowrap}
   // src/sim/goals.js
   function goalMet(g, S2) {
     const obj = S2.objs.find((o) => o.name === g.target), unit = S2.units.find((u) => u.name === g.target);
-    const frac = obj ? (obj.maxHp - obj.hp) / obj.maxHp : 0;
+    const frac2 = obj ? (obj.maxHp - obj.hp) / obj.maxHp : 0;
     switch (g.kind) {
       case "destroy":
         return !!obj && obj.status === "destroyed";
       case "damage":
-        return !!obj && frac >= (g.min ?? DAMAGED_AT);
+        return !!obj && frac2 >= (g.min ?? DAMAGED_AT);
       case "protect":
         return !!obj && obj.status === "operational";
       case "survive":
@@ -5505,6 +5539,9 @@ table.t.mc td.pc{white-space:nowrap}
     const survived = real.filter((a) => a.shots > 0);
     if (survived.length) out.push(`${survived.length} arma(s) sobrevivieron a ${survived.reduce((s, a) => s + a.shots, 0)} interceptor(es) disparados contra ellas (${list(survived)}): la Pk por disparo nunca es 100% y baja con maniobra terminal, baja firma, bengalas o interferencia.`);
     const decoyShots = decoys.reduce((s, t) => s + (t.fly || []).length, 0);
+    const clsDecoys = decoys.filter((t) => t.clsAs === "señuelo").length, wrong = S2.threats.filter((t) => !t.isDecoy && t.clsAs === "señuelo");
+    if (clsDecoys) out.push(`Los radares de tiro reconocieron ${clsDecoys} de ${decoys.length} señuelo(s)${S2.ignoreDecoys ? " y dejaron de tirarles" : '; con la doctrina "no tirarle a pistas clasificadas como señuelo" se habrían ahorrado interceptores'}.`);
+    if (wrong.length) out.push(`${wrong.length} arma(s) real(es) se clasificaron por error como señuelo (${wrong.map((t) => t.T.short).join(", ")})${S2.ignoreDecoys ? " y no se les tiró" : ""}.`);
     if (decoyShots) out.push(`Los señuelos consumieron ${decoyShots} interceptor(es) que no se usaron contra armas reales. La "vista del defensor" muestra cómo los ve el operador: iguales a las armas.`);
     const empty = S2.events.filter((e) => e.key && e.key.startsWith("empty:"));
     if (empty.length) out.push(`Se quedaron sin munición: ${empty.map((e) => e.text.replace(" se queda sin munición", "")).join(", ")}. Sin recarga, la saturación agota los cargadores antes de que llegue lo más peligroso.`);
@@ -5970,6 +6007,7 @@ table.t.mc td.pc{white-space:nowrap}
       <div class="field"><label for="optC2">Integración de la defensa ${infoBtn("c2")}</label><select id="optC2" class="sel">${Object.entries(C2_LEVELS).map(([k, L]) => `<option value="${k}" ${S.c2 === k ? "selected" : ""}>${esc(L.name)}</option>`).join("")}</select></div>
       <p class="hint" id="c2Info">${esc(C2_LEVELS[S.c2].desc)}</p>
       <div class="field"><label for="optDoc">Doctrina de tiro</label><select id="optDoc" class="sel"><option value="salva" ${S.doctrine === "salva" ? "selected" : ""}>Salva (según unidad)</option><option value="sls" ${S.doctrine === "sls" ? "selected" : ""}>Disparar-observar-disparar</option></select></div>
+      <label class="check" title="Los radares de tiro (S, C, X, Ku) aprenden a distinguir señuelos con el tiempo de seguimiento. Con esta opción no se dispara a pistas clasificadas como señuelo: ahorra munición, pero a veces un arma real se clasifica mal."><input type="checkbox" id="optDecoy" ${S.ignoreDecoys ? "checked" : ""}> No tirarle a pistas clasificadas como señuelo</label>
     </div>
     <div class="grp"><h3>Clima ${infoBtn("clima")}</h3>
       <div class="field"><label for="optWx">Tiempo</label><select id="optWx" class="sel">${Object.entries(WEATHER).map(([k, W]) => `<option value="${k}" ${S.weather === k ? "selected" : ""}>${esc(W.name)}</option>`).join("")}</select></div>
@@ -6008,6 +6046,9 @@ table.t.mc td.pc{white-space:nowrap}
     };
     $("#optDoc").onchange = (e) => {
       S.doctrine = e.target.value;
+    };
+    $("#optDecoy").onchange = (e) => {
+      S.ignoreDecoys = e.target.checked;
     };
     $("#optWx").onchange = (e) => {
       if (S.started) {
@@ -6383,7 +6424,7 @@ table.t.mc td.pc{white-space:nowrap}
       version: VERSION,
       saved: now.toISOString(),
       map: mapRef(),
-      rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather },
+      rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather, ignoreDecoys: S.ignoreDecoys },
       scenario: S.scen ? { base: baseKey(S.scen), ...pick(S.scen, META_KEYS) } : null,
       setup: {
         objs: s.objs.map((g) => pick(g, OBJ_KEYS)),
@@ -6568,7 +6609,7 @@ table.t.mc td.pc{white-space:nowrap}
     });
     const r = raw.rules || {};
     const net = bool("rules.net", r.net);
-    const rules = { c2: r.c2 ?? (net === void 0 ? void 0 : c2FromNet(net)), doctrine: r.doctrine, weather: r.weather };
+    const rules = { c2: r.c2 ?? (net === void 0 ? void 0 : c2FromNet(net)), doctrine: r.doctrine, weather: r.weather, ignoreDecoys: bool("rules.ignoreDecoys", r.ignoreDecoys) };
     if (r.weather !== void 0 && !WEATHER[r.weather]) err(`rules.weather: "${String(r.weather)}" no es un clima válido (${Object.keys(WEATHER).join(", ")}).`);
     if (r.c2 !== void 0 && !C2_LEVELS[r.c2]) err(`rules.c2: "${String(r.c2)}" no es un nivel de mando y control válido (${Object.keys(C2_LEVELS).join(", ")}).`);
     if (r.doctrine !== void 0 && !DOCTRINES.includes(r.doctrine)) err(`rules.doctrine: "${String(r.doctrine)}" no es ${DOCTRINES.join(" ni ")}.`);
@@ -6636,6 +6677,7 @@ table.t.mc td.pc{white-space:nowrap}
     }
     if (data.rules.c2) S.c2 = data.rules.c2;
     S.weather = data.rules.weather || "despejado";
+    S.ignoreDecoys = !!data.rules.ignoreDecoys;
     if (data.rules.doctrine) S.doctrine = data.rules.doctrine;
     S.scen = data.scenario ? {
       ...data.scenario,

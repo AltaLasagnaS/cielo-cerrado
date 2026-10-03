@@ -64,6 +64,9 @@ function explain(S, arrivals, decoys) {
   const survived = real.filter(a => a.shots > 0);
   if (survived.length) out.push(`${survived.length} arma(s) sobrevivieron a ${survived.reduce((s, a) => s + a.shots, 0)} interceptor(es) disparados contra ellas (${list(survived)}): la Pk por disparo nunca es 100% y baja con maniobra terminal, baja firma, bengalas o interferencia.`);
   const decoyShots = decoys.reduce((s, t) => s + (t.fly || []).length, 0);
+  const clsDecoys = decoys.filter(t => t.clsAs === 'señuelo').length, wrong = S.threats.filter(t => !t.isDecoy && t.clsAs === 'señuelo');
+  if (clsDecoys) out.push(`Los radares de tiro reconocieron ${clsDecoys} de ${decoys.length} señuelo(s)${S.ignoreDecoys ? ' y dejaron de tirarles' : '; con la doctrina "no tirarle a pistas clasificadas como señuelo" se habrían ahorrado interceptores'}.`);
+  if (wrong.length) out.push(`${wrong.length} arma(s) real(es) se clasificaron por error como señuelo (${wrong.map(t => t.T.short).join(', ')})${S.ignoreDecoys ? ' y no se les tiró' : ''}.`);
   if (decoyShots) out.push(`Los señuelos consumieron ${decoyShots} interceptor(es) que no se usaron contra armas reales. La "vista del defensor" muestra cómo los ve el operador: iguales a las armas.`);
   const empty = S.events.filter(e => e.key && e.key.startsWith('empty:'));
   if (empty.length) out.push(`Se quedaron sin munición: ${empty.map(e => e.text.replace(' se queda sin munición', '')).join(', ')}. Sin recarga, la saturación agota los cargadores antes de que llegue lo más peligroso.`);
