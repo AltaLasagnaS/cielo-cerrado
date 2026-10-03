@@ -26,6 +26,7 @@ Vuela lento (≈185 km/h). Desde 2025 crucero a 2–5 km de altura para quedar f
 - **Ojiva:** 50 kg (BCh-50); 90 kg (BCh-90, 62 kg de explosivo)
 - **Alcance:** ≈1.350–1.800 km típico; 2.500 km máx. declarado; ≈650 km con ojiva de 90 kg
 - **Costo:** Producción rusa US$20–80k (CSIS usa 35k); el precio de importación iraní era US$193k
+- **Altura de vuelo:** típica 2000 m, límites reales 50–5000 m · perfiles: Bajo (2022–23) 1000 m, Alto (desde 2025) 3000 m. Volaba a 700–2.000 m en 2022–23; desde 2025, 2–5 km con picada final (Forbes, Ukrainska Pravda). Por debajo de ~50 m choca con el terreno y los cables.
 
 - Se lanzan en oleadas de cientos por noche: 54.538 drones tipo Shahed en 2025, ~40% señuelos (ISIS).
 - Neutralización mensual 83–93% entre ago-2025 y may-2026, sumando derribos y "pérdidas" por guerra electrónica (ISIS).
@@ -83,6 +84,7 @@ Crucero ≈300 km/h, hasta ≈370 km/h al cruzar zonas defendidas (GUR). Los 550
 - **Ojiva:** ≈50 kg termobárica-fragmentación (TBBCh-50)
 - **Alcance:** ≈1.000 km (GUR)
 - **Costo:** Sin cifra oficial: ≈Geran-2 + 40% (el motor JT80 cuesta US$18–35k en el mercado civil)
+- **Altura de vuelo:** típica 1500 m, límites reales 100–5000 m. Estimación: mismo envolvente que el Geran-2.
 
 - Uso regular desde junio de 2025; primer derribo con dron interceptor Sting el 30/11/2025.
 - La inteligencia ucraniana informó en 2026 que se frenó su producción en transición al Geran-4.
@@ -127,6 +129,7 @@ Imita a un Shahed en trayecto. Su único trabajo es hacer gastar munición y sat
 - **Ojiva:** Ninguna en la mayoría (algunas 2,5–5 kg o cámara)
 - **Alcance:** 300–600 km
 - **Costo:** ≈US$10k según funcionarios ucranianos: espuma y terciado, motor de aeromodelismo
+- **Altura de vuelo:** típica 1200 m, límites reales 100–3000 m. Señuelo: vuela a la altura de los Shahed que acompaña.
 
 - Primer uso en julio de 2024; Alabuga produce hasta ~50 por día (ISIS).
 - La espuma es casi transparente al radar: lo que refleja es el motor y la electrónica, por eso su RCS es menor que la del Shahed.
@@ -172,6 +175,7 @@ Crucero a 700–720 km/h y 30–70 m sobre el terreno en la fase final, siguiend
 - **Ojiva:** 400–480 kg; ≈800 kg en la variante de dos ojivas
 - **Alcance:** ≈2.500–2.800 km (CSIS); hasta 3.500 km según otras fuentes
 - **Costo:** Contratos rusos filtrados: US$2,0 M (2024) y 2,0–2,4 M (2025). Forbes Ukraine estimaba US$13 M
+- **Altura de vuelo:** típica 50 m, límites reales 30–6000 m · perfiles: Rasante 50 m, Crucero alto 6000 m. 30–70 m siguiendo el terreno; también puede cruzar a ≈6.000 m (Wikipedia, CSIS). Alto ahorra combustible pero lo ve cualquier radar.
 
 - Lanzado desde Tu-95MS y Tu-160 fuera del alcance ucraniano.
 - Desde fines de 2023 lleva dispensador de bengalas (módulo L-504, activo a 3–5 km del blanco); en 2026 se reportó además el sistema SP-504 de autoprotección electrónica.
@@ -229,6 +233,7 @@ Subsónico (Mach 0,7–0,8), ≈20 m sobre el agua y 50–150 m sobre tierra.
 - **Ojiva:** ≈450–500 kg
 - **Alcance:** 1.500–2.500 km (CSIS)
 - **Costo:** Contratos rusos filtrados: ≈US$2 M. Forbes Ukraine estimaba 6,5 M
+- **Altura de vuelo:** típica 50 m, límites reales 20–300 m · perfiles: Sobre el mar 20 m, Sobre tierra 50 m. ≈20 m sobre el agua, 50–150 m sobre tierra (Wikipedia).
 
 - Lanzado desde corbetas, fragatas y submarinos del Mar Negro y el Caspio.
 - La estadística ucraniana lo agrupa con Kh-101/555 e Iskander-K: 66,6% interceptados entre feb-2022 y ago-2024.
@@ -282,6 +287,7 @@ Versión de crucero terrestre del sistema Iskander, derivada de la familia Kalib
 - **Ojiva:** ≈480–500 kg
 - **Alcance:** ≈500 km (publicado)
 - **Costo:** Contratos rusos filtrados: ≈US$1,5–1,7 M
+- **Altura de vuelo:** típica 50 m, límites reales 6–6000 m · perfiles: Rasante 50 m, Crucero alto 6000 m. Tramo medio a ≈6 km de altura y 7–150 m al acercarse al blanco (RUSI).
 
 - Se lanza desde el mismo camión que el Iskander-M: el defensor no sabe de antemano si viene balístico o crucero.
 - Ucrania contabilizó 261 Iskander-K derribados hasta feb-2026 (ISW).
@@ -607,6 +613,7 @@ Vuelo rasante a 30–40 m guiado por mapa de terreno; al final hace un "bunt": t
 - **Ojiva:** 450 kg BROACH (penetrante en tándem)
 - **Alcance:** ≈250 km (exportación, la entregada a Ucrania); ≈550 km versión UK/FR
 - **Costo:** ≈£2 M (≈US$2,5 M, 2023); el precio original era £790k
+- **Altura de vuelo:** típica 35 m, límites reales 30–300 m. 30–40 m en la fase rasante (Defense Mirror); más alto es estimación.
 
 - Lanzado por Su-24 ucranianos adaptados.
 - Rusia reclamó decenas de intercepciones sin datos verificables; no hay tasa independiente.
@@ -705,6 +712,7 @@ Antibuque subsónico rasante (4–5 m sobre el agua en la fase final). Hundió a
 - **Ojiva:** 150 kg (Long Neptune ≈260 kg)
 - **Alcance:** 280–300 km (Long Neptune ≈1.000 km)
 - **Costo:** Sin cifra oficial; ≈US$1,5 M es una estimación de prensa
+- **Altura de vuelo:** típica 15 m, límites reales 3–300 m · perfiles: Sobre el mar 5 m, Sobre tierra 30 m. 3–5 m sobre el mar (RBC-Ucrania); ≈30 m sobre tierra es estimación.
 
 - La versión de ataque a tierra (más larga y gruesa) amplió el alcance a ~1.000 km.
 - Producción de ~100 por año en 2024.
@@ -747,6 +755,7 @@ Dron de ataque ucraniano de 250–300 kg usado contra refinerías y bases en Rus
 - **Ojiva:** 50–75 kg
 - **Alcance:** ≈1.000–1.400 km (hasta 2.000 km con ojiva liviana)
 - **Costo:** ≈US$200k (reportado)
+- **Altura de vuelo:** típica 500 m, límites reales 50–3000 m. Estimación: envolvente análogo al Shahed.
 
 - Usado en grandes oleadas contra infraestructura petrolera.
 - Más grande y metálico que un Shahed: su RCS estimada es mayor.
@@ -786,6 +795,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 - **Ojiva:** 1.000–1.150 kg (declarado)
 - **Alcance:** 3.000 km declarado; ≈950 km en línea recta demostrado
 - **Costo:** "Un poco menos de US$600k" según la CEO de Fire Point (jul-2026)
+- **Altura de vuelo:** típica 35 m, límites reales 15–1000 m. Declarado: 15–114 m en crucero (Wikipedia); el tope de 1.000 m es estimación.
 
 - Datos mayormente declarados por el fabricante.
 - Kyiv Post (jun-2026): de 34 lanzamientos, solo 5 impactos creíbles, sin separar intercepción de falla.
@@ -832,6 +842,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 ≈40 km vs balísticos (estimado), ≈100 km vs aeronaves · PAC-3 MSE: hit-to-kill, buscador activo, motor de doble pulso, techo ≈36 km
 
 - **Sensor:** AN/MPQ-65, Banda C (G/H OTAN), 100 km contra 1 m², sector 90°, refresco 2 s, ECCM 10 dB
+- **Altura de antena:** 4 m, fija. Fija: la antena va sobre el semirremolque M860, inclinada a 67,5°. El mástil de ≈30 m de la batería (AMG) es de comunicaciones, no del radar (FM 3-01.85).
 - **Arma:** PAC-3 MSE, guiado activo, 3–100 km (balísticos: 40 km), 50 m–36 km, 8 canales, 16 disparos, Pk base dron 0.9 · crucero 0.9 · supersonico 0.6 · balistico 0.7 · hiper 0.5
 
 - El AN/MPQ-65 busca en un sector de ~90° (sigue en ~120°): hay que orientarlo hacia la amenaza. El LTAMDS nuevo tiene 3 paneles y 360°.
@@ -886,6 +897,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 ≈160 km vs aeronaves, ≈20 km vs balísticos · GEM-T: fragmentación, guiado TVM (necesita que el radar propio vea el blanco), Mach ≈3,5
 
 - **Sensor:** AN/MPQ-65, Banda C (G/H OTAN), 100 km contra 1 m², sector 90°, refresco 2 s, ECCM 10 dB
+- **Altura de antena:** 4 m, fija. Fija: la antena va sobre el semirremolque M860. El mástil de ≈30 m (AMG) es de comunicaciones, no del radar.
 - **Arma:** PAC-2 GEM-T, guiado TVM, 3–160 km (balísticos: 20 km), 60 m–24 km, 8 canales, 16 disparos, Pk base dron 0.8 · crucero 0.85 · supersonico 0.55 · balistico 0.4 · hiper 0.25
 
 - Mayor alcance contra aviones y misiles de crucero que el MSE, pero peor contra balísticos.
@@ -925,6 +937,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 ≈100 km vs aeronaves (50 km por debajo de 3 km de altura), 20–35 km vs balísticos · Aster 30: 1,4 km/s, buscador activo, control "PIF-PAF" (toberas laterales para maniobra final)
 
 - **Sensor:** Arabel, Banda X (I/J OTAN), 80 km contra 1 m², sector 360°, refresco 1 s, ECCM 10 dB
+- **Altura de antena:** 5 m, fija. Fija: Arabel montado sobre camión (altura estimada).
 - **Arma:** Aster 30, guiado activo, 3–100 km (balísticos: 25 km), 50 m–20 km, 10 canales, 32 disparos, Pk base dron 0.85 · crucero 0.88 · supersonico 0.6 · balistico 0.6 · hiper 0.4
 
 - Radar Arabel en banda X, giratorio a 60 rpm (refresco 1 s), ~100 km de alcance.
@@ -967,6 +980,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 40 km, techo 20 km (SLX: 80 km) · IRIS-T SL: guiado inercial + datalink, buscador IR de imagen terminal, ≈Mach 3
 
 - **Sensor:** Hensoldt TRML-4D, Banda C (G/H OTAN), 100 km contra 1 m², sector 360°, refresco 1 s, ECCM 10 dB
+- **Altura de antena:** 6 m por defecto, regulable 4–12 m. Mástil hidráulico sobre el camión: la antena llega hasta 12 m (Hensoldt). Retraído ≈4 m (estimado).
 - **Arma:** IRIS-T SL, guiado IR, 1–40 km (balísticos: — km), 10 m–20 km, 8 canales, 24 disparos, Pk base dron 0.9 · crucero 0.88 · supersonico 0.2 · balistico 0 · hiper 0
 
 - El TRML-4D es banda C (G OTAN): 250 km instrumentados, cazas a más de 120 km, misiles supersónicos a más de 60 km, 1.500 pistas.
@@ -1009,6 +1023,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 ≈35–40 km (AMRAAM-ER: 50–60 km) · AIM-120: misil aire-aire adaptado, buscador radar activo
 
 - **Sensor:** AN/MPQ-64 Sentinel, Banda X (I/J OTAN), 60 km contra 1 m², sector 360°, refresco 2 s, ECCM 8 dB
+- **Altura de antena:** 4 m, fija. Fija: Sentinel sobre remolque (altura estimada).
 - **Arma:** AIM-120, guiado activo, 1–35 km (balísticos: — km), 30 m–15 km, 6 canales, 18 disparos, Pk base dron 0.85 · crucero 0.88 · supersonico 0.4 · balistico 0 · hiper 0
 
 - Noruega reclamó 94% de éxito en Ucrania (feb-2025, ~900 AMRAAM); no se aclara si es por disparo o por blanco y ~60% de los blancos eran crucero.
@@ -1050,6 +1065,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 47 km (5V55K) / 75 km (5V55R), techo 27 km · 5V55: hasta 2.000 m/s, guiado por mando (K) o TVM (R)
 
 - **Sensor:** 30N6 Flap Lid (en torre 40V6), Banda X (I/J OTAN), 100 km contra 1 m², sector 90°, refresco 2 s, ECCM 3 dB
+- **Altura de antena:** 25 m por defecto, regulable 7–39 m. Sin torre, la antena queda a ≈7 m sobre su vehículo (estimado); en la torre 40V6M a ≈25 m y en la 40V6MD a ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h, no se cambia durante el combate.
 - **Arma:** 5V55R, guiado TVM, 5–75 km (balísticos: 25 km), 25 m–27 km, 4 canales, 16 disparos, Pk base dron 0.5 · crucero 0.6 · supersonico 0.4 · balistico 0.15 · hiper 0.05
 
 - Ucrania tenía 35 batallones S-300PS/PT en feb-2022 (RUSI), ~250 lanzadores: fue la columna vertebral de su defensa en 2022.
@@ -1087,6 +1103,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 3,3–35 km, techo 22 km · 9M38: ≈Mach 3, semiactivo: el radar del lanzador tiene que iluminar el blanco hasta el impacto
 
 - **Sensor:** 9S35 Fire Dome (+9S18M1 Snow Drift), Banda X (I/J OTAN), 50 km contra 1 m², sector 360°, refresco 2 s, ECCM 3 dB
+- **Altura de antena:** 4 m, fija. Fija: radar sobre el vehículo de orugas (altura estimada).
 - **Arma:** 9M38, guiado SARH, 3.3–35 km (balísticos: 10 km), 15 m–22 km, 3 canales, 12 disparos, Pk base dron 0.55 · crucero 0.6 · supersonico 0.35 · balistico 0.05 · hiper 0
 
 - Lo usan ambos bandos (Rusia con versiones M2/M3). Ucrania tenía 15 divisiones en 2022.
@@ -1122,6 +1139,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 ≈3,5–4 km típico (5,5 km con FAPDS) · Dos cañones Oerlikon 35 mm, 550 disparos/min cada uno, 640 proyectiles a bordo
 
 - **Sensor:** Búsqueda S + seguimiento Ku, Banda S (E/F OTAN), 15 km contra 1 m², sector 360°, refresco 1 s, ECCM 0 dB
+- **Altura de antena:** 3 m, fija. Fija: radar sobre la torreta (altura estimada).
 - **Arma:** ráfaga 35 mm, guiado cañón, 0.1–4 km (balísticos: — km), 0 m–3 km, 1 canales, 20 disparos, Pk base dron 0.55 · crucero 0.35 · supersonico 0.05 · balistico 0 · hiper 0
 
 - Considerado de los mejores "mata-Shahed".
@@ -1153,6 +1171,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 ≈1,5 km · Pickup con ametralladora pesada (DShK/M2), reflector y visor térmico
 
 - **Sensor:** Visual / térmico, Óptico / IR, 5 km contra 1 m², sector 360°, refresco 1 s, ECCM inmune
+- **Altura de antena:** 2 m, fija. Fija: ojos y óptica del equipo.
 - **Arma:** ráfaga 12,7 mm, guiado cañón, 0–1.5 km (balísticos: — km), 0 m–1.5 km, 1 canales, 30 disparos, Pk base dron 0.2 · crucero 0.05 · supersonico 0 · balistico 0 · hiper 0
 
 - Muy barato, se reubica rápido y aprovecha la alerta de la red acústica.
@@ -1178,6 +1197,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 ≈4,8 km, techo ≈3,8 km · Misil portátil con buscador infrarrojo (Stinger Mach 2,2; Igla ≈570 m/s)
 
 - **Sensor:** Visual / IR, Óptico / IR, 7 km contra 1 m², sector 360°, refresco 1 s, ECCM inmune
+- **Altura de antena:** 2 m, fija. Fija: el tirador.
 - **Arma:** FIM-92 Stinger, guiado IR, 0.2–4.8 km (balísticos: — km), 10 m–3.8 km, 1 canales, 4 disparos, Pk base dron 0.5 · crucero 0.4 · supersonico 0.05 · balistico 0 · hiper 0
 
 - Stinger: más de US$400k; Igla: ~US$60–80k (dato viejo).
@@ -1241,6 +1261,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 18–20 km misil, 4 km cañones · 57E6: 1.300 m/s al apagar el motor, ≈900 m/s promedio a 12 km; guiado por mando radio, ojiva de varillas
 
 - **Sensor:** 1RS1 búsqueda (S) + 1RS2 seguimiento (Ku), Banda S (E/F OTAN), 30 km contra 1 m², sector 360°, refresco 1 s, ECCM 5 dB
+- **Altura de antena:** 6 m, fija. Fija: radares sobre el camión (altura estimada).
 - **Arma:** 57E6, guiado mando, 1–18 km (balísticos: 5 km), 5 m–15 km, 3 canales, 12 disparos, Pk base dron 0.65 · crucero 0.6 · supersonico 0.3 · balistico 0.1 · hiper 0
 
 - Radar de búsqueda: 36 km contra 2 m², 20 km contra un misil de crucero de 0,1 m².
@@ -1274,6 +1295,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 15–16 km, techo 10 km · 9M338: lanzamiento vertical, guiado por mando
 
 - **Sensor:** Búsqueda (banda F ≈ S) + seguimiento (G/H y Ku), Banda S (E/F OTAN), 25 km contra 1 m², sector 360°, refresco 1 s, ECCM 5 dB
+- **Altura de antena:** 4 m, fija. Fija: radar sobre el vehículo de orugas (altura estimada).
 - **Arma:** 9M338, guiado mando, 1–15 km (balísticos: 5 km), 10 m–10 km, 4 canales, 16 disparos, Pk base dron 0.75 · crucero 0.7 · supersonico 0.35 · balistico 0.1 · hiper 0
 
 - Defensa de punto contra drones, bombas planeadoras y misiles de crucero.
@@ -1306,6 +1328,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 48N6DM: 240–250 km; 40N6: hasta 380–400 km · 48N6: ≈2.000 m/s, guiado TVM; 9M96E2 (activo) para corto/medio alcance
 
 - **Sensor:** 92N6 Grave Stone (en torre 40V6M), Banda X (I/J OTAN), 200 km contra 1 m², sector 120°, refresco 2 s, ECCM 8 dB
+- **Altura de antena:** 25 m por defecto, regulable 7–39 m. Sin torre, la antena queda a ≈7 m sobre su vehículo (estimado); en la torre 40V6M a ≈25 m y en la 40V6MD a ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h, no se cambia durante el combate.
 - **Arma:** 48N6, guiado TVM, 3–250 km (balísticos: 60 km), 10 m–27 km, 10 canales, 32 disparos, Pk base dron 0.75 · crucero 0.7 · supersonico 0.6 · balistico 0.5 · hiper 0.3
 
 - Ucrania destruyó varios radares (92N6, 96L6, 91N6) y lanzadores con ATACMS, Neptune y drones.
@@ -1342,6 +1365,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 200 km instrumentados; contra 1 m² a 50 m de altura ≈110–115 km con mástil
 
 - **Sensor:** 36D6 "Tin Shield", Banda S (E/F OTAN), 175 km contra 1 m², sector 360°, refresco 5 s, ECCM 3 dB
+- **Altura de antena:** 10 m por defecto, regulable 10–39 m. Sobre su remolque ≈10 m (estimado); puede ir en la torre 40V6M/MD hasta ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h.
 
 - Radar de alerta y adquisición que alimenta a las baterías S-300. Rota a 6 o 12 rpm.
 - Podés subirle el mástil (torre 40V6M) para ver más lejos a baja cota.
@@ -1368,6 +1392,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 P-18MR contra 1 m²: 35 km a 100 m de altura, 120 km a 5 km
 
 - **Sensor:** P-18MR, VHF (banda métrica), 160 km contra 1 m², sector 360°, refresco 6 s, ECCM 0 dB
+- **Altura de antena:** 8 m, fija. Fija: antenas Yagi sobre su soporte (altura estimada).
 
 - En VHF las formas furtivas pierden efecto: la RCS del Kh-101 o del Storm Shadow "crece" mucho.
 - Precisión pobre: sirve para alerta y para pasar pistas a la red, no para guiar misiles.
@@ -1394,6 +1419,7 @@ P-18MR contra 1 m²: 35 km a 100 m de altura, 120 km a 5 km
 ≈5 km por grupo de sensores (cada micrófono oye 1–3 km)
 
 - **Sensor:** Micrófonos en red, Acústico, 5 km contra 1 m², sector 360°, refresco 2 s, ECCM inmune
+- **Altura de antena:** 0 m, fija. Micrófonos a nivel del suelo.
 
 - ~10.000 sensores de US$400–500 c/u conectados por celular.
 - Solo detecta drones con motor; no ve misiles ni blancos muy altos.

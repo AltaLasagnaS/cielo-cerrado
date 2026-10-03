@@ -33,7 +33,11 @@ export function renderSel(live) {
     if (S.started) html += `<dt>Estado</dt><dd style="color:${u.alive ? 'var(--ok)' : 'var(--red)'}">${u.alive ? 'Operativa' : 'Destruida'}</dd>`;
     html += '</dl>';
     if (ed) {
-      if (r && d.kind !== 'aew' && r.band !== 'ACU' && r.band !== 'OPT') html += `<div class="field"><label for="sMast">Altura de antena / mástil</label><span class="val">${u.mast} m</span><input id="sMast" type="range" min="2" max="40" value="${u.mast}"></div>`;
+      if (r && d.kind !== 'aew' && r.band !== 'ACU' && r.band !== 'OPT') {
+        const [lo, hi] = r.mastRange || [r.mast, r.mast];
+        html += lo === hi ? `<div class="field"><label>Altura de antena</label><span class="val">${u.mast} m · fija</span></div>` : `<div class="field"><label for="sMast">Altura de antena / mástil</label><span class="val">${u.mast} m</span><input id="sMast" type="range" min="${lo}" max="${hi}" value="${u.mast}"></div>`;
+        if (r.mastNote) html += `<p class="hint">${esc(r.mastNote)}</p>`;
+      }
       if (d.kind === 'aew') html += `<div class="field"><label for="sAlt">Altitud de vuelo</label><span class="val">${u.alt} m</span><input id="sAlt" type="range" min="2000" max="11000" step="250" value="${u.alt}"></div>`;
       if (r && (r.sector < 360)) html += `<div class="field"><label for="sAz">${r.side ? 'Rumbo de vuelo' : 'Orientación del sector'}</label><span class="val">${u.az}°</span><input id="sAz" type="range" min="0" max="359" value="${u.az}"></div>`;
       if (d.sam) html += `<label class="check"><input type="checkbox" id="sNoD" ${u.noDrones ? 'checked' : ''}> No gastar en drones (reservar para misiles)</label><div class="field"><label for="sMag">Munición disponible</label><input id="sMag" class="inp" type="number" min="1" max="200" value="${u.mag}"></div><div class="field"><label for="sSal">Interceptores por blanco</label><input id="sSal" class="inp" type="number" min="1" max="4" value="${u.salvo}"></div>`;

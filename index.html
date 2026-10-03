@@ -417,6 +417,8 @@ table.t.mc td.pc{white-space:nowrap}
       v: 51,
       agl: 2e3,
       aglRange: [50, 5e3],
+      aglModes: [["Bajo (2022–23)", 1e3], ["Alto (desde 2025)", 3e3]],
+      aglNote: "Volaba a 700–2.000 m en 2022–23; desde 2025, 2–5 km con picada final (Forbes, Ukrainska Pravda). Por debajo de ~50 m choca con el terreno y los cables.",
       rcs: 0.02,
       rcsSide: 0.14,
       rcsRear: 0.03,
@@ -443,6 +445,7 @@ table.t.mc td.pc{white-space:nowrap}
       v: 92,
       agl: 1500,
       aglRange: [100, 5e3],
+      aglNote: "Estimación: mismo envolvente que el Geran-2.",
       rcs: 0.03,
       rcsSide: 0.2,
       rcsRear: 0.05,
@@ -470,6 +473,7 @@ table.t.mc td.pc{white-space:nowrap}
       v: 40,
       agl: 1200,
       aglRange: [100, 3e3],
+      aglNote: "Señuelo: vuela a la altura de los Shahed que acompaña.",
       rcs: 0.02,
       rcsSide: 0.05,
       rcsRear: 0.03,
@@ -497,7 +501,9 @@ table.t.mc td.pc{white-space:nowrap}
       ir: true,
       v: 200,
       agl: 50,
-      aglRange: [30, 300],
+      aglRange: [30, 6e3],
+      aglModes: [["Rasante", 50], ["Crucero alto", 6e3]],
+      aglNote: "30–70 m siguiendo el terreno; también puede cruzar a ≈6.000 m (Wikipedia, CSIS). Alto ahorra combustible pero lo ve cualquier radar.",
       rcs: 0.03,
       rcsSide: 0.13,
       rcsRear: 0.042,
@@ -524,6 +530,8 @@ table.t.mc td.pc{white-space:nowrap}
       v: 240,
       agl: 50,
       aglRange: [20, 300],
+      aglModes: [["Sobre el mar", 20], ["Sobre tierra", 50]],
+      aglNote: "≈20 m sobre el agua, 50–150 m sobre tierra (Wikipedia).",
       rcs: 0.1,
       rcsSide: 0.45,
       rcsRear: 0.14,
@@ -549,7 +557,9 @@ table.t.mc td.pc{white-space:nowrap}
       prof: "cruise",
       v: 250,
       agl: 50,
-      aglRange: [20, 1e3],
+      aglRange: [6, 6e3],
+      aglModes: [["Rasante", 50], ["Crucero alto", 6e3]],
+      aglNote: "Tramo medio a ≈6 km de altura y 7–150 m al acercarse al blanco (RUSI).",
       rcs: 0.1,
       rcsSide: 0.45,
       rcsRear: 0.14,
@@ -717,6 +727,7 @@ table.t.mc td.pc{white-space:nowrap}
       v: 275,
       agl: 35,
       aglRange: [30, 300],
+      aglNote: "30–40 m en la fase rasante (Defense Mirror); más alto es estimación.",
       rcs: 0.05,
       rcsSide: 0.17,
       rcsRear: 0.071,
@@ -768,7 +779,9 @@ table.t.mc td.pc{white-space:nowrap}
       prof: "cruise",
       v: 260,
       agl: 15,
-      aglRange: [5, 300],
+      aglRange: [3, 300],
+      aglModes: [["Sobre el mar", 5], ["Sobre tierra", 30]],
+      aglNote: "3–5 m sobre el mar (RBC-Ucrania); ≈30 m sobre tierra es estimación.",
       rcs: 0.1,
       rcsSide: 0.45,
       rcsRear: 0.14,
@@ -795,6 +808,7 @@ table.t.mc td.pc{white-space:nowrap}
       v: 56,
       agl: 500,
       aglRange: [50, 3e3],
+      aglNote: "Estimación: envolvente análogo al Shahed.",
       rcs: 0.3,
       rcsSide: 0.77,
       rcsRear: 0.3,
@@ -821,6 +835,7 @@ table.t.mc td.pc{white-space:nowrap}
       v: 245,
       agl: 35,
       aglRange: [15, 1e3],
+      aglNote: "Declarado: 15–114 m en crucero (Wikipedia); el tope de 1.000 m es estimación.",
       rcs: 1,
       rcsSide: 2.4,
       rcsRear: 1.4,
@@ -848,7 +863,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
-      radar: { name: "AN/MPQ-65", band: "C", R1: 100, mast: 4, sector: 90, eccm: 10, scan: 2 },
+      radar: { name: "AN/MPQ-65", band: "C", R1: 100, mast: 4, mastRange: [4, 4], mastNote: "Fija: la antena va sobre el semirremolque M860, inclinada a 67,5°. El mástil de ≈30 m de la batería (AMG) es de comunicaciones, no del radar (FM 3-01.85).", sector: 90, eccm: 10, scan: 2 },
       sam: { maxR: 100, maxRtbm: 40, minR: 3, altMin: 50, altMax: 36e3, vInt: 1300, vmaxT: 3e3, react: 9, ch: 8, mag: 16, salvo: 2, guid: "activo", shot: "PAC-3 MSE", noDrones: true, cost: 4.2, pk: { dron: 0.9, crucero: 0.9, supersonico: 0.6, balistico: 0.7, hiper: 0.5 } },
       range: "≈40 km vs balísticos (estimado), ≈100 km vs aeronaves",
       interceptor: "PAC-3 MSE: hit-to-kill, buscador activo, motor de doble pulso, techo ≈36 km",
@@ -861,7 +876,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
-      radar: { name: "AN/MPQ-65", band: "C", R1: 100, mast: 4, sector: 90, eccm: 10, scan: 2 },
+      radar: { name: "AN/MPQ-65", band: "C", R1: 100, mast: 4, mastRange: [4, 4], mastNote: "Fija: la antena va sobre el semirremolque M860. El mástil de ≈30 m (AMG) es de comunicaciones, no del radar.", sector: 90, eccm: 10, scan: 2 },
       sam: { maxR: 160, maxRtbm: 20, minR: 3, altMin: 60, altMax: 24e3, vInt: 900, vmaxT: 2500, react: 9, ch: 8, mag: 16, salvo: 2, guid: "TVM", shot: "PAC-2 GEM-T", noDrones: true, cost: 3, pk: { dron: 0.8, crucero: 0.85, supersonico: 0.55, balistico: 0.4, hiper: 0.25 } },
       range: "≈160 km vs aeronaves, ≈20 km vs balísticos",
       interceptor: "GEM-T: fragmentación, guiado TVM (necesita que el radar propio vea el blanco), Mach ≈3,5",
@@ -874,7 +889,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
-      radar: { name: "Arabel", band: "X", R1: 80, mast: 5, sector: 360, eccm: 10, scan: 1 },
+      radar: { name: "Arabel", band: "X", R1: 80, mast: 5, mastRange: [5, 5], mastNote: "Fija: Arabel montado sobre camión (altura estimada).", sector: 360, eccm: 10, scan: 1 },
       sam: { maxR: 100, maxRtbm: 25, minR: 3, altMin: 50, altMax: 2e4, vInt: 1050, vmaxT: 2500, react: 8, ch: 10, mag: 32, salvo: 2, guid: "activo", shot: "Aster 30", noDrones: true, cost: 2, pk: { dron: 0.85, crucero: 0.88, supersonico: 0.6, balistico: 0.6, hiper: 0.4 } },
       range: "≈100 km vs aeronaves (50 km por debajo de 3 km de altura), 20–35 km vs balísticos",
       interceptor: 'Aster 30: 1,4 km/s, buscador activo, control "PIF-PAF" (toberas laterales para maniobra final)',
@@ -887,7 +902,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
-      radar: { name: "Hensoldt TRML-4D", band: "C", R1: 100, mast: 6, sector: 360, eccm: 10, scan: 1 },
+      radar: { name: "Hensoldt TRML-4D", band: "C", R1: 100, mast: 6, mastRange: [4, 12], mastNote: "Mástil hidráulico sobre el camión: la antena llega hasta 12 m (Hensoldt). Retraído ≈4 m (estimado).", sector: 360, eccm: 10, scan: 1 },
       sam: { maxR: 40, maxRtbm: 0, minR: 1, altMin: 10, altMax: 2e4, vInt: 750, vmaxT: 1200, react: 6, ch: 8, mag: 24, salvo: 1, guid: "IR", shot: "IRIS-T SL", cost: 0.5, pk: { dron: 0.9, crucero: 0.88, supersonico: 0.2, balistico: 0, hiper: 0 } },
       range: "40 km, techo 20 km (SLX: 80 km)",
       interceptor: "IRIS-T SL: guiado inercial + datalink, buscador IR de imagen terminal, ≈Mach 3",
@@ -900,7 +915,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
-      radar: { name: "AN/MPQ-64 Sentinel", band: "X", R1: 60, mast: 4, sector: 360, eccm: 8, scan: 2 },
+      radar: { name: "AN/MPQ-64 Sentinel", band: "X", R1: 60, mast: 4, mastRange: [4, 4], mastNote: "Fija: Sentinel sobre remolque (altura estimada).", sector: 360, eccm: 8, scan: 2 },
       sam: { maxR: 35, maxRtbm: 0, minR: 1, altMin: 30, altMax: 15e3, vInt: 900, vmaxT: 1e3, react: 6, ch: 6, mag: 18, salvo: 1, guid: "activo", shot: "AIM-120", cost: 1.07, pk: { dron: 0.85, crucero: 0.88, supersonico: 0.4, balistico: 0, hiper: 0 } },
       range: "≈35–40 km (AMRAAM-ER: 50–60 km)",
       interceptor: "AIM-120: misil aire-aire adaptado, buscador radar activo",
@@ -913,7 +928,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
-      radar: { name: "30N6 Flap Lid (en torre 40V6)", band: "X", R1: 100, mast: 25, sector: 90, eccm: 3, scan: 2 },
+      radar: { name: "30N6 Flap Lid (en torre 40V6)", band: "X", R1: 100, mast: 25, mastRange: [7, 39], mastNote: "Sin torre, la antena queda a ≈7 m sobre su vehículo (estimado); en la torre 40V6M a ≈25 m y en la 40V6MD a ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h, no se cambia durante el combate.", sector: 90, eccm: 3, scan: 2 },
       sam: { maxR: 75, maxRtbm: 25, minR: 5, altMin: 25, altMax: 27e3, vInt: 1300, vmaxT: 1300, react: 12, ch: 4, mag: 16, salvo: 2, guid: "TVM", shot: "5V55R", cost: 0.5, pk: { dron: 0.5, crucero: 0.6, supersonico: 0.4, balistico: 0.15, hiper: 0.05 } },
       range: "47 km (5V55K) / 75 km (5V55R), techo 27 km",
       interceptor: "5V55: hasta 2.000 m/s, guiado por mando (K) o TVM (R)",
@@ -926,7 +941,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "both",
       kind: "sam",
       color: "#62b6ff",
-      radar: { name: "9S35 Fire Dome (+9S18M1 Snow Drift)", band: "X", R1: 50, mast: 4, sector: 360, eccm: 3, scan: 2 },
+      radar: { name: "9S35 Fire Dome (+9S18M1 Snow Drift)", band: "X", R1: 50, mast: 4, mastRange: [4, 4], mastNote: "Fija: radar sobre el vehículo de orugas (altura estimada).", sector: 360, eccm: 3, scan: 2 },
       sam: { maxR: 35, maxRtbm: 10, minR: 3.3, altMin: 15, altMax: 22e3, vInt: 650, vmaxT: 830, react: 22, ch: 3, mag: 12, salvo: 2, guid: "SARH", shot: "9M38", cost: 0.5, pk: { dron: 0.55, crucero: 0.6, supersonico: 0.35, balistico: 0.05, hiper: 0 } },
       range: "3,3–35 km, techo 22 km",
       interceptor: "9M38: ≈Mach 3, semiactivo: el radar del lanzador tiene que iluminar el blanco hasta el impacto",
@@ -939,7 +954,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "gun",
       color: "#62b6ff",
-      radar: { name: "Búsqueda S + seguimiento Ku", band: "S", R1: 15, mast: 3, sector: 360, eccm: 0, scan: 1 },
+      radar: { name: "Búsqueda S + seguimiento Ku", band: "S", R1: 15, mast: 3, mastRange: [3, 3], mastNote: "Fija: radar sobre la torreta (altura estimada).", sector: 360, eccm: 0, scan: 1 },
       sam: { maxR: 4, maxRtbm: 0, minR: 0.1, altMin: 0, altMax: 3e3, vInt: 1100, vmaxT: 400, react: 3, ch: 1, mag: 20, salvo: 1, guid: "cañón", shot: "ráfaga 35 mm", cost: 0.018, pk: { dron: 0.55, crucero: 0.35, supersonico: 0.05, balistico: 0, hiper: 0 } },
       range: "≈3,5–4 km típico (5,5 km con FAPDS)",
       interceptor: "Dos cañones Oerlikon 35 mm, 550 disparos/min cada uno, 640 proyectiles a bordo",
@@ -952,7 +967,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "gun",
       color: "#62b6ff",
-      radar: { name: "Visual / térmico", band: "OPT", R1: 5, mast: 2, sector: 360, eccm: 99, scan: 1 },
+      radar: { name: "Visual / térmico", band: "OPT", R1: 5, mast: 2, mastRange: [2, 2], mastNote: "Fija: ojos y óptica del equipo.", sector: 360, eccm: 99, scan: 1 },
       sam: { maxR: 1.5, maxRtbm: 0, minR: 0, altMin: 0, altMax: 1500, vInt: 800, vmaxT: 250, react: 5, ch: 1, mag: 30, salvo: 1, guid: "cañón", shot: "ráfaga 12,7 mm", cost: 3e-4, pk: { dron: 0.2, crucero: 0.05, supersonico: 0, balistico: 0, hiper: 0 } },
       range: "≈1,5 km",
       interceptor: "Pickup con ametralladora pesada (DShK/M2), reflector y visor térmico",
@@ -965,7 +980,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "both",
       kind: "sam",
       color: "#62b6ff",
-      radar: { name: "Visual / IR", band: "OPT", R1: 7, mast: 2, sector: 360, eccm: 99, scan: 1 },
+      radar: { name: "Visual / IR", band: "OPT", R1: 7, mast: 2, mastRange: [2, 2], mastNote: "Fija: el tirador.", sector: 360, eccm: 99, scan: 1 },
       sam: { maxR: 4.8, maxRtbm: 0, minR: 0.2, altMin: 10, altMax: 3800, vInt: 550, vmaxT: 400, react: 6, ch: 1, mag: 4, salvo: 1, guid: "IR", shot: "FIM-92 Stinger", cost: 0.45, pk: { dron: 0.5, crucero: 0.4, supersonico: 0.05, balistico: 0, hiper: 0 } },
       range: "≈4,8 km, techo ≈3,8 km",
       interceptor: "Misil portátil con buscador infrarrojo (Stinger Mach 2,2; Igla ≈570 m/s)",
@@ -991,7 +1006,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "RU",
       kind: "sam",
       color: "#ff9f5a",
-      radar: { name: "1RS1 búsqueda (S) + 1RS2 seguimiento (Ku)", band: "S", R1: 30, mast: 6, sector: 360, eccm: 5, scan: 1 },
+      radar: { name: "1RS1 búsqueda (S) + 1RS2 seguimiento (Ku)", band: "S", R1: 30, mast: 6, mastRange: [6, 6], mastNote: "Fija: radares sobre el camión (altura estimada).", sector: 360, eccm: 5, scan: 1 },
       sam: { maxR: 18, maxRtbm: 5, minR: 1, altMin: 5, altMax: 15e3, vInt: 900, vmaxT: 1e3, react: 5, ch: 3, mag: 12, salvo: 2, guid: "mando", shot: "57E6", cost: 0.15, pk: { dron: 0.65, crucero: 0.6, supersonico: 0.3, balistico: 0.1, hiper: 0 } },
       range: "18–20 km misil, 4 km cañones",
       interceptor: "57E6: 1.300 m/s al apagar el motor, ≈900 m/s promedio a 12 km; guiado por mando radio, ojiva de varillas",
@@ -1004,7 +1019,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "RU",
       kind: "sam",
       color: "#ff9f5a",
-      radar: { name: "Búsqueda (banda F ≈ S) + seguimiento (G/H y Ku)", band: "S", R1: 25, mast: 4, sector: 360, eccm: 5, scan: 1 },
+      radar: { name: "Búsqueda (banda F ≈ S) + seguimiento (G/H y Ku)", band: "S", R1: 25, mast: 4, mastRange: [4, 4], mastNote: "Fija: radar sobre el vehículo de orugas (altura estimada).", sector: 360, eccm: 5, scan: 1 },
       sam: { maxR: 15, maxRtbm: 5, minR: 1, altMin: 10, altMax: 1e4, vInt: 700, vmaxT: 700, react: 6, ch: 4, mag: 16, salvo: 1, guid: "mando", shot: "9M338", cost: 0.3, pk: { dron: 0.75, crucero: 0.7, supersonico: 0.35, balistico: 0.1, hiper: 0 } },
       range: "15–16 km, techo 10 km",
       interceptor: "9M338: lanzamiento vertical, guiado por mando",
@@ -1017,7 +1032,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "RU",
       kind: "sam",
       color: "#ff9f5a",
-      radar: { name: "92N6 Grave Stone (en torre 40V6M)", band: "X", R1: 200, mast: 25, sector: 120, eccm: 8, scan: 2 },
+      radar: { name: "92N6 Grave Stone (en torre 40V6M)", band: "X", R1: 200, mast: 25, mastRange: [7, 39], mastNote: "Sin torre, la antena queda a ≈7 m sobre su vehículo (estimado); en la torre 40V6M a ≈25 m y en la 40V6MD a ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h, no se cambia durante el combate.", sector: 120, eccm: 8, scan: 2 },
       sam: { maxR: 250, maxRtbm: 60, minR: 3, altMin: 10, altMax: 27e3, vInt: 1500, vmaxT: 4800, react: 9, ch: 10, mag: 32, salvo: 2, guid: "TVM", shot: "48N6", noDrones: true, cost: 1.5, pk: { dron: 0.75, crucero: 0.7, supersonico: 0.6, balistico: 0.5, hiper: 0.3 } },
       range: "48N6DM: 240–250 km; 40N6: hasta 380–400 km",
       interceptor: "48N6: ≈2.000 m/s, guiado TVM; 9M96E2 (activo) para corto/medio alcance",
@@ -1030,7 +1045,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "both",
       kind: "sensor",
       color: "#62b6ff",
-      radar: { name: '36D6 "Tin Shield"', band: "S", R1: 175, mast: 10, sector: 360, eccm: 3, scan: 5 },
+      radar: { name: '36D6 "Tin Shield"', band: "S", R1: 175, mast: 10, mastRange: [10, 39], mastNote: "Sobre su remolque ≈10 m (estimado); puede ir en la torre 40V6M/MD hasta ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h.", sector: 360, eccm: 3, scan: 5 },
       range: "200 km instrumentados; contra 1 m² a 50 m de altura ≈110–115 km con mástil",
       notes: ["Radar de alerta y adquisición que alimenta a las baterías S-300. Rota a 6 o 12 rpm.", "Podés subirle el mástil (torre 40V6M) para ver más lejos a baja cota."],
       sources: [SRC.rt_36d6, SRC.uos_36d6]
@@ -1041,7 +1056,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "both",
       kind: "sensor",
       color: "#62b6ff",
-      radar: { name: "P-18MR", band: "VHF", R1: 160, mast: 8, sector: 360, eccm: 0, scan: 6 },
+      radar: { name: "P-18MR", band: "VHF", R1: 160, mast: 8, mastRange: [8, 8], mastNote: "Fija: antenas Yagi sobre su soporte (altura estimada).", sector: 360, eccm: 0, scan: 6 },
       range: "P-18MR contra 1 m²: 35 km a 100 m de altura, 120 km a 5 km",
       notes: ['En VHF las formas furtivas pierden efecto: la RCS del Kh-101 o del Storm Shadow "crece" mucho.', "Precisión pobre: sirve para alerta y para pasar pistas a la red, no para guiar misiles."],
       sources: [WP("P-18_radar"), SRC.dx_p18]
@@ -1052,7 +1067,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "acoustic",
       color: "#62b6ff",
-      radar: { name: "Micrófonos en red", band: "ACU", R1: 5, mast: 0, sector: 360, eccm: 99, scan: 2, altMax: 3e3 },
+      radar: { name: "Micrófonos en red", band: "ACU", R1: 5, mast: 0, mastRange: [0, 0], mastNote: "Micrófonos a nivel del suelo.", sector: 360, eccm: 99, scan: 2, altMax: 3e3 },
       range: "≈5 km por grupo de sensores (cada micrófono oye 1–3 km)",
       notes: ["~10.000 sensores de US$400–500 c/u conectados por celular.", "Solo detecta drones con motor; no ve misiles ni blancos muy altos.", "Inmune a la interferencia de radar y al RCS."],
       sources: [WP("Sky_Fortress_(drone_defense_system)"), SRC.odessa_sf]
@@ -4696,7 +4711,11 @@ table.t.mc td.pc{white-space:nowrap}
       if (S.started) html += `<dt>Estado</dt><dd style="color:${u.alive ? "var(--ok)" : "var(--red)"}">${u.alive ? "Operativa" : "Destruida"}</dd>`;
       html += "</dl>";
       if (ed) {
-        if (r && d.kind !== "aew" && r.band !== "ACU" && r.band !== "OPT") html += `<div class="field"><label for="sMast">Altura de antena / mástil</label><span class="val">${u.mast} m</span><input id="sMast" type="range" min="2" max="40" value="${u.mast}"></div>`;
+        if (r && d.kind !== "aew" && r.band !== "ACU" && r.band !== "OPT") {
+          const [lo, hi] = r.mastRange || [r.mast, r.mast];
+          html += lo === hi ? `<div class="field"><label>Altura de antena</label><span class="val">${u.mast} m · fija</span></div>` : `<div class="field"><label for="sMast">Altura de antena / mástil</label><span class="val">${u.mast} m</span><input id="sMast" type="range" min="${lo}" max="${hi}" value="${u.mast}"></div>`;
+          if (r.mastNote) html += `<p class="hint">${esc(r.mastNote)}</p>`;
+        }
         if (d.kind === "aew") html += `<div class="field"><label for="sAlt">Altitud de vuelo</label><span class="val">${u.alt} m</span><input id="sAlt" type="range" min="2000" max="11000" step="250" value="${u.alt}"></div>`;
         if (r && r.sector < 360) html += `<div class="field"><label for="sAz">${r.side ? "Rumbo de vuelo" : "Orientación del sector"}</label><span class="val">${u.az}°</span><input id="sAz" type="range" min="0" max="359" value="${u.az}"></div>`;
         if (d.sam) html += `<label class="check"><input type="checkbox" id="sNoD" ${u.noDrones ? "checked" : ""}> No gastar en drones (reservar para misiles)</label><div class="field"><label for="sMag">Munición disponible</label><input id="sMag" class="inp" type="number" min="1" max="200" value="${u.mag}"></div><div class="field"><label for="sSal">Interceptores por blanco</label><input id="sSal" class="inp" type="number" min="1" max="4" value="${u.salvo}"></div>`;
@@ -4822,7 +4841,9 @@ table.t.mc td.pc{white-space:nowrap}
       <div class="field"><label for="aInt">Intervalo entre lanzamientos (s)</label><input id="aInt" class="inp" type="number" min="0" max="600" value="${a.interval}"></div>
       <label class="check"><input type="checkbox" id="aSync" ${a.sync ? "checked" : ""}> Sincronizar llegada (en vez de hora de lanzamiento)</label>
       <div class="field"><label for="aTime">${a.sync ? "Llegada del primero en T+ (s)" : "Lanzamiento en T+ (s)"}</label><input id="aTime" class="inp" type="number" min="0" max="7200" value="${a.sync ? a.tArrive : a.tStart}"></div>
-      ${T.aglRange ? `<div class="field"><label for="aAgl">Altura de vuelo sobre el terreno</label><span class="val" id="aAglV">${a.agl} m</span><input id="aAgl" type="range" min="${T.aglRange[0]}" max="${T.aglRange[1]}" step="5" value="${a.agl}"></div>` : ""}
+      ${T.aglRange ? `<div class="field"><label for="aAgl">Altura de vuelo sobre el terreno</label><span class="val" id="aAglV">${a.agl} m</span><input id="aAgl" type="range" min="${T.aglRange[0]}" max="${T.aglRange[1]}" step="1" value="${a.agl}"></div>
+      <div class="row" id="aAglModes"><button class="btn sm" data-agl="${T.agl}">Típica${(T.aglModes || []).filter(([, h]) => h === T.agl).map(([n2]) => " · " + esc(n2)).join("")} (${T.agl} m)</button>${(T.aglModes || []).filter(([, h]) => h !== T.agl).map(([n2, h]) => `<button class="btn sm" data-agl="${h}">${esc(n2)} (${h} m)</button>`).join("")}</div>
+      <p class="hint">Límite real: ${T.aglRange[0]}–${T.aglRange[1]} m. ${esc(T.aglNote || "")}</p>` : ""}
       ${off ? `<div class="field"><label for="aDist">Distancia real de lanzamiento (km)</label><input id="aDist" class="inp" type="number" min="60" max="1500" value="${a.launchDist}"></div>` : ""}
       ${T.maneuver || T.prof === "ballistic" || T.cls === "crucero" ? `<label class="check"><input type="checkbox" id="aMan" ${a.maneuver ? "checked" : ""}> Maniobra evasiva terminal</label>` : ""}
       ${T.decoys ? `<label class="check"><input type="checkbox" id="aDec" ${a.decoys ? "checked" : ""}> Liberar ${T.decoys} señuelos en fase terminal</label>` : ""}
@@ -4858,6 +4879,13 @@ table.t.mc td.pc{white-space:nowrap}
     };
     if ($("#aAgl")) $("#aAgl").oninput = (e) => {
       a.agl = +e.target.value;
+      $("#aAglV").textContent = a.agl + " m";
+    };
+    if ($("#aAglModes")) $("#aAglModes").onclick = (e) => {
+      const b = e.target.closest("[data-agl]");
+      if (!b) return;
+      a.agl = +b.dataset.agl;
+      $("#aAgl").value = a.agl;
       $("#aAglV").textContent = a.agl + " m";
     };
     if ($("#aMan")) $("#aMan").onchange = (e) => {
@@ -5990,6 +6018,12 @@ table.t.mc td.pc{white-space:nowrap}
   }
   function validateScenario(raw) {
     const errors = [], warnings = [];
+    const inLimits = (w, v, lim, what) => {
+      if (typeof v !== "number" || !lim) return v;
+      const c = Math.min(lim[1], Math.max(lim[0], v));
+      if (c !== v) warnings.push(`${w}: ${v} m está fuera de ${what} (${lim[0]}–${lim[1]} m); se usa ${c} m.`);
+      return c;
+    };
     const err = (m2) => {
       if (errors.length < 30) errors.push(m2);
     };
@@ -6101,7 +6135,7 @@ table.t.mc td.pc{white-space:nowrap}
         y: u.y,
         name: str(w + " · name", u.name, 120),
         az: num2(w + " · az", u.az, 0, 360, { opt: true }),
-        mast: num2(w + " · mast", u.mast, 0, 200, { opt: true }),
+        mast: inLimits(w + " · mast", num2(w + " · mast", u.mast, 0, 200, { opt: true }), DEFENSES[u.type].radar?.mastRange, "la altura real de su antena"),
         alt: num2(w + " · alt", u.alt, 0, 2e4, { opt: true }),
         mag: num2(w + " · mag", u.mag, 0, 1e3, { int: true, opt: true }),
         salvo: num2(w + " · salvo", u.salvo, 0, 10, { int: true, opt: true }),
@@ -6134,7 +6168,7 @@ table.t.mc td.pc{white-space:nowrap}
         tStart: num2(w + " · tStart", sv.tStart, 0, T, { opt: true }),
         sync: bool(w + " · sync", sv.sync),
         tArrive: num2(w + " · tArrive", sv.tArrive, 0, T, { opt: true }),
-        agl: num2(w + " · agl", sv.agl, 0, 3e4, { opt: true }),
+        agl: inLimits(w + " · agl", num2(w + " · agl", sv.agl, 0, 3e4, { opt: true }), THREATS[sv.type].aglRange, "sus límites reales de vuelo"),
         launchDist: num2(w + " · launchDist", sv.launchDist, 1, 5e3, { opt: true }),
         maneuver: bool(w + " · maneuver", sv.maneuver),
         decoys: bool(w + " · decoys", sv.decoys)

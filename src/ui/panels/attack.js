@@ -30,7 +30,9 @@ export function renderAtk() {
       <div class="field"><label for="aInt">Intervalo entre lanzamientos (s)</label><input id="aInt" class="inp" type="number" min="0" max="600" value="${a.interval}"></div>
       <label class="check"><input type="checkbox" id="aSync" ${a.sync ? 'checked' : ''}> Sincronizar llegada (en vez de hora de lanzamiento)</label>
       <div class="field"><label for="aTime">${a.sync ? 'Llegada del primero en T+ (s)' : 'Lanzamiento en T+ (s)'}</label><input id="aTime" class="inp" type="number" min="0" max="7200" value="${a.sync ? a.tArrive : a.tStart}"></div>
-      ${T.aglRange ? `<div class="field"><label for="aAgl">Altura de vuelo sobre el terreno</label><span class="val" id="aAglV">${a.agl} m</span><input id="aAgl" type="range" min="${T.aglRange[0]}" max="${T.aglRange[1]}" step="5" value="${a.agl}"></div>` : ''}
+      ${T.aglRange ? `<div class="field"><label for="aAgl">Altura de vuelo sobre el terreno</label><span class="val" id="aAglV">${a.agl} m</span><input id="aAgl" type="range" min="${T.aglRange[0]}" max="${T.aglRange[1]}" step="1" value="${a.agl}"></div>
+      <div class="row" id="aAglModes"><button class="btn sm" data-agl="${T.agl}">Típica${(T.aglModes || []).filter(([, h]) => h === T.agl).map(([n]) => ' · ' + esc(n)).join('')} (${T.agl} m)</button>${(T.aglModes || []).filter(([, h]) => h !== T.agl).map(([n, h]) => `<button class="btn sm" data-agl="${h}">${esc(n)} (${h} m)</button>`).join('')}</div>
+      <p class="hint">Límite real: ${T.aglRange[0]}–${T.aglRange[1]} m. ${esc(T.aglNote || '')}</p>` : ''}
       ${off ? `<div class="field"><label for="aDist">Distancia real de lanzamiento (km)</label><input id="aDist" class="inp" type="number" min="60" max="1500" value="${a.launchDist}"></div>` : ''}
       ${T.maneuver || T.prof === 'ballistic' || T.cls === 'crucero' ? `<label class="check"><input type="checkbox" id="aMan" ${a.maneuver ? 'checked' : ''}> Maniobra evasiva terminal</label>` : ''}
       ${T.decoys ? `<label class="check"><input type="checkbox" id="aDec" ${a.decoys ? 'checked' : ''}> Liberar ${T.decoys} señuelos en fase terminal</label>` : ''}
@@ -45,6 +47,7 @@ export function renderAtk() {
   $('#aTime').onchange = e => { if (a.sync) a.tArrive = +e.target.value; else a.tStart = +e.target.value; };
   $('#aSync').onchange = e => { a.sync = e.target.checked; renderAtk(); };
   if ($('#aAgl')) $('#aAgl').oninput = e => { a.agl = +e.target.value; $('#aAglV').textContent = a.agl + ' m'; };
+  if ($('#aAglModes')) $('#aAglModes').onclick = e => { const b = e.target.closest('[data-agl]'); if (!b) return; a.agl = +b.dataset.agl; $('#aAgl').value = a.agl; $('#aAglV').textContent = a.agl + ' m'; };
   if ($('#aMan')) $('#aMan').onchange = e => { a.maneuver = e.target.checked; };
   if ($('#aDec')) $('#aDec').onchange = e => { a.decoys = e.target.checked; };
   $('#aRoute').onclick = () => { if (S.started) { toast('Reiniciá para editar el escenario.'); return; } S.route = { pts: [], targetUnit: null }; S.mode = 'route'; updateModebar(); renderAtk(); };

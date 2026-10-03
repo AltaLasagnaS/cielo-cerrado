@@ -47,7 +47,9 @@ Cada parámetro numérico relevante tiene un **rango** (mínimo, probable, máxi
 
 for (const [k, t] of Object.entries(THREATS)) {
   doc += `\n### ${t.name}\n\n\`${k}\` · ${t.side === 'RU' ? 'Rusia' : 'Ucrania / OTAN'} · ${CLS_NAME[t.cls]} · perfil \`${t.prof}\`\n\n${md(t.profile)}\n\n`;
-  doc += `- **Guiado:** ${md(t.guidance)}\n- **Propulsión:** ${md(t.engine)}\n- **Ojiva:** ${md(t.warhead)}\n- **Alcance:** ${md(t.range)}\n- **Costo:** ${md(t.costNote)}\n\n`;
+  doc += `- **Guiado:** ${md(t.guidance)}\n- **Propulsión:** ${md(t.engine)}\n- **Ojiva:** ${md(t.warhead)}\n- **Alcance:** ${md(t.range)}\n- **Costo:** ${md(t.costNote)}\n`;
+  if (t.aglRange) doc += `- **Altura de vuelo:** típica ${t.agl} m, límites reales ${t.aglRange[0]}–${t.aglRange[1]} m${t.aglModes ? ' · perfiles: ' + t.aglModes.map(([n, h]) => `${md(n)} ${h} m`).join(', ') : ''}. ${md(t.aglNote)}\n`;
+  doc += '\n';
   doc += t.notes.map(n => `- ${md(n)}`).join('\n') + '\n\n#### Parámetros\n\n' + uncTable('thr', k);
   if (OBS[k]?.length) doc += `\n#### Tasas de intercepción reportadas\n\n| Período | Lanzados | Derribados | Tasa | Nota | Fuente |\n|---|---:|---:|---|---|---|\n` + OBS[k].map(o => `| ${md(o[0])} | ${o[1] ?? '—'} | ${o[2] ?? '—'} | ${md(o[3])} | ${md(o[5])} | ${link(SRC_REF(o[4]))} |`).join('\n') + '\n';
   doc += `\n#### Fuentes generales\n\n${t.sources.map(s => '- ' + link(s)).join('\n')}\n`;
@@ -58,6 +60,7 @@ for (const [k, d] of Object.entries(DEFENSES)) {
   doc += `\n### ${d.name}\n\n\`${k}\` · ${d.side === 'RU' ? 'Rusia' : d.side === 'UA' ? 'Ucrania / OTAN' : 'ambos bandos'} · tipo \`${d.kind}\`\n\n`;
   if (d.range) doc += `${md(d.range)}${d.interceptor ? ' · ' + md(d.interceptor) : ''}\n\n`;
   if (d.radar) doc += `- **Sensor:** ${md(d.radar.name)}, ${BANDS[d.radar.band].name}, ${d.radar.R1} km contra 1 m², sector ${d.radar.sector}°, refresco ${d.radar.scan} s, ECCM ${d.radar.eccm >= 99 ? 'inmune' : d.radar.eccm + ' dB'}\n`;
+  if (d.radar?.mastRange) { const [lo, hi] = d.radar.mastRange; doc += `- **Altura de antena:** ${lo === hi ? lo + ' m, fija' : d.radar.mast + ' m por defecto, regulable ' + lo + '–' + hi + ' m'}. ${md(d.radar.mastNote)}\n`; }
   if (d.sam) doc += `- **Arma:** ${md(d.sam.shot)}, guiado ${d.sam.guid}, ${d.sam.minR}–${d.sam.maxR} km (balísticos: ${d.sam.maxRtbm || '—'} km), ${d.sam.altMin} m–${d.sam.altMax / 1000} km, ${d.sam.ch} canales, ${d.sam.mag} disparos, Pk base ${Object.entries(d.sam.pk).map(([c, v]) => c + ' ' + v).join(' · ')}\n`;
   doc += '\n' + d.notes.map(n => `- ${md(n)}`).join('\n') + '\n\n#### Parámetros\n\n' + uncTable('def', k) + `\n#### Fuentes generales\n\n${d.sources.map(s => '- ' + link(s)).join('\n')}\n`;
 }

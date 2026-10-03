@@ -33,20 +33,32 @@ for (const key of ['mb_noche', 'gb_ruso']) {
 
 test('guardar y cargar conserva lo que edita el jugador (mástil, munición, reglas, jammer apagado)', () => {
   const file = exported('mb_noche', S => {
-    const u = S.setup.defs.find(d => d.name === 'Patriot-1'); u.mast = 30; u.mag = 4; u.az = 10; u.noDrones = true;
+    const u = S.setup.defs.find(d => d.name === 'Patriot-1'); u.mag = 4; u.az = 10; u.noDrones = true;
+    S.setup.defs.find(d => d.name === 'IRIS-T-1').mast = 11;
     S.setup.objs[0].maxHp = 1234; S.setup.jams[0].on = false; S.c2 = 'descoordinada'; S.doctrine = 'sls';
   });
   clearSetup();
   const res = validateScenario(file); assert.ok(res.ok, res.errors.join('\n'));
   loadScenarioData(res.data);
   const u = S.setup.defs.find(d => d.name === 'Patriot-1');
-  assert.deepEqual([u.mast, u.mag, u.az, u.noDrones], [30, 4, 10, true]);
+  assert.deepEqual([u.mag, u.az, u.noDrones], [4, 10, true]);
+  assert.equal(S.setup.defs.find(d => d.name === 'IRIS-T-1').mast, 11);
   assert.equal(S.setup.objs[0].maxHp, 1234);
   assert.equal(S.setup.jams[0].on, false);
   assert.equal(S.c2, 'descoordinada'); assert.equal(S.doctrine, 'sls');
   // las salvas siguen apuntando a la misma defensa aunque los ids cambien
   const isk = S.setup.salvos.find(sv => sv.type === 'isk_m');
   assert.equal(S.setup.defs.find(d => d.id === isk.targetUnit).name, 'Patriot-1');
+});
+
+test('cargar: mástil y altura de vuelo fuera de los límites reales se acomodan al borde, con aviso', () => {
+  const file = exported('mb_noche');
+  const pat = file.setup.defs.find(d => d.type === 'patriot'); pat.mast = 30;          // radar fijo de 4 m
+  const sh = file.setup.salvos.find(sv => sv.type === 'shahed'); sh.agl = 20;          // mínimo real 50 m
+  const res = validateScenario(file); assert.ok(res.ok, res.errors.join('\n'));
+  assert.equal(res.data.setup.defs.find(d => d.id === pat.id).mast, 4);
+  assert.equal(res.data.setup.salvos.find(sv => sv.id === sh.id).agl, 50);
+  assert.equal(res.warnings.length, 2, res.warnings.join('\n'));
 });
 
 test('nombre de archivo sin acentos ni símbolos', () => {

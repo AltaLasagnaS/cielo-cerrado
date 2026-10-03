@@ -106,7 +106,7 @@ El botón **Guardar** descarga `S.setup` más las reglas y las metas como JSON (
  "scenario": { "base": "mb_noche", "name": "…", "player": "defensa", "goals": [ … ], "description": "…" },
  "setup": {
   "objs":   [ { "id": 1, "type": "fuel", "x": 63.5, "y": 55.8, "name": "…", "maxHp": 800 } ],
-  "defs":   [ { "id": 4, "type": "patriot", "x": 58, "y": 58, "name": "Patriot-1", "az": 320, "mast": 12, "mag": 16, "salvo": 2 } ],
+  "defs":   [ { "id": 4, "type": "patriot", "x": 58, "y": 58, "name": "Patriot-1", "az": 320, "mast": 4, "mag": 16, "salvo": 2 } ],
   "salvos": [ { "id": 18, "type": "isk_m", "count": 2, "pts": [[60, 0], [58.2, 58]], "targetUnit": 4, "sync": true, "tArrive": 1530 } ],
   "jams":   [ { "id": 24, "type": "soj", "x": 4, "y": 18, "alt": 8000, "on": true } ]
  }

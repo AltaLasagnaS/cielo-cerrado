@@ -210,6 +210,8 @@ horizonte:         d ≈ 4,12 · (√h_radar + √h_blanco)     [km; h en m]
 bulto terrestre:   b = d₁·d₂ / (2·KR)
 ```
 
+**Altura de antena y de vuelo:** el horizonte crece con la raíz de las dos alturas, por eso subir la antena o bajar el arma pesa tanto. Ambas están acotadas a lo real: cada radar tiene `mastRange` (mín = máx si la antena va fija sobre su vehículo; S-300/S-400 llegan a ≈39 m con la torre 40V6MD) y cada arma `aglRange` con perfiles típicos (`aglModes`). La simulación usa la altura elegida durante todo el vuelo; no modela el cambio de perfil a mitad de ruta (por ejemplo, crucero alto y descenso final).
+
 **Línea de vista** (`los`): muestrea el segmento una vez por celda (máximo 700 muestras). La vista queda tapada si en algún punto `terreno + 4 m + b` supera la altura del rayo.
 
 **Cobertura** (`physics/coverage.js`): es un *viewshed* radial. Para cada sensor se lanzan N ≥ 360 rayos y en cada uno se guarda el máximo ángulo de elevación del relieve visto hasta ahí. Una celda es visible si el ángulo hacia el blanco de referencia (a `agl` m sobre el terreno) lo supera y está dentro de `detR` con la interferencia en ese azimut.

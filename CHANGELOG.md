@@ -6,6 +6,11 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 
 ## [Sin publicar]
 
+### Agregado
+- **Altura de aproximación con límites reales** (pestaña Ataque): al elegir un arma, la altura arranca en la típica; el deslizador solo deja elegir dentro de lo que el arma vuela de verdad, con botones de perfiles conocidos (Shahed bajo 2022–23 / alto desde 2025; Kh-101 e Iskander-K rasante o crucero a ≈6 km; Kalibr y Neptune sobre el mar o sobre tierra) y la fuente de cada dato. Cambian algunos límites: Kh-101 30–300 → 30–6.000 m, Iskander-K 20–1.000 → 6–6.000 m, Neptune 5–300 → 3–300 m.
+- **Altura de antena real de cada radar** (panel de selección): los radares montados sobre vehículo o remolque (Patriot, SAMP/T, NASAMS, Buk, Tor, Pantsir, Gepard, P-18) tienen la antena fija y ya no se puede subir; IRIS-T regula 4–12 m (mástil del TRML-4D); S-300, S-400 y el 36D6 van de su vehículo hasta ≈39 m con la torre 40V6MD. Cada uno explica de dónde sale. El "mástil de 30 m" del Patriot era el de comunicaciones, no el del radar.
+- Los archivos guardados con un mástil o una altura fuera de esos límites se cargan acomodados al borde, con un aviso. El catálogo (docs/CATALOGO.md) lista los límites de cada arma y radar.
+
 ### Cambiado
 - **[sim]** RCS de costado y de cola de los misiles ajustadas con la base de datos de CMO: en sus 452 armas guiadas el costado es el frente +3 dB (el doble) y la cola igual al frente. Para las armas sin dato OSINT directo, el probable pasa a ser la media geométrica entre la estimación por forma y esa regla (por ejemplo Kalibr: costado 1 → 0,45 m²; ATACMS: 3 → 0,77 m²) y el rango cubre las dos. Shahed, Geran-3 y Gerbera no cambian.
 

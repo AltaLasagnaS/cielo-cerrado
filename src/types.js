@@ -13,7 +13,9 @@
  * @property {number} [vDive] Velocidad en picada (m/s, perfil highdive)
  * @property {number} [vLow]  Velocidad del tramo rasante (m/s, perfil hilo)
  * @property {number} [agl]   Altura de vuelo sobre el terreno (m)
- * @property {[number, number]} [aglRange] Rango ajustable por el jugador (m)
+ * @property {[number, number]} [aglRange] Límites reales de operación: lo que el jugador puede elegir (m)
+ * @property {Array<[string, number]>} [aglModes] Perfiles de aproximación típicos: [nombre, m AGL]
+ * @property {string} [aglNote] De dónde salen la altura típica y los límites
  * @property {number} [cruiseAlt] Altura de crucero (m, highdive/hilo)
  * @property {number} [apogee]    Apogeo (km, ballistic)
  * @property {number} [diveDist]  Distancia de picada (km, highdive)
@@ -48,6 +50,8 @@
  * @property {'VHF'|'L'|'S'|'C'|'X'|'Ku'|'ACU'|'OPT'} band
  * @property {number} R1     Alcance contra 1 m² (km)
  * @property {number} mast   Altura de antena (m) o de vuelo (AEW)
+ * @property {[number, number]} [mastRange] Altura real posible de la antena (m); mín = máx significa fija
+ * @property {string} [mastNote] De dónde sale (fija, mástil, torre)
  * @property {number} sector Sector de búsqueda (°; 360 = giratorio)
  * @property {boolean} [side] Antena lateral (dos sectores a ±90°)
  * @property {number} eccm   Margen contra interferencia (dB; 99 = inmune)
