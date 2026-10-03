@@ -48,6 +48,7 @@ Cada parámetro numérico relevante tiene un **rango** (mínimo, probable, máxi
 for (const [k, t] of Object.entries(THREATS)) {
   doc += `\n### ${t.name}\n\n\`${k}\` · ${t.side === 'RU' ? 'Rusia' : 'Ucrania / OTAN'} · ${CLS_NAME[t.cls]} · perfil \`${t.prof}\`\n\n${md(t.profile)}\n\n`;
   doc += `- **Guiado:** ${md(t.guidance)}\n- **Propulsión:** ${md(t.engine)}\n- **Ojiva:** ${md(t.warhead)}\n- **Alcance:** ${md(t.range)}\n- **Costo:** ${md(t.costNote)}\n`;
+  if (t.navFix || t.seekerKm) doc += `- **Sin GNSS:** ${t.navFix ? 'descarta el engaño con ' + md(t.navFix) : 'sin corrección independiente del satélite'}${t.seekerKm ? '; su buscador terminal corrige errores de hasta ' + t.seekerKm + ' km' : ''}\n`;
   if (t.aglRange) doc += `- **Altura de vuelo:** típica ${t.agl} m, límites reales ${t.aglRange[0]}–${t.aglRange[1]} m${t.aglModes ? ' · perfiles: ' + t.aglModes.map(([n, h]) => `${md(n)} ${h} m`).join(', ') : ''}. ${md(t.aglNote)}\n`;
   doc += '\n';
   doc += t.notes.map(n => `- ${md(n)}`).join('\n') + '\n\n#### Parámetros\n\n' + uncTable('thr', k);

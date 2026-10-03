@@ -9,6 +9,7 @@ import { rnd } from '../util/rng.js';
 import { surf, los } from '../physics/terrain.js';
 import { antZ, aspectCos, detR, inSector, jamJ } from '../physics/radar.js';
 import { buildThreat, posAt, speedAt } from '../physics/kinematics.js';
+import { gnssNavError } from '../physics/navigation.js';
 import { RADAR_GUID, isTBM, trackOK, reactionStart, solve, calcPk } from '../physics/engagement.js';
 import { C2_LEVELS } from '../data/index.js';
 import { damageAt, targetStatus } from '../physics/damage.js';
@@ -66,7 +67,13 @@ export function step(dt) {
       event(label(th) + ' libera señuelos', 'decoys');
     }
     if (!th.gnssHit && th.T.gnss < 1) {
-      for (const j of S.jamsLive) { const J = JAMMERS[j.type]; if (!J.gnssJam || !j.on) continue; if (Math.hypot(p.x - j.x, p.y - j.y) <= J.radius) { th.gnssHit = true; th.navErr = (1 - th.T.gnss) * (J.spoofKm ? J.spoofKm * 1000 * (0.5 + rnd()) : 300 + rnd() * 1500); if (th.navErr > 150) { log('w', label(th) + (J.spoofKm ? ' es engañada por ' + J.short + ' (spoofing GNSS): desvío ≈' + (th.navErr / 1000).toFixed(1) + ' km.' : ' entra en zona anti-GNSS: error de navegación ≈' + Math.round(th.navErr) + ' m.')); event('Primera arma desviada por interferencia GNSS', 'gnss'); } break; } }
+      for (const j of S.jamsLive) {
+        const J = JAMMERS[j.type]; if (!J.gnssJam || !j.on) continue; if (Math.hypot(p.x - j.x, p.y - j.y) > J.radius) continue;
+        const n = gnssNavError(th.T, J); th.gnssHit = true; th.navErr = n.err;
+        if (n.corrected) log('w', label(th) + ' pierde el GNSS en la zona de ' + J.short + (n.rejected ? ' y descarta el engaño' : '') + ', pero su buscador terminal encuentra el blanco.');
+        else if (th.navErr > 150) { log('w', label(th) + (n.spoofed ? ' es engañada por ' + J.short + ' (spoofing GNSS): desvío ≈' + (th.navErr / 1000).toFixed(1) + ' km.' : (n.rejected ? ' descarta el engaño de ' + J.short + ' con su corrección de terreno; sigue con inercial: error ≈' : ' entra en zona anti-GNSS: error de navegación ≈') + Math.round(th.navErr) + ' m.')); event('Primera arma desviada por interferencia GNSS', 'gnss'); }
+        break;
+      }
     }
   }
   // sensores

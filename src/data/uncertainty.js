@@ -8,7 +8,7 @@ import { S_ } from './sources.js';
 export const U = (min, p, max, c, src, nota) => ({ min, p, max, c, src: src || [], nota: nota || '' });
 export const PL = {
   v: ['Velocidad de crucero', 'm/s'], vDive: ['Velocidad terminal (picada)', 'm/s'], vLow: ['Velocidad rasante final', 'm/s'],
-  agl: ['Altura de vuelo', 'm AGL'], cruiseAlt: ['Altura de crucero', 'm'], apogee: ['Apogeo', 'km'],
+  agl: ['Altura de vuelo', 'm AGL'], seekerKm: ['Ventana que corrige el buscador terminal', 'km'], cruiseAlt: ['Altura de crucero', 'm'], apogee: ['Apogeo', 'km'],
   rcs: ['RCS frontal (X/S)', 'm²'], rcsSide: ['RCS lateral (X/S)', 'm²'], rcsRear: ['RCS de cola (X/S)', 'm²'], rcsVHF: ['RCS en VHF', 'm²'], cep: ['CEP', 'm'], cost: ['Costo unitario', 'M US$'],
   decoys: ['Señuelos por misil', ''], manPk: ['Efecto de su maniobra terminal sobre la Pk', '×'],
   'info.rangeKm': ['Alcance', 'km'], 'info.warheadKg': ['Ojiva', 'kg'],
@@ -62,6 +62,7 @@ export const UNC = {
     kh101: {
       v: U(195, 200, 270, 'alta', S_('csis_kh101'), 'Mach 0,58 crucero, 0,78 máx.'),
       agl: U(30, 50, 70, 'alta', S_('csis_kh101'), '30–70 m en la fase final; tramos de crucero más altos'),
+      seekerKm: U(1, 2, 4, 'baja', S_('csis_kh101'), 'est: buscador TV/IR terminal y correlación óptica de la escena; revisa unos pocos km alrededor del punto previsto'),
       rcs: U(0.000098, 0.0017, 0.1, 'baja', S_('gs_rcs', 'cmo_db3k'), 'est por forma/OSINT 0,03 m²; CMO (DB3K, AS-23A Kodiak [Kh-101]): −40,1 dBsm ≈ 0,000098 m² de frente. Probable = media geométrica'),
       rcsSide: U(0.00019, 0.0075, 1, 'baja', S_('cmo_db3k'), 'est por forma/OSINT 0,3 m²; CMO (DB3K, AS-23A Kodiak [Kh-101]): −37,3 dBsm ≈ 0,00019 m² de costado. Probable = media geométrica'),
       rcsRear: U(0.000098, 0.0024, 0.2, 'baja', S_('cmo_db3k'), 'est por forma/OSINT 0,06 m²; CMO (DB3K, AS-23A Kodiak [Kh-101]): −40,1 dBsm ≈ 0,000098 m² de cola. Probable = media geométrica'),
@@ -74,6 +75,7 @@ export const UNC = {
     kalibr: {
       v: U(230, 240, 270, 'alta', S_('wp:Kalibr_(missile_family)', 'csis_kalibr'), 'Mach 0,7–0,8'),
       agl: U(20, 50, 150, 'media', S_('wp:Kalibr_(missile_family)'), '≈20 m sobre el agua, 50–150 m sobre tierra'),
+      seekerKm: U(1, 2, 4, 'baja', S_('wp:Kalibr_(missile_family)'), 'est: correlación de la escena final (tipo DSMAC) o buscador terminal'),
       rcs: U(0.05, 0.072, 0.3, 'baja', S_('gs_rcs', 'cmo_db3k'), 'est por forma/OSINT 0,1 m²; CMO (DB3K, SS-N-30A Sagaris [3M14 Kalibr]): −12,9 dBsm ≈ 0,051 m² de frente. Probable = media geométrica'),
       rcsSide: U(0.098, 0.31, 3, 'baja', S_('cmo_db3k'), 'est por forma/OSINT 1 m²; CMO (DB3K, SS-N-30A Sagaris [3M14 Kalibr]): −10,1 dBsm ≈ 0,098 m² de costado. Probable = media geométrica'),
       rcsRear: U(0.05, 0.1, 0.5, 'baja', S_('tomahawk_l', 'cmo_db3k'), 'est por forma/OSINT 0,2 m²; CMO (DB3K, SS-N-30A Sagaris [3M14 Kalibr]): −12,9 dBsm ≈ 0,051 m² de cola. Probable = media geométrica'),
@@ -86,6 +88,7 @@ export const UNC = {
     isk_k: {
       v: U(220, 250, 280, 'baja', [], 'est: derivado del Kalibr, subsónico'),
       agl: U(6, 50, 150, 'media', S_('rusi_isk22'), ''),
+      seekerKm: U(2, 5, 10, 'baja', S_('rusi_isk22'), 'est: el buscador radar se activa a ~20 km del blanco; la ventana que puede corregir es menor'),
       rcs: U(0.05, 0.13, 0.3, 'baja', S_('gs_rcs', 'cmo_db3k'), 'est por forma/OSINT 0,1 m²; CMO (DB3K, SSC-7 Southpaw [9M728 Iskander-K]): −7,6 dBsm ≈ 0,17 m² de frente. Probable = media geométrica'),
       rcsSide: U(0.2, 0.58, 3, 'baja', S_('cmo_db3k'), 'est por forma/OSINT 1 m²; CMO (DB3K, SSC-7 Southpaw [9M728 Iskander-K]): −4,8 dBsm ≈ 0,33 m² de costado. Probable = media geométrica'),
       rcsRear: U(0.05, 0.19, 0.5, 'baja', S_('cmo_db3k'), 'est por forma/OSINT 0,2 m²; CMO (DB3K, SSC-7 Southpaw [9M728 Iskander-K]): −7,6 dBsm ≈ 0,17 m² de cola. Probable = media geométrica'),
@@ -98,6 +101,7 @@ export const UNC = {
     isk_m: {
       v: U(1000, 1150, 1400, 'media', S_('gur_isk', 'wp:9K720_Iskander'), 'velocidad horizontal media del modelo; pico 2.100–2.600 m/s, 1.300–1.400 m/s cerca del blanco'),
       apogee: U(40, 45, 100, 'media', S_('gur_isk', 'rusi_isk25'), 'típico 40–50 km; el GUR da 100 km como máximo'),
+      seekerKm: U(0.5, 1, 2, 'baja', [], 'est: buscador óptico de correlación de escena en la picada final: ventana chica'),
       rcs: U(0.03, 0.14, 0.3, 'baja', S_('cmo_isk', 'cmo_db3k'), 'est por forma/OSINT 0,1 m²; CMO (DB3K, SS-26 Stone [9M723 Iskander-M]): −7,3 dBsm ≈ 0,19 m² de frente. Probable = media geométrica'),
       rcsSide: U(0.2, 0.6, 3, 'baja', S_('cmo_db3k'), 'est por forma/OSINT 1 m²; CMO (DB3K, SS-26 Stone [9M723 Iskander-M]): −4,5 dBsm ≈ 0,35 m² de costado. Probable = media geométrica'),
       rcsRear: U(0.1, 0.24, 1, 'baja', S_('cmo_db3k'), 'est por forma/OSINT 0,3 m²; CMO (DB3K, SS-26 Stone [9M723 Iskander-M]): −7,3 dBsm ≈ 0,19 m² de cola. Probable = media geométrica'),
@@ -112,6 +116,7 @@ export const UNC = {
     kinzhal: {
       v: U(1100, 1250, 1500, 'media', S_('wp:Kh-47M2_Kinzhal', 'csis_kinzhal'), '≈1.240 m/s medido en la intercepción (The Economist); CSIS: acelera a Mach 4'),
       apogee: U(35, 45, 80, 'baja', S_('gs_kinzhal'), 'est por física: lanzado a 15–20 km y Mach 2+'),
+      seekerKm: U(0.5, 1, 2, 'baja', [], 'est: análogo al Iskander-M'),
       rcs: U(0.03, 0.14, 0.3, 'baja', S_('gs_kinzhal', 'cmo_db3k'), 'est por forma/OSINT 0,1 m²; CMO (DB3K, AS-24 Killjoy [Kh-47M2 Kinzhal]): −7,3 dBsm ≈ 0,19 m² de frente. Probable = media geométrica'),
       rcsSide: U(0.2, 0.6, 3, 'baja', S_('cmo_db3k'), 'est por forma/OSINT 1 m²; CMO (DB3K, AS-24 Killjoy [Kh-47M2 Kinzhal]): −4,5 dBsm ≈ 0,35 m² de costado. Probable = media geométrica'),
       rcsRear: U(0.1, 0.24, 1, 'baja', S_('cmo_db3k'), 'est por forma/OSINT 0,3 m²; CMO (DB3K, AS-24 Killjoy [Kh-47M2 Kinzhal]): −7,3 dBsm ≈ 0,19 m² de cola. Probable = media geométrica'),
@@ -166,6 +171,7 @@ export const UNC = {
     storm: {
       v: U(270, 275, 323, 'alta', S_('wp:Storm_Shadow', 'dmn_storm'), 'Mach 0,8–0,95'),
       agl: U(30, 35, 40, 'alta', S_('dmn_storm'), ''),
+      seekerKm: U(1, 2, 4, 'baja', S_('dmn_storm'), 'est: buscador IR de imagen con reconocimiento automático del blanco'),
       rcs: U(0.000038, 0.0014, 0.1, 'baja', S_('gs_rcs', 'dmn_storm', 'cmo_db3k'), 'est por forma/OSINT 0,05 m²; CMO (DB3K, Storm Shadow): −44,2 dBsm ≈ 0,000038 m² de frente. Probable = media geométrica'),
       rcsSide: U(0.000076, 0.0048, 1, 'baja', S_('cmo_db3k'), 'est por forma/OSINT 0,3 m²; CMO (DB3K, Storm Shadow): −41,2 dBsm ≈ 0,000076 m² de costado. Probable = media geométrica'),
       rcsRear: U(0.000038, 0.0019, 0.3, 'baja', S_('cmo_db3k'), 'est por forma/OSINT 0,1 m²; CMO (DB3K, Storm Shadow): −44,2 dBsm ≈ 0,000038 m² de cola. Probable = media geométrica'),
@@ -190,6 +196,7 @@ export const UNC = {
     neptune: {
       v: U(250, 260, 270, 'media', S_('rbc_neptune'), ''),
       agl: U(3, 15, 100, 'media', S_('rbc_neptune'), '4–5 m sobre el mar; est ~30 m sobre tierra'),
+      seekerKm: U(1, 3, 6, 'baja', S_('rbc_neptune'), 'est: buscador radar terminal (diseñado como antibuque)'),
       rcs: U(0.049, 0.07, 0.3, 'baja', S_('gs_rcs', 'cmo_db3k'), 'est por forma/OSINT 0,1 m²; CMO (DB3K, R-360MC Neptun): −13,1 dBsm ≈ 0,049 m² de frente. Probable = media geométrica'),
       rcsSide: U(0.1, 0.32, 3, 'baja', S_('cmo_db3k'), 'est por forma/OSINT 1 m²; CMO (DB3K, R-360MC Neptun): −10 dBsm ≈ 0,1 m² de costado. Probable = media geométrica'),
       rcsRear: U(0.049, 0.099, 0.5, 'baja', S_('cmo_db3k'), 'est por forma/OSINT 0,2 m²; CMO (DB3K, R-360MC Neptun): −13,1 dBsm ≈ 0,049 m² de cola. Probable = media geométrica'),
@@ -202,6 +209,7 @@ export const UNC = {
     lyutyi: {
       v: U(44, 56, 83, 'baja', S_('wp:Liutyi'), 'fuentes entre 160 y 300 km/h'),
       agl: U(50, 500, 3000, 'baja', [], 'est: análogo al Shahed'),
+      seekerKm: U(0.1, 0.3, 1, 'baja', [], 'est: guiado terminal con cámara y reconocimiento por IA de alcance corto'),
       rcs: U(0.1, 0.3, 1, 'baja', [], 'est: motor y hélice como reflectores principales'),
       rcsSide: U(0.3, 0.77, 3, 'baja', S_('cmo_cwdb'), 'est por forma 1 m² (×3 el frente); regla de CMO: costado = frente +3 dB (×2, mediana de 452 armas guiadas de su base). Probable = media geométrica'),
       rcsRear: U(0.1, 0.3, 1, 'baja', S_('cmo_cwdb'), 'est por forma 0,3 m²; regla de CMO: cola = frente. Probable = media geométrica'),

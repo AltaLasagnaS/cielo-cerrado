@@ -113,7 +113,11 @@ interferencia:  navErr = (1 − gnss) · (300 + U·1500)  m
 engaño:         navErr = (1 − gnss) · spoofKm · (0,5 + U)  km     (Pokrova, Lima)
 ```
 
-Con `navErr` > 2 km, el debrief cuenta el arma como "perdida localmente".
+Dos correcciones (`physics/navigation.js`):
+- **Corrección por terreno** (`T.navFix`: Kh-101, Kalibr, Storm Shadow): el arma compara el terreno con su mapa, nota que el GNSS falso no coincide y lo descarta. Contra un engaño queda como con interferencia (error de cientos de metros, no de kilómetros).
+- **Buscador terminal** (`T.seekerKm`): si `navErr` ≤ `seekerKm`, el buscador reconoce el blanco con probabilidad `SEEKER_ACQ` = 0,9 y el error queda en 0. Si no cabe, el error se mantiene.
+
+Cada arma que entra en la zona consume un número al azar, y uno más solo si el buscador entra en juego. Con `navErr` > 2 km, el debrief cuenta el arma como "perdida localmente".
 
 ### Rol
 

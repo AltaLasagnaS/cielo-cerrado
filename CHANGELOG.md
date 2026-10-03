@@ -6,6 +6,12 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 
 ## [Sin publicar]
 
+### Corregido
+- **[sim]** **El engaño GNSS (Pokrova, Lima) era demasiado fuerte contra los misiles de crucero.** Ahora el Kh-101, el Kalibr y el Storm Shadow descartan la posición falsa gracias a su corrección por terreno (quedan con el error del inercial, cientos de metros en vez de kilómetros), y las armas con buscador terminal (Kh-101, Kalibr, Iskander, Kinzhal, Storm Shadow, Neptune, Liutyi) corrigen al final si el error cabe en su ventana (90% de las veces). Los Shahed y Gerbera siguen siendo desviados como antes. Mensajes nuevos en el registro y concepto actualizado en la Academia.
+
+### Cambiado
+- **[sim]** El escenario de Kiev vuelve a tener la red **Pokrova** sobre la ciudad: con el modelo corregido la defensa gana ≈3 de cada 4 noches (sin ella, ≈6 de cada 10).
+
 ### Cambiado
 - **[sim]** **RCS con la base moderna de CMO (DB3K):** para 13 armas, la RCS de frente, costado, cola y en bandas bajas es ahora la media geométrica entre la estimación por forma/OSINT y el valor de CMO para esa arma (antes el costado y la cola usaban una regla general). Lo más fuerte: **Kh-101** frente 0,03 → 0,0017 m² y **Storm Shadow** 0,05 → 0,0014 m² (se detectan a la mitad de distancia); Shahed y Geran-3 en VHF 0,12 → 0,064 m²; Geran-3 frente 0,03 → 0,023; Iskander-M y Kinzhal 0,1 → 0,14; Kalibr 0,1 → 0,072; Kh-22 1 → 0,73.
 - **[sim]** Rebalanceo con Monte Carlo (40 noches por escenario) para que sigan siendo desafiantes: Kiev 10 → 8 Kh-101 (la defensa gana ≈6 de cada 10), refinería de Gotemburgo 3 → 2 Kh-101 (≈5 de cada 10), puente de Monterey 12 → 9 Storm Shadow (el ataque gana ≈5 de cada 10).

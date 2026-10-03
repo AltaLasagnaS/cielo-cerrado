@@ -219,12 +219,12 @@ export const SCENARIOS = {
     time: '01:30 hora local · invierno',
     description: 'Una noche típica de la campaña rusa contra la energía ucraniana: oleadas de Shahed desde el norte y el este, señuelos Gerbera para gastar munición, misiles de crucero Kh-101 y Kalibr, y balísticos Iskander-M y Kinzhal al final, todo para llegar casi junto. Los blancos son las centrales de cogeneración que dan luz y calefacción a la ciudad y la represa de Kiev. Las posiciones de la defensa son ilustrativas, no las reales.',
     forces: {
-      defensa: 'Defensa por capas de la capital: radar 3D y radar VHF de alerta, Patriot (sector hacia el noreste), NASAMS, IRIS-T, dos Gepard junto a las centrales, tres grupos móviles, red acústica, y drones interceptores. Red de mando integrada.',
+      defensa: 'Defensa por capas de la capital: radar 3D y radar VHF de alerta, Patriot (sector hacia el noreste), NASAMS, IRIS-T, dos Gepard junto a las centrales, tres grupos móviles, red acústica, drones interceptores y la red anti-GNSS Pokrova sobre la ciudad. Red de mando integrada.',
       ataque: '28 Shahed en dos oleadas, 10 Gerbera, 8 Kh-101, 6 Kalibr, 3 Iskander-M con señuelos y 2 Kinzhal.'
     },
     conditions: 'Noche de invierno. El motor no modela clima ni luz: la noche solo explica por qué los grupos móviles dependen de la alerta acústica y del radar.',
     rules: { c2: 'coordinada', doctrine: 'salva' },
-    rulesText: ['Red integrada activa y doctrina de salva.', 'No hay recarga: cada unidad cuenta solo con la munición inicial.', 'Los misiles de crucero y los balísticos llegan casi juntos (T+24:50 a T+25:30), después de una hora de drones.', 'Sin guerra electrónica al empezar. Probá agregar la red anti-GNSS Pokrova (pestaña EW) sobre la ciudad y repetí con Monte Carlo: en el modelo actual desvía casi todo lo que pasa la defensa (probablemente de más para los misiles de crucero, ver ROADMAP).'],
+    rulesText: ['Red integrada activa y doctrina de salva.', 'No hay recarga: cada unidad cuenta solo con la munición inicial.', 'Los misiles de crucero y los balísticos llegan casi juntos (T+24:50 a T+25:30), después de una hora de drones.', 'Pokrova engaña al GNSS de los Shahed y los Gerbera sobre la ciudad. Los Kh-101 y Kalibr la descartan con su corrección de terreno, y los misiles con buscador terminal corrigen al final: apagala (pestaña EW) y compará con Monte Carlo.'],
     objectives: [
       { type: 'infra', name: 'Central CHP-5', short: 'CHP-5', x: 40.3, y: 67.4, hp: 1500, desc: 'Central de cogeneración de ~700 MW: luz y calefacción para buena parte de la margen derecha y de Darnytsia.' },
       { type: 'infra', name: 'Central CHP-6', short: 'CHP-6', x: 46.9, y: 52, hp: 1500, desc: 'Central de cogeneración de ~500 MW en Troieshchyna, margen izquierda.' },
@@ -255,7 +255,9 @@ export const SCENARIOS = {
       { type: 'isk_m', count: 3, interval: 15, sync: true, tArrive: 1520, launchDist: 400, maneuver: true, decoys: true, pts: [[70, 0], [46.9, 52]], targetObj: 'Central CHP-6' },
       { type: 'kinzhal', count: 2, interval: 15, sync: true, tArrive: 1530, launchDist: 450, pts: [[70, 20], [36.3, 45.7]], targetObj: 'Represa de Kiev' }
     ],
-    jams: [],
+    jams: [
+      { type: 'pokrova', x: 42, y: 58 }
+    ],
     goals: [
       { side: 'ataque', primary: true, kind: 'destroy', target: 'Central CHP-5', text: 'Destruir la central CHP-5' },
       { side: 'ataque', primary: true, kind: 'destroy', target: 'Central CHP-6', text: 'Destruir la central CHP-6' },
