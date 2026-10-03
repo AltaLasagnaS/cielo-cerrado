@@ -63,7 +63,7 @@ export const THREATS = {
     sources: [SRC.rusi_isk22, WP('9K720_Iskander'), SRC.costs_leak]
   },
   isk_m: {
-    name: '9M723 Iskander-M (cuasibalístico)', short: 'Iskander-M', side: 'RU', cls: 'balistico', prof: 'ballistic',
+    name: '9M723 Iskander-M (cuasibalístico)', short: 'Iskander-M', side: 'RU', cls: 'balistico', prof: 'ballistic', swerling: 3,
     v: 1150, apogee: 45, launchDist: 300, rcs: 0.14, rcsSide: 0.6, rcsRear: 0.24, rcsVHF: 0.24, seekerKm: 1, gnss: 0.9, cep: 25, warhead: '450–700 kg', range: '390–500 km (9M723-2: ≈550 km)',
     cost: 2.7, costNote: 'Contratos rusos filtrados: US$2,4–3,0 M', maneuver: true, decoys: 6, manPk: 0.6,
     guidance: 'INS + GNSS (Kometa) + buscador óptico/radar terminal', engine: 'Cohete de combustible sólido, una etapa',
@@ -72,7 +72,7 @@ export const THREATS = {
     sources: [SRC.gur_isk, SRC.rusi_isk25, SRC.ft_aerotime, SRC.twz_9b899, SRC.costs_leak]
   },
   kinzhal: {
-    name: 'Kh-47M2 Kinzhal (aerobalístico)', short: 'Kinzhal', side: 'RU', cls: 'balistico', prof: 'ballistic',
+    name: 'Kh-47M2 Kinzhal (aerobalístico)', short: 'Kinzhal', side: 'RU', cls: 'balistico', prof: 'ballistic', swerling: 3,
     v: 1250, apogee: 45, launchDist: 450, rcs: 0.14, rcsSide: 0.6, rcsRear: 0.24, rcsVHF: 0.24, seekerKm: 1, gnss: 0.9, cep: 20, warhead: '≈480 kg', range: '≈460–480 km tras el lanzamiento',
     cost: 4.5, costNote: 'Contratos rusos filtrados: ≈US$4,5 M. Forbes Ukraine estimaba 10–15 M', maneuver: true, manPk: 0.8,
     guidance: 'INS + corrección en vuelo + buscador terminal', engine: 'Cohete sólido (derivado del Iskander)',
@@ -108,7 +108,7 @@ export const THREATS = {
     sources: [WP('P-800_Oniks'), SRC.rbc_oniks, SRC.syrskyi]
   },
   zircon: {
-    name: '3M22 Tsirkon (Zircon)', short: 'Tsirkon', side: 'RU', cls: 'hiper', prof: 'highdive',
+    name: '3M22 Tsirkon (Zircon)', short: 'Tsirkon', side: 'RU', cls: 'hiper', prof: 'highdive', swerling: 3,
     v: 1500, vDive: 1150, cruiseAlt: 30000, diveDist: 45, launchDist: 400, rcs: 0.21, rcsSide: 0.74, rcsRear: 0.29, rcsVHF: 0.38, gnss: 1, cep: 30, warhead: '≈120 kg (KNDISE: ≤40 kg de explosivo)', range: '≈1.000 km (declarado, sin confirmar)',
     cost: 5.4, costNote: 'Contratos rusos filtrados: US$5,2–5,6 M', maneuver: true, manPk: 0.85,
     guidance: 'INS + buscador radar activo', engine: 'Dos etapas de combustible sólido según el GUR y los restos analizados (Rusia declara scramjet)',
@@ -126,7 +126,7 @@ export const THREATS = {
     sources: [WP('Storm_Shadow'), SRC.dmn_storm, SRC.dn_storm, SRC.aoav_storm]
   },
   atacms: {
-    name: 'MGM-140 ATACMS', short: 'ATACMS', side: 'UA', cls: 'balistico', prof: 'ballistic',
+    name: 'MGM-140 ATACMS', short: 'ATACMS', side: 'UA', cls: 'balistico', prof: 'ballistic', swerling: 3,
     v: 1000, apogee: 40, launchDist: 250, rcs: 0.08, rcsSide: 0.62, rcsRear: 0.14, rcsVHF: 0.14, gnss: 0.6, cep: 10, warhead: '≈230 kg unitaria (M57) o submuniciones', range: '165 km (M39) / 300 km (M39A1, M48, M57)',
     cost: 1.5, costNote: '≈US$1,5 M (M39 actualizado a FY2022); M57 ≈1,7 M', maneuver: false,
     guidance: 'INS + GPS', engine: 'Cohete sólido, una etapa',

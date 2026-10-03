@@ -22,6 +22,7 @@
  * @property {number} [launchDist] Distancia de lanzamiento fuera del mapa (km)
  * @property {number} rcs     RCS frontal en X/S (m²)
  * @property {number} [rcsVHF] RCS en VHF (m²)
+ * @property {1|3} [swerling] Fluctuación de la RCS entre barridos (physics/radar.js#pdRel): 1 = muchos reflectores parecidos (por defecto), 3 = uno dominante (balísticos)
  * @property {boolean} [lo]   Baja firma (furtivo)
  * @property {boolean} [ir]   Lanza bengalas contra buscadores IR
  * @property {boolean} [cold] Sin motor (planeadora): casi invisible para buscadores IR

@@ -6,6 +6,9 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 
 ## [Sin publicar]
 
+### Cambiado
+- **[sim]** **Swerling 3 para los balísticos** (Iskander-M, Kinzhal, ATACMS y Tsirkon): su RCS tiene un reflector dominante y "titila" menos que la de un dron o un misil de crucero (Swerling 1). Con la misma SNR media se detectan más seguido de cerca (83% por barrido al 80% del alcance, contra 75%) y menos de lejos (18% a 1,2 veces, contra 26%). El alcance del catálogo sigue siendo el de 50%. Las dos fórmulas están **verificadas** contra una integración numérica independiente (tests/swerling.test.js). La ficha de cada arma muestra su modelo. Efecto medido (40 noches): Kiev 68% y refinería 33% sin cambios; puente de Monterey, el ataque gana ≈53% (antes ≈45%, dentro del ruido estadístico).
+
 ### Agregado
 - **Mapa de Járkov** sobre el relieve real (SRTM), generado con `scripts/gen-terrain.mjs`. El centro de la ciudad está en el borde norte del tile N49E036, así que el script ahora arma una ventana de 1° con dos tiles (49,5–50,5° N): entra la ciudad entera y la franja de frontera al norte. Kiev se regenera idéntico.
 - **[sim]** **Escenario "Járkov · bombas planeadoras"** (jugás la defensa): 30 bombas FAB-500 con UMPK en tres oleadas, soltadas desde Rusia a ≈60 km, con antenas CRPA Kometa de 12 elementos (las dos estaciones Lima de la ciudad no les alcanzan), más 12 Shahed contra el centro. Blancos: la central CHP-5 de Podvirky y el centro de la ciudad. Con la disposición inicial la defensa gana ≈55% (Monte Carlo, 40 noches), gastando decenas de millones en misiles contra bombas de US$30 mil. Golden nueva `kh_umpk_s1`.

@@ -120,11 +120,14 @@ export function detR(u, th, J, ca = 1, wx = null) {
 /** ¿El techo de nubes o niebla de wx le tapa a un sensor óptico en tierra un blanco a agl m? */
 export const belowCeiling = (r, wx, agl) => !(r.band === 'OPT' && wx && wx.ceiling != null && agl > wx.ceiling);
 
-// ---------------- PROBABILIDAD DE DETECCIÓN (SNR, Swerling 1) ----------------
+// ---------------- PROBABILIDAD DE DETECCIÓN (SNR, Swerling 1 y 3) ----------------
 // El alcance del catálogo (detR) es el de Pd = 50% en un barrido con probabilidad de falsa alarma
-// PFA. La relación señal/ruido cae con r⁴: SNR(r) = SNR50 · (R/r)⁴ · pérdidas. Para un blanco que
-// "titila" de barrido a barrido (Swerling 1: muchos reflectores parecidos, drones y misiles) la
-// probabilidad de detectarlo en un barrido es Pd = PFA^(1/(1+SNR)). Ver docs/FISICA.md §2.
+// PFA. La relación señal/ruido cae con r⁴: SNR(r) = SNR50 · (R/r)⁴ · pérdidas. La RCS "titila" de
+// barrido a barrido; cómo titila depende de la forma (T.swerling, por defecto 1):
+//   Swerling 1: muchos reflectores parecidos (drones, misiles de crucero) → Pd = PFA^(1/(1+SNR));
+//   Swerling 3: un reflector dominante más otros chicos (balísticos) → fórmula de pdSwerling3.
+// Las dos fórmulas son de un pulso con detector de ley cuadrática y están verificadas contra una
+// integración numérica independiente en tests/swerling.test.js. Ver docs/FISICA.md §2.
 
 /** Probabilidad de falsa alarma de diseño (valor típico de libro). */
 export const PFA = 1e-6;
@@ -138,6 +141,25 @@ export const PD_CUTOFF = 1.2;
 
 /** Pd de un barrido, Swerling 1. */
 export const pdSwerling1 = snr => (snr > 0 ? Math.pow(PFA, 1 / (1 + snr)) : 0);
+
+/** Umbral de detección con el ruido normalizado a 1: T = −ln(PFA) ≈ 13,8. */
+export const THRESH = -Math.log(PFA);
+/**
+ * Pd de un barrido, Swerling 3 (RCS con distribución χ² de 4 grados de libertad):
+ *   Pd = (1 + 2·SNR·T / (2 + SNR)²) · exp(−2T / (2 + SNR))
+ * Contra Swerling 1 con la misma SNR media: algo peor con señal débil, bastante mejor con señal
+ * fuerte (titila menos: es raro que el reflector dominante "desaparezca").
+ */
+export const pdSwerling3 = snr => (snr > 0 ? (1 + 2 * snr * THRESH / ((2 + snr) ** 2)) * Math.exp(-2 * THRESH / (2 + snr)) : 0);
+
+/** SNR que da Pd = 50% con Swerling 3 y PFA (bisección; ≈15,7, 12,0 dB). */
+export const SNR50_3 = (() => { let lo = 0.1, hi = 1000; for (let k = 0; k < 100; k++) { const m = (lo + hi) / 2; if (pdSwerling3(m) < 0.5) lo = m; else hi = m; } return (lo + hi) / 2; })();
+
+/** Modelo de fluctuación de la amenaza (1 o 3). */
+export const swerlingOf = th => ((th.T || th).swerling === 3 ? 3 : 1);
+
+/** Pd de un barrido para el modelo m (1 o 3) con SNR relativa k = SNR / SNR50 (k = 1 → 50%). */
+export const pdRel = (m, k) => (m === 3 ? pdSwerling3(SNR50_3 * k) : pdSwerling1(SNR50 * k));
 
 /**
  * Clutter: un blanco a menos de CLUTTER_AGL m sobre el suelo se ve "contra el suelo" y compite con
@@ -170,7 +192,7 @@ export function pdScan(u, th, rr, R, agl, x, y, ca) {
   const r = D(u).radar; if (rr > PD_CUTOFF * R) return 0;
   if (r.band !== 'OPT' && r.band !== 'ACU' && inNotch(r, th, ca)) return 0;
   const loss = r.band === 'OPT' || r.band === 'ACU' ? 0 : clutterLossDb(r, agl, x, y);
-  return pdSwerling1(SNR50 * Math.pow(R / Math.max(rr, 1e-3), 4) / Math.pow(10, loss / 10));
+  return pdRel(swerlingOf(th), Math.pow(R / Math.max(rr, 1e-3), 4) / Math.pow(10, loss / 10));
 }
 
 /** Horizonte de radar (km) entre una antena a hr metros y un blanco a ht metros, Tierra 4/3. */
