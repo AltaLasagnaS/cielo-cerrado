@@ -6,7 +6,7 @@ import { D } from '../data/index.js';
 import { clamp } from '../util/math.js';
 import { KR, LOS_MARGIN } from './constants.js';
 import { MAP } from './terrain.js';
-import { antZ, detR, inSector, jamJ } from './radar.js';
+import { antZ, belowCeiling, detR, inSector, jamJ } from './radar.js';
 
 /**
  * Calcula la grilla de cobertura sobre el mapa activo.
@@ -14,6 +14,7 @@ import { antZ, detR, inSector, jamJ } from './radar.js';
  * @param jams   interferidores
  * @param ref    ficha de la amenaza de referencia (THREATS[k])
  * @param agl    altura del blanco sobre el terreno (m)
+ * @param wx     clima (data/weather.js), opcional
  * @returns Uint8Array W×H con la cantidad de sensores que ven cada celda.
  *
  * Método: para cada sensor se lanzan N rayos radiales (N ≥ 360, según el alcance) y se recorre cada
@@ -21,7 +22,7 @@ import { antZ, detR, inSector, jamJ } from './radar.js';
  * una celda es visible si el ángulo hacia el blanco supera a ese máximo. Es el algoritmo clásico de
  * viewshed radial, O(rayos × pasos) en vez de O(celdas × pasos).
  */
-export function coverageGrid(units, jams, ref, agl) {
+export function coverageGrid(units, jams, ref, agl, wx = null) {
   const W = MAP.W, H = MAP.H, c = MAP.cellKm, data = MAP.data;
   const cov = new Uint8Array(W * H), stamp = new Int32Array(W * H).fill(-1);
   let ri = 0;
@@ -29,16 +30,17 @@ export function coverageGrid(units, jams, ref, agl) {
     const d = D(u), r = d.radar; if (!r) continue; ri++;
     if (r.band === 'ACU') {
       if (ref.cls !== 'dron' || agl > (r.altMax || 3000)) continue;
-      const R = r.R1, i0 = Math.max(0, ((u.y - R) / c) | 0), i1 = Math.min(H - 1, ((u.y + R) / c) | 0), j0 = Math.max(0, ((u.x - R) / c) | 0), j1 = Math.min(W - 1, ((u.x + R) / c) | 0);
+      const R = detR(u, ref, 0, 1, wx), i0 = Math.max(0, ((u.y - R) / c) | 0), i1 = Math.min(H - 1, ((u.y + R) / c) | 0), j0 = Math.max(0, ((u.x - R) / c) | 0), j1 = Math.min(W - 1, ((u.x + R) / c) | 0);
       for (let i = i0; i <= i1; i++) for (let j = j0; j <= j1; j++) { const k = i * W + j; if (stamp[k] !== ri && Math.hypot((j + .5) * c - u.x, (i + .5) * c - u.y) <= R) { stamp[k] = ri; cov[k]++; } }
       continue;
     }
     const hr = antZ(u), st = c * 0.6;
-    const Rmax = r.band === 'OPT' ? r.R1 : detR(u, ref, 0);
+    if (!belowCeiling(r, wx, agl)) continue;
+    const Rmax = detR(u, ref, 0, 1, wx);
     const N = clamp(Math.ceil(2 * Math.PI * Math.min(Rmax, MAP.wKm + MAP.hKm) / (c * 0.7)), 360, 6000);
     for (let a = 0; a < N; a++) {
       const az = a * 360 / N; if (!inSector(u, az)) continue;
-      const J = jamJ(u, az, jams); const R = r.band === 'OPT' ? r.R1 : detR(u, ref, J);
+      const J = jamJ(u, az, jams); const R = detR(u, ref, J, 1, wx);
       const dx = Math.sin(az * Math.PI / 180), dy = -Math.cos(az * Math.PI / 180);
       // intersección rayo-caja
       let tmin = 0, tmax = R;
