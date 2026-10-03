@@ -3,5 +3,6 @@
 import monterey from './monterey.js';
 import goteborg from './goteborg.js';
 import kyiv from './kyiv.js';
+import kharkiv from './kharkiv.js';
 
-export const TERRAIN = { monterey, goteborg, kyiv };
+export const TERRAIN = { monterey, goteborg, kyiv, kharkiv };

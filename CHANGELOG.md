@@ -7,6 +7,10 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 ## [Sin publicar]
 
 ### Agregado
+- **Mapa de Járkov** sobre el relieve real (SRTM), generado con `scripts/gen-terrain.mjs`. El centro de la ciudad está en el borde norte del tile N49E036, así que el script ahora arma una ventana de 1° con dos tiles (49,5–50,5° N): entra la ciudad entera y la franja de frontera al norte. Kiev se regenera idéntico.
+- **[sim]** **Escenario "Járkov · bombas planeadoras"** (jugás la defensa): 30 bombas FAB-500 con UMPK en tres oleadas, soltadas desde Rusia a ≈60 km, con antenas CRPA Kometa de 12 elementos (las dos estaciones Lima de la ciudad no les alcanzan), más 12 Shahed contra el centro. Blancos: la central CHP-5 de Podvirky y el centro de la ciudad. Con la disposición inicial la defensa gana ≈55% (Monte Carlo, 40 noches), gastando decenas de millones en misiles contra bombas de US$30 mil. Golden nueva `kh_umpk_s1`.
+
+### Agregado
 - **Antenas CRPA contra varias fuentes de interferencia GNSS** (pestaña Ataque → "Antena GNSS"; se guarda como `crpa` en cada salva): una CRPA de N elementos (4, 8, 12 o 16, como las Kometa rusas) anula hasta N − 1 interferidores que lleguen desde direcciones distintas; dos estaciones casi alineadas vistas desde el arma cuentan como una. Con más fuentes, el arma pierde el GNSS como antes. Por defecto las salvas van sin CRPA: los escenarios y las golden no cambian. Probalo en Kiev: con una CRPA de 4 los Shahed ignoran la única estación Pokrova.
 
 ### Agregado
