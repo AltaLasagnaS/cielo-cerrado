@@ -973,5 +973,241 @@
    ]
   ],
   "log": 198
+ },
+ "kv_energia_s1": {
+  "t": 1589.75,
+  "stats": {
+   "launched": 77,
+   "killed": 53,
+   "hits": 6,
+   "misses": 0,
+   "decoys": 28,
+   "decoysKilled": 10,
+   "shots": 86,
+   "defCost": 98.76090000000003,
+   "atkCost": 52.18000000000001,
+   "lost": 0,
+   "byUnit": {
+    "NASAMS-1": 18,
+    "Interceptores-1": 10,
+    "IRIS-T-1": 24,
+    "Patriot-1": 16,
+    "Grupo móvil 3": 3,
+    "Gepard-1": 13,
+    "Gepard-2": 2
+   },
+   "damage": 2617,
+   "dmgByWeapon": {
+    "Iskander-M": 1317,
+    "Kinzhal": 878,
+    "Kh-101": 422
+   },
+   "missSum": 165.79374186544896,
+   "missN": 6,
+   "objsDestroyed": 0,
+   "satChannels": {
+    "Interceptores-1": 5,
+    "Patriot-1": 2
+   },
+   "satMag": {
+    "NASAMS-1": 1,
+    "Patriot-1": 1
+   }
+  },
+  "impacts": [
+   [
+    46.8646,
+    51.9791,
+    "hit"
+   ],
+   [
+    48.789,
+    53.0381,
+    "decoy"
+   ],
+   [
+    47.755,
+    55.2451,
+    "decoy"
+   ],
+   [
+    45.3678,
+    54.4497,
+    "decoy"
+   ],
+   [
+    49.1068,
+    52.6649,
+    "decoy"
+   ],
+   [
+    45.6553,
+    51.3898,
+    "decoy"
+   ],
+   [
+    48.0171,
+    53.3996,
+    "decoy"
+   ],
+   [
+    36.3155,
+    45.694,
+    "hit"
+   ],
+   [
+    46.9294,
+    52.0008,
+    "hit"
+   ],
+   [
+    44.7537,
+    51.7049,
+    "decoy"
+   ],
+   [
+    44.7243,
+    53.2548,
+    "decoy"
+   ],
+   [
+    47.3176,
+    52.9793,
+    "decoy"
+   ],
+   [
+    45.6088,
+    51.3986,
+    "decoy"
+   ],
+   [
+    49.8209,
+    50.6363,
+    "decoy"
+   ],
+   [
+    48.301,
+    49.5509,
+    "decoy"
+   ],
+   [
+    36.3043,
+    45.7212,
+    "hit"
+   ],
+   [
+    46.9387,
+    52.002,
+    "hit"
+   ],
+   [
+    50.1415,
+    51.0952,
+    "decoy"
+   ],
+   [
+    44.2778,
+    50.7133,
+    "decoy"
+   ],
+   [
+    49.2488,
+    52.6813,
+    "decoy"
+   ],
+   [
+    48.9257,
+    52.4079,
+    "decoy"
+   ],
+   [
+    48.8652,
+    51.7294,
+    "decoy"
+   ],
+   [
+    44.9067,
+    54.1594,
+    "decoy"
+   ],
+   [
+    40.3156,
+    67.4094,
+    "hit"
+   ]
+  ],
+  "units": [
+   [
+    "Radar 3D",
+    true,
+    0
+   ],
+   [
+    "Radar VHF",
+    true,
+    0
+   ],
+   [
+    "Patriot-1",
+    true,
+    0
+   ],
+   [
+    "NASAMS-1",
+    true,
+    0
+   ],
+   [
+    "IRIS-T-1",
+    true,
+    0
+   ],
+   [
+    "Gepard-1",
+    true,
+    7
+   ],
+   [
+    "Gepard-2",
+    true,
+    18
+   ],
+   [
+    "Grupo móvil 1",
+    true,
+    30
+   ],
+   [
+    "Grupo móvil 2",
+    true,
+    30
+   ],
+   [
+    "Grupo móvil 3",
+    true,
+    27
+   ],
+   [
+    "Acústico 1",
+    true,
+    0
+   ],
+   [
+    "Acústico 2",
+    true,
+    0
+   ],
+   [
+    "Acústico 3",
+    true,
+    0
+   ],
+   [
+    "Interceptores-1",
+    true,
+    10
+   ]
+  ],
+  "log": 276
  }
 }

@@ -60,3 +60,13 @@ test('mapas incluidos: puntos altos razonables y separados', () => {
     for (let i = 0; i < Math.min(p.length, 60); i++) for (let j = 0; j < i; j++) assert.ok(Math.hypot(p[i].x - p[j].x, p[i].y - p[j].y) >= 1.5);
   }
 });
+
+test('Kiev: el Dniéper y el embalse están en la máscara de agua; las centrales, en tierra', async () => {
+  const { setMap, builtinMap, isWater } = await import('../src/physics/terrain.js');
+  const { terrainClass } = await import('../src/physics/terrain-analysis.js');
+  setMap(builtinMap('kyiv'));
+  assert.ok(isWater(40, 62), 'Dniéper frente al centro');
+  assert.ok(isWater(34, 20), 'embalse de Kiev');
+  assert.equal(terrainClass(40, 62), 'Río o lago');
+  for (const [x, y] of [[40.3, 67.4], [46.9, 52], [37.1, 61]]) assert.ok(!isWater(x, y), `(${x}, ${y}) en tierra`);
+});

@@ -2,5 +2,6 @@
 // formato que monterey.js (ver docs/DATOS-Y-FUENTES.md) y sumarlo acá.
 import monterey from './monterey.js';
 import goteborg from './goteborg.js';
+import kyiv from './kyiv.js';
 
-export const TERRAIN = { monterey, goteborg };
+export const TERRAIN = { monterey, goteborg, kyiv };

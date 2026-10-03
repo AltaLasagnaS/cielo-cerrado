@@ -22,8 +22,21 @@ export function setMap(m) {
   return MAP;
 }
 
-/** Arma el objeto de mapa de uno de los relieves incluidos (sin activarlo). */
-export function builtinMap(key) { const t = TERRAIN[key]; return { key, name: t.name, W: t.W, H: t.H, cell: t.cell, latN: t.latN, lonW: t.lonW, dlat: t.dlat, dlon: t.dlon, places: t.places.filter(p => p[1] >= 0 && p[1] <= t.W * t.cell / 1000 && p[2] >= 0 && p[2] <= t.H * t.cell / 1000), data: decodeB64(t.b64) }; }
+/** Decodifica una máscara de 1 bit por celda en base64 → Uint8Array (0/1) de n celdas. */
+export function decodeBits(b64, n) { const bin = atob(b64), out = new Uint8Array(n); for (let q = 0; q < n; q++) out[q] = (bin.charCodeAt(q >> 3) >> (q & 7)) & 1; return out; }
+
+/**
+ * Arma el objeto de mapa de uno de los relieves incluidos (sin activarlo). water = máscara de ríos
+ * y lagos (si el relieve la trae): solo para el dibujo y la lectura del terreno, no para la física.
+ */
+export function builtinMap(key) { const t = TERRAIN[key]; return { key, name: t.name, W: t.W, H: t.H, cell: t.cell, latN: t.latN, lonW: t.lonW, dlat: t.dlat, dlon: t.dlon, places: t.places.filter(p => p[1] >= 0 && p[1] <= t.W * t.cell / 1000 && p[2] >= 0 && p[2] <= t.H * t.cell / 1000), data: decodeB64(t.b64), water: t.water ? decodeBits(t.water, t.W * t.H) : null }; }
+
+/** ¿La celda de (x, y) km es río o lago según la máscara del relieve? (false si no hay máscara). */
+export function isWater(x, y) {
+  const w = MAP?.water; if (!w) return false;
+  const j = Math.floor(x / MAP.cellKm), i = Math.floor(y / MAP.cellKm);
+  return i >= 0 && j >= 0 && i < MAP.H && j < MAP.W && w[i * MAP.W + j] === 1;
+}
 
 /** Mapa plano a nivel 0 (útil para tests y para aislar la física del relieve). */
 export function flatMap(W = 450, H = 555, cell = 200) { return { key: 'flat', name: 'Plano', W, H, cell, latN: 0, lonW: 0, dlat: cell / 111000, dlon: cell / 111000, places: [], data: new Int16Array(W * H) }; }

@@ -30,7 +30,7 @@ El juego es una página web estática hecha con **JavaScript moderno (módulos E
 - `bands.js`: **la única fuente de datos de bandas** (simulación, fichas, Academia).
 - `targets.js`: tipos de objetivo y parámetros de daño.
 - `scenarios.js`: escenarios declarativos (objetivos, fuerzas, reglas, metas).
-- `terrain/`: relieves (metadatos + grilla en base64).
+- `terrain/`: relieves (metadatos + grilla en base64 + máscara opcional de ríos y lagos). Kiev se genera con `scripts/gen-terrain.mjs`.
 
 ### `src/physics/`: modelos (ver [FISICA.md](FISICA.md))
 - `terrain.js`: mapa activo, `elev`, `surf`, `los`, importación SRTM.

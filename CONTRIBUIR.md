@@ -48,6 +48,9 @@ Agregá una entrada en `src/data/scenarios.js`. Todo es declarativo: objetivos, 
 
 Antes de darlo por bueno, balancealo con el modo Monte Carlo (20–40 corridas): un buen escenario no se gana ni se pierde siempre con la disposición inicial. Después sumale un caso a `tests/golden.test.js` y corré `UPDATE_GOLDEN=1 npm test` (verificá que las golden viejas no cambien).
 
+### Agregar un relieve real
+`scripts/gen-terrain.mjs` convierte un tile SRTM de 1° × 1° en un relieve del juego (con máscara de ríos y lagos). Agregá una entrada en `MAPS` (tile y lugares con latitud y longitud), corré `node scripts/gen-terrain.mjs <clave>` (o pasale un `.hgt` local) y sumá el módulo a `src/data/terrain/index.js`. Ojo: cada relieve agrega ~0,5 MB a `index.html`.
+
 ### Agregar un concepto a la Academia
 Agregá un objeto en `src/edu/concepts.js` con `body()` (la explicación) y `engine()` (cómo lo hace el motor). Usá los datos y funciones reales en lugar de copiar números, así la explicación no queda desactualizada.
 

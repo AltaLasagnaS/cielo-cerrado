@@ -212,6 +212,62 @@ export const SCENARIOS = {
     success: 'Ataque: el puente de la autopista 1 queda destruido.',
     failure: 'Ataque: el puente sigue en pie al terminar la oleada.'
   },
+  kv_energia: {
+    map: 'kyiv', name: 'Kiev · noche contra la energía (defensa ucraniana)',
+    player: 'defensa',
+    time: '01:30 hora local · invierno',
+    description: 'Una noche típica de la campaña rusa contra la energía ucraniana: oleadas de Shahed desde el norte y el este, señuelos Gerbera para gastar munición, misiles de crucero Kh-101 y Kalibr, y balísticos Iskander-M y Kinzhal al final, todo para llegar casi junto. Los blancos son las centrales de cogeneración que dan luz y calefacción a la ciudad y la represa de Kiev. Las posiciones de la defensa son ilustrativas, no las reales.',
+    forces: {
+      defensa: 'Defensa por capas de la capital: radar 3D y radar VHF de alerta, Patriot (sector hacia el noreste), NASAMS, IRIS-T, dos Gepard junto a las centrales, tres grupos móviles, red acústica, y drones interceptores. Red de mando integrada.',
+      ataque: '28 Shahed en dos oleadas, 10 Gerbera, 10 Kh-101, 6 Kalibr, 3 Iskander-M con señuelos y 2 Kinzhal.'
+    },
+    conditions: 'Noche de invierno. El motor no modela clima ni luz: la noche solo explica por qué los grupos móviles dependen de la alerta acústica y del radar.',
+    rules: { net: true, doctrine: 'salva' },
+    rulesText: ['Red integrada activa y doctrina de salva.', 'No hay recarga: cada unidad cuenta solo con la munición inicial.', 'Los misiles de crucero y los balísticos llegan casi juntos (T+24:50 a T+25:30), después de una hora de drones.', 'Sin guerra electrónica al empezar. Probá agregar la red anti-GNSS Pokrova (pestaña EW) sobre la ciudad y repetí con Monte Carlo: en el modelo actual desvía casi todo lo que pasa la defensa (probablemente de más para los misiles de crucero, ver ROADMAP).'],
+    objectives: [
+      { type: 'infra', name: 'Central CHP-5', short: 'CHP-5', x: 40.3, y: 67.4, hp: 1500, desc: 'Central de cogeneración de ~700 MW: luz y calefacción para buena parte de la margen derecha y de Darnytsia.' },
+      { type: 'infra', name: 'Central CHP-6', short: 'CHP-6', x: 46.9, y: 52, hp: 1500, desc: 'Central de cogeneración de ~500 MW en Troieshchyna, margen izquierda.' },
+      { type: 'infra', name: 'Represa de Kiev', short: 'Represa', x: 36.3, y: 45.7, hp: 2500, desc: 'Central hidroeléctrica de Vyshhorod, al pie del embalse de Kiev.' }
+    ],
+    defs: [
+      { type: 'ewr', x: 30, y: 72, name: 'Radar 3D' },
+      { type: 'p18', x: 52, y: 60, name: 'Radar VHF' },
+      { type: 'patriot', x: 33, y: 60, az: 40, name: 'Patriot-1' },
+      { type: 'nasams', x: 44, y: 58, name: 'NASAMS-1' },
+      { type: 'irist', x: 34, y: 67, name: 'IRIS-T-1' },
+      { type: 'gepard', x: 42, y: 69, name: 'Gepard-1' },
+      { type: 'gepard', x: 48, y: 53, name: 'Gepard-2' },
+      { type: 'mfg', x: 36, y: 48, name: 'Grupo móvil 1' },
+      { type: 'mfg', x: 55, y: 48, name: 'Grupo móvil 2' },
+      { type: 'mfg', x: 28, y: 55, name: 'Grupo móvil 3' },
+      { type: 'acoustic', x: 38, y: 40, name: 'Acústico 1' },
+      { type: 'acoustic', x: 58, y: 45, name: 'Acústico 2' },
+      { type: 'acoustic', x: 30, y: 50, name: 'Acústico 3' },
+      { type: 'intdrone', x: 44, y: 63, name: 'Interceptores-1' }
+    ],
+    salvos: [
+      { type: 'shahed', count: 18, interval: 20, tStart: 0, agl: 1500, pts: [[40, 0], [42, 30], [46.9, 52]], targetObj: 'Central CHP-6' },
+      { type: 'gerbera', count: 10, interval: 25, tStart: 60, agl: 900, pts: [[70, 5], [50, 30], [44, 55]] },
+      { type: 'shahed', count: 10, interval: 30, tStart: 120, agl: 2000, pts: [[70, 40], [55, 55], [40.3, 67.4]], targetObj: 'Central CHP-5' },
+      { type: 'kh101', count: 10, interval: 10, sync: true, tArrive: 1500, agl: 40, pts: [[0, 30], [20, 50], [40.3, 67.4]], targetObj: 'Central CHP-5' },
+      { type: 'kalibr', count: 6, interval: 8, sync: true, tArrive: 1490, agl: 50, pts: [[45, 111], [42, 90], [40.3, 67.4]], targetObj: 'Central CHP-5' },
+      { type: 'isk_m', count: 3, interval: 15, sync: true, tArrive: 1520, launchDist: 400, maneuver: true, decoys: true, pts: [[70, 0], [46.9, 52]], targetObj: 'Central CHP-6' },
+      { type: 'kinzhal', count: 2, interval: 15, sync: true, tArrive: 1530, launchDist: 450, pts: [[70, 20], [36.3, 45.7]], targetObj: 'Represa de Kiev' }
+    ],
+    jams: [],
+    goals: [
+      { side: 'ataque', primary: true, kind: 'destroy', target: 'Central CHP-5', text: 'Destruir la central CHP-5' },
+      { side: 'ataque', primary: true, kind: 'destroy', target: 'Central CHP-6', text: 'Destruir la central CHP-6' },
+      { side: 'ataque', primary: false, kind: 'damage', target: 'Represa de Kiev', min: 0.3, text: 'Dañar la represa (≥ 30%)' },
+      { side: 'defensa', primary: true, kind: 'survive', target: 'Central CHP-5', text: 'Que la central CHP-5 no sea destruida' },
+      { side: 'defensa', primary: true, kind: 'survive', target: 'Central CHP-6', text: 'Que la central CHP-6 no sea destruida' },
+      { side: 'defensa', primary: false, kind: 'protect', target: 'Represa de Kiev', text: 'Mantener operativa la represa' },
+      { side: 'defensa', primary: false, kind: 'keepUnit', target: 'Patriot-1', text: 'Conservar la batería Patriot-1' }
+    ],
+    success: 'Defensa: las dos centrales siguen en pie al terminar la noche.',
+    failure: 'Defensa: alguna de las centrales queda destruida.'
+  },
+  kv_vacio: { map: 'kyiv', name: 'Kiev · vacío', player: 'defensa', description: 'Mapa libre sobre el relieve real de Kiev (SRTM): ubicá objetivos, defensas, ataques y guerra electrónica.', objectives: [], defs: [], salvos: [], jams: [], goals: [] },
   mb_vacio: { map: 'monterey', name: 'Monterey · vacío', player: 'defensa', description: 'Mapa libre para armar tu propio escenario: ubicá objetivos, defensas, ataques y guerra electrónica.', objectives: [], defs: [], salvos: [], jams: [], goals: [] },
   gb_vacio: { map: 'goteborg', name: 'Gotemburgo · vacío', player: 'defensa', description: 'Mapa libre para armar tu propio escenario: ubicá objetivos, defensas, ataques y guerra electrónica.', objectives: [], defs: [], salvos: [], jams: [], goals: [] }
 };

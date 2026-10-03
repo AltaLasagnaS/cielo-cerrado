@@ -28,7 +28,7 @@ Propuesta detallada, con orden, dificultad, datos y pruebas: [docs/investigacion
 
 ## Juego
 
-- Más escenarios: Kyiv (relieve SRTM), corredor del mar Negro.
+- Más escenarios: corredor del mar Negro, otras ciudades ucranianas (Odesa, Járkov) con `scripts/gen-terrain.mjs`.
 - Plataformas aéreas propias: patrullas de cazas como interceptores con radio de acción.
 - Niebla de guerra más estricta: jugar solo con lo que ven tus sensores.
 - Editor de objetivos y metas desde la interfaz.
