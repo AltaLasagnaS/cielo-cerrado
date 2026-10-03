@@ -177,6 +177,7 @@ Crucero a 700–720 km/h y 30–70 m sobre el terreno en la fase final, siguiend
 - **Ojiva:** 400–480 kg; ≈800 kg en la variante de dos ojivas
 - **Alcance:** ≈2.500–2.800 km (CSIS); hasta 3.500 km según otras fuentes
 - **Costo:** Contratos rusos filtrados: US$2,0 M (2024) y 2,0–2,4 M (2025). Forbes Ukraine estimaba US$13 M
+- **Sin GNSS:** descarta el engaño con correlación óptica del terreno; su buscador terminal corrige errores de hasta 2 km
 - **Altura de vuelo:** típica 50 m, límites reales 30–6000 m · perfiles: Rasante 50 m, Crucero alto 6000 m. 30–70 m siguiendo el terreno; también puede cruzar a ≈6.000 m (Wikipedia, CSIS). Alto ahorra combustible pero lo ve cualquier radar.
 
 - Lanzado desde Tu-95MS y Tu-160 fuera del alcance ucraniano.
@@ -189,6 +190,7 @@ Crucero a 700–720 km/h y 30–70 m sobre el terreno en la fase final, siguiend
 |---|---:|---:|---:|---|---|---|
 | Velocidad de crucero (m/s) | 195 | **200** | 270 | alta | [1] | Mach 0,58 crucero, 0,78 máx. |
 | Altura de vuelo (m AGL) | 30 | **50** | 70 | alta | [1] | 30–70 m en la fase final; tramos de crucero más altos |
+| Ventana que corrige el buscador terminal (km) | 1 | **2** | 4 | baja | [1] | est: buscador TV/IR terminal y correlación óptica de la escena; revisa unos pocos km alrededor del punto previsto |
 | RCS frontal (X/S) (m²) | 0 | **0,002** | 0,1 | baja | [2] [3] | est por forma/OSINT 0,03 m²; CMO (DB3K, AS-23A Kodiak [Kh-101]): −40,1 dBsm ≈ 0,000098 m² de frente. Probable = media geométrica |
 | RCS lateral (X/S) (m²) | 0 | **0,008** | 1 | baja | [3] | est por forma/OSINT 0,3 m²; CMO (DB3K, AS-23A Kodiak [Kh-101]): −37,3 dBsm ≈ 0,00019 m² de costado. Probable = media geométrica |
 | RCS de cola (X/S) (m²) | 0 | **0,002** | 0,2 | baja | [3] | est por forma/OSINT 0,06 m²; CMO (DB3K, AS-23A Kodiak [Kh-101]): −40,1 dBsm ≈ 0,000098 m² de cola. Probable = media geométrica |
@@ -235,6 +237,7 @@ Subsónico (Mach 0,7–0,8), ≈20 m sobre el agua y 50–150 m sobre tierra.
 - **Ojiva:** ≈450–500 kg
 - **Alcance:** 1.500–2.500 km (CSIS)
 - **Costo:** Contratos rusos filtrados: ≈US$2 M. Forbes Ukraine estimaba 6,5 M
+- **Sin GNSS:** descarta el engaño con correlación del terreno (TERCOM); su buscador terminal corrige errores de hasta 2 km
 - **Altura de vuelo:** típica 50 m, límites reales 20–300 m · perfiles: Sobre el mar 20 m, Sobre tierra 50 m. ≈20 m sobre el agua, 50–150 m sobre tierra (Wikipedia).
 
 - Lanzado desde corbetas, fragatas y submarinos del Mar Negro y el Caspio.
@@ -246,6 +249,7 @@ Subsónico (Mach 0,7–0,8), ≈20 m sobre el agua y 50–150 m sobre tierra.
 |---|---:|---:|---:|---|---|---|
 | Velocidad de crucero (m/s) | 230 | **240** | 270 | alta | [1] [2] | Mach 0,7–0,8 |
 | Altura de vuelo (m AGL) | 20 | **50** | 150 | media | [1] | ≈20 m sobre el agua, 50–150 m sobre tierra |
+| Ventana que corrige el buscador terminal (km) | 1 | **2** | 4 | baja | [1] | est: correlación de la escena final (tipo DSMAC) o buscador terminal |
 | RCS frontal (X/S) (m²) | 0,05 | **0,072** | 0,3 | baja | [3] [4] | est por forma/OSINT 0,1 m²; CMO (DB3K, SS-N-30A Sagaris [3M14 Kalibr]): −12,9 dBsm ≈ 0,051 m² de frente. Probable = media geométrica |
 | RCS lateral (X/S) (m²) | 0,098 | **0,31** | 3 | baja | [4] | est por forma/OSINT 1 m²; CMO (DB3K, SS-N-30A Sagaris [3M14 Kalibr]): −10,1 dBsm ≈ 0,098 m² de costado. Probable = media geométrica |
 | RCS de cola (X/S) (m²) | 0,05 | **0,1** | 0,5 | baja | [5] [4] | est por forma/OSINT 0,2 m²; CMO (DB3K, SS-N-30A Sagaris [3M14 Kalibr]): −12,9 dBsm ≈ 0,051 m² de cola. Probable = media geométrica |
@@ -289,6 +293,7 @@ Versión de crucero terrestre del sistema Iskander, derivada de la familia Kalib
 - **Ojiva:** ≈480–500 kg
 - **Alcance:** ≈500 km (publicado)
 - **Costo:** Contratos rusos filtrados: ≈US$1,5–1,7 M
+- **Sin GNSS:** sin corrección independiente del satélite; su buscador terminal corrige errores de hasta 5 km
 - **Altura de vuelo:** típica 50 m, límites reales 6–6000 m · perfiles: Rasante 50 m, Crucero alto 6000 m. Tramo medio a ≈6 km de altura y 7–150 m al acercarse al blanco (RUSI).
 
 - Se lanza desde el mismo camión que el Iskander-M: el defensor no sabe de antemano si viene balístico o crucero.
@@ -300,6 +305,7 @@ Versión de crucero terrestre del sistema Iskander, derivada de la familia Kalib
 |---|---:|---:|---:|---|---|---|
 | Velocidad de crucero (m/s) | 220 | **250** | 280 | baja | — | est: derivado del Kalibr, subsónico |
 | Altura de vuelo (m AGL) | 6 | **50** | 150 | media | [1] | — |
+| Ventana que corrige el buscador terminal (km) | 2 | **5** | 10 | baja | [1] | est: el buscador radar se activa a ~20 km del blanco; la ventana que puede corregir es menor |
 | RCS frontal (X/S) (m²) | 0,05 | **0,13** | 0,3 | baja | [2] [3] | est por forma/OSINT 0,1 m²; CMO (DB3K, SSC-7 Southpaw [9M728 Iskander-K]): −7,6 dBsm ≈ 0,17 m² de frente. Probable = media geométrica |
 | RCS lateral (X/S) (m²) | 0,2 | **0,58** | 3 | baja | [3] | est por forma/OSINT 1 m²; CMO (DB3K, SSC-7 Southpaw [9M728 Iskander-K]): −4,8 dBsm ≈ 0,33 m² de costado. Probable = media geométrica |
 | RCS de cola (X/S) (m²) | 0,05 | **0,19** | 0,5 | baja | [3] | est por forma/OSINT 0,2 m²; CMO (DB3K, SSC-7 Southpaw [9M728 Iskander-K]): −7,6 dBsm ≈ 0,17 m² de cola. Probable = media geométrica |
@@ -339,6 +345,7 @@ Trayectoria aplanada con apogeo típico de 40–50 km; hasta 2.100 m/s, ≈1.300
 - **Ojiva:** 450–700 kg
 - **Alcance:** 390–500 km (9M723-2: ≈550 km)
 - **Costo:** Contratos rusos filtrados: US$2,4–3,0 M
+- **Sin GNSS:** sin corrección independiente del satélite; su buscador terminal corrige errores de hasta 1 km
 
 - Lleva señuelos 9B899 (RUSI escribe 9B999): unos 6 por misil, con emisor RF e IR.
 - Desde fines de 2025 una actualización de software agrega picada empinada o viraje terminal: la intercepción cayó de 37% (ago-2025) a 6% (sep-2025) según el FT.
@@ -351,6 +358,7 @@ Trayectoria aplanada con apogeo típico de 40–50 km; hasta 2.100 m/s, ≈1.300
 |---|---:|---:|---:|---|---|---|
 | Velocidad de crucero (m/s) | 1.000 | **1.150** | 1.400 | media | [1] [2] | velocidad horizontal media del modelo; pico 2.100–2.600 m/s, 1.300–1.400 m/s cerca del blanco |
 | Apogeo (km) | 40 | **45** | 100 | media | [1] [3] | típico 40–50 km; el GUR da 100 km como máximo |
+| Ventana que corrige el buscador terminal (km) | 0,5 | **1** | 2 | baja | — | est: buscador óptico de correlación de escena en la picada final: ventana chica |
 | RCS frontal (X/S) (m²) | 0,03 | **0,14** | 0,3 | baja | [4] [5] | est por forma/OSINT 0,1 m²; CMO (DB3K, SS-26 Stone [9M723 Iskander-M]): −7,3 dBsm ≈ 0,19 m² de frente. Probable = media geométrica |
 | RCS lateral (X/S) (m²) | 0,2 | **0,6** | 3 | baja | [5] | est por forma/OSINT 1 m²; CMO (DB3K, SS-26 Stone [9M723 Iskander-M]): −4,5 dBsm ≈ 0,35 m² de costado. Probable = media geométrica |
 | RCS de cola (X/S) (m²) | 0,1 | **0,24** | 1 | baja | [5] | est por forma/OSINT 0,3 m²; CMO (DB3K, SS-26 Stone [9M723 Iskander-M]): −7,3 dBsm ≈ 0,19 m² de cola. Probable = media geométrica |
@@ -403,6 +411,7 @@ Lanzado desde MiG-31K. Rusia lo vende como "Mach 10", pero un operador de Patrio
 - **Ojiva:** ≈480 kg
 - **Alcance:** ≈460–480 km tras el lanzamiento
 - **Costo:** Contratos rusos filtrados: ≈US$4,5 M. Forbes Ukraine estimaba 10–15 M
+- **Sin GNSS:** sin corrección independiente del satélite; su buscador terminal corrige errores de hasta 1 km
 
 - Primer derribo confirmado por Patriot sobre Kyiv el 4/5/2023.
 - 111 lanzados y 28 interceptados (25%) hasta ago-2024.
@@ -414,6 +423,7 @@ Lanzado desde MiG-31K. Rusia lo vende como "Mach 10", pero un operador de Patrio
 |---|---:|---:|---:|---|---|---|
 | Velocidad de crucero (m/s) | 1.100 | **1.250** | 1.500 | media | [1] [2] | ≈1.240 m/s medido en la intercepción (The Economist); CSIS: acelera a Mach 4 |
 | Apogeo (km) | 35 | **45** | 80 | baja | [3] | est por física: lanzado a 15–20 km y Mach 2+ |
+| Ventana que corrige el buscador terminal (km) | 0,5 | **1** | 2 | baja | — | est: análogo al Iskander-M |
 | RCS frontal (X/S) (m²) | 0,03 | **0,14** | 0,3 | baja | [3] [4] | est por forma/OSINT 0,1 m²; CMO (DB3K, AS-24 Killjoy [Kh-47M2 Kinzhal]): −7,3 dBsm ≈ 0,19 m² de frente. Probable = media geométrica |
 | RCS lateral (X/S) (m²) | 0,2 | **0,6** | 3 | baja | [4] | est por forma/OSINT 1 m²; CMO (DB3K, AS-24 Killjoy [Kh-47M2 Kinzhal]): −4,5 dBsm ≈ 0,35 m² de costado. Probable = media geométrica |
 | RCS de cola (X/S) (m²) | 0,1 | **0,24** | 1 | baja | [4] | est por forma/OSINT 0,3 m²; CMO (DB3K, AS-24 Killjoy [Kh-47M2 Kinzhal]): −7,3 dBsm ≈ 0,19 m² de cola. Probable = media geométrica |
@@ -615,6 +625,7 @@ Vuelo rasante a 30–40 m guiado por mapa de terreno; al final hace un "bunt": t
 - **Ojiva:** 450 kg BROACH (penetrante en tándem)
 - **Alcance:** ≈250 km (exportación, la entregada a Ucrania); ≈550 km versión UK/FR
 - **Costo:** ≈£2 M (≈US$2,5 M, 2023); el precio original era £790k
+- **Sin GNSS:** descarta el engaño con TERPROM (correlación del terreno); su buscador terminal corrige errores de hasta 2 km
 - **Altura de vuelo:** típica 35 m, límites reales 30–300 m. 30–40 m en la fase rasante (Defense Mirror); más alto es estimación.
 
 - Lanzado por Su-24 ucranianos adaptados.
@@ -627,6 +638,7 @@ Vuelo rasante a 30–40 m guiado por mapa de terreno; al final hace un "bunt": t
 |---|---:|---:|---:|---|---|---|
 | Velocidad de crucero (m/s) | 270 | **275** | 323 | alta | [1] [2] | Mach 0,8–0,95 |
 | Altura de vuelo (m AGL) | 30 | **35** | 40 | alta | [2] | — |
+| Ventana que corrige el buscador terminal (km) | 1 | **2** | 4 | baja | [2] | est: buscador IR de imagen con reconocimiento automático del blanco |
 | RCS frontal (X/S) (m²) | 0 | **0,001** | 0,1 | baja | [3] [2] [4] | est por forma/OSINT 0,05 m²; CMO (DB3K, Storm Shadow): −44,2 dBsm ≈ 0,000038 m² de frente. Probable = media geométrica |
 | RCS lateral (X/S) (m²) | 0 | **0,005** | 1 | baja | [4] | est por forma/OSINT 0,3 m²; CMO (DB3K, Storm Shadow): −41,2 dBsm ≈ 0,000076 m² de costado. Probable = media geométrica |
 | RCS de cola (X/S) (m²) | 0 | **0,002** | 0,3 | baja | [4] | est por forma/OSINT 0,1 m²; CMO (DB3K, Storm Shadow): −44,2 dBsm ≈ 0,000038 m² de cola. Probable = media geométrica |
@@ -714,6 +726,7 @@ Antibuque subsónico rasante (4–5 m sobre el agua en la fase final). Hundió a
 - **Ojiva:** 150 kg (Long Neptune ≈260 kg)
 - **Alcance:** 280–300 km (Long Neptune ≈1.000 km)
 - **Costo:** Sin cifra oficial; ≈US$1,5 M es una estimación de prensa
+- **Sin GNSS:** sin corrección independiente del satélite; su buscador terminal corrige errores de hasta 3 km
 - **Altura de vuelo:** típica 15 m, límites reales 3–300 m · perfiles: Sobre el mar 5 m, Sobre tierra 30 m. 3–5 m sobre el mar (RBC-Ucrania); ≈30 m sobre tierra es estimación.
 
 - La versión de ataque a tierra (más larga y gruesa) amplió el alcance a ~1.000 km.
@@ -725,6 +738,7 @@ Antibuque subsónico rasante (4–5 m sobre el agua en la fase final). Hundió a
 |---|---:|---:|---:|---|---|---|
 | Velocidad de crucero (m/s) | 250 | **260** | 270 | media | [1] | — |
 | Altura de vuelo (m AGL) | 3 | **15** | 100 | media | [1] | 4–5 m sobre el mar; est ~30 m sobre tierra |
+| Ventana que corrige el buscador terminal (km) | 1 | **3** | 6 | baja | [1] | est: buscador radar terminal (diseñado como antibuque) |
 | RCS frontal (X/S) (m²) | 0,049 | **0,07** | 0,3 | baja | [2] [3] | est por forma/OSINT 0,1 m²; CMO (DB3K, R-360MC Neptun): −13,1 dBsm ≈ 0,049 m² de frente. Probable = media geométrica |
 | RCS lateral (X/S) (m²) | 0,1 | **0,32** | 3 | baja | [3] | est por forma/OSINT 1 m²; CMO (DB3K, R-360MC Neptun): −10 dBsm ≈ 0,1 m² de costado. Probable = media geométrica |
 | RCS de cola (X/S) (m²) | 0,049 | **0,099** | 0,5 | baja | [3] | est por forma/OSINT 0,2 m²; CMO (DB3K, R-360MC Neptun): −13,1 dBsm ≈ 0,049 m² de cola. Probable = media geométrica |
@@ -757,6 +771,7 @@ Dron de ataque ucraniano de 250–300 kg usado contra refinerías y bases en Rus
 - **Ojiva:** 50–75 kg
 - **Alcance:** ≈1.000–1.400 km (hasta 2.000 km con ojiva liviana)
 - **Costo:** ≈US$200k (reportado)
+- **Sin GNSS:** sin corrección independiente del satélite; su buscador terminal corrige errores de hasta 0.3 km
 - **Altura de vuelo:** típica 500 m, límites reales 50–3000 m. Estimación: envolvente análogo al Shahed.
 
 - Usado en grandes oleadas contra infraestructura petrolera.
@@ -768,6 +783,7 @@ Dron de ataque ucraniano de 250–300 kg usado contra refinerías y bases en Rus
 |---|---:|---:|---:|---|---|---|
 | Velocidad de crucero (m/s) | 44 | **56** | 83 | baja | [1] | fuentes entre 160 y 300 km/h |
 | Altura de vuelo (m AGL) | 50 | **500** | 3.000 | baja | — | est: análogo al Shahed |
+| Ventana que corrige el buscador terminal (km) | 0,1 | **0,3** | 1 | baja | — | est: guiado terminal con cámara y reconocimiento por IA de alcance corto |
 | RCS frontal (X/S) (m²) | 0,1 | **0,3** | 1 | baja | — | est: motor y hélice como reflectores principales |
 | RCS lateral (X/S) (m²) | 0,3 | **0,77** | 3 | baja | [2] | est por forma 1 m² (×3 el frente); regla de CMO: costado = frente +3 dB (×2, mediana de 452 armas guiadas de su base). Probable = media geométrica |
 | RCS de cola (X/S) (m²) | 0,1 | **0,3** | 1 | baja | [2] | est por forma 0,3 m²; regla de CMO: cola = frente. Probable = media geométrica |

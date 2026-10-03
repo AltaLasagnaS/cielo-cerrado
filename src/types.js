@@ -25,6 +25,8 @@
  * @property {boolean} [lo]   Baja firma (furtivo)
  * @property {boolean} [ir]   Lanza bengalas contra buscadores IR
  * @property {number} gnss    Dependencia del GNSS: 0 = total, 1 = inmune
+ * @property {string} [navFix] Corrección de navegación independiente del satélite (descarta el engaño GNSS)
+ * @property {number} [seekerKm] Ventana que corrige el buscador terminal (km)
  * @property {number} cep     CEP (m)
  * @property {number} cost    Costo unitario (M US$)
  * @property {boolean} maneuver Maniobra terminal por defecto
