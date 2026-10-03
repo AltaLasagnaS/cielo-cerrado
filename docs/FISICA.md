@@ -219,6 +219,8 @@ r / vInt ≤ τ   (el interceptor llega a tiempo, con ≤ 3 s de holgura)
 
 **Señuelos** (`physics/decoys.js`): cada barrido de un radar de tiro (bandas con `decoyTau`: S 60 s, C 25 s, X 18 s, Ku 12 s; VHF y L no clasifican) que ve una pista suma `radar.scan` segundos de seguimiento. La pista queda clasificada cuando `1 − exp(−t/τ)` supera un umbral fijo de esa pista (sale de `th.phase`, ya sorteado: no cambia la secuencia de azar). τ es el de la banda más rápida que la siguió, ×4 para los señuelos que suelta un balístico (acompañan al misil). Un arma real se toma por señuelo con probabilidad 3%. Con la opción **"no tirarle a pistas clasificadas como señuelo"** (pestaña Defensa) se ahorra munición con ese riesgo; el debrief cuenta los señuelos reconocidos y las armas mal clasificadas.
 
+**Recarga:** cada batería tiene munición lista (`mag`) y una **reserva** (`sam.reserve`, editable en el panel de selección). Cuando se vacía y no tiene interceptores en vuelo, recarga toda la batería en `sam.reloadS` segundos (Patriot ≈40 min, NASAMS e IRIS-T ≈20–30 min, Buk ≈13 min, grupos móviles ≈2 min; estimaciones con rango en `UNC`). Si el mapa tiene objetivos **depósito de munición**, solo recarga si alguno sigue en pie a menos de 30 km: destruirlo corta el reabastecimiento.
+
 **Doctrina:** con "salva" se disparan `u.salvo` interceptores por blanco (cada 0,6 s); con "disparar-observar-disparar", uno.
 
 ---
@@ -307,7 +309,7 @@ Es un modelo de juego: no representa estructuras, incendios, penetración ni sub
 | RCS con tres aspectos | Sin aspecto arriba/abajo ni detalle angular fino | Tabla por ángulo (como el "3D radar splat" de CMO PE) |
 | Clutter y Doppler simples | Pérdida de SNR por clutter según el procesamiento del radar y la rugosidad, y notch por velocidad radial | Clutter de lluvia y de mar por estado del mar; visibilidad sub-clutter por radar con datos |
 | Clima simple | Lluvia (ITU-R P.838-3), techo de nubes y factores ópticos/acústicos fijos por escenario | Día y noche, clutter de lluvia, viento, clima que cambia durante el escenario |
-| Sin recarga | Las baterías quedan vacías | Recarga con tiempo y depósito de munición como objetivo |
+| Recarga de batería completa | Recarga toda la batería de una vez (`sam.reloadS`) desde su reserva; los tiempos son estimaciones | Recarga por lanzador; vehículos de recarga como unidades |
 | Swerling 1 para todos | Sin el caso 3 (reflector dominante) ni integración de pulsos | Swerling 3 verificado; integración no coherente |
 | Interceptor en línea recta a velocidad media | Sin energía ni geometría de persecución | Perfil de velocidad y límite de g |
 | Discriminación de señuelos | El radar nunca distingue señuelos | Probabilidad de discriminación por banda y tiempo de seguimiento |

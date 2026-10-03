@@ -914,33 +914,35 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
-| Radar: detección contra 1 m² (km) | 90 | **100** | 120 | baja | [1] | est: 170 km es el alcance instrumentado; avión grande 150–170 km, escalado con σ^¼ |
-| Radar: sector de búsqueda (°) | 90 | **90** | 120 | media | [1] | búsqueda 90°, seguimiento 120° |
+| Tiempo de recarga de la batería (s) | 1.800 | **2.400** | 3.600 | baja | [1] | foro de CMO: ≈40 min; 30–60 min por lanzador con grúa |
+| Radar: detección contra 1 m² (km) | 90 | **100** | 120 | baja | [2] | est: 170 km es el alcance instrumentado; avión grande 150–170 km, escalado con σ^¼ |
+| Radar: sector de búsqueda (°) | 90 | **90** | 120 | media | [2] | búsqueda 90°, seguimiento 120° |
 | Radar: refresco (s) | 1 | **2** | 3 | baja | — | est: barrido electrónico en sector fijo |
-| Alcance vs aeronaves/crucero (km) | 60 | **100** | 120 | baja | [2] | — |
-| Alcance vs balísticos (km) | 30 | **40** | 60 | baja | [2] | — |
-| Techo (m) | 35.000 | **36.000** | 40.000 | media | [2] | — |
+| Alcance vs aeronaves/crucero (km) | 60 | **100** | 120 | baja | [3] | — |
+| Alcance vs balísticos (km) | 30 | **40** | 60 | baja | [3] | — |
+| Techo (m) | 35.000 | **36.000** | 40.000 | media | [3] | — |
 | Velocidad media del interceptor (m/s) | 1.100 | **1.300** | 1.500 | baja | — | est: ≈0,75 × velocidad máxima |
-| Tiempo de reacción (s) | 8 | **9** | 15 | baja | [3] | — |
-| Canales simultáneos | 6 | **8** | 9 | media | [1] | 9 misiles guiados a la vez |
-| Munición de la unidad | 12 | **16** | 48 | media | [4] | M903: 12 MSE; 6–8 lanzadores por batería |
-| Costo por disparo | US$4 M | **US$4.2 M** | US$5.3 M | alta | [5] [6] | FY2025: 4,19 M; plurianual 2025 ≈4,97 M con costos asociados |
+| Tiempo de reacción (s) | 8 | **9** | 15 | baja | [4] | — |
+| Canales simultáneos | 6 | **8** | 9 | media | [2] | 9 misiles guiados a la vez |
+| Munición de la unidad | 12 | **16** | 48 | media | [5] | M903: 12 MSE; 6–8 lanzadores por batería |
+| Costo por disparo | US$4 M | **US$4.2 M** | US$5.3 M | alta | [6] [7] | FY2025: 4,19 M; plurianual 2025 ≈4,97 M con costos asociados |
 | Pk por disparo vs drones | 0,8 | **0,9** | 0,95 | baja | — | est |
 | Pk por disparo vs crucero | 0,8 | **0,9** | 0,95 | media | — | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
-| Pk por disparo vs supersónicos | 0,4 | **0,6** | 0,8 | baja | [7] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
-| Pk por disparo vs balísticos | 0,4 | **0,7** | 0,85 | media | [8] [9] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
-| Pk por disparo vs hipersónicos | 0,3 | **0,5** | 0,7 | baja | [10] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
+| Pk por disparo vs supersónicos | 0,4 | **0,6** | 0,8 | baja | [8] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
+| Pk por disparo vs balísticos | 0,4 | **0,7** | 0,85 | media | [9] [10] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
+| Pk por disparo vs hipersónicos | 0,3 | **0,5** | 0,7 | baja | [11] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
 
-1. [Radartutorial: AN/MPQ-53](https://www.radartutorial.eu/19.kartei/06.missile/karte003.en.html)
-2. [Wikipedia: MIM-104 Patriot](https://en.wikipedia.org/wiki/MIM-104_Patriot)
-3. [Army Recognition: SAMP/T vs Patriot en Ucrania](https://www.armyrecognition.com/focus-analysis-conflicts/army/defence-security-industry-technology/french-samp-t-vs-u-s-patriot-air-defense-systems-technical-and-operational-analysis-in-ukraine)
-4. [CSIS Missile Defense: Patriot](https://missilethreat.csis.org/system/patriot/)
-5. [US Army FY2025 Missile Procurement (P-40, costo unitario PAC-3 MSE)](https://www.asafm.army.mil/Portals/72/Documents/BudgetMaterial/2025/Base%20Budget/Procurement/Missile-Procurement-Army.pdf)
-6. [Breaking Defense: contrato plurianual PAC-3 (sep-2025)](https://breakingdefense.com/2025/09/army-awards-lockheed-multiyear-9-8-billion-contract-for-thousands-of-pac-3-missiles/)
-7. [RBC-Ukraine: 9 de 12 Kh-22 derribados sobre Kyiv (feb-2026)](https://newsukraine.rbc.ua/news/kyiv-attack-air-force-shoots-down-9-kh-22-1770042905.html)
-8. [RUSI: Iskander, an improved Russian missile tests Ukraine’s air defence (nov-2025)](https://www.rusi.org/explore-our-research/publications/commentary/iskander-improved-russian-missile-tests-ukraines-air-defence)
-9. [AeroTime (resume Financial Times): intercepción de balísticos 37% → 6% (2025)](https://www.aerotime.aero/articles/russias-upgraded-ballistic-missiles-outmaneuver-ukraines-patriot-systems-ft)
-10. [NV: SAMP/T y Patriot interceptan Zircon (mar-2024)](https://english.nv.ua/nation/ukraine-uses-european-samp-t-and-american-patriot-systems-to-intercept-russian-zircon-missiles-50404796.html)
+1. [Foro de Matrix Games: recargar una batería Patriot en CMO (≈40 min, ejemplo de juego)](http://www.matrixgames.com/forums/viewtopic.php?t=294701)
+2. [Radartutorial: AN/MPQ-53](https://www.radartutorial.eu/19.kartei/06.missile/karte003.en.html)
+3. [Wikipedia: MIM-104 Patriot](https://en.wikipedia.org/wiki/MIM-104_Patriot)
+4. [Army Recognition: SAMP/T vs Patriot en Ucrania](https://www.armyrecognition.com/focus-analysis-conflicts/army/defence-security-industry-technology/french-samp-t-vs-u-s-patriot-air-defense-systems-technical-and-operational-analysis-in-ukraine)
+5. [CSIS Missile Defense: Patriot](https://missilethreat.csis.org/system/patriot/)
+6. [US Army FY2025 Missile Procurement (P-40, costo unitario PAC-3 MSE)](https://www.asafm.army.mil/Portals/72/Documents/BudgetMaterial/2025/Base%20Budget/Procurement/Missile-Procurement-Army.pdf)
+7. [Breaking Defense: contrato plurianual PAC-3 (sep-2025)](https://breakingdefense.com/2025/09/army-awards-lockheed-multiyear-9-8-billion-contract-for-thousands-of-pac-3-missiles/)
+8. [RBC-Ukraine: 9 de 12 Kh-22 derribados sobre Kyiv (feb-2026)](https://newsukraine.rbc.ua/news/kyiv-attack-air-force-shoots-down-9-kh-22-1770042905.html)
+9. [RUSI: Iskander, an improved Russian missile tests Ukraine’s air defence (nov-2025)](https://www.rusi.org/explore-our-research/publications/commentary/iskander-improved-russian-missile-tests-ukraines-air-defence)
+10. [AeroTime (resume Financial Times): intercepción de balísticos 37% → 6% (2025)](https://www.aerotime.aero/articles/russias-upgraded-ballistic-missiles-outmaneuver-ukraines-patriot-systems-ft)
+11. [NV: SAMP/T y Patriot interceptan Zircon (mar-2024)](https://english.nv.ua/nation/ukraine-uses-european-samp-t-and-american-patriot-systems-to-intercept-russian-zircon-missiles-50404796.html)
 
 #### Fuentes generales
 
@@ -1051,6 +1053,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Tiempo de recarga de la batería (s) | 600 | **1.200** | 2.400 | baja | — | est: sin dato público firme |
 | Radar: detección contra 1 m² (km) | 80 | **100** | 150 | media | [1] | cazas a más de 120 km, misiles supersónicos a más de 60 km |
 | Alcance vs aeronaves/crucero (km) | 40 | **40** | 40 | alta | [2] | — |
 | Alcance vs balísticos (km) | 0 | **0** | 10 | baja | — | sin datos públicos de capacidad antibalística (se quitó del modelo) |
@@ -1094,6 +1097,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Tiempo de recarga de la batería (s) | 900 | **1.800** | 3.600 | baja | — | est: lanzador de 6 AMRAAM recargado con grúa; sin dato público firme |
 | Radar: detección contra 1 m² (km) | 40 | **60** | 90 | media | [1] | 40 km el básico, 120 km el F1/A3 |
 | Alcance vs aeronaves/crucero (km) | 25 | **35** | 40 | media | [2] | — |
 | Techo (m) | 12.000 | **15.000** | 21.000 | baja | [3] | est |
@@ -1241,6 +1245,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Tiempo de recarga de la batería (s) | 60 | **120** | 300 | baja | — | est: cambiar la cinta de la ametralladora |
 | Radar: detección contra 1 m² (km) | 2 | **5** | 8 | baja | — | est: visual/térmico nocturno con alerta acústica |
 | Alcance vs aeronaves/crucero (km) | 1 | **1,5** | 2 | media | — | — |
 | Pk por disparo vs drones | 0,05 | **0,2** | 0,3 | baja | — | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |

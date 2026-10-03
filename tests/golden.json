@@ -33,7 +33,8 @@
     "IRIS-T-1": 1,
     "NASAMS-1": 1,
     "Patriot-1": 1
-   }
+   },
+   "reloads": 0
   },
   "impacts": [
    [
@@ -154,7 +155,7 @@
     16
    ]
   ],
-  "log": 185
+  "log": 188
  },
  "mb_noche_s42": {
   "t": 1550,
@@ -186,7 +187,8 @@
    },
    "satMag": {
     "Patriot-1": 1
-   }
+   },
+   "reloads": 0
   },
   "impacts": [
    [
@@ -312,7 +314,7 @@
     18
    ]
   ],
-  "log": 172
+  "log": 174
  },
  "mb_noche_sls_sin_red": {
   "t": 1550,
@@ -345,7 +347,8 @@
    "satChannels": {},
    "satMag": {
     "Patriot-1": 1
-   }
+   },
+   "reloads": 0
   },
   "impacts": [
    [
@@ -481,7 +484,7 @@
     20
    ]
   ],
-  "log": 199
+  "log": 201
  },
  "mb_noche_plano": {
   "t": 1550,
@@ -512,7 +515,8 @@
    },
    "satMag": {
     "Patriot-1": 1
-   }
+   },
+   "reloads": 0
   },
   "impacts": [
    [
@@ -628,7 +632,7 @@
     20
    ]
   ],
-  "log": 169
+  "log": 171
  },
  "gb_ruso_s1": {
   "t": 1494.5,
@@ -656,7 +660,8 @@
    "satChannels": {
     "Tor-M2": 9
    },
-   "satMag": {}
+   "satMag": {},
+   "reloads": 0
   },
   "impacts": [
    [
@@ -697,7 +702,7 @@
     0
    ]
   ],
-  "log": 140
+  "log": 142
  },
  "gb_ruso_s9": {
   "t": 1494.5,
@@ -727,7 +732,8 @@
    },
    "satMag": {
     "Tor-M2": 1
-   }
+   },
+   "reloads": 0
   },
   "impacts": [
    [
@@ -768,7 +774,7 @@
     0
    ]
   ],
-  "log": 141
+  "log": 143
  },
  "gb_refineria_s1": {
   "t": 1528,
@@ -806,7 +812,8 @@
    "satMag": {
     "IRIS-T-1": 1,
     "RBS 70-1": 1
-   }
+   },
+   "reloads": 0
   },
   "impacts": [
    [
@@ -892,7 +899,7 @@
     20
    ]
   ],
-  "log": 153
+  "log": 156
  },
  "mb_puente_s1": {
   "t": 1537.5,
@@ -934,7 +941,8 @@
     "Pantsir-1": 1,
     "Pantsir-2": 1,
     "S-400": 1
-   }
+   },
+   "reloads": 0
   },
   "impacts": [
    [
@@ -1015,7 +1023,7 @@
     0
    ]
   ],
-  "log": 209
+  "log": 214
  },
  "kv_energia_s1": {
   "t": 1550,
@@ -1053,7 +1061,8 @@
    "satMag": {
     "NASAMS-1": 1,
     "Patriot-1": 1
-   }
+   },
+   "reloads": 0
   },
   "impacts": [
    [
@@ -1269,6 +1278,6 @@
     11
    ]
   ],
-  "log": 286
+  "log": 289
  }
 }

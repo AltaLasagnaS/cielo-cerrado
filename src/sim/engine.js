@@ -21,7 +21,7 @@ import { log, event, label, uLabel } from './log.js';
 
 /** Arma la corrida a partir de S.setup: copia unidades y jammers y programa todos los lanzamientos. */
 export function startSim() {
-  S.units = S.setup.defs.map(d => ({ ...d, alive: true, magLeft: d.mag, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
+  S.units = S.setup.defs.map(d => ({ ...d, alive: true, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
   S.jamsLive = S.setup.jams.map(j => ({ ...j, _losMap: {} }));
   S.objs = S.setup.objs.map(g => ({ ...g, hp: g.maxHp, status: 'operational', hits: 0, dmgBy: {} }));
   S.threats = []; S.ints = []; S.fx = []; S.impacts = []; S.stats = newStats(); S.log = []; S.events = []; S.arrivals = [];
@@ -109,6 +109,18 @@ export function step(dt) {
       }
     }
   }
+  // recarga: una batería vacía con reserva recarga en sam.reloadS; si hay depósitos de munición en el
+  // mapa, necesita uno en pie a menos de RESUPPLY_KM (destruirlos corta la recarga)
+  for (const u of S.units) {
+    if (!u.alive || !D(u).sam) continue;
+    if (u.reloadUntil !== null && t >= u.reloadUntil) {
+      const n = Math.min(u.mag, u.reserveLeft); u.magLeft += n; u.reserveLeft -= n; u.reloadUntil = null; S.stats.reloads++;
+      log('l', uLabel(u) + ' termina de recargar: ' + n + ' listos, quedan ' + u.reserveLeft + ' en reserva.');
+    } else if (u.reloadUntil === null && u.magLeft === 0 && u.active === 0 && u.reserveLeft > 0 && canResupply(u)) {
+      u.reloadUntil = t + D(u).sam.reloadS;
+      log('w', uLabel(u) + ' empieza a recargar (' + Math.round(D(u).sam.reloadS / 60) + ' min).');
+    }
+  }
   // enfrentamientos (cada 1 s simulado por unidad)
   for (const u of S.units) {
     if (!u.alive || !D(u).sam || u.magLeft <= 0) continue;
@@ -187,6 +199,18 @@ function solveFor(u, th, t) {
 function shooterScore(u, th, t) {
   const pk = Math.max(0.01, calcPk(u, th, t, S.jamsLive));
   return th.cls === 'dron' ? -D(u).sam.cost / pk : pk;
+}
+
+/** Distancia máxima (km) a un depósito de munición para poder recargar. */
+export const RESUPPLY_KM = 30;
+
+/**
+ * ¿Puede recargar u? Sin depósitos de munición en el mapa, sí (vehículos propios de la batería); con
+ * depósitos, solo si alguno sigue en pie a menos de RESUPPLY_KM.
+ */
+export function canResupply(u) {
+  const dumps = S.objs.filter(g => g.type === 'ammo'); if (!dumps.length) return true;
+  return dumps.some(g => g.status !== 'destroyed' && Math.hypot(g.x - u.x, g.y - u.y) <= RESUPPLY_KM);
 }
 
 /** Costo esperado por derribo de u contra th (costo del disparo / Pk). */
