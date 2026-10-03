@@ -1281,6 +1281,7 @@ table.t.mc td.pc{white-space:nowrap}
       sources: [SRC.ng_alq131, SRC.fas_alq131, SRC.dx_f16nl, SRC.afm_f16ew]
     }
   };
+  var CRPA_SIZES = [0, 4, 8, 12, 16];
 
   // src/data/uncertainty.js
   var U = (min, p, max, c, src, nota) => ({ min, p, max, c, src: src || [], nota: nota || "" });
@@ -3098,6 +3099,7 @@ table.t.mc td.pc{white-space:nowrap}
       agl: sv.agl ?? T.agl,
       maneuver: !!sv.maneuver,
       link: !!(sv.link && T.datalink),
+      crpa: sv.crpa ?? 0,
       decoyRel: sv.decoys ? T.decoys || 0 : 0,
       released: false,
       alive: false,
@@ -3227,6 +3229,17 @@ table.t.mc td.pc{white-space:nowrap}
     }
     return { err, spoofed, rejected, corrected };
   }
+  var CRPA_SEP_DEG = 10;
+  var crpaNulls = (n2) => Math.max(0, (n2 || 0) - 1);
+  function distinctDirections(x, y, srcs2) {
+    const az = srcs2.map((s) => (Math.atan2(s.x - x, -(s.y - y)) * 180 / Math.PI + 360) % 360).sort((a, b) => a - b);
+    if (az.length <= 1) return az.length;
+    let n2 = 1;
+    for (let i = 1; i < az.length; i++) if (az[i] - az[i - 1] >= CRPA_SEP_DEG) n2++;
+    if (n2 > 1 && az[0] + 360 - az[az.length - 1] < CRPA_SEP_DEG) n2--;
+    return n2;
+  }
+  var crpaOverwhelmed = (n2, x, y, srcs2) => srcs2.length > 0 && distinctDirections(x, y, srcs2) > crpaNulls(n2);
 
   // src/physics/engagement.js
   var RADAR_GUID = ["TVM", "SARH", "mando", "cañón"];
@@ -3428,10 +3441,14 @@ table.t.mc td.pc{white-space:nowrap}
         event(label(th) + " libera señuelos", "decoys");
       }
       if (!th.gnssHit && th.T.gnss < 1) {
-        for (const j of S.jamsLive) {
+        const srcs2 = S.jamsLive.filter((j) => JAMMERS[j.type].gnssJam && j.on && Math.hypot(p.x - j.x, p.y - j.y) <= JAMMERS[j.type].radius);
+        const held = th.crpa > 0 && srcs2.length > 0 && !crpaOverwhelmed(th.crpa, p.x, p.y, srcs2);
+        if (held && !th.crpaHeld) {
+          th.crpaHeld = true;
+          log("d", label(th) + ": su antena CRPA de " + th.crpa + " elementos anula la interferencia GNSS (" + srcs2.length + " fuente" + (srcs2.length > 1 ? "s" : "") + ").");
+        }
+        for (const j of held ? [] : srcs2) {
           const J = JAMMERS[j.type];
-          if (!J.gnssJam || !j.on) continue;
-          if (Math.hypot(p.x - j.x, p.y - j.y) > J.radius) continue;
           const link = th.link && !S.jamsLive.some((k) => JAMMERS[k.type].linkJam && k.on && Math.hypot(p.x - k.x, p.y - k.y) <= JAMMERS[k.type].radius);
           const n2 = gnssNavError(th.T, J, link);
           th.gnssHit = true;
@@ -3797,7 +3814,7 @@ table.t.mc td.pc{white-space:nowrap}
   }
   function addSalvo(o) {
     const T = THREATS[o.type];
-    const sv = { id: nextId(), type: o.type, count: o.count || 1, interval: o.interval ?? 20, tStart: o.tStart || 0, sync: !!o.sync, tArrive: o.tArrive || 0, agl: o.agl ?? T.agl, launchDist: o.launchDist ?? T.launchDist, maneuver: o.maneuver ?? T.maneuver, decoys: !!o.decoys, link: !!o.link, pts: o.pts, targetUnit: null, targetObj: null };
+    const sv = { id: nextId(), type: o.type, count: o.count || 1, interval: o.interval ?? 20, tStart: o.tStart || 0, sync: !!o.sync, tArrive: o.tArrive || 0, agl: o.agl ?? T.agl, launchDist: o.launchDist ?? T.launchDist, maneuver: o.maneuver ?? T.maneuver, decoys: !!o.decoys, link: !!o.link, crpa: o.crpa ?? 0, pts: o.pts, targetUnit: null, targetObj: null };
     const find = (list, ref) => list.find((v) => v.name === ref || v.id === ref);
     if (o.targetUnit) {
       const u = find(S.setup.defs, o.targetUnit);
@@ -4869,7 +4886,7 @@ table.t.mc td.pc{white-space:nowrap}
       group: "Guerra electrónica",
       title: "Interferencia y engaño GNSS",
       body: () => `<p>Las señales GPS/GLONASS llegan a la Tierra extremadamente débiles: un transmisor modesto cerca del arma las tapa (<b>interferencia</b>) o las falsifica (<b>engaño</b>, spoofing). Sin satélites, el arma navega solo con su sistema inercial (INS), que acumula error. Las antenas CRPA (como la Kometa de los Shahed) anulan la dirección del jammer, y la navegación por imagen del terreno no depende de los satélites.</p><p>Ucrania usa sobre todo <b>engaño</b> (Pokrova, Lima): el arma no "se pierde", cree estar en otro lugar y se desvía kilómetros. Rusia protege sus bases con supresores como el Pole-21.</p><p>El engaño funciona muy bien contra drones baratos como el Shahed, pero mucho menos contra misiles de crucero: el Kh-101, el Kalibr y el Storm Shadow comparan el terreno que ven con un mapa interno, notan que el GNSS miente y lo descartan. Y los que tienen <b>buscador terminal</b> (cámara, infrarrojo o radar) reconocen el blanco al final y corrigen el error que les quede.</p>`,
-      engine: () => `<p>Los anti-GNSS (${code("gnssJam")}) no afectan radares y siempre juegan para el defensor: ${Object.values(JAMMERS).filter((j) => j.gnssJam).map((j) => esc(j.short) + " " + j.radius + " km" + (j.spoofKm ? " (engaño, ~" + j.spoofKm + " km)" : "")).join(", ")}. Un arma con ${code("T.gnss")} &lt; 1 que entra en el radio suma un error a su caída: con interferencia, ${code("navErr = (1 − gnss) · (300 + azar·1500) m")}; con engaño, ${code("(1 − gnss) · spoofKm · (0,5 + azar)")} km, salvo que el arma tenga corrección por terreno (${code("T.navFix")}: ${Object.values(THREATS).filter((t) => t.navFix).map((t) => esc(t.short)).join(", ")}), que descarta el engaño y queda como con interferencia. Si el error final cabe en la ventana del buscador terminal (${code("T.seekerKm")}), lo corrige con probabilidad ${SEEKER_ACQ}. Si el desvío supera 2 km, el debrief la cuenta como "perdida localmente". Con ${code("gnss = 1")} (guiado por radar o por terreno) es inmune. Ejemplos: ${["shahed", "kh101", "atacms", "kh22"].map((k) => esc(THREATS[k].short) + " " + THREATS[k].gnss).join(", ")}.</p>`
+      engine: () => `<p>Los anti-GNSS (${code("gnssJam")}) no afectan radares y siempre juegan para el defensor: ${Object.values(JAMMERS).filter((j) => j.gnssJam).map((j) => esc(j.short) + " " + j.radius + " km" + (j.spoofKm ? " (engaño, ~" + j.spoofKm + " km)" : "")).join(", ")}. Un arma con ${code("T.gnss")} &lt; 1 que entra en el radio suma un error a su caída: con interferencia, ${code("navErr = (1 − gnss) · (300 + azar·1500) m")}; con engaño, ${code("(1 − gnss) · spoofKm · (0,5 + azar)")} km, salvo que el arma tenga corrección por terreno (${code("T.navFix")}: ${Object.values(THREATS).filter((t) => t.navFix).map((t) => esc(t.short)).join(", ")}), que descarta el engaño y queda como con interferencia. Si el error final cabe en la ventana del buscador terminal (${code("T.seekerKm")}), lo corrige con probabilidad ${SEEKER_ACQ}. Si el desvío supera 2 km, el debrief la cuenta como "perdida localmente". Con ${code("gnss = 1")} (guiado por radar o por terreno) es inmune. Ejemplos: ${["shahed", "kh101", "atacms", "kh22"].map((k) => esc(THREATS[k].short) + " " + THREATS[k].gnss).join(", ")}.</p><p>Antena CRPA (${code("sv.crpa")}, pestaña Ataque): con N elementos anula hasta N − 1 anti-GNSS que lleguen desde direcciones distintas (a más de 10° entre sí vistas desde el arma). Con más fuentes, pierde el satélite y vale lo de arriba. Por eso contra una CRPA hacen falta muchas estaciones repartidas, no una más potente.</p>`
     },
     {
       id: "detect",
@@ -5295,7 +5312,7 @@ table.t.mc td.pc{white-space:nowrap}
       const T = THREATS[sv.type];
       const probe = buildThreat(sv, 0, 0);
       releaseId();
-      el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${sv.count}× ${esc(T.name)}</b><dl class="kv"><dt>Blanco</dt><dd>${esc(targetName(sv) || "punto del mapa")}</dd><dt>Ojiva</dt><dd>${warheadKg(T) ? warheadKg(T) + " kg · " + Math.round(directDamage(T)) + " HP por impacto directo" : "sin ojiva"}</dd><dt>Recorrido</dt><dd>${probe.L.toFixed(0)} km</dd><dt>Tiempo de vuelo</dt><dd>${fmtT(probe.ft).slice(2)}</dd><dt>${sv.sync ? "Llegada" : "Lanzamiento"}</dt><dd>T+${sv.sync ? sv.tArrive : sv.tStart} s</dd>${T.aglRange ? "<dt>Altura</dt><dd>" + sv.agl + " m AGL</dd>" : ""}<dt>Maniobra</dt><dd>${sv.maneuver ? "sí" : "no"}</dd><dt>Costo salva</dt><dd>${money(T.cost * sv.count)}</dd></dl>
+      el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${sv.count}× ${esc(T.name)}</b><dl class="kv"><dt>Blanco</dt><dd>${esc(targetName(sv) || "punto del mapa")}</dd><dt>Ojiva</dt><dd>${warheadKg(T) ? warheadKg(T) + " kg · " + Math.round(directDamage(T)) + " HP por impacto directo" : "sin ojiva"}</dd><dt>Recorrido</dt><dd>${probe.L.toFixed(0)} km</dd><dt>Tiempo de vuelo</dt><dd>${fmtT(probe.ft).slice(2)}</dd><dt>${sv.sync ? "Llegada" : "Lanzamiento"}</dt><dd>T+${sv.sync ? sv.tArrive : sv.tStart} s</dd>${T.aglRange ? "<dt>Altura</dt><dd>" + sv.agl + " m AGL</dd>" : ""}<dt>Maniobra</dt><dd>${sv.maneuver ? "sí" : "no"}</dd><dt>Costo salva</dt><dd>${money(T.cost * sv.count)}</dd>${sv.crpa ? `<dt>Antena GNSS</dt><dd>CRPA de ${sv.crpa} elementos: anula hasta ${sv.crpa - 1} interferidores</dd>` : ""}</dl>
       <div class="row"><button class="btn sm" id="vInfo">Ficha</button>${!S.started ? '<button class="btn sm danger" id="vDel">Eliminar</button>' : ""}</div>`;
       $("#vInfo").onclick = () => openFicha("thr", sv.type);
       if ($("#vDel")) $("#vDel").onclick = () => {
@@ -5361,6 +5378,7 @@ table.t.mc td.pc{white-space:nowrap}
       ${(T.maneuver || T.prof === "ballistic" || T.cls === "crucero") && T.prof !== "glide" ? `<label class="check"><input type="checkbox" id="aMan" ${a.maneuver ? "checked" : ""}> Maniobra evasiva terminal</label>` : ""}
       ${T.decoys ? `<label class="check"><input type="checkbox" id="aDec" ${a.decoys ? "checked" : ""}> Liberar ${T.decoys} señuelos en fase terminal</label>` : ""}
       ${T.datalink ? `<label class="check" title="${esc(T.datalink)}: el operador ve la posición real y descarta el engaño GNSS, salvo dentro del radio de un antidrón que corta enlaces (Bukovel-AD)"><input type="checkbox" id="aLink" ${a.link ? "checked" : ""}> Enlace de datos (${esc(T.datalink)})</label>` : ""}
+      ${T.gnss < 1 ? `<div class="field" title="Una antena CRPA de N elementos anula hasta N − 1 interferidores GNSS que lleguen desde direcciones distintas. Con más fuentes, el arma pierde el satélite."><label for="aCrpa">Antena GNSS ${infoBtn("gnss")}</label><select id="aCrpa" class="sel">${CRPA_SIZES.map((n2) => `<option value="${n2}" ${(a.crpa ?? 0) === n2 ? "selected" : ""}>${n2 ? "CRPA de " + n2 + " elementos (anula " + (n2 - 1) + ")" : "Común (sin CRPA)"}</option>`).join("")}</select></div>` : ""}
       <button class="btn pri" id="aRoute">${S.mode === "route" ? "Trazando…" : "Trazar ruta en el mapa"}</button>
       <p class="hint">${off ? "Tocá un punto en la dirección desde donde viene y después el blanco. Se lanza a la distancia indicada, fuera del mapa." : "Tocá el punto de entrada, los waypoints (usá valles para esconderte del radar) y el blanco. Si el último punto cae sobre una unidad de defensa, la apunta."}</p>
     </div>
@@ -5410,6 +5428,9 @@ table.t.mc td.pc{white-space:nowrap}
     };
     if ($("#aLink")) $("#aLink").onchange = (e) => {
       a.link = e.target.checked;
+    };
+    if ($("#aCrpa")) $("#aCrpa").onchange = (e) => {
+      a.crpa = +e.target.value;
     };
     $("#aRoute").onclick = () => {
       if (S.started) {
@@ -5466,7 +5487,7 @@ table.t.mc td.pc{white-space:nowrap}
   }
   function defaultAtk(type, prev) {
     const T = THREATS[type];
-    return { type, count: prev ? prev.count : T.cls === "dron" ? 8 : 2, interval: T.cls === "dron" ? 20 : 10, tStart: 0, sync: prev ? prev.sync : false, tArrive: prev ? prev.tArrive : 900, agl: T.agl ?? 0, launchDist: T.launchDist, maneuver: !!T.maneuver, decoys: !!T.decoys, link: false };
+    return { type, count: prev ? prev.count : T.cls === "dron" ? 8 : 2, interval: T.cls === "dron" ? 20 : 10, tStart: 0, sync: prev ? prev.sync : false, tArrive: prev ? prev.tArrive : 900, agl: T.agl ?? 0, launchDist: T.launchDist, maneuver: !!T.maneuver, decoys: !!T.decoys, link: false, crpa: prev && THREATS[prev.type].gnss < 1 ? prev.crpa ?? 0 : 0 };
   }
   function removeObj(id) {
     S.setup.objs = S.setup.objs.filter((g) => g.id !== id);
@@ -6533,7 +6554,7 @@ table.t.mc td.pc{white-space:nowrap}
   };
   var OBJ_KEYS = ["id", "type", "x", "y", "name", "short", "maxHp", "desc"];
   var DEF_KEYS = ["id", "type", "x", "y", "name", "az", "mast", "alt", "mag", "salvo", "noDrones", "link", "reserve"];
-  var SALVO_KEYS = ["id", "type", "count", "interval", "tStart", "sync", "tArrive", "agl", "launchDist", "maneuver", "decoys", "link", "pts", "targetUnit", "targetObj"];
+  var SALVO_KEYS = ["id", "type", "count", "interval", "tStart", "sync", "tArrive", "agl", "launchDist", "maneuver", "decoys", "link", "crpa", "pts", "targetUnit", "targetObj"];
   var JAM_KEYS = ["id", "type", "x", "y", "alt", "on"];
   var META_KEYS = ["name", "player", "time", "description", "forces", "conditions", "rulesText", "goals", "success", "failure"];
   var baseKey = (sc2) => sc2 ? sc2.base ?? Object.keys(SCENARIOS).find((k) => SCENARIOS[k] === sc2) ?? null : null;
@@ -6720,7 +6741,8 @@ table.t.mc td.pc{white-space:nowrap}
         launchDist: num2(w + " · launchDist", sv.launchDist, 1, 5e3, { opt: true }),
         maneuver: bool(w + " · maneuver", sv.maneuver),
         decoys: bool(w + " · decoys", sv.decoys),
-        link: bool(w + " · link", sv.link)
+        link: bool(w + " · link", sv.link),
+        crpa: CRPA_SIZES.includes(sv.crpa ?? 0) ? sv.crpa : (err(`${w} · crpa: ${JSON.stringify(sv.crpa)} no es una antena válida (${CRPA_SIZES.join(", ")} elementos).`), void 0)
       };
     });
     const jams = list("jams", setup.jams).map((j, i) => {

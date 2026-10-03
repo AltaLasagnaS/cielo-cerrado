@@ -145,6 +145,18 @@ Dos correcciones (`physics/navigation.js`):
 
 Cada arma que entra en la zona consume un número al azar, y uno más solo si el buscador entra en juego. Con `navErr` > 2 km, el debrief cuenta el arma como "perdida localmente".
 
+**Antena CRPA** (`sv.crpa`, elegible por salva en la pestaña Ataque: 0, 4, 8, 12 o 16 elementos; `physics/navigation.js`): una antena de recepción con diagrama controlado apunta un "nulo" hacia cada interferidor. Con N elementos anula hasta **N − 1 fuentes** que lleguen desde direcciones distintas:
+
+```
+fuentes = anti-GNSS encendidos cuyo radio cubre al arma
+direcciones = fuentes agrupadas por acimut visto desde el arma (dos a menos de 10° caen en el mismo nulo)
+pierde el GNSS  ⇔  direcciones > N − 1
+```
+
+Mientras la CRPA alcanza, el arma conserva el satélite y no suma error; se vuelve a revisar en cada paso, así que al entrar en el radio de más estaciones puede perderlo más adelante. Cuando lo pierde, el efecto es el de arriba (con la primera estación de la lista, como antes). Por defecto las salvas van sin CRPA: los escenarios no cambian.
+
+Referencias de tamaño (confianza baja, `docs/investigacion/guerra-electronica-ucraniana.md` D3): Shahed 2022–23 sin CRPA o de 4; Kometa de 8 y 12 en Shahed y UMPK desde 2025; Kometa-M de 16 (dic-2025) en Shahed e Iskander-K. Ingenieros ucranianos: contra 8 elementos hicieron falta 19 estaciones Lima; contra 16, ni 104. La regla N − 1 es la cota clásica de un arreglo adaptativo; los 10° de separación son una estimación de juego (en la realidad depende de la geometría del arreglo y de la potencia de cada fuente).
+
 ### Rol
 
 El efecto depende del **rol** y no de la bandera: los jammers de radar siempre degradan los radares de la defensa, y los anti-GNSS siempre desvían armas del atacante.
@@ -350,7 +362,7 @@ Es un modelo de juego: no representa estructuras, incendios, penetración ni sub
 | Swerling 1 para todos | Sin el caso 3 (reflector dominante) ni integración de pulsos | Swerling 3 verificado; integración no coherente |
 | Interceptor en línea recta a velocidad media | Energía resumida en dos factores (alcance según el aspecto y Pk según la fracción del alcance); el tiempo de vuelo sigue siendo r / vInt | Perfil de velocidad (motor y planeo) y límite de g (paso B de la propuesta) |
 | Discriminación de señuelos | Por banda y tiempo de seguimiento, con un umbral fijo por pista | Discriminación por características (RCS, velocidad, trayectoria) |
-| GNSS sin CRPA explícita | `gnss` resume toda la resistencia | Número de elementos de la CRPA frente al número de fuentes (ver `docs/investigacion/`) |
+| CRPA por conteo de direcciones | N − 1 nulos y 10° de separación; sin potencia de cada fuente ni distancia | Relación señal/interferencia por fuente; profundidad de nulo según los elementos |
 | Daño funcional en dos componentes | Radar (alcance y reacción) o lanzador; sin reparación ni daño parcial de lanzadores | Componentes por lanzador, reparación con el tiempo, objetivos con capacidades (una base que no lanza aviones) |
 
 La propuesta detallada de cada mejora (qué cambia, dificultad, datos, pruebas y cómo lo resuelven *Command: Modern Operations* y *Fleet Command*) está en [investigacion/mejoras-fisica.md](investigacion/mejoras-fisica.md).

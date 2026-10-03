@@ -7,6 +7,9 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 ## [Sin publicar]
 
 ### Agregado
+- **Antenas CRPA contra varias fuentes de interferencia GNSS** (pestaña Ataque → "Antena GNSS"; se guarda como `crpa` en cada salva): una CRPA de N elementos (4, 8, 12 o 16, como las Kometa rusas) anula hasta N − 1 interferidores que lleguen desde direcciones distintas; dos estaciones casi alineadas vistas desde el arma cuentan como una. Con más fuentes, el arma pierde el GNSS como antes. Por defecto las salvas van sin CRPA: los escenarios y las golden no cambian. Probalo en Kiev: con una CRPA de 4 los Shahed ignoran la única estación Pokrova.
+
+### Agregado
 - **[sim]** **Daño funcional de las unidades:** una explosión cerca de una batería la daña sin destruirla. Al perder el 20% de la vida pierde un componente y al 50% el otro: con el **radar dañado** ve un 30% menos y reacciona 1,5 veces más lento; con el **lanzador dañado** no dispara aunque le queden misiles. En el mapa aparece con un anillo naranja; el panel de selección dice qué perdió y el debrief la nombra. No cambia los escenarios incluidos (40 noches de la base de Gotemburgo y del puente de Monterey dan exactamente lo mismo, y las golden solo suman el contador nuevo `unitsDamaged` en 0): sus baterías están lejos de donde caen las armas. Se nota al ubicar defensas pegadas a un objetivo o con armas apuntadas a una unidad que caen cerca sin pegarle.
 
 ### Agregado
