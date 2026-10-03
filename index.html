@@ -919,7 +919,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
-      radar: { name: "AN/MPQ-65", band: "C", mti: "pd", R1: 100, mast: 4, mastRange: [4, 4], mastNote: "Fija: la antena va sobre el semirremolque M860, inclinada a 67,5°. El mástil de ≈30 m de la batería (AMG) es de comunicaciones, no del radar (FM 3-01.85).", sector: 90, eccm: 10, scan: 2 },
+      radar: { name: "AN/MPQ-65", agile: true, slc: 1, band: "C", mti: "pd", R1: 100, mast: 4, mastRange: [4, 4], mastNote: "Fija: la antena va sobre el semirremolque M860, inclinada a 67,5°. El mástil de ≈30 m de la batería (AMG) es de comunicaciones, no del radar (FM 3-01.85).", sector: 90, eccm: 10, scan: 2 },
       sam: { maxR: 100, maxRtbm: 40, minR: 3, altMin: 50, altMax: 36e3, vInt: 1300, vmaxT: 3e3, react: 9, ch: 8, mag: 16, reserve: 16, reloadS: 2400, salvo: 2, guid: "activo", shot: "PAC-3 MSE", noDrones: true, cost: 4.2, pk: { dron: 0.9, crucero: 0.9, supersonico: 0.6, balistico: 0.7, hiper: 0.5 } },
       range: "≈40 km vs balísticos (estimado), ≈100 km vs aeronaves",
       interceptor: "PAC-3 MSE: hit-to-kill, buscador activo, motor de doble pulso, techo ≈36 km",
@@ -932,7 +932,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
-      radar: { name: "AN/MPQ-65", band: "C", mti: "pd", R1: 100, mast: 4, mastRange: [4, 4], mastNote: "Fija: la antena va sobre el semirremolque M860. El mástil de ≈30 m (AMG) es de comunicaciones, no del radar.", sector: 90, eccm: 10, scan: 2 },
+      radar: { name: "AN/MPQ-65", agile: true, slc: 1, band: "C", mti: "pd", R1: 100, mast: 4, mastRange: [4, 4], mastNote: "Fija: la antena va sobre el semirremolque M860. El mástil de ≈30 m (AMG) es de comunicaciones, no del radar.", sector: 90, eccm: 10, scan: 2 },
       sam: { maxR: 160, maxRtbm: 20, minR: 3, altMin: 60, altMax: 24e3, vInt: 900, vmaxT: 2500, react: 9, ch: 8, mag: 16, reserve: 16, reloadS: 2400, salvo: 2, guid: "TVM", shot: "PAC-2 GEM-T", noDrones: true, cost: 3, pk: { dron: 0.8, crucero: 0.85, supersonico: 0.55, balistico: 0.4, hiper: 0.25 } },
       range: "≈160 km vs aeronaves, ≈20 km vs balísticos",
       interceptor: "GEM-T: fragmentación, guiado TVM (necesita que el radar propio vea el blanco), Mach ≈3,5",
@@ -945,7 +945,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
-      radar: { name: "Arabel", band: "X", mti: "pd", R1: 80, mast: 5, mastRange: [5, 5], mastNote: "Fija: Arabel montado sobre camión (altura estimada).", sector: 360, eccm: 10, scan: 1 },
+      radar: { name: "Arabel", agile: true, lowSL: true, slc: 1, band: "X", mti: "pd", R1: 80, mast: 5, mastRange: [5, 5], mastNote: "Fija: Arabel montado sobre camión (altura estimada).", sector: 360, eccm: 10, scan: 1 },
       sam: { maxR: 100, maxRtbm: 25, minR: 3, altMin: 50, altMax: 2e4, vInt: 1050, vmaxT: 2500, react: 8, ch: 10, mag: 32, reserve: 16, reloadS: 2400, salvo: 2, guid: "activo", shot: "Aster 30", noDrones: true, cost: 2, pk: { dron: 0.85, crucero: 0.88, supersonico: 0.6, balistico: 0.6, hiper: 0.4 } },
       range: "≈100 km vs aeronaves (50 km por debajo de 3 km de altura), 20–35 km vs balísticos",
       interceptor: 'Aster 30: 1,4 km/s, buscador activo, control "PIF-PAF" (toberas laterales para maniobra final)',
@@ -958,7 +958,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
-      radar: { name: "Hensoldt TRML-4D", band: "C", mti: "pd", R1: 100, mast: 6, mastRange: [4, 12], mastNote: "Mástil hidráulico sobre el camión: la antena llega hasta 12 m (Hensoldt). Retraído ≈4 m (estimado).", sector: 360, eccm: 10, scan: 1 },
+      radar: { name: "Hensoldt TRML-4D", agile: true, lowSL: true, slc: 2, band: "C", mti: "pd", R1: 100, mast: 6, mastRange: [4, 12], mastNote: "Mástil hidráulico sobre el camión: la antena llega hasta 12 m (Hensoldt). Retraído ≈4 m (estimado).", sector: 360, eccm: 10, scan: 1 },
       sam: { maxR: 40, maxRtbm: 0, minR: 1, altMin: 10, altMax: 2e4, vInt: 750, vmaxT: 1200, react: 6, ch: 8, mag: 24, reserve: 8, reloadS: 1200, salvo: 1, guid: "IR", shot: "IRIS-T SL", cost: 0.5, pk: { dron: 0.9, crucero: 0.88, supersonico: 0.2, balistico: 0, hiper: 0 } },
       range: "40 km, techo 20 km (SLX: 80 km)",
       interceptor: "IRIS-T SL: guiado inercial + datalink, buscador IR de imagen terminal, ≈Mach 3",
@@ -971,7 +971,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
-      radar: { name: "AN/MPQ-64 Sentinel", band: "X", mti: "pd", R1: 60, mast: 4, mastRange: [4, 4], mastNote: "Fija: Sentinel sobre remolque (altura estimada).", sector: 360, eccm: 8, scan: 2 },
+      radar: { name: "AN/MPQ-64 Sentinel", agile: true, lowSL: true, band: "X", mti: "pd", R1: 60, mast: 4, mastRange: [4, 4], mastNote: "Fija: Sentinel sobre remolque (altura estimada).", sector: 360, eccm: 8, scan: 2 },
       sam: { maxR: 35, maxRtbm: 0, minR: 1, altMin: 30, altMax: 15e3, vInt: 900, vmaxT: 1e3, react: 6, ch: 6, mag: 18, reserve: 12, reloadS: 1800, salvo: 1, guid: "activo", shot: "AIM-120", cost: 1.07, pk: { dron: 0.85, crucero: 0.88, supersonico: 0.4, balistico: 0, hiper: 0 } },
       range: "≈35–40 km (AMRAAM-ER: 50–60 km)",
       interceptor: "AIM-120: misil aire-aire adaptado, buscador radar activo",
@@ -984,7 +984,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
-      radar: { name: "30N6 Flap Lid (en torre 40V6)", band: "X", mti: "pd", R1: 100, mast: 25, mastRange: [7, 39], mastNote: "Sin torre, la antena queda a ≈7 m sobre su vehículo (estimado); en la torre 40V6M a ≈25 m y en la 40V6MD a ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h, no se cambia durante el combate.", sector: 90, eccm: 3, scan: 2 },
+      radar: { name: "30N6 Flap Lid (en torre 40V6)", agile: true, lowSL: true, band: "X", mti: "pd", R1: 100, mast: 25, mastRange: [7, 39], mastNote: "Sin torre, la antena queda a ≈7 m sobre su vehículo (estimado); en la torre 40V6M a ≈25 m y en la 40V6MD a ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h, no se cambia durante el combate.", sector: 90, eccm: 3, scan: 2 },
       sam: { maxR: 75, maxRtbm: 25, minR: 5, altMin: 25, altMax: 27e3, vInt: 1300, vmaxT: 1300, react: 12, ch: 4, mag: 16, reserve: 12, reloadS: 2400, salvo: 2, guid: "TVM", shot: "5V55R", cost: 0.5, pk: { dron: 0.5, crucero: 0.6, supersonico: 0.4, balistico: 0.15, hiper: 0.05 } },
       range: "47 km (5V55K) / 75 km (5V55R), techo 27 km",
       interceptor: "5V55: hasta 2.000 m/s, guiado por mando (K) o TVM (R)",
@@ -1101,7 +1101,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "RU",
       kind: "sam",
       color: "#ff9f5a",
-      radar: { name: "1RS1 búsqueda (S) + 1RS2 seguimiento (Ku)", band: "S", mti: "pd", R1: 30, mast: 6, mastRange: [6, 6], mastNote: "Fija: radares sobre el camión (altura estimada).", sector: 360, eccm: 5, scan: 1 },
+      radar: { name: "1RS1 búsqueda (S) + 1RS2 seguimiento (Ku)", agile: true, band: "S", mti: "pd", R1: 30, mast: 6, mastRange: [6, 6], mastNote: "Fija: radares sobre el camión (altura estimada).", sector: 360, eccm: 5, scan: 1 },
       sam: { maxR: 18, maxRtbm: 5, minR: 1, altMin: 5, altMax: 15e3, vInt: 900, vmaxT: 1e3, react: 5, ch: 3, mag: 12, reserve: 12, reloadS: 1800, salvo: 2, guid: "mando", shot: "57E6", cost: 0.15, pk: { dron: 0.65, crucero: 0.6, supersonico: 0.3, balistico: 0.1, hiper: 0 } },
       range: "18–20 km misil, 4 km cañones",
       interceptor: "57E6: 1.300 m/s al apagar el motor, ≈900 m/s promedio a 12 km; guiado por mando radio, ojiva de varillas",
@@ -1114,7 +1114,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "RU",
       kind: "sam",
       color: "#ff9f5a",
-      radar: { name: "Búsqueda (banda F ≈ S) + seguimiento (G/H y Ku)", band: "S", mti: "pd", R1: 25, mast: 4, mastRange: [4, 4], mastNote: "Fija: radar sobre el vehículo de orugas (altura estimada).", sector: 360, eccm: 5, scan: 1 },
+      radar: { name: "Búsqueda (banda F ≈ S) + seguimiento (G/H y Ku)", agile: true, band: "S", mti: "pd", R1: 25, mast: 4, mastRange: [4, 4], mastNote: "Fija: radar sobre el vehículo de orugas (altura estimada).", sector: 360, eccm: 5, scan: 1 },
       sam: { maxR: 15, maxRtbm: 5, minR: 1, altMin: 10, altMax: 1e4, vInt: 700, vmaxT: 700, react: 6, ch: 4, mag: 16, reserve: 8, reloadS: 1080, salvo: 1, guid: "mando", shot: "9M338", cost: 0.3, pk: { dron: 0.75, crucero: 0.7, supersonico: 0.35, balistico: 0.1, hiper: 0 } },
       range: "15–16 km, techo 10 km",
       interceptor: "9M338: lanzamiento vertical, guiado por mando",
@@ -1127,7 +1127,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "RU",
       kind: "sam",
       color: "#ff9f5a",
-      radar: { name: "92N6 Grave Stone (en torre 40V6M)", band: "X", mti: "pd", R1: 200, mast: 25, mastRange: [7, 39], mastNote: "Sin torre, la antena queda a ≈7 m sobre su vehículo (estimado); en la torre 40V6M a ≈25 m y en la 40V6MD a ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h, no se cambia durante el combate.", sector: 120, eccm: 8, scan: 2 },
+      radar: { name: "92N6 Grave Stone (en torre 40V6M)", agile: true, lowSL: true, slc: 1, band: "X", mti: "pd", R1: 200, mast: 25, mastRange: [7, 39], mastNote: "Sin torre, la antena queda a ≈7 m sobre su vehículo (estimado); en la torre 40V6M a ≈25 m y en la 40V6MD a ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h, no se cambia durante el combate.", sector: 120, eccm: 8, scan: 2 },
       sam: { maxR: 250, maxRtbm: 60, minR: 3, altMin: 10, altMax: 27e3, vInt: 1500, vmaxT: 4800, react: 9, ch: 10, mag: 32, reserve: 16, reloadS: 2400, salvo: 2, guid: "TVM", shot: "48N6", noDrones: true, cost: 1.5, pk: { dron: 0.75, crucero: 0.7, supersonico: 0.6, balistico: 0.5, hiper: 0.3 } },
       range: "48N6DM: 240–250 km; 40N6: hasta 380–400 km",
       interceptor: "48N6: ≈2.000 m/s, guiado TVM; 9M96E2 (activo) para corto/medio alcance",
@@ -1140,7 +1140,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "both",
       kind: "sensor",
       color: "#62b6ff",
-      radar: { name: '36D6 "Tin Shield"', band: "S", mti: "mti", R1: 175, mast: 10, mastRange: [10, 39], mastNote: "Sobre su remolque ≈10 m (estimado); puede ir en la torre 40V6M/MD hasta ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h.", sector: 360, eccm: 3, scan: 5 },
+      radar: { name: '36D6 "Tin Shield"', slc: 2, band: "S", mti: "mti", R1: 175, mast: 10, mastRange: [10, 39], mastNote: "Sobre su remolque ≈10 m (estimado); puede ir en la torre 40V6M/MD hasta ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h.", sector: 360, eccm: 3, scan: 5 },
       range: "200 km instrumentados; contra 1 m² a 50 m de altura ≈110–115 km con mástil",
       notes: ["Radar de alerta y adquisición que alimenta a las baterías S-300. Rota a 6 o 12 rpm.", "Podés subirle el mástil (torre 40V6M) para ver más lejos a baja cota."],
       sources: [SRC.rt_36d6, SRC.uos_36d6]
@@ -1174,7 +1174,7 @@ table.t.mc td.pc{white-space:nowrap}
       kind: "aew",
       color: "#62b6ff",
       alt: 6e3,
-      radar: { name: "Erieye (AESA, lateral)", band: "S", mti: "pd", R1: 240, mast: 6e3, sector: 150, side: true, eccm: 10, scan: 4 },
+      radar: { name: "Erieye (AESA, lateral)", agile: true, lowSL: true, band: "S", mti: "pd", R1: 240, mast: 6e3, sector: 150, side: true, eccm: 10, scan: 4 },
       range: "≈330–350 km contra cazas; 450 km instrumentados",
       notes: ["Suecia lo anunció en mayo de 2024; la transferencia se confirmó en agosto de 2025 y opera en combate desde marzo de 2026.", 'Antena lateral "tabla": ve a ambos costados (~150° c/u) y tiene zonas ciegas adelante y atrás. Orientá el rumbo de vuelo.', "Desde 6 km de altura ve misiles rasantes a más de 100 km, donde un radar terrestre no llega."],
       sources: [WP("Saab_340_AEW&C"), WP("Erieye"), SRC.dx_saab, SRC.gs_erieye]
@@ -1286,6 +1286,10 @@ table.t.mc td.pc{white-space:nowrap}
     }
   };
   var CRPA_SIZES = [0, 4, 8, 12, 16];
+  var JAM_MODES = {
+    barrage: { name: "Barrera (toda la banda)", gain: 1 },
+    spot: { name: "Puntual (contra un radar)", gain: 10, agileGain: 0.1 }
+  };
 
   // src/data/uncertainty.js
   var U = (min, p, max, c, src, nota) => ({ min, p, max, c, src: src || [], nota: nota || "" });
@@ -3069,11 +3073,27 @@ table.t.mc td.pc{white-space:nowrap}
     const J = JAMMERS[j.type];
     return [j.x, j.y, J.air ? j.alt : surf(j.x, j.y) + J.mast];
   }
+  var SIDELOBES = { near: 0.05, far: 3e-3 };
+  var LOW_SIDELOBES = { near: 0.01, far: 1e-3 };
+  var SLC_RESIDUAL = 0.03;
+  function singleJam(r, P, dkm, lobe, mg = 1) {
+    const sl = r.lowSL ? LOW_SIDELOBES : SIDELOBES;
+    let G = lobe === "main" ? 1 : sl[lobe];
+    if (lobe !== "main" && r.slc) G *= SLC_RESIDUAL;
+    return P * G * mg / (dkm + 1) ** 2 * Math.pow(10, -(r.eccm || 0) / 10);
+  }
+  var burnThrough = (r, J) => r.R1 * Math.pow(1 / (1 + J), 0.25);
+  function modeGain(j, u, r) {
+    const M = JAM_MODES[j.mode] || JAM_MODES.barrage;
+    if (!M.agileGain) return M.gain;
+    if (j.target !== u.id) return 0;
+    return r.agile ? M.agileGain : M.gain;
+  }
   function jamJ(u, az, list) {
     const r = D(u).radar;
     if (!r || r.band === "ACU" || r.band === "OPT") return 0;
     let J = 0;
-    const bw = BANDS[r.band].bw, uz = antZ(u);
+    const bw = BANDS[r.band].bw, uz = antZ(u), sl = r.lowSL ? LOW_SIDELOBES : SIDELOBES, side = r.slc ? [] : null;
     for (const j of list) {
       const JJ = JAMMERS[j.type];
       if (!j.on || j.dead || JJ.gnssJam || !JJ.bands.includes(r.band)) continue;
@@ -3087,9 +3107,18 @@ table.t.mc td.pc{white-space:nowrap}
       const p = jamPos(j);
       const dkm = Math.hypot(p[0] - u.x, p[1] - u.y, (p[2] - uz) / 1e3) + 1;
       const jaz = azOf(p[0] - u.x, p[1] - u.y), dd = angDiff(jaz, az);
-      let G = dd <= bw ? 1 : dd <= 3 * bw ? 0.05 : 3e-3;
+      const main = dd <= bw;
+      let G = main ? 1 : dd <= 3 * bw ? sl.near : sl.far;
       if (!inSector(u, jaz)) G *= 0.1;
-      J += JJ.P * G / (dkm * dkm);
+      const v = JJ.P * G * modeGain(j, u, r) / (dkm * dkm);
+      if (side && !main) side.push(v);
+      else J += v;
+    }
+    if (side) {
+      side.sort((a, b) => b - a);
+      side.forEach((v, k) => {
+        J += k < r.slc ? v * SLC_RESIDUAL : v;
+      });
     }
     return J * Math.pow(10, -(r.eccm || 0) / 10);
   }
@@ -3935,8 +3964,12 @@ table.t.mc td.pc{white-space:nowrap}
   }
   var targetName = (sv) => sv.targetUnit ? S.setup.defs.find((u) => u.id === sv.targetUnit)?.name : sv.targetObj ? S.setup.objs.find((g) => g.id === sv.targetObj)?.name : null;
   function addJam(type, x, y, o = {}) {
-    const J = JAMMERS[type];
+    const J = JAMMERS[type], u = o.target != null ? S.setup.defs.find((v) => v.name === o.target || v.id === o.target) : null;
     const j = { id: nextId(), type, x, y, alt: o.alt ?? J.alt, on: true };
+    if (J.bands) {
+      j.mode = o.mode === "spot" ? "spot" : "barrage";
+      j.target = u ? u.id : null;
+    }
     S.setup.jams.push(j);
     return j;
   }
@@ -4972,8 +5005,8 @@ table.t.mc td.pc{white-space:nowrap}
       id: "eccm",
       group: "Guerra electrónica",
       title: "ECCM (contra-contramedidas)",
-      body: () => `<p>Son las técnicas del radar para resistir la interferencia: agilidad de frecuencia, lóbulos laterales bajos, supresión de lóbulos laterales, antenas adaptativas que "apuntan un nulo" al jammer, y modos de seguir al propio jammer (home-on-jam). Los radares modernos AESA resisten mucho más que los soviéticos de los años 70.</p>`,
-      engine: () => `<p>${code("radar.eccm")} en dB divide la interferencia por 10^(eccm/10): con 10 dB, el radar sufre una décima parte. Por ejemplo, Patriot ${DEFENSES.patriot.radar.eccm} dB, S-300P ${DEFENSES.s300.radar.eccm} dB y radar VHF ${DEFENSES.p18.radar.eccm} dB. Los sensores acústicos y ópticos son inmunes.</p>`
+      body: () => `<p>Son las técnicas del radar para resistir la interferencia: agilidad de frecuencia, lóbulos laterales bajos, supresión de lóbulos laterales, antenas adaptativas que "apuntan un nulo" al jammer, y modos de seguir al propio jammer (home-on-jam). Los radares modernos AESA resisten mucho más que los soviéticos de los años 70.</p><p>Del otro lado, el jammer elige: <b>barrera</b> (reparte la potencia en toda la banda y molesta a todos) o <b>puntual</b> (la concentra en la frecuencia de un radar y le pega mucho más fuerte). Contra un radar que salta de frecuencia, el puntual no sirve. Y un cancelador de lóbulos laterales borra al jammer que entra de costado, pero no al que está alineado con los blancos: por eso el avión de interferencia se pone detrás del ataque.</p><p>Mirá la ficha de cada jammer: muestra la <b>distancia de quemado</b> de cada radar (desde dónde el eco le gana al ruido).</p>`,
+      engine: () => `<ul><li>${code("radar.agile")} (agilidad de frecuencia): el ruido puntual le deja ×0,1 en vez de ×10.</li><li>${code("radar.lowSL")} (lóbulos bajos): por los costados entra −20/−30 dB en vez de −13/−25 dB.</li><li>${code("radar.slc")} = N canceladores: los N jammers más fuertes que entran por los lóbulos laterales quedan ×0,03; el del lóbulo principal no se puede cancelar.</li></ul><p>Además, ${code("radar.eccm")} en dB divide lo que queda por 10^(eccm/10): con 10 dB, el radar sufre una décima parte. Por ejemplo, Patriot ${DEFENSES.patriot.radar.eccm} dB, S-300P ${DEFENSES.s300.radar.eccm} dB y radar VHF ${DEFENSES.p18.radar.eccm} dB. Los sensores acústicos y ópticos son inmunes.</p>`
     },
     {
       id: "gnss",
@@ -5235,7 +5268,7 @@ table.t.mc td.pc{white-space:nowrap}
       if ($("#fCal")) $("#fCal").onclick = () => pushModalFn(openCal);
     } else {
       const j = JAMMERS[k];
-      openModal(`<header><div><span class="chip ew">Guerra electrónica</span><h2>${esc(j.name)}</h2></div><button class="btn x">Cerrar</button></header><div class="bd"><div class="specs">${j.gnssJam ? spec("Efecto " + infoBtn("gnss"), j.spoofKm ? "Engaño GNSS (spoofing)" : "Interferencia GNSS") + spec("Radio", j.radius + " km") + (j.spoofKm ? spec("Desvío típico", j.spoofKm + " km") : "") + spec("Rol", "Defensor: desvía armas atacantes") : spec("Bandas", j.bands.join(", ")) + spec("Plataforma", j.air ? "Aérea, " + j.alt + " m" : "Terrestre, mástil " + j.mast + " m") + spec("Potencia relativa", j.P.toExponential(0))}</div><ul>${j.notes.map((n2) => `<li>${esc(n2)}</li>`).join("")}</ul>${confTable("jam", k)}${srcs(j.sources)}</div>`, () => openFicha(kind, k));
+      openModal(`<header><div><span class="chip ew">Guerra electrónica</span><h2>${esc(j.name)}</h2></div><button class="btn x">Cerrar</button></header><div class="bd"><div class="specs">${j.gnssJam ? spec("Efecto " + infoBtn("gnss"), j.spoofKm ? "Engaño GNSS (spoofing)" : "Interferencia GNSS") + spec("Radio", j.radius + " km") + (j.spoofKm ? spec("Desvío típico", j.spoofKm + " km") : "") + spec("Rol", "Defensor: desvía armas atacantes") : spec("Bandas", j.bands.join(", ")) + spec("Plataforma", j.air ? "Aérea, " + j.alt + " m" : "Terrestre, mástil " + j.mast + " m") + spec("Potencia relativa", j.P.toExponential(0))}</div><ul>${j.notes.map((n2) => `<li>${esc(n2)}</li>`).join("")}</ul>${j.bands ? jamTable(j) : ""}${confTable("jam", k)}${srcs(j.sources)}</div>`, () => openFicha(kind, k));
     }
   }
   function cmpThreats() {
@@ -5243,6 +5276,20 @@ table.t.mc td.pc{white-space:nowrap}
   }
   function cmpDefs() {
     openModal(`<header><h2>Comparar defensas</h2><button class="btn x">Cerrar</button></header><div class="bd"><div class="tblwrap"><table class="t"><thead><tr><th>Sistema</th><th>Bando</th><th>Alcance</th><th>Anti-TBM</th><th>Techo</th><th>Guiado</th><th>Radar</th><th>1 m² a</th><th>Canales</th><th>US$/disparo</th><th>Pk crucero</th><th>Pk balíst.</th></tr></thead><tbody>${Object.values(DEFENSES).filter((d) => d.sam).map((d) => `<tr><td>${esc(d.name)}</td><td>${d.side}</td><td>${d.sam.maxR} km</td><td>${d.sam.maxRtbm ? d.sam.maxRtbm + " km" : "—"}</td><td>${d.sam.altMax / 1e3} km</td><td>${d.sam.guid}</td><td>${d.radar ? d.radar.band : "red"}</td><td>${d.radar ? d.radar.R1 + " km" : "—"}</td><td>${d.sam.ch}</td><td>${money(d.sam.cost)}</td><td>${Math.round(d.sam.pk.crucero * 100)}%</td><td>${Math.round(d.sam.pk.balistico * 100)}%</td></tr>`).join("")}</tbody></table></div></div>`, cmpDefs);
+  }
+  var JAM_TABLE_KM = 100;
+  function jamTable(j) {
+    const seen = /* @__PURE__ */ new Set(), rows = [];
+    for (const d of Object.values(DEFENSES)) {
+      const r = d.radar;
+      if (!r || !j.bands.includes(r.band) || seen.has(r.name)) continue;
+      seen.add(r.name);
+      const R = (lobe, mg) => burnThrough(r, singleJam(r, j.P, JAM_TABLE_KM, lobe, mg)).toFixed(0) + " km";
+      const ec = [r.agile ? "agilidad" : "", r.lowSL ? "lóbulos bajos" : "", r.slc ? r.slc + " SLC" : ""].filter(Boolean).join(", ") || "—";
+      rows.push(`<tr><td>${esc(d.short)} · ${esc(r.name)} (${r.band})</td><td>${ec}</td><td>${r.R1} km</td><td>${R("main", JAM_MODES.barrage.gain)}</td><td>${R("near", JAM_MODES.barrage.gain)}</td><td>${R("main", r.agile ? JAM_MODES.spot.agileGain : JAM_MODES.spot.gain)}</td></tr>`);
+    }
+    return `<div><h3>Qué le hace a cada radar ${infoBtn("eccm")} ${infoBtn("noise")}</h3><p class="hint">Alcance contra 1 m² con este jammer a ${JAM_TABLE_KM} km, sin relieve. Es la distancia de <b>quemado</b>: más cerca de eso, el eco del blanco le gana al ruido. "De frente": el jammer está alineado con los blancos (lóbulo principal); "de costado": entra por los primeros lóbulos laterales, donde pesan los lóbulos bajos y los canceladores (SLC).</p>
+    <div class="tblwrap"><table class="t"><thead><tr><th>Radar</th><th>ECCM</th><th>Sin jammer</th><th>Barrera, de frente</th><th>Barrera, de costado</th><th>Puntual, de frente</th></tr></thead><tbody>${rows.join("")}</tbody></table></div></div>`;
   }
 
   // src/ui/panels/ew.js
@@ -5252,7 +5299,7 @@ table.t.mc td.pc{white-space:nowrap}
     <p class="hint">El efecto depende del <b>rol</b>, no de la bandera: los interferidores de radar degradan los radares de la defensa (herramienta del atacante) y los anti-GNSS desvían las armas del atacante (herramienta del defensor).</p><div class="grp"><h3>Interferidores y contramedidas</h3><div class="unitgrid">${Object.entries(JAMMERS).map(([k, j]) => `<button class="ub ew ${S.mode === "placeJam" && S.placeType === k ? "act" : ""}" data-k="${k}" title="${esc(j.name)}"><span>${esc(j.short)}</span><i data-info="${k}" role="button" aria-label="Ficha">i</i></button>`).join("")}</div></div>
     <label class="check"><input type="checkbox" id="optStr" ${S.strobes ? "checked" : ""}> Mostrar "strobes" de interferencia (líneas violeta radar → jammer)</label>
     <div class="grp"><h3>Desplegados</h3><div class="list" id="jList">${S.setup.jams.map((j) => `<div class="item vio"><span class="t">${esc(JAMMERS[j.type].name)}</span><span class="s">${j.x.toFixed(1)}, ${j.y.toFixed(1)} km${JAMMERS[j.type].air ? " · " + j.alt + " m" : ""}</span><span class="a"><button class="btn sm ${j.on ? "on" : ""}" data-tog="${j.id}">${j.on ? "Activo" : "Apagado"}</button><button class="btn sm danger" data-del="${j.id}" aria-label="Borrar">✕</button></span></div>`).join("") || '<p class="hint">Ninguno.</p>'}</div></div>
-    <div class="grp"><h3>Modelo ${infoBtn("noise")} ${infoBtn("lobes")} ${infoBtn("eccm")} ${infoBtn("gnss")}</h3><p class="hint">Jammer de ruido: reduce el alcance de detección como <b>R' = R·(1/(1+J/N))<sup>¼</sup></b>. J/N cae con la distancia al cuadrado, solo afecta radares de la misma banda, necesita línea de vista y es ~25 dB más débil fuera del lóbulo principal. Cada radar tiene un margen ECCM (dB) en su ficha. El anti-GNSS no toca radares: desvía armas que navegan por satélite.</p></div>`;
+    <div class="grp"><h3>Modelo ${infoBtn("noise")} ${infoBtn("lobes")} ${infoBtn("eccm")} ${infoBtn("gnss")}</h3><p class="hint">Jammer de ruido: reduce el alcance de detección como <b>R' = R·(1/(1+J/N))<sup>¼</sup></b>. J/N cae con la distancia al cuadrado, solo afecta radares de la misma banda, necesita línea de vista y es ~25 dB más débil fuera del lóbulo principal. Elegí barrera o ruido puntual (contra un radar) en el panel de selección del jammer. Cada radar tiene sus ECCM: agilidad de frecuencia (anula el puntual), lóbulos bajos y canceladores de los lóbulos laterales (no pueden con un jammer alineado con los blancos). La ficha del jammer muestra la distancia de quemado de cada radar. El anti-GNSS no toca radares: desvía armas que navegan por satélite.</p></div>`;
     el.onclick = (e) => {
       const inf = e.target.closest("[data-info]");
       if (inf) {
@@ -5382,6 +5429,7 @@ table.t.mc td.pc{white-space:nowrap}
       const J = JAMMERS[j.type];
       el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(J.name)}</b><dl class="kv"><dt>Posición</dt><dd>${j.x.toFixed(1)}, ${j.y.toFixed(1)} km</dd>${J.bands ? "<dt>Bandas</dt><dd>" + J.bands.join(", ") + "</dd>" : "<dt>Radio</dt><dd>" + J.radius + " km</dd>"}</dl>
       ${J.air && !S.started ? `<div class="field"><label for="jAlt">Altitud</label><span class="val">${j.alt} m</span><input id="jAlt" type="range" min="1000" max="12000" step="250" value="${j.alt}"></div>` : ""}
+      ${J.bands ? jamModeHtml(j, J) : ""}
       <div class="row"><button class="btn sm" id="jInfo">Ficha</button>${!S.started ? '<button class="btn sm danger" id="jDel">Eliminar</button>' : ""}</div>`;
       $("#jInfo").onclick = () => openFicha("jam", j.type);
       if ($("#jAlt")) $("#jAlt").oninput = (e) => {
@@ -5395,6 +5443,17 @@ table.t.mc td.pc{white-space:nowrap}
         S.sel = null;
         renderSel();
         renderEW();
+        schedCov();
+      };
+      if ($("#jMode")) $("#jMode").onchange = (e) => {
+        j.mode = e.target.value;
+        if (j.mode === "spot" && j.target == null) j.target = jamTargets(J)[0]?.id ?? null;
+        renderSel();
+        schedCov();
+      };
+      if ($("#jTgt")) $("#jTgt").onchange = (e) => {
+        j.target = +e.target.value;
+        renderSel();
         schedCov();
       };
     } else if (sel.kind === "salvo") {
@@ -5442,6 +5501,17 @@ table.t.mc td.pc{white-space:nowrap}
       el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(label(th))}</b><dl class="kv"><dt>Altitud</dt><dd>${Math.round(p.z)} m (${Math.round(p.z - surf(p.x, p.y))} AGL)</dd><dt>Velocidad</dt><dd>${kmh(v)}</dd><dt>Al blanco</dt><dd>${p.rem.toFixed(1)} km</dd><dt>Primera detección</dt><dd>${th.firstDet === null ? "—" : fmtT(th.firstDet)}</dd></dl><div class="row"><button class="btn sm" id="tInfo">Ficha</button></div>`;
       $("#tInfo").onclick = () => openFicha("thr", th.type);
     }
+  }
+  var jamTargets = (J) => S.setup.defs.filter((u) => D(u).radar && J.bands.includes(D(u).radar.band));
+  function jamModeHtml(j, J) {
+    const ed = !S.started, tg = S.setup.defs.find((u) => u.id === j.target), r = tg && D(tg).radar;
+    const opts = Object.entries(JAM_MODES).map(([k, M]) => `<option value="${k}" ${(j.mode || "barrage") === k ? "selected" : ""}>${esc(M.name)}</option>`).join("");
+    let h = `<div class="field" title="Barrera: reparte la potencia en toda la banda. Puntual: la concentra en la frecuencia de un radar (×${JAM_MODES.spot.gain}), pero un radar con agilidad de frecuencia salta y la deja en ×${JAM_MODES.spot.agileGain}."><label for="jMode">Ruido</label><select id="jMode" class="sel" ${ed ? "" : "disabled"}>${opts}</select></div>`;
+    if (j.mode === "spot") {
+      h += `<div class="field"><label for="jTgt">Contra el radar de</label><select id="jTgt" class="sel" ${ed ? "" : "disabled"}>${jamTargets(J).map((u) => `<option value="${u.id}" ${u.id === j.target ? "selected" : ""}>${esc(u.name)} (${D(u).radar.band})</option>`).join("") || "<option>No hay radares en sus bandas</option>"}</select></div>`;
+      if (r) h += `<p class="hint">${r.agile ? `${esc(tg.name)} tiene agilidad de frecuencia: salta de frecuencia y el ruido puntual casi no le hace nada (×${JAM_MODES.spot.agileGain}). Contra él conviene la barrera.` : `${esc(tg.name)} no tiene agilidad de frecuencia: el ruido puntual le pega ×${JAM_MODES.spot.gain} más que la barrera. A los demás radares no los toca.`}</p>`;
+    }
+    return h;
   }
 
   // src/ui/panels/attack.js
@@ -6649,7 +6719,7 @@ table.t.mc td.pc{white-space:nowrap}
   var OBJ_KEYS = ["id", "type", "x", "y", "name", "short", "maxHp", "desc"];
   var DEF_KEYS = ["id", "type", "x", "y", "name", "az", "mast", "alt", "mag", "salvo", "noDrones", "link", "reserve"];
   var SALVO_KEYS = ["id", "type", "count", "interval", "tStart", "sync", "tArrive", "agl", "launchDist", "maneuver", "decoys", "link", "crpa", "pts", "targetUnit", "targetObj"];
-  var JAM_KEYS = ["id", "type", "x", "y", "alt", "on"];
+  var JAM_KEYS = ["id", "type", "x", "y", "alt", "on", "mode", "target"];
   var META_KEYS = ["name", "player", "time", "description", "forces", "conditions", "rulesText", "goals", "success", "failure"];
   var baseKey = (sc2) => sc2 ? sc2.base ?? Object.keys(SCENARIOS).find((k) => SCENARIOS[k] === sc2) ?? null : null;
   function mapRef() {
@@ -6846,7 +6916,9 @@ table.t.mc td.pc{white-space:nowrap}
         return null;
       }
       pos(w, j.x, j.y);
-      return { id: id(w, j.id), type: j.type, x: j.x, y: j.y, alt: num2(w + " · alt", j.alt, 0, 2e4, { opt: true }), on: bool(w + " · on", j.on) };
+      if (j.mode !== void 0 && !JAM_MODES[j.mode]) err(`${w} · mode: "${String(j.mode)}" no es un modo válido (${Object.keys(JAM_MODES).join(", ")}).`);
+      if (j.target != null && !defIds.has(j.target)) err(`${w}: apunta su ruido puntual a la defensa con id ${JSON.stringify(j.target)}, que no está en el archivo.`);
+      return { id: id(w, j.id), type: j.type, x: j.x, y: j.y, alt: num2(w + " · alt", j.alt, 0, 2e4, { opt: true }), on: bool(w + " · on", j.on), mode: j.mode, target: j.target ?? void 0 };
     });
     const r = raw.rules || {};
     const net = bool("rules.net", r.net);
@@ -6913,7 +6985,7 @@ table.t.mc td.pc{white-space:nowrap}
       addSalvo({ ...o, targetUnit: sv.targetUnit != null ? defId.get(sv.targetUnit) : null, targetObj: sv.targetObj != null ? objId.get(sv.targetObj) : null });
     }
     for (const j of data.setup.jams) {
-      const jj = addJam(j.type, j.x, j.y, { alt: j.alt });
+      const jj = addJam(j.type, j.x, j.y, { alt: j.alt, mode: j.mode, target: j.target != null ? defId.get(j.target) : null });
       if (j.on !== void 0) jj.on = j.on;
     }
     if (data.rules.c2) S.c2 = data.rules.c2;

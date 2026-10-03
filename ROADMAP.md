@@ -21,6 +21,8 @@ Propuesta detallada, con orden, dificultad, datos y pruebas: [docs/investigacion
 - Clima, segunda parte (los estados base ya están): día y noche para los sensores IR, nieve, clutter de lluvia, viento sobre los drones y clima que cambia durante la noche.
 - **Enlaces de datos por sistema** (Link 16, red nacional ucraniana, red rusa tipo Polyana) con pasarelas: solo comparten pistas los sistemas compatibles.
 
+- ECM/ECCM, segunda parte: engaño (DRFM, robo de ventana de distancia) contra los radares de tiro, supresión de lóbulos laterales (SLB) contra pulsos, home-on-jam (misiles que van contra el avión de interferencia) y triangulación de jammers con varios radares.
+
 ## Juego
 
 - Más escenarios: corredor del mar Negro, Odesa con `scripts/gen-terrain.mjs` (Kiev y Járkov ya están).

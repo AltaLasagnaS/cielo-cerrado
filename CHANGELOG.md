@@ -6,6 +6,13 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 
 ## [Sin publicar]
 
+### Agregado
+- **[sim]** **ECM y ECCM contra radares, primera parte** (docs/FISICA.md §4):
+  - **Ruido de barrera o puntual** (panel de selección del jammer): la barrera reparte la potencia en toda la banda; el puntual la concentra en **un** radar elegido (×10), salvo que ese radar tenga **agilidad de frecuencia** (×0,1). Por defecto, barrera, como antes.
+  - **ECCM por radar** en lugar de un solo número: agilidad de frecuencia, **lóbulos laterales bajos** y **canceladores de lóbulos laterales** (anulan los N jammers más fuertes que entran de costado, nunca el del lóbulo principal). Patriot y S-300 con fuentes; el resto, estimaciones documentadas. El `eccm` en dB queda para lo demás (procesamiento).
+  - **Distancia de quemado** en la ficha de cada jammer: alcance de cada radar con el jammer de frente o de costado, en barrera o puntual.
+  - Academia (ECCM) y pruebas nuevas (tests/ecm.test.js). Efecto medido (40 noches): Monterey noche sin cambios (100%); en la refinería, con el avión de interferencia, la defensa gana ≈40% (antes ≈33%, dentro del ruido estadístico).
+
 ### Cambiado
 - **[sim]** **Swerling 3 para los balísticos** (Iskander-M, Kinzhal, ATACMS y Tsirkon): su RCS tiene un reflector dominante y "titila" menos que la de un dron o un misil de crucero (Swerling 1). Con la misma SNR media se detectan más seguido de cerca (83% por barrido al 80% del alcance, contra 75%) y menos de lejos (18% a 1,2 veces, contra 26%). El alcance del catálogo sigue siendo el de 50%. Las dos fórmulas están **verificadas** contra una integración numérica independiente (tests/swerling.test.js). La ficha de cada arma muestra su modelo. Efecto medido (40 noches): Kiev 68% y refinería 33% sin cambios; puente de Monterey, el ataque gana ≈53% (antes ≈45%, dentro del ruido estadístico).
 

@@ -1,9 +1,9 @@
 // ---------------- FICHAS ----------------
 // Ventanas modales: ficha de cada arma/defensa/jammer (datos, notas, quién lo detecta, tasas reales,
 // confianza de los datos y fuentes), comparativas y calibración de Pk.
-import { BANDS, CLS_NAME, THREATS, DEFENSES, JAMMERS, OBS, UNC, PL, CAL, SRC_REF } from '../data/index.js';
+import { BANDS, CLS_NAME, THREATS, DEFENSES, JAMMERS, OBS, UNC, PL, CAL, SRC_REF, JAM_MODES } from '../data/index.js';
 import { esc, kmh, mach, money } from '../util/format.js';
-import { rcsAt, horizon } from '../physics/radar.js';
+import { rcsAt, horizon, singleJam, burnThrough } from '../physics/radar.js';
 import { $ } from './dom.js';
 import { infoBtn, bandChip } from './academy.js';
 
@@ -98,7 +98,7 @@ export function openFicha(kind, k) {
     openModal(h, () => openFicha(kind, k)); if ($('#fCal')) $('#fCal').onclick = () => pushModalFn(openCal);
   } else {
     const j = JAMMERS[k];
-    openModal(`<header><div><span class="chip ew">Guerra electrónica</span><h2>${esc(j.name)}</h2></div><button class="btn x">Cerrar</button></header><div class="bd"><div class="specs">${j.gnssJam ? spec('Efecto ' + infoBtn('gnss'), j.spoofKm ? 'Engaño GNSS (spoofing)' : 'Interferencia GNSS') + spec('Radio', j.radius + ' km') + (j.spoofKm ? spec('Desvío típico', j.spoofKm + ' km') : '') + spec('Rol', 'Defensor: desvía armas atacantes') : spec('Bandas', j.bands.join(', ')) + spec('Plataforma', j.air ? 'Aérea, ' + j.alt + ' m' : 'Terrestre, mástil ' + j.mast + ' m') + spec('Potencia relativa', j.P.toExponential(0))}</div><ul>${j.notes.map(n => `<li>${esc(n)}</li>`).join('')}</ul>${confTable('jam', k)}${srcs(j.sources)}</div>`, () => openFicha(kind, k));
+    openModal(`<header><div><span class="chip ew">Guerra electrónica</span><h2>${esc(j.name)}</h2></div><button class="btn x">Cerrar</button></header><div class="bd"><div class="specs">${j.gnssJam ? spec('Efecto ' + infoBtn('gnss'), j.spoofKm ? 'Engaño GNSS (spoofing)' : 'Interferencia GNSS') + spec('Radio', j.radius + ' km') + (j.spoofKm ? spec('Desvío típico', j.spoofKm + ' km') : '') + spec('Rol', 'Defensor: desvía armas atacantes') : spec('Bandas', j.bands.join(', ')) + spec('Plataforma', j.air ? 'Aérea, ' + j.alt + ' m' : 'Terrestre, mástil ' + j.mast + ' m') + spec('Potencia relativa', j.P.toExponential(0))}</div><ul>${j.notes.map(n => `<li>${esc(n)}</li>`).join('')}</ul>${j.bands ? jamTable(j) : ''}${confTable('jam', k)}${srcs(j.sources)}</div>`, () => openFicha(kind, k));
   }
 }
 export function cmpThreats() {
@@ -106,4 +106,22 @@ export function cmpThreats() {
 }
 export function cmpDefs() {
   openModal(`<header><h2>Comparar defensas</h2><button class="btn x">Cerrar</button></header><div class="bd"><div class="tblwrap"><table class="t"><thead><tr><th>Sistema</th><th>Bando</th><th>Alcance</th><th>Anti-TBM</th><th>Techo</th><th>Guiado</th><th>Radar</th><th>1 m² a</th><th>Canales</th><th>US$/disparo</th><th>Pk crucero</th><th>Pk balíst.</th></tr></thead><tbody>${Object.values(DEFENSES).filter(d => d.sam).map(d => `<tr><td>${esc(d.name)}</td><td>${d.side}</td><td>${d.sam.maxR} km</td><td>${d.sam.maxRtbm ? d.sam.maxRtbm + ' km' : '—'}</td><td>${d.sam.altMax / 1000} km</td><td>${d.sam.guid}</td><td>${d.radar ? d.radar.band : 'red'}</td><td>${d.radar ? d.radar.R1 + ' km' : '—'}</td><td>${d.sam.ch}</td><td>${money(d.sam.cost)}</td><td>${Math.round(d.sam.pk.crucero * 100)}%</td><td>${Math.round(d.sam.pk.balistico * 100)}%</td></tr>`).join('')}</tbody></table></div></div>`, cmpDefs);
+}
+
+/**
+ * Qué le hace un jammer de radar a cada radar de sus bandas: alcance contra 1 m² (Pd 50%) sin
+ * interferencia y con el jammer a JAM_TABLE_KM, según el modo y el lóbulo por el que entra
+ * (physics/radar.js#singleJam). Ese alcance es la distancia de "quemado": más cerca, el eco gana.
+ */
+const JAM_TABLE_KM = 100;
+function jamTable(j) {
+  const seen = new Set(), rows = [];
+  for (const d of Object.values(DEFENSES)) {
+    const r = d.radar; if (!r || !j.bands.includes(r.band) || seen.has(r.name)) continue; seen.add(r.name);
+    const R = (lobe, mg) => burnThrough(r, singleJam(r, j.P, JAM_TABLE_KM, lobe, mg)).toFixed(0) + ' km';
+    const ec = [r.agile ? 'agilidad' : '', r.lowSL ? 'lóbulos bajos' : '', r.slc ? r.slc + ' SLC' : ''].filter(Boolean).join(', ') || '—';
+    rows.push(`<tr><td>${esc(d.short)} · ${esc(r.name)} (${r.band})</td><td>${ec}</td><td>${r.R1} km</td><td>${R('main', JAM_MODES.barrage.gain)}</td><td>${R('near', JAM_MODES.barrage.gain)}</td><td>${R('main', r.agile ? JAM_MODES.spot.agileGain : JAM_MODES.spot.gain)}</td></tr>`);
+  }
+  return `<div><h3>Qué le hace a cada radar ${infoBtn('eccm')} ${infoBtn('noise')}</h3><p class="hint">Alcance contra 1 m² con este jammer a ${JAM_TABLE_KM} km, sin relieve. Es la distancia de <b>quemado</b>: más cerca de eso, el eco del blanco le gana al ruido. "De frente": el jammer está alineado con los blancos (lóbulo principal); "de costado": entra por los primeros lóbulos laterales, donde pesan los lóbulos bajos y los canceladores (SLC).</p>
+    <div class="tblwrap"><table class="t"><thead><tr><th>Radar</th><th>ECCM</th><th>Sin jammer</th><th>Barrera, de frente</th><th>Barrera, de costado</th><th>Puntual, de frente</th></tr></thead><tbody>${rows.join('')}</tbody></table></div></div>`;
 }

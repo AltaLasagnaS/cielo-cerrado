@@ -126,13 +126,36 @@ La **cobertura** del mapa y las tablas de las fichas usan el frente: es el peor 
 ### Ruido contra radares
 
 ```
-J = Σ_jammers  P · G(Δaz) / d²   · 10^(−ECCM/10)        (physics/radar.js#jamJ)
+J = Σ_jammers  P · G(Δaz) · modo / d²   · 10^(−ECCM/10)        (physics/radar.js#jamJ)
 
 G = 1        si |Δaz| ≤ bw          (lóbulo principal; bw = BANDS[b].bw)
-G = 0,05     si |Δaz| ≤ 3·bw        (primeros lóbulos laterales, −13 dB)
-G = 0,003    más afuera             (−25 dB)
+G = 0,05     si |Δaz| ≤ 3·bw        (primeros lóbulos laterales, −13 dB; 0,01 = −20 dB con lóbulos bajos)
+G = 0,003    más afuera             (−25 dB; 0,001 = −30 dB con lóbulos bajos)
 G ×= 0,1     si el jammer está fuera del sector del radar
 ```
+
+**ECM: barrera o puntual** (`j.mode`, panel de selección del jammer; `data/jammers.js#JAM_MODES`):
+- **Barrera** (por defecto): reparte la potencia en toda la banda y afecta a todos los radares de sus bandas (modo ×1).
+- **Puntual**: concentra la potencia en la frecuencia de **un** radar elegido (`j.target`): ×10 contra ese radar, nada contra los demás. Si el radar tiene **agilidad de frecuencia** (`radar.agile`), salta de frecuencia pulso a pulso y el ruido puntual le deja solo ×0,1: contra él hay que usar barrera, que rinde mucho menos por radar. El ×10 es un valor de juego (la ganancia real es el cociente entre los anchos de banda y puede ser mucho mayor).
+
+**ECCM** (campos del radar en `data/defenses.js`):
+- **Agilidad de frecuencia** (`agile`): anula el ruido puntual (arriba).
+- **Lóbulos laterales bajos** (`lowSL`): la antena recibe menos por los costados (−20/−30 dB en vez de −13/−25 dB). No ayuda contra un jammer en el lóbulo principal.
+- **Canceladores de lóbulos laterales** (`slc` = N): anulan los N jammers más fuertes que entran por los lóbulos laterales (quedan ×0,03, −15 dB). **No pueden** con uno en el lóbulo principal, porque cancelarlo borraría también el eco del blanco. Por eso el avión de interferencia stand-off se pone detrás de los atacantes. Es la misma lógica que la CRPA de las armas (§4 GNSS), del otro lado.
+- **`eccm` (dB)**: lo demás (procesamiento, compresión de pulso, CFAR, operador), como antes.
+
+| Radar | Agilidad | Lóbulos bajos | SLC | Fuente |
+|---|---|---|---|---|
+| AN/MPQ-65 (Patriot) | sí | — | 1 | Radartutorial, MDAA ("al menos un SLC") |
+| 30N6 (S-300) | sí | sí | — | Air Power Australia (lóbulos muy bajos, ECCM extensas) |
+| 92N6 (S-400) | sí | sí | 1 | estimación (misma familia que el 30N6) |
+| TRML-4D (IRIS-T), Arabel (SAMP/T) | sí | sí | 2 / 1 | estimación (AESA/PESA modernos) |
+| Sentinel (NASAMS), Erieye | sí | sí | — | estimación |
+| 36D6 Tin Shield | — | — | 2 | estimación (el fabricante declara marcar el rumbo de los jammers) |
+| Tor, Pantsir | sí | — | — | estimación |
+| P-18, S-125, S-200, HPIR (Hawk), Gepard, Buk | — | — | — | radares de los 60–70 o sin dato |
+
+**Distancia de quemado:** con la interferencia J, el radar ve hasta `R' = R1·(1/(1+J))^¼` contra 1 m². Más cerca, el eco del blanco le gana al ruido. La ficha de cada jammer de radar muestra esa distancia para cada radar de sus bandas, con el jammer a 100 km de frente o de costado, en barrera o puntual (`physics/radar.js#singleJam`, `burnThrough`).
 
 Solo suman los jammers activos de la **misma banda** con **línea de vista** radar–jammer. `d` es la distancia 3D en km (+1 para evitar la división por cero). `P` es una **potencia relativa de juego**: las potencias reales no son públicas.
 

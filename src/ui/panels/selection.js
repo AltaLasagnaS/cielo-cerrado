@@ -1,6 +1,6 @@
 // Tarjeta "Selección": detalle y parámetros editables de lo que esté seleccionado en el mapa
 // (defensa, jammer, salva o amenaza en vuelo).
-import { THREATS, JAMMERS, TARGET_TYPES, TARGET_STATUS, D, UNIT_TARGET } from '../../data/index.js';
+import { THREATS, JAMMERS, JAM_MODES, TARGET_TYPES, TARGET_STATUS, D, UNIT_TARGET } from '../../data/index.js';
 import { esc, fmtT, kmh, money } from '../../util/format.js';
 import { releaseId } from '../../util/ids.js';
 import { surf, latlon } from '../../physics/terrain.js';
@@ -61,10 +61,13 @@ export function renderSel(live) {
     const J = JAMMERS[j.type];
     el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(J.name)}</b><dl class="kv"><dt>Posición</dt><dd>${j.x.toFixed(1)}, ${j.y.toFixed(1)} km</dd>${J.bands ? '<dt>Bandas</dt><dd>' + J.bands.join(', ') + '</dd>' : '<dt>Radio</dt><dd>' + J.radius + ' km</dd>'}</dl>
       ${J.air && !S.started ? `<div class="field"><label for="jAlt">Altitud</label><span class="val">${j.alt} m</span><input id="jAlt" type="range" min="1000" max="12000" step="250" value="${j.alt}"></div>` : ''}
+      ${J.bands ? jamModeHtml(j, J) : ''}
       <div class="row"><button class="btn sm" id="jInfo">Ficha</button>${!S.started ? '<button class="btn sm danger" id="jDel">Eliminar</button>' : ''}</div>`;
     $('#jInfo').onclick = () => openFicha('jam', j.type);
     if ($('#jAlt')) $('#jAlt').oninput = e => { j.alt = +e.target.value; j._losMap = {}; e.target.parentElement.querySelector('.val').textContent = j.alt + ' m'; schedCov(); };
     if ($('#jDel')) $('#jDel').onclick = () => { S.setup.jams = S.setup.jams.filter(v => v.id !== j.id); S.sel = null; renderSel(); renderEW(); schedCov(); };
+    if ($('#jMode')) $('#jMode').onchange = e => { j.mode = e.target.value; if (j.mode === 'spot' && j.target == null) j.target = jamTargets(J)[0]?.id ?? null; renderSel(); schedCov(); };
+    if ($('#jTgt')) $('#jTgt').onchange = e => { j.target = +e.target.value; renderSel(); schedCov(); };
   } else if (sel.kind === 'salvo') {
     const sv = S.setup.salvos.find(v => v.id === sel.id); if (!sv) { S.sel = null; return renderSel(); }
     const T = THREATS[sv.type]; const probe = buildThreat(sv, 0, 0); releaseId();
@@ -89,4 +92,19 @@ export function renderSel(live) {
     el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(label(th))}</b><dl class="kv"><dt>Altitud</dt><dd>${Math.round(p.z)} m (${Math.round(p.z - surf(p.x, p.y))} AGL)</dd><dt>Velocidad</dt><dd>${kmh(v)}</dd><dt>Al blanco</dt><dd>${p.rem.toFixed(1)} km</dd><dt>Primera detección</dt><dd>${th.firstDet === null ? '—' : fmtT(th.firstDet)}</dd></dl><div class="row"><button class="btn sm" id="tInfo">Ficha</button></div>`;
     $('#tInfo').onclick = () => openFicha('thr', th.type);
   }
+}
+
+/** Defensas cuyo radar trabaja en alguna banda del jammer J (blancos posibles del ruido puntual). */
+const jamTargets = J => S.setup.defs.filter(u => D(u).radar && J.bands.includes(D(u).radar.band));
+
+/** Modo del jammer (barrera o puntual) y, si es puntual, el radar elegido. */
+function jamModeHtml(j, J) {
+  const ed = !S.started, tg = S.setup.defs.find(u => u.id === j.target), r = tg && D(tg).radar;
+  const opts = Object.entries(JAM_MODES).map(([k, M]) => `<option value="${k}" ${(j.mode || 'barrage') === k ? 'selected' : ''}>${esc(M.name)}</option>`).join('');
+  let h = `<div class="field" title="Barrera: reparte la potencia en toda la banda. Puntual: la concentra en la frecuencia de un radar (×${JAM_MODES.spot.gain}), pero un radar con agilidad de frecuencia salta y la deja en ×${JAM_MODES.spot.agileGain}."><label for="jMode">Ruido</label><select id="jMode" class="sel" ${ed ? '' : 'disabled'}>${opts}</select></div>`;
+  if (j.mode === 'spot') {
+    h += `<div class="field"><label for="jTgt">Contra el radar de</label><select id="jTgt" class="sel" ${ed ? '' : 'disabled'}>${jamTargets(J).map(u => `<option value="${u.id}" ${u.id === j.target ? 'selected' : ''}>${esc(u.name)} (${D(u).radar.band})</option>`).join('') || '<option>No hay radares en sus bandas</option>'}</select></div>`;
+    if (r) h += `<p class="hint">${r.agile ? `${esc(tg.name)} tiene agilidad de frecuencia: salta de frecuencia y el ruido puntual casi no le hace nada (×${JAM_MODES.spot.agileGain}). Contra él conviene la barrera.` : `${esc(tg.name)} no tiene agilidad de frecuencia: el ruido puntual le pega ×${JAM_MODES.spot.gain} más que la barrera. A los demás radares no los toca.`}</p>`;
+  }
+  return h;
 }
