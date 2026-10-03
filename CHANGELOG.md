@@ -6,6 +6,9 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 
 ## [Sin publicar]
 
+### Agregado
+- **Clima** (pestaña Defensa → "Clima"), fijo durante todo el escenario: despejado, nublado con techo bajo, lluvia moderada, tormenta o niebla. La lluvia atenúa los radares según su banda con la fórmula oficial ITU-R P.838-3 (S y L casi no la notan; X y Ku pierden alcance, sobre todo en tormenta). Los sensores ópticos e infrarrojos (grupos móviles, MANPADS) pierden alcance con lluvia o niebla y no ven nada por encima del techo de nubes; la red acústica oye menos con lluvia. La cobertura del mapa refleja el clima. Se guarda en los archivos de escenario (`rules.weather`). Concepto nuevo en la Academia. Los escenarios incluidos siguen despejados: las golden no cambian.
+
 ### Corregido
 - **[sim]** **El engaño GNSS (Pokrova, Lima) era demasiado fuerte contra los misiles de crucero.** Ahora el Kh-101, el Kalibr y el Storm Shadow descartan la posición falsa gracias a su corrección por terreno (quedan con el error del inercial, cientos de metros en vez de kilómetros), y las armas con buscador terminal (Kh-101, Kalibr, Iskander, Kinzhal, Storm Shadow, Neptune, Liutyi) corrigen al final si el error cabe en su ventana (90% de las veces). Los Shahed y Gerbera siguen siendo desviados como antes. Mensajes nuevos en el registro y concepto actualizado en la Academia.
 

@@ -4,13 +4,14 @@
 // desde el catálogo (no hay valores copiados a mano: si cambia un dato, cambia la explicación).
 //
 // Cada concepto: { id, group, title, body() → HTML, engine() → HTML, widget? { html(), mount(el) } }
-import { BANDS, THREATS, DEFENSES, JAMMERS, UNC, CLS_NAME, TARGET_TYPES, DAMAGE, C2_LEVELS } from '../data/index.js';
+import { BANDS, THREATS, DEFENSES, JAMMERS, UNC, CLS_NAME, TARGET_TYPES, DAMAGE, C2_LEVELS, WEATHER } from '../data/index.js';
 import { esc, kmh } from '../util/format.js';
 import { KR, HORIZON_K, LOS_MARGIN } from '../physics/constants.js';
 import { rcsAt, horizon } from '../physics/radar.js';
 import { directDamage, radius50, warheadKg } from '../physics/damage.js';
 import { RELIEF_RADIUS_KM } from '../physics/terrain-analysis.js';
 import { SEEKER_ACQ } from '../physics/navigation.js';
+import { rainGamma } from '../physics/weather.js';
 import { AUTO_PHASES } from '../sim/pace.js';
 
 export const CONCEPT_GROUPS = ['Radar y bandas', 'Detección y terreno', 'Guerra electrónica', 'Enfrentamiento'];
@@ -192,6 +193,13 @@ export const CONCEPTS = [
     engine: () => `<p>El nivel se elige en la pestaña Defensa (${code('S.c2')}) y lo usan ${code('trackOK()')} y ${code('reactionStart()')}:</p>
       <div class="tblwrap"><table class="t"><thead><tr><th>Nivel</th><th>Demora de la red</th><th>Tira con pista ajena</th><th>Reparto de blancos</th></tr></thead><tbody>${Object.values(C2_LEVELS).map(L => `<tr><td>${esc(L.name)}</td><td>${L.share === 'none' ? '—' : L.lag + ' s'}</td><td>${{ none: 'no', cue: 'no (solo alerta)', track: 'activos/IR e interceptores', fire: 'también guiados por radar' }[L.share]}</td><td>${L.deconf ? 'sí' : 'no'}</td></tr>`).join('')}</tbody></table></div>
       <p>"Coordinada" y "desconectada" son el viejo interruptor "red integrada" encendido y apagado. Las demoras son estimaciones de juego. Todavía no se modelan el error de posición de las pistas de red ni los enlaces por sistema (Link 16 vs. red nacional): ver ROADMAP.</p>`
+  },
+  {
+    id: 'clima', group: 'Radar y bandas', title: 'Clima: lluvia, nubes y niebla',
+    body: () => `<p>El tiempo no afecta igual a todos los sensores. La <b>lluvia</b> absorbe y dispersa las microondas, tanto más cuanto más alta es la frecuencia: un radar en banda S o L casi no la nota, uno en X la siente y uno en Ku pierde mucho alcance en una tormenta. Por eso los radares de alerta usan bandas bajas y los de guiado (X, Ku) sufren más.</p><p>Los sensores <b>ópticos e infrarrojos</b> (los grupos móviles con ametralladoras y cámaras térmicas, los MANPADS) son los más castigados: la lluvia o la niebla les achican el alcance a una fracción y las <b>nubes</b> les tapan todo lo que vuela por encima, aunque se escuche el motor. La red <b>acústica</b> oye menos con lluvia y viento.</p>`,
+    engine: () => `<p>El clima se elige en la pestaña Defensa (${code('S.weather')}) y queda fijo todo el escenario. La atenuación del radar sale de la Rec. ITU-R P.838-3: ${code('γ = k · R^α')} dB/km, con k y α según la frecuencia de cada banda (${code('BANDS[b].ghz')}), sobre un camino de lluvia de hasta ${code('rainKm')}. El alcance resuelve ${code('R = R0 · 10^(−γ·min(R, L)/20)')}. Con lluvia de 4 mm/h, γ por banda: ${['S', 'C', 'X', 'Ku'].map(b => b + ' ' + rainGamma(b, 4).toFixed(3)).join(' · ')} dB/km.</p>
+      <div class="tblwrap"><table class="t"><thead><tr><th>Clima</th><th>Lluvia</th><th>Óptico/IR</th><th>Techo para ópticos</th><th>Acústico</th></tr></thead><tbody>${Object.values(WEATHER).map(W => `<tr><td>${esc(W.name)}</td><td>${W.rain ? W.rain + ' mm/h en ' + W.rainKm + ' km' : '—'}</td><td>×${W.opt}</td><td>${W.ceiling != null ? W.ceiling + ' m' : '—'}</td><td>×${W.acu}</td></tr>`).join('')}</tbody></table></div>
+      <p>Los factores ópticos y acústicos son estimaciones de juego (el manual de CMO dice que la lluvia deja lo visual en 1–5% y degrada mucho el IR). No se modelan el día y la noche, el viento sobre los drones, ni el clutter de lluvia.</p>`
   },
   {
     id: 'saturation', group: 'Enfrentamiento', title: 'Saturación y canales simultáneos',
