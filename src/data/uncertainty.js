@@ -15,7 +15,7 @@ export const PL = {
   'radar.R1': ['Radar: detección contra 1 m²', 'km'], 'radar.sector': ['Radar: sector de búsqueda', '°'], 'radar.scan': ['Radar: refresco', 's'], 'radar.altMax': ['Altura máxima detectable', 'm'],
   'sam.maxR': ['Alcance vs aeronaves/crucero', 'km'], 'sam.maxRtbm': ['Alcance vs balísticos', 'km'], 'sam.altMax': ['Techo', 'm'], 'sam.altMin': ['Altura mínima de enfrentamiento', 'm'],
   'sam.vInt': ['Velocidad media del interceptor', 'm/s'], 'sam.vmaxT': ['Blanco más rápido enfrentable', 'm/s'], 'sam.react': ['Tiempo de reacción', 's'],
-  'sam.ch': ['Canales simultáneos', ''], 'sam.mag': ['Munición de la unidad', ''], 'sam.cost': ['Costo por disparo', 'M US$'],
+  'sam.ch': ['Canales simultáneos', ''], 'sam.mag': ['Munición de la unidad', ''], 'sam.reloadS': ['Tiempo de recarga de la batería', 's'], 'sam.reserve': ['Reserva para recargar', ''], 'sam.cost': ['Costo por disparo', 'M US$'],
   'sam.pk.dron': ['Pk por disparo vs drones', ''], 'sam.pk.crucero': ['Pk por disparo vs crucero', ''], 'sam.pk.supersonico': ['Pk por disparo vs supersónicos', ''],
   'sam.pk.balistico': ['Pk por disparo vs balísticos', ''], 'sam.pk.hiper': ['Pk por disparo vs hipersónicos', ''],
   alt: ['Altitud de patrulla', 'm'], radius: ['Radio de efecto', 'km'], spoofKm: ['Desvío típico por engaño GNSS', 'km'], P: ['Potencia relativa (juego)', '']
@@ -247,6 +247,7 @@ export const UNC = {
   },
   def: {
     patriot: {
+      'sam.reloadS': U(1800, 2400, 3600, 'baja', S_('cmo_reload'), 'foro de CMO: ≈40 min; 30–60 min por lanzador con grúa'),
       'radar.R1': U(90, 100, 120, 'baja', S_('rt_mpq53'), 'est: 170 km es el alcance instrumentado; avión grande 150–170 km, escalado con σ^¼'),
       'radar.sector': U(90, 90, 120, 'media', S_('rt_mpq53'), 'búsqueda 90°, seguimiento 120°'),
       'radar.scan': U(1, 2, 3, 'baja', [], 'est: barrido electrónico en sector fijo'),
@@ -292,6 +293,7 @@ export const UNC = {
       'sam.pk.hiper': U(0.2, 0.4, 0.6, 'baja', S_('nv_zircon'), PK_NOTE)
     },
     irist: {
+      'sam.reloadS': U(600, 1200, 2400, 'baja', [], 'est: sin dato público firme'),
       'radar.R1': U(80, 100, 150, 'media', S_('hensoldt'), 'cazas a más de 120 km, misiles supersónicos a más de 60 km'),
       'sam.maxR': U(40, 40, 40, 'alta', S_('wp:IRIS-T_SL'), ''),
       'sam.maxRtbm': U(0, 0, 10, 'baja', [], 'sin datos públicos de capacidad antibalística (se quitó del modelo)'),
@@ -306,6 +308,7 @@ export const UNC = {
       'sam.pk.supersonico': U(0.1, 0.2, 0.35, 'baja', S_('syrskyi'), 'est: sin datos contra Mach 2–4; Oniks 5,7% a nivel nacional')
     },
     nasams: {
+      'sam.reloadS': U(900, 1800, 3600, 'baja', [], 'est: lanzador de 6 AMRAAM recargado con grúa; sin dato público firme'),
       'radar.R1': U(40, 60, 90, 'media', S_('wp:AN/MPQ-64_Sentinel'), '40 km el básico, 120 km el F1/A3'),
       'sam.maxR': U(25, 35, 40, 'media', S_('crs_nasams'), ''),
       'sam.altMax': U(12000, 15000, 21000, 'baja', S_('kongsberg'), 'est'),
@@ -343,6 +346,7 @@ export const UNC = {
       'sam.pk.dron': U(0.35, 0.55, 0.75, 'baja', [], PK_NOTE)
     },
     mfg: {
+      'sam.reloadS': U(60, 120, 300, 'baja', [], 'est: cambiar la cinta de la ametralladora'),
       'radar.R1': U(2, 5, 8, 'baja', [], 'est: visual/térmico nocturno con alerta acústica'),
       'sam.maxR': U(1, 1.5, 2, 'media', [], ''),
       'sam.pk.dron': U(0.05, 0.2, 0.3, 'baja', [], PK_NOTE)

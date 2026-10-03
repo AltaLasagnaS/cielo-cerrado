@@ -35,6 +35,7 @@ export const SRC = {
   mil_newa: ['Militarnyi: los S-125 Newa-SC polacos ya operan en Ucrania', 'https://militarnyi.com/en/news/polish-s-125-newa-sc-sam-are-already-operating-in-ukraine/'],
   kp_s125: ['Kyiv Post: Ucrania saca provecho de material soviético viejo (S-125 derriba un Kalibr)', 'https://www.kyivpost.com/post/35197'],
   cmo_db3k_sam: ['Base de datos de Command: Modern Operations (DB3000 515): alcances, techos y velocidades de MIM-23, 5V28 y 5V27 (estimaciones de juego, en millas náuticas)', 'https://www.matrixgames.com/game/command-modern-operations'],
+  cmo_reload: ['Foro de Matrix Games: recargar una batería Patriot en CMO (≈40 min, ejemplo de juego)', 'http://www.matrixgames.com/forums/viewtopic.php?t=294701'],
   cmo_db3k: ['Base de datos de Command: Modern Operations (DB3000 515): firma radar por arma (frente, costado y cola en bandas A–D y E–M). Son estimaciones del juego, no mediciones; se citan valor por valor', 'https://www.matrixgames.com/game/command-modern-operations'],
   cmo_isk: ['Foro Matrix Games, base DB3000 de CMO: RCS del Iskander-E −9,8 dBsm (estimación de juego)', 'https://forums.matrixgames.com/viewtopic.php?t=243914&start=1820'],
   uav_rcs: ['Rosamilia et al. (Cranfield): mediciones de RCS de UAV por aspecto en 8–18 GHz', 'https://dspace.lib.cranfield.ac.uk/server/api/core/bitstreams/b70b94cb-9ed7-4067-a2ae-913fa1950b41/content'],

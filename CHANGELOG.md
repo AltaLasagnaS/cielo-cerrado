@@ -7,6 +7,9 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 ## [Sin publicar]
 
 ### Agregado
+- **[sim]** **Recarga de munición:** cada batería tiene una reserva (editable en el panel de selección) y recarga en un tiempo propio cuando se vacía (Patriot ≈40 min, NASAMS ≈30 min, IRIS-T ≈20 min, grupos móviles ≈2 min; estimaciones con rango). Si el mapa tiene depósitos de munición, hace falta uno en pie a menos de 30 km: destruirlo corta la recarga. El debrief cuenta las recargas. Los escenarios casi no cambian (Kiev ≈70%, refinería ≈35%, puente ≈40%): las recargas largas no entran en una noche de 25 minutos de misiles.
+
+### Agregado
 - **Discriminación de señuelos:** los radares de tiro (S, C, X, Ku) aprenden a distinguir un señuelo de un arma con el tiempo de seguimiento (más rápido en las bandas altas; los señuelos del Iskander cuestan 4 veces más que un Gerbera; ≈3% de error con armas reales). Nueva opción en la pestaña Defensa: **"no tirarle a pistas clasificadas como señuelo"**. El debrief cuenta los señuelos reconocidos y las armas mal clasificadas. Sin la opción, los resultados no cambian.
 
 ### Cambiado

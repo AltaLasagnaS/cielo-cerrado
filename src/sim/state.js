@@ -29,7 +29,9 @@ export function newStats() {
     // daño a objetivos
     damage: 0, dmgByWeapon: {}, missSum: 0, missN: 0, objsDestroyed: 0,
     // saturación: veces que una unidad tenía blancos pero no le quedaban canales o munición
-    satChannels: {}, satMag: {}
+    satChannels: {}, satMag: {},
+    // recargas completadas
+    reloads: 0
   };
 }
 S.stats = newStats();

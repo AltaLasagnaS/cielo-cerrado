@@ -24,7 +24,7 @@ const DOCTRINES = ['salva', 'sls'];
 
 const pick = (o, keys) => { const r = {}; for (const k of keys) if (o[k] !== undefined) r[k] = structuredClone(o[k]); return r; };
 const OBJ_KEYS = ['id', 'type', 'x', 'y', 'name', 'short', 'maxHp', 'desc'];
-const DEF_KEYS = ['id', 'type', 'x', 'y', 'name', 'az', 'mast', 'alt', 'mag', 'salvo', 'noDrones', 'link'];
+const DEF_KEYS = ['id', 'type', 'x', 'y', 'name', 'az', 'mast', 'alt', 'mag', 'salvo', 'noDrones', 'link', 'reserve'];
 const SALVO_KEYS = ['id', 'type', 'count', 'interval', 'tStart', 'sync', 'tArrive', 'agl', 'launchDist', 'maneuver', 'decoys', 'link', 'pts', 'targetUnit', 'targetObj'];
 const JAM_KEYS = ['id', 'type', 'x', 'y', 'alt', 'on'];
 const META_KEYS = ['name', 'player', 'time', 'description', 'forces', 'conditions', 'rulesText', 'goals', 'success', 'failure'];
@@ -136,7 +136,8 @@ export function validateScenario(raw) {
     return {
       id: id(w, u.id), type: u.type, x: u.x, y: u.y, name: str(w + ' · name', u.name, 120),
       az: num(w + ' · az', u.az, 0, 360, { opt: true }), mast: inLimits(w + ' · mast', num(w + ' · mast', u.mast, 0, 200, { opt: true }), DEFENSES[u.type].radar?.mastRange, 'la altura real de su antena'), alt: num(w + ' · alt', u.alt, 0, 20000, { opt: true }),
-      mag: num(w + ' · mag', u.mag, 0, 1000, { int: true, opt: true }), salvo: num(w + ' · salvo', u.salvo, 0, 10, { int: true, opt: true }), noDrones: bool(w + ' · noDrones', u.noDrones), link: bool(w + ' · link', u.link)
+      mag: num(w + ' · mag', u.mag, 0, 1000, { int: true, opt: true }), salvo: num(w + ' · salvo', u.salvo, 0, 10, { int: true, opt: true }), noDrones: bool(w + ' · noDrones', u.noDrones), link: bool(w + ' · link', u.link),
+      reserve: num(w + ' · reserve', u.reserve, 0, 1000, { int: true, opt: true })
     };
   });
   const objIds = new Set(objs.filter(Boolean).map(g => g.id)), defIds = new Set(defs.filter(Boolean).map(u => u.id));
@@ -222,7 +223,7 @@ export function loadScenarioData(data) {
   for (const g of data.setup.objs) objId.set(g.id, addObj(g.type, g.x, g.y, { name: g.name, short: g.short, hp: g.maxHp, desc: g.desc }).id);
   for (const d of data.setup.defs) {
     const u = addDef(d.type, d.x, d.y, { name: d.name, az: d.az });
-    for (const k of ['mast', 'alt', 'mag', 'salvo', 'noDrones', 'link']) if (d[k] !== undefined) u[k] = d[k];
+    for (const k of ['mast', 'alt', 'mag', 'salvo', 'noDrones', 'link', 'reserve']) if (d[k] !== undefined) u[k] = d[k];
     defId.set(d.id, u.id);
   }
   for (const sv of data.setup.salvos) {
