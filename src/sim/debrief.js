@@ -70,7 +70,7 @@ function explain(S, arrivals, decoys) {
   if (S.stats.reloads) out.push(`Hubo ${S.stats.reloads} recarga(s) de baterías durante el ataque.`);
   if (decoyShots) out.push(`Los señuelos consumieron ${decoyShots} interceptor(es) que no se usaron contra armas reales. La "vista del defensor" muestra cómo los ve el operador: iguales a las armas.`);
   const empty = S.events.filter(e => e.key && e.key.startsWith('empty:'));
-  if (empty.length) out.push(`Se quedaron sin munición: ${empty.map(e => e.text.replace(' se queda sin munición', '')).join(', ')}. Sin recarga, la saturación agota los cargadores antes de que llegue lo más peligroso.`);
+  if (empty.length) out.push(`Se quedaron sin munición: ${empty.map(e => e.text.replace(' se queda sin munición', '')).join(', ')}. Mientras recargan (o sin reserva), la saturación agota los cargadores antes de que llegue lo más peligroso.`);
   const sat = Object.entries(st.satChannels).sort((a, b) => b[1] - a[1]);
   if (sat.length) out.push(`Saturación de canales de tiro: ${sat.slice(0, 3).map(([k, v]) => `${k} (${v} s)`).join(', ')} tuvo más blancos que canales simultáneos.`);
   const gnss = real.filter(a => a.nav > 150 && a.nav <= LOST_M), lostL = real.filter(a => a.nav > LOST_M);

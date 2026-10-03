@@ -7,6 +7,21 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 ## [Sin publicar]
 
 ### Agregado
+- **[sim]** **Energía del interceptor** (docs/FISICA.md §6–§7):
+  - **Alcance según el aspecto:** un misil llega más lejos contra un blanco que viene de frente que contra uno que se aleja. Alcance efectivo = alcance máximo × (0,8 + 0,2·coseno del aspecto): ×1 de frente, ×0,8 de costado, ×0,6 de cola.
+  - **Pk según la energía:** un misil que llega al borde de su alcance llega "cansado". La Pk se multiplica por un factor *relativo* al tiro típico (al 90% del alcance, con el que están calibradas las Pk del catálogo): hasta ×1,25 en un tiro corto, ×0,71 en el borde. No se aplica a cañones ni a drones interceptores.
+  - **Doctrina "Disparar dentro del X% del alcance"** (pestaña Defensa, 50–100%, por defecto 100%; se guarda como `rules.fireRange`): esperar a que el blanco se acerque sube la Pk.
+  - Concepto nuevo en la Academia: "Energía del interceptor".
+
+### Cambiado
+- **[sim]** Rebalanceo con Monte Carlo (40 noches, valores probables, como las mediciones anteriores). Con la energía, el IRIS-T les tiraba a los Shahed en el borde de su alcance, vaciaba el cargador y después pasaban los Kh-101: **Kiev bajaba de ≈70% a ≈38%**; la refinería de ≈35% a ≈25% y el puente (ataque) de ≈40% a ≈30%. Ajustes: Kiev, segunda oleada de Shahed 10 → 6 (vuelve a ≈68%); refinería, Geran-3 6 → 4 (≈33%); puente, Storm Shadow 10 → 11 (el ataque gana ≈45%).
+- La doctrina de alcance pesa mucho: en Kiev, tirar dentro del 90% o del 80% del alcance da 40 de 40 noches defendidas. Los briefings lo sugieren.
+- La prueba de nubes usa Shahed a 1.000 m: a 1.500 m quedan fuera del alcance efectivo de un grupo móvil.
+
+### Corregido
+- Los briefings de Kiev, la refinería y Monterey decían "No hay recarga", pero desde la recarga de munición las baterías tienen reserva. El debrief tampoco dice más "Sin recarga".
+
+### Agregado
 - **[sim]** **Recarga de munición:** cada batería tiene una reserva (editable en el panel de selección) y recarga en un tiempo propio cuando se vacía (Patriot ≈40 min, NASAMS ≈30 min, IRIS-T ≈20 min, grupos móviles ≈2 min; estimaciones con rango). Si el mapa tiene depósitos de munición, hace falta uno en pie a menos de 30 km: destruirlo corta la recarga. El debrief cuenta las recargas. Los escenarios casi no cambian (Kiev ≈70%, refinería ≈35%, puente ≈40%): las recargas largas no entran en una noche de 25 minutos de misiles.
 
 ### Agregado

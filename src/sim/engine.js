@@ -133,7 +133,7 @@ export function step(dt) {
     it.done = true; const u = it.u; u.active = Math.max(0, u.active - 1);
     const th = it.th;
     if (!th.alive) { log('d', it.shot + ' de ' + uLabel(u) + ': blanco ya destruido, autodestrucción.'); continue; }
-    const pk = calcPk(u, th, t, S.jamsLive) * (it.remote ? C2_LEVELS[it.c2].remotePk : 1);   // error de posición de la pista de red
+    const pk = calcPk(u, th, t, S.jamsLive, it.f ?? null) * (it.remote ? C2_LEVELS[it.c2].remotePk : 1);   // error de posición de la pista de red
     if (rnd() < pk) {
       th.alive = false; th.killed = true; S.stats.killed++; if (th.isDecoy) S.stats.decoysKilled++;
       const p = th.p || it; S.fx.push({ x: p.x, y: p.y, rt: performance.now(), c: '#6fd08c' });
@@ -178,7 +178,7 @@ function canEngage(u, th, t, c2, probe) {
 /** Segunda mitad de canEngage (lo caro): solución de tiro y cobertura del punto de encuentro. */
 function solveFor(u, th, t) {
   const sm = D(u).sam, r = D(u).radar;
-  const sol = solve(u, th, t); if (!sol) return null;
+  const sol = solve(u, th, t, S.fireRange ?? 1); if (!sol) return null;
   if (speedAt(th, t + sol.tau) > sm.vmaxT) return null;
   const remote = !(r && t - (th.det[u.id] ?? -1e9) <= r.scan * 2 + 0.6);
   if (RADAR_GUID.includes(sm.guid) && sm.guid !== 'cañón') {
@@ -194,10 +194,11 @@ function solveFor(u, th, t) {
 
 /**
  * Puntaje para el reparto "mejor tirador" (mayor = mejor): contra drones, el menor costo esperado por
- * derribo (costo del disparo / Pk); contra el resto, la mayor Pk.
+ * derribo (costo del disparo / Pk); contra el resto, la mayor Pk. f = fracción del alcance del tiro
+ * (solve), para contar la energía del misil.
  */
-function shooterScore(u, th, t) {
-  const pk = Math.max(0.01, calcPk(u, th, t, S.jamsLive));
+function shooterScore(u, th, t, f = null) {
+  const pk = Math.max(0.01, calcPk(u, th, t, S.jamsLive, f));
   return th.cls === 'dron' ? -D(u).sam.cost / pk : pk;
 }
 
@@ -247,8 +248,8 @@ export function engage(u, t) {
     const f = solveFor(u, th, t); if (!f) continue;
     if (L.best && u.link !== false) {
       // mejor tirador ahora: otra batería con enlace que también puede tirar ya y es mejor
-      const mine = shooterScore(u, th, t);
-      const better = S.units.some(v => v !== u && v.link !== false && canEngage(v, th, t, c2, true) && shooterScore(v, th, t) > mine * (th.cls === 'dron' ? 0.999 : 1.001) && solveFor(v, th, t));
+      const mine = shooterScore(u, th, t, f.sol.f);
+      const better = S.units.some(v => { if (v === u || v.link === false || !canEngage(v, th, t, c2, true)) return false; const fv = solveFor(v, th, t); return !!fv && shooterScore(v, th, t, fv.sol.f) > mine * (th.cls === 'dron' ? 0.999 : 1.001); });
       if (better) continue;
       // defensa por capas: un dron se le deja a una capa al menos 2 veces más barata por derribo que
       // tenga munición y por cuya envolvente vaya a pasar antes de llegar
@@ -261,7 +262,7 @@ export function engage(u, t) {
     const { sol, remote } = f;
     const n = Math.min(S.doctrine === 'salva' ? (u.salvo || sm.salvo) : 1, u.magLeft, ch - u.active);
     for (let k = 0; k < n; k++) {
-      const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2 };
+      const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f };
       S.ints.push(it); (th.fly = th.fly || []).push(it);
       u.magLeft--; u.active++; S.stats.shots++; S.stats.defCost += sm.cost;
       S.stats.byUnit[uLabel(u)] = (S.stats.byUnit[uLabel(u)] || 0) + 1;

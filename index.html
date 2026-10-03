@@ -2001,7 +2001,7 @@ table.t.mc td.pc{white-space:nowrap}
       },
       conditions: "Noche despejada (clima: despejado). El motor no modela la luz: la noche solo explica por qué los grupos móviles dependen de la alerta acústica. Probá cambiar el clima en la pestaña Defensa.",
       rules: { c2: "coordinada", doctrine: "salva", weather: "despejado" },
-      rulesText: ["Red integrada activa y doctrina de salva.", "No hay recarga: cada unidad cuenta solo con la munición inicial.", "Los Kh-101, Kalibr e Iskander están sincronizados para llegar casi juntos (T+24:40 a T+25:30)."],
+      rulesText: ["Red integrada activa y doctrina de salva.", "Cada batería recarga desde su reserva cuando se vacía, pero una recarga lleva de 2 min (grupos móviles) a 40 min (Patriot): en el pico del ataque cuenta la munición lista.", "Doctrina de alcance al 100% (pestaña Defensa): probá tirar más cerca, dentro del 90% o del 80% del alcance.", "Los Kh-101, Kalibr e Iskander están sincronizados para llegar casi juntos (T+24:40 a T+25:30)."],
       objectives: [
         { type: "fuel", name: "Depósito de combustible Salinas", short: "Combustible Salinas", x: 63.5, y: 55.8, desc: "Abastece a la región: es el blanco principal del ataque." },
         { type: "infra", name: "Puerto de Monterey", short: "Puerto Monterey", x: 42.2, y: 64.3, desc: "Terminal portuaria, blanco de los Kalibr lanzados desde el mar." },
@@ -2097,11 +2097,11 @@ table.t.mc td.pc{white-space:nowrap}
       description: "Ejercicio hipotético: una oleada al estilo de las campañas rusas contra la energía ucraniana cae sobre la refinería de la isla de Hisingen, en la desembocadura del Göta älv. Los drones Shahed y los señuelos Gerbera llegan desde el mar para gastar munición; detrás vienen misiles de crucero Kalibr rasantes sobre el agua, Kh-101 desde el norte y dos Kinzhal contra el puerto. La refinería es lo único que importa: sin ella no hay combustible para la región.",
       forces: {
         defensa: "Defensa por capas con material sueco y donado: radar 3D sobre las colinas de Hisingen, un avión Saab AEW patrullando sobre el mar, Patriot (sector hacia el oeste), IRIS-T, NASAMS, dos puestos RBS 70 (MANPADS), dos grupos móviles, red acústica y drones interceptores. Red de mando integrada.",
-        ataque: "16 Shahed, 8 Gerbera, 6 Geran-3 (a reacción), 6 Kalibr, 2 Kh-101 y 2 Kinzhal, con un avión de interferencia stand-off sobre el Kattegat."
+        ataque: "16 Shahed, 8 Gerbera, 4 Geran-3 (a reacción), 6 Kalibr, 2 Kh-101 y 2 Kinzhal, con un avión de interferencia stand-off sobre el Kattegat."
       },
       conditions: "Noche despejada sobre el mar (clima: despejado). El motor no modela la luz: la noche solo explica por qué los grupos móviles dependen de la alerta acústica y del radar.",
       rules: { c2: "coordinada", doctrine: "salva", weather: "despejado" },
-      rulesText: ["Red integrada activa y doctrina de salva.", "No hay recarga: cada unidad cuenta solo con la munición inicial.", "Los Kalibr y los Kh-101 llegan casi juntos (T+25:00 a T+25:10); los Kinzhal, medio minuto después.", "El Patriot mira al oeste: lo que entra por el norte lo tienen que resolver el IRIS-T y la defensa de punto."],
+      rulesText: ["Red integrada activa y doctrina de salva.", "Cada batería recarga desde su reserva cuando se vacía, pero una recarga lleva de 2 min (grupos móviles) a 40 min (Patriot): en el pico del ataque cuenta la munición lista.", "Doctrina de alcance al 100% (pestaña Defensa): probá tirar más cerca, dentro del 90% o del 80% del alcance.", "Los Kalibr y los Kh-101 llegan casi juntos (T+25:00 a T+25:10); los Kinzhal, medio minuto después.", "El Patriot mira al oeste: lo que entra por el norte lo tienen que resolver el IRIS-T y la defensa de punto."],
       objectives: [
         { type: "fuel", name: "Refinería de Hisingen", short: "Refinería", x: 51.1, y: 34.4, hp: 1600, desc: "Torres de destilación, tanques y cañerías sobre la costa norte del Göta älv. Blanco principal." },
         { type: "fuel", name: "Terminal petrolera de Skarvik", short: "Terminal Skarvik", x: 54.1, y: 34, desc: "Tanques de almacenamiento y muelles de carga de combustible." },
@@ -2124,7 +2124,7 @@ table.t.mc td.pc{white-space:nowrap}
       salvos: [
         { type: "shahed", count: 16, interval: 20, tStart: 0, agl: 1500, pts: [[0, 28], [30, 33], [51.1, 34.4]], targetObj: "Refinería de Hisingen" },
         { type: "gerbera", count: 8, interval: 25, tStart: 60, agl: 900, pts: [[0, 42], [30, 38], [51, 34.6]] },
-        { type: "geran3", count: 6, interval: 30, tStart: 400, agl: 800, pts: [[30, 0], [45, 20], [54.1, 34]], targetObj: "Terminal petrolera de Skarvik" },
+        { type: "geran3", count: 4, interval: 30, tStart: 400, agl: 800, pts: [[30, 0], [45, 20], [54.1, 34]], targetObj: "Terminal petrolera de Skarvik" },
         { type: "kalibr", count: 6, interval: 8, sync: true, tArrive: 1500, agl: 20, pts: [[0, 75], [32, 44], [51.1, 34.4]], targetObj: "Refinería de Hisingen" },
         { type: "kh101", count: 2, interval: 15, sync: true, tArrive: 1510, agl: 40, pts: [[20, 0], [42, 18], [51.1, 34.4]], targetObj: "Refinería de Hisingen" },
         { type: "kinzhal", count: 2, interval: 15, sync: true, tArrive: 1540, launchDist: 450, pts: [[59, 111], [55.6, 33.9]], targetObj: "Puerto de Gotemburgo" }
@@ -2151,7 +2151,7 @@ table.t.mc td.pc{white-space:nowrap}
       description: "Ejercicio hipotético inspirado en los ataques ucranianos a los puentes de Chonhar y Crimea: la autopista 1 cruza el estero Elkhorn en Moss Landing por un puente costero, con un puente ferroviario al lado. Por ahí pasa toda la logística del frente. Una defensa rusa con S-400, Pantsir, Tor y Buk lo protege. Tu tarea: cortar el puente carretero.",
       forces: {
         defensa: "S-400 sobre las lomas del este (sector hacia el sudoeste), dos Pantsir y un Tor junto a los puentes, un Buk-M1, radar 3D y radar VHF de alerta. Red integrada.",
-        ataque: "10 Storm Shadow y 2 Flamingo contra el puente carretero, 4 ATACMS contra el puente ferroviario, 2 Neptune contra el S-400 y 30 drones Liutyi contra la central eléctrica, que llegan un par de minutos antes para gastar la munición de la defensa de punto."
+        ataque: "11 Storm Shadow y 2 Flamingo contra el puente carretero, 4 ATACMS contra el puente ferroviario, 2 Neptune contra el S-400 y 30 drones Liutyi contra la central eléctrica, que llegan un par de minutos antes para gastar la munición de la defensa de punto."
       },
       conditions: "Despejado. El motor no modela la luz. Probá cambiar el clima en la pestaña Defensa.",
       rules: { c2: "coordinada", doctrine: "salva", weather: "despejado" },
@@ -2171,7 +2171,7 @@ table.t.mc td.pc{white-space:nowrap}
         { type: "p18", x: 58, y: 40, name: "Radar VHF" }
       ],
       salvos: [
-        { type: "storm", count: 10, interval: 5, sync: true, tArrive: 1500, agl: 35, pts: [[0, 58], [30, 52], [44, 45], [51.8, 40.9]], targetObj: "Puente de la autopista 1" },
+        { type: "storm", count: 11, interval: 5, sync: true, tArrive: 1500, agl: 35, pts: [[0, 58], [30, 52], [44, 45], [51.8, 40.9]], targetObj: "Puente de la autopista 1" },
         { type: "flamingo", count: 2, interval: 10, sync: true, tArrive: 1510, agl: 35, pts: [[0, 30], [35, 37], [51.8, 40.9]], targetObj: "Puente de la autopista 1" },
         { type: "atacms", count: 4, interval: 6, sync: true, tArrive: 1490, launchDist: 250, pts: [[52, 111], [52.4, 40.7]], targetObj: "Puente ferroviario del estero Elkhorn" },
         { type: "neptune", count: 2, interval: 10, sync: true, tArrive: 1480, agl: 12, pts: [[0, 66], [40, 58], [62, 48]], targetUnit: "S-400" },
@@ -2197,11 +2197,11 @@ table.t.mc td.pc{white-space:nowrap}
       description: "Una noche típica de la campaña rusa contra la energía ucraniana: oleadas de Shahed desde el norte y el este, señuelos Gerbera para gastar munición, misiles de crucero Kh-101 y Kalibr, y balísticos Iskander-M y Kinzhal al final, todo para llegar casi junto. Los blancos son las centrales de cogeneración que dan luz y calefacción a la ciudad y la represa de Kiev. Las posiciones de la defensa son ilustrativas, no las reales.",
       forces: {
         defensa: "Defensa por capas de la capital: radar 3D y radar VHF de alerta, Patriot (sector hacia el noreste), NASAMS, IRIS-T, dos Gepard junto a las centrales, tres grupos móviles, red acústica, drones interceptores y la red anti-GNSS Pokrova sobre la ciudad. Red de mando integrada.",
-        ataque: "28 Shahed en dos oleadas, 10 Gerbera, 7 Kh-101, 6 Kalibr, 3 Iskander-M con señuelos y 2 Kinzhal."
+        ataque: "24 Shahed en dos oleadas, 10 Gerbera, 7 Kh-101, 6 Kalibr, 3 Iskander-M con señuelos y 2 Kinzhal."
       },
       conditions: "Noche de invierno, despejada. El motor no modela la luz: la noche solo explica por qué los grupos móviles dependen de la alerta acústica y del radar. Probá un techo de nubes bajo (pestaña Defensa): los grupos móviles dejan de ver a los Shahed que vuelan arriba.",
       rules: { c2: "coordinada", doctrine: "salva", weather: "despejado" },
-      rulesText: ["Red integrada activa y doctrina de salva.", "No hay recarga: cada unidad cuenta solo con la munición inicial.", "Los misiles de crucero y los balísticos llegan casi juntos (T+24:50 a T+25:30), después de una hora de drones.", "Pokrova engaña al GNSS de los Shahed y los Gerbera sobre la ciudad. Los Kh-101 y Kalibr la descartan con su corrección de terreno, y los misiles con buscador terminal corrigen al final: apagala (pestaña EW) y compará con Monte Carlo."],
+      rulesText: ["Red integrada activa y doctrina de salva.", "Cada batería recarga desde su reserva cuando se vacía, pero una recarga lleva de 2 min (grupos móviles) a 40 min (Patriot): en el pico del ataque cuenta la munición lista.", "Doctrina de alcance al 100% (pestaña Defensa): probá tirar más cerca, dentro del 90% o del 80% del alcance.", "Los misiles de crucero y los balísticos llegan casi juntos (T+24:50 a T+25:30), después de una hora de drones.", "Pokrova engaña al GNSS de los Shahed y los Gerbera sobre la ciudad. Los Kh-101 y Kalibr la descartan con su corrección de terreno, y los misiles con buscador terminal corrigen al final: apagala (pestaña EW) y compará con Monte Carlo."],
       objectives: [
         { type: "infra", name: "Central CHP-5", short: "CHP-5", x: 40.3, y: 67.4, hp: 1500, desc: "Central de cogeneración de ~700 MW: luz y calefacción para buena parte de la margen derecha y de Darnytsia." },
         { type: "infra", name: "Central CHP-6", short: "CHP-6", x: 46.9, y: 52, hp: 1500, desc: "Central de cogeneración de ~500 MW en Troieshchyna, margen izquierda." },
@@ -2226,7 +2226,7 @@ table.t.mc td.pc{white-space:nowrap}
       salvos: [
         { type: "shahed", count: 18, interval: 20, tStart: 0, agl: 1500, pts: [[40, 0], [42, 30], [46.9, 52]], targetObj: "Central CHP-6" },
         { type: "gerbera", count: 10, interval: 25, tStart: 60, agl: 900, pts: [[70, 5], [50, 30], [44, 55]] },
-        { type: "shahed", count: 10, interval: 30, tStart: 120, agl: 2e3, pts: [[70, 40], [55, 55], [40.3, 67.4]], targetObj: "Central CHP-5" },
+        { type: "shahed", count: 6, interval: 30, tStart: 120, agl: 2e3, pts: [[70, 40], [55, 55], [40.3, 67.4]], targetObj: "Central CHP-5" },
         { type: "kh101", count: 7, interval: 10, sync: true, tArrive: 1500, agl: 40, pts: [[0, 30], [20, 50], [40.3, 67.4]], targetObj: "Central CHP-5" },
         { type: "kalibr", count: 6, interval: 8, sync: true, tArrive: 1490, agl: 50, pts: [[45, 111], [42, 90], [40.3, 67.4]], targetObj: "Central CHP-5" },
         { type: "isk_m", count: 3, interval: 15, sync: true, tArrive: 1520, launchDist: 400, maneuver: true, decoys: true, pts: [[70, 0], [46.9, 52]], targetObj: "Central CHP-6" },
@@ -2595,9 +2595,11 @@ table.t.mc td.pc{white-space:nowrap}
     setup: { objs: [], defs: [], salvos: [], jams: [] },
     // escenario cargado (data/scenarios.js) o null si es un relieve importado
     scen: null,
-    // opciones de mando (c2 = nivel de integración, ver data/c2.js), clima (data/weather.js) y de visualización
+    // opciones de mando (c2 = nivel de integración, ver data/c2.js; fireRange = disparar dentro de esa
+    // fracción del alcance efectivo), clima (data/weather.js) y de visualización
     c2: "coordinada",
     doctrine: "salva",
+    fireRange: 1,
     weather: "despejado",
     ignoreDecoys: false,
     showCov: true,
@@ -3247,7 +3249,24 @@ table.t.mc td.pc{white-space:nowrap}
     }
     return C2_ORDER[Math.max(0, i)];
   }
-  function solve(u, th, t) {
+  var rangeFactor = (ca) => 0.8 + 0.2 * clamp(ca, -1, 1);
+  var energy = (f) => f <= 0.75 ? 1 : Math.max(0.5, 1 - 2 * (f - 0.75));
+  var ENERGY_REF = 0.9;
+  var energyPk = (f) => Math.min(1.25, energy(f) / energy(ENERGY_REF));
+  var usesEnergy = (guid) => guid !== "cañón" && guid !== "operador";
+  function closingCos(th, tt, p, x, y, z) {
+    let q = posAt(th, tt - 0.5), a = q, b = p;
+    if (!q || tt - 0.5 < th.tLaunch) {
+      q = posAt(th, tt + 0.5);
+      a = p;
+      b = q;
+    }
+    if (!a || !b) return 1;
+    const vx = b.x - a.x, vy = b.y - a.y, vz = (b.z - a.z) / 1e3, lx = x - p.x, ly = y - p.y, lzk = (z - p.z) / 1e3;
+    const nv = Math.hypot(vx, vy, vz), nl = Math.hypot(lx, ly, lzk);
+    return nv && nl ? (vx * lx + vy * ly + vz * lzk) / (nv * nl) : 1;
+  }
+  function solve(u, th, t, pct3 = 1) {
     const sm = D(u).sam, tbm = isTBM(th);
     const maxR = tbm ? sm.maxRtbm : sm.maxR;
     const lz = surf(u.x, u.y) + 2;
@@ -3258,15 +3277,18 @@ table.t.mc td.pc{white-space:nowrap}
       if (!p) break;
       const dh = Math.hypot(p.x - u.x, p.y - u.y), r = Math.hypot(dh, (p.z - lz) / 1e3);
       const agl = p.z - surf(p.x, p.y);
-      if (r <= maxR && r >= sm.minR && agl >= sm.altMin && p.z - lz <= sm.altMax) {
-        const tf = r * 1e3 / sm.vInt;
-        if (tf <= tau) return tau - tf <= 3 ? { tau, p, r } : null;
+      if (r <= maxR * pct3 && r >= sm.minR && agl >= sm.altMin && p.z - lz <= sm.altMax) {
+        const kin = maxR * rangeFactor(closingCos(th, t + tau, p, u.x, u.y, lz));
+        if (r <= kin * pct3) {
+          const tf = r * 1e3 / sm.vInt;
+          if (tf <= tau) return tau - tf <= 3 ? { tau, p, r, f: r / kin } : null;
+        }
       }
       tau += tau < 30 ? 0.5 : 2;
     }
     return null;
   }
-  function calcPk(u, th, t, jams) {
+  function calcPk(u, th, t, jams, f = null) {
     const sm = D(u).sam;
     let pk = sm.pk[th.cls] || 0;
     const p = th.p;
@@ -3281,6 +3303,7 @@ table.t.mc td.pc{white-space:nowrap}
     }
     const v = speedAt(th, t);
     if (v > 0.8 * sm.vmaxT) pk *= 0.8;
+    if (f !== null && usesEnergy(sm.guid)) pk *= energyPk(f);
     return clamp(pk, 0, 0.98);
   }
 
@@ -3499,7 +3522,7 @@ table.t.mc td.pc{white-space:nowrap}
         log("d", it.shot + " de " + uLabel(u) + ": blanco ya destruido, autodestrucción.");
         continue;
       }
-      const pk = calcPk(u, th, t, S.jamsLive) * (it.remote ? C2_LEVELS[it.c2].remotePk : 1);
+      const pk = calcPk(u, th, t, S.jamsLive, it.f ?? null) * (it.remote ? C2_LEVELS[it.c2].remotePk : 1);
       if (rnd() < pk) {
         th.alive = false;
         th.killed = true;
@@ -3550,7 +3573,7 @@ table.t.mc td.pc{white-space:nowrap}
   }
   function solveFor(u, th, t) {
     const sm = D(u).sam, r = D(u).radar;
-    const sol = solve(u, th, t);
+    const sol = solve(u, th, t, S.fireRange ?? 1);
     if (!sol) return null;
     if (speedAt(th, t + sol.tau) > sm.vmaxT) return null;
     const remote = !(r && t - (th.det[u.id] ?? -1e9) <= r.scan * 2 + 0.6);
@@ -3563,8 +3586,8 @@ table.t.mc td.pc{white-space:nowrap}
     }
     return { sol, remote };
   }
-  function shooterScore(u, th, t) {
-    const pk = Math.max(0.01, calcPk(u, th, t, S.jamsLive));
+  function shooterScore(u, th, t, f = null) {
+    const pk = Math.max(0.01, calcPk(u, th, t, S.jamsLive, f));
     return th.cls === "dron" ? -D(u).sam.cost / pk : pk;
   }
   var RESUPPLY_KM = 30;
@@ -3600,8 +3623,12 @@ table.t.mc td.pc{white-space:nowrap}
       const f = solveFor(u, th, t);
       if (!f) continue;
       if (L.best && u.link !== false) {
-        const mine = shooterScore(u, th, t);
-        const better = S.units.some((v) => v !== u && v.link !== false && canEngage(v, th, t, c2, true) && shooterScore(v, th, t) > mine * (th.cls === "dron" ? 0.999 : 1.001) && solveFor(v, th, t));
+        const mine = shooterScore(u, th, t, f.sol.f);
+        const better = S.units.some((v) => {
+          if (v === u || v.link === false || !canEngage(v, th, t, c2, true)) return false;
+          const fv = solveFor(v, th, t);
+          return !!fv && shooterScore(v, th, t, fv.sol.f) > mine * (th.cls === "dron" ? 0.999 : 1.001);
+        });
         if (better) continue;
         if (th.cls === "dron") {
           const cpk = costPerKill(u, th, t);
@@ -3612,7 +3639,7 @@ table.t.mc td.pc{white-space:nowrap}
       const { sol, remote } = f;
       const n2 = Math.min(S.doctrine === "salva" ? u.salvo || sm.salvo : 1, u.magLeft, ch - u.active);
       for (let k = 0; k < n2; k++) {
-        const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2 };
+        const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f };
         S.ints.push(it);
         (th.fly = th.fly || []).push(it);
         u.magLeft--;
@@ -3776,6 +3803,7 @@ table.t.mc td.pc{white-space:nowrap}
     }
     S.weather = WEATHER[sc2.rules?.weather] ? sc2.rules.weather : WEATHER_DEFAULT;
     S.ignoreDecoys = !!sc2.rules?.ignoreDecoys;
+    S.fireRange = sc2.rules?.fireRange ?? 1;
     S.scen = sc2;
   }
 
@@ -4809,7 +4837,7 @@ table.t.mc td.pc{white-space:nowrap}
       group: "Enfrentamiento",
       title: "Pk (probabilidad de derribo)",
       body: () => `<p>Es la probabilidad de que <b>un</b> interceptor que llega al punto de encuentro destruya el blanco. Por eso se dispara en salva: con n interceptores independientes,</p><p class="formula">P(derribo) = 1 − (1 − Pk)ⁿ</p><p>Con Pk 0,7 y 2 misiles: 1 − 0,3² = 0,91.</p><p>Las tasas que publican los gobiernos no son una Pk: mezclan cobertura, munición y saturación (ver "Calibración de Pk" en el Catálogo).</p>`,
-      engine: () => `<p>${code("calcPk()")}: Pk base por clase (${Object.keys(CLS_NAME).join(", ")}) desde ${code("sam.pk")}, calibrada contra episodios reales. Se multiplica por la maniobra terminal (${code("T.manPk")}, o ×0,85 contra cañones), por las bengalas contra IR (×0,85), por la baja firma (×0,85 con buscador activo, ×0,75 con guiado desde tierra), por la interferencia y por blancos a más del 80% de ${code("vmaxT")} (×0,8). Tope 0,98.</p>`
+      engine: () => `<p>${code("calcPk()")}: Pk base por clase (${Object.keys(CLS_NAME).join(", ")}) desde ${code("sam.pk")}, calibrada contra episodios reales. Se multiplica por la maniobra terminal (${code("T.manPk")}, o ×0,85 contra cañones), por las bengalas contra IR (×0,85), por la baja firma (×0,85 con buscador activo, ×0,75 con guiado desde tierra), por la interferencia por blancos a más del 80% de ${code("vmaxT")} (×0,8) y por la energía del misil en el punto de encuentro (${code("energyPk()")}, ver "Energía del interceptor"). Tope 0,98.</p>`
     },
     {
       id: "c2",
@@ -4835,7 +4863,7 @@ table.t.mc td.pc{white-space:nowrap}
       group: "Enfrentamiento",
       title: "Saturación y canales simultáneos",
       body: () => `<p>Cada batería puede guiar un número limitado de interceptores a la vez (<b>canales</b>), tiene una cantidad finita de misiles y necesita tiempo para reaccionar. Las oleadas sincronizadas, los señuelos y los drones baratos buscan justamente eso: llenar los canales y vaciar los cargadores antes de que llegue lo valioso.</p>`,
-      engine: () => `<p>${code("sam.ch")} (canales), ${code("sam.mag")} (munición, sin recarga), ${code("u.active")} (interceptores en vuelo). Con red integrada, dos baterías no disparan al mismo blanco. El debrief cuenta los segundos con canales llenos (${code("stats.satChannels")}) y quién se quedó sin munición.</p>`
+      engine: () => `<p>${code("sam.ch")} (canales), ${code("sam.mag")} (munición lista; la reserva se carga en ${code("sam.reloadS")}), ${code("u.active")} (interceptores en vuelo). Con red integrada, dos baterías no disparan al mismo blanco. El debrief cuenta los segundos con canales llenos (${code("stats.satChannels")}) y quién se quedó sin munición.</p>`
     },
     {
       id: "window",
@@ -4847,7 +4875,16 @@ table.t.mc td.pc{white-space:nowrap}
         return `<p>El alcance del catálogo es el máximo contra un blanco ideal. La <b>ventana práctica</b> es el tiempo en que, a la vez, el blanco está dentro de la envolvente (alcances mínimo y máximo, piso y techo), está siendo seguido, ya pasó el tiempo de reacción y el interceptor puede llegar antes que él.</p>
       <p>Ejemplo con los datos del motor: un ${esc(T.short)} vuela a ${n(T.cruiseAlt / 1e3)} km de altura y pica en los últimos ${dd} km a ${kmh(T.vDive)}. El IRIS-T tiene ${s.maxR} km de alcance, pero su techo es de ${n(s.altMax / 1e3)} km y el blanco recién baja de esa altura en los últimos ~${n(remAlt, 1)} km: quedan <b>~${n(tw)} s</b>. Menos ${s.react} s de reacción, y con un interceptor que promedia ${kmh(s.vInt)} contra un blanco a ${kmh(T.vDive)}, en el mejor caso el encuentro sería a ~${n(x, 1)} km. Ahí la Pk contra supersónicos es ${Math.round(s.pk.supersonico * 100)}% y baja otro ×0,8 porque el blanco va cerca del máximo enfrentable (${kmh(s.vmaxT)}). Es una ventana de pocos segundos con poca probabilidad, aunque "el alcance alcance". Coincide con los 3 derribos en más de 400 lanzamientos fuera de la cobertura Patriot.</p>`;
       },
-      engine: () => `<p>${code("solve()")} recorre la trayectoria futura del blanco y verifica ${code("minR ≤ r ≤ maxR")} (o ${code("maxRtbm")} para balísticos), ${code("altMin ≤ altura ≤ altMax")} y el tiempo de vuelo del interceptor (${code("vInt")}). ${code("engage()")} descarta además blancos más rápidos que ${code("vmaxT")} y sin línea de vista al punto de encuentro.</p>`
+      engine: () => `<p>${code("solve()")} recorre la trayectoria futura del blanco y verifica ${code("minR ≤ r ≤ maxR × rangeFactor × fireRange")} (o ${code("maxRtbm")} para balísticos; ver "Energía del interceptor"), ${code("altMin ≤ altura ≤ altMax")} y el tiempo de vuelo del interceptor (${code("vInt")}). ${code("engage()")} descarta además blancos más rápidos que ${code("vmaxT")} y sin línea de vista al punto de encuentro.</p>`
+    },
+    {
+      id: "energia",
+      group: "Enfrentamiento",
+      title: "Energía del interceptor: de frente o de cola",
+      body: () => `<p>Un misil antiaéreo quema su motor en pocos segundos y después <b>planea</b>: pierde velocidad con cada kilómetro y cada maniobra. Por eso el alcance del catálogo es contra un blanco que viene <b>de frente</b>. Si el blanco se aleja, el misil tiene que alcanzarlo y llega mucho menos lejos; si pasa de costado, algo en el medio.</p>
+      <p>Además, un misil que llega al límite de su alcance llega "cansado": con poca velocidad le cuesta seguir a un blanco que maniobra. Un tiro más corto llega con energía de sobra.</p>
+      <p>De ahí la doctrina <b>"disparar dentro del X% del alcance"</b> (pestaña Defensa): esperar a que el blanco se acerque sube la Pk, pero deja menos tiempo para un segundo tiro si el primero falla.</p>`,
+      engine: () => `<ul><li>${code("rangeFactor(ca) = 0,8 + 0,2·ca")}, con ${code("ca")} el coseno entre la dirección del blanco y la línea blanco→lanzador: ×1 de frente, ×0,8 de costado, ×0,6 de cola.</li><li>Alcance efectivo: ${code("maxR × rangeFactor × fireRange")}.</li><li>Energía con ${code("f = r / (maxR × rangeFactor)")}: 1 hasta f = 0,75 y baja lineal hasta 0,5 en el borde.</li><li>${code("energyPk(f) = min(1,25; energía(f) / energía(0,9))")}: es <b>relativa</b> al tiro típico al 90% del alcance, porque las Pk del catálogo ya están calibradas con tiros así. Un tiro corto vale hasta ×1,25 y uno en el borde ×0,71.</li><li>No se aplica a cañones ni a drones interceptores (tienen motor todo el vuelo).</li><li>Valores de juego, elegidos a mano; ver docs/FISICA.md §6–§7.</li></ul>`
     },
     {
       id: "damage",
@@ -5575,7 +5612,7 @@ table.t.mc td.pc{white-space:nowrap}
     if (S2.stats.reloads) out.push(`Hubo ${S2.stats.reloads} recarga(s) de baterías durante el ataque.`);
     if (decoyShots) out.push(`Los señuelos consumieron ${decoyShots} interceptor(es) que no se usaron contra armas reales. La "vista del defensor" muestra cómo los ve el operador: iguales a las armas.`);
     const empty = S2.events.filter((e) => e.key && e.key.startsWith("empty:"));
-    if (empty.length) out.push(`Se quedaron sin munición: ${empty.map((e) => e.text.replace(" se queda sin munición", "")).join(", ")}. Sin recarga, la saturación agota los cargadores antes de que llegue lo más peligroso.`);
+    if (empty.length) out.push(`Se quedaron sin munición: ${empty.map((e) => e.text.replace(" se queda sin munición", "")).join(", ")}. Mientras recargan (o sin reserva), la saturación agota los cargadores antes de que llegue lo más peligroso.`);
     const sat = Object.entries(st.satChannels).sort((a, b) => b[1] - a[1]);
     if (sat.length) out.push(`Saturación de canales de tiro: ${sat.slice(0, 3).map(([k, v]) => `${k} (${v} s)`).join(", ")} tuvo más blancos que canales simultáneos.`);
     const gnss = real.filter((a) => a.nav > 150 && a.nav <= LOST_M), lostL = real.filter((a) => a.nav > LOST_M);
@@ -6039,6 +6076,7 @@ table.t.mc td.pc{white-space:nowrap}
       <p class="hint" id="c2Info">${esc(C2_LEVELS[S.c2].desc)}</p>
       <div class="field"><label for="optDoc">Doctrina de tiro</label><select id="optDoc" class="sel"><option value="salva" ${S.doctrine === "salva" ? "selected" : ""}>Salva (según unidad)</option><option value="sls" ${S.doctrine === "sls" ? "selected" : ""}>Disparar-observar-disparar</option></select></div>
       <label class="check" title="Los radares de tiro (S, C, X, Ku) aprenden a distinguir señuelos con el tiempo de seguimiento. Con esta opción no se dispara a pistas clasificadas como señuelo: ahorra munición, pero a veces un arma real se clasifica mal."><input type="checkbox" id="optDecoy" ${S.ignoreDecoys ? "checked" : ""}> No tirarle a pistas clasificadas como señuelo</label>
+      <div class="field" title="Alcance efectivo = alcance máximo × geometría (menos contra un blanco que se aleja). Esperar a que el blanco se acerque deja menos tiempo para un segundo tiro, pero el misil llega con más energía y la Pk sube."><label for="optFR">Disparar dentro del ${'<span id="frVal">' + Math.round(S.fireRange * 100) + "%</span>"} del alcance ${infoBtn("energia")}</label><input type="range" id="optFR" min="50" max="100" step="5" value="${Math.round(S.fireRange * 100)}"></div>
     </div>
     <div class="grp"><h3>Clima ${infoBtn("clima")}</h3>
       <div class="field"><label for="optWx">Tiempo</label><select id="optWx" class="sel">${Object.entries(WEATHER).map(([k, W]) => `<option value="${k}" ${S.weather === k ? "selected" : ""}>${esc(W.name)}</option>`).join("")}</select></div>
@@ -6080,6 +6118,10 @@ table.t.mc td.pc{white-space:nowrap}
     };
     $("#optDecoy").onchange = (e) => {
       S.ignoreDecoys = e.target.checked;
+    };
+    $("#optFR").oninput = (e) => {
+      S.fireRange = +e.target.value / 100;
+      $("#frVal").textContent = e.target.value + "%";
     };
     $("#optWx").onchange = (e) => {
       if (S.started) {
@@ -6455,7 +6497,7 @@ table.t.mc td.pc{white-space:nowrap}
       version: VERSION,
       saved: now.toISOString(),
       map: mapRef(),
-      rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather, ignoreDecoys: S.ignoreDecoys },
+      rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather, ignoreDecoys: S.ignoreDecoys, fireRange: S.fireRange },
       scenario: S.scen ? { base: baseKey(S.scen), ...pick(S.scen, META_KEYS) } : null,
       setup: {
         objs: s.objs.map((g) => pick(g, OBJ_KEYS)),
@@ -6641,7 +6683,7 @@ table.t.mc td.pc{white-space:nowrap}
     });
     const r = raw.rules || {};
     const net = bool("rules.net", r.net);
-    const rules = { c2: r.c2 ?? (net === void 0 ? void 0 : c2FromNet(net)), doctrine: r.doctrine, weather: r.weather, ignoreDecoys: bool("rules.ignoreDecoys", r.ignoreDecoys) };
+    const rules = { c2: r.c2 ?? (net === void 0 ? void 0 : c2FromNet(net)), doctrine: r.doctrine, weather: r.weather, ignoreDecoys: bool("rules.ignoreDecoys", r.ignoreDecoys), fireRange: num2("rules.fireRange", r.fireRange, 0.3, 1, { opt: true }) };
     if (r.weather !== void 0 && !WEATHER[r.weather]) err(`rules.weather: "${String(r.weather)}" no es un clima válido (${Object.keys(WEATHER).join(", ")}).`);
     if (r.c2 !== void 0 && !C2_LEVELS[r.c2]) err(`rules.c2: "${String(r.c2)}" no es un nivel de mando y control válido (${Object.keys(C2_LEVELS).join(", ")}).`);
     if (r.doctrine !== void 0 && !DOCTRINES.includes(r.doctrine)) err(`rules.doctrine: "${String(r.doctrine)}" no es ${DOCTRINES.join(" ni ")}.`);
@@ -6710,6 +6752,7 @@ table.t.mc td.pc{white-space:nowrap}
     if (data.rules.c2) S.c2 = data.rules.c2;
     S.weather = data.rules.weather || "despejado";
     S.ignoreDecoys = !!data.rules.ignoreDecoys;
+    S.fireRange = data.rules.fireRange ?? 1;
     if (data.rules.doctrine) S.doctrine = data.rules.doctrine;
     S.scen = data.scenario ? {
       ...data.scenario,

@@ -54,7 +54,9 @@ test('corrida: con techo de nubes los grupos móviles no derriban Shahed que vue
   const kills = wx => {
     useMap('monterey', { flat: true }); clearSetup(); S.weather = wx;
     addDef('mfg', 45, 60, { name: 'G' });
-    addSalvo({ type: 'shahed', count: 6, interval: 20, agl: 1500, pts: [[20, 60], [70, 60]] });
+    // a 1.000 m: por encima del techo de nubes (≈600 m) y dentro del alcance efectivo del grupo móvil
+    // (a 1.500 m queda fuera una vez que el alcance depende del aspecto: physics/engagement.js#rangeFactor)
+    addSalvo({ type: 'shahed', count: 6, interval: 20, agl: 1000, pts: [[20, 60], [70, 60]] });
     runCurrent(4); return S.stats.byUnit.G || 0;
   };
   assert.ok(kills('despejado') > 0, 'despejado: tendría que tirar');

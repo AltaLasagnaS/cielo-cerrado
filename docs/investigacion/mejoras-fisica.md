@@ -421,6 +421,8 @@ No distingue sistemas ni demoras, y es todo o nada para todo el bando.
 
 **Cómo lo resuelve Fleet Command (NWP).** Velocidad constante. Algunas doctrinas apagan el arma cuando se cumple su tiempo máximo de vuelo (alcance ÷ velocidad). Y el motor, según el manual del mod, dispara SAM y AAM al **75% del alcance máximo** [nwp_man, nwp_doc].
 
+**Estado:** paso A hecho (alcance según el aspecto, Pk relativa al tiro típico y doctrina de alcance; ver `docs/FISICA.md` §6–§7). El paso B queda pendiente.
+
 **Propuesta, en dos pasos:**
 - **Paso A (barato, estilo NWP).**
   - Parámetro de doctrina "**disparar dentro del X% del alcance**": por defecto 100%, que es lo de hoy.

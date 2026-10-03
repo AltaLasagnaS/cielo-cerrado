@@ -184,7 +184,7 @@ export const CONCEPTS = [
   {
     id: 'pk', group: 'Enfrentamiento', title: 'Pk (probabilidad de derribo)',
     body: () => `<p>Es la probabilidad de que <b>un</b> interceptor que llega al punto de encuentro destruya el blanco. Por eso se dispara en salva: con n interceptores independientes,</p><p class="formula">P(derribo) = 1 − (1 − Pk)ⁿ</p><p>Con Pk 0,7 y 2 misiles: 1 − 0,3² = 0,91.</p><p>Las tasas que publican los gobiernos no son una Pk: mezclan cobertura, munición y saturación (ver "Calibración de Pk" en el Catálogo).</p>`,
-    engine: () => `<p>${code('calcPk()')}: Pk base por clase (${Object.keys(CLS_NAME).join(', ')}) desde ${code('sam.pk')}, calibrada contra episodios reales. Se multiplica por la maniobra terminal (${code('T.manPk')}, o ×0,85 contra cañones), por las bengalas contra IR (×0,85), por la baja firma (×0,85 con buscador activo, ×0,75 con guiado desde tierra), por la interferencia y por blancos a más del 80% de ${code('vmaxT')} (×0,8). Tope 0,98.</p>`
+    engine: () => `<p>${code('calcPk()')}: Pk base por clase (${Object.keys(CLS_NAME).join(', ')}) desde ${code('sam.pk')}, calibrada contra episodios reales. Se multiplica por la maniobra terminal (${code('T.manPk')}, o ×0,85 contra cañones), por las bengalas contra IR (×0,85), por la baja firma (×0,85 con buscador activo, ×0,75 con guiado desde tierra), por la interferencia por blancos a más del 80% de ${code('vmaxT')} (×0,8) y por la energía del misil en el punto de encuentro (${code('energyPk()')}, ver "Energía del interceptor"). Tope 0,98.</p>`
   },
   {
     id: 'c2', group: 'Enfrentamiento', title: 'Mando y control: qué tan integrada está la defensa',
@@ -204,7 +204,7 @@ export const CONCEPTS = [
   {
     id: 'saturation', group: 'Enfrentamiento', title: 'Saturación y canales simultáneos',
     body: () => `<p>Cada batería puede guiar un número limitado de interceptores a la vez (<b>canales</b>), tiene una cantidad finita de misiles y necesita tiempo para reaccionar. Las oleadas sincronizadas, los señuelos y los drones baratos buscan justamente eso: llenar los canales y vaciar los cargadores antes de que llegue lo valioso.</p>`,
-    engine: () => `<p>${code('sam.ch')} (canales), ${code('sam.mag')} (munición, sin recarga), ${code('u.active')} (interceptores en vuelo). Con red integrada, dos baterías no disparan al mismo blanco. El debrief cuenta los segundos con canales llenos (${code('stats.satChannels')}) y quién se quedó sin munición.</p>`
+    engine: () => `<p>${code('sam.ch')} (canales), ${code('sam.mag')} (munición lista; la reserva se carga en ${code('sam.reloadS')}), ${code('u.active')} (interceptores en vuelo). Con red integrada, dos baterías no disparan al mismo blanco. El debrief cuenta los segundos con canales llenos (${code('stats.satChannels')}) y quién se quedó sin munición.</p>`
   },
   {
     id: 'window', group: 'Enfrentamiento', title: 'Alcance teórico vs ventana práctica',
@@ -215,7 +215,14 @@ export const CONCEPTS = [
       return `<p>El alcance del catálogo es el máximo contra un blanco ideal. La <b>ventana práctica</b> es el tiempo en que, a la vez, el blanco está dentro de la envolvente (alcances mínimo y máximo, piso y techo), está siendo seguido, ya pasó el tiempo de reacción y el interceptor puede llegar antes que él.</p>
       <p>Ejemplo con los datos del motor: un ${esc(T.short)} vuela a ${n(T.cruiseAlt / 1000)} km de altura y pica en los últimos ${dd} km a ${kmh(T.vDive)}. El IRIS-T tiene ${s.maxR} km de alcance, pero su techo es de ${n(s.altMax / 1000)} km y el blanco recién baja de esa altura en los últimos ~${n(remAlt, 1)} km: quedan <b>~${n(tw)} s</b>. Menos ${s.react} s de reacción, y con un interceptor que promedia ${kmh(s.vInt)} contra un blanco a ${kmh(T.vDive)}, en el mejor caso el encuentro sería a ~${n(x, 1)} km. Ahí la Pk contra supersónicos es ${Math.round(s.pk.supersonico * 100)}% y baja otro ×0,8 porque el blanco va cerca del máximo enfrentable (${kmh(s.vmaxT)}). Es una ventana de pocos segundos con poca probabilidad, aunque "el alcance alcance". Coincide con los 3 derribos en más de 400 lanzamientos fuera de la cobertura Patriot.</p>`;
     },
-    engine: () => `<p>${code('solve()')} recorre la trayectoria futura del blanco y verifica ${code('minR ≤ r ≤ maxR')} (o ${code('maxRtbm')} para balísticos), ${code('altMin ≤ altura ≤ altMax')} y el tiempo de vuelo del interceptor (${code('vInt')}). ${code('engage()')} descarta además blancos más rápidos que ${code('vmaxT')} y sin línea de vista al punto de encuentro.</p>`
+    engine: () => `<p>${code('solve()')} recorre la trayectoria futura del blanco y verifica ${code('minR ≤ r ≤ maxR × rangeFactor × fireRange')} (o ${code('maxRtbm')} para balísticos; ver "Energía del interceptor"), ${code('altMin ≤ altura ≤ altMax')} y el tiempo de vuelo del interceptor (${code('vInt')}). ${code('engage()')} descarta además blancos más rápidos que ${code('vmaxT')} y sin línea de vista al punto de encuentro.</p>`
+  },
+  {
+    id: 'energia', group: 'Enfrentamiento', title: 'Energía del interceptor: de frente o de cola',
+    body: () => `<p>Un misil antiaéreo quema su motor en pocos segundos y después <b>planea</b>: pierde velocidad con cada kilómetro y cada maniobra. Por eso el alcance del catálogo es contra un blanco que viene <b>de frente</b>. Si el blanco se aleja, el misil tiene que alcanzarlo y llega mucho menos lejos; si pasa de costado, algo en el medio.</p>
+      <p>Además, un misil que llega al límite de su alcance llega "cansado": con poca velocidad le cuesta seguir a un blanco que maniobra. Un tiro más corto llega con energía de sobra.</p>
+      <p>De ahí la doctrina <b>"disparar dentro del X% del alcance"</b> (pestaña Defensa): esperar a que el blanco se acerque sube la Pk, pero deja menos tiempo para un segundo tiro si el primero falla.</p>`,
+    engine: () => `<ul><li>${code('rangeFactor(ca) = 0,8 + 0,2·ca')}, con ${code('ca')} el coseno entre la dirección del blanco y la línea blanco→lanzador: ×1 de frente, ×0,8 de costado, ×0,6 de cola.</li><li>Alcance efectivo: ${code('maxR × rangeFactor × fireRange')}.</li><li>Energía con ${code('f = r / (maxR × rangeFactor)')}: 1 hasta f = 0,75 y baja lineal hasta 0,5 en el borde.</li><li>${code('energyPk(f) = min(1,25; energía(f) / energía(0,9))')}: es <b>relativa</b> al tiro típico al 90% del alcance, porque las Pk del catálogo ya están calibradas con tiros así. Un tiro corto vale hasta ×1,25 y uno en el borde ×0,71.</li><li>No se aplica a cañones ni a drones interceptores (tienen motor todo el vuelo).</li><li>Valores de juego, elegidos a mano; ver docs/FISICA.md §6–§7.</li></ul>`
   },
   {
     id: 'damage', group: 'Enfrentamiento', title: 'Daño a objetivos',

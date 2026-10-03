@@ -189,10 +189,21 @@ Es un modelo **cinemático guiado por datos**: la amenaza recorre una ruta polig
 **Solución** (`solve`): recorre la trayectoria futura del blanco con pasos de 0,5 s hasta 30 s y de 2 s hasta 400 s. Toma el primer instante τ en que:
 
 ```
-minR ≤ r ≤ maxR (o maxRtbm si es balístico/hipersónico)
+minR ≤ r ≤ R_ef = maxR × rangeFactor(ca) × fireRange   (maxRtbm si es balístico/hipersónico)
 altMin ≤ AGL   y   z − z_lanzador ≤ altMax
 r / vInt ≤ τ   (el interceptor llega a tiempo, con ≤ 3 s de holgura)
 ```
+
+**Alcance efectivo según el aspecto** (`rangeFactor`): un misil quema el motor en segundos y después planea, así que llega más lejos contra un blanco que viene de frente que contra uno que se aleja (tiene que alcanzarlo).
+
+```
+rangeFactor(ca) = 0,8 + 0,2·ca        ca = cos(dirección del blanco, línea blanco→lanzador)
+                                       ×1 de frente · ×0,8 de costado · ×0,6 de cola
+```
+
+La dirección del blanco sale de su posición 0,5 s antes del punto evaluado (3D, con la altura en km). Se aplica a todos los sistemas, también cañones y drones interceptores. Es un valor de juego (sin fuente directa): la forma es la de las envolventes de CMO, que se achican contra blancos que se alejan (fuente `cmo_kin` en [investigacion/mejoras-fisica.md](investigacion/mejoras-fisica.md)); el 0,6 de cola es conservador.
+
+**Doctrina "disparar dentro del X% del alcance"** (`S.fireRange`, deslizador 50–100% en la pestaña Defensa, `rules.fireRange` en los archivos, válido entre 0,3 y 1; por defecto 1): solo se busca encuentro dentro de esa fracción del alcance efectivo. El motor de Fleet Command dispara SAM al 75% (fuente `nwp_man`, mismo documento). Tirar más cerca sube la Pk (§7) pero deja menos tiempo para un segundo tiro.
 
 **Filtros de** `engage()`: el blanco no puede ir más rápido que `vmaxT`; los guiados por radar necesitan línea de vista al punto de encuentro; hay que tener canales (`sam.ch`) y munición libres. Con red, no se dispara a un blanco que ya tiene interceptores en vuelo. La prioridad es para el blanco que llega primero (`rem / v`).
 
@@ -239,6 +250,17 @@ Pk = sam.pk[clase] × modificadores, acotada a [0; 0,98]           (physics/enga
 | Baja firma contra mando, TVM o semiactivo | 0,75 |
 | Interferencia sobre el radar de la batería (J > 1) | 1/(1 + 0,08·J), mínimo 0,5 |
 | Blanco a más del 80% de `vmaxT` | 0,8 |
+| Energía del misil en el encuentro (no cañones ni drones interceptores) | `energyPk(f)`, de 0,71 a 1,25 |
+
+**Energía** (`energyPk`): con `f = r / (maxR × rangeFactor)` (fracción del alcance cinemático, **sin** la doctrina: la energía depende de la física, no de la regla de tiro),
+
+```
+energía(f) = 1                       si f ≤ 0,75
+           = 1 − 2·(f − 0,75)        hasta 0,5 en f = 1
+energyPk(f) = min(1,25; energía(f) / energía(0,9))
+```
+
+Es **relativa al tiro típico** (f = 0,9 → ×1) porque las Pk base ya están calibradas con episodios reales de tiros cerca del alcance máximo: aplicarla en absoluto contaría dos veces la pérdida de energía (una versión así bajaba Kiev de ≈70% a ≈25% de noches defendidas). Un tiro corto vale hasta ×1,25 (todavía acotado por el tope de 0,98); uno en el borde, ×0,71. Los valores 0,75, 0,5 y 0,9 son estimaciones de juego; la forma sigue la propuesta "paso A" de `docs/investigacion/mejoras-fisica.md` §8.
 
 Las Pk base están **calibradas** contra episodios reales dentro de la cobertura de sistemas capaces (ver `CAL` en `data/calibration.js` y la ventana "Calibración de Pk"). Con `n` interceptores independientes: `P(derribo) = 1 − (1 − Pk)ⁿ`.
 
@@ -311,8 +333,8 @@ Es un modelo de juego: no representa estructuras, incendios, penetración ni sub
 | Clima simple | Lluvia (ITU-R P.838-3), techo de nubes y factores ópticos/acústicos fijos por escenario | Día y noche, clutter de lluvia, viento, clima que cambia durante el escenario |
 | Recarga de batería completa | Recarga toda la batería de una vez (`sam.reloadS`) desde su reserva; los tiempos son estimaciones | Recarga por lanzador; vehículos de recarga como unidades |
 | Swerling 1 para todos | Sin el caso 3 (reflector dominante) ni integración de pulsos | Swerling 3 verificado; integración no coherente |
-| Interceptor en línea recta a velocidad media | Sin energía ni geometría de persecución | Perfil de velocidad y límite de g |
-| Discriminación de señuelos | El radar nunca distingue señuelos | Probabilidad de discriminación por banda y tiempo de seguimiento |
+| Interceptor en línea recta a velocidad media | Energía resumida en dos factores (alcance según el aspecto y Pk según la fracción del alcance); el tiempo de vuelo sigue siendo r / vInt | Perfil de velocidad (motor y planeo) y límite de g (paso B de la propuesta) |
+| Discriminación de señuelos | Por banda y tiempo de seguimiento, con un umbral fijo por pista | Discriminación por características (RCS, velocidad, trayectoria) |
 | GNSS sin CRPA explícita | `gnss` resume toda la resistencia | Número de elementos de la CRPA frente al número de fuentes (ver `docs/investigacion/`) |
 | Daño simple | Sin efectos funcionales (un radar dañado sigue funcionando) | Degradación de capacidades según el estado |
 
