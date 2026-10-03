@@ -914,7 +914,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
-      radar: { name: "AN/MPQ-65", band: "C", R1: 100, mast: 4, mastRange: [4, 4], mastNote: "Fija: la antena va sobre el semirremolque M860, inclinada a 67,5°. El mástil de ≈30 m de la batería (AMG) es de comunicaciones, no del radar (FM 3-01.85).", sector: 90, eccm: 10, scan: 2 },
+      radar: { name: "AN/MPQ-65", band: "C", mti: "pd", R1: 100, mast: 4, mastRange: [4, 4], mastNote: "Fija: la antena va sobre el semirremolque M860, inclinada a 67,5°. El mástil de ≈30 m de la batería (AMG) es de comunicaciones, no del radar (FM 3-01.85).", sector: 90, eccm: 10, scan: 2 },
       sam: { maxR: 100, maxRtbm: 40, minR: 3, altMin: 50, altMax: 36e3, vInt: 1300, vmaxT: 3e3, react: 9, ch: 8, mag: 16, salvo: 2, guid: "activo", shot: "PAC-3 MSE", noDrones: true, cost: 4.2, pk: { dron: 0.9, crucero: 0.9, supersonico: 0.6, balistico: 0.7, hiper: 0.5 } },
       range: "≈40 km vs balísticos (estimado), ≈100 km vs aeronaves",
       interceptor: "PAC-3 MSE: hit-to-kill, buscador activo, motor de doble pulso, techo ≈36 km",
@@ -927,7 +927,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
-      radar: { name: "AN/MPQ-65", band: "C", R1: 100, mast: 4, mastRange: [4, 4], mastNote: "Fija: la antena va sobre el semirremolque M860. El mástil de ≈30 m (AMG) es de comunicaciones, no del radar.", sector: 90, eccm: 10, scan: 2 },
+      radar: { name: "AN/MPQ-65", band: "C", mti: "pd", R1: 100, mast: 4, mastRange: [4, 4], mastNote: "Fija: la antena va sobre el semirremolque M860. El mástil de ≈30 m (AMG) es de comunicaciones, no del radar.", sector: 90, eccm: 10, scan: 2 },
       sam: { maxR: 160, maxRtbm: 20, minR: 3, altMin: 60, altMax: 24e3, vInt: 900, vmaxT: 2500, react: 9, ch: 8, mag: 16, salvo: 2, guid: "TVM", shot: "PAC-2 GEM-T", noDrones: true, cost: 3, pk: { dron: 0.8, crucero: 0.85, supersonico: 0.55, balistico: 0.4, hiper: 0.25 } },
       range: "≈160 km vs aeronaves, ≈20 km vs balísticos",
       interceptor: "GEM-T: fragmentación, guiado TVM (necesita que el radar propio vea el blanco), Mach ≈3,5",
@@ -940,7 +940,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
-      radar: { name: "Arabel", band: "X", R1: 80, mast: 5, mastRange: [5, 5], mastNote: "Fija: Arabel montado sobre camión (altura estimada).", sector: 360, eccm: 10, scan: 1 },
+      radar: { name: "Arabel", band: "X", mti: "pd", R1: 80, mast: 5, mastRange: [5, 5], mastNote: "Fija: Arabel montado sobre camión (altura estimada).", sector: 360, eccm: 10, scan: 1 },
       sam: { maxR: 100, maxRtbm: 25, minR: 3, altMin: 50, altMax: 2e4, vInt: 1050, vmaxT: 2500, react: 8, ch: 10, mag: 32, salvo: 2, guid: "activo", shot: "Aster 30", noDrones: true, cost: 2, pk: { dron: 0.85, crucero: 0.88, supersonico: 0.6, balistico: 0.6, hiper: 0.4 } },
       range: "≈100 km vs aeronaves (50 km por debajo de 3 km de altura), 20–35 km vs balísticos",
       interceptor: 'Aster 30: 1,4 km/s, buscador activo, control "PIF-PAF" (toberas laterales para maniobra final)',
@@ -953,7 +953,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
-      radar: { name: "Hensoldt TRML-4D", band: "C", R1: 100, mast: 6, mastRange: [4, 12], mastNote: "Mástil hidráulico sobre el camión: la antena llega hasta 12 m (Hensoldt). Retraído ≈4 m (estimado).", sector: 360, eccm: 10, scan: 1 },
+      radar: { name: "Hensoldt TRML-4D", band: "C", mti: "pd", R1: 100, mast: 6, mastRange: [4, 12], mastNote: "Mástil hidráulico sobre el camión: la antena llega hasta 12 m (Hensoldt). Retraído ≈4 m (estimado).", sector: 360, eccm: 10, scan: 1 },
       sam: { maxR: 40, maxRtbm: 0, minR: 1, altMin: 10, altMax: 2e4, vInt: 750, vmaxT: 1200, react: 6, ch: 8, mag: 24, salvo: 1, guid: "IR", shot: "IRIS-T SL", cost: 0.5, pk: { dron: 0.9, crucero: 0.88, supersonico: 0.2, balistico: 0, hiper: 0 } },
       range: "40 km, techo 20 km (SLX: 80 km)",
       interceptor: "IRIS-T SL: guiado inercial + datalink, buscador IR de imagen terminal, ≈Mach 3",
@@ -966,7 +966,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
-      radar: { name: "AN/MPQ-64 Sentinel", band: "X", R1: 60, mast: 4, mastRange: [4, 4], mastNote: "Fija: Sentinel sobre remolque (altura estimada).", sector: 360, eccm: 8, scan: 2 },
+      radar: { name: "AN/MPQ-64 Sentinel", band: "X", mti: "pd", R1: 60, mast: 4, mastRange: [4, 4], mastNote: "Fija: Sentinel sobre remolque (altura estimada).", sector: 360, eccm: 8, scan: 2 },
       sam: { maxR: 35, maxRtbm: 0, minR: 1, altMin: 30, altMax: 15e3, vInt: 900, vmaxT: 1e3, react: 6, ch: 6, mag: 18, salvo: 1, guid: "activo", shot: "AIM-120", cost: 1.07, pk: { dron: 0.85, crucero: 0.88, supersonico: 0.4, balistico: 0, hiper: 0 } },
       range: "≈35–40 km (AMRAAM-ER: 50–60 km)",
       interceptor: "AIM-120: misil aire-aire adaptado, buscador radar activo",
@@ -979,7 +979,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
-      radar: { name: "30N6 Flap Lid (en torre 40V6)", band: "X", R1: 100, mast: 25, mastRange: [7, 39], mastNote: "Sin torre, la antena queda a ≈7 m sobre su vehículo (estimado); en la torre 40V6M a ≈25 m y en la 40V6MD a ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h, no se cambia durante el combate.", sector: 90, eccm: 3, scan: 2 },
+      radar: { name: "30N6 Flap Lid (en torre 40V6)", band: "X", mti: "pd", R1: 100, mast: 25, mastRange: [7, 39], mastNote: "Sin torre, la antena queda a ≈7 m sobre su vehículo (estimado); en la torre 40V6M a ≈25 m y en la 40V6MD a ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h, no se cambia durante el combate.", sector: 90, eccm: 3, scan: 2 },
       sam: { maxR: 75, maxRtbm: 25, minR: 5, altMin: 25, altMax: 27e3, vInt: 1300, vmaxT: 1300, react: 12, ch: 4, mag: 16, salvo: 2, guid: "TVM", shot: "5V55R", cost: 0.5, pk: { dron: 0.5, crucero: 0.6, supersonico: 0.4, balistico: 0.15, hiper: 0.05 } },
       range: "47 km (5V55K) / 75 km (5V55R), techo 27 km",
       interceptor: "5V55: hasta 2.000 m/s, guiado por mando (K) o TVM (R)",
@@ -992,7 +992,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "both",
       kind: "sam",
       color: "#62b6ff",
-      radar: { name: "9S35 Fire Dome (+9S18M1 Snow Drift)", band: "X", R1: 50, mast: 4, mastRange: [4, 4], mastNote: "Fija: radar sobre el vehículo de orugas (altura estimada).", sector: 360, eccm: 3, scan: 2 },
+      radar: { name: "9S35 Fire Dome (+9S18M1 Snow Drift)", band: "X", mti: "mti", R1: 50, mast: 4, mastRange: [4, 4], mastNote: "Fija: radar sobre el vehículo de orugas (altura estimada).", sector: 360, eccm: 3, scan: 2 },
       sam: { maxR: 35, maxRtbm: 10, minR: 3.3, altMin: 15, altMax: 22e3, vInt: 650, vmaxT: 830, react: 22, ch: 3, mag: 12, salvo: 2, guid: "SARH", shot: "9M38", cost: 0.5, pk: { dron: 0.55, crucero: 0.6, supersonico: 0.35, balistico: 0.05, hiper: 0 } },
       range: "3,3–35 km, techo 22 km",
       interceptor: "9M38: ≈Mach 3, semiactivo: el radar del lanzador tiene que iluminar el blanco hasta el impacto",
@@ -1005,7 +1005,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "gun",
       color: "#62b6ff",
-      radar: { name: "Búsqueda S + seguimiento Ku", band: "S", R1: 15, mast: 3, mastRange: [3, 3], mastNote: "Fija: radar sobre la torreta (altura estimada).", sector: 360, eccm: 0, scan: 1 },
+      radar: { name: "Búsqueda S + seguimiento Ku", band: "S", mti: "pd", R1: 15, mast: 3, mastRange: [3, 3], mastNote: "Fija: radar sobre la torreta (altura estimada).", sector: 360, eccm: 0, scan: 1 },
       sam: { maxR: 4, maxRtbm: 0, minR: 0.1, altMin: 0, altMax: 3e3, vInt: 1100, vmaxT: 400, react: 3, ch: 1, mag: 20, salvo: 1, guid: "cañón", shot: "ráfaga 35 mm", cost: 0.018, pk: { dron: 0.55, crucero: 0.35, supersonico: 0.05, balistico: 0, hiper: 0 } },
       range: "≈3,5–4 km típico (5,5 km con FAPDS)",
       interceptor: "Dos cañones Oerlikon 35 mm, 550 disparos/min cada uno, 640 proyectiles a bordo",
@@ -1057,7 +1057,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
-      radar: { name: "AN/MPQ-61 HPIR (+ AN/MPQ-50 PAR, AN/MPQ-62 CWAR)", band: "X", R1: 70, mast: 4, mastRange: [4, 4], mastNote: "Fija: radares sobre remolques (altura estimada).", sector: 360, eccm: 5, scan: 2 },
+      radar: { name: "AN/MPQ-61 HPIR (+ AN/MPQ-50 PAR, AN/MPQ-62 CWAR)", band: "X", mti: "pd", R1: 70, mast: 4, mastRange: [4, 4], mastNote: "Fija: radares sobre remolques (altura estimada).", sector: 360, eccm: 5, scan: 2 },
       sam: { maxR: 40, maxRtbm: 0, minR: 1.5, altMin: 60, altMax: 17700, vInt: 700, vmaxT: 820, react: 15, ch: 2, mag: 9, salvo: 2, guid: "SARH", shot: "MIM-23B", cost: 0.3, pk: { dron: 0.6, crucero: 0.7, supersonico: 0.4, balistico: 0, hiper: 0 } },
       range: "1,5–40 km, techo ≈17 km",
       interceptor: "MIM-23B: ≈Mach 2,5, semiactivo: el HPIR ilumina el blanco hasta el impacto",
@@ -1070,7 +1070,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
-      radar: { name: 'SNR-125 "Low Blow" (+ P-18/P-19 de búsqueda)', band: "X", R1: 40, mast: 4, mastRange: [4, 6], mastNote: "Cabina de radar sobre remolque; la versión polaca Newa-SC va sobre chasis MAZ-543 (≈4–6 m, estimado).", sector: 360, eccm: 3, scan: 2 },
+      radar: { name: 'SNR-125 "Low Blow" (+ P-18/P-19 de búsqueda)', band: "X", mti: "none", R1: 40, mast: 4, mastRange: [4, 6], mastNote: "Cabina de radar sobre remolque; la versión polaca Newa-SC va sobre chasis MAZ-543 (≈4–6 m, estimado).", sector: 360, eccm: 3, scan: 2 },
       sam: { maxR: 25, maxRtbm: 0, minR: 2.5, altMin: 25, altMax: 18e3, vInt: 600, vmaxT: 700, react: 25, ch: 1, mag: 8, salvo: 2, guid: "mando", shot: "5V27", cost: 0.15, pk: { dron: 0.45, crucero: 0.55, supersonico: 0.3, balistico: 0, hiper: 0 } },
       range: "2,5–25 km, techo 18 km",
       interceptor: "5V27: guiado por radiocomando desde el SNR-125 (un blanco a la vez)",
@@ -1083,7 +1083,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
-      radar: { name: '5N62 "Square Pair" (iluminación; búsqueda con P-14/radar de la red)', band: "C", R1: 250, mast: 8, mastRange: [8, 8], mastNote: "Fija: antena del 5N62 sobre su base (altura estimada).", sector: 120, eccm: 3, scan: 4 },
+      radar: { name: '5N62 "Square Pair" (iluminación; búsqueda con P-14/radar de la red)', band: "C", mti: "pd", R1: 250, mast: 8, mastRange: [8, 8], mastNote: "Fija: antena del 5N62 sobre su base (altura estimada).", sector: 120, eccm: 3, scan: 4 },
       sam: { maxR: 250, maxRtbm: 0, minR: 17, altMin: 300, altMax: 4e4, vInt: 1100, vmaxT: 1180, react: 60, ch: 1, mag: 6, salvo: 2, guid: "SARH", shot: "5V28", cost: 0.6, pk: { dron: 0.2, crucero: 0.25, supersonico: 0.2, balistico: 0, hiper: 0 } },
       range: "17–250 km, techo ≈40 km; no baja de 300 m",
       interceptor: "5V28: misil de 7 t con cohetes aceleradores, semiactivo (el 5N62 ilumina hasta el impacto)",
@@ -1096,7 +1096,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "RU",
       kind: "sam",
       color: "#ff9f5a",
-      radar: { name: "1RS1 búsqueda (S) + 1RS2 seguimiento (Ku)", band: "S", R1: 30, mast: 6, mastRange: [6, 6], mastNote: "Fija: radares sobre el camión (altura estimada).", sector: 360, eccm: 5, scan: 1 },
+      radar: { name: "1RS1 búsqueda (S) + 1RS2 seguimiento (Ku)", band: "S", mti: "pd", R1: 30, mast: 6, mastRange: [6, 6], mastNote: "Fija: radares sobre el camión (altura estimada).", sector: 360, eccm: 5, scan: 1 },
       sam: { maxR: 18, maxRtbm: 5, minR: 1, altMin: 5, altMax: 15e3, vInt: 900, vmaxT: 1e3, react: 5, ch: 3, mag: 12, salvo: 2, guid: "mando", shot: "57E6", cost: 0.15, pk: { dron: 0.65, crucero: 0.6, supersonico: 0.3, balistico: 0.1, hiper: 0 } },
       range: "18–20 km misil, 4 km cañones",
       interceptor: "57E6: 1.300 m/s al apagar el motor, ≈900 m/s promedio a 12 km; guiado por mando radio, ojiva de varillas",
@@ -1109,7 +1109,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "RU",
       kind: "sam",
       color: "#ff9f5a",
-      radar: { name: "Búsqueda (banda F ≈ S) + seguimiento (G/H y Ku)", band: "S", R1: 25, mast: 4, mastRange: [4, 4], mastNote: "Fija: radar sobre el vehículo de orugas (altura estimada).", sector: 360, eccm: 5, scan: 1 },
+      radar: { name: "Búsqueda (banda F ≈ S) + seguimiento (G/H y Ku)", band: "S", mti: "pd", R1: 25, mast: 4, mastRange: [4, 4], mastNote: "Fija: radar sobre el vehículo de orugas (altura estimada).", sector: 360, eccm: 5, scan: 1 },
       sam: { maxR: 15, maxRtbm: 5, minR: 1, altMin: 10, altMax: 1e4, vInt: 700, vmaxT: 700, react: 6, ch: 4, mag: 16, salvo: 1, guid: "mando", shot: "9M338", cost: 0.3, pk: { dron: 0.75, crucero: 0.7, supersonico: 0.35, balistico: 0.1, hiper: 0 } },
       range: "15–16 km, techo 10 km",
       interceptor: "9M338: lanzamiento vertical, guiado por mando",
@@ -1122,7 +1122,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "RU",
       kind: "sam",
       color: "#ff9f5a",
-      radar: { name: "92N6 Grave Stone (en torre 40V6M)", band: "X", R1: 200, mast: 25, mastRange: [7, 39], mastNote: "Sin torre, la antena queda a ≈7 m sobre su vehículo (estimado); en la torre 40V6M a ≈25 m y en la 40V6MD a ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h, no se cambia durante el combate.", sector: 120, eccm: 8, scan: 2 },
+      radar: { name: "92N6 Grave Stone (en torre 40V6M)", band: "X", mti: "pd", R1: 200, mast: 25, mastRange: [7, 39], mastNote: "Sin torre, la antena queda a ≈7 m sobre su vehículo (estimado); en la torre 40V6M a ≈25 m y en la 40V6MD a ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h, no se cambia durante el combate.", sector: 120, eccm: 8, scan: 2 },
       sam: { maxR: 250, maxRtbm: 60, minR: 3, altMin: 10, altMax: 27e3, vInt: 1500, vmaxT: 4800, react: 9, ch: 10, mag: 32, salvo: 2, guid: "TVM", shot: "48N6", noDrones: true, cost: 1.5, pk: { dron: 0.75, crucero: 0.7, supersonico: 0.6, balistico: 0.5, hiper: 0.3 } },
       range: "48N6DM: 240–250 km; 40N6: hasta 380–400 km",
       interceptor: "48N6: ≈2.000 m/s, guiado TVM; 9M96E2 (activo) para corto/medio alcance",
@@ -1135,7 +1135,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "both",
       kind: "sensor",
       color: "#62b6ff",
-      radar: { name: '36D6 "Tin Shield"', band: "S", R1: 175, mast: 10, mastRange: [10, 39], mastNote: "Sobre su remolque ≈10 m (estimado); puede ir en la torre 40V6M/MD hasta ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h.", sector: 360, eccm: 3, scan: 5 },
+      radar: { name: '36D6 "Tin Shield"', band: "S", mti: "mti", R1: 175, mast: 10, mastRange: [10, 39], mastNote: "Sobre su remolque ≈10 m (estimado); puede ir en la torre 40V6M/MD hasta ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h.", sector: 360, eccm: 3, scan: 5 },
       range: "200 km instrumentados; contra 1 m² a 50 m de altura ≈110–115 km con mástil",
       notes: ["Radar de alerta y adquisición que alimenta a las baterías S-300. Rota a 6 o 12 rpm.", "Podés subirle el mástil (torre 40V6M) para ver más lejos a baja cota."],
       sources: [SRC.rt_36d6, SRC.uos_36d6]
@@ -1146,7 +1146,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "both",
       kind: "sensor",
       color: "#62b6ff",
-      radar: { name: "P-18MR", band: "VHF", R1: 160, mast: 8, mastRange: [8, 8], mastNote: "Fija: antenas Yagi sobre su soporte (altura estimada).", sector: 360, eccm: 0, scan: 6 },
+      radar: { name: "P-18MR", band: "VHF", mti: "mti", R1: 160, mast: 8, mastRange: [8, 8], mastNote: "Fija: antenas Yagi sobre su soporte (altura estimada).", sector: 360, eccm: 0, scan: 6 },
       range: "P-18MR contra 1 m²: 35 km a 100 m de altura, 120 km a 5 km",
       notes: ['En VHF las formas furtivas pierden efecto: la RCS del Kh-101 o del Storm Shadow "crece" mucho.', "Precisión pobre: sirve para alerta y para pasar pistas a la red, no para guiar misiles."],
       sources: [WP("P-18_radar"), SRC.dx_p18]
@@ -1169,7 +1169,7 @@ table.t.mc td.pc{white-space:nowrap}
       kind: "aew",
       color: "#62b6ff",
       alt: 6e3,
-      radar: { name: "Erieye (AESA, lateral)", band: "S", R1: 240, mast: 6e3, sector: 150, side: true, eccm: 10, scan: 4 },
+      radar: { name: "Erieye (AESA, lateral)", band: "S", mti: "pd", R1: 240, mast: 6e3, sector: 150, side: true, eccm: 10, scan: 4 },
       range: "≈330–350 km contra cazas; 450 km instrumentados",
       notes: ["Suecia lo anunció en mayo de 2024; la transferencia se confirmó en agosto de 2025 y opera en combate desde marzo de 2026.", 'Antena lateral "tabla": ve a ambos costados (~150° c/u) y tiene zonas ciegas adelante y atrás. Orientá el rumbo de vuelo.', "Desde 6 km de altura ve misiles rasantes a más de 100 km, donde un radar terrestre no llega."],
       sources: [WP("Saab_340_AEW&C"), WP("Erieye"), SRC.dx_saab, SRC.gs_erieye]
@@ -1181,7 +1181,7 @@ table.t.mc td.pc{white-space:nowrap}
       kind: "aew",
       color: "#ff9f5a",
       alt: 9e3,
-      radar: { name: "Shmel-M (rotodomo)", band: "S", R1: 230, mast: 9e3, sector: 360, eccm: 5, scan: 10 },
+      radar: { name: "Shmel-M (rotodomo)", band: "S", mti: "pd", R1: 230, mast: 9e3, sector: 360, eccm: 5, scan: 10 },
       range: "≈650 km contra blancos grandes; 150 pistas dentro de 230 km",
       notes: ["Rusia perdió dos A-50 en 2024 (14/1 y 23/2).", "Rotodomo de 360°. La banda del Shmel-M no es pública (se asume S)."],
       sources: [WP("Beriev_A-50")]
@@ -2140,7 +2140,7 @@ table.t.mc td.pc{white-space:nowrap}
       description: "Ejercicio hipotético inspirado en los ataques ucranianos a los puentes de Chonhar y Crimea: la autopista 1 cruza el estero Elkhorn en Moss Landing por un puente costero, con un puente ferroviario al lado. Por ahí pasa toda la logística del frente. Una defensa rusa con S-400, Pantsir, Tor y Buk lo protege. Tu tarea: cortar el puente carretero.",
       forces: {
         defensa: "S-400 sobre las lomas del este (sector hacia el sudoeste), dos Pantsir y un Tor junto a los puentes, un Buk-M1, radar 3D y radar VHF de alerta. Red integrada.",
-        ataque: "9 Storm Shadow y 2 Flamingo contra el puente carretero, 4 ATACMS contra el puente ferroviario, 2 Neptune contra el S-400 y 30 drones Liutyi contra la central eléctrica, que llegan un par de minutos antes para gastar la munición de la defensa de punto."
+        ataque: "10 Storm Shadow y 2 Flamingo contra el puente carretero, 4 ATACMS contra el puente ferroviario, 2 Neptune contra el S-400 y 30 drones Liutyi contra la central eléctrica, que llegan un par de minutos antes para gastar la munición de la defensa de punto."
       },
       conditions: "Despejado. El motor no modela la luz. Probá cambiar el clima en la pestaña Defensa.",
       rules: { c2: "coordinada", doctrine: "salva", weather: "despejado" },
@@ -2160,7 +2160,7 @@ table.t.mc td.pc{white-space:nowrap}
         { type: "p18", x: 58, y: 40, name: "Radar VHF" }
       ],
       salvos: [
-        { type: "storm", count: 9, interval: 5, sync: true, tArrive: 1500, agl: 35, pts: [[0, 58], [30, 52], [44, 45], [51.8, 40.9]], targetObj: "Puente de la autopista 1" },
+        { type: "storm", count: 10, interval: 5, sync: true, tArrive: 1500, agl: 35, pts: [[0, 58], [30, 52], [44, 45], [51.8, 40.9]], targetObj: "Puente de la autopista 1" },
         { type: "flamingo", count: 2, interval: 10, sync: true, tArrive: 1510, agl: 35, pts: [[0, 30], [35, 37], [51.8, 40.9]], targetObj: "Puente de la autopista 1" },
         { type: "atacms", count: 4, interval: 6, sync: true, tArrive: 1490, launchDist: 250, pts: [[52, 111], [52.4, 40.7]], targetObj: "Puente ferroviario del estero Elkhorn" },
         { type: "neptune", count: 2, interval: 10, sync: true, tArrive: 1480, agl: 12, pts: [[0, 66], [40, 58], [62, 48]], targetUnit: "S-400" },
@@ -2726,6 +2726,189 @@ table.t.mc td.pc{white-space:nowrap}
     return R;
   }
 
+  // src/physics/terrain-analysis.js
+  var RELIEF_RADIUS_KM = 5;
+  var cache = /* @__PURE__ */ new WeakMap();
+  function analysis(map = MAP) {
+    let a = cache.get(map);
+    if (!a || a.data !== map.data) {
+      a = analyze(map);
+      cache.set(map, a);
+    }
+    return a;
+  }
+  function analyze(map) {
+    const { W, H, data } = map;
+    const I = new Float64Array((W + 1) * (H + 1));
+    for (let i = 0; i < H; i++) {
+      let row = 0;
+      for (let j = 0; j < W; j++) {
+        row += Math.max(0, data[i * W + j]);
+        I[(i + 1) * (W + 1) + j + 1] = I[i * (W + 1) + j + 1] + row;
+      }
+    }
+    const R = Math.max(1, Math.round(RELIEF_RADIUS_KM / map.cellKm));
+    const mean = new Float32Array(W * H);
+    for (let i = 0; i < H; i++) for (let j = 0; j < W; j++) {
+      const i0 = Math.max(0, i - R), i1 = Math.min(H, i + R + 1), j0 = Math.max(0, j - R), j1 = Math.min(W, j + R + 1);
+      const s = I[i1 * (W + 1) + j1] - I[i0 * (W + 1) + j1] - I[i1 * (W + 1) + j0] + I[i0 * (W + 1) + j0];
+      mean[i * W + j] = s / ((i1 - i0) * (j1 - j0));
+    }
+    return { data: map.data, mean, peaks: findPeaks(map), contours: null };
+  }
+  function sampleGrid(map, g, x, y) {
+    const c = map.cellKm, fx = clamp(x / c - 0.5, 0, map.W - 1.001), fy = clamp(y / c - 0.5, 0, map.H - 1.001);
+    const j = fx | 0, i = fy | 0, tx = fx - j, ty = fy - i, W = map.W, k = i * W + j;
+    return (g[k] * (1 - tx) + g[k + 1] * tx) * (1 - ty) + (g[k + W] * (1 - tx) + g[k + W + 1] * tx) * ty;
+  }
+  function relativeRelief(x, y) {
+    return surf(x, y) - sampleGrid(MAP, analysis().mean, x, y);
+  }
+  function slopeAt(x, y) {
+    const c = MAP.cellKm, m = c * 2e3;
+    return 100 * Math.hypot((surf(x + c, y) - surf(x - c, y)) / m, (surf(x, y + c) - surf(x, y - c)) / m);
+  }
+  function terrainClass(x, y) {
+    if (surf(x, y) <= 0) return "Mar";
+    if (isWater(x, y)) return "Río o lago";
+    const rel = relativeRelief(x, y), sl = slopeAt(x, y);
+    if (rel >= 80) return sl < 15 ? "Cota dominante" : "Ladera alta";
+    if (rel <= -60) return "Valle / hondonada";
+    if (sl >= 12) return "Ladera";
+    return Math.abs(rel) > 25 ? "Terreno ondulado" : "Llano";
+  }
+  function findPeaks(map) {
+    const { W, H, data, cellKm: c } = map;
+    let maxE = 0;
+    for (let k = 0; k < data.length; k++) if (data[k] > maxE) maxE = data[k];
+    const minRelief = Math.max(25, 0.04 * maxE);
+    const rMax = Math.max(1, Math.round(1 / c)), rMin = Math.max(2, Math.round(3 / c));
+    const cand = [];
+    for (let i = 1; i < H - 1; i++) for (let j = 1; j < W - 1; j++) {
+      const k = i * W + j, e = data[k];
+      if (e <= 0) continue;
+      let ok = true;
+      for (let di = -1; di <= 1 && ok; di++) for (let dj = -1; dj <= 1; dj++) {
+        if (!di && !dj) continue;
+        const n2 = data[k + di * W + dj];
+        if (n2 > e || n2 === e && (di < 0 || di === 0 && dj < 0)) {
+          ok = false;
+          break;
+        }
+      }
+      if (ok) cand.push(k);
+    }
+    const peaks = [];
+    for (const k of cand) {
+      const i = k / W | 0, j = k - i * W, e = data[k];
+      let dom = true;
+      for (let di = -rMax; di <= rMax && dom; di++) for (let dj = -rMax; dj <= rMax; dj++) {
+        const ii = i + di, jj = j + dj;
+        if (ii < 0 || jj < 0 || ii >= H || jj >= W) continue;
+        if (data[ii * W + jj] > e) {
+          dom = false;
+          break;
+        }
+      }
+      if (!dom) continue;
+      let lo = e;
+      for (let di = -rMin; di <= rMin; di++) for (let dj = -rMin; dj <= rMin; dj++) {
+        const ii = i + di, jj = j + dj;
+        if (ii < 0 || jj < 0 || ii >= H || jj >= W) continue;
+        const v = Math.max(0, data[ii * W + jj]);
+        if (v < lo) lo = v;
+      }
+      if (e - lo >= minRelief) peaks.push({ x: (j + 0.5) * c, y: (i + 0.5) * c, e, relief: e - lo });
+    }
+    peaks.sort((a, b) => b.relief - a.relief || b.e - a.e);
+    const out = [];
+    for (const p of peaks) {
+      if (out.every((q) => Math.hypot(q.x - p.x, q.y - p.y) >= 1.5)) out.push(p);
+      if (out.length >= 400) break;
+    }
+    return out;
+  }
+  var contourInterval = (maxE) => maxE > 600 ? 100 : maxE > 200 ? 50 : 20;
+  function contourLines(map = MAP) {
+    const a = analysis(map);
+    if (a.contours) return a.contours;
+    const { W, H, data, cellKm: c } = map;
+    let maxE = 0;
+    for (let k = 0; k < data.length; k++) if (data[k] > maxE) maxE = data[k];
+    const interval = contourInterval(Math.max(50, maxE));
+    const res = { interval, coast: [], minor: [], index: [] };
+    const levels = [0.5];
+    for (let L = interval; L < maxE; L += interval) levels.push(L);
+    for (const L of levels) {
+      const out = L === 0.5 ? res.coast : Math.round(L / interval) % 5 === 0 ? res.index : res.minor;
+      for (let i = 0; i < H - 1; i++) for (let j = 0; j < W - 1; j++) {
+        const k = i * W + j;
+        const v0 = data[k], v1 = data[k + 1], v2 = data[k + W + 1], v3 = data[k + W];
+        const idx = (v0 > L ? 8 : 0) | (v1 > L ? 4 : 0) | (v2 > L ? 2 : 0) | (v3 > L ? 1 : 0);
+        if (idx === 0 || idx === 15) continue;
+        const x0 = (j + 0.5) * c, y0 = (i + 0.5) * c;
+        const e = [
+          // puntos de cruce en cada lado: arriba, derecha, abajo, izquierda
+          () => [x0 + c * (L - v0) / (v1 - v0), y0],
+          () => [x0 + c, y0 + c * (L - v1) / (v2 - v1)],
+          () => [x0 + c * (L - v3) / (v2 - v3), y0 + c],
+          () => [x0, y0 + c * (L - v0) / (v3 - v0)]
+        ];
+        const seg = (p, q) => {
+          const A = e[p](), B = e[q]();
+          out.push(A[0], A[1], B[0], B[1]);
+        };
+        const mid = (v0 + v1 + v2 + v3) / 4 > L;
+        switch (idx) {
+          case 1:
+          case 14:
+            seg(3, 2);
+            break;
+          case 2:
+          case 13:
+            seg(2, 1);
+            break;
+          case 3:
+          case 12:
+            seg(3, 1);
+            break;
+          case 4:
+          case 11:
+            seg(0, 1);
+            break;
+          case 6:
+          case 9:
+            seg(0, 2);
+            break;
+          case 7:
+          case 8:
+            seg(3, 0);
+            break;
+          case 5:
+            if (mid) {
+              seg(3, 0);
+              seg(2, 1);
+            } else {
+              seg(3, 2);
+              seg(0, 1);
+            }
+            break;
+          case 10:
+            if (mid) {
+              seg(0, 1);
+              seg(3, 2);
+            } else {
+              seg(3, 0);
+              seg(2, 1);
+            }
+            break;
+        }
+      }
+    }
+    a.contours = res;
+    return res;
+  }
+
   // src/physics/radar.js
   function rcsAt(th, band, ca = 1) {
     return rcsFront(th, band) * aspectFactor(th, band, ca);
@@ -2802,6 +2985,31 @@ table.t.mc td.pc{white-space:nowrap}
     return wx && wx.rain ? rainRange(R, rainGamma(r.band, wx.rain), wx.rainKm) : R;
   }
   var belowCeiling = (r, wx, agl) => !(r.band === "OPT" && wx && wx.ceiling != null && agl > wx.ceiling);
+  var PFA = 1e-6;
+  var SNR50 = Math.log(PFA) / Math.log(0.5) - 1;
+  var PD_CUTOFF = 1.2;
+  var pdSwerling1 = (snr) => snr > 0 ? Math.pow(PFA, 1 / (1 + snr)) : 0;
+  var CLUTTER_DB = { none: 20, mti: 10, pd: 3 };
+  var CLUTTER_AGL = 300;
+  var NOTCH_MS = { mti: 15, pd: 8 };
+  function clutterLossDb(r, agl, x, y) {
+    const base = CLUTTER_DB[r.mti];
+    if (!base || agl >= CLUTTER_AGL) return 0;
+    const rough = surf(x, y) <= 0 ? 0.7 : clamp(0.5 + slopeAt(x, y) / 10, 0.5, 1.5);
+    return base * rough * (1 - Math.max(0, agl) / CLUTTER_AGL);
+  }
+  function inNotch(r, th, ca) {
+    const thr = NOTCH_MS[r.mti], v = th.vel;
+    if (!thr || !v) return false;
+    return Math.hypot(v[0], v[1], v[2]) * Math.abs(ca) < thr;
+  }
+  function pdScan(u, th, rr, R, agl, x, y, ca) {
+    const r = D(u).radar;
+    if (rr > PD_CUTOFF * R) return 0;
+    if (r.band !== "OPT" && r.band !== "ACU" && inNotch(r, th, ca)) return 0;
+    const loss = r.band === "OPT" || r.band === "ACU" ? 0 : clutterLossDb(r, agl, x, y);
+    return pdSwerling1(SNR50 * Math.pow(R / Math.max(rr, 1e-3), 4) / Math.pow(10, loss / 10));
+  }
   function horizon(hr, ht) {
     return HORIZON_K * (Math.sqrt(Math.max(0, hr)) + Math.sqrt(Math.max(0, ht)));
   }
@@ -3197,13 +3405,12 @@ table.t.mc td.pc{white-space:nowrap}
           const az = azOf(dx, dy);
           if (!inSector(u, az)) continue;
           const rr = Math.hypot(dh, (p.z - uz) / 1e3);
-          const ca = aspectCos(th, u.x, u.y, uz);
-          if (rr > detR(u, th, 0, ca, wx) || !belowCeiling(r, wx, p.z - surf(p.x, p.y))) continue;
+          const ca = aspectCos(th, u.x, u.y, uz), agl = p.z - surf(p.x, p.y);
+          if (rr > PD_CUTOFF * detR(u, th, 0, ca, wx) || !belowCeiling(r, wx, agl)) continue;
           const J = jamJ(u, az, S.jamsLive);
           const R = detR(u, th, J, ca, wx);
-          if (rr > R) continue;
-          const pd = rr < 0.8 * R ? 0.95 : 0.95 - (rr - 0.8 * R) / (0.2 * R) * 0.65;
-          if (rnd() > pd) continue;
+          const pd = pdScan(u, th, rr, R, agl, p.x, p.y, ca);
+          if (pd <= 0 || rnd() > pd) continue;
           ok = los(u.x, u.y, uz, p.x, p.y, p.z);
         }
         if (ok) {
@@ -3512,189 +3719,6 @@ table.t.mc td.pc{white-space:nowrap}
   // src/ui/dom.js
   var $ = (s) => document.querySelector(s);
   var isDefenderView = () => $("#defView").checked;
-
-  // src/physics/terrain-analysis.js
-  var RELIEF_RADIUS_KM = 5;
-  var cache = /* @__PURE__ */ new WeakMap();
-  function analysis(map = MAP) {
-    let a = cache.get(map);
-    if (!a || a.data !== map.data) {
-      a = analyze(map);
-      cache.set(map, a);
-    }
-    return a;
-  }
-  function analyze(map) {
-    const { W, H, data } = map;
-    const I = new Float64Array((W + 1) * (H + 1));
-    for (let i = 0; i < H; i++) {
-      let row = 0;
-      for (let j = 0; j < W; j++) {
-        row += Math.max(0, data[i * W + j]);
-        I[(i + 1) * (W + 1) + j + 1] = I[i * (W + 1) + j + 1] + row;
-      }
-    }
-    const R = Math.max(1, Math.round(RELIEF_RADIUS_KM / map.cellKm));
-    const mean = new Float32Array(W * H);
-    for (let i = 0; i < H; i++) for (let j = 0; j < W; j++) {
-      const i0 = Math.max(0, i - R), i1 = Math.min(H, i + R + 1), j0 = Math.max(0, j - R), j1 = Math.min(W, j + R + 1);
-      const s = I[i1 * (W + 1) + j1] - I[i0 * (W + 1) + j1] - I[i1 * (W + 1) + j0] + I[i0 * (W + 1) + j0];
-      mean[i * W + j] = s / ((i1 - i0) * (j1 - j0));
-    }
-    return { data: map.data, mean, peaks: findPeaks(map), contours: null };
-  }
-  function sampleGrid(map, g, x, y) {
-    const c = map.cellKm, fx = clamp(x / c - 0.5, 0, map.W - 1.001), fy = clamp(y / c - 0.5, 0, map.H - 1.001);
-    const j = fx | 0, i = fy | 0, tx = fx - j, ty = fy - i, W = map.W, k = i * W + j;
-    return (g[k] * (1 - tx) + g[k + 1] * tx) * (1 - ty) + (g[k + W] * (1 - tx) + g[k + W + 1] * tx) * ty;
-  }
-  function relativeRelief(x, y) {
-    return surf(x, y) - sampleGrid(MAP, analysis().mean, x, y);
-  }
-  function slopeAt(x, y) {
-    const c = MAP.cellKm, m = c * 2e3;
-    return 100 * Math.hypot((surf(x + c, y) - surf(x - c, y)) / m, (surf(x, y + c) - surf(x, y - c)) / m);
-  }
-  function terrainClass(x, y) {
-    if (surf(x, y) <= 0) return "Mar";
-    if (isWater(x, y)) return "Río o lago";
-    const rel = relativeRelief(x, y), sl = slopeAt(x, y);
-    if (rel >= 80) return sl < 15 ? "Cota dominante" : "Ladera alta";
-    if (rel <= -60) return "Valle / hondonada";
-    if (sl >= 12) return "Ladera";
-    return Math.abs(rel) > 25 ? "Terreno ondulado" : "Llano";
-  }
-  function findPeaks(map) {
-    const { W, H, data, cellKm: c } = map;
-    let maxE = 0;
-    for (let k = 0; k < data.length; k++) if (data[k] > maxE) maxE = data[k];
-    const minRelief = Math.max(25, 0.04 * maxE);
-    const rMax = Math.max(1, Math.round(1 / c)), rMin = Math.max(2, Math.round(3 / c));
-    const cand = [];
-    for (let i = 1; i < H - 1; i++) for (let j = 1; j < W - 1; j++) {
-      const k = i * W + j, e = data[k];
-      if (e <= 0) continue;
-      let ok = true;
-      for (let di = -1; di <= 1 && ok; di++) for (let dj = -1; dj <= 1; dj++) {
-        if (!di && !dj) continue;
-        const n2 = data[k + di * W + dj];
-        if (n2 > e || n2 === e && (di < 0 || di === 0 && dj < 0)) {
-          ok = false;
-          break;
-        }
-      }
-      if (ok) cand.push(k);
-    }
-    const peaks = [];
-    for (const k of cand) {
-      const i = k / W | 0, j = k - i * W, e = data[k];
-      let dom = true;
-      for (let di = -rMax; di <= rMax && dom; di++) for (let dj = -rMax; dj <= rMax; dj++) {
-        const ii = i + di, jj = j + dj;
-        if (ii < 0 || jj < 0 || ii >= H || jj >= W) continue;
-        if (data[ii * W + jj] > e) {
-          dom = false;
-          break;
-        }
-      }
-      if (!dom) continue;
-      let lo = e;
-      for (let di = -rMin; di <= rMin; di++) for (let dj = -rMin; dj <= rMin; dj++) {
-        const ii = i + di, jj = j + dj;
-        if (ii < 0 || jj < 0 || ii >= H || jj >= W) continue;
-        const v = Math.max(0, data[ii * W + jj]);
-        if (v < lo) lo = v;
-      }
-      if (e - lo >= minRelief) peaks.push({ x: (j + 0.5) * c, y: (i + 0.5) * c, e, relief: e - lo });
-    }
-    peaks.sort((a, b) => b.relief - a.relief || b.e - a.e);
-    const out = [];
-    for (const p of peaks) {
-      if (out.every((q) => Math.hypot(q.x - p.x, q.y - p.y) >= 1.5)) out.push(p);
-      if (out.length >= 400) break;
-    }
-    return out;
-  }
-  var contourInterval = (maxE) => maxE > 600 ? 100 : maxE > 200 ? 50 : 20;
-  function contourLines(map = MAP) {
-    const a = analysis(map);
-    if (a.contours) return a.contours;
-    const { W, H, data, cellKm: c } = map;
-    let maxE = 0;
-    for (let k = 0; k < data.length; k++) if (data[k] > maxE) maxE = data[k];
-    const interval = contourInterval(Math.max(50, maxE));
-    const res = { interval, coast: [], minor: [], index: [] };
-    const levels = [0.5];
-    for (let L = interval; L < maxE; L += interval) levels.push(L);
-    for (const L of levels) {
-      const out = L === 0.5 ? res.coast : Math.round(L / interval) % 5 === 0 ? res.index : res.minor;
-      for (let i = 0; i < H - 1; i++) for (let j = 0; j < W - 1; j++) {
-        const k = i * W + j;
-        const v0 = data[k], v1 = data[k + 1], v2 = data[k + W + 1], v3 = data[k + W];
-        const idx = (v0 > L ? 8 : 0) | (v1 > L ? 4 : 0) | (v2 > L ? 2 : 0) | (v3 > L ? 1 : 0);
-        if (idx === 0 || idx === 15) continue;
-        const x0 = (j + 0.5) * c, y0 = (i + 0.5) * c;
-        const e = [
-          // puntos de cruce en cada lado: arriba, derecha, abajo, izquierda
-          () => [x0 + c * (L - v0) / (v1 - v0), y0],
-          () => [x0 + c, y0 + c * (L - v1) / (v2 - v1)],
-          () => [x0 + c * (L - v3) / (v2 - v3), y0 + c],
-          () => [x0, y0 + c * (L - v0) / (v3 - v0)]
-        ];
-        const seg = (p, q) => {
-          const A = e[p](), B = e[q]();
-          out.push(A[0], A[1], B[0], B[1]);
-        };
-        const mid = (v0 + v1 + v2 + v3) / 4 > L;
-        switch (idx) {
-          case 1:
-          case 14:
-            seg(3, 2);
-            break;
-          case 2:
-          case 13:
-            seg(2, 1);
-            break;
-          case 3:
-          case 12:
-            seg(3, 1);
-            break;
-          case 4:
-          case 11:
-            seg(0, 1);
-            break;
-          case 6:
-          case 9:
-            seg(0, 2);
-            break;
-          case 7:
-          case 8:
-            seg(3, 0);
-            break;
-          case 5:
-            if (mid) {
-              seg(3, 0);
-              seg(2, 1);
-            } else {
-              seg(3, 2);
-              seg(0, 1);
-            }
-            break;
-          case 10:
-            if (mid) {
-              seg(0, 1);
-              seg(3, 2);
-            } else {
-              seg(3, 0);
-              seg(2, 1);
-            }
-            break;
-        }
-      }
-    }
-    a.contours = res;
-    return res;
-  }
 
   // src/render/terrain.js
   var RELIEF_MODES = { normal: "Normal", peaks: "Puntos altos", contours: "Curvas de nivel", shade: "Sombreado" };
@@ -4602,7 +4626,7 @@ table.t.mc td.pc{white-space:nowrap}
       body: () => `<p>La potencia del eco que vuelve a la antena es</p><p class="formula">Pr = Pt · G² · λ² · σ / ((4π)³ · R⁴)</p>
       <p>Pt es la potencia transmitida, G la ganancia de la antena y R la distancia. La onda viaja de ida y de vuelta: por eso cae con <b>R⁴</b>. El radar detecta si Pr supera su sensibilidad mínima, así que el alcance máximo es</p><p class="formula">R_max ∝ σ^¼</p>
       <p>Hace falta <b>16 veces más RCS para duplicar el alcance</b>; con una RCS 10 veces menor, el alcance cae a 0,56 veces. Por eso la furtividad ayuda, pero no hace invisible: acorta la distancia de detección.</p>`,
-      engine: () => `<p>${code("detR(u, th, J) = R1 · σ_banda^¼ · (1/(1+J))^¼")}, donde ${code("R1")} es el alcance del radar contra 1 m² (dato del catálogo, con rango y fuentes) y J la interferencia. En cada barrido la probabilidad de detección es 95% hasta el 80% de ese alcance y cae linealmente hasta 30% en el límite.</p>`,
+      engine: () => `<p>${code("detR(u, th, J) = R1 · σ_banda^¼ · (1/(1+J))^¼")}, donde ${code("R1")} es el alcance del radar contra 1 m² (dato del catálogo, con rango y fuentes) y J la interferencia. Ese alcance es el de 50% por barrido: más cerca la probabilidad sube rápido (75% al 80% del alcance, 96% a la mitad) y más lejos baja (26% a 1,2 veces, y ahí se corta). Sale de la relación señal/ruido con fluctuación Swerling 1. Los blancos rasantes pierden señal por el eco del suelo (clutter), menos en los radares pulso-Doppler, y un radar Doppler no ve en ese barrido a un blanco que le pasa exactamente de costado (notch).</p>`,
       widget: {
         html: () => `<div class="widget"><div class="field"><label for="wRad">Radar</label><select id="wRad" class="sel">${Object.entries(DEFENSES).filter(([, d]) => d.radar && radarBands.includes(d.radar.band)).map(([k, d]) => `<option value="${k}" ${k === "ewr" ? "selected" : ""}>${esc(d.short)} (${d.radar.band}, ${d.radar.R1} km vs 1 m²)</option>`).join("")}</select></div>
         <div class="field"><label for="wSig">RCS del blanco en la banda del radar</label><span class="val" id="wSigV"></span><input id="wSig" type="range" min="-3" max="1" step="0.05" value="-1"></div>

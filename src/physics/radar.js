@@ -6,6 +6,8 @@ import { angDiff, azOf } from '../util/math.js';
 import { HORIZON_K } from './constants.js';
 import { surf, los } from './terrain.js';
 import { rainGamma, rainRange } from './weather.js';
+import { slopeAt } from './terrain-analysis.js';
+import { clamp } from '../util/math.js';
 
 /**
  * RCS (m²) de una amenaza en una banda, vista con aspecto ca (ver aspectFactor; 1 = de frente).
@@ -116,6 +118,59 @@ export function detR(u, th, J, ca = 1, wx = null) {
 
 /** ¿El techo de nubes o niebla de wx le tapa a un sensor óptico en tierra un blanco a agl m? */
 export const belowCeiling = (r, wx, agl) => !(r.band === 'OPT' && wx && wx.ceiling != null && agl > wx.ceiling);
+
+// ---------------- PROBABILIDAD DE DETECCIÓN (SNR, Swerling 1) ----------------
+// El alcance del catálogo (detR) es el de Pd = 50% en un barrido con probabilidad de falsa alarma
+// PFA. La relación señal/ruido cae con r⁴: SNR(r) = SNR50 · (R/r)⁴ · pérdidas. Para un blanco que
+// "titila" de barrido a barrido (Swerling 1: muchos reflectores parecidos, drones y misiles) la
+// probabilidad de detectarlo en un barrido es Pd = PFA^(1/(1+SNR)). Ver docs/FISICA.md §2.
+
+/** Probabilidad de falsa alarma de diseño (valor típico de libro). */
+export const PFA = 1e-6;
+/** SNR que da Pd = 50% con Swerling 1 y PFA: ln(PFA)/ln(0,5) − 1 ≈ 18,9 (12,8 dB). */
+export const SNR50 = Math.log(PFA) / Math.log(0.5) - 1;
+/**
+ * Más allá de este múltiplo del alcance la Pd por barrido es < 26%: ecos sueltos que no alcanzan para
+ * confirmar una pista (regla "M de N" de los extractores de pistas). No se sortea.
+ */
+export const PD_CUTOFF = 1.2;
+
+/** Pd de un barrido, Swerling 1. */
+export const pdSwerling1 = snr => (snr > 0 ? Math.pow(PFA, 1 / (1 + snr)) : 0);
+
+/**
+ * Clutter: un blanco a menos de CLUTTER_AGL m sobre el suelo se ve "contra el suelo" y compite con
+ * su eco. Pérdida máxima (dB) según el procesamiento del radar (radar.mti): 'none' sin filtro de
+ * blancos móviles, 'mti' filtro clásico, 'pd' pulso-Doppler. Escala con lo rasante del blanco y con
+ * la rugosidad del suelo (pendiente local; el mar cuenta como moderado). Valores estimados.
+ */
+export const CLUTTER_DB = { none: 20, mti: 10, pd: 3 };
+export const CLUTTER_AGL = 300;
+/** Notch Doppler: velocidad radial (m/s) por debajo de la cual el filtro borra el blanco. */
+export const NOTCH_MS = { mti: 15, pd: 8 };
+
+export function clutterLossDb(r, agl, x, y) {
+  const base = CLUTTER_DB[r.mti]; if (!base || agl >= CLUTTER_AGL) return 0;
+  const rough = surf(x, y) <= 0 ? 0.7 : clamp(0.5 + slopeAt(x, y) / 10, 0.5, 1.5);
+  return base * rough * (1 - Math.max(0, agl) / CLUTTER_AGL);
+}
+
+/** ¿El blanco cae en el notch Doppler del radar? (velocidad radial = |v|·cos del aspecto) */
+export function inNotch(r, th, ca) {
+  const thr = NOTCH_MS[r.mti], v = th.vel; if (!thr || !v) return false;
+  return Math.hypot(v[0], v[1], v[2]) * Math.abs(ca) < thr;
+}
+
+/**
+ * Pd de un barrido del radar de u contra th a distancia rr (km), con alcance R (detR, ya con
+ * interferencia y clima), a agl m sobre el suelo en (x, y) y con aspecto ca.
+ */
+export function pdScan(u, th, rr, R, agl, x, y, ca) {
+  const r = D(u).radar; if (rr > PD_CUTOFF * R) return 0;
+  if (r.band !== 'OPT' && r.band !== 'ACU' && inNotch(r, th, ca)) return 0;
+  const loss = r.band === 'OPT' || r.band === 'ACU' ? 0 : clutterLossDb(r, agl, x, y);
+  return pdSwerling1(SNR50 * Math.pow(R / Math.max(rr, 1e-3), 4) / Math.pow(10, loss / 10));
+}
 
 /** Horizonte de radar (km) entre una antena a hr metros y un blanco a ht metros, Tierra 4/3. */
 export function horizon(hr, ht) { return HORIZON_K * (Math.sqrt(Math.max(0, hr)) + Math.sqrt(Math.max(0, ht))); }

@@ -53,6 +53,7 @@
  * @property {string} name
  * @property {'VHF'|'L'|'S'|'C'|'X'|'Ku'|'ACU'|'OPT'} band
  * @property {number} R1     Alcance contra 1 m² (km)
+ * @property {'none'|'mti'|'pd'} [mti] Procesamiento contra clutter: sin filtro, MTI o pulso-Doppler (physics/radar.js)
  * @property {number} mast   Altura de antena (m) o de vuelo (AEW)
  * @property {[number, number]} [mastRange] Altura real posible de la antena (m); mín = máx significa fija
  * @property {string} [mastNote] De dónde sale (fija, mástil, torre)

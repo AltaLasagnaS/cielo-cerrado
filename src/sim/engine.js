@@ -7,7 +7,7 @@ import { money } from '../util/format.js';
 import { nextId } from '../util/ids.js';
 import { rnd } from '../util/rng.js';
 import { surf, los } from '../physics/terrain.js';
-import { antZ, aspectCos, belowCeiling, detR, inSector, jamJ } from '../physics/radar.js';
+import { antZ, aspectCos, belowCeiling, detR, inSector, jamJ, pdScan, PD_CUTOFF } from '../physics/radar.js';
 import { buildThreat, posAt, speedAt } from '../physics/kinematics.js';
 import { gnssNavError } from '../physics/navigation.js';
 import { RADAR_GUID, isTBM, trackOK, reactionStart, solve, calcPk, effectiveC2 } from '../physics/engagement.js';
@@ -91,13 +91,12 @@ export function step(dt) {
         const az = azOf(dx, dy); if (!inSector(u, az)) continue;
         const rr = Math.hypot(dh, (p.z - uz) / 1000);
         // primero el alcance sin interferencia (cota superior, barata) y recién después la interferencia
-        const ca = aspectCos(th, u.x, u.y, uz);
-        if (rr > detR(u, th, 0, ca, wx) || !belowCeiling(r, wx, p.z - surf(p.x, p.y))) continue;
+        const ca = aspectCos(th, u.x, u.y, uz), agl = p.z - surf(p.x, p.y);
+        if (rr > PD_CUTOFF * detR(u, th, 0, ca, wx) || !belowCeiling(r, wx, agl)) continue;
         const J = jamJ(u, az, S.jamsLive); const R = detR(u, th, J, ca, wx);
-        if (rr > R) continue;
-        // probabilidad de detección por barrido: 95% hasta el 80% del alcance, cae a 30% en el límite
-        const pd = rr < 0.8 * R ? 0.95 : 0.95 - (rr - 0.8 * R) / (0.2 * R) * 0.65;
-        if (rnd() > pd) continue;
+        // probabilidad de detección del barrido: SNR con fluctuación Swerling 1, clutter y notch Doppler
+        const pd = pdScan(u, th, rr, R, agl, p.x, p.y, ca);
+        if (pd <= 0 || rnd() > pd) continue;
         ok = los(u.x, u.y, uz, p.x, p.y, p.z);
       }
       if (ok) {

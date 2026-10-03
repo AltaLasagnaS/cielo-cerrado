@@ -6,6 +6,13 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 
 ## [Sin publicar]
 
+### Cambiado
+- **[sim]** **Detección por relación señal/ruido.** Cada barrido sortea la detección con la fórmula de Swerling 1, y el alcance del catálogo pasa a ser el de 50% por barrido: 75% al 80% del alcance, 96% a la mitad, 26% a 1,2 veces (ahí se corta: los ecos sueltos no confirman una pista). Además:
+  - **Clutter:** un blanco a menos de 300 m pierde señal por el eco del suelo, mucho en un radar sin filtro (S-125), poco en uno pulso-Doppler (Patriot, IRIS-T…), y más en terreno quebrado.
+  - **Notch Doppler:** un radar Doppler no ve en ese barrido a un blanco que le pasa de costado.
+  
+  Cada radar tiene ahora su tipo de procesamiento (`radar.mti`). Efecto medido con Monte Carlo: los rasantes se detectan algo más tarde (Kh-101 ≈10%) y los balísticos 20–30% antes. El puente de Monterey pasa de 9 a 10 Storm Shadow para seguir parejo (≈40%); Kiev queda en ≈70% y la refinería en ≈35%.
+
 ### Agregado
 - **Bomba planeadora FAB-500 con UMPK** (Rusia): perfil de vuelo nuevo `glide`. Se suelta fuera del mapa a ≈10 km de altura y 40–100 km del blanco, y baja planeando a ≈250 m/s. Es barata (≈US$30 mil), casi no tiene firma infrarroja (×0,3 de Pk para buscadores IR) y su RCS sale de la base de CMO y de la forma.
 - **Tres defensas que usa Ucrania**, con datos del DB3K de CMO y de fuentes abiertas:
