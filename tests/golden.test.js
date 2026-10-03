@@ -13,7 +13,9 @@ const CASES = {
   mb_noche_sls_sin_red: ['mb_noche', { seed: 3, net: false, doctrine: 'sls' }],
   mb_noche_plano: ['mb_noche', { seed: 2, flat: true }],
   gb_ruso_s1: ['gb_ruso', { seed: 1 }],
-  gb_ruso_s9: ['gb_ruso', { seed: 9 }]
+  gb_ruso_s9: ['gb_ruso', { seed: 9 }],
+  gb_refineria_s1: ['gb_refineria', { seed: 1 }],
+  mb_puente_s1: ['mb_puente', { seed: 1 }]
 };
 
 const summarize = S => ({

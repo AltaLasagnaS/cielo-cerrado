@@ -11,7 +11,7 @@ Desplegás radares, baterías antiaéreas y guerra electrónica sobre relieve re
 También se publica en **GitHub Pages** en cada cambio de la rama `main` (workflow `.github/workflows/pages.yml`): <https://altalasagnas.github.io/cielo-cerrado/>.
 
 Primeros pasos:
-1. Elegí un escenario arriba a la derecha y leé el **briefing**.
+1. Elegí un escenario arriba a la derecha y leé el **briefing**. Hay cuatro jugables: la noche de ataque combinado sobre Monterey, el ataque a la base con S-400 en Gotemburgo, la **defensa de la refinería de Hisingen** (Gotemburgo) y el **ataque al puente de Moss Landing** (Monterey).
 2. Tocá **▶ Iniciar**. La velocidad **Auto** acelera cuando no pasa nada y frena cuando hay combate.
 3. Al terminar se abre el **debrief**. ¿Fue suerte? El botón **Monte Carlo** corre la misma situación muchas veces y muestra la probabilidad de que cada objetivo sobreviva.
 4. Probá cambiar cosas: mové defensas (antes de iniciar), agregá ataques en la pestaña **Ataque** o activá la capa **Relieve → Puntos altos** para ubicar radares en cotas dominantes.

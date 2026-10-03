@@ -1,7 +1,7 @@
 // Integridad del catálogo: atrapa errores de tipeo al agregar armas, fuentes o escenarios.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { THREATS, DEFENSES, JAMMERS, BANDS, CLS_NAME, UNC, OBS, SRC, SCENARIOS, TERRAIN, PL } from '../src/data/index.js';
+import { THREATS, DEFENSES, JAMMERS, BANDS, CLS_NAME, UNC, OBS, SRC, SCENARIOS, TERRAIN, PL, TARGET_TYPES } from '../src/data/index.js';
 
 const PROFILES = ['drone', 'cruise', 'bunt', 'ballistic', 'highdive', 'hilo'];
 
@@ -59,6 +59,41 @@ test('escenarios: mapas, tipos y blancos válidos', () => {
       if (s.targetUnit) assert.ok(names.has(s.targetUnit), `${k}: blanco ${s.targetUnit}`);
     }
     for (const j of sc.jams) assert.ok(JAMMERS[j.type], `${k}: jammer ${j.type}`);
+  }
+});
+
+test('escenarios: objetivos, posiciones dentro del mapa, blancos de las salvas y metas válidas', () => {
+  const KINDS = ['destroy', 'damage', 'protect', 'survive', 'killUnit', 'keepUnit'];
+  for (const [k, sc] of Object.entries(SCENARIOS)) {
+    const t = TERRAIN[sc.map], wKm = t.W * t.cell / 1000, hKm = t.H * t.cell / 1000;
+    const inMap = (x, y, what) => assert.ok(x >= 0 && y >= 0 && x <= wKm && y <= hKm, `${k}: ${what} (${x}, ${y}) fuera del mapa ${wKm}×${hKm} km`);
+    const objNames = new Set(sc.objectives.map(o => o.name)), defNames = new Set(sc.defs.map(d => d.name));
+    assert.equal(objNames.size, sc.objectives.length, `${k}: nombres de objetivo repetidos`);
+    for (const o of sc.objectives) { assert.ok(TARGET_TYPES[o.type], `${k}: tipo de objetivo ${o.type}`); inMap(o.x, o.y, o.name); }
+    for (const d of sc.defs) inMap(d.x, d.y, d.name || d.type);
+    for (const j of sc.jams) inMap(j.x, j.y, j.type);
+    for (const s of sc.salvos) {
+      for (const p of s.pts) inMap(p[0], p[1], `ruta de ${s.type}`);
+      if (s.targetObj) assert.ok(objNames.has(s.targetObj), `${k}: blanco ${s.targetObj}`);
+    }
+    for (const g of sc.goals) {
+      assert.ok(['ataque', 'defensa'].includes(g.side), `${k}: bando de "${g.text}"`);
+      assert.ok(KINDS.includes(g.kind), `${k}: tipo de meta ${g.kind}`);
+      const pool = ['killUnit', 'keepUnit'].includes(g.kind) ? defNames : objNames;
+      assert.ok(pool.has(g.target), `${k}: la meta "${g.text}" apunta a "${g.target}", que no existe`);
+      assert.ok(g.text, `${k}: meta sin texto`);
+    }
+  }
+});
+
+test('escenarios jugables: briefing completo y al menos una meta principal por bando', () => {
+  for (const [k, sc] of Object.entries(SCENARIOS)) {
+    if (!sc.salvos.length) continue;   // los mapas vacíos son para armar a mano
+    for (const f of ['name', 'player', 'time', 'description', 'conditions', 'success', 'failure']) assert.ok(sc[f], `${k}: falta ${f}`);
+    assert.ok(sc.forces?.defensa && sc.forces?.ataque, `${k}: faltan las fuerzas`);
+    assert.ok(sc.rulesText?.length, `${k}: faltan las reglas especiales`);
+    assert.ok(sc.objectives.length, `${k}: sin objetivos`);
+    for (const side of ['ataque', 'defensa']) assert.ok(sc.goals.some(g => g.side === side && g.primary), `${k}: sin meta principal para ${side}`);
   }
 });
 

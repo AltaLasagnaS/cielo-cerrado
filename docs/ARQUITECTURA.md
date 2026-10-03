@@ -86,7 +86,7 @@ El bucle de la interfaz (`ui/loop.js`) llama a `step(0,25)` las veces necesarias
 
 - `util/rng.js` centraliza el azar; `seeded(n)` da corridas idénticas.
 - `util/ids.js` centraliza los ids. El orden en que se piden importa, porque aparecen en el registro.
-- `tests/golden.json` guarda el resultado de 6 corridas con semilla fija. Si cambia la física, estas pruebas fallan **a propósito** (ver [CONTRIBUIR.md](../CONTRIBUIR.md)).
+- `tests/golden.json` guarda el resultado de 8 corridas con semilla fija. Si cambia la física, estas pruebas fallan **a propósito** (ver [CONTRIBUIR.md](../CONTRIBUIR.md)).
 
 ## Build
 
