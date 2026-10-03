@@ -1,0 +1,85 @@
+// Modos de edición del mapa y la barra de avisos/confirmación.
+//   select   seleccionar y mover lo ya ubicado
+//   placeDef ubicar una defensa · placeJam un interferidor · placeObj un objetivo
+//   route    trazar la ruta de una salva
+// Regla: nada se crea con un click. El click propone una posición (S.preview) y recién
+// "Confirmar" (o Enter) crea la unidad; "Cancelar" (o Esc) descarta la propuesta.
+import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES } from '../data/index.js';
+import { esc } from '../util/format.js';
+import { isOffmap } from '../physics/kinematics.js';
+import { surf } from '../physics/terrain.js';
+import { terrainClass } from '../physics/terrain-analysis.js';
+import { S } from '../sim/state.js';
+import { addDef, addJam, addObj, addSalvo } from '../sim/setup.js';
+import { draw } from '../render/draw.js';
+import { $ } from './dom.js';
+import { schedCov } from './coverage.js';
+import { renderTabs } from './panels/index.js';
+import { renderAtk } from './panels/attack.js';
+import { renderSel } from './panels/selection.js';
+
+const PLACE = {
+  placeDef: { cat: DEFENSES, add: addDef, sel: 'def', name: t => DEFENSES[t].short },
+  placeJam: { cat: JAMMERS, add: addJam, sel: 'jam', name: t => JAMMERS[t].short },
+  placeObj: { cat: TARGET_TYPES, add: addObj, sel: 'obj', name: t => TARGET_TYPES[t].name }
+};
+
+/** Cambia de modo. type = clave de lo que se ubica. Siempre descarta la propuesta pendiente. */
+export function setMode(m, type) {
+  S.mode = m; S.placeType = type || null; S.preview = null; if (m !== 'route') S.route = null; updateModebar(); renderTabs(); draw();
+}
+
+/** Click corto sobre el mapa en un modo de ubicación: propone la posición (no crea nada). */
+export function proposePlacement(x, y) {
+  S.preview = { mode: S.mode, type: S.placeType, x: +x.toFixed(2), y: +y.toFixed(2) };
+  updateModebar(); draw();
+}
+
+/** Crea lo propuesto. */
+export function confirmPlacement() {
+  const p = S.preview; if (!p) return;
+  const P = PLACE[p.mode], o = P.add(p.type, p.x, p.y);
+  S.preview = null; S.sel = { kind: P.sel, id: o.id };
+  renderSel(); renderTabs(); renderAtk(); schedCov(); updateModebar(); draw();
+}
+
+export function cancelPlacement() { S.preview = null; updateModebar(); draw(); }
+
+/** Muestra la instrucción o la pregunta de confirmación del modo actual. */
+export function updateModebar() {
+  const mb = $('#modebar');
+  if (S.mode === 'select') { mb.hidden = true; return; }
+  mb.hidden = false;
+  let html = '', ok = null, cancel = () => setMode('select'), cancelTxt = 'Salir';
+  const P = PLACE[S.mode];
+  if (P && S.preview) {
+    const p = S.preview, e = Math.round(surf(p.x, p.y));
+    html = `¿Colocar <b>${esc(P.name(p.type))}</b> aquí? <span class="dim">${p.x.toFixed(1)}, ${p.y.toFixed(1)} km · ${e} m · ${esc(terrainClass(p.x, p.y))}</span>`;
+    ok = confirmPlacement; cancel = cancelPlacement; cancelTxt = 'Cancelar';
+  } else if (P) {
+    html = `Tocá el mapa donde quieras ubicar <b>${esc(P.name(S.placeType))}</b>; vas a poder confirmar o cancelar.`;
+  } else if (S.mode === 'route') {
+    const T = THREATS[S.atk.type], off = isOffmap(T), n = S.route.pts.length;
+    if (off) {
+      if (n >= 2) { html = `¿Lanzar <b>${S.atk.count}× ${esc(T.short)}</b> desde ${S.atk.launchDist} km hacia este blanco?`; ok = finishRoute; cancel = () => { S.route.pts = []; S.route.targetUnit = S.route.targetObj = null; updateModebar(); draw(); }; cancelTxt = 'Cancelar'; }
+      else html = n ? 'Ahora tocá el <b>blanco</b> (un objetivo o una defensa para apuntarle).' : 'Tocá un punto en la <b>dirección de lanzamiento</b>.';
+    } else {
+      html = 'Tocá el inicio, los waypoints y el <b>blanco</b> (último punto). Puntos: ' + n;
+      if (n >= 2) ok = finishRoute;
+    }
+  }
+  mb.innerHTML = html + (ok ? ' <button class="btn sm pri" id="mbOk">Confirmar</button>' : '') + ` <button class="btn sm" id="mbX">${cancelTxt}</button>`;
+  $('#mbX').onclick = cancel;
+  if (ok) $('#mbOk').onclick = ok;
+}
+
+/** Convierte la ruta trazada en una salva programada. */
+export function finishRoute() {
+  if (!S.route || S.route.pts.length < 2) { toast('La ruta necesita al menos 2 puntos.'); return; }
+  const sv = addSalvo({ ...S.atk, pts: S.route.pts, targetUnit: S.route.targetUnit, targetObj: S.route.targetObj });
+  S.sel = { kind: 'salvo', id: sv.id }; setMode('select'); renderAtk(); renderSel(); schedCov();
+}
+
+/** Aviso breve en la barra inferior (2,2 s). */
+let toastT = null;
+export function toast(m) { const mb = $('#modebar'); mb.hidden = false; mb.textContent = m; clearTimeout(toastT); toastT = setTimeout(() => updateModebar(), 2200); }

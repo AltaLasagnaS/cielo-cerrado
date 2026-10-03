@@ -1,0 +1,85 @@
+// Calibración: casos de prueba corridos con el motor del simulador (Monte Carlo, modo "salva", red integrada).
+// "real" = dato observado; "obj" = rango objetivo para la tasa de derribo dentro de cobertura; "sim" = medido con los valores probables.
+export const CAL = [
+ {
+  "caso": "16 Kh-101 (cada 5 s) contra IRIS-T + NASAMS + radar 3D",
+  "real": "NASAMS: 94% reclamado; IRIS-T: \"casi 100%\" (≈240 derribos). Datos de operador/fabricante, sesgados hacia arriba.",
+  "obj": "85–100%",
+  "sim": 1,
+  "lo": 1,
+  "hi": 1,
+  "ok": true
+ },
+ {
+  "caso": "20 Kalibr (cada 3 s) contra S-300PS + Buk-M1 + radar 3D",
+  "real": "67% para crucero a nivel nacional (feb-22 → ago-24), con defensa mayormente soviética.",
+  "obj": "60–85%",
+  "sim": 0.738,
+  "lo": 0.494,
+  "hi": 0.915,
+  "ok": true
+ },
+ {
+  "caso": "60 Shahed + 30 Gerbera contra 2 Gepard, 3 grupos móviles, 2 equipos de interceptores, red acústica",
+  "real": "Derribo cinético 52% (mar–may 25) a 63% (2022–24); el resto de la neutralización es guerra electrónica, que el juego no modela como pérdida.",
+  "obj": "50–70%",
+  "sim": 0.592,
+  "lo": 0.382,
+  "hi": 0.755,
+  "ok": true
+ },
+ {
+  "caso": "8 Iskander-M con maniobra 2025 y señuelos contra 1 Patriot MSE (16 misiles)",
+  "real": "37% nacional en jun–sep 25 (IC95% 31–45%), cota inferior de lo que pasa dentro de cobertura; 6–17% en otoño 2025.",
+  "obj": "35–65%",
+  "sim": 0.463,
+  "lo": 0.338,
+  "hi": 0.491,
+  "ok": true
+ },
+ {
+  "caso": "6 Kinzhal contra 1 Patriot MSE",
+  "real": "6 de 6 sobre Kyiv el 16/5/2023 (IC95% 61–100%); 25% a nivel nacional.",
+  "obj": "61–100%",
+  "sim": 0.992,
+  "lo": 0.771,
+  "hi": 1,
+  "ok": true
+ },
+ {
+  "caso": "12 Kh-22 (cada 5 s) contra 1 Patriot MSE (16 misiles)",
+  "real": "9 de 12 sobre Kyiv el 2/2/2026 (IC95% 47–91%).",
+  "obj": "47–91%",
+  "sim": 0.646,
+  "lo": 0.469,
+  "hi": 0.767,
+  "ok": true
+ },
+ {
+  "caso": "6 Kh-22 contra IRIS-T + NASAMS, sin Patriot",
+  "real": "3 de más de 400 derribados antes de feb-2026 (IC95% 0–2%).",
+  "obj": "0–10%",
+  "sim": 0,
+  "lo": 0,
+  "hi": 0,
+  "ok": true
+ },
+ {
+  "caso": "6 Oniks (perfil hi-lo) contra IRIS-T + NASAMS ubicados en el blanco",
+  "real": "5,7% a nivel nacional (12 de 211). No hay datos dentro de cobertura: caso de control, sin objetivo.",
+  "obj": "—",
+  "sim": 0.617,
+  "lo": 0.287,
+  "hi": 0.833,
+  "ok": null
+ },
+ {
+  "caso": "4 Zircon contra Patriot + SAMP/T",
+  "real": "2 de 2 sobre Kyiv el 25/3/2024 (IC95% 34–100%); 33% nacional hasta ago-24.",
+  "obj": "34–100%",
+  "sim": 0.975,
+  "lo": 0.806,
+  "hi": 1,
+  "ok": true
+ }
+];

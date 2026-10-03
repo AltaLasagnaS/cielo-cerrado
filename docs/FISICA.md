@@ -1,0 +1,244 @@
+# Modelos físicos de Cielo Cerrado
+
+Este documento explica **qué calcula el motor y cómo**, con las fórmulas y las simplificaciones a la vista. El código en `src/physics/` remite a estas secciones (por ejemplo, `ver docs/FISICA.md §6`). Cada modelo tiene pruebas en `tests/` que verifican sus propiedades.
+
+La idea de diseño es la de un **CMO liviano**: modelos simples pero con la forma física correcta (las proporciones y las tendencias importan más que la precisión absoluta), con datos públicos y la incertidumbre explícita.
+
+---
+
+## §1 Convenciones
+
+| Magnitud | Unidad | Nota |
+|---|---|---|
+| Posición en el mapa (x, y) | km | Desde la esquina noroeste. x crece hacia el este, y hacia el **sur** (como la pantalla) |
+| Altura z | m sobre el nivel del mar | AGL = z − terreno |
+| Azimut | ° | 0 = norte, sentido horario (`azOf` en `util/math.js`) |
+| Velocidades | m/s | La interfaz muestra km/h y Mach (340 m/s) |
+| Costos | millones de US$ | |
+| Tiempo | s simulados | Paso fijo de 0,25 s (`ui/loop.js`), sea cual sea la velocidad elegida |
+
+**Azar:** todo pasa por `util/rng.js#rnd()`. Con una semilla (`setRandom(seeded(n))`) una corrida es 100% reproducible: así funcionan las pruebas "golden".
+
+---
+
+## §2 Detección radar
+
+### Ecuación del radar
+
+La potencia del eco es `Pr = Pt·G²·λ²·σ / ((4π)³·R⁴)`. Con el resto fijo, el alcance máximo escala como **R ∝ σ^¼**. Cada radar del catálogo trae `R1`, su alcance contra un blanco de 1 m², así que:
+
+```
+detR = R1 · σ_banda^¼ · (1 / (1 + J))^¼        (physics/radar.js#detR)
+```
+
+`σ_banda` es la RCS del blanco en la banda del radar (§3) y `J` la relación interferencia/ruido (§4). Los sensores acústicos y ópticos usan `R1` fijo.
+
+### Barridos y probabilidad de detección
+
+Cada radar barre cada `radar.scan` segundos. Si el blanco está dentro del alcance, del sector y con línea de vista (§8), la probabilidad de detectarlo en ese barrido es:
+
+```
+Pd = 0,95                                   si r < 0,8·R
+Pd = 0,95 − (r − 0,8·R)/(0,2·R) · 0,65       entre 0,8·R y R  (cae a 0,30 en el límite)
+```
+
+Es una aproximación a la curva de Swerling: lejos del límite casi siempre detecta; cerca del borde, a veces sí y a veces no.
+
+### Sectores
+
+`radar.sector` < 360 limita la búsqueda a ±sector/2 alrededor de la orientación `u.az`. Los radares de antena lateral (`radar.side`, como el Erieye) ven dos sectores a ±90° del rumbo. Ver `inSector()`.
+
+### Sensores no radar
+
+- **Acústico:** detecta solo drones, dentro de `R1` km horizontales y por debajo de `radar.altMax`.
+- **Óptico:** usa un alcance fijo con línea de vista.
+
+---
+
+## §3 RCS por banda
+
+`th.rcs` es la RCS **frontal estimada en bandas X/S**. `rcsAt(th, banda)` la ajusta con las reglas de `BANDS[banda].rcs` (en `data/bands.js`, la única fuente de datos de bandas):
+
+| Banda | Regla | Razón física |
+|---|---|---|
+| VHF | `rcsVHF` propio si existe; si no, ×12 (baja firma), ×4 (σ < 0,05 m²), ×2 (resto) | Resonancia: λ ≈ 1–2 m es del tamaño del blanco; el conformado furtivo pierde efecto |
+| L | ×3 (baja firma), ×1,4 (resto) | Todavía cerca de la resonancia para misiles chicos |
+| S, C, X | sin cambio | Régimen óptico: manda la forma |
+| Ku/Ka | ×1,6 para drones | Las ondas milimétricas "ven" hélices y motores |
+
+**Simplificación:** un número por banda y de frente. La RCS real cambia mucho con el aspecto (el catálogo guarda `rcsSide` cuando hay datos, pero el motor no lo usa todavía), con la polarización y con la frecuencia exacta.
+
+---
+
+## §4 Guerra electrónica
+
+### Ruido contra radares
+
+```
+J = Σ_jammers  P · G(Δaz) / d²   · 10^(−ECCM/10)        (physics/radar.js#jamJ)
+
+G = 1        si |Δaz| ≤ bw          (lóbulo principal; bw = BANDS[b].bw)
+G = 0,05     si |Δaz| ≤ 3·bw        (primeros lóbulos laterales, −13 dB)
+G = 0,003    más afuera             (−25 dB)
+G ×= 0,1     si el jammer está fuera del sector del radar
+```
+
+Solo suman los jammers activos de la **misma banda** con **línea de vista** radar–jammer. `d` es la distancia 3D en km (+1 para evitar la división por cero). `P` es una **potencia relativa de juego**: las potencias reales no son públicas.
+
+El alcance queda en `R' = R·(1/(1+J))^¼`. La Pk de los guiados que dependen del radar se multiplica por `1/(1 + 0,08·J)`, con un piso de 0,5 (§7).
+
+### GNSS
+
+Las armas con `T.gnss` < 1 (dependencia del satélite: 1 = inmune) que entran en el radio de un anti-GNSS acumulan un error de navegación que se suma a la dispersión de la caída (§10):
+
+```
+interferencia:  navErr = (1 − gnss) · (300 + U·1500)  m
+engaño:         navErr = (1 − gnss) · spoofKm · (0,5 + U)  km     (Pokrova, Lima)
+```
+
+Con `navErr` > 2 km, el debrief cuenta el arma como "perdida localmente".
+
+### Rol
+
+El efecto depende del **rol** y no de la bandera: los jammers de radar siempre degradan los radares de la defensa, y los anti-GNSS siempre desvían armas del atacante.
+
+---
+
+## §5 Cinemática de las amenazas
+
+Es un modelo **cinemático guiado por datos**: la amenaza recorre una ruta poligonal a velocidad constante por fase, y su altura sale del perfil de vuelo. No se integran fuerzas, porque alcanza para los tiempos de vuelo, la geometría de intercepción y el horizonte.
+
+| Perfil | Altura |
+|---|---|
+| `drone` | Terreno + `agl`, mirando 0,4–0,9 km adelante. Picada lineal en los últimos 2 km |
+| `cruise` | Terreno + `agl`, mirando hasta 1,5 km adelante. Baja al blanco en los últimos 0,5 km |
+| `bunt` | Como `cruise`, más un ascenso de 1.500 m entre 8 y 3 km del blanco y picada final (Storm Shadow) |
+| `ballistic` | Parábola `z = 4·apogeo·f·(1−f)`, con `f` la fracción del recorrido. Lanzado a `launchDist` km |
+| `highdive` | Crucero a `cruiseAlt` a velocidad `v` y picada lineal en los últimos `diveDist` km a `vDive` |
+| `hilo` | Crucero alto, transición entre 60 y 40 km del blanco, y tramo final rasante a `vLow` |
+
+- **Maniobra terminal:** desplazamiento lateral senoidal (amplitud 0,4 km para balísticos y 0,15 km para el resto) dentro de `termZone` (25 km balísticos, 15 km supersónicos, 10 km el resto).
+- **Salvas:** dispersión lateral de 0,25 km entre misiles, para que no se apilen.
+- **Señuelos:** se liberan a 40 km del blanco; se abren hasta 1–3,5 km del misil padre y suben hasta 300 m.
+- **Velocidad instantánea:** diferencia centrada de ±0,5 s (`speedAt`).
+
+---
+
+## §6 Seguimiento y solución de tiro
+
+**Pista** (`trackOK`):
+- **Propia:** el radar de la batería vio el blanco en los últimos 2 barridos (+0,6 s).
+- **De red:** cualquier sensor lo vio en los últimos 12 s y la red integrada está activa.
+
+| Guiado | Necesita |
+|---|---|
+| TVM, SARH, mando, cañón | Pista propia (el radar de la batería guía hasta el final) |
+| Activo, IR | Propia o de red |
+| Operador (drones interceptores) | De red |
+
+**Tiempo de reacción:** desde que hay pista hasta el primer disparo pasan `sam.react` segundos.
+
+**Solución** (`solve`): recorre la trayectoria futura del blanco con pasos de 0,5 s hasta 30 s y de 2 s hasta 400 s. Toma el primer instante τ en que:
+
+```
+minR ≤ r ≤ maxR (o maxRtbm si es balístico/hipersónico)
+altMin ≤ AGL   y   z ≤ altMax
+r / vInt ≤ τ   (el interceptor llega a tiempo, con ≤ 3 s de holgura)
+```
+
+**Filtros de** `engage()`: el blanco no puede ir más rápido que `vmaxT`; los guiados por radar necesitan línea de vista al punto de encuentro; hay que tener canales (`sam.ch`) y munición libres. Con red, no se dispara a un blanco que ya tiene interceptores en vuelo. La prioridad es para el blanco que llega primero (`rem / v`).
+
+**Doctrina:** con "salva" se disparan `u.salvo` interceptores por blanco (cada 0,6 s); con "disparar-observar-disparar", uno.
+
+---
+
+## §7 Probabilidad de derribo
+
+```
+Pk = sam.pk[clase] × modificadores, acotada a [0; 0,98]           (physics/engagement.js#calcPk)
+```
+
+| Condición | Factor |
+|---|---|
+| Maniobra terminal dentro de `termZone` | `T.manPk` (o 0,7); 0,85 contra cañones |
+| Bengalas (`T.ir`) contra guiado IR | 0,85 |
+| Baja firma (`T.lo`) contra buscador activo | 0,85 |
+| Baja firma contra mando, TVM o semiactivo | 0,75 |
+| Interferencia sobre el radar de la batería (J > 1) | 1/(1 + 0,08·J), mínimo 0,5 |
+| Blanco a más del 80% de `vmaxT` | 0,8 |
+
+Las Pk base están **calibradas** contra episodios reales dentro de la cobertura de sistemas capaces (ver `CAL` en `data/calibration.js` y la ventana "Calibración de Pk"). Con `n` interceptores independientes: `P(derribo) = 1 − (1 − Pk)ⁿ`.
+
+---
+
+## §8 Terreno, horizonte, línea de vista y cobertura
+
+**Grilla:** celdas de 200 m (int16, m). `elev()` interpola bilinealmente entre centros de celda y `surf()` = max(0, elev).
+
+**Tierra 4/3:** la refracción estándar curva el haz hacia abajo; se modela con un radio efectivo `KR = 8.500 km`.
+
+```
+horizonte:         d ≈ 4,12 · (√h_radar + √h_blanco)     [km; h en m]
+bulto terrestre:   b = d₁·d₂ / (2·KR)
+```
+
+**Línea de vista** (`los`): muestrea el segmento una vez por celda (máximo 700 muestras). La vista queda tapada si en algún punto `terreno + 4 m + b` supera la altura del rayo.
+
+**Cobertura** (`physics/coverage.js`): es un *viewshed* radial. Para cada sensor se lanzan N ≥ 360 rayos y en cada uno se guarda el máximo ángulo de elevación del relieve visto hasta ahí. Una celda es visible si el ángulo hacia el blanco de referencia (a `agl` m sobre el terreno) lo supera y está dentro de `detR` con la interferencia en ese azimut.
+
+---
+
+## §9 Lectura del relieve (solo visual)
+
+`physics/terrain-analysis.js` usa la misma grilla que `surf()` pero **no la modifica** (hay una prueba que lo verifica).
+
+- **Relieve relativo:** elevación − promedio del terreno en 5 km a la redonda. Se calcula con una imagen integral, en O(1) por consulta.
+- **Puntos altos:** máximos locales que dominan ~1 km y sobresalen al menos max(25 m; 4% del máximo del mapa) sobre lo más bajo de ~3 km. Se ordenan por dominancia y se ralean a ≥ 1,5 km entre sí; en pantalla, además, ≥ 74 px.
+- **Curvas de nivel:** *marching squares* sobre los centros de celda, con equidistancia de 20, 50 o 100 m según el desnivel. Cada 5ª curva es maestra; la costa es la curva de 0,5 m.
+- **Sombreado:** iluminación de Lambert (normal del terreno · sol), con el sol al NO a 45° y exageración vertical ×2. El modo "Sombreado" combina tres soles a 40° (×3).
+- **Calidad visual:** el raster se genera a k× la grilla (k ≤ 4) con la misma interpolación bilineal, y se dibuja con suavizado. Costa, curvas, marcadores, anillos, rutas y textos son vectores en coordenadas de pantalla × `devicePixelRatio`.
+
+---
+
+## §10 Impacto y daño
+
+**Caída:** dispersión circular normal alrededor del punto apuntado:
+
+```
+σ = CEP / 1,1774          r = σ·√(−2·ln(1 − U)) + navErr          ángulo uniforme
+```
+
+Cuenta como **impacto en el blanco** si r ≤ 20 m (drones) o 50 m (misiles). Los señuelos caen sin efecto.
+
+**Daño** (`physics/damage.js`, parámetros en `data/targets.js`), aplicado a cada objetivo cercano:
+
+```
+W = ojiva en kg (catálogo: info.warheadKg)
+daño directo = 12 · W^0,6 · vulnerabilidad del objetivo
+R50 = 4 · W^⅓  m                         (escala de Hopkinson-Cranz)
+factor = 1 / (1 + (d / R50)²)             d = distancia fuera de la huella del objetivo
+```
+
+Por debajo de un factor de 0,02 no hay daño. Ejemplos de impacto directo con vulnerabilidad 1: Shahed (50 kg) ≈ 126 HP; Kh-101 (450 kg) ≈ 470 HP; Flamingo (1.000 kg) ≈ 756 HP.
+
+**Estados:** *operativo* → *dañado* (≥ 20% de vida perdida) → *destruido* (0 HP).
+
+Es un modelo de juego: no representa estructuras, incendios, penetración ni submuniciones.
+
+---
+
+## §11 Simplificaciones conocidas y mejoras posibles
+
+| Simplificación | Efecto | Mejora posible |
+|---|---|---|
+| RCS solo frontal | Subestima lo que ven los radares de costado a la ruta | Usar `rcsSide` según el ángulo entre la ruta y la línea radar–blanco |
+| Sin clutter ni Doppler | Los blancos rasantes sobre tierra son más fáciles de lo real (solo los esconde el relieve) | Factor de clutter según el AGL y el tipo de radar |
+| Sin clima | Sin atenuación por lluvia en X/Ku ni restricciones ópticas | Condición del escenario con pérdidas por banda |
+| Sin recarga | Las baterías quedan vacías | Recarga con tiempo y depósito de munición como objetivo |
+| Pd por barrido simplificada | Sin fluctuación de RCS (Swerling) | Modelo Swerling 1/3 |
+| Interceptor en línea recta a velocidad media | Sin energía ni geometría de persecución | Perfil de velocidad y límite de g |
+| Discriminación de señuelos | El radar nunca distingue señuelos | Probabilidad de discriminación por banda y tiempo de seguimiento |
+| GNSS sin CRPA explícita | `gnss` resume toda la resistencia | Número de elementos de la CRPA frente al número de fuentes (ver `docs/investigacion/`) |
+| Daño simple | Sin efectos funcionales (un radar dañado sigue funcionando) | Degradación de capacidades según el estado |
+
+Cada mejora cambia resultados. Antes de mergearla: correr las pruebas, revisar los cambios de los golden y anotarla en el CHANGELOG (ver [CONTRIBUIR.md](../CONTRIBUIR.md)).

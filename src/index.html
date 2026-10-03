@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cielo Cerrado</title>
+<meta name="description" content="Simulador táctico de defensa aérea con datos públicos aproximados.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="./styles/app.css">
+</head>
+<body>
+
+<div class="app">
+  <header class="top">
+    <div class="brand"><h1>Cielo <span>Cerrado</span></h1><small>Simulador táctico de defensa aérea · datos públicos aproximados</small></div>
+    <div class="topctl">
+      <select id="scenario" class="sel" aria-label="Escenario"></select>
+      <label class="btn" for="hgt" title="Cargar un tile SRTM .hgt descomprimido">Cargar relieve .hgt</label>
+      <input id="hgt" type="file" accept=".hgt" hidden>
+      <button id="helpBtn" class="btn">Cómo se usa</button>
+    </div>
+  </header>
+  <div class="main">
+    <aside class="side">
+      <nav class="tabs" role="tablist">
+        <button data-tab="def" class="act">Defensa</button>
+        <button data-tab="atk">Ataque</button>
+        <button data-tab="ew" title="Guerra electrónica">EW</button>
+        <button data-tab="cat">Catálogo</button>
+        <button data-tab="edu">Academia</button>
+      </nav>
+      <div class="tabbody" id="tab-def"></div>
+      <div class="tabbody" id="tab-atk" hidden></div>
+      <div class="tabbody" id="tab-ew" hidden></div>
+      <div class="tabbody" id="tab-cat" hidden></div>
+      <div class="tabbody" id="tab-edu" hidden></div>
+    </aside>
+    <section class="mapwrap" id="mapwrap">
+      <canvas id="map"></canvas>
+      <div class="simbar">
+        <button id="play" class="btn pri sm">▶ Iniciar</button>
+        <button id="reset" class="btn sm">↺ Reiniciar</button>
+        <span class="clock" id="clock">T+00:00</span>
+        <span class="tscale" id="tscale"></span>
+        <div class="speeds" id="speeds"></div>
+        <label class="check" style="font-size:12px"><input type="checkbox" id="defView"> Vista del defensor</label>
+      </div>
+      <div class="relief" id="relief" role="group" aria-label="Lectura del relieve"><span>Relieve</span></div>
+      <div class="zoom"><button id="zin" aria-label="Acercar">+</button><button id="zout" aria-label="Alejar">−</button><button id="zfit" aria-label="Encuadrar" style="font-size:12px">⤢</button></div>
+      <div class="legend" id="legend">
+        <span><i class="sw" style="background:#62b6ff"></i>Defensa (Ucrania/OTAN)</span>
+        <span><i class="sw" style="background:#ff9f5a"></i>Defensa (Rusia)</span>
+        <span><i class="sw" style="background:#ff5b4d"></i>Amenaza</span>
+        <span><i class="sw" style="background:#c58cff"></i>Guerra electrónica</span>
+        <span><i class="sw" style="background:rgba(79,209,197,.55)"></i>Cobertura radar</span>
+      </div>
+      <div class="modebar" id="modebar" hidden></div>
+      <div class="tip" id="tip" hidden></div>
+    </section>
+    <aside class="right">
+      <div class="card" id="scenCard"></div>
+      <div class="card" id="selCard"><h3>Selección</h3><p class="hint">Tocá una unidad en el mapa para ver y ajustar sus parámetros.</p></div>
+      <div class="card"><h3>Resultado</h3><div class="stats" id="stats"></div></div>
+      <div class="card"><h3>Registro</h3><div class="log" id="log"></div></div>
+    </aside>
+  </div>
+</div>
+<div class="modal" id="modal" hidden><div class="sheet" id="sheet"></div></div>
+<script type="module" src="./main.js"></script>
+</body>
+</html>

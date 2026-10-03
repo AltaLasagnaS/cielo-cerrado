@@ -1,0 +1,25 @@
+# Integración continua: en cada push y pull request corre las pruebas, regenera el juego y el
+# catálogo, y falla si index.html o docs/CATALOGO.md no estaban al día con src/.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - name: index.html y docs/CATALOGO.md al día
+        run: |
+          npm run build
+          npm run docs
+          git diff --exit-code -- index.html docs/CATALOGO.md || (echo "::error::Corré 'npm run build' y 'npm run docs' y commiteá los archivos generados." && exit 1)

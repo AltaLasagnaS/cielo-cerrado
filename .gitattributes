@@ -1,0 +1,4 @@
+# Archivos generados o de datos: sin diff línea a línea en GitHub
+index.html linguist-generated=true -diff
+src/data/terrain/*.js linguist-generated=true -diff
+docs/CATALOGO.md linguist-generated=true
