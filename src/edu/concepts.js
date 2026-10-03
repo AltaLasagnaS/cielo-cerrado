@@ -4,7 +4,7 @@
 // desde el catálogo (no hay valores copiados a mano: si cambia un dato, cambia la explicación).
 //
 // Cada concepto: { id, group, title, body() → HTML, engine() → HTML, widget? { html(), mount(el) } }
-import { BANDS, THREATS, DEFENSES, JAMMERS, UNC, CLS_NAME, TARGET_TYPES, DAMAGE } from '../data/index.js';
+import { BANDS, THREATS, DEFENSES, JAMMERS, UNC, CLS_NAME, TARGET_TYPES, DAMAGE, C2_LEVELS } from '../data/index.js';
 import { esc, kmh } from '../util/format.js';
 import { KR, HORIZON_K, LOS_MARGIN } from '../physics/constants.js';
 import { rcsAt, horizon } from '../physics/radar.js';
@@ -183,6 +183,14 @@ export const CONCEPTS = [
     id: 'pk', group: 'Enfrentamiento', title: 'Pk (probabilidad de derribo)',
     body: () => `<p>Es la probabilidad de que <b>un</b> interceptor que llega al punto de encuentro destruya el blanco. Por eso se dispara en salva: con n interceptores independientes,</p><p class="formula">P(derribo) = 1 − (1 − Pk)ⁿ</p><p>Con Pk 0,7 y 2 misiles: 1 − 0,3² = 0,91.</p><p>Las tasas que publican los gobiernos no son una Pk: mezclan cobertura, munición y saturación (ver "Calibración de Pk" en el Catálogo).</p>`,
     engine: () => `<p>${code('calcPk()')}: Pk base por clase (${Object.keys(CLS_NAME).join(', ')}) desde ${code('sam.pk')}, calibrada contra episodios reales. Se multiplica por la maniobra terminal (${code('T.manPk')}, o ×0,85 contra cañones), por las bengalas contra IR (×0,85), por la baja firma (×0,85 con buscador activo, ×0,75 con guiado desde tierra), por la interferencia y por blancos a más del 80% de ${code('vmaxT')} (×0,8). Tope 0,98.</p>`
+  },
+  {
+    id: 'c2', group: 'Enfrentamiento', title: 'Mando y control: qué tan integrada está la defensa',
+    body: () => `<p>Una batería sola ve lo que ve su radar. Integrada en una red, se entera antes de lo que viene, puede disparar con la pista de otro sensor y no le tira a lo que otra batería ya está enfrentando. Cuánto de eso funciona depende del <b>mando y control (C2)</b>: qué red hay, con qué demora llega la información y con qué calidad.</p>
+      <p>En Ucrania conviven niveles muy distintos: sistemas occidentales con enlace Link 16 (Patriot, NASAMS), sistemas soviéticos que entran a la imagen aérea nacional mediante "cajas negras" de conversión y unidades que reciben la situación aérea en tabletas (Virazh-Planshet). Del lado ruso, puestos automatizados como Polyana-D4M1 integran brigadas de S-300, Buk, Tor y Pantsir.</p>`,
+    engine: () => `<p>El nivel se elige en la pestaña Defensa (${code('S.c2')}) y lo usan ${code('trackOK()')} y ${code('reactionStart()')}:</p>
+      <div class="tblwrap"><table class="t"><thead><tr><th>Nivel</th><th>Demora de la red</th><th>Tira con pista ajena</th><th>Reparto de blancos</th></tr></thead><tbody>${Object.values(C2_LEVELS).map(L => `<tr><td>${esc(L.name)}</td><td>${L.share === 'none' ? '—' : L.lag + ' s'}</td><td>${{ none: 'no', cue: 'no (solo alerta)', track: 'activos/IR e interceptores', fire: 'también guiados por radar' }[L.share]}</td><td>${L.deconf ? 'sí' : 'no'}</td></tr>`).join('')}</tbody></table></div>
+      <p>"Coordinada" y "desconectada" son el viejo interruptor "red integrada" encendido y apagado. Las demoras son estimaciones de juego. Todavía no se modelan el error de posición de las pistas de red ni los enlaces por sistema (Link 16 vs. red nacional): ver ROADMAP.</p>`
   },
   {
     id: 'saturation', group: 'Enfrentamiento', title: 'Saturación y canales simultáneos',

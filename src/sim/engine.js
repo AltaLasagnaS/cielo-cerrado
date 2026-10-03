@@ -9,7 +9,8 @@ import { rnd } from '../util/rng.js';
 import { surf, los } from '../physics/terrain.js';
 import { antZ, aspectCos, detR, inSector, jamJ } from '../physics/radar.js';
 import { buildThreat, posAt, speedAt } from '../physics/kinematics.js';
-import { RADAR_GUID, isTBM, trackOK, solve, calcPk } from '../physics/engagement.js';
+import { RADAR_GUID, isTBM, trackOK, reactionStart, solve, calcPk } from '../physics/engagement.js';
+import { C2_LEVELS } from '../data/index.js';
 import { damageAt, targetStatus } from '../physics/damage.js';
 import { azOf } from '../util/math.js';
 import { S, newStats } from './state.js';
@@ -143,12 +144,12 @@ export function engage(u, t) {
     const maxR = isTBM(th) ? sm.maxRtbm : sm.maxR; if (!maxR) continue;
     if (u.noDrones && th.cls === 'dron') continue;
     if (dh > maxR + 120) continue;
-    if (!trackOK(u, th, t, S.net)) { delete u.avail[th.id]; continue; }
-    if (u.avail[th.id] === undefined) u.avail[th.id] = t;
+    if (!trackOK(u, th, t, S.c2)) { delete u.avail[th.id]; continue; }
+    if (u.avail[th.id] === undefined) u.avail[th.id] = reactionStart(th, t, S.c2);
     if (t - u.avail[th.id] < sm.react) continue;
     // coordinación
     const flying = (th.fly || []).filter(i => !i.done);
-    if (S.net ? flying.length : flying.some(i => i.u === u)) continue;
+    if (C2_LEVELS[S.c2].deconf ? flying.length : flying.some(i => i.u === u)) continue;
     cand.push([th, th.p.rem / Math.max(1, th.T.v)]);
   }
   cand.sort((a, b) => a[1] - b[1]);

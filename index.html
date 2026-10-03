@@ -1827,7 +1827,7 @@ table.t.mc td.pc{white-space:nowrap}
         ataque: "20 Shahed, 8 Gerbera, 4 Kh-101, 3 Kalibr y 2 Iskander-M. Un avión de interferencia stand-off acompaña desde el noroeste."
       },
       conditions: "Noche despejada. El motor no modela clima ni luz: la noche solo explica por qué los grupos móviles dependen de la alerta acústica.",
-      rules: { net: true, doctrine: "salva" },
+      rules: { c2: "coordinada", doctrine: "salva" },
       rulesText: ["Red integrada activa y doctrina de salva.", "No hay recarga: cada unidad cuenta solo con la munición inicial.", "Los Kh-101, Kalibr e Iskander están sincronizados para llegar casi juntos (T+24:40 a T+25:30)."],
       objectives: [
         { type: "fuel", name: "Depósito de combustible Salinas", short: "Combustible Salinas", x: 63.5, y: 55.8, desc: "Abastece a la región: es el blanco principal del ataque." },
@@ -1883,7 +1883,7 @@ table.t.mc td.pc{white-space:nowrap}
         ataque: "6 Storm Shadow, 16 Liutyi, 2 Neptune y 4 ATACMS lanzados desde 220 km, todo sincronizado para llegar en menos de un minuto."
       },
       conditions: "Despejado. El motor no modela clima ni luz.",
-      rules: { net: true, doctrine: "salva" },
+      rules: { c2: "coordinada", doctrine: "salva" },
       rulesText: ["Red integrada activa y doctrina de salva para la defensa rusa.", "El supresor GNSS desvía a las armas que dependen del satélite (los ATACMS y los Liutyi son los más sensibles).", "Llegada sincronizada entre T+24:00 y T+24:50 para saturar canales de tiro."],
       objectives: [
         { type: "ammo", name: "Depósito de munición", short: "Depósito munición", x: 57.8, y: 32.5, desc: "Arsenal de la base: blanco principal." },
@@ -1927,7 +1927,7 @@ table.t.mc td.pc{white-space:nowrap}
         ataque: "16 Shahed, 8 Gerbera, 6 Geran-3 (a reacción), 6 Kalibr, 3 Kh-101 y 2 Kinzhal, con un avión de interferencia stand-off sobre el Kattegat."
       },
       conditions: "Noche despejada sobre el mar. El motor no modela clima ni luz: la noche solo explica por qué los grupos móviles dependen de la alerta acústica y del radar.",
-      rules: { net: true, doctrine: "salva" },
+      rules: { c2: "coordinada", doctrine: "salva" },
       rulesText: ["Red integrada activa y doctrina de salva.", "No hay recarga: cada unidad cuenta solo con la munición inicial.", "Los Kalibr y los Kh-101 llegan casi juntos (T+25:00 a T+25:10); los Kinzhal, medio minuto después.", "El Patriot mira al oeste: lo que entra por el norte lo tienen que resolver el IRIS-T y la defensa de punto."],
       objectives: [
         { type: "fuel", name: "Refinería de Hisingen", short: "Refinería", x: 51.1, y: 34.4, hp: 1600, desc: "Torres de destilación, tanques y cañerías sobre la costa norte del Göta älv. Blanco principal." },
@@ -1981,7 +1981,7 @@ table.t.mc td.pc{white-space:nowrap}
         ataque: "12 Storm Shadow y 2 Flamingo contra el puente carretero, 4 ATACMS contra el puente ferroviario, 2 Neptune contra el S-400 y 30 drones Liutyi contra la central eléctrica, que llegan un par de minutos antes para gastar la munición de la defensa de punto."
       },
       conditions: "Despejado. El motor no modela clima ni luz.",
-      rules: { net: true, doctrine: "salva" },
+      rules: { c2: "coordinada", doctrine: "salva" },
       rulesText: ["Red integrada activa y doctrina de salva para la defensa rusa.", 'Un puente es un blanco duro y angosto: hace falta acertar varias ojivas grandes (la huella de "Infraestructura" es de 60 m).', "Sin guerra electrónica al empezar. Probá agregar un supresor GNSS Pole-21 junto al puente (pestaña EW) y repetir con Monte Carlo: con un desvío de 100–500 m casi ninguna ojiva acierta un blanco tan angosto.", "Los Liutyi llegan entre T+21:00 y T+23:00; los misiles, sincronizados entre T+24:40 y T+25:10."],
       objectives: [
         { type: "infra", name: "Puente de la autopista 1", short: "Puente Hwy 1", x: 51.8, y: 40.9, hp: 1200, desc: "Puente carretero sobre la boca del estero Elkhorn. Blanco principal." },
@@ -2027,7 +2027,7 @@ table.t.mc td.pc{white-space:nowrap}
         ataque: "28 Shahed en dos oleadas, 10 Gerbera, 10 Kh-101, 6 Kalibr, 3 Iskander-M con señuelos y 2 Kinzhal."
       },
       conditions: "Noche de invierno. El motor no modela clima ni luz: la noche solo explica por qué los grupos móviles dependen de la alerta acústica y del radar.",
-      rules: { net: true, doctrine: "salva" },
+      rules: { c2: "coordinada", doctrine: "salva" },
       rulesText: ["Red integrada activa y doctrina de salva.", "No hay recarga: cada unidad cuenta solo con la munición inicial.", "Los misiles de crucero y los balísticos llegan casi juntos (T+24:50 a T+25:30), después de una hora de drones.", "Sin guerra electrónica al empezar. Probá agregar la red anti-GNSS Pokrova (pestaña EW) sobre la ciudad y repetí con Monte Carlo: en el modelo actual desvía casi todo lo que pasa la defensa (probablemente de más para los misiles de crucero, ver ROADMAP)."],
       objectives: [
         { type: "infra", name: "Central CHP-5", short: "CHP-5", x: 40.3, y: 67.4, hp: 1500, desc: "Central de cogeneración de ~700 MW: luz y calefacción para buena parte de la margen derecha y de Darnytsia." },
@@ -2076,6 +2076,43 @@ table.t.mc td.pc{white-space:nowrap}
     mb_vacio: { map: "monterey", name: "Monterey · vacío", player: "defensa", description: "Mapa libre para armar tu propio escenario: ubicá objetivos, defensas, ataques y guerra electrónica.", objectives: [], defs: [], salvos: [], jams: [], goals: [] },
     gb_vacio: { map: "goteborg", name: "Gotemburgo · vacío", player: "defensa", description: "Mapa libre para armar tu propio escenario: ubicá objetivos, defensas, ataques y guerra electrónica.", objectives: [], defs: [], salvos: [], jams: [], goals: [] }
   };
+
+  // src/data/c2.js
+  var C2_LEVELS = {
+    desconectada: {
+      name: "Desconectada",
+      share: "none",
+      lag: 0,
+      window: 0,
+      deconf: false,
+      desc: "Cada batería pelea sola con su radar. Nadie avisa ni reparte blancos: dos baterías pueden gastar misiles en el mismo blanco."
+    },
+    descoordinada: {
+      name: "Descoordinada (solo alerta)",
+      share: "cue",
+      lag: 45,
+      window: 12,
+      deconf: false,
+      desc: "Llegan alertas por voz o tableta con ~45 s de demora: la batería se prepara antes (arranca su tiempo de reacción), pero necesita su propia pista para disparar y no hay reparto de blancos."
+    },
+    coordinada: {
+      name: "Coordinada (imagen común)",
+      share: "track",
+      lag: 0,
+      window: 12,
+      deconf: true,
+      desc: "Imagen aérea común: los misiles activos o IR y los drones interceptores pueden disparar con la pista de otro sensor, y una batería no repite un blanco que otra ya está enfrentando."
+    },
+    integrada: {
+      name: "Integrada (calidad de tiro)",
+      share: "fire",
+      lag: 2,
+      window: 12,
+      deconf: true,
+      desc: "Pista compuesta de calidad de tiro (tipo IBCS o CEC): además, los sistemas guiados por radar pueden lanzar con la pista de otro sensor si su radar ve el punto de encuentro, y la alerta llega casi sin demora."
+    }
+  };
+  var c2FromNet = (net) => net ? "coordinada" : "desconectada";
 
   // src/data/targets.js
   var TARGET_TYPES = {
@@ -2323,8 +2360,8 @@ table.t.mc td.pc{white-space:nowrap}
     setup: { objs: [], defs: [], salvos: [], jams: [] },
     // escenario cargado (data/scenarios.js) o null si es un relieve importado
     scen: null,
-    // opciones de mando y de visualización
-    net: true,
+    // opciones de mando (c2 = nivel de integración, ver data/c2.js) y de visualización
+    c2: "coordinada",
     doctrine: "salva",
     showCov: true,
     covRef: "kh101",
@@ -2675,12 +2712,17 @@ table.t.mc td.pc{white-space:nowrap}
   // src/physics/engagement.js
   var RADAR_GUID = ["TVM", "SARH", "mando", "cañón"];
   var isTBM = (th) => th.cls === "balistico" || th.cls === "hiper";
-  function trackOK(u, th, t, net) {
-    const d = D(u), own = d.radar ? t - (th.det[u.id] ?? -1e9) <= d.radar.scan * 2 + 0.6 : false;
-    const netT = net && t - th.lastNet <= 12;
-    if (RADAR_GUID.includes(d.sam.guid)) return own;
+  function trackOK(u, th, t, c2) {
+    const d = D(u), L = C2_LEVELS[c2], own = d.radar ? t - (th.det[u.id] ?? -1e9) <= d.radar.scan * 2 + 0.6 : false;
+    const netT = (L.share === "track" || L.share === "fire") && th.firstDet !== null && t - th.firstDet >= L.lag && t - th.lastNet <= L.window;
+    if (RADAR_GUID.includes(d.sam.guid)) return own || L.share === "fire" && netT;
     if (d.sam.guid === "operador") return netT;
     return own || netT;
+  }
+  function reactionStart(th, t, c2) {
+    const L = C2_LEVELS[c2];
+    if ((L.share === "cue" || L.share === "fire") && th.firstDet !== null) return Math.min(t, th.firstDet + L.lag);
+    return t;
   }
   function solve(u, th, t) {
     const sm = D(u).sam, tbm = isTBM(th);
@@ -2943,14 +2985,14 @@ table.t.mc td.pc{white-space:nowrap}
       if (!maxR) continue;
       if (u.noDrones && th.cls === "dron") continue;
       if (dh > maxR + 120) continue;
-      if (!trackOK(u, th, t, S.net)) {
+      if (!trackOK(u, th, t, S.c2)) {
         delete u.avail[th.id];
         continue;
       }
-      if (u.avail[th.id] === void 0) u.avail[th.id] = t;
+      if (u.avail[th.id] === void 0) u.avail[th.id] = reactionStart(th, t, S.c2);
       if (t - u.avail[th.id] < sm.react) continue;
       const flying = (th.fly || []).filter((i) => !i.done);
-      if (S.net ? flying.length : flying.some((i) => i.u === u)) continue;
+      if (C2_LEVELS[S.c2].deconf ? flying.length : flying.some((i) => i.u === u)) continue;
       cand.push([th, th.p.rem / Math.max(1, th.T.v)]);
     }
     cand.sort((a, b) => a[1] - b[1]);
@@ -3119,7 +3161,8 @@ table.t.mc td.pc{white-space:nowrap}
     for (const o of salvos) addSalvo(o);
     for (const j of jams) addJam(j.type, j.x, j.y, j);
     if (sc2.rules) {
-      if (sc2.rules.net !== void 0) S.net = sc2.rules.net;
+      if (sc2.rules.c2 && C2_LEVELS[sc2.rules.c2]) S.c2 = sc2.rules.c2;
+      else if (sc2.rules.net !== void 0) S.c2 = c2FromNet(sc2.rules.net);
       if (sc2.rules.doctrine) S.doctrine = sc2.rules.doctrine;
     }
     S.scen = sc2;
@@ -4340,6 +4383,16 @@ table.t.mc td.pc{white-space:nowrap}
       engine: () => `<p>${code("calcPk()")}: Pk base por clase (${Object.keys(CLS_NAME).join(", ")}) desde ${code("sam.pk")}, calibrada contra episodios reales. Se multiplica por la maniobra terminal (${code("T.manPk")}, o ×0,85 contra cañones), por las bengalas contra IR (×0,85), por la baja firma (×0,85 con buscador activo, ×0,75 con guiado desde tierra), por la interferencia y por blancos a más del 80% de ${code("vmaxT")} (×0,8). Tope 0,98.</p>`
     },
     {
+      id: "c2",
+      group: "Enfrentamiento",
+      title: "Mando y control: qué tan integrada está la defensa",
+      body: () => `<p>Una batería sola ve lo que ve su radar. Integrada en una red, se entera antes de lo que viene, puede disparar con la pista de otro sensor y no le tira a lo que otra batería ya está enfrentando. Cuánto de eso funciona depende del <b>mando y control (C2)</b>: qué red hay, con qué demora llega la información y con qué calidad.</p>
+      <p>En Ucrania conviven niveles muy distintos: sistemas occidentales con enlace Link 16 (Patriot, NASAMS), sistemas soviéticos que entran a la imagen aérea nacional mediante "cajas negras" de conversión y unidades que reciben la situación aérea en tabletas (Virazh-Planshet). Del lado ruso, puestos automatizados como Polyana-D4M1 integran brigadas de S-300, Buk, Tor y Pantsir.</p>`,
+      engine: () => `<p>El nivel se elige en la pestaña Defensa (${code("S.c2")}) y lo usan ${code("trackOK()")} y ${code("reactionStart()")}:</p>
+      <div class="tblwrap"><table class="t"><thead><tr><th>Nivel</th><th>Demora de la red</th><th>Tira con pista ajena</th><th>Reparto de blancos</th></tr></thead><tbody>${Object.values(C2_LEVELS).map((L) => `<tr><td>${esc(L.name)}</td><td>${L.share === "none" ? "—" : L.lag + " s"}</td><td>${{ none: "no", cue: "no (solo alerta)", track: "activos/IR e interceptores", fire: "también guiados por radar" }[L.share]}</td><td>${L.deconf ? "sí" : "no"}</td></tr>`).join("")}</tbody></table></div>
+      <p>"Coordinada" y "desconectada" son el viejo interruptor "red integrada" encendido y apagado. Las demoras son estimaciones de juego. Todavía no se modelan el error de posición de las pistas de red ni los enlaces por sistema (Link 16 vs. red nacional): ver ROADMAP.</p>`
+    },
+    {
       id: "saturation",
       group: "Enfrentamiento",
       title: "Saturación y canales simultáneos",
@@ -5518,7 +5571,8 @@ table.t.mc td.pc{white-space:nowrap}
     ${grp("Rusia", (d) => d.side === "RU" && d.kind !== "aew")}
     ${grp("Sensores", (d) => ["sensor", "aew", "acoustic"].includes(d.kind))}
     <div class="grp"><h3>Mando y control ${infoBtn("detect")} ${infoBtn("saturation")}</h3>
-      <label class="check"><input type="checkbox" id="optNet" ${S.net ? "checked" : ""}><span>Red integrada<br><span class="hint">Las pistas de cualquier sensor se comparten. Misiles activos/IR y drones interceptores pueden disparar con pista ajena, y se evita que dos baterías gasten misiles en el mismo blanco.</span></span></label>
+      <div class="field"><label for="optC2">Integración de la defensa ${infoBtn("c2")}</label><select id="optC2" class="sel">${Object.entries(C2_LEVELS).map(([k, L]) => `<option value="${k}" ${S.c2 === k ? "selected" : ""}>${esc(L.name)}</option>`).join("")}</select></div>
+      <p class="hint" id="c2Info">${esc(C2_LEVELS[S.c2].desc)}</p>
       <div class="field"><label for="optDoc">Doctrina de tiro</label><select id="optDoc" class="sel"><option value="salva" ${S.doctrine === "salva" ? "selected" : ""}>Salva (según unidad)</option><option value="sls" ${S.doctrine === "sls" ? "selected" : ""}>Disparar-observar-disparar</option></select></div>
     </div>
     <div class="grp"><h3>Cobertura de radar ${infoBtn("horizon")} ${infoBtn("los")}</h3>
@@ -5543,8 +5597,14 @@ table.t.mc td.pc{white-space:nowrap}
       if (S.mode === "placeDef" && S.placeType === b.dataset.k) setMode("select");
       else setMode("placeDef", b.dataset.k);
     };
-    $("#optNet").onchange = (e) => {
-      S.net = e.target.checked;
+    $("#optC2").onchange = (e) => {
+      if (S.started) {
+        toast("Reiniciá para cambiar el mando y control.");
+        e.target.value = S.c2;
+        return;
+      }
+      S.c2 = e.target.value;
+      $("#c2Info").textContent = C2_LEVELS[S.c2].desc;
     };
     $("#optDoc").onchange = (e) => {
       S.doctrine = e.target.value;
@@ -5913,7 +5973,7 @@ table.t.mc td.pc{white-space:nowrap}
       version: VERSION,
       saved: now.toISOString(),
       map: mapRef(),
-      rules: { net: S.net, doctrine: S.doctrine },
+      rules: { c2: S.c2, doctrine: S.doctrine },
       scenario: S.scen ? { base: baseKey(S.scen), ...pick(S.scen, META_KEYS) } : null,
       setup: {
         objs: s.objs.map((g) => pick(g, OBJ_KEYS)),
@@ -6089,7 +6149,9 @@ table.t.mc td.pc{white-space:nowrap}
       return { id: id(w, j.id), type: j.type, x: j.x, y: j.y, alt: num2(w + " · alt", j.alt, 0, 2e4, { opt: true }), on: bool(w + " · on", j.on) };
     });
     const r = raw.rules || {};
-    const rules = { net: bool("rules.net", r.net), doctrine: r.doctrine };
+    const net = bool("rules.net", r.net);
+    const rules = { c2: r.c2 ?? (net === void 0 ? void 0 : c2FromNet(net)), doctrine: r.doctrine };
+    if (r.c2 !== void 0 && !C2_LEVELS[r.c2]) err(`rules.c2: "${String(r.c2)}" no es un nivel de mando y control válido (${Object.keys(C2_LEVELS).join(", ")}).`);
     if (r.doctrine !== void 0 && !DOCTRINES.includes(r.doctrine)) err(`rules.doctrine: "${String(r.doctrine)}" no es ${DOCTRINES.join(" ni ")}.`);
     let scenario = null;
     if (raw.scenario != null) {
@@ -6153,7 +6215,7 @@ table.t.mc td.pc{white-space:nowrap}
       const jj = addJam(j.type, j.x, j.y, { alt: j.alt });
       if (j.on !== void 0) jj.on = j.on;
     }
-    if (data.rules.net !== void 0) S.net = data.rules.net;
+    if (data.rules.c2) S.c2 = data.rules.c2;
     if (data.rules.doctrine) S.doctrine = data.rules.doctrine;
     S.scen = data.scenario ? {
       ...data.scenario,

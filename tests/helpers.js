@@ -16,19 +16,20 @@ export function useMap(key, { flat = false } = {}) {
 export function clearSetup() {
   resetState();
   S.setup = { objs: [], defs: [], salvos: [], jams: [] }; S.sel = null; S.mode = 'select';
-  S.net = true; S.doctrine = 'salva';
+  S.c2 = 'coordinada'; S.doctrine = 'salva';
 }
 
 /**
  * Corre un escenario completo con semilla fija y devuelve el estado final.
- * opts: { seed, flat, net, doctrine, prep(S) }
+ * opts: { seed, flat, net (viejo: true = coordinada, false = desconectada), c2, doctrine, prep(S) }
  */
 export function runScenario(key, opts = {}) {
   const sc = SCENARIOS[key];
   useMap(sc.map, opts);
   clearSetup();
   applyScenario(sc);
-  if (opts.net !== undefined) S.net = opts.net;
+  if (opts.net !== undefined) S.c2 = opts.net ? 'coordinada' : 'desconectada';
+  if (opts.c2) S.c2 = opts.c2;
   if (opts.doctrine) S.doctrine = opts.doctrine;
   if (opts.prep) opts.prep(S);
   return runCurrent(opts.seed ?? 1);

@@ -1,5 +1,5 @@
 // Pestaña "Defensa": catálogo de sistemas para ubicar, mando y control, y opciones de cobertura.
-import { DEFENSES, THREATS } from '../../data/index.js';
+import { DEFENSES, THREATS, C2_LEVELS } from '../../data/index.js';
 import { esc } from '../../util/format.js';
 import { S } from '../../sim/state.js';
 import { draw } from '../../render/draw.js';
@@ -19,7 +19,8 @@ export function renderDef() {
     ${grp('Rusia', d => d.side === 'RU' && d.kind !== 'aew')}
     ${grp('Sensores', d => ['sensor', 'aew', 'acoustic'].includes(d.kind))}
     <div class="grp"><h3>Mando y control ${infoBtn('detect')} ${infoBtn('saturation')}</h3>
-      <label class="check"><input type="checkbox" id="optNet" ${S.net ? 'checked' : ''}><span>Red integrada<br><span class="hint">Las pistas de cualquier sensor se comparten. Misiles activos/IR y drones interceptores pueden disparar con pista ajena, y se evita que dos baterías gasten misiles en el mismo blanco.</span></span></label>
+      <div class="field"><label for="optC2">Integración de la defensa ${infoBtn('c2')}</label><select id="optC2" class="sel">${Object.entries(C2_LEVELS).map(([k, L]) => `<option value="${k}" ${S.c2 === k ? 'selected' : ''}>${esc(L.name)}</option>`).join('')}</select></div>
+      <p class="hint" id="c2Info">${esc(C2_LEVELS[S.c2].desc)}</p>
       <div class="field"><label for="optDoc">Doctrina de tiro</label><select id="optDoc" class="sel"><option value="salva" ${S.doctrine === 'salva' ? 'selected' : ''}>Salva (según unidad)</option><option value="sls" ${S.doctrine === 'sls' ? 'selected' : ''}>Disparar-observar-disparar</option></select></div>
     </div>
     <div class="grp"><h3>Cobertura de radar ${infoBtn('horizon')} ${infoBtn('los')}</h3>
@@ -33,7 +34,7 @@ export function renderDef() {
     const b = e.target.closest('.ub'); if (!b) return; if (S.started) { toast('Reiniciá para editar el escenario.'); return; }
     if (S.mode === 'placeDef' && S.placeType === b.dataset.k) setMode('select'); else setMode('placeDef', b.dataset.k);
   };
-  $('#optNet').onchange = e => { S.net = e.target.checked; };
+  $('#optC2').onchange = e => { if (S.started) { toast('Reiniciá para cambiar el mando y control.'); e.target.value = S.c2; return; } S.c2 = e.target.value; $('#c2Info').textContent = C2_LEVELS[S.c2].desc; };
   $('#optDoc').onchange = e => { S.doctrine = e.target.value; };
   $('#optCov').onchange = e => { S.showCov = e.target.checked; draw(); };
   $('#optRef').onchange = e => { S.covRef = e.target.value; const T = THREATS[S.covRef]; S.covAgl = T.agl ?? (T.prof === 'ballistic' ? 10000 : (T.prof === 'hilo' ? 15 : 5000)); $('#optAgl').value = S.covAgl; $('#aglVal').textContent = S.covAgl + ' m'; schedCov(); };

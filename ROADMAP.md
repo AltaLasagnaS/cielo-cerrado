@@ -23,7 +23,7 @@ Propuesta detallada, con orden, dificultad, datos y pruebas: [docs/investigacion
 - Interceptor con perfil de energía y límite de g en lugar de velocidad media.
 - Daño funcional: un radar dañado pierde alcance, una base dañada no lanza.
 - Clima por **estados** (despejado, nublado, lluvia, tormenta, niebla, nieve): atenuación por lluvia según la banda (ITU-R P.838), restricciones ópticas e IR, estado del mar y viento.
-- **Integración de la defensa aérea** por niveles (desconectada, descoordinada, coordinada, integrada), con demora y precisión de las pistas compartidas, reparto de blancos e interrupción de comunicaciones. Reemplaza al interruptor "red integrada".
+- Integración de la defensa aérea, segunda parte: error de posición de las pistas de red, reparto "mejor tirador" en el nivel integrado e interrupción de comunicaciones (los cuatro niveles ya están).
 - **Enlaces de datos por sistema** (Link 16, red nacional ucraniana, red rusa tipo Polyana) con pasarelas: solo comparten pistas los sistemas compatibles.
 
 ## Juego
