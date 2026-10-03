@@ -876,11 +876,11 @@
   "log": 142
  },
  "mb_puente_s1": {
-  "t": 1533.25,
+  "t": 1524.75,
   "stats": {
    "launched": 47,
-   "killed": 46,
-   "hits": 1,
+   "killed": 44,
+   "hits": 3,
    "misses": 0,
    "decoys": 0,
    "decoysKilled": 0,
@@ -895,31 +895,40 @@
     "Tor-M2": 12,
     "S-400": 32
    },
-   "damage": 422,
+   "damage": 1200,
    "dmgByWeapon": {
-    "Storm Shadow": 422
+    "Storm Shadow": 1200
    },
-   "missSum": 2.2428539386838873,
-   "missN": 1,
-   "objsDestroyed": 0,
+   "missSum": 3.647560248523628,
+   "missN": 3,
+   "objsDestroyed": 1,
    "satChannels": {
     "Buk-M1": 5,
     "Pantsir-1": 9,
     "Pantsir-2": 7,
     "Tor-M2": 7,
-    "S-400": 10
+    "S-400": 13
    },
    "satMag": {
     "Buk-M1": 1,
     "Pantsir-1": 1,
-    "Pantsir-2": 1,
-    "S-400": 1
+    "Pantsir-2": 1
    }
   },
   "impacts": [
    [
+    51.8014,
+    40.8998,
+    "hit"
+   ],
+   [
+    51.8003,
+    40.9008,
+    "hit"
+   ],
+   [
     51.8007,
-    40.9021,
+    40.8988,
     "hit"
    ]
   ],
@@ -960,7 +969,7 @@
     0
    ]
   ],
-  "log": 193
+  "log": 198
  },
  "kv_energia_s1": {
   "t": 1550,

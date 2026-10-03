@@ -12,6 +12,7 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 ### Corregido
 - **[sim]** En el nivel de C2 **integrada**: los cañones (Gepard, grupos móviles) ya no disparan con la pista de otro sensor (siempre apuntan con el suyo), y un sistema guiado por radar solo lanza con pista ajena si su propio radar cubre el punto de encuentro (sector y alcance), como dice la descripción del nivel. Los escenarios incluidos usan "coordinada": no cambian.
 - En celulares y tablets, el arreglo de los botones durante la partida podía dejar congelada la tarjeta de selección o las estadísticas después de tocar un botón. Ahora se detecta el botón *apretado* en lugar de "el puntero encima".
+- **[sim]** El techo de cada arma (`sam.altMax`) se comparaba contra la altura del blanco **sobre el nivel del mar** en lugar de la altura **sobre el lanzador**: en mapas altos (Kiev está a 100–200 m) los grupos móviles no tiraban a un Shahed a 1.500 m sobre el terreno aunque lo tuvieran al alcance. Cambia el escenario del puente de Monterey (el ataque gana ≈6 de cada 10 en vez de 5).
 - Durante una partida, los botones **Ficha**, **Briefing** y **Ver debrief** a veces no respondían: los paneles se redibujan varias veces por segundo y el botón se reemplazaba entre que se apretaba y se soltaba. Ahora el panel no se redibuja mientras el puntero está sobre uno de sus botones.
 
 ### Corregido

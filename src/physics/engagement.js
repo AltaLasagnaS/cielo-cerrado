@@ -58,7 +58,8 @@ export function solve(u, th, t) {
     const p = posAt(th, t + tau); if (!p) break;
     const dh = Math.hypot(p.x - u.x, p.y - u.y), r = Math.hypot(dh, (p.z - lz) / 1000);
     const agl = p.z - surf(p.x, p.y);
-    if (r <= maxR && r >= sm.minR && agl >= sm.altMin && p.z <= sm.altMax) {
+    // altMin: sobre el terreno bajo el blanco (el piso del radar); altMax: sobre el lanzador (techo del arma)
+    if (r <= maxR && r >= sm.minR && agl >= sm.altMin && p.z - lz <= sm.altMax) {
       const tf = r * 1000 / sm.vInt;
       if (tf <= tau) return (tau - tf <= 3) ? { tau, p, r } : null;
     }
