@@ -484,13 +484,15 @@ Todo campo nuevo tiene que tener valor por defecto **neutro** (el que reproduce 
   2. **Enlace de datos por unidad**, un interruptor aparte. Dos unidades con enlace compatible encendido se pasan **pistas de calidad de tiro**, con poca demora, **aunque el resto de la defensa esté fuera del circuito**. Ejemplo: un avión o un radar con Link 16 que le pasa la pista a un Patriot mientras los Buk y los grupos móviles solo reciben alertas por tableta.
   
   Quién tiene enlace nativo y comprobable está en el anexo K: son pocos, casi todos occidentales.
+- **Interruptor de enlace también para el ataque**, por ahora solo de tecnología: si el arma tiene o no enlace de datos. Qué armas lo tienen está en el anexo K. El efecto en el juego (cambiar de blanco en vuelo, guía en vivo) se define cuando se implemente.
 - **Clima:** estados **fijos** por escenario (sin clima que cambie durante la corrida).
+- **RCS:** valores basados en OSINT y en la base de CMO. Cuando las dos fuentes difieren, el probable es el **punto medio en escala logarítmica** (media geométrica) y el rango cubre a las dos.
 - **RCS:** se implementa primero. Los números salen como explica el anexo J.
 
 **Siguen abiertas:**
 - **RCS:** ¿cuatro aspectos (frente, costado, cola, abajo) o los seis de CMO? Propuesta: cuatro, en **dos rangos de frecuencia** como CMO (anexo J).
 - **Energía:** ¿alcanza el paso A o queremos el perfil completo del paso B?
-- **Enlaces de las armas atacantes** (anexo K): los Shahed con módem *mesh* y los Kh-101 que se pueden redirigir en vuelo. ¿Lo modelamos (por ejemplo, cambiar de blanco a mitad de camino) o queda para más adelante?
+- **Efecto del enlace en las armas atacantes** (anexo K): ¿cambiar de blanco a mitad de camino, esquivar defensas conocidas o guía en vivo del operador? Queda para cuando se implemente.
 
 ## G) Notas sobre las fuentes
 
@@ -566,9 +568,21 @@ La diferencia frente–costado es la parte más incierta. Por eso el Monte Carlo
 | **Gepard, grupos móviles, MANPADS, acústicos** (Ucrania) | Tabletas (Virazh-Planshet) | Reciben la imagen aérea para orientarse, no para guiar [ua_virazh] | Media |
 | **S-400, S-300, Buk, Tor, Pantsir** (Rusia) | Red automatizada propia | Polyana-D4M1, Baikal-1ME y Senezh integran brigadas mixtas y asignan blancos a las S-400 (fabricante) [ru_polyana] | Existencia alta; desempeño real desconocido |
 
-**Del lado atacante también hay enlaces** (es otra mejora posible, no la del interruptor):
-- **Shahed/Geran y Gerbera:** desde 2025 se ven módems *mesh* chinos (XK-F358, HX-50) con cámaras. Permiten telemetría, redirigirlos en vuelo y hasta guiarlos en vivo, a unos 100 km del frente [shahed_mesh].
-- **Kh-101:** varias fuentes dicen que se puede redirigir a otro blanco en vuelo. No encontré confirmación de un enlace satelital bidireccional [kh101_retarget].
+**Del lado atacante: qué armas del catálogo tienen enlace de datos.** "Enlace" acá es cualquier comunicación con el arma después del lanzamiento (telemetría, cambio de blanco, video o guía en vivo):
+
+| Arma | ¿Enlace? | Qué dice la fuente | Confianza |
+|---|---|---|---|
+| **Shahed / Geran-2** | Sí, en parte de la flota desde 2025 | Módems *mesh* chinos (XK-F358, HX-50), cámaras y antenas en restos. Permiten telemetría, redirigirlos y hasta guiarlos en vivo a ~100 km del frente [shahed_mesh] | Media–alta |
+| **Gerbera** (señuelo) | Sí, en algunos | Fueron los primeros con cámara y módem *mesh* en 2025 [shahed_mesh] | Media |
+| **Geran-3** (a reacción) | Sí, en algunos | Ejemplar intacto recuperado en septiembre de 2025 con cámara, video en vivo y módem *mesh* [geran3_mesh] | Media–alta |
+| **Kh-101** | Cambio de blanco en vuelo, según varias fuentes | No encontré confirmación de un enlace bidireccional [kh101_retarget] | Baja–media |
+| **Iskander-M** | Antes del lanzamiento, sí; en vuelo, dudoso | El vehículo programa el misil por enlace. Hay versiones de que la cabeza óptica se puede corregir por radio desde AWACS o drones: sin confirmar [isk_link] | Baja |
+| **Oniks** | Integración de blancos en el lanzador | El lanzador Bastion integra datos externos para salvas coordinadas. Que los misiles "conversen" entre sí es un antecedente del P-500 Bazalt, no algo confirmado en el Oniks [oniks_link] | Baja |
+| **Kalibr, Kinzhal, Kh-22, Tsirkon, 9M728** | Sin datos públicos | — | — |
+| **Storm Shadow** | Enlace de una vía para informar el impacto; el cambio de blanco en vuelo con enlace de dos vías figuraba como mejora planeada | [storm_link] | Media (lo planeado, sin confirmar) |
+| **ATACMS** | No | Guía inercial + GNSS | Media |
+| **Neptune** | Sin datos firmes | Solo prensa genérica sobre "actualización en tiempo real" | Baja |
+| **Liutyi y Flamingo** | Sin datos firmes | Hay drones ucranianos con Starlink y *mesh* (Palytsia, Bucha), pero no encontré confirmación para estos dos [ua_mesh] | Baja |
 
 **Cómo queda en el juego:**
 - Cada defensa trae en el catálogo `links` (por ejemplo `['L16']`), con fuente y confianza.
@@ -633,3 +647,9 @@ Claves usadas en el texto. Todas aparecieron en resultados de búsqueda del 3 de
 - **ua_mix**: IISS, "Ukraine's ground-based air defence: evolution, resilience and pressure" (feb-2025) — <https://www.iiss.org/online-analysis/military-balance/2025/02/ukraines-ground-based-air-defence-evolution-resilience-and-pressure/>; CSIS, "Does Ukraine Already Have Functional CJADC2 Technology?" — <https://www.csis.org/analysis/does-ukraine-already-have-functional-cjadc2-technology>; Ukraine War Analytics, "Radar Systems Supporting Ukrainian Air Defense" — <https://ukraine-war-analytics.com/air-defense/air-defense-radars-ukraine.html>
 - **shahed_mesh**: Fabian Hinz, "Networking the Shahed" — <https://luftlage.substack.com/p/networking-the-shahed>; NV / Defense Express, "Russia turns Shaheds into FPV drones with cameras and mesh modems" — <https://english.nv.ua/nation/russia-turns-shaheds-into-fpv-drones-with-cameras-and-mesh-modems-defense-express-50544076.html>; Calibre Defence, "Mesh networks" — <https://www.calibredefence.co.uk/mesh-networks-how-russia-is-increasing-the-range-of-its-drones/>
 - **kh101_retarget**: GlobalSecurity, "Kh-101 / Kh-102" — <https://www.globalsecurity.org/wmd/world/russia/kh-101.htm>; Missile Defense Advocacy Alliance, "KH-101/102" — <https://www.missiledefenseadvocacy.org/missile-threat-and-proliferation/todays-missile-threat/russia/kh-101102/>
+- **geran3_mesh**: Euromaidan Press, "Ukraine recovers Russia's undamaged Geran-3 jet kamikaze drone carrying camera and live-link equipment" (27-nov-2025) — <https://euromaidanpress.com/2025/11/27/ukraine-recovers-russias-undamaged-geran-3-jet-kamikaze-drone-carrying-camera-and-live-link-equipment-video/>; dev.ua — <https://dev.ua/en/news/syly-oborony-zakhopyly-neushkodzhenyi-reaktyvnyi-dron-heran-3-z-kameroiu-ta-mesh-zviazkom-1764235139>
+- **isk_link**: RUSI, "The Iskander-M and Iskander-K: A Technical Profile" — <https://www.rusi.org/explore-our-research/publications/commentary/iskander-m-and-iskander-k-technical-profile>; Army Technology, "Iskander Tactical Ballistic Missile System" — <https://www.army-technology.com/projects/iksander-system/>
+- **oniks_link**: Wikipedia, "K-300P Bastion-P" — <https://en.wikipedia.org/wiki/K-300P_Bastion-P>; Wikipedia, "P-500 Bazalt" — <https://en.wikipedia.org/wiki/P-500_Bazalt>
+- **storm_link**: Wikipedia, "Storm Shadow" — <https://en.wikipedia.org/wiki/Storm_Shadow>; FlightGlobal, "Upgrade for Storm Shadow/Scalp" — <https://www.flightglobal.com/upgrade-for-storm-shadow/scalp/55352.article>
+- **ua_mesh**: UA News, "Palytsia equipped with Starlink" — <https://ua.news/en/war-vs-rf/ukrayinskii-dron-palitsia-otrimav-starlink-i-dalnist-polotu-do-90-km>; Kyiv Post, "Ukraine's FP-2 Drones Hit Deep Inside Russia Where Starlink Is Unavailable" — <https://www.kyivpost.com/post/83087>
+- **cmo_isk**: foro Matrix Games, "Thread for DB3000 database problems, updates or issues", p. 92 (Iskander-E: −9,8 dBsm en la base) — <https://forums.matrixgames.com/viewtopic.php?t=243914&start=1820>
