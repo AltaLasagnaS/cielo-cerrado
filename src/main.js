@@ -20,6 +20,7 @@ import { initInput } from './ui/input.js';
 import { initModal } from './ui/fichas.js';
 import { initHelp } from './ui/help.js';
 import { initHgtImport } from './ui/hgt.js';
+import { initScenarioFile, loadFromObject, saveScenario } from './ui/scenario-file.js';
 import { initRelief } from './ui/relief.js';
 import { initAcademy } from './ui/academy.js';
 import { initTabs, renderAll } from './ui/panels/index.js';
@@ -44,12 +45,13 @@ initTabs();
 initModal();
 initHelp();
 initHgtImport();
+initScenarioFile();
 initRelief();
 initAcademy();
 
 const sc = $('#scenario');
 sc.innerHTML = Object.entries(SCENARIOS).map(([k, s]) => `<option value="${k}">${esc(s.name)}</option>`).join('');
-sc.onchange = e => { if (e.target.value !== 'hgt') { loadScenario(e.target.value); openBriefing(); } };
+sc.onchange = e => { if (SCENARIOS[e.target.value]) { loadScenario(e.target.value); openBriefing(); } };
 let fitted = false;
 new ResizeObserver(() => { resize(); if (!fitted) { fitView(); fitted = true; } }).observe($('#mapwrap'));
 // si cambia la densidad de píxeles (zoom del navegador, otro monitor) se rehace el canvas
@@ -59,4 +61,4 @@ loadScenario('mb_noche');
 resize(); fitView();
 startLoop();
 
-window.__S = S; window.__dbg = { flat: () => { MAP.data = new Int16Array(MAP.data.length); MAP.key = 'flat'; MAP.max = 0; MAP.min = 0; buildBase(); }, computeCov, draw, addDef, addSalvo, addJam, startSim, step, resetSim, loadScenario, renderAll, openDebrief };
+window.__S = S; window.__dbg = { flat: () => { MAP.data = new Int16Array(MAP.data.length); MAP.key = 'flat'; MAP.max = 0; MAP.min = 0; buildBase(); }, computeCov, draw, addDef, addSalvo, addJam, startSim, step, resetSim, loadScenario, renderAll, openDebrief, loadFromObject, saveScenario };

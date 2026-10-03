@@ -201,6 +201,9 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
     <div class="brand"><h1>Cielo <span>Cerrado</span></h1><small>Simulador táctico de defensa aérea · datos públicos aproximados</small></div>
     <div class="topctl">
       <select id="scenario" class="sel" aria-label="Escenario"></select>
+      <button id="saveScen" class="btn" title="Descargar el escenario armado como archivo .json">Guardar</button>
+      <label class="btn" for="loadScen" title="Abrir un escenario guardado (.json)">Cargar</label>
+      <input id="loadScen" type="file" accept=".json,application/json" hidden>
       <label class="btn" for="hgt" title="Cargar un tile SRTM .hgt descomprimido">Cargar relieve .hgt</label>
       <input id="hgt" type="file" accept=".hgt" hidden>
       <button id="helpBtn" class="btn">Cómo se usa</button>
@@ -5264,6 +5267,7 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
     <li><b>Guerra electrónica:</b> jammers de ruido (aéreo o Krasukha) y supresor GNSS. Las líneas violeta muestran qué radar está siendo interferido.</li>
     <li><b>Cobertura:</b> el mapa sombrea en turquesa dónde tus sensores ven un blanco de referencia a cierta altura sobre el terreno, considerando relieve real, curvatura terrestre, RCS en la banda de cada radar e interferencia. Bajá la altura y vas a ver aparecer los huecos de los valles.</li>
     <li><b>Simulación:</b> ▶ Iniciar, velocidades 1×–60×. "Vista del defensor" oculta lo que no fue detectado y muestra los señuelos igual que las armas reales.</li>
+    <li><b>Guardar y cargar:</b> "Guardar" descarga lo que armaste (objetivos, defensas, ataques, jammers, reglas y metas) como archivo .json; "Cargar" lo vuelve a abrir, también en otra computadora. Al cargar se revisa que el mapa exista y que las armas y defensas estén en el catálogo; si algo falla, no se toca lo que tenías. Un escenario sobre un relieve .hgt necesita que cargues ese relieve antes.</li>
     <li><b>Relieve propio:</b> "Cargar relieve .hgt" acepta tiles SRTM descomprimidos (por ejemplo N50E030.hgt para Kyiv), de 1201×1201 o 3601×3601 muestras.</li>
   </ul>
   <h3>Qué modela y qué no</h3>
@@ -5303,6 +5307,354 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
       log("d", "Relieve cargado: " + f.name + " (" + kmx.toFixed(0) + " × " + kmy + " km). Escenario vacío.");
       renderLog();
     };
+  }
+
+  // src/sim/scenario-io.js
+  var FORMAT = "cielo-cerrado/escenario";
+  var VERSION = 1;
+  var EDGE_KM = 1;
+  var MAX_ITEMS = 500;
+  var SIDES = ["ataque", "defensa"];
+  var GOAL_KINDS = ["destroy", "damage", "protect", "survive", "killUnit", "keepUnit"];
+  var DOCTRINES = ["salva", "sls"];
+  var pick = (o, keys) => {
+    const r = {};
+    for (const k of keys) if (o[k] !== void 0) r[k] = structuredClone(o[k]);
+    return r;
+  };
+  var OBJ_KEYS = ["id", "type", "x", "y", "name", "short", "maxHp", "desc"];
+  var DEF_KEYS = ["id", "type", "x", "y", "name", "az", "mast", "alt", "mag", "salvo", "noDrones"];
+  var SALVO_KEYS = ["id", "type", "count", "interval", "tStart", "sync", "tArrive", "agl", "launchDist", "maneuver", "decoys", "pts", "targetUnit", "targetObj"];
+  var JAM_KEYS = ["id", "type", "x", "y", "alt", "on"];
+  var META_KEYS = ["name", "player", "time", "description", "forces", "conditions", "rulesText", "goals", "success", "failure"];
+  var baseKey = (sc2) => sc2 ? sc2.base ?? Object.keys(SCENARIOS).find((k) => SCENARIOS[k] === sc2) ?? null : null;
+  function mapRef() {
+    if (TERRAIN[MAP.key]) return { key: MAP.key, name: MAP.name };
+    return { key: MAP.key, name: MAP.name, latN: MAP.latN, lonW: MAP.lonW, wKm: +MAP.wKm.toFixed(3), hKm: +MAP.hKm.toFixed(3) };
+  }
+  function exportScenario(now = /* @__PURE__ */ new Date()) {
+    const s = S.setup;
+    return {
+      format: FORMAT,
+      version: VERSION,
+      saved: now.toISOString(),
+      map: mapRef(),
+      rules: { net: S.net, doctrine: S.doctrine },
+      scenario: S.scen ? { base: baseKey(S.scen), ...pick(S.scen, META_KEYS) } : null,
+      setup: {
+        objs: s.objs.map((g) => pick(g, OBJ_KEYS)),
+        defs: s.defs.map((u) => pick(u, DEF_KEYS)),
+        salvos: s.salvos.map((sv) => pick(sv, SALVO_KEYS)),
+        jams: s.jams.map((j) => pick(j, JAM_KEYS))
+      }
+    };
+  }
+  function exportFileName() {
+    const base = (S.scen?.name || MAP.name || "escenario").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
+    return "cielo-cerrado-" + (base || "escenario") + ".json";
+  }
+  function validateScenario(raw) {
+    const errors = [], warnings = [];
+    const err = (m2) => {
+      if (errors.length < 30) errors.push(m2);
+    };
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return { ok: false, errors: ["El archivo no contiene un objeto JSON."], warnings };
+    if (raw.format !== FORMAT) return { ok: false, errors: [`No es un archivo de escenario de Cielo Cerrado (falta "format": "${FORMAT}").`], warnings };
+    if (raw.version !== VERSION) return { ok: false, errors: [`Versión de archivo ${raw.version} no soportada (esta versión del juego lee la ${VERSION}).`], warnings };
+    const m = raw.map;
+    let wKm, hKm, map = null;
+    if (!m || typeof m.key !== "string") err('Falta el mapa ("map.key").');
+    else if (TERRAIN[m.key]) {
+      const t = TERRAIN[m.key];
+      map = { key: m.key, builtin: true };
+      wKm = t.W * t.cell / 1e3;
+      hKm = t.H * t.cell / 1e3;
+    } else if (m.key === "hgt") {
+      if (MAP?.key !== "hgt" || MAP.name !== m.name || Math.abs(MAP.latN - m.latN) > 1e-6 || Math.abs(MAP.lonW - m.lonW) > 1e-6) err(`El escenario usa el relieve importado "${String(m.name)}". Cargalo primero con "Cargar relieve .hgt" y después el escenario.`);
+      else {
+        map = { key: "hgt", builtin: false };
+        wKm = MAP.wKm;
+        hKm = MAP.hKm;
+      }
+    } else err(`Mapa desconocido: "${String(m.key)}". Los incluidos son: ${Object.keys(TERRAIN).join(", ")}.`);
+    if (errors.length) return { ok: false, errors, warnings };
+    const isNum = (v) => typeof v === "number" && Number.isFinite(v);
+    const num = (where, v, lo, hi, { int = false, opt = false } = {}) => {
+      if (v === void 0 || v === null) {
+        if (!opt) err(`${where}: falta el valor.`);
+        return void 0;
+      }
+      if (!isNum(v) || v < lo || v > hi || int && !Number.isInteger(v)) {
+        err(`${where}: ${JSON.stringify(v)} no es ${int ? "un entero" : "un número"} entre ${lo} y ${hi}.`);
+        return void 0;
+      }
+      return v;
+    };
+    const bool = (where, v) => {
+      if (v === void 0) return void 0;
+      if (typeof v !== "boolean") {
+        err(`${where}: tiene que ser true o false.`);
+        return void 0;
+      }
+      return v;
+    };
+    const str = (where, v, max, opt = true) => {
+      if (v === void 0 || v === null) {
+        if (!opt) err(`${where}: falta el texto.`);
+        return void 0;
+      }
+      if (typeof v !== "string" || v.length > max) {
+        err(`${where}: tiene que ser un texto de hasta ${max} caracteres.`);
+        return void 0;
+      }
+      return v;
+    };
+    const pos = (where, x, y) => {
+      const ok = isNum(x) && isNum(y) && x >= -EDGE_KM && y >= -EDGE_KM && x <= wKm + EDGE_KM && y <= hKm + EDGE_KM;
+      if (!ok) err(`${where}: la posición (${JSON.stringify(x)}, ${JSON.stringify(y)}) está fuera del mapa (${wKm.toFixed(0)} × ${hKm.toFixed(0)} km).`);
+      return ok;
+    };
+    const list = (name, v) => {
+      if (v === void 0) return [];
+      if (!Array.isArray(v)) {
+        err(`setup.${name} tiene que ser una lista.`);
+        return [];
+      }
+      if (v.length > MAX_ITEMS) {
+        err(`setup.${name}: más de ${MAX_ITEMS} elementos.`);
+        return [];
+      }
+      return v.filter((x, i) => {
+        if (!x || typeof x !== "object") {
+          err(`setup.${name}[${i}] no es un objeto.`);
+          return false;
+        }
+        return true;
+      });
+    };
+    const ids = /* @__PURE__ */ new Set();
+    const id = (where, v) => {
+      if (!Number.isInteger(v) || ids.has(v)) {
+        err(`${where}: "id" ausente o repetido.`);
+        return null;
+      }
+      ids.add(v);
+      return v;
+    };
+    const setup = raw.setup;
+    if (!setup || typeof setup !== "object") return { ok: false, errors: ['Falta la sección "setup" con objetivos, defensas, salvas y jammers.'], warnings };
+    const objs = list("objs", setup.objs).map((g, i) => {
+      const w = `Objetivo ${i + 1}${typeof g.name === "string" ? " (" + g.name + ")" : ""}`;
+      if (!TARGET_TYPES[g.type]) {
+        err(`${w}: tipo de objetivo desconocido "${String(g.type)}". Válidos: ${Object.keys(TARGET_TYPES).join(", ")}.`);
+        return { id: id(w, g.id) };
+      }
+      pos(w, g.x, g.y);
+      return { id: id(w, g.id), type: g.type, x: g.x, y: g.y, name: str(w + " · name", g.name, 120, false), short: str(w + " · short", g.short, 60), maxHp: num(w + " · maxHp", g.maxHp, 1, 1e5, { opt: true }), desc: str(w + " · desc", g.desc, 1e3) };
+    });
+    const defs = list("defs", setup.defs).map((u, i) => {
+      const w = `Defensa ${i + 1}${typeof u.name === "string" ? " (" + u.name + ")" : ""}`;
+      if (!DEFENSES[u.type]) {
+        err(`${w}: tipo de defensa desconocido "${String(u.type)}". Mirá la pestaña Catálogo para ver los disponibles.`);
+        return { id: id(w, u.id) };
+      }
+      pos(w, u.x, u.y);
+      return {
+        id: id(w, u.id),
+        type: u.type,
+        x: u.x,
+        y: u.y,
+        name: str(w + " · name", u.name, 120),
+        az: num(w + " · az", u.az, 0, 360, { opt: true }),
+        mast: num(w + " · mast", u.mast, 0, 200, { opt: true }),
+        alt: num(w + " · alt", u.alt, 0, 2e4, { opt: true }),
+        mag: num(w + " · mag", u.mag, 0, 1e3, { int: true, opt: true }),
+        salvo: num(w + " · salvo", u.salvo, 0, 10, { int: true, opt: true }),
+        noDrones: bool(w + " · noDrones", u.noDrones)
+      };
+    });
+    const objIds = new Set(objs.filter(Boolean).map((g) => g.id)), defIds = new Set(defs.filter(Boolean).map((u) => u.id));
+    const salvos = list("salvos", setup.salvos).map((sv, i) => {
+      const w = `Salva ${i + 1}${typeof sv.type === "string" ? " (" + sv.type + ")" : ""}`;
+      if (!THREATS[sv.type]) {
+        err(`${w}: arma desconocida "${String(sv.type)}". Mirá la pestaña Catálogo para ver las disponibles.`);
+        return null;
+      }
+      if (!Array.isArray(sv.pts) || sv.pts.length < 2 || sv.pts.length > 100) {
+        err(`${w}: la ruta ("pts") necesita entre 2 y 100 puntos.`);
+        return null;
+      }
+      const pts = sv.pts.map((p, k) => Array.isArray(p) && pos(`${w}, punto ${k + 1}`, p[0], p[1]) ? [p[0], p[1]] : null);
+      if (sv.targetUnit != null && !defIds.has(sv.targetUnit)) err(`${w}: apunta a la defensa con id ${JSON.stringify(sv.targetUnit)}, que no está en el archivo.`);
+      if (sv.targetObj != null && !objIds.has(sv.targetObj)) err(`${w}: apunta al objetivo con id ${JSON.stringify(sv.targetObj)}, que no está en el archivo.`);
+      const T = 36e3;
+      return {
+        id: id(w, sv.id),
+        type: sv.type,
+        pts,
+        targetUnit: sv.targetUnit ?? null,
+        targetObj: sv.targetObj ?? null,
+        count: num(w + " · count", sv.count, 1, 500, { int: true }),
+        interval: num(w + " · interval", sv.interval, 0, T, { opt: true }),
+        tStart: num(w + " · tStart", sv.tStart, 0, T, { opt: true }),
+        sync: bool(w + " · sync", sv.sync),
+        tArrive: num(w + " · tArrive", sv.tArrive, 0, T, { opt: true }),
+        agl: num(w + " · agl", sv.agl, 0, 3e4, { opt: true }),
+        launchDist: num(w + " · launchDist", sv.launchDist, 1, 5e3, { opt: true }),
+        maneuver: bool(w + " · maneuver", sv.maneuver),
+        decoys: bool(w + " · decoys", sv.decoys)
+      };
+    });
+    const jams = list("jams", setup.jams).map((j, i) => {
+      const w = `Interferidor ${i + 1}`;
+      if (!JAMMERS[j.type]) {
+        err(`${w}: tipo desconocido "${String(j.type)}". Válidos: ${Object.keys(JAMMERS).join(", ")}.`);
+        return null;
+      }
+      pos(w, j.x, j.y);
+      return { id: id(w, j.id), type: j.type, x: j.x, y: j.y, alt: num(w + " · alt", j.alt, 0, 2e4, { opt: true }), on: bool(w + " · on", j.on) };
+    });
+    const r = raw.rules || {};
+    const rules = { net: bool("rules.net", r.net), doctrine: r.doctrine };
+    if (r.doctrine !== void 0 && !DOCTRINES.includes(r.doctrine)) err(`rules.doctrine: "${String(r.doctrine)}" no es ${DOCTRINES.join(" ni ")}.`);
+    let scenario = null;
+    if (raw.scenario != null) {
+      const sc2 = raw.scenario;
+      if (typeof sc2 !== "object") err('"scenario" tiene que ser un objeto.');
+      else {
+        scenario = { base: typeof sc2.base === "string" && SCENARIOS[sc2.base] ? sc2.base : null, name: str("scenario.name", sc2.name, 200) || "Escenario cargado", player: sc2.player ?? "defensa" };
+        if (!SIDES.includes(scenario.player)) err(`scenario.player: "${String(sc2.player)}" no es "ataque" ni "defensa".`);
+        for (const k of ["time", "conditions", "success", "failure"]) scenario[k] = str("scenario." + k, sc2[k], 1e3);
+        scenario.description = str("scenario.description", sc2.description, 5e3);
+        if (sc2.forces != null) scenario.forces = { defensa: str("scenario.forces.defensa", sc2.forces.defensa, 2e3) || "", ataque: str("scenario.forces.ataque", sc2.forces.ataque, 2e3) || "" };
+        if (sc2.rulesText != null) scenario.rulesText = Array.isArray(sc2.rulesText) ? sc2.rulesText.slice(0, 30).map((t, i) => str(`scenario.rulesText[${i}]`, t, 1e3) || "") : (err("scenario.rulesText tiene que ser una lista de textos."), []);
+        const goals = sc2.goals == null ? [] : Array.isArray(sc2.goals) ? sc2.goals.slice(0, 50) : (err("scenario.goals tiene que ser una lista."), []);
+        const names = new Set([...objs, ...defs].filter(Boolean).map((x) => x.name).filter(Boolean));
+        scenario.goals = goals.map((g, i) => {
+          const w = `Meta ${i + 1}`;
+          if (!g || typeof g !== "object") {
+            err(`${w}: no es un objeto.`);
+            return null;
+          }
+          if (!SIDES.includes(g.side)) err(`${w}: "side" tiene que ser "ataque" o "defensa".`);
+          if (!GOAL_KINDS.includes(g.kind)) err(`${w}: tipo "${String(g.kind)}" desconocido. Válidos: ${GOAL_KINDS.join(", ")}.`);
+          const target = str(w + " · target", g.target, 120, false);
+          if (target && !names.has(target)) warnings.push(`${w} ("${g.text || target}"): no hay ningún objetivo ni defensa llamado "${target}"; no se va a poder cumplir.`);
+          return { side: g.side, primary: !!g.primary, kind: g.kind, target, min: num(w + " · min", g.min, 0, 1, { opt: true }), text: str(w + " · text", g.text, 300) || target || "" };
+        }).filter(Boolean);
+      }
+    }
+    if (errors.length) return { ok: false, errors, warnings };
+    const clean = (o) => {
+      for (const k of Object.keys(o)) if (o[k] === void 0) delete o[k];
+      return o;
+    };
+    const data = {
+      map,
+      rules: clean(rules),
+      scenario: scenario && clean(scenario),
+      setup: { objs: objs.map(clean), defs: defs.map(clean), salvos: salvos.map(clean), jams: jams.map(clean) }
+    };
+    if (!objs.length && !defs.length && !salvos.length && !jams.length) warnings.push("El archivo no tiene objetivos, defensas, salvas ni jammers: el mapa queda vacío.");
+    return { ok: true, errors, warnings, data };
+  }
+  function loadScenarioData(data) {
+    if (MAP?.key !== data.map.key) throw new Error(`loadScenarioData: el mapa activo es ${MAP?.key}, el escenario es de ${data.map.key}`);
+    S.setup = { objs: [], defs: [], salvos: [], jams: [] };
+    S.sel = null;
+    S.mode = "select";
+    const objId = /* @__PURE__ */ new Map(), defId = /* @__PURE__ */ new Map();
+    for (const g of data.setup.objs) objId.set(g.id, addObj(g.type, g.x, g.y, { name: g.name, short: g.short, hp: g.maxHp, desc: g.desc }).id);
+    for (const d of data.setup.defs) {
+      const u = addDef(d.type, d.x, d.y, { name: d.name, az: d.az });
+      for (const k of ["mast", "alt", "mag", "salvo", "noDrones"]) if (d[k] !== void 0) u[k] = d[k];
+      defId.set(d.id, u.id);
+    }
+    for (const sv of data.setup.salvos) {
+      const o = structuredClone(sv);
+      delete o.id;
+      addSalvo({ ...o, targetUnit: sv.targetUnit != null ? defId.get(sv.targetUnit) : null, targetObj: sv.targetObj != null ? objId.get(sv.targetObj) : null });
+    }
+    for (const j of data.setup.jams) {
+      const jj = addJam(j.type, j.x, j.y, { alt: j.alt });
+      if (j.on !== void 0) jj.on = j.on;
+    }
+    if (data.rules.net !== void 0) S.net = data.rules.net;
+    if (data.rules.doctrine) S.doctrine = data.rules.doctrine;
+    S.scen = data.scenario ? {
+      ...data.scenario,
+      map: data.map.key,
+      // el briefing lista los objetivos del escenario: son los del archivo
+      objectives: S.setup.objs.map((g) => ({ type: g.type, name: g.name, short: g.short, x: g.x, y: g.y, hp: g.maxHp, desc: g.desc })),
+      defs: [],
+      salvos: [],
+      jams: []
+    } : null;
+  }
+
+  // src/ui/scenario-file.js
+  var MAX_BYTES = 2 * 1024 * 1024;
+  function initScenarioFile() {
+    $("#saveScen").onclick = saveScenario;
+    $("#loadScen").onchange = async (e) => {
+      const f = e.target.files[0];
+      if (!f) return;
+      e.target.value = "";
+      if (f.size > MAX_BYTES) {
+        showErrors(f.name, ["El archivo pesa más de 2 MB: no parece un escenario."]);
+        return;
+      }
+      let raw;
+      try {
+        raw = JSON.parse(await f.text());
+      } catch (x) {
+        showErrors(f.name, ["No es un JSON válido: " + x.message]);
+        return;
+      }
+      loadFromObject(raw, f.name);
+    };
+  }
+  function saveScenario() {
+    const json = JSON.stringify(exportScenario(), null, 1);
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([json], { type: "application/json" }));
+    a.download = exportFileName();
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1e3);
+    toast("Escenario guardado: " + a.download);
+  }
+  function loadFromObject(raw, fileName = "archivo") {
+    const res = validateScenario(raw);
+    if (!res.ok) {
+      showErrors(fileName, res.errors);
+      return res;
+    }
+    const { data } = res;
+    resetSim();
+    if (data.map.builtin && MAP?.key !== data.map.key) applyMap(builtinMap(data.map.key));
+    loadScenarioData(data);
+    const sc2 = $("#scenario");
+    sc2.querySelector('option[value="file"]')?.remove();
+    const short = fileName.length > 40 ? fileName.slice(0, 37) + "…" : fileName;
+    sc2.insertAdjacentHTML("beforeend", `<option value="file" title="${esc(fileName)}">Archivo: ${esc(short)}</option>`);
+    sc2.value = "file";
+    renderAll();
+    schedCov();
+    const s = S.setup;
+    log("d", `Escenario cargado desde ${fileName}: ${s.objs.length} objetivos, ${s.defs.length} defensas, ${s.salvos.length} salvas, ${s.jams.length} interferidores.`);
+    for (const w of res.warnings) log("w", w);
+    renderLog();
+    if (res.warnings.length) openModal(`<header><h2>Escenario cargado con avisos</h2><button class="btn x">Cerrar</button></header><div class="bd"><p>Se cargó <b>${esc(fileName)}</b>, pero conviene revisar:</p><ul>${res.warnings.map((w) => `<li>${esc(w)}</li>`).join("")}</ul></div>`);
+    else toast("Escenario cargado: " + fileName);
+    return res;
+  }
+  function showErrors(fileName, errors) {
+    openModal(`<header><h2>No se pudo cargar el escenario</h2><button class="btn x">Cerrar</button></header><div class="bd">
+    <p>El archivo <b>${esc(fileName)}</b> tiene problemas. No se cambió nada de lo que tenías armado.</p>
+    <ul>${errors.map((e) => `<li>${esc(e)}</li>`).join("")}</ul>
+    <p class="hint">Los archivos válidos se generan con el botón "Guardar". Si lo editaste a mano, revisá los tipos con la pestaña Catálogo.</p></div>`);
   }
 
   // src/ui/relief.js
@@ -5390,12 +5742,13 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
   initModal();
   initHelp();
   initHgtImport();
+  initScenarioFile();
   initRelief();
   initAcademy();
   var sc = $("#scenario");
   sc.innerHTML = Object.entries(SCENARIOS).map(([k, s]) => `<option value="${k}">${esc(s.name)}</option>`).join("");
   sc.onchange = (e) => {
-    if (e.target.value !== "hgt") {
+    if (SCENARIOS[e.target.value]) {
       loadScenario(e.target.value);
       openBriefing();
     }
@@ -5424,7 +5777,7 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
     MAP.max = 0;
     MAP.min = 0;
     buildBase();
-  }, computeCov, draw, addDef, addSalvo, addJam, startSim, step, resetSim, loadScenario, renderAll, openDebrief };
+  }, computeCov, draw, addDef, addSalvo, addJam, startSim, step, resetSim, loadScenario, renderAll, openDebrief, loadFromObject, saveScenario };
 })();
 </script>
 </body>

@@ -6,7 +6,6 @@ Son ideas ordenadas por prioridad, no promesas. Cada ítem que cambie resultados
 
 ## Próximo (0.4)
 
-- **Guardar y cargar escenarios** en JSON: los escenarios ya son datos declarativos (`data/scenarios.js`), falta exportar e importar el `S.setup` del jugador.
 - **Arnés de calibración reproducible** (`npm run calibrar`): reconstruir los casos de `CAL` con geometría guardada y correr el Monte Carlo en Node. Hace falta para cualquier cambio de física.
 - **Modo Monte Carlo** en la interfaz: N corridas con parámetros sorteados dentro de su rango (`applySample`, ya existe), con la distribución de resultados en el debrief.
 - **Verificar las fuentes de la investigación de EW ucraniana** (ver `docs/investigacion/`) y subir la confianza de lo confirmado.

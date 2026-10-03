@@ -45,6 +45,7 @@ El juego es una página web estática hecha con **JavaScript moderno (módulos E
 ### `src/sim/`: estado y simulación
 - `state.js` (`S`): estado único. `S.setup` es lo que arma el jugador; el resto es la corrida en curso.
 - `setup.js`: agregar objetivos, defensas, salvas y jammers; desplegar escenarios.
+- `scenario-io.js`: guardar el escenario del jugador como JSON y validarlo y desplegarlo al cargar.
 - `engine.js`: `startSim`, `step(dt)`, `engage`, `impact`.
 - `log.js`: registro y eventos de la línea de tiempo.
 - `goals.js`, `debrief.js`: evaluación de metas y análisis final.
@@ -62,6 +63,7 @@ El juego es una página web estática hecha con **JavaScript moderno (módulos E
 - `input.js`: gestos (click, arrastre, pellizco) y teclado.
 - `modes.js`: modos de edición y confirmación antes de colocar.
 - `fichas.js`: ventanas modales con historial ("← Volver").
+- `scenario-file.js`: botones Guardar y Cargar (descarga y lectura del archivo, cambio de mapa).
 - `debrief.js`, `academy.js`, `relief.js`, `controls.js`, `loop.js`, `coverage.js`, `hgt.js`, `help.js`.
 
 ### `src/edu/concepts.js`
@@ -89,3 +91,27 @@ El bucle de la interfaz (`ui/loop.js`) llama a `step(0,25)` las veces necesarias
 - `scripts/build.mjs`: esbuild empaqueta `src/main.js` (IIFE, sin minificar) y lo inserta, junto con el CSS, en la plantilla `src/index.html`. El resultado es el `index.html` de la raíz.
 - `scripts/dev.mjs`: servidor de desarrollo que sirve `src/` tal cual (los módulos ES funcionan nativos en el navegador) y recarga al guardar.
 - `scripts/gen-catalog-doc.mjs`: genera `docs/CATALOGO.md`.
+
+## Archivo de escenario (Guardar / Cargar)
+
+El botón **Guardar** descarga `S.setup` más las reglas y las metas como JSON (`sim/scenario-io.js#exportScenario`). Ejemplo abreviado:
+
+```json
+{
+ "format": "cielo-cerrado/escenario", "version": 1, "saved": "2026-10-03T12:00:00.000Z",
+ "map": { "key": "monterey", "name": "Bahía de Monterey (California, EE.UU.)" },
+ "rules": { "net": true, "doctrine": "salva" },
+ "scenario": { "base": "mb_noche", "name": "…", "player": "defensa", "goals": [ … ], "description": "…" },
+ "setup": {
+  "objs":   [ { "id": 1, "type": "fuel", "x": 63.5, "y": 55.8, "name": "…", "maxHp": 800 } ],
+  "defs":   [ { "id": 4, "type": "patriot", "x": 58, "y": 58, "name": "Patriot-1", "az": 320, "mast": 12, "mag": 16, "salvo": 2 } ],
+  "salvos": [ { "id": 18, "type": "isk_m", "count": 2, "pts": [[60, 0], [58.2, 58]], "targetUnit": 4, "sync": true, "tArrive": 1530 } ],
+  "jams":   [ { "id": 24, "type": "soj", "x": 4, "y": 18, "alt": 8000, "on": true } ]
+ }
+}
+```
+
+- Las coordenadas son las del juego (km desde la esquina noroeste). `targetUnit` y `targetObj` son ids **del archivo**; al cargar se renumeran y las salvas siguen apuntando a lo mismo.
+- **Al cargar** (`validateScenario`) se revisa todo antes de tocar el estado: formato y versión, mapa incluido (o, para un relieve `.hgt`, que ese mismo relieve esté cargado), tipos que existan en el catálogo (`DEFENSES`, `THREATS`, `JAMMERS`, `TARGET_TYPES`), posiciones dentro del mapa (±1 km), números finitos y en rango, ids únicos y blancos existentes. Si hay errores no se cambia nada y se listan; una meta sobre algo que ya no existe es solo un aviso. Solo se copian los campos conocidos.
+- Con la misma semilla, un escenario guardado y vuelto a cargar da **exactamente** la misma corrida (`tests/scenario-io.test.js`).
+- Si el formato cambia, subir `VERSION` y aceptar las versiones anteriores que se puedan convertir.

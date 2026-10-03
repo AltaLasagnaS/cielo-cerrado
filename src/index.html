@@ -17,6 +17,9 @@
     <div class="brand"><h1>Cielo <span>Cerrado</span></h1><small>Simulador táctico de defensa aérea · datos públicos aproximados</small></div>
     <div class="topctl">
       <select id="scenario" class="sel" aria-label="Escenario"></select>
+      <button id="saveScen" class="btn" title="Descargar el escenario armado como archivo .json">Guardar</button>
+      <label class="btn" for="loadScen" title="Abrir un escenario guardado (.json)">Cargar</label>
+      <input id="loadScen" type="file" accept=".json,application/json" hidden>
       <label class="btn" for="hgt" title="Cargar un tile SRTM .hgt descomprimido">Cargar relieve .hgt</label>
       <input id="hgt" type="file" accept=".hgt" hidden>
       <button id="helpBtn" class="btn">Cómo se usa</button>
