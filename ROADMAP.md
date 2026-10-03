@@ -6,7 +6,9 @@ Son ideas ordenadas por prioridad, no promesas. Cada ítem que cambie resultados
 
 ## Próximo (0.4)
 
-- **Arnés de calibración reproducible** (`npm run calibrar`): reconstruir los casos de `CAL` con geometría guardada y correr el Monte Carlo en Node. Hace falta para cualquier cambio de física.
+- **Arnés de calibración reproducible** (`npm run calibrar`): reconstruir los casos de `CAL` con geometría guardada. El Monte Carlo de escenarios en Node ya está (`npm run mc`).
+- **Confirmación de pistas "M de N"** en lugar del corte a 1,2·R, y **`remotePk` con rango en `UNC`** (ver `docs/investigacion/valores-estimados.md`).
+- **Recalibrar** "Monterey · noche" (la defensa gana siempre) y "Gotemburgo · base con S-400" (el ataque no gana nunca).
 - **Verificar las fuentes de la investigación de EW ucraniana** (ver `docs/investigacion/`) y subir la confianza de lo confirmado.
 - **Documentar el origen de los relieves** incluidos.
 

@@ -46,7 +46,7 @@ Igual que un arma, en `defenses.js` y `UNC.def`. La Pk por clase debe estar just
 ### Agregar un escenario
 Agregá una entrada en `src/data/scenarios.js`. Todo es declarativo: objetivos, defensas, salvas, jammers, reglas y metas, documentado en el encabezado del archivo. La prueba de catálogo verifica que los tipos y nombres existan, que todo esté dentro del mapa, que las metas apunten a objetivos o defensas reales y que el briefing esté completo (hora, descripción, fuerzas, condiciones, reglas, metas principales de los dos bandos, éxito y fracaso).
 
-Antes de darlo por bueno, balancealo con el modo Monte Carlo (20–40 corridas): un buen escenario no se gana ni se pierde siempre con la disposición inicial. Después sumale un caso a `tests/golden.test.js` y corré `UPDATE_GOLDEN=1 npm test` (verificá que las golden viejas no cambien).
+Antes de darlo por bueno, balancealo con el modo Monte Carlo (20–40 corridas; en Node, `npm run mc -- <escenario>`, 40 noches con los valores probables): un buen escenario no se gana ni se pierde siempre con la disposición inicial. Después sumale un caso a `tests/golden.test.js` y corré `UPDATE_GOLDEN=1 npm test` (verificá que las golden viejas no cambien).
 
 ### Agregar un relieve real
 `scripts/gen-terrain.mjs` convierte un tile SRTM de 1° × 1° en un relieve del juego (con máscara de ríos y lagos). Agregá una entrada en `MAPS` (tile y lugares con latitud y longitud), corré `node scripts/gen-terrain.mjs <clave>` (o pasale un `.hgt` local) y sumá el módulo a `src/data/terrain/index.js`. Ojo: cada relieve agrega ~0,5 MB a `index.html`.
