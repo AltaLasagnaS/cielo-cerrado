@@ -7,6 +7,7 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 ## [Sin publicar]
 
 ### Agregado
+- **Guardar y cargar escenarios** en JSON (botones *Guardar* y *Cargar* de la barra superior): objetivos, defensas con sus ajustes, salvas, jammers, reglas, briefing y metas. Al cargar se valida el formato, el mapa, que las armas, defensas, jammers y objetivos existan en el catálogo, que las posiciones estén dentro del mapa y que los blancos de las salvas existan; si algo falla no se toca lo armado. Formato en `docs/ARQUITECTURA.md`.
 - **Publicación en GitHub Pages**: el workflow `pages.yml` sube el `index.html` de la raíz en cada push a `main` (o a mano desde Actions), después de verificar que esté al día con `src/`.
 
 ## [0.3.0] - 2026-10-03

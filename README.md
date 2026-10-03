@@ -15,7 +15,8 @@ Primeros pasos:
 2. Tocá **▶ Iniciar**. La velocidad **Auto** acelera cuando no pasa nada y frena cuando hay combate.
 3. Al terminar se abre el **debrief**.
 4. Probá cambiar cosas: mové defensas (antes de iniciar), agregá ataques en la pestaña **Ataque** o activá la capa **Relieve → Puntos altos** para ubicar radares en cotas dominantes.
-5. ¿No sabés qué es la RCS o por qué un radar VHF ve misiles furtivos? Pestaña **Academia** o los botones **ⓘ**.
+5. **Guardar** descarga lo que armaste como archivo `.json`; **Cargar** lo vuelve a abrir (también en otra computadora).
+6. ¿No sabés qué es la RCS o por qué un radar VHF ve misiles furtivos? Pestaña **Academia** o los botones **ⓘ**.
 
 ## Qué modela
 
