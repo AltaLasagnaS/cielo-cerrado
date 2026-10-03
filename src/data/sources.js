@@ -25,6 +25,7 @@ export const SRC = {
   // Shahed / drones
   kharkiv_rcs: ['Sukharevsky et al. (Univ. Fuerza Aérea, Járkov, 2023): modelado de RCS del Shahed-136', 'https://fliphtml5.com/pdvau/uvoj/Shahed_136_UAV_RCS_measurements/'],
   cmo_req_shahed: ['Base de datos de Command: Modern Operations (pedido #2214): firma del Shahed-136 por aspecto en bandas A–D y E–M (estimación de juego)', 'https://github.com/PygmalionOfCyprus/cmo-db-requests/issues/2214'],
+  cmo_cwdb: ['Base de datos de Command: Modern Operations (CWDB 514): en 452 armas guiadas, costado = frente +3 dB y cola = frente (regla del juego, no medición)', 'https://www.matrixgames.com/game/command-modern-operations'],
   cmo_isk: ['Foro Matrix Games, base DB3000 de CMO: RCS del Iskander-E −9,8 dBsm (estimación de juego)', 'https://forums.matrixgames.com/viewtopic.php?t=243914&start=1820'],
   uav_rcs: ['Rosamilia et al. (Cranfield): mediciones de RCS de UAV por aspecto en 8–18 GHz', 'https://dspace.lib.cranfield.ac.uk/server/api/core/bitstreams/b70b94cb-9ed7-4067-a2ae-913fa1950b41/content'],
   tomahawk_l: ['Predição Radar do Míssil de Cruzeiro Tomahawk em Banda L (simulación MLFMA: frente 1,41 m², cola 0,41 m²)', 'https://www.researchgate.net/publication/363731654_Predicao_Radar_do_Missil_de_Cruzeiro_Tomahawk_em_Banda_L_baseado_na_RCS_Dinamica'],

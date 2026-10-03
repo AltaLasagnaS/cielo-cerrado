@@ -6,6 +6,9 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 
 ## [Sin publicar]
 
+### Cambiado
+- **[sim]** RCS de costado y de cola de los misiles ajustadas con la base de datos de CMO: en sus 452 armas guiadas el costado es el frente +3 dB (el doble) y la cola igual al frente. Para las armas sin dato OSINT directo, el probable pasa a ser la media geométrica entre la estimación por forma y esa regla (por ejemplo Kalibr: costado 1 → 0,45 m²; ATACMS: 3 → 0,77 m²) y el rango cubre las dos. Shahed, Geran-3 y Gerbera no cambian.
+
 ### Agregado
 - **Niveles de integración de la defensa aérea** (pestaña Defensa → "Integración de la defensa"), en lugar del interruptor "red integrada": *desconectada*, *descoordinada* (solo alertas con ~45 s de demora que adelantan la reacción), *coordinada* (imagen común, el comportamiento de siempre) e *integrada* (pista de calidad de tiro: también los sistemas guiados por radar pueden lanzar con la pista de otro sensor). Los escenarios y los archivos guardados con `net: true|false` se leen como coordinada o desconectada. Concepto nuevo en la Academia. **[sim]** solo si se eligen los niveles nuevos: las golden no cambian.
 - **Mapa de Kiev** sobre el relieve real (SRTM N50E030, celdas de 200 m) con el Dniéper, el embalse de Kiev y el Desná, generado por `scripts/gen-terrain.mjs` (reproducible).
