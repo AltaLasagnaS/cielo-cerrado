@@ -15,7 +15,6 @@ Son ideas ordenadas por prioridad, no promesas. Cada ítem que cambie resultados
 Propuesta detallada, con orden, dificultad, datos y pruebas: [docs/investigacion/mejoras-fisica.md](docs/investigacion/mejoras-fisica.md).
 
 
-- RCS según el aspecto (usar `rcsSide` según el ángulo de vista).
 - Clutter de suelo y mar para blancos rasantes, según el tipo de radar.
 - Fluctuación de RCS (Swerling) en la probabilidad de detección.
 - Discriminación de señuelos según la banda y el tiempo de seguimiento.

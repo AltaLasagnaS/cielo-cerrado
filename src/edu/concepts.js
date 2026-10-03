@@ -45,9 +45,9 @@ export const CONCEPTS = [
     id: 'rcs', group: 'Radar y bandas', title: 'RCS (sección eficaz radar)',
     body: () => `<p>La <b>RCS</b> (σ, en m²) mide cuánta energía de radar devuelve un blanco hacia la antena. Se expresa como el área de una esfera metálica ideal que reflejaría lo mismo: no es el tamaño físico. Un misil furtivo de 7 m puede tener menos RCS que un dron de 2,5 m.</p>
       <p>Depende de la <b>forma</b> (superficies planas que reflejan hacia el radar, cavidades como tomas de aire), los <b>materiales</b> (metal, compuestos, pinturas absorbentes), el <b>aspecto</b> (desde qué ángulo se lo mira), la <b>polarización</b> y la <b>frecuencia</b> del radar.</p>`,
-    engine: () => `<p>Cada amenaza tiene ${code('rcs')} = RCS <b>frontal estimada en bandas X/S</b> (m²) y ${code('rcsAt(th, banda)')} la ajusta según la tabla de ${code('BANDS')}. El valor probable, el rango mín–máx, la confianza y la justificación están en la ficha de cada arma → "Confianza de los datos".</p>
+    engine: () => `<p>Cada amenaza tiene ${code('rcs')}, ${code('rcsSide')} y ${code('rcsRear')} = RCS <b>de frente, de costado y de cola estimadas en bandas X/S</b> (m²), más ${code('rcsVHF')} para las bandas métricas. ${code('rcsAt(th, banda, aspecto)')} ajusta según la banda (tabla de ${code('BANDS')}) y según desde dónde la mira cada radar (ver "La RCS depende del aspecto"). El valor probable, el rango mín–máx, la confianza y la justificación están en la ficha de cada arma → "Confianza de los datos".</p>
       <div class="tblwrap"><table class="t"><thead><tr><th>Amenaza</th><th>Mín</th><th>Probable</th><th>Máx</th><th>Confianza</th></tr></thead><tbody>${THREAT_EX.map(k => { const u = UNC.thr[k].rcs; return `<tr><td>${esc(THREATS[k].short)}</td><td>${u.min}</td><td><b>${u.p}</b></td><td>${u.max}</td><td>${u.c}</td></tr>`; }).join('')}</tbody></table></div>
-      <div class="warn">La RCS del simulador es una <b>estimación simplificada</b>: un número por banda y de frente. La RCS real cambia muchísimo con el ángulo y la frecuencia, y los valores medidos son secretos.</div>`
+      <div class="warn">La RCS del simulador es una <b>estimación simplificada</b>: frente, costado y cola, con reglas por banda. La RCS real cambia muchísimo con el ángulo exacto, la polarización y la frecuencia, y los valores medidos son secretos. Por eso cada número tiene un rango ancho: las fuentes públicas (OSINT) y la base de datos de <i>Command: Modern Operations</i> llegan a diferir en un orden de magnitud.</div>`
   },
   {
     id: 'freq', group: 'Radar y bandas', title: 'Frecuencia y longitud de onda',
@@ -67,8 +67,28 @@ export const CONCEPTS = [
   },
   {
     id: 'aspect', group: 'Radar y bandas', title: 'La RCS depende del aspecto',
-    body: () => `<p>Un mismo blanco devuelve muy distinto según desde dónde se lo mire. De frente se ven la nariz y bordes de ataque, muchas veces diseñados para desviar la energía; de costado, el fuselaje entero funciona como un espejo. La diferencia frente/costado suele ser de 10 a 30 veces.</p>`,
-    engine: () => `<p>El catálogo guarda la RCS lateral cuando hay datos (${code('UNC.thr[k].rcsSide')}), por ejemplo Shahed: frontal <b>${UNC.thr.shahed.rcs.p}</b> m² vs. lateral <b>${UNC.thr.shahed.rcsSide.p}</b> m² (estudio de Járkov). <b>El motor usa siempre la frontal</b>: supone que el arma viene de frente hacia los sensores que defienden su blanco. Por eso subestima lo que ve un radar ubicado de costado a la ruta. Es una simplificación conocida (ver ROADMAP).</p>`
+    body: () => `<p>Un mismo blanco devuelve muy distinto según desde dónde se lo mire. De frente se ven la nariz y los bordes de ataque, muchas veces diseñados para desviar la energía; de costado, el fuselaje y las alas funcionan como espejos; de cola aparecen la tobera o la hélice. La diferencia frente/costado suele ser de 5 a 30 veces.</p>
+      <p>Consecuencia táctica: un radar ubicado <b>al costado</b> de un corredor de ataque ve las armas más lejos que uno ubicado en la punta, donde lo enfrentan de frente. En bandas métricas (VHF) el efecto es menor, porque el blanco está cerca de la resonancia y la forma pesa menos.</p>`,
+    engine: () => `<p>${code('aspectCos()')} calcula el ángulo θ entre la velocidad del arma (3D, la guarda la simulación en cada paso) y la línea arma → radar: θ = 0° de frente, 90° de costado, 180° de cola. ${code('aspectFactor()')} interpola <b>en decibeles</b>:</p>
+      <p class="formula">ln σ(θ) = cos²θ · ln σ_frente (o σ_cola) + sin²θ · ln σ_costado</p>
+      <p>En las bandas bajas (${code('BANDS[b].low')}: VHF y L) el contraste se reduce a la mitad en dB. La cobertura del mapa y las tablas de las fichas usan el frente, que es el peor caso para el defensor.</p>
+      <p>Ejemplo, Shahed: frente <b>${THREATS.shahed.rcs}</b>, costado <b>${THREATS.shahed.rcsSide}</b> y cola <b>${THREATS.shahed.rcsRear}</b> m². Son la media geométrica entre el modelado de Járkov y la base de CMO, que difieren mucho; el rango completo está en su ficha.</p>`,
+    widget: {
+      html: () => `<div class="widget"><div class="field"><label for="aThr">Amenaza</label><select id="aThr" class="sel">${Object.entries(THREATS).map(([k, t]) => `<option value="${k}" ${k === 'shahed' ? 'selected' : ''}>${esc(t.short)}</option>`).join('')}</select></div>
+        <div class="field"><label for="aRad">Radar</label><select id="aRad" class="sel">${Object.entries(DEFENSES).filter(([, d]) => d.radar && radarBands.includes(d.radar.band)).map(([k, d]) => `<option value="${k}" ${k === 'pantsir' ? 'selected' : ''}>${esc(d.short)} (${d.radar.band})</option>`).join('')}</select></div>
+        <div class="field"><label for="aAng">Ángulo de aspecto (0° = de frente, 90° = de costado, 180° = de cola)</label><span class="val" id="aAngV"></span><input id="aAng" type="range" min="0" max="180" step="5" value="90"></div>
+        <p class="wout" id="aOut"></p></div>`,
+      mount: el => {
+        const upd = () => {
+          const t = THREATS[el.querySelector('#aThr').value], r = DEFENSES[el.querySelector('#aRad').value].radar, deg = +el.querySelector('#aAng').value;
+          const ca = Math.cos(deg * Math.PI / 180), s0 = rcsAt(t, r.band), s = rcsAt(t, r.band, ca);
+          el.querySelector('#aAngV').textContent = deg + '°';
+          el.querySelector('#aOut').innerHTML = `RCS en ${r.band}: <b>${rcsTxt(s)} m²</b> (de frente ${rcsTxt(s0)}) · alcance por señal <b>${n(r.R1 * Math.pow(s, 0.25))} km</b> (de frente ${n(r.R1 * Math.pow(s0, 0.25))} km)`;
+        };
+        for (const id of ['#aThr', '#aRad']) el.querySelector(id).onchange = upd;
+        el.querySelector('#aAng').oninput = upd; upd();
+      }
+    }
   },
   {
     id: 'radarEq', group: 'Radar y bandas', title: 'Ecuación del radar y R ∝ σ^¼',

@@ -28,10 +28,10 @@ La idea de diseño es la de un **CMO liviano**: modelos simples pero con la form
 La potencia del eco es `Pr = Pt·G²·λ²·σ / ((4π)³·R⁴)`. Con el resto fijo, el alcance máximo escala como **R ∝ σ^¼**. Cada radar del catálogo trae `R1`, su alcance contra un blanco de 1 m², así que:
 
 ```
-detR = R1 · σ_banda^¼ · (1 / (1 + J))^¼        (physics/radar.js#detR)
+detR = R1 · σ(banda, aspecto)^¼ · (1 / (1 + J))^¼        (physics/radar.js#detR)
 ```
 
-`σ_banda` es la RCS del blanco en la banda del radar (§3) y `J` la relación interferencia/ruido (§4). Los sensores acústicos y ópticos usan `R1` fijo.
+`σ(banda, aspecto)` es la RCS del blanco en la banda del radar y vista desde donde está el radar (§3), y `J` la relación interferencia/ruido (§4). Antes de calcular la interferencia, el motor descarta los blancos que están más lejos que el alcance sin interferencia (es una cota exacta: con interferencia el alcance solo baja). Los sensores acústicos y ópticos usan `R1` fijo.
 
 ### Barridos y probabilidad de detección
 
@@ -66,7 +66,24 @@ Es una aproximación a la curva de Swerling: lejos del límite casi siempre dete
 | S, C, X | sin cambio | Régimen óptico: manda la forma |
 | Ku/Ka | ×1,6 para drones | Las ondas milimétricas "ven" hélices y motores |
 
-**Simplificación:** un número por banda y de frente. La RCS real cambia mucho con el aspecto (el catálogo guarda `rcsSide` cuando hay datos, pero el motor no lo usa todavía), con la polarización y con la frecuencia exacta.
+### Aspecto (frente, costado, cola)
+
+Cada amenaza tiene `rcs` (frente), `rcsSide` (costado) y `rcsRear` (cola) en bandas X/S. En cada barrido, `aspectCos()` calcula el coseno del ángulo θ entre la velocidad 3D del arma (`th.vel`, que la simulación guarda en cada paso) y la línea arma → radar: 1 de frente, 0 de costado, −1 de cola. `aspectFactor()` interpola **en decibeles**:
+
+```
+ln σ(θ) = cos²θ · ln σ_frente + sin²θ · ln σ_costado          (0° ≤ θ ≤ 90°)
+ln σ(θ) = cos²θ · ln σ_cola   + sin²θ · ln σ_costado          (90° < θ ≤ 180°)
+```
+
+Las reglas de la tabla de arriba se aplican sobre el frente y después se multiplica por σ(θ)/σ_frente. En las **bandas bajas** (`BANDS[b].low`: VHF y L, el rango "A–D" de CMO) el contraste se reduce a la mitad en dB, porque cerca de la resonancia la forma pesa menos.
+
+Ejemplo con el catálogo: un Pantsir (S, 30 km contra 1 m²) ve un Shahed a ≈ 11 km de frente y a ≈ 18 km de costado. En una prueba con el Pantsir a 9 km de una ruta recta, la primera detección llega ≈ 75 s antes que con la RCS frontal sola (`tests/rcs-aspect.test.js`).
+
+La **cobertura** del mapa y las tablas de las fichas usan el frente: es el peor caso para el defensor. Las fichas suman una columna "De costado".
+
+**De dónde salen los números:** OSINT (modelados y mediciones publicados) y la base de datos de *Command: Modern Operations* como segunda opinión. Cuando difieren, el probable es la **media geométrica** y el rango cubre a las dos (ver [DATOS-Y-FUENTES.md](DATOS-Y-FUENTES.md) y [investigacion/mejoras-fisica.md](investigacion/mejoras-fisica.md), anexo J).
+
+**Simplificaciones:** tres aspectos en el plano del arma (sin "arriba/abajo" separado: el ángulo es 3D, así que un balístico en picada hacia el radar cuenta como frente); sin polarización ni frecuencia exacta dentro de cada banda.
 
 ---
 
@@ -231,7 +248,7 @@ Es un modelo de juego: no representa estructuras, incendios, penetración ni sub
 
 | Simplificación | Efecto | Mejora posible |
 |---|---|---|
-| RCS solo frontal | Subestima lo que ven los radares de costado a la ruta | Usar `rcsSide` según el ángulo entre la ruta y la línea radar–blanco |
+| RCS con tres aspectos | Sin aspecto arriba/abajo ni detalle angular fino | Tabla por ángulo (como el "3D radar splat" de CMO PE) |
 | Sin clutter ni Doppler | Los blancos rasantes sobre tierra son más fáciles de lo real (solo los esconde el relieve) | Factor de clutter según el AGL y el tipo de radar |
 | Sin clima | Sin atenuación por lluvia en X/Ku ni restricciones ópticas | Condición del escenario con pérdidas por banda |
 | Sin recarga | Las baterías quedan vacías | Recarga con tiempo y depósito de munición como objetivo |

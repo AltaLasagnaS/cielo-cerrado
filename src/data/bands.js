@@ -8,6 +8,9 @@
 //             lo: × si la amenaza es de baja firma (th.lo) · dron: × si es un dron
 //             small/smallBelow: × si su RCS frontal es menor que smallBelow m² · other: × en el resto
 //           Sin "rcs" la banda usa la RCS frontal tal cual.
+//   low     banda baja ("A–D" en la nomenclatura de CMO: VHF, UHF, L). Ahí los blancos chicos están
+//           cerca de la resonancia y la RCS cambia menos con el aspecto: physics/radar.js#aspectFactor
+//           usa la mitad del contraste en dB entre frente, costado y cola.
 //   freq, lambda ([mín, máx] en metros), res, uses, pros, cons: texto educativo (Academia).
 //
 // Los multiplicadores son una simplificación del juego (ver docs/FISICA.md §3): la RCS real depende
@@ -19,7 +22,7 @@ export const BANDS = {
     note: 'Longitud de onda ~1–2 m: el "stealth" por forma pierde efecto (resonancia), pero precisión pobre: sirve para alerta, no para guiar misiles.',
     freq: '30–300 MHz (radares de alerta: ~150–200 MHz)', lambda: [1, 2], res: 'Muy baja: haces de varios grados, errores de cientos de metros.',
     uses: 'Alerta temprana de largo alcance (P-18, Nebo).', pros: 'Ve blancos furtivos y chicos mejor que las bandas altas; antenas baratas.', cons: 'Antenas enormes, mala precisión angular, no sirve para guiar misiles; vulnerable a interferencia de ancho de banda amplio.',
-    rcs: { own: 'rcsVHF', lo: 12, small: 4, smallBelow: 0.05, other: 2 },
+    rcs: { own: 'rcsVHF', lo: 12, small: 4, smallBelow: 0.05, other: 2 }, low: true,
     rcsWhy: 'Con λ de 1–2 m, partes del blanco (alas, aletas, el fuselaje entero) miden lo mismo que la onda y entran en resonancia: devuelven mucha más energía. El conformado furtivo está pensado para bandas centimétricas y acá pierde efecto. El motor usa la RCS VHF estimada de cada arma (rcsVHF) y, si falta, multiplica la frontal: ×12 si es de baja firma, ×4 si es muy chica (< 0,05 m²), ×2 en el resto.'
   },
   L: {
@@ -27,7 +30,7 @@ export const BANDS = {
     note: 'Alerta temprana de largo alcance.',
     freq: '1–2 GHz', lambda: [0.15, 0.3], res: 'Baja a media.',
     uses: 'Vigilancia de largo alcance y control de tránsito aéreo en ruta.', pros: 'Mucho alcance, poca atenuación por lluvia.', cons: 'Resolución limitada; antenas grandes.',
-    rcs: { lo: 3, other: 1.4 },
+    rcs: { lo: 3, other: 1.4 }, low: true,
     rcsWhy: 'Todavía cerca de la zona de resonancia para misiles chicos: el motor multiplica la RCS frontal ×3 si el blanco es de baja firma y ×1,4 en el resto.'
   },
   S: {

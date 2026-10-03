@@ -24,6 +24,10 @@ export const SRC = {
   gs_rcs: ['GlobalSecurity: tabla de RCS de referencia', 'https://www.globalsecurity.org/military/world/stealth-aircraft-rcs.htm'],
   // Shahed / drones
   kharkiv_rcs: ['Sukharevsky et al. (Univ. Fuerza Aérea, Járkov, 2023): modelado de RCS del Shahed-136', 'https://fliphtml5.com/pdvau/uvoj/Shahed_136_UAV_RCS_measurements/'],
+  cmo_req_shahed: ['Base de datos de Command: Modern Operations (pedido #2214): firma del Shahed-136 por aspecto en bandas A–D y E–M (estimación de juego)', 'https://github.com/PygmalionOfCyprus/cmo-db-requests/issues/2214'],
+  cmo_isk: ['Foro Matrix Games, base DB3000 de CMO: RCS del Iskander-E −9,8 dBsm (estimación de juego)', 'https://forums.matrixgames.com/viewtopic.php?t=243914&start=1820'],
+  uav_rcs: ['Rosamilia et al. (Cranfield): mediciones de RCS de UAV por aspecto en 8–18 GHz', 'https://dspace.lib.cranfield.ac.uk/server/api/core/bitstreams/b70b94cb-9ed7-4067-a2ae-913fa1950b41/content'],
+  tomahawk_l: ['Predição Radar do Míssil de Cruzeiro Tomahawk em Banda L (simulación MLFMA: frente 1,41 m², cola 0,41 m²)', 'https://www.researchgate.net/publication/363731654_Predicao_Radar_do_Missil_de_Cruzeiro_Tomahawk_em_Banda_L_baseado_na_RCS_Dinamica'],
   ar_shahed: ['Army Recognition: Shahed-136, datos técnicos', 'https://www.armyrecognition.com/military-products/army/unmanned-systems/unmanned-aerial-vehicles/shahed-136-loitering-munition-kamikaze-suicide-drone-technical-data'],
   sprotyv: ['Recomendaciones a unidades contra Shahed-136 (sprotyvg7)', 'https://sprotyvg7.com.ua/lesson/rekomendacii-pidrozdilam-shhodo-borotbi-z-bezpilotnimi-litalnimi-aparatami-kamikadze-shahed-136-geran-2'],
   u24_high: ['UNITED24: por qué los enjambres vuelan más alto (2025)', 'https://united24media.com/war-in-ukraine/why-russias-drone-swarms-are-getting-deadlier-by-flying-higher-9305'],
