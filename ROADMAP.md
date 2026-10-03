@@ -15,7 +15,7 @@ Son ideas ordenadas por prioridad, no promesas. Cada ítem que cambie resultados
 Propuesta detallada, con orden, dificultad, datos y pruebas: [docs/investigacion/mejoras-fisica.md](docs/investigacion/mejoras-fisica.md).
 
 
-- Detección, segunda parte: Swerling 3 (verificar la fórmula), clutter de mar según el estado del mar y de lluvia, visibilidad sub-clutter por radar con datos.
+- Detección, tercera parte: integración de pulsos, clutter de mar según el estado del mar y de lluvia, visibilidad sub-clutter por radar con datos (Swerling 3 ya está, verificado).
 - Interceptor con perfil de velocidad (motor y planeo) y límite de g en lugar de velocidad media (el paso A, alcance según el aspecto y Pk según la energía, ya está).
 - Daño funcional, segunda parte: reparación con el tiempo, daño por lanzador y objetivos con capacidades (una base aérea dañada no lanza aviones, cuando haya aviones).
 - Clima, segunda parte (los estados base ya están): día y noche para los sensores IR, nieve, clutter de lluvia, viento sobre los drones y clima que cambia durante la noche.

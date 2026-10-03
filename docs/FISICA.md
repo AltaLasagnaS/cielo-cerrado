@@ -41,13 +41,21 @@ Cada radar barre cada `radar.scan` segundos. Si el blanco está dentro del secto
 R   = detR(...)                    alcance del catálogo = el de Pd 50% con PFA = 10⁻⁶
 SNR = SNR50 · (R/r)⁴ / 10^(clutter/10)        SNR50 = ln(PFA)/ln(0,5) − 1 ≈ 18,9 (12,8 dB)
 Pd  = PFA^(1/(1+SNR))                          (Swerling 1, un pulso)
+Pd  = (1 + 2·SNR·T/(2+SNR)²) · exp(−2T/(2+SNR))   (Swerling 3, un pulso; T = −ln PFA ≈ 13,8, SNR50 ≈ 15,7)
 ```
+
+Cada amenaza tiene su modelo de fluctuación (`T.swerling`, por defecto 1):
+- **Swerling 1:** muchos reflectores parecidos; la RCS titila mucho de barrido a barrido. Drones, misiles de crucero, planeadoras.
+- **Swerling 3:** un reflector dominante más otros chicos (χ² de 4 grados de libertad). Le asignamos este modelo a los balísticos y al Tsirkon (Iskander-M, Kinzhal, ATACMS): cuerpos de revolución con un eco principal. Es una elección de modelado de confianza baja; los libros lo proponen para blancos con un reflector dominante.
 
 | r / R | 0,3 | 0,5 | 0,8 | 1,0 | 1,2 |
 |---|---|---|---|---|---|
-| Pd | 0,99 | 0,96 | 0,75 | 0,50 | 0,26 |
+| Pd Swerling 1 | 0,99 | 0,96 | 0,75 | 0,50 | 0,26 |
+| Pd Swerling 3 | 1,00 | 0,99 | 0,83 | 0,50 | 0,18 |
 
-Más allá de **1,2·R** no se sortea: con menos de 26% por barrido los ecos sueltos no alcanzan para confirmar una pista (regla "M de N"). Con varios barridos seguidos la detección acumulada sube rápido. Todos los blancos usan Swerling 1; el caso 3 (un reflector dominante) queda pendiente hasta verificar su fórmula.
+Las dos fórmulas están **verificadas** contra una integración numérica independiente (Marcum Q₁ de un blanco fijo promediada sobre la distribución de la RCS) en `tests/swerling.test.js`: coinciden a 10⁻⁴.
+
+Más allá de **1,2·R** no se sortea: con menos de 26% por barrido los ecos sueltos no alcanzan para confirmar una pista (regla "M de N"). Con varios barridos seguidos la detección acumulada sube rápido. Con Swerling 3 el corte a 1,2·R deja 18% por barrido.
 
 **Clutter** (eco del suelo): si el blanco vuela a menos de 300 m sobre el terreno, la SNR pierde hasta `CLUTTER_DB[radar.mti]` dB: 20 sin filtro de blancos móviles (`'none'`, S-125), 10 con MTI clásico (`'mti'`: Buk, 36D6, P-18) y 3 con pulso-Doppler (`'pd'`: Patriot, IRIS-T, NASAMS, S-300/400, Pantsir, Tor, Gepard, Hawk, AEW). La pérdida escala con lo rasante (0 a 300 m, máxima a 0 m) y con la rugosidad del suelo (pendiente local: ×0,5 en el llano a ×1,5 en zonas quebradas; ×0,7 sobre el mar). Valores estimados.
 
@@ -359,7 +367,7 @@ Es un modelo de juego: no representa estructuras, incendios, penetración ni sub
 | Clutter y Doppler simples | Pérdida de SNR por clutter según el procesamiento del radar y la rugosidad, y notch por velocidad radial | Clutter de lluvia y de mar por estado del mar; visibilidad sub-clutter por radar con datos |
 | Clima simple | Lluvia (ITU-R P.838-3), techo de nubes y factores ópticos/acústicos fijos por escenario | Día y noche, clutter de lluvia, viento, clima que cambia durante el escenario |
 | Recarga de batería completa | Recarga toda la batería de una vez (`sam.reloadS`) desde su reserva; los tiempos son estimaciones | Recarga por lanzador; vehículos de recarga como unidades |
-| Swerling 1 para todos | Sin el caso 3 (reflector dominante) ni integración de pulsos | Swerling 3 verificado; integración no coherente |
+| Swerling 1 y 3 de un pulso | Sin integración de pulsos ni casos 2 y 4 (fluctuación pulso a pulso) | Integración no coherente; Swerling 2/4 según la agilidad de frecuencia del radar |
 | Interceptor en línea recta a velocidad media | Energía resumida en dos factores (alcance según el aspecto y Pk según la fracción del alcance); el tiempo de vuelo sigue siendo r / vInt | Perfil de velocidad (motor y planeo) y límite de g (paso B de la propuesta) |
 | Discriminación de señuelos | Por banda y tiempo de seguimiento, con un umbral fijo por pista | Discriminación por características (RCS, velocidad, trayectoria) |
 | CRPA por conteo de direcciones | N − 1 nulos y 10° de separación; sin potencia de cada fuente ni distancia | Relación señal/interferencia por fuente; profundidad de nulo según los elementos |
