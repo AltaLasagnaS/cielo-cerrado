@@ -2852,6 +2852,7 @@ table.t.mc td.pc{white-space:nowrap}
   function trackOK(u, th, t, c2) {
     const d = D(u), L = C2_LEVELS[c2], own = d.radar ? t - (th.det[u.id] ?? -1e9) <= d.radar.scan * 2 + 0.6 : false;
     const netT = (L.share === "track" || L.share === "fire") && th.firstDet !== null && t - th.firstDet >= L.lag && t - th.lastNet <= L.window;
+    if (d.sam.guid === "cañón") return own;
     if (RADAR_GUID.includes(d.sam.guid)) return own || L.share === "fire" && netT;
     if (d.sam.guid === "operador") return netT;
     return own || netT;
@@ -3144,7 +3145,14 @@ table.t.mc td.pc{white-space:nowrap}
       if (!sol) continue;
       const v = speedAt(th, t + sol.tau);
       if (v > sm.vmaxT) continue;
-      if (RADAR_GUID.includes(sm.guid) && sm.guid !== "cañón" && !los(u.x, u.y, antZ(u), sol.p.x, sol.p.y, sol.p.z)) continue;
+      if (RADAR_GUID.includes(sm.guid) && sm.guid !== "cañón") {
+        if (!los(u.x, u.y, antZ(u), sol.p.x, sol.p.y, sol.p.z)) continue;
+        const r = D(u).radar, ownT = t - (th.det[u.id] ?? -1e9) <= r.scan * 2 + 0.6;
+        if (!ownT) {
+          const az = azOf(sol.p.x - u.x, sol.p.y - u.y), dk = Math.hypot(sol.p.x - u.x, sol.p.y - u.y, (sol.p.z - antZ(u)) / 1e3);
+          if (!inSector(u, az) || dk > detR(u, th, jamJ(u, az, S.jamsLive), 1, WEATHER[S.weather])) continue;
+        }
+      }
       const n2 = Math.min(S.doctrine === "salva" ? u.salvo || sm.salvo : 1, u.magLeft, ch - u.active);
       for (let k = 0; k < n2; k++) {
         const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false };
@@ -6533,7 +6541,7 @@ table.t.mc td.pc{white-space:nowrap}
     }
     draw();
     if (++uiTick % 10 === 0) {
-      const free = (id) => !document.querySelector(id + " button:hover");
+      const free = (id) => !(pressedBtn && document.querySelector(id)?.contains(pressedBtn));
       if (free("#stats")) renderStats();
       renderLogIfDirty();
       if (S.sel && S.started && free("#selCard")) renderSel(true);
@@ -6541,7 +6549,16 @@ table.t.mc td.pc{white-space:nowrap}
     }
     requestAnimationFrame(loop);
   }
+  var pressedBtn = null;
+  var release = () => setTimeout(() => {
+    pressedBtn = null;
+  }, 0);
   function startLoop() {
+    document.addEventListener("pointerdown", (e) => {
+      pressedBtn = e.target.closest?.("button") || null;
+    }, true);
+    document.addEventListener("pointerup", release, true);
+    document.addEventListener("pointercancel", release, true);
     requestAnimationFrame(loop);
   }
 

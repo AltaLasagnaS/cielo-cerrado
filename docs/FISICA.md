@@ -193,7 +193,7 @@ r / vInt ≤ τ   (el interceptor llega a tiempo, con ≤ 3 s de holgura)
 | Desconectada | no | nadie | desde la pista propia | no |
 | Descoordinada | solo alerta, 45 s de demora | nadie | desde la alerta | no |
 | Coordinada | sí, vale 12 s | activos/IR e interceptores | desde la pista | sí |
-| Integrada | sí, 2 s de demora, vale 12 s | también guiados por radar (si ven el punto de encuentro) | desde la alerta | sí |
+| Integrada | sí, 2 s de demora, vale 12 s | también guiados por radar, si su radar cubre el punto de encuentro (sector, alcance y línea de vista); los cañones siempre necesitan su propio sensor | desde la alerta | sí |
 
 "Coordinada" y "desconectada" son el viejo interruptor "red integrada" encendido y apagado (resultados idénticos).
 

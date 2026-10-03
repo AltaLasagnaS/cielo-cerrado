@@ -3,6 +3,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { C2_LEVELS } from '../src/data/index.js';
 import { trackOK, reactionStart } from '../src/physics/engagement.js';
+import { S } from '../src/sim/state.js';
+import { addDef, addSalvo } from '../src/sim/setup.js';
+import { useMap, clearSetup, runCurrent } from './helpers.js';
 
 // Pista vista por la red a los 100 s y por última vez a los 150 s; nunca por el radar propio de la unidad.
 const th = { det: {}, firstDet: 100, lastNet: 150 };
@@ -30,4 +33,21 @@ test('C2: la alerta adelanta el tiempo de reacción en "descoordinada" e "integr
   assert.equal(reactionStart(th, 200, 'descoordinada'), 100 + C2_LEVELS.descoordinada.lag);
   assert.equal(reactionStart(th, 200, 'integrada'), 100 + C2_LEVELS.integrada.lag);
   assert.equal(reactionStart(th, 120, 'descoordinada'), 120);   // la alerta todavía no llegó
+});
+
+test('C2: los cañones (Gepard, grupos móviles) siempre necesitan ver el blanco con su propio sensor', () => {
+  for (const k of Object.keys(C2_LEVELS)) for (const type of ['gepard', 'mfg']) assert.equal(trackOK(u(type), th, 155, k), false, `${type} ${k}`);
+  assert.equal(trackOK(u('gepard'), { ...th, det: { 1: 154 } }, 155, 'integrada'), true);
+});
+
+test('C2 integrada: un guiado por radar no lanza con pista ajena si su sector no cubre el punto de encuentro', () => {
+  // S-300P mirando al norte (sector 90°); el Kh-22 viene del sur y lo ve solo el radar 3D de la red
+  const shots = az => {
+    useMap('monterey', { flat: true }); clearSetup(); S.c2 = 'integrada';
+    addDef('s300', 50, 50, { name: 'S', az }); addDef('ewr', 50, 52, { name: 'R' });
+    addSalvo({ type: 'kh22', count: 2, interval: 30, pts: [[50, 110], [50, 52]] });
+    runCurrent(3); return S.stats.byUnit.S || 0;
+  };
+  assert.equal(shots(0), 0);          // de espaldas: no dispara aunque la red tenga la pista
+  assert.ok(shots(180) > 0);          // de frente: dispara
 });
