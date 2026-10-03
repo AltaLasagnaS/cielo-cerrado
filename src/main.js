@@ -26,6 +26,7 @@ import { initAcademy } from './ui/academy.js';
 import { initTabs, renderAll } from './ui/panels/index.js';
 import { markLogDirty, renderStats } from './ui/panels/results.js';
 import { openDebrief } from './ui/debrief.js';
+import { openMonteCarlo } from './ui/montecarlo.js';
 import { openBriefing } from './ui/panels/scenario.js';
 import { startLoop } from './ui/loop.js';
 
@@ -48,6 +49,7 @@ initHgtImport();
 initScenarioFile();
 initRelief();
 initAcademy();
+$('#mcBtn').onclick = openMonteCarlo;
 
 const sc = $('#scenario');
 sc.innerHTML = Object.entries(SCENARIOS).map(([k, s]) => `<option value="${k}">${esc(s.name)}</option>`).join('');
@@ -61,4 +63,4 @@ loadScenario('mb_noche');
 resize(); fitView();
 startLoop();
 
-window.__S = S; window.__dbg = { flat: () => { MAP.data = new Int16Array(MAP.data.length); MAP.key = 'flat'; MAP.max = 0; MAP.min = 0; buildBase(); }, computeCov, draw, addDef, addSalvo, addJam, startSim, step, resetSim, loadScenario, renderAll, openDebrief, loadFromObject, saveScenario };
+window.__S = S; window.__dbg = { flat: () => { MAP.data = new Int16Array(MAP.data.length); MAP.key = 'flat'; MAP.max = 0; MAP.min = 0; buildBase(); }, computeCov, draw, addDef, addSalvo, addJam, startSim, step, resetSim, loadScenario, renderAll, openDebrief, openMonteCarlo, loadFromObject, saveScenario };
