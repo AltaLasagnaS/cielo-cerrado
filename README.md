@@ -13,7 +13,7 @@ También se publica en **GitHub Pages** en cada cambio de la rama `main` (workfl
 Primeros pasos:
 1. Elegí un escenario arriba a la derecha y leé el **briefing**.
 2. Tocá **▶ Iniciar**. La velocidad **Auto** acelera cuando no pasa nada y frena cuando hay combate.
-3. Al terminar se abre el **debrief**.
+3. Al terminar se abre el **debrief**. ¿Fue suerte? El botón **Monte Carlo** corre la misma situación muchas veces y muestra la probabilidad de que cada objetivo sobreviva.
 4. Probá cambiar cosas: mové defensas (antes de iniciar), agregá ataques en la pestaña **Ataque** o activá la capa **Relieve → Puntos altos** para ubicar radares en cotas dominantes.
 5. **Guardar** descarga lo que armaste como archivo `.json`; **Cargar** lo vuelve a abrir (también en otra computadora).
 6. ¿No sabés qué es la RCS o por qué un radar VHF ve misiles furtivos? Pestaña **Academia** o los botones **ⓘ**.

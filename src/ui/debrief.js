@@ -3,7 +3,9 @@ import { TARGET_TYPES, TARGET_STATUS } from '../data/index.js';
 import { esc, fmtT, money } from '../util/format.js';
 import { S } from '../sim/state.js';
 import { buildDebrief } from '../sim/debrief.js';
+import { $ } from './dom.js';
 import { openModal } from './fichas.js';
+import { openMonteCarlo } from './montecarlo.js';
 
 const pct = (a, b) => b ? Math.round(100 * a / b) + '%' : '—';
 const SIDE = { ataque: 'Ataque', defensa: 'Defensa' };
@@ -44,5 +46,7 @@ export function openDebrief() {
     <div><h3>Línea de tiempo</h3><ol class="timeline">${tl}</ol></div>
     <div><h3>Por tipo de arma</h3><div class="tblwrap"><table class="t"><thead><tr><th>Arma</th><th>Lanzadas</th><th>Derribadas</th><th>Llegaron</th><th>Interceptores recibidos</th></tr></thead><tbody>${typeRows}</tbody></table></div></div>
     <p class="hint">Todo lo de arriba sale de lo que registró el motor durante la corrida. Corré de nuevo con otra disposición: el azar (detección, Pk, dispersión) cambia el resultado de una corrida a otra.</p>
+    <div class="row"><button class="btn" id="dbMc">¿Fue suerte? Repetir muchas veces (Monte Carlo)</button></div>
   </div>`, openDebrief);
+  $('#dbMc').onclick = openMonteCarlo;
 }

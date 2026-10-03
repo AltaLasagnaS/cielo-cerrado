@@ -45,6 +45,7 @@ El juego es una página web estática hecha con **JavaScript moderno (módulos E
 ### `src/sim/`: estado y simulación
 - `state.js` (`S`): estado único. `S.setup` es lo que arma el jugador; el resto es la corrida en curso.
 - `setup.js`: agregar objetivos, defensas, salvas y jammers; desplegar escenarios.
+- `montecarlo.js`: modo Monte Carlo (N corridas, sorteo de parámetros, distribución de resultados).
 - `scenario-io.js`: guardar el escenario del jugador como JSON y validarlo y desplegarlo al cargar.
 - `engine.js`: `startSim`, `step(dt)`, `engage`, `impact`.
 - `log.js`: registro y eventos de la línea de tiempo.
@@ -63,6 +64,7 @@ El juego es una página web estática hecha con **JavaScript moderno (módulos E
 - `input.js`: gestos (click, arrastre, pellizco) y teclado.
 - `modes.js`: modos de edición y confirmación antes de colocar.
 - `fichas.js`: ventanas modales con historial ("← Volver").
+- `montecarlo.js`: ventanas de configuración, progreso y debrief del modo Monte Carlo.
 - `scenario-file.js`: botones Guardar y Cargar (descarga y lectura del archivo, cambio de mapa).
 - `debrief.js`, `academy.js`, `relief.js`, `controls.js`, `loop.js`, `coverage.js`, `hgt.js`, `help.js`.
 
@@ -115,3 +117,15 @@ El botón **Guardar** descarga `S.setup` más las reglas y las metas como JSON (
 - **Al cargar** (`validateScenario`) se revisa todo antes de tocar el estado: formato y versión, mapa incluido (o, para un relieve `.hgt`, que ese mismo relieve esté cargado), tipos que existan en el catálogo (`DEFENSES`, `THREATS`, `JAMMERS`, `TARGET_TYPES`), posiciones dentro del mapa (±1 km), números finitos y en rango, ids únicos y blancos existentes. Si hay errores no se cambia nada y se listan; una meta sobre algo que ya no existe es solo un aviso. Solo se copian los campos conocidos.
 - Con la misma semilla, un escenario guardado y vuelto a cargar da **exactamente** la misma corrida (`tests/scenario-io.test.js`).
 - Si el formato cambia, subir `VERSION` y aceptar las versiones anteriores que se puedan convertir.
+
+## Modo Monte Carlo (`sim/montecarlo.js`)
+
+Corre N veces el mismo `S.setup`. La corrida *i* usa la semilla `seed + i` para la simulación y, si se pide sorteo, otra semilla derivada (`paramSeed`) para `applySample`, que reemplaza cada parámetro de `UNC` por un valor de una distribución triangular (mín, probable, máx). Lo que elige el jugador (posiciones, munición, mástil, rutas y alturas de las salvas) no se sortea porque se copia al ubicar cada cosa.
+
+Para no ensuciar el juego normal ni las golden:
+
+- la serie corre en **tramos** (`tick(ms)`): la interfaz los llama entre cuadros para no congelar la página. Al empezar cada tramo se vuelve a aplicar el mismo sorteo y se instala el generador de la corrida; al terminar el tramo (aunque haya un error) se restaura el catálogo probable (`applyProbable`), se quita el generador (`setRandom(null)`) y se reponen los enganches de la interfaz;
+- al final el estado vuelve a modo edición (`resetState`) con el setup intacto;
+- sin sorteo, cada corrida es idéntica a una corrida normal con la misma semilla.
+
+De cada corrida se guarda un resumen (`summarizeRun`) y `aggregate` arma la distribución: probabilidad de que cada objetivo sobreviva o siga operativo, de cumplir cada meta y de perder cada unidad (con intervalo de confianza del 95% de Wilson), media y percentiles 10/50/90 de interceptaciones, impactos, daño y costos, y un histograma del porcentaje interceptado. Pruebas en `tests/montecarlo.test.js`.

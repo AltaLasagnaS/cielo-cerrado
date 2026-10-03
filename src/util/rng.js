@@ -1,5 +1,5 @@
-// Fuente de azar de la simulación. Por defecto usa Math.random; los tests y el futuro modo
-// Monte Carlo la reemplazan por un generador con semilla para que las corridas sean reproducibles.
+// Fuente de azar de la simulación. Por defecto usa Math.random; los tests y el modo
+// Monte Carlo (sim/montecarlo.js) la reemplazan por un generador con semilla para que las corridas sean reproducibles.
 let source = null;
 
 /** Número aleatorio uniforme en [0, 1). */

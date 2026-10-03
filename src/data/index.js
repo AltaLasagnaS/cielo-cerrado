@@ -4,7 +4,7 @@
 // Revisión OSINT oct-2026. Cada parámetro numérico relevante tiene un rango en UNC
 // {min, p (probable), max, c (confianza), src, nota}. El valor "p" es el que usa la simulación:
 // applyProbable() lo escribe sobre THREATS/DEFENSES/JAMMERS al importar este módulo.
-// min/max quedan para el modo Monte Carlo (applySample).
+// min/max los usa el modo Monte Carlo (applySample, ver sim/montecarlo.js).
 // RCS y Pk siguen siendo estimaciones: no hay mediciones públicas confiables (ver notas de cada parámetro).
 import { THREATS } from './threats.js';
 import { DEFENSES } from './defenses.js';
@@ -47,7 +47,7 @@ export function applyProbable() {
 
 /**
  * Muestreo triangular (min, moda = probable, max) de un parámetro con incertidumbre.
- * Base del futuro modo Monte Carlo.
+ * La usa el modo Monte Carlo (sim/montecarlo.js) a través de applySample.
  */
 export function sampleU(u, rng = Math.random) {
   const a = u.min, b = u.max, c = u.p; if (b <= a) return c;

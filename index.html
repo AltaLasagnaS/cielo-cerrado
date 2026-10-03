@@ -192,6 +192,18 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
   .speeds button{padding:2px 4px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* Monte Carlo: progreso, barras de probabilidad con intervalo de confianza e histograma */
+.mcprog{height:8px;background:#2a323c;border-radius:4px;overflow:hidden;margin:6px 0}.mcprog i{display:block;height:100%;background:var(--teal);transition:width .2s}
+table.t.mc td.pc{white-space:nowrap}
+.pbar{position:relative;display:inline-block;vertical-align:middle;width:64px;height:8px;background:#2a323c;border-radius:4px;overflow:hidden;margin-right:8px}
+.pbar i{position:absolute;left:0;top:2px;bottom:2px;background:var(--teal);border-radius:0 4px 4px 0}
+.pbar .ci{position:absolute;top:0;bottom:0;background:rgba(79,209,197,.28)}
+.hist{display:flex;align-items:flex-end;gap:2px;height:110px;padding:14px 0 0;border-bottom:1px solid var(--line2)}
+.hist .hb{position:relative;flex:1;height:100%;display:flex;align-items:flex-end}
+.hist .hb i{display:block;width:100%;background:var(--teal);border-radius:4px 4px 0 0;min-height:0}
+.hist .hb span{position:absolute;left:0;right:0;text-align:center;font-family:var(--f-mono);font-size:11px;color:var(--muted);top:-14px}
+.histx{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:11px;color:var(--dim);margin-top:3px}
 </style>
 </head>
 <body>
@@ -229,6 +241,7 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
       <div class="simbar">
         <button id="play" class="btn pri sm">▶ Iniciar</button>
         <button id="reset" class="btn sm">↺ Reiniciar</button>
+        <button id="mcBtn" class="btn sm" title="Correr la misma situación muchas veces y ver la distribución de resultados">Monte Carlo</button>
         <span class="clock" id="clock">T+00:00</span>
         <span class="tscale" id="tscale"></span>
         <div class="speeds" id="speeds"></div>
@@ -2137,6 +2150,19 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
   // src/util/rng.js
   var source = null;
   var rnd = () => (source || Math.random)();
+  function setRandom(fn) {
+    source = fn;
+  }
+  function seeded(seed) {
+    let s = seed >>> 0;
+    return () => {
+      s |= 0;
+      s = s + 1831565813 | 0;
+      let t = Math.imul(s ^ s >>> 15, 1 | s);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
 
   // src/util/math.js
   var clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -4447,15 +4473,15 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
       renderAtk();
     };
     $("#aInfo").onclick = () => openFicha("thr", a.type);
-    const num = (id, k) => {
+    const num2 = (id, k) => {
       const i = $(id);
       if (i) i.onchange = (e) => {
         a[k] = +e.target.value;
       };
     };
-    num("#aCount", "count");
-    num("#aInt", "interval");
-    num("#aDist", "launchDist");
+    num2("#aCount", "count");
+    num2("#aInt", "interval");
+    num2("#aDist", "launchDist");
     $("#aTime").onchange = (e) => {
       if (a.sync) a.tArrive = +e.target.value;
       else a.tStart = +e.target.value;
@@ -4731,9 +4757,243 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
     return out;
   }
 
-  // src/ui/debrief.js
-  var pct = (a, b) => b ? Math.round(100 * a / b) + "%" : "—";
+  // src/sim/montecarlo.js
+  var MC_STEP = 0.25;
+  var MAX_STEPS = 4e4;
+  var paramSeed = (s) => (Math.imul(s, 2654435761) ^ 1540483477) >>> 0;
+  var ended = () => !S.pending.length && S.threats.every((t) => !t.alive) && S.ints.every((i) => i.done);
+  function summarizeRun(S2, seed) {
+    const { goals, outcome } = evaluateGoals(S2.scen, S2);
+    const st = S2.stats, real = S2.threats.filter((t) => !t.isDecoy).length;
+    return {
+      seed,
+      t: S2.t,
+      result: outcome.result,
+      goals: goals.map((g) => g.met),
+      objs: S2.objs.map((o) => ({ name: o.name, hp: Math.max(0, o.hp), maxHp: o.maxHp, status: o.status })),
+      lost: S2.units.filter((u) => !u.alive).map((u) => u.name),
+      real,
+      intercepted: st.killed - st.decoysKilled,
+      impacts: st.hits,
+      damage: st.damage,
+      shots: st.shots,
+      defCost: st.defCost,
+      atkCost: st.atkCost,
+      decoysKilled: st.decoysKilled
+    };
+  }
+  function createMonteCarlo({ runs = 20, seed = 1, sample = true } = {}) {
+    const mc = { runs, seed, sample, results: [], done: false, cancelled: false, current: -1 };
+    let rng = null, steps = 0;
+    const saved = { ...hooks }, quiet = { onLog() {
+    }, onEnd() {
+    }, onUnitLost() {
+    }, defenderView: () => false };
+    mc.tick = (budgetMs = 40) => {
+      if (mc.done) return true;
+      const t0 = Date.now();
+      Object.assign(hooks, quiet);
+      try {
+        do {
+          if (rng === null) {
+            mc.current = mc.results.length;
+            if (mc.current >= runs) {
+              finish();
+              break;
+            }
+            const s = seed + mc.current;
+            if (sample) applySample(seeded(paramSeed(s)));
+            rng = seeded(s);
+            setRandom(rng);
+            startSim();
+            S.running = false;
+            steps = 0;
+          } else {
+            if (sample) applySample(seeded(paramSeed(seed + mc.current)));
+            setRandom(rng);
+          }
+          while (steps < MAX_STEPS && !ended()) {
+            step(MC_STEP);
+            steps++;
+            if (Date.now() - t0 >= budgetMs) break;
+          }
+          if (steps >= MAX_STEPS || ended()) {
+            mc.results.push(summarizeRun(S, seed + mc.current));
+            rng = null;
+          }
+          setRandom(null);
+          if (sample) applyProbable();
+        } while (Date.now() - t0 < budgetMs && !mc.done);
+      } finally {
+        setRandom(null);
+        if (sample) applyProbable();
+        Object.assign(hooks, saved);
+      }
+      if (!mc.done && mc.results.length >= runs) finish();
+      return mc.done;
+    };
+    mc.cancel = () => {
+      mc.cancelled = true;
+      finish();
+    };
+    function finish() {
+      if (mc.done) return;
+      mc.done = true;
+      resetState();
+    }
+    return mc;
+  }
+  function quantile(sorted, q) {
+    if (!sorted.length) return null;
+    const i = (sorted.length - 1) * q, a = Math.floor(i), b = Math.ceil(i);
+    return sorted[a] + (sorted[b] - sorted[a]) * (i - a);
+  }
+  function wilson(k, n2, z = 1.96) {
+    if (!n2) return [0, 1];
+    const p = k / n2, d = 1 + z * z / n2, c = p + z * z / (2 * n2), m = z * Math.sqrt(p * (1 - p) / n2 + z * z / (4 * n2 * n2));
+    return [Math.max(0, (c - m) / d), Math.min(1, (c + m) / d)];
+  }
+  var prop = (k, n2) => {
+    const [lo, hi] = wilson(k, n2);
+    return { k, n: n2, p: n2 ? k / n2 : 0, lo, hi };
+  };
+  function describe(values) {
+    const v = values.filter(Number.isFinite).sort((a, b) => a - b);
+    if (!v.length) return { n: 0, mean: null, min: null, p10: null, p50: null, p90: null, max: null };
+    return { n: v.length, mean: v.reduce((s, x) => s + x, 0) / v.length, min: v[0], p10: quantile(v, 0.1), p50: quantile(v, 0.5), p90: quantile(v, 0.9), max: v[v.length - 1] };
+  }
+  function histogram(values, lo, hi, bins = 10) {
+    const out = Array.from({ length: bins }, (_, i) => ({ from: lo + (hi - lo) * i / bins, to: lo + (hi - lo) * (i + 1) / bins, n: 0 }));
+    for (const x of values) {
+      if (!Number.isFinite(x)) continue;
+      const i = Math.min(bins - 1, Math.max(0, Math.floor((x - lo) / (hi - lo || 1) * bins)));
+      out[i].n++;
+    }
+    return out;
+  }
+  function aggregate(results, scen, { sample = true, seed = 1 } = {}) {
+    const n2 = results.length;
+    const count = (f) => results.filter(f).length;
+    const outcome = {};
+    for (const r of ["exito", "parcial", "fracaso"]) outcome[r] = prop(count((x) => x.result === r), n2);
+    outcome.none = prop(count((x) => x.result === null), n2);
+    const goals = (scen?.goals || []).map((g, i) => ({ ...g, met: prop(count((x) => x.goals[i]), n2) }));
+    const names = results[0]?.objs.map((o) => o.name) || [];
+    const objectives = names.map((name, i) => {
+      const os = results.map((r) => r.objs[i]);
+      return {
+        name,
+        maxHp: os[0].maxHp,
+        survive: prop(os.filter((o) => o.status !== "destroyed").length, n2),
+        operational: prop(os.filter((o) => o.status === "operational").length, n2),
+        destroyed: prop(os.filter((o) => o.status === "destroyed").length, n2),
+        dmgFrac: describe(os.map((o) => (o.maxHp - o.hp) / o.maxHp))
+      };
+    });
+    const lostNames = [...new Set(results.flatMap((r) => r.lost))];
+    const unitsLost = lostNames.map((name) => ({ name, lost: prop(count((r) => r.lost.includes(name)), n2) })).sort((a, b) => b.lost.p - a.lost.p);
+    const rate = results.map((r) => r.real ? r.intercepted / r.real : NaN);
+    const metrics = {
+      interceptRate: describe(rate),
+      intercepted: describe(results.map((r) => r.intercepted)),
+      impacts: describe(results.map((r) => r.impacts)),
+      damage: describe(results.map((r) => r.damage)),
+      shots: describe(results.map((r) => r.shots)),
+      defCost: describe(results.map((r) => r.defCost)),
+      atkCost: describe(results.map((r) => r.atkCost))
+    };
+    return { n: n2, sample, seed, scen, player: scen?.player || null, outcome, goals, objectives, unitsLost, metrics, interceptHist: histogram(rate, 0, 1, 10) };
+  }
+
+  // src/ui/montecarlo.js
+  var RUNS = [10, 20, 50, 100];
   var SIDE2 = { ataque: "Ataque", defensa: "Defensa" };
+  var last = { runs: 20, sample: true, seed: 1 };
+  function openMonteCarlo() {
+    if (!S.setup.salvos.length) {
+      toast("Agregá al menos un ataque en la pestaña Ataque.");
+      return;
+    }
+    openModal(`<header><div><span class="chip">${esc(S.scen?.name || "Escenario libre")}</span><h2>Monte Carlo</h2></div><button class="btn x">Cerrar</button></header><div class="bd">
+    <p>Corre <b>la misma situación</b> muchas veces con semillas distintas y muestra qué tan probable es cada resultado. Una sola corrida puede ser suerte; cien corridas muestran la tendencia.</p>
+    <div class="field"><label for="mcRuns">Cantidad de corridas</label><select id="mcRuns" class="sel">${RUNS.map((n2) => `<option value="${n2}" ${n2 === last.runs ? "selected" : ""}>${n2}</option>`).join("")}</select></div>
+    <label class="check"><input type="checkbox" id="mcSample" ${last.sample ? "checked" : ""}> Sortear los parámetros dentro de su rango de incertidumbre (RCS, Pk, velocidades, alcances, CEP…)</label>
+    <p class="hint">Sin sorteo, solo cambia el azar de cada corrida (detección, Pk, dispersión) con los valores probables del catálogo. Con sorteo, además, cada corrida usa un catálogo distinto tomado de los rangos mín–probable–máx de cada ficha. Lo que elegiste vos (posiciones, munición, mástiles, rutas, alturas) no se sortea.</p>
+    <div class="field"><label for="mcSeed">Primera semilla</label><input id="mcSeed" class="inp" type="number" min="1" max="1000000" value="${last.seed}"></div>
+    <p class="hint">La corrida <i>i</i> usa la semilla <i>primera + i</i>: con los mismos datos, la serie se puede repetir exacta. Una corrida del escenario de Monterey tarda 1–2 s, así que 50 corridas llevan alrededor de un minuto.</p>
+    <div class="row"><button class="btn pri" id="mcGo">Correr</button></div>
+  </div>`, openMonteCarlo);
+    $("#mcGo").onclick = () => {
+      last = { runs: +$("#mcRuns").value, sample: $("#mcSample").checked, seed: Math.max(1, Math.floor(+$("#mcSeed").value) || 1) };
+      run(last);
+    };
+  }
+  function run(opts) {
+    resetSim();
+    const mc = createMonteCarlo(opts), t0 = performance.now();
+    openModal(`<header><h2>Monte Carlo en curso</h2></header><div class="bd">
+    <p id="mcTxt">Preparando…</p><div class="mcprog"><i id="mcBar" style="width:0%"></i></div>
+    <p class="hint" id="mcEta">&nbsp;</p><div class="row"><button class="btn" id="mcStop">Cancelar</button></div></div>`);
+    $("#mcStop").onclick = () => mc.cancel();
+    const frame = () => {
+      if ($("#modal").hidden && !mc.done) mc.cancel();
+      mc.tick(40);
+      const k = mc.results.length, el = (performance.now() - t0) / 1e3;
+      if (!mc.done) {
+        $("#mcTxt").textContent = `Corrida ${Math.min(k + 1, opts.runs)} de ${opts.runs}`;
+        $("#mcBar").style.width = (100 * k / opts.runs).toFixed(1) + "%";
+        if (k) $("#mcEta").textContent = `Faltan unos ${Math.ceil(el / k * (opts.runs - k))} s`;
+        setTimeout(frame, 0);
+        return;
+      }
+      resetSim();
+      renderAll();
+      if (!k) {
+        closeModal();
+        toast("Monte Carlo cancelado.");
+        return;
+      }
+      openMcDebrief(aggregate(mc.results, S.scen, opts), mc.cancelled);
+    };
+    setTimeout(frame, 0);
+  }
+  var pct = (v) => v == null ? "—" : Math.round(v * 100) + "%";
+  var ci = (p) => `${pct(p.lo)}–${pct(p.hi)}`;
+  var num = (v, d = 0) => v == null ? "—" : v.toLocaleString("es-AR", { maximumFractionDigits: d, minimumFractionDigits: d });
+  var pbar = (p) => `<div class="pbar" title="${pct(p.p)} (${p.k} de ${p.n}); IC 95%: ${ci(p)}"><span class="ci" style="left:${(100 * p.lo).toFixed(1)}%;width:${(100 * (p.hi - p.lo)).toFixed(1)}%"></span><i style="width:${(100 * p.p).toFixed(1)}%"></i></div>`;
+  var pcell = (p) => `<td class="pc">${pbar(p)}<b>${pct(p.p)}</b> <span class="dim">${ci(p)}</span></td>`;
+  function openMcDebrief(a, cancelled = false) {
+    const o = a.outcome, side = a.player;
+    const resTxt = o.none.k === a.n ? "Sin metas definidas" : `Éxito ${pct(o.exito.p)} · parcial ${pct(o.parcial.p)} · fracaso ${pct(o.fracaso.p)}`;
+    const objRows = a.objectives.map((x) => `<tr><td>${esc(x.name)}</td>${pcell(x.survive)}${pcell(x.operational)}<td>${pct(x.dmgFrac.mean)}</td><td>${pct(x.dmgFrac.p10)}–${pct(x.dmgFrac.p90)}</td></tr>`).join("");
+    const goalRows = a.goals.map((g) => `<tr><td class="nt">${g.primary ? "<b>Principal:</b> " : ""}${esc(g.text)}</td><td>${SIDE2[g.side]}${g.side === side ? " (vos)" : ""}</td>${pcell(g.met)}</tr>`).join("");
+    const unitRows = a.unitsLost.map((u) => `<tr><td>${esc(u.name)}</td>${pcell(u.lost)}</tr>`).join("");
+    const m = a.metrics;
+    const mrow = (lab, d, f = (v) => num(v)) => `<tr><td>${lab}</td><td>${f(d.mean)}</td><td>${f(d.p10)}</td><td>${f(d.p50)}</td><td>${f(d.p90)}</td><td>${f(d.min)}–${f(d.max)}</td></tr>`;
+    const hmax = Math.max(1, ...a.interceptHist.map((h) => h.n));
+    const hist = a.interceptHist.map((h) => `<div class="hb" title="${pct(h.from)}–${pct(h.to)} interceptadas: ${h.n} corrida(s)"><i style="height:${(100 * h.n / hmax).toFixed(1)}%"></i>${h.n ? `<span>${h.n}</span>` : ""}</div>`).join("");
+    openModal(`<header><div><span class="chip">${esc(a.scen?.name || "Escenario libre")}</span><h2>Debrief Monte Carlo</h2></div><button class="btn x">Cerrar</button></header><div class="bd debrief">
+    <div class="dbres"><b>${side ? esc(SIDE2[side]) + ": " : ""}${resTxt}</b><span>${a.n} corridas${cancelled ? " (cancelado antes de terminar)" : ""} · ${a.sample ? "parámetros sorteados en su rango" : "valores probables del catálogo"} · semillas ${a.seed}–${a.seed + a.n - 1}</span></div>
+    ${a.objectives.length ? `<div><h3>Objetivos: probabilidad de que sobrevivan</h3><div class="tblwrap"><table class="t mc"><thead><tr><th>Objetivo</th><th>No destruido</th><th>Operativo</th><th>Daño medio</th><th>Daño p10–p90</th></tr></thead><tbody>${objRows}</tbody></table></div></div>` : ""}
+    ${goalRows ? `<div><h3>Metas: probabilidad de cumplirlas</h3><div class="tblwrap"><table class="t mc"><thead><tr><th>Meta</th><th>Bando</th><th>Se cumple</th></tr></thead><tbody>${goalRows}</tbody></table></div></div>` : ""}
+    ${unitRows ? `<div><h3>Unidades de defensa perdidas</h3><div class="tblwrap"><table class="t mc"><thead><tr><th>Unidad</th><th>Probabilidad de perderla</th></tr></thead><tbody>${unitRows}</tbody></table></div></div>` : ""}
+    <div><h3>Armas reales interceptadas (% por corrida)</h3><div class="hist" role="img" aria-label="Histograma del porcentaje de armas reales interceptadas en cada corrida">${hist}</div><div class="histx"><span>0%</span><span>50%</span><span>100%</span></div><p class="hint">Cada barra cuenta cuántas corridas terminaron con ese porcentaje de interceptación (pasá el mouse para ver el detalle).</p></div>
+    <div><h3>Dispersión de resultados</h3><div class="tblwrap"><table class="t"><thead><tr><th>Medida</th><th>Media</th><th>p10</th><th>Mediana</th><th>p90</th><th>Mín–máx</th></tr></thead><tbody>
+      ${mrow("Armas reales interceptadas", m.interceptRate, pct)}${mrow("Interceptadas (cantidad)", m.intercepted)}${mrow("Impactos en el blanco", m.impacts)}${mrow("Daño total (HP)", m.damage)}${mrow("Interceptores lanzados", m.shots)}${mrow("Gasto de la defensa", m.defCost, (v) => v == null ? "—" : money(v))}${mrow("Costo del ataque", m.atkCost, (v) => v == null ? "—" : money(v))}
+    </tbody></table></div></div>
+    <div><h3>Cómo leerlo</h3><ul class="why">
+      <li><b>Probabilidad</b> = corridas en las que pasó ÷ corridas totales. La franja clara de cada barra es el <b>intervalo de confianza del 95%</b> (Wilson): con pocas corridas es ancho; para afinarlo hacen falta más corridas (el ancho baja con √N).</li>
+      <li><b>p10 / p90</b>: el 10% de las corridas dio menos que p10 y el 10% dio más que p90. Es el rango "típico" sin los extremos.</li>
+      <li>${a.sample ? 'Cada corrida sorteó RCS, Pk, velocidades, alcances, CEP y costos dentro de los rangos del catálogo (fichas → "Confianza de los datos"): la dispersión mezcla el azar del combate con lo que no sabemos de cada sistema.' : "Todas las corridas usaron los valores probables del catálogo: la dispersión es solo el azar del combate (detección, Pk, dispersión de impactos)."}</li>
+      <li>Es un modelo con datos públicos aproximados: compará disposiciones entre sí más que leer los porcentajes como predicción.</li></ul></div>
+    <div class="row"><button class="btn" id="mcAgain">Otra serie</button></div>
+  </div>`, () => openMcDebrief(a, cancelled));
+    $("#mcAgain").onclick = openMonteCarlo;
+  }
+
+  // src/ui/debrief.js
+  var pct2 = (a, b) => b ? Math.round(100 * a / b) + "%" : "—";
+  var SIDE3 = { ataque: "Ataque", defensa: "Defensa" };
   function openDebrief() {
     const d = buildDebrief(S), a = d.attack, g = d.damage, f = d.defense;
     const res = d.outcome.result, resCls = { exito: "st-operational", parcial: "st-damaged", fracaso: "st-destroyed" }[res] || "";
@@ -4741,18 +5001,18 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
     const goalRows = ["ataque", "defensa"].map((side) => {
       const gs = d.goals.filter((x) => x.side === side);
       if (!gs.length) return "";
-      return `<div><b>${SIDE2[side]}${d.outcome.side === side ? " (vos)" : ""}</b><ul class="goals">${gs.map((x) => `<li class="${x.met ? "ok" : "no"}">${x.met ? "✔" : "✘"} ${x.primary ? "<b>Principal:</b> " : "Secundaria: "}${esc(x.text)}</li>`).join("")}</ul></div>`;
+      return `<div><b>${SIDE3[side]}${d.outcome.side === side ? " (vos)" : ""}</b><ul class="goals">${gs.map((x) => `<li class="${x.met ? "ok" : "no"}">${x.met ? "✔" : "✘"} ${x.primary ? "<b>Principal:</b> " : "Secundaria: "}${esc(x.text)}</li>`).join("")}</ul></div>`;
     }).join("");
     const typeRows = Object.entries(a.byType).map(([k, b]) => `<tr><td>${esc(k)}</td><td>${b.launched}</td><td>${b.killed}</td><td>${b.arrived}</td><td>${b.shotsAt}</td></tr>`).join("");
     const tl = d.timeline.map((e) => `<li><time>${fmtT(e.t)}</time> — ${esc(e.text)}</li>`).join("") || "<li>Sin eventos.</li>";
     openModal(`<header><div><span class="chip">${esc(d.scen?.name || "Escenario libre")}</span><h2>Debrief</h2></div><button class="btn x">Cerrar</button></header><div class="bd debrief">
-    <div class="dbres ${resCls}"><b>${esc(d.outcome.side ? SIDE2[d.outcome.side] + ": " : "")}${esc(d.outcome.text)}</b><span>Duración ${fmtT(d.t).slice(2)} de tiempo simulado</span></div>
+    <div class="dbres ${resCls}"><b>${esc(d.outcome.side ? SIDE3[d.outcome.side] + ": " : "")}${esc(d.outcome.text)}</b><span>Duración ${fmtT(d.t).slice(2)} de tiempo simulado</span></div>
     ${goalRows ? `<div><h3>Metas del escenario</h3><div class="dbgoals">${goalRows}</div></div>` : ""}
     <div><h3>Objetivos</h3>${objRows}</div>
     <div class="dbcols">
       <div><h3>Ataque</h3><ul class="dblist">
         <li><b>${a.real}</b> armas lanzadas${a.decoys ? ` + <b>${a.decoys}</b> señuelos` : ""}</li>
-        <li><b>${a.intercepted}</b> interceptadas (${pct(a.intercepted, a.real)})</li>
+        <li><b>${a.intercepted}</b> interceptadas (${pct2(a.intercepted, a.real)})</li>
         <li><b>${a.impacts}</b> impactos en el blanco · <b>${a.misses}</b> fuera${a.lostLocally ? ` (<b>${a.lostLocally}</b> perdidas localmente por engaño GNSS)` : ""}</li>
         <li><b>${a.decoysKilled}</b> señuelos derribados</li></ul></div>
       <div><h3>Daño</h3><ul class="dblist">
@@ -4771,7 +5031,9 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
     <div><h3>Línea de tiempo</h3><ol class="timeline">${tl}</ol></div>
     <div><h3>Por tipo de arma</h3><div class="tblwrap"><table class="t"><thead><tr><th>Arma</th><th>Lanzadas</th><th>Derribadas</th><th>Llegaron</th><th>Interceptores recibidos</th></tr></thead><tbody>${typeRows}</tbody></table></div></div>
     <p class="hint">Todo lo de arriba sale de lo que registró el motor durante la corrida. Corré de nuevo con otra disposición: el azar (detección, Pk, dispersión) cambia el resultado de una corrida a otra.</p>
+    <div class="row"><button class="btn" id="dbMc">¿Fue suerte? Repetir muchas veces (Monte Carlo)</button></div>
   </div>`, openDebrief);
+    $("#dbMc").onclick = openMonteCarlo;
   }
 
   // src/ui/panels/results.js
@@ -5379,7 +5641,7 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
     } else err(`Mapa desconocido: "${String(m.key)}". Los incluidos son: ${Object.keys(TERRAIN).join(", ")}.`);
     if (errors.length) return { ok: false, errors, warnings };
     const isNum = (v) => typeof v === "number" && Number.isFinite(v);
-    const num = (where, v, lo, hi, { int = false, opt = false } = {}) => {
+    const num2 = (where, v, lo, hi, { int = false, opt = false } = {}) => {
       if (v === void 0 || v === null) {
         if (!opt) err(`${where}: falta el valor.`);
         return void 0;
@@ -5450,7 +5712,7 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
         return { id: id(w, g.id) };
       }
       pos(w, g.x, g.y);
-      return { id: id(w, g.id), type: g.type, x: g.x, y: g.y, name: str(w + " · name", g.name, 120, false), short: str(w + " · short", g.short, 60), maxHp: num(w + " · maxHp", g.maxHp, 1, 1e5, { opt: true }), desc: str(w + " · desc", g.desc, 1e3) };
+      return { id: id(w, g.id), type: g.type, x: g.x, y: g.y, name: str(w + " · name", g.name, 120, false), short: str(w + " · short", g.short, 60), maxHp: num2(w + " · maxHp", g.maxHp, 1, 1e5, { opt: true }), desc: str(w + " · desc", g.desc, 1e3) };
     });
     const defs = list("defs", setup.defs).map((u, i) => {
       const w = `Defensa ${i + 1}${typeof u.name === "string" ? " (" + u.name + ")" : ""}`;
@@ -5465,11 +5727,11 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
         x: u.x,
         y: u.y,
         name: str(w + " · name", u.name, 120),
-        az: num(w + " · az", u.az, 0, 360, { opt: true }),
-        mast: num(w + " · mast", u.mast, 0, 200, { opt: true }),
-        alt: num(w + " · alt", u.alt, 0, 2e4, { opt: true }),
-        mag: num(w + " · mag", u.mag, 0, 1e3, { int: true, opt: true }),
-        salvo: num(w + " · salvo", u.salvo, 0, 10, { int: true, opt: true }),
+        az: num2(w + " · az", u.az, 0, 360, { opt: true }),
+        mast: num2(w + " · mast", u.mast, 0, 200, { opt: true }),
+        alt: num2(w + " · alt", u.alt, 0, 2e4, { opt: true }),
+        mag: num2(w + " · mag", u.mag, 0, 1e3, { int: true, opt: true }),
+        salvo: num2(w + " · salvo", u.salvo, 0, 10, { int: true, opt: true }),
         noDrones: bool(w + " · noDrones", u.noDrones)
       };
     });
@@ -5494,13 +5756,13 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
         pts,
         targetUnit: sv.targetUnit ?? null,
         targetObj: sv.targetObj ?? null,
-        count: num(w + " · count", sv.count, 1, 500, { int: true }),
-        interval: num(w + " · interval", sv.interval, 0, T, { opt: true }),
-        tStart: num(w + " · tStart", sv.tStart, 0, T, { opt: true }),
+        count: num2(w + " · count", sv.count, 1, 500, { int: true }),
+        interval: num2(w + " · interval", sv.interval, 0, T, { opt: true }),
+        tStart: num2(w + " · tStart", sv.tStart, 0, T, { opt: true }),
         sync: bool(w + " · sync", sv.sync),
-        tArrive: num(w + " · tArrive", sv.tArrive, 0, T, { opt: true }),
-        agl: num(w + " · agl", sv.agl, 0, 3e4, { opt: true }),
-        launchDist: num(w + " · launchDist", sv.launchDist, 1, 5e3, { opt: true }),
+        tArrive: num2(w + " · tArrive", sv.tArrive, 0, T, { opt: true }),
+        agl: num2(w + " · agl", sv.agl, 0, 3e4, { opt: true }),
+        launchDist: num2(w + " · launchDist", sv.launchDist, 1, 5e3, { opt: true }),
         maneuver: bool(w + " · maneuver", sv.maneuver),
         decoys: bool(w + " · decoys", sv.decoys)
       };
@@ -5512,7 +5774,7 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
         return null;
       }
       pos(w, j.x, j.y);
-      return { id: id(w, j.id), type: j.type, x: j.x, y: j.y, alt: num(w + " · alt", j.alt, 0, 2e4, { opt: true }), on: bool(w + " · on", j.on) };
+      return { id: id(w, j.id), type: j.type, x: j.x, y: j.y, alt: num2(w + " · alt", j.alt, 0, 2e4, { opt: true }), on: bool(w + " · on", j.on) };
     });
     const r = raw.rules || {};
     const rules = { net: bool("rules.net", r.net), doctrine: r.doctrine };
@@ -5540,7 +5802,7 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
           if (!GOAL_KINDS.includes(g.kind)) err(`${w}: tipo "${String(g.kind)}" desconocido. Válidos: ${GOAL_KINDS.join(", ")}.`);
           const target = str(w + " · target", g.target, 120, false);
           if (target && !names.has(target)) warnings.push(`${w} ("${g.text || target}"): no hay ningún objetivo ni defensa llamado "${target}"; no se va a poder cumplir.`);
-          return { side: g.side, primary: !!g.primary, kind: g.kind, target, min: num(w + " · min", g.min, 0, 1, { opt: true }), text: str(w + " · text", g.text, 300) || target || "" };
+          return { side: g.side, primary: !!g.primary, kind: g.kind, target, min: num2(w + " · min", g.min, 0, 1, { opt: true }), text: str(w + " · text", g.text, 300) || target || "" };
         }).filter(Boolean);
       }
     }
@@ -5682,7 +5944,7 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
 
   // src/ui/loop.js
   var STEP = 0.25;
-  var last = performance.now();
+  var last2 = performance.now();
   var uiTick = 0;
   var holdUntil = 0;
   function updateAutoPhase(now) {
@@ -5698,8 +5960,8 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
     }
   }
   function loop(now) {
-    const dtr = Math.min(0.1, (now - last) / 1e3);
-    last = now;
+    const dtr = Math.min(0.1, (now - last2) / 1e3);
+    last2 = now;
     if (S.running) {
       if (S.auto) updateAutoPhase(now);
       let adv = dtr * currentSpeed();
@@ -5745,6 +6007,7 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
   initScenarioFile();
   initRelief();
   initAcademy();
+  $("#mcBtn").onclick = openMonteCarlo;
   var sc = $("#scenario");
   sc.innerHTML = Object.entries(SCENARIOS).map(([k, s]) => `<option value="${k}">${esc(s.name)}</option>`).join("");
   sc.onchange = (e) => {
@@ -5777,7 +6040,7 @@ button.chip{background:none;cursor:pointer} button.chip:hover{border-color:var(-
     MAP.max = 0;
     MAP.min = 0;
     buildBase();
-  }, computeCov, draw, addDef, addSalvo, addJam, startSim, step, resetSim, loadScenario, renderAll, openDebrief, loadFromObject, saveScenario };
+  }, computeCov, draw, addDef, addSalvo, addJam, startSim, step, resetSim, loadScenario, renderAll, openDebrief, openMonteCarlo, loadFromObject, saveScenario };
 })();
 </script>
 </body>

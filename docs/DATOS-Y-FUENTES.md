@@ -4,7 +4,7 @@ Cielo Cerrado es un juego con **aspiraciones de realismo** hecho con **datos pú
 
 ## 1. Principios
 
-1. **Todo número relevante tiene un rango.** No hay un único valor "verdadero": cada parámetro tiene mínimo, probable y máximo, una confianza (alta, media o baja) y su razonamiento. La simulación usa el probable; el rango queda para el futuro modo Monte Carlo.
+1. **Todo número relevante tiene un rango.** No hay un único valor "verdadero": cada parámetro tiene mínimo, probable y máximo, una confianza (alta, media o baja) y su razonamiento. La simulación usa el probable; el modo Monte Carlo puede sortear cada parámetro dentro de su rango (distribución triangular mín–probable–máx) para ver cuánto pesa lo que no sabemos.
 2. **Se cita la fuente o se dice que es una estimación.** Si no hay un dato público, la nota empieza con **"est"** y explica el razonamiento (física, sistemas análogos, tamaño o forma).
 3. **Se separan las afirmaciones de los hechos.** Las cifras de fabricantes, gobiernos o fuerzas armadas en guerra se marcan como tales y bajan la confianza.
 4. **Calibrar contra la realidad, no contra la propaganda.** Las Pk no se copian de los folletos: se ajustan para que el motor reproduzca episodios reales observados (§4).
