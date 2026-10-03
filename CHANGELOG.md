@@ -6,6 +6,9 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 
 ## [Sin publicar]
 
+### Agregado
+- **Discriminación de señuelos:** los radares de tiro (S, C, X, Ku) aprenden a distinguir un señuelo de un arma con el tiempo de seguimiento (más rápido en las bandas altas; los señuelos del Iskander cuestan 4 veces más que un Gerbera; ≈3% de error con armas reales). Nueva opción en la pestaña Defensa: **"no tirarle a pistas clasificadas como señuelo"**. El debrief cuenta los señuelos reconocidos y las armas mal clasificadas. Sin la opción, los resultados no cambian.
+
 ### Cambiado
 - **[sim]** **Detección por relación señal/ruido.** Cada barrido sortea la detección con la fórmula de Swerling 1, y el alcance del catálogo pasa a ser el de 50% por barrido: 75% al 80% del alcance, 96% a la mitad, 26% a 1,2 veces (ahí se corta: los ecos sueltos no confirman una pista). Además:
   - **Clutter:** un blanco a menos de 300 m pierde señal por el eco del suelo, mucho en un radar sin filtro (S-125), poco en uno pulso-Doppler (Patriot, IRIS-T…), y más en terreno quebrado.

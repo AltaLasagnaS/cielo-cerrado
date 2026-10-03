@@ -16,7 +16,6 @@ Propuesta detallada, con orden, dificultad, datos y pruebas: [docs/investigacion
 
 
 - Detección, segunda parte: Swerling 3 (verificar la fórmula), clutter de mar según el estado del mar y de lluvia, visibilidad sub-clutter por radar con datos.
-- Discriminación de señuelos según la banda y el tiempo de seguimiento.
 - CRPA explícita contra la cantidad de fuentes GNSS (propuesta en `docs/investigacion/`).
 - Recarga de munición con tiempos y depósitos como objetivos.
 - Interceptor con perfil de energía y límite de g en lugar de velocidad media.

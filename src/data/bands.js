@@ -12,6 +12,8 @@
 //   low     banda baja ("A–D" en la nomenclatura de CMO: VHF, UHF, L). Ahí los blancos chicos están
 //           cerca de la resonancia y la RCS cambia menos con el aspecto: physics/radar.js#aspectFactor
 //           usa la mitad del contraste en dB entre frente, costado y cola.
+//   decoyTau tiempo característico (s de seguimiento) para distinguir un señuelo de un arma real con
+//           un radar de esta banda (physics/decoys.js). Sin él la banda no clasifica (VHF, L: alerta).
 //   freq, lambda ([mín, máx] en metros), res, uses, pros, cons: texto educativo (Academia).
 //
 // Los multiplicadores son una simplificación del juego (ver docs/FISICA.md §3): la RCS real depende
@@ -35,28 +37,28 @@ export const BANDS = {
     rcsWhy: 'Todavía cerca de la zona de resonancia para misiles chicos: el motor multiplica la RCS frontal ×3 si el blanco es de baja firma y ×1,4 en el resto.'
   },
   S: {
-    name: 'Banda S (E/F OTAN)', ghz: 3, bw: 2,
+    name: 'Banda S (E/F OTAN)', ghz: 3, decoyTau: 60, bw: 2,
     note: 'Buen compromiso alcance/clima; típica en radares de vigilancia 3D y AEW.',
     freq: '2–4 GHz', lambda: [0.075, 0.15], res: 'Media.',
     uses: 'Vigilancia 3D (36D6), AEW (Erieye, A-50), búsqueda de defensas de punto (Pantsir, Tor).', pros: 'Buen alcance y poca sensibilidad a la lluvia.', cons: 'Menos precisión que C o X para guiar.',
     rcsWhy: 'Es una de las bandas de referencia del catálogo: el motor usa la RCS frontal (th.rcs) sin cambios.'
   },
   C: {
-    name: 'Banda C (G/H OTAN)', ghz: 5.5, bw: 1.5,
+    name: 'Banda C (G/H OTAN)', ghz: 5.5, decoyTau: 25, bw: 1.5,
     note: 'Radares multifunción de defensa aérea (Patriot, TRML-4D del IRIS-T).',
     freq: '4–8 GHz', lambda: [0.0375, 0.075], res: 'Media a alta.',
     uses: 'Radares multifunción (búsqueda + seguimiento + guiado): AN/MPQ-65 del Patriot, TRML-4D.', pros: 'Compromiso entre alcance y precisión; un solo radar puede buscar y guiar.', cons: 'Más afectado por la lluvia que S o L.',
     rcsWhy: 'Régimen óptico para casi todos los blancos: el motor usa la RCS frontal sin cambios.'
   },
   X: {
-    name: 'Banda X (I/J OTAN)', ghz: 9.5, bw: 1,
+    name: 'Banda X (I/J OTAN)', ghz: 9.5, decoyTau: 18, bw: 1,
     note: 'Control de tiro: buena resolución, menos alcance y más afectada por lluvia.',
     freq: '8–12 GHz', lambda: [0.025, 0.0375], res: 'Alta: haces de ~1°.',
     uses: 'Control de tiro e iluminación (30N6, 92N6, 9S35, Arabel, Sentinel), buscadores de misiles.', pros: 'Resolución angular y de seguimiento alta con antenas manejables.', cons: 'Menos alcance para la misma potencia y antena, atenuación por lluvia; es la banda contra la que se optimiza el conformado furtivo.',
     rcsWhy: 'Banda de referencia del catálogo (RCS frontal "X/S"). Con λ de ~3 cm todos los blancos son grandes respecto de la onda (régimen óptico): manda la forma, y por eso funcionan el conformado furtivo y los materiales absorbentes.'
   },
   Ku: {
-    name: 'Banda Ku/Ka', ghz: 15, bw: 0.8,
+    name: 'Banda Ku/Ka', ghz: 15, decoyTau: 12, bw: 0.8,
     note: 'Seguimiento de alta precisión a corto alcance, buscadores de misiles.',
     freq: '12–18 GHz (Ku) y 27–40 GHz (Ka)', lambda: [0.0075, 0.025], res: 'Muy alta.',
     uses: 'Radares de seguimiento de corto alcance (Pantsir 1RS2), buscadores activos, cañones.', pros: 'Precisión muy alta, antenas chicas.', cons: 'Alcance corto y mucha atenuación atmosférica y por lluvia.',

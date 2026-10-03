@@ -16,7 +16,7 @@ export function useMap(key, { flat = false } = {}) {
 export function clearSetup() {
   resetState();
   S.setup = { objs: [], defs: [], salvos: [], jams: [] }; S.sel = null; S.mode = 'select';
-  S.c2 = 'coordinada'; S.doctrine = 'salva'; S.weather = 'despejado';
+  S.c2 = 'coordinada'; S.doctrine = 'salva'; S.weather = 'despejado'; S.ignoreDecoys = false;
 }
 
 /**
