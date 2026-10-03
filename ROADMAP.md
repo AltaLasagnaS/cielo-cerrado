@@ -12,6 +12,9 @@ Son ideas ordenadas por prioridad, no promesas. Cada ítem que cambie resultados
 
 ## Física (cada ítem es **[sim]**)
 
+Propuesta detallada, con orden, dificultad, datos y pruebas: [docs/investigacion/mejoras-fisica.md](docs/investigacion/mejoras-fisica.md).
+
+
 - RCS según el aspecto (usar `rcsSide` según el ángulo de vista).
 - Clutter de suelo y mar para blancos rasantes, según el tipo de radar.
 - Fluctuación de RCS (Swerling) en la probabilidad de detección.
@@ -20,7 +23,9 @@ Son ideas ordenadas por prioridad, no promesas. Cada ítem que cambie resultados
 - Recarga de munición con tiempos y depósitos como objetivos.
 - Interceptor con perfil de energía y límite de g en lugar de velocidad media.
 - Daño funcional: un radar dañado pierde alcance, una base dañada no lanza.
-- Clima: atenuación por lluvia en X/Ku y restricciones ópticas.
+- Clima por **estados** (despejado, nublado, lluvia, tormenta, niebla, nieve): atenuación por lluvia según la banda (ITU-R P.838), restricciones ópticas e IR, estado del mar y viento.
+- **Integración de la defensa aérea** por niveles (desconectada, descoordinada, coordinada, integrada), con demora y precisión de las pistas compartidas, reparto de blancos e interrupción de comunicaciones. Reemplaza al interruptor "red integrada".
+- **Enlaces de datos por sistema** (Link 16, red nacional ucraniana, red rusa tipo Polyana) con pasarelas: solo comparten pistas los sistemas compatibles.
 
 ## Juego
 

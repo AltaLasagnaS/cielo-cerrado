@@ -53,6 +53,7 @@ El código está en `src/`, separado en capas: **datos → física → simulaci�
 | [docs/DATOS-Y-FUENTES.md](docs/DATOS-Y-FUENTES.md) | De dónde sale cada número, cómo se calibró y cómo tratar los sesgos de las fuentes |
 | [docs/CATALOGO.md](docs/CATALOGO.md) | Todo el catálogo con rangos y fuentes (autogenerado) |
 | [CONTRIBUIR.md](CONTRIBUIR.md) | Cómo agregar armas, escenarios o cambiar la física sin romper nada |
+| [docs/investigacion/](docs/investigacion/) | Investigaciones: guerra electrónica ucraniana y cómo mejorar los modelos físicos |
 | [ROADMAP.md](ROADMAP.md) | Hacia dónde va el proyecto |
 | [CHANGELOG.md](CHANGELOG.md) | Historial de cambios |
 

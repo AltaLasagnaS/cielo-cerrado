@@ -241,4 +241,6 @@ Es un modelo de juego: no representa estructuras, incendios, penetración ni sub
 | GNSS sin CRPA explícita | `gnss` resume toda la resistencia | Número de elementos de la CRPA frente al número de fuentes (ver `docs/investigacion/`) |
 | Daño simple | Sin efectos funcionales (un radar dañado sigue funcionando) | Degradación de capacidades según el estado |
 
+La propuesta detallada de cada mejora (qué cambia, dificultad, datos, pruebas y cómo lo resuelven *Command: Modern Operations* y *Fleet Command*) está en [investigacion/mejoras-fisica.md](investigacion/mejoras-fisica.md).
+
 Cada mejora cambia resultados. Antes de mergearla: correr las pruebas, revisar los cambios de los golden y anotarla en el CHANGELOG (ver [CONTRIBUIR.md](../CONTRIBUIR.md)).
