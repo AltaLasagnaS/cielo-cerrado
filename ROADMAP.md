@@ -35,7 +35,6 @@ Son ideas ordenadas por prioridad, no promesas. Cada ítem que cambie resultados
 
 ## Técnica
 
-- Publicar en GitHub Pages (el `index.html` de la raíz ya es el juego completo).
 - Versión de escritorio opcional (Tauri o Electron) si hace falta acceso a archivos grandes.
 - Tipografías embebidas para el uso sin conexión.
 - Pruebas de interfaz en el navegador dentro de la CI (Playwright).
