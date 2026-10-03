@@ -14,11 +14,12 @@ export const directDamage = T => DAMAGE.K * Math.pow(warheadKg(T), DAMAGE.EXP) *
 export const radius50 = T => DAMAGE.R50K * Math.cbrt(warheadKg(T));
 
 /**
- * Daño que causa T al caer a dist metros del centro de un objetivo de tipo type.
+ * Daño que causa T al caer a dist metros del centro de un objetivo de tipo type (clave de
+ * TARGET_TYPES, o un objeto { radius, vuln } como data/targets.js#UNIT_TARGET).
  * → { dmg, factor, edge } con edge = distancia fuera de la huella (0 = impacto directo).
  */
 export function damageAt(T, type, dist) {
-  const tt = TARGET_TYPES[type], W = warheadKg(T);
+  const tt = typeof type === 'string' ? TARGET_TYPES[type] : type, W = warheadKg(T);
   if (!W || !tt) return { dmg: 0, factor: 0, edge: dist };
   const edge = Math.max(0, dist - tt.radius);
   const factor = 1 / (1 + (edge / radius50(T)) ** 2);

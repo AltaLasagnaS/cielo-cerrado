@@ -22,6 +22,23 @@ export const TARGET_STATUS = { operational: 'Operativo', damaged: 'Dañado', des
 export const DAMAGED_AT = 0.2;
 
 /**
+ * Las unidades de defensa como blanco (daño funcional, sim/engine.js#damageUnits): una batería típica
+ * con radar, lanzadores y vehículos dispersos en ≈30 m, liviana y sensible a esquirlas como un sitio
+ * de radar. Valores de juego.
+ */
+export const UNIT_TARGET = { hp: 300, radius: 30, vuln: 1.2 };
+
+/**
+ * Daño funcional: al perder UNIT_COMP_AT[k] de la vida, la unidad pierde su componente k+1 (radar o
+ * lanzador; si tiene los dos, se sortea cuál primero).
+ *   radar dañado: alcance de detección ×radarR y tiempo de reacción ×react;
+ *   lanzador dañado: no lanza (sigue viendo y alimentando la red).
+ * Valores de juego (sin fuente directa); ver docs/FISICA.md §10.
+ */
+export const UNIT_DAMAGE = { radarR: 0.7, react: 1.5 };
+export const UNIT_COMP_AT = [0.2, 0.5];
+
+/**
  * Modelo de daño (ver physics/damage.js):
  *   daño directo  = K · W^EXP · vuln · mult        (W = ojiva en kg, del catálogo: info.warheadKg)
  *   radio al 50%  = R50K · W^(1/3)  m               (escala de Hopkinson-Cranz)

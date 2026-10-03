@@ -87,6 +87,7 @@ export function draw() {
     else { ctx.moveTo(sx, sy - 9); ctx.lineTo(sx + 8, sy + 6); ctx.lineTo(sx - 8, sy + 6); ctx.closePath(); }
     ctx.fill(); ctx.stroke();
     if (d.kind === 'aew') { ctx.strokeStyle = c; ctx.beginPath(); ctx.arc(sx, sy, 12, 0, 7); ctx.stroke(); }
+    if (S.started && !dead && (u.dmgRadar || u.dmgLauncher)) { ctx.strokeStyle = '#e6a53c'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(sx, sy, 12, 0, 7); ctx.stroke(); }   // dañada
     if (dead) { ctx.strokeStyle = '#ff5b4d'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(sx - 7, sy - 7); ctx.lineTo(sx + 7, sy + 7); ctx.moveTo(sx + 7, sy - 7); ctx.lineTo(sx - 7, sy + 7); ctx.stroke(); }
     const ammo = S.started && d.sam && u.alive ? ' ' + u.magLeft : '';
     labelAt(sx, sy, (u.name || d.short) + ammo, dead ? '#6b7888' : '#e6eef6');

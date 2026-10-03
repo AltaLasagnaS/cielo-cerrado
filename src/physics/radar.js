@@ -1,7 +1,7 @@
 // ---------------- RADAR / DETECCIÓN ----------------
 // Ecuación del radar simplificada (R ∝ σ^¼), sectores de antena, horizonte e interferencia de ruido.
 // Ver docs/FISICA.md §2–§4.
-import { BANDS, JAMMERS, D } from '../data/index.js';
+import { BANDS, JAMMERS, D, UNIT_DAMAGE } from '../data/index.js';
 import { angDiff, azOf } from '../util/math.js';
 import { HORIZON_K } from './constants.js';
 import { surf, los } from './terrain.js';
@@ -107,12 +107,13 @@ export function jamJ(u, az, list) {
  * wx (data/weather.js, opcional): la lluvia atenúa el radar (physics/weather.js#rainRange) y el
  * clima achica los alcances ópticos (wx.opt) y acústicos (wx.acu). El techo de nubes (wx.ceiling)
  * lo aplican quienes conocen la altura del blanco (sim/engine.js, physics/coverage.js).
+ * Un sensor dañado durante la corrida (u.dmgRadar, daño funcional) ve ×UNIT_DAMAGE.radarR.
  */
 export function detR(u, th, J, ca = 1, wx = null) {
-  const r = D(u).radar;
-  if (r.band === 'ACU') return r.R1 * (wx ? wx.acu : 1);
-  if (r.band === 'OPT') return r.R1 * (wx ? wx.opt : 1);
-  const R = r.R1 * Math.pow(rcsAt(th.T || th, r.band, ca), 0.25) * Math.pow(1 / (1 + J), 0.25);
+  const r = D(u).radar, dmg = u.dmgRadar ? UNIT_DAMAGE.radarR : 1;
+  if (r.band === 'ACU') return r.R1 * (wx ? wx.acu : 1) * dmg;
+  if (r.band === 'OPT') return r.R1 * (wx ? wx.opt : 1) * dmg;
+  const R = r.R1 * Math.pow(rcsAt(th.T || th, r.band, ca), 0.25) * Math.pow(1 / (1 + J), 0.25) * dmg;
   return wx && wx.rain ? rainRange(R, rainGamma(r.band, wx.rain), wx.rainKm) : R;
 }
 

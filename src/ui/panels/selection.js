@@ -1,6 +1,6 @@
 // Tarjeta "Selección": detalle y parámetros editables de lo que esté seleccionado en el mapa
 // (defensa, jammer, salva o amenaza en vuelo).
-import { THREATS, JAMMERS, TARGET_TYPES, TARGET_STATUS, D } from '../../data/index.js';
+import { THREATS, JAMMERS, TARGET_TYPES, TARGET_STATUS, D, UNIT_TARGET } from '../../data/index.js';
 import { esc, fmtT, kmh, money } from '../../util/format.js';
 import { releaseId } from '../../util/ids.js';
 import { surf, latlon } from '../../physics/terrain.js';
@@ -30,7 +30,10 @@ export function renderSel(live) {
     if (r && r.band !== 'ACU') { const hor = horizon(antZ(u) - (d.kind === 'aew' ? 0 : ground), 50); html += `<dt>Radar</dt><dd>${esc(r.name)} · ${r.band}</dd><dt>Horizonte vs blanco a 50 m</dt><dd>${hor.toFixed(0)} km</dd>`; }
     if (d.sam) html += `<dt>Alcance</dt><dd>${d.sam.maxR} km${d.sam.maxRtbm ? ' (TBM ' + d.sam.maxRtbm + ')' : ''}</dd><dt>Guiado</dt><dd>${d.sam.guid}</dd>`;
     if (S.started && d.sam) html += `<dt>Munición</dt><dd>${u.magLeft}/${u.mag} · reserva ${u.reserveLeft}</dd><dt>En vuelo</dt><dd>${u.active}/${d.sam.ch}</dd>${u.reloadUntil !== null ? `<dt>Recargando</dt><dd>faltan ${Math.ceil((u.reloadUntil - S.t) / 60)} min</dd>` : ''}`;
-    if (S.started) html += `<dt>Estado</dt><dd style="color:${u.alive ? 'var(--ok)' : 'var(--red)'}">${u.alive ? 'Operativa' : 'Destruida'}</dd>`;
+    if (S.started) {
+      const hurt = u.alive && (u.dmgRadar || u.dmgLauncher), what = [u.dmgRadar ? 'radar: menos alcance y reacción más lenta' : '', u.dmgLauncher ? 'lanzador fuera de servicio' : ''].filter(Boolean).join('; ');
+      html += `<dt>Estado</dt><dd style="color:${!u.alive ? 'var(--red)' : hurt ? 'var(--warn, #e6a53c)' : 'var(--ok)'}">${!u.alive ? 'Destruida' : hurt ? 'Dañada (' + what + ')' : 'Operativa'}${u.alive && u.hp < UNIT_TARGET.hp ? ' · ' + Math.max(0, u.hp) + '/' + UNIT_TARGET.hp + ' HP' : ''}</dd>`;
+    }
     html += '</dl>';
     if (ed) {
       if (r && d.kind !== 'aew' && r.band !== 'ACU' && r.band !== 'OPT') {

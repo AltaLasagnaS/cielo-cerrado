@@ -7,6 +7,9 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 ## [Sin publicar]
 
 ### Agregado
+- **[sim]** **Daño funcional de las unidades:** una explosión cerca de una batería la daña sin destruirla. Al perder el 20% de la vida pierde un componente y al 50% el otro: con el **radar dañado** ve un 30% menos y reacciona 1,5 veces más lento; con el **lanzador dañado** no dispara aunque le queden misiles. En el mapa aparece con un anillo naranja; el panel de selección dice qué perdió y el debrief la nombra. No cambia los escenarios incluidos (40 noches de la base de Gotemburgo y del puente de Monterey dan exactamente lo mismo, y las golden solo suman el contador nuevo `unitsDamaged` en 0): sus baterías están lejos de donde caen las armas. Se nota al ubicar defensas pegadas a un objetivo o con armas apuntadas a una unidad que caen cerca sin pegarle.
+
+### Agregado
 - **[sim]** **Energía del interceptor** (docs/FISICA.md §6–§7):
   - **Alcance según el aspecto:** un misil llega más lejos contra un blanco que viene de frente que contra uno que se aleja. Alcance efectivo = alcance máximo × (0,8 + 0,2·coseno del aspecto): ×1 de frente, ×0,8 de costado, ×0,6 de cola.
   - **Pk según la energía:** un misil que llega al borde de su alcance llega "cansado". La Pk se multiplica por un factor *relativo* al tiro típico (al 90% del alcance, con el que están calibradas las Pk del catálogo): hasta ×1,25 en un tiro corto, ×0,71 en el borde. No se aplica a cañones ni a drones interceptores.
