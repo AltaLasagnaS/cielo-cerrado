@@ -67,6 +67,13 @@ export function exportFileName() {
  */
 export function validateScenario(raw) {
   const errors = [], warnings = [];
+  // un valor fuera de los límites reales (p. ej. de una versión vieja) se acomoda al borde, con aviso
+  const inLimits = (w, v, lim, what) => {
+    if (typeof v !== 'number' || !lim) return v;
+    const c = Math.min(lim[1], Math.max(lim[0], v));
+    if (c !== v) warnings.push(`${w}: ${v} m está fuera de ${what} (${lim[0]}–${lim[1]} m); se usa ${c} m.`);
+    return c;
+  };
   const err = m => { if (errors.length < 30) errors.push(m); };
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return { ok: false, errors: ['El archivo no contiene un objeto JSON.'], warnings };
   if (raw.format !== FORMAT) return { ok: false, errors: [`No es un archivo de escenario de Cielo Cerrado (falta "format": "${FORMAT}").`], warnings };
@@ -128,7 +135,7 @@ export function validateScenario(raw) {
     pos(w, u.x, u.y);
     return {
       id: id(w, u.id), type: u.type, x: u.x, y: u.y, name: str(w + ' · name', u.name, 120),
-      az: num(w + ' · az', u.az, 0, 360, { opt: true }), mast: num(w + ' · mast', u.mast, 0, 200, { opt: true }), alt: num(w + ' · alt', u.alt, 0, 20000, { opt: true }),
+      az: num(w + ' · az', u.az, 0, 360, { opt: true }), mast: inLimits(w + ' · mast', num(w + ' · mast', u.mast, 0, 200, { opt: true }), DEFENSES[u.type].radar?.mastRange, 'la altura real de su antena'), alt: num(w + ' · alt', u.alt, 0, 20000, { opt: true }),
       mag: num(w + ' · mag', u.mag, 0, 1000, { int: true, opt: true }), salvo: num(w + ' · salvo', u.salvo, 0, 10, { int: true, opt: true }), noDrones: bool(w + ' · noDrones', u.noDrones)
     };
   });
@@ -146,7 +153,7 @@ export function validateScenario(raw) {
       id: id(w, sv.id), type: sv.type, pts, targetUnit: sv.targetUnit ?? null, targetObj: sv.targetObj ?? null,
       count: num(w + ' · count', sv.count, 1, 500, { int: true }), interval: num(w + ' · interval', sv.interval, 0, T, { opt: true }),
       tStart: num(w + ' · tStart', sv.tStart, 0, T, { opt: true }), sync: bool(w + ' · sync', sv.sync), tArrive: num(w + ' · tArrive', sv.tArrive, 0, T, { opt: true }),
-      agl: num(w + ' · agl', sv.agl, 0, 30000, { opt: true }), launchDist: num(w + ' · launchDist', sv.launchDist, 1, 5000, { opt: true }),
+      agl: inLimits(w + ' · agl', num(w + ' · agl', sv.agl, 0, 30000, { opt: true }), THREATS[sv.type].aglRange, 'sus límites reales de vuelo'), launchDist: num(w + ' · launchDist', sv.launchDist, 1, 5000, { opt: true }),
       maneuver: bool(w + ' · maneuver', sv.maneuver), decoys: bool(w + ' · decoys', sv.decoys)
     };
   });
