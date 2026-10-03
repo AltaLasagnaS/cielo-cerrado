@@ -163,7 +163,7 @@ Es un modelo **cinemático guiado por datos**: la amenaza recorre una ruta polig
 
 ```
 minR ≤ r ≤ maxR (o maxRtbm si es balístico/hipersónico)
-altMin ≤ AGL   y   z ≤ altMax
+altMin ≤ AGL   y   z − z_lanzador ≤ altMax
 r / vInt ≤ τ   (el interceptor llega a tiempo, con ≤ 3 s de holgura)
 ```
 
