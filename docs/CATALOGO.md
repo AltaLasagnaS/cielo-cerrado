@@ -30,7 +30,7 @@ Vuela lento (≈185 km/h). Desde 2025 crucero a 2–5 km de altura para quedar f
 - Se lanzan en oleadas de cientos por noche: 54.538 drones tipo Shahed en 2025, ~40% señuelos (ISIS).
 - Neutralización mensual 83–93% entre ago-2025 y may-2026, sumando derribos y "pérdidas" por guerra electrónica (ISIS).
 - Red acústica Sky Fortress (~10.000 micrófonos) para detectarlos a baja cota.
-- RCS: el único estudio técnico (Járkov, 2023) da mediana 0,23 m² en todos los aspectos; de frente queda en ~0,05 m².
+- RCS: el único estudio técnico (Járkov, 2023) da mediana 0,23 m² en todos los aspectos y ~0,05 m² de frente; la base de CMO estima mucho menos (~0,008 de frente). El juego usa el punto medio: 0,02 de frente, 0,14 de costado y 0,03 de cola.
 
 #### Parámetros
 
@@ -38,22 +38,24 @@ Vuela lento (≈185 km/h). Desde 2025 crucero a 2–5 km de altura para quedar f
 |---|---:|---:|---:|---|---|---|
 | Velocidad de crucero (m/s) | 39 | **51** | 58 | alta | [1] [2] | 185 km/h típico; 140–150 km/h de promedio en rutas largas; 200–210 km/h a gran altura |
 | Altura de vuelo (m AGL) | 50 | **2.000** | 5.000 | alta | [3] [4] [2] | 2022–23: 700–2.000 m; desde 2025: 2–5 km con picada final |
-| RCS frontal (X/S) (m²) | 0,01 | **0,05** | 0,2 | baja | [5] [2] | Modelado de Járkov: mediana 0,23 m² (X) en todos los aspectos; de frente la detección es 1,7–2× menor que de costado, o sea σ frontal 8–16× menor |
-| RCS lateral (X/S) (m²) | 0,3 | **1** | 3 | baja | [5] | media lateral modelada 1,6 m² (X) y 2,1 m² (S) |
-| RCS en VHF (m²) | 0,1 | **0,3** | 1 | baja | — | est: envergadura 2,5 m frente a λ 1,5–2 m: resonancia; motor y estructura conductora |
+| RCS frontal (X/S) (m²) | 0,005 | **0,02** | 0,2 | baja | [5] [6] [2] | Járkov (OSINT): ≈0,05 de frente (mediana 0,23 m² en todos los aspectos; de frente se detecta 1,7–2× más cerca que de costado). CMO: −21 dBsm ≈ 0,008 en E–M. probable = media geométrica entre OSINT y CMO |
+| RCS lateral (X/S) (m²) | 0,02 | **0,14** | 3 | baja | [5] [6] | Járkov: media lateral modelada 1,6 m² (X) y 2,1 m² (S). CMO: −17 dBsm ≈ 0,02 (analogía con Harop/Mobin). probable = media geométrica entre OSINT y CMO; es el valor más incierto |
+| RCS de cola (X/S) (m²) | 0,005 | **0,03** | 0,3 | baja | [6] | CMO: −21 dBsm ≈ 0,008. OSINT est: motor de pistón y hélice atrás, ≈2× el frente (0,1). probable = media geométrica entre OSINT y CMO |
+| RCS en VHF (m²) | 0,05 | **0,12** | 1 | baja | [6] | CMO: −13 dBsm ≈ 0,05 de frente en bandas A–D. est OSINT 0,3: envergadura 2,5 m frente a λ 1,5–2 m (resonancia). probable = media geométrica entre OSINT y CMO |
 | CEP (m) | 5 | **15** | 50 | baja | — | est: con GNSS + CRPA 10–20 m; solo INS empeora mucho |
-| Costo unitario | US$20k | **US$35k** | US$80k | media | [6] [7] | CSIS: 20–80k, usa 35k; Forbes Ukraine 50k; exportación iraní 193k |
-| Alcance (km) | 650 | **1.500** | 2.500 | media | [8] [1] | el informe de ISIS dice que con BCh-90 cae a ~650 km desde ~1.350 km |
-| Ojiva (kg) | 40 | **50** | 90 | alta | [8] | BCh-50 o BCh-90 (62 kg de explosivo) |
+| Costo unitario | US$20k | **US$35k** | US$80k | media | [7] [8] | CSIS: 20–80k, usa 35k; Forbes Ukraine 50k; exportación iraní 193k |
+| Alcance (km) | 650 | **1.500** | 2.500 | media | [9] [1] | el informe de ISIS dice que con BCh-90 cae a ~650 km desde ~1.350 km |
+| Ojiva (kg) | 40 | **50** | 90 | alta | [9] | BCh-50 o BCh-90 (62 kg de explosivo) |
 
 1. [Army Recognition: Shahed-136, datos técnicos](https://www.armyrecognition.com/military-products/army/unmanned-systems/unmanned-aerial-vehicles/shahed-136-loitering-munition-kamikaze-suicide-drone-technical-data)
 2. [Recomendaciones a unidades contra Shahed-136 (sprotyvg7)](https://sprotyvg7.com.ua/lesson/rekomendacii-pidrozdilam-shhodo-borotbi-z-bezpilotnimi-litalnimi-aparatami-kamikadze-shahed-136-geran-2)
 3. [UNITED24: por qué los enjambres vuelan más alto (2025)](https://united24media.com/war-in-ukraine/why-russias-drone-swarms-are-getting-deadlier-by-flying-higher-9305)
 4. [Forbes (Hambling): interceptores contra Shahed a gran altura (abr-2025)](https://www.forbes.com/sites/davidhambling/2025/04/11/ukraines-interceptors-take-down-high-flying-russian-shaheds/)
 5. [Sukharevsky et al. (Univ. Fuerza Aérea, Járkov, 2023): modelado de RCS del Shahed-136](https://fliphtml5.com/pdvau/uvoj/Shahed_136_UAV_RCS_measurements/)
-6. [CSIS: costo-efectividad de los ataques con drones](https://www.csis.org/analysis/calculating-cost-effectiveness-russias-drone-strikes)
-7. [Ekonomichna Pravda / Forbes Ukraine: costos estimados (2024)](https://www.pravda.com.ua/eng/news/2024/08/26/7472003/)
-8. [ISIS: ojivas del Shahed de Alabuga](https://isis-online.org/isis-reports/alabugas-shahed-136-geran-2-warheads-a-dangerous-escalation)
+6. [Base de datos de Command: Modern Operations (pedido #2214): firma del Shahed-136 por aspecto en bandas A–D y E–M (estimación de juego)](https://github.com/PygmalionOfCyprus/cmo-db-requests/issues/2214)
+7. [CSIS: costo-efectividad de los ataques con drones](https://www.csis.org/analysis/calculating-cost-effectiveness-russias-drone-strikes)
+8. [Ekonomichna Pravda / Forbes Ukraine: costos estimados (2024)](https://www.pravda.com.ua/eng/news/2024/08/26/7472003/)
+9. [ISIS: ojivas del Shahed de Alabuga](https://isis-online.org/isis-reports/alabugas-shahed-136-geran-2-warheads-a-dangerous-escalation)
 
 #### Tasas de intercepción reportadas
 
@@ -92,17 +94,20 @@ Crucero ≈300 km/h, hasta ≈370 km/h al cruzar zonas defendidas (GUR). Los 550
 |---|---:|---:|---:|---|---|---|
 | Velocidad de crucero (m/s) | 83 | **92** | 103 | alta | [1] [2] [3] | GUR: 300 km/h crucero, 370 km/h máx. |
 | Altura de vuelo (m AGL) | 100 | **1.500** | 5.000 | baja | — | est: mismo envolvente que el Geran-2 |
-| RCS frontal (X/S) (m²) | 0,02 | **0,05** | 0,2 | baja | [1] | est: misma célula que el Geran-2, sin hélice pero con toma de aire |
-| RCS en VHF (m²) | 0,1 | **0,3** | 1 | baja | — | est: con λ≈1,5–2 m el cuerpo entra en zona de resonancia y el conformado furtivo pierde efecto |
+| RCS frontal (X/S) (m²) | 0,008 | **0,03** | 0,2 | baja | [1] [4] | est: misma célula que el Geran-2 (ver Shahed), sin hélice pero con toma de aire (×1,5) |
+| RCS lateral (X/S) (m²) | 0,03 | **0,2** | 3 | baja | — | est: como el Shahed de costado, con la góndola del motor a reacción |
+| RCS de cola (X/S) (m²) | 0,01 | **0,05** | 0,5 | baja | — | est: tobera del turborreactor visible desde atrás |
+| RCS en VHF (m²) | 0,05 | **0,12** | 1 | baja | [4] | est: igual que el Shahed (misma envergadura). est: con λ≈1,5–2 m el cuerpo entra en zona de resonancia y el conformado furtivo pierde efecto |
 | CEP (m) | 5 | **15** | 50 | baja | — | est: como el Geran-2 |
 | Costo unitario | US$50k | **US$70k** | US$100k | baja | [3] [1] | est: Geran-2 + ~40%; el JT80 cuesta 18–35k |
 | Alcance (km) | 600 | **1.000** | 1.500 | media | [1] [3] | — |
-| Ojiva (kg) | 50 | **50** | 90 | media | [3] [4] | — |
+| Ojiva (kg) | 50 | **50** | 90 | media | [3] [5] | — |
 
 1. [Defense Express (GUR): el Geran-3 lleva motor chino JT80 (sep-2025)](https://en.defence-ua.com/news/russian_geran_3_drone_revealed_to_contain_chinese_engine_and_western_components-15843.html)
 2. [Militarnyi: primer derribo de un Geran-3 con dron interceptor](https://militarnyi.com/en/news/ukrainian-interceptor-drone-downs-jet-powered-shahed-for-the-first-time/)
 3. [Forbes (Hambling): el Shahed a reacción (sep-2025)](https://www.forbes.com/sites/davidhambling/2025/09/18/russias-new-jet-powered-shahed-revealed-what-it-means-for-ukraine/)
-4. [CSIS Missile Threat: Shahed-238](https://missilethreat.csis.org/missile/shahed-238/)
+4. [Base de datos de Command: Modern Operations (pedido #2214): firma del Shahed-136 por aspecto en bandas A–D y E–M (estimación de juego)](https://github.com/PygmalionOfCyprus/cmo-db-requests/issues/2214)
+5. [CSIS Missile Threat: Shahed-238](https://missilethreat.csis.org/missile/shahed-238/)
 
 #### Fuentes generales
 
@@ -134,6 +139,8 @@ Imita a un Shahed en trayecto. Su único trabajo es hacer gastar munición y sat
 | Velocidad de crucero (m/s) | 33 | **40** | 44 | media | [1] | hasta 160 km/h |
 | Altura de vuelo (m AGL) | 100 | **1.200** | 3.000 | media | [1] | — |
 | RCS frontal (X/S) (m²) | 0,005 | **0,02** | 0,05 | baja | — | est: espuma casi transparente; reflejan motor, electrónica y cableado |
+| RCS lateral (X/S) (m²) | 0,01 | **0,05** | 0,2 | baja | — | est: la espuma casi no suma de costado; reflejan el motor y los cables |
+| RCS de cola (X/S) (m²) | 0,005 | **0,03** | 0,1 | baja | — | est: motor y hélice atrás |
 | RCS en VHF (m²) | 0,03 | **0,1** | 0,3 | baja | — | est: con λ≈1,5–2 m el cuerpo entra en zona de resonancia y el conformado furtivo pierde efecto |
 | Costo unitario | US$3k | **US$10k** | US$15k | media | [2] [3] | "unos pocos miles" a ~10k |
 | Alcance (km) | 300 | **450** | 600 | media | [3] | — |
@@ -178,6 +185,7 @@ Crucero a 700–720 km/h y 30–70 m sobre el terreno en la fase final, siguiend
 | Altura de vuelo (m AGL) | 30 | **50** | 70 | alta | [1] | 30–70 m en la fase final; tramos de crucero más altos |
 | RCS frontal (X/S) (m²) | 0,01 | **0,03** | 0,1 | baja | [2] | est: sin medición pública; analogía con la tabla de GlobalSecurity (Tomahawk 0,5 m², ALCM furtivo <0,05, Harpoon/Exocet 0,1) y tamaño/forma; forma de baja observabilidad |
 | RCS lateral (X/S) (m²) | 0,1 | **0,3** | 1 | baja | — | est: cuerpo de 7,45 m visto de costado |
+| RCS de cola (X/S) (m²) | 0,02 | **0,06** | 0,2 | baja | — | est: tobera del turbofán; forma furtiva también atrás |
 | RCS en VHF (m²) | 0,3 | **0,5** | 1 | baja | — | est: con λ≈1,5–2 m el cuerpo entra en zona de resonancia y el conformado furtivo pierde efecto |
 | CEP (m) | 6 | **15** | 20 | media | [1] [3] | CSIS: 6 m, generalmente 10–20 m |
 | Costo unitario | US$1.2 M | **US$2.2 M** | US$13 M | media | [4] [5] [6] | contratos filtrados 2,0–2,4 M; Forbes Ukraine 13 M (inflado) |
@@ -231,19 +239,21 @@ Subsónico (Mach 0,7–0,8), ≈20 m sobre el agua y 50–150 m sobre tierra.
 | Velocidad de crucero (m/s) | 230 | **240** | 270 | alta | [1] [2] | Mach 0,7–0,8 |
 | Altura de vuelo (m AGL) | 20 | **50** | 150 | media | [1] | ≈20 m sobre el agua, 50–150 m sobre tierra |
 | RCS frontal (X/S) (m²) | 0,05 | **0,1** | 0,3 | baja | [3] | est: sin medición pública; analogía con la tabla de GlobalSecurity (Tomahawk 0,5 m², ALCM furtivo <0,05, Harpoon/Exocet 0,1) y tamaño/forma |
-| RCS lateral (X/S) (m²) | 0,5 | **1** | 3 | baja | — | est |
+| RCS lateral (X/S) (m²) | 0,5 | **1** | 3 | baja | — | est: cuerpo cilíndrico de 6,2 m visto de costado |
+| RCS de cola (X/S) (m²) | 0,05 | **0,2** | 0,5 | baja | [4] | est: tobera y aletas. Simulación del Tomahawk en banda L: cola 0,41 m², menor que el frente en esa banda |
 | RCS en VHF (m²) | 0,3 | **0,5** | 1 | baja | — | est: con λ≈1,5–2 m el cuerpo entra en zona de resonancia y el conformado furtivo pierde efecto |
 | CEP (m) | 3 | **10** | 20 | baja | [1] | 2–3 m declarado con GLONASS; real est 5–20 m |
-| Costo unitario | US$1 M | **US$2 M** | US$6.5 M | media | [4] [5] [6] | — |
+| Costo unitario | US$1 M | **US$2 M** | US$6.5 M | media | [5] [6] [7] | — |
 | Alcance (km) | 1.400 | **1.750** | 2.500 | media | [2] | — |
 | Ojiva (kg) | 450 | **450** | 500 | alta | [2] | — |
 
 1. [Wikipedia: Kalibr (missile family)](https://en.wikipedia.org/wiki/Kalibr_(missile_family))
 2. [CSIS Missile Threat: SS-N-30A (3M-14 Kalibr)](https://missilethreat.csis.org/missile/ss-n-30a/)
 3. [GlobalSecurity: tabla de RCS de referencia](https://www.globalsecurity.org/military/world/stealth-aircraft-rcs.htm)
-4. [Defence Blog / Militarnyi: costos de contratos rusos filtrados 2024–2027](https://defence-blog.com/analysts-break-down-real-cost-of-russian-missiles/)
-5. [Ekonomichna Pravda / Forbes Ukraine: costos estimados (2024)](https://www.pravda.com.ua/eng/news/2024/08/26/7472003/)
-6. [Responsible Statecraft: crítica a las estimaciones de costo](https://responsiblestatecraft.org/cost-russian-missiles/)
+4. [Predição Radar do Míssil de Cruzeiro Tomahawk em Banda L (simulación MLFMA: frente 1,41 m², cola 0,41 m²)](https://www.researchgate.net/publication/363731654_Predicao_Radar_do_Missil_de_Cruzeiro_Tomahawk_em_Banda_L_baseado_na_RCS_Dinamica)
+5. [Defence Blog / Militarnyi: costos de contratos rusos filtrados 2024–2027](https://defence-blog.com/analysts-break-down-real-cost-of-russian-missiles/)
+6. [Ekonomichna Pravda / Forbes Ukraine: costos estimados (2024)](https://www.pravda.com.ua/eng/news/2024/08/26/7472003/)
+7. [Responsible Statecraft: crítica a las estimaciones de costo](https://responsiblestatecraft.org/cost-russian-missiles/)
 
 #### Tasas de intercepción reportadas
 
@@ -281,6 +291,8 @@ Versión de crucero terrestre del sistema Iskander, derivada de la familia Kalib
 | Velocidad de crucero (m/s) | 220 | **250** | 280 | baja | — | est: derivado del Kalibr, subsónico |
 | Altura de vuelo (m AGL) | 6 | **50** | 150 | media | [1] | — |
 | RCS frontal (X/S) (m²) | 0,05 | **0,1** | 0,3 | baja | [2] | est: sin medición pública; analogía con la tabla de GlobalSecurity (Tomahawk 0,5 m², ALCM furtivo <0,05, Harpoon/Exocet 0,1) y tamaño/forma |
+| RCS lateral (X/S) (m²) | 0,3 | **1** | 3 | baja | — | est: derivado del Kalibr |
+| RCS de cola (X/S) (m²) | 0,05 | **0,2** | 0,5 | baja | — | est: como el Kalibr |
 | RCS en VHF (m²) | 0,3 | **0,5** | 1 | baja | — | est: con λ≈1,5–2 m el cuerpo entra en zona de resonancia y el conformado furtivo pierde efecto |
 | CEP (m) | 3 | **10** | 20 | baja | [1] | 1–3 m declarado |
 | Costo unitario | US$1 M | **US$1.6 M** | US$1.8 M | media | [3] [4] | — |
@@ -328,23 +340,26 @@ Trayectoria aplanada con apogeo típico de 40–50 km; hasta 2.100 m/s, ≈1.300
 |---|---:|---:|---:|---|---|---|
 | Velocidad de crucero (m/s) | 1.000 | **1.150** | 1.400 | media | [1] [2] | velocidad horizontal media del modelo; pico 2.100–2.600 m/s, 1.300–1.400 m/s cerca del blanco |
 | Apogeo (km) | 40 | **45** | 100 | media | [1] [3] | típico 40–50 km; el GUR da 100 km como máximo |
-| RCS frontal (X/S) (m²) | 0,03 | **0,1** | 0,3 | baja | — | est: cuerpo cónico-ojival de 0,92 m de diámetro visto de nariz |
+| RCS frontal (X/S) (m²) | 0,03 | **0,1** | 0,3 | baja | [4] | est: cuerpo cónico-ojival de 0,92 m de diámetro visto de nariz. CMO (base DB3000): Iskander-E −9,8 dBsm ≈ 0,1, coincide |
+| RCS lateral (X/S) (m²) | 0,3 | **1** | 3 | baja | — | est: cuerpo de 7,3 m y 0,92 m de diámetro visto de costado |
+| RCS de cola (X/S) (m²) | 0,1 | **0,3** | 1 | baja | — | est: base plana del cuerpo y toberas |
 | RCS en VHF (m²) | 0,1 | **0,3** | 1 | baja | — | est: con λ≈1,5–2 m el cuerpo entra en zona de resonancia y el conformado furtivo pierde efecto |
-| CEP (m) | 5 | **25** | 30 | media | [1] [4] [5] | GUR: 20–30 m; 5–7 m es valor de folleto |
-| Costo unitario | US$2.4 M | **US$2.7 M** | US$3 M | alta | [6] | — |
-| Señuelos por misil | 2 | **6** | 6 | media | [1] [7] [3] | unos 6 señuelos 9B899 por misil (RUSI escribe 9B999). El juego no modela la discriminación del radar: el mínimo representa un radar que descarta la mayoría |
-| Efecto de su maniobra terminal sobre la Pk (×) | 0,4 | **0,6** | 0,85 | baja | [8] [3] | calibrado: perfil con la actualización de 2025; 0,85 ≈ perfil 2023–24 |
+| CEP (m) | 5 | **25** | 30 | media | [1] [5] [6] | GUR: 20–30 m; 5–7 m es valor de folleto |
+| Costo unitario | US$2.4 M | **US$2.7 M** | US$3 M | alta | [7] | — |
+| Señuelos por misil | 2 | **6** | 6 | media | [1] [8] [3] | unos 6 señuelos 9B899 por misil (RUSI escribe 9B999). El juego no modela la discriminación del radar: el mínimo representa un radar que descarta la mayoría |
+| Efecto de su maniobra terminal sobre la Pk (×) | 0,4 | **0,6** | 0,85 | baja | [9] [3] | calibrado: perfil con la actualización de 2025; 0,85 ≈ perfil 2023–24 |
 | Alcance (km) | 390 | **450** | 550 | alta | [1] | — |
-| Ojiva (kg) | 450 | **480** | 700 | media | [1] [4] | — |
+| Ojiva (kg) | 450 | **480** | 700 | media | [1] [5] | — |
 
 1. [GUR War&Sanctions: Iskander-M](https://war-sanctions.gur.gov.ua/en/page-iskander-m)
 2. [Wikipedia: 9K720 Iskander](https://en.wikipedia.org/wiki/9K720_Iskander)
 3. [RUSI: Iskander, an improved Russian missile tests Ukraine’s air defence (nov-2025)](https://www.rusi.org/explore-our-research/publications/commentary/iskander-improved-russian-missile-tests-ukraines-air-defence)
-4. [RUSI: Iskander-M and Iskander-K, a technical profile (2022)](https://www.rusi.org/explore-our-research/publications/commentary/iskander-m-and-iskander-k-technical-profile)
-5. [CSIS Missile Threat: SS-26 Iskander](https://missilethreat.csis.org/missile/ss-26-2/)
-6. [Defence Blog / Militarnyi: costos de contratos rusos filtrados 2024–2027](https://defence-blog.com/analysts-break-down-real-cost-of-russian-missiles/)
-7. [TWZ: señuelos secretos del Iskander](https://www.twz.com/44760/russias-use-of-iskander-ballistic-missiles-in-ukraine-exposes-secret-decoy-capability)
-8. [AeroTime (resume Financial Times): intercepción de balísticos 37% → 6% (2025)](https://www.aerotime.aero/articles/russias-upgraded-ballistic-missiles-outmaneuver-ukraines-patriot-systems-ft)
+4. [Foro Matrix Games, base DB3000 de CMO: RCS del Iskander-E −9,8 dBsm (estimación de juego)](https://forums.matrixgames.com/viewtopic.php?t=243914&start=1820)
+5. [RUSI: Iskander-M and Iskander-K, a technical profile (2022)](https://www.rusi.org/explore-our-research/publications/commentary/iskander-m-and-iskander-k-technical-profile)
+6. [CSIS Missile Threat: SS-26 Iskander](https://missilethreat.csis.org/missile/ss-26-2/)
+7. [Defence Blog / Militarnyi: costos de contratos rusos filtrados 2024–2027](https://defence-blog.com/analysts-break-down-real-cost-of-russian-missiles/)
+8. [TWZ: señuelos secretos del Iskander](https://www.twz.com/44760/russias-use-of-iskander-ballistic-missiles-in-ukraine-exposes-secret-decoy-capability)
+9. [AeroTime (resume Financial Times): intercepción de balísticos 37% → 6% (2025)](https://www.aerotime.aero/articles/russias-upgraded-ballistic-missiles-outmaneuver-ukraines-patriot-systems-ft)
 
 #### Tasas de intercepción reportadas
 
@@ -388,6 +403,8 @@ Lanzado desde MiG-31K. Rusia lo vende como "Mach 10", pero un operador de Patrio
 | Velocidad de crucero (m/s) | 1.100 | **1.250** | 1.500 | media | [1] [2] | ≈1.240 m/s medido en la intercepción (The Economist); CSIS: acelera a Mach 4 |
 | Apogeo (km) | 35 | **45** | 80 | baja | [3] | est por física: lanzado a 15–20 km y Mach 2+ |
 | RCS frontal (X/S) (m²) | 0,03 | **0,1** | 0,3 | baja | [3] | "aproximadamente la del 9M723" |
+| RCS lateral (X/S) (m²) | 0,3 | **1** | 3 | baja | — | est: como el 9M723 |
+| RCS de cola (X/S) (m²) | 0,1 | **0,3** | 1 | baja | — | est: como el 9M723 |
 | RCS en VHF (m²) | 0,1 | **0,3** | 1 | baja | — | est: con λ≈1,5–2 m el cuerpo entra en zona de resonancia y el conformado furtivo pierde efecto |
 | CEP (m) | 10 | **20** | 30 | baja | — | est: análogo al Iskander-M |
 | Costo unitario | US$2 M | **US$4.5 M** | US$15 M | media | [4] [5] [6] | contrato filtrado 4,4–4,5 M |
@@ -442,6 +459,8 @@ Sube a ≈27 km, vuela a Mach 3,5–4,6 y pica casi vertical. Muy impreciso cont
 | Velocidad terminal (picada) (m/s) | 900 | **1.100** | 1.350 | baja | — | est: no hay medición pública de la picada |
 | Altura de crucero (m) | 12.000 | **27.000** | 40.000 | media | [1] [2] | ≈27 km régimen alto; ≈12 km régimen bajo; Kh-32 hasta ~40 km |
 | RCS frontal (X/S) (m²) | 0,5 | **1** | 3 | baja | — | est: 11,6 m de largo y 0,9 m de diámetro, sin conformado furtivo |
+| RCS lateral (X/S) (m²) | 3 | **10** | 30 | baja | — | est: 11,6 m de largo y alas, sin conformado furtivo |
+| RCS de cola (X/S) (m²) | 1 | **2** | 5 | baja | — | est: tobera grande del cohete |
 | RCS en VHF (m²) | 1 | **3** | 10 | baja | — | est: con λ≈1,5–2 m el cuerpo entra en zona de resonancia y el conformado furtivo pierde efecto |
 | CEP (m) | 90 | **150** | 500 | baja | [1] | >91 m; buscador antibuque, malo contra tierra |
 | Costo unitario | US$500k | **US$1 M** | US$1.5 M | baja | [3] | solo estimación Forbes/EP |
@@ -491,6 +510,8 @@ Mach 2,6 a ~14 km y baja a 10–15 m para el tramo final, a Mach 2.
 | Altura de crucero (m) | 10.000 | **14.000** | 15.000 | media | [2] | — |
 | Altura de vuelo (m AGL) | 10 | **15** | 20 | media | [2] | — |
 | RCS frontal (X/S) (m²) | 0,1 | **0,3** | 1 | baja | — | est: toma de aire frontal anular (cavidad) de 0,7 m |
+| RCS lateral (X/S) (m²) | 0,5 | **2** | 5 | baja | — | est: cuerpo de 8,9 m visto de costado |
+| RCS de cola (X/S) (m²) | 0,2 | **0,5** | 1 | baja | — | est: tobera del estatorreactor |
 | RCS en VHF (m²) | 0,5 | **1** | 3 | baja | — | est: con λ≈1,5–2 m el cuerpo entra en zona de resonancia y el conformado furtivo pierde efecto |
 | CEP (m) | 10 | **20** | 50 | baja | — | est: buscador nuevo para tierra desde 2024 |
 | Costo unitario | US$1 M | **US$1.25 M** | US$1.5 M | baja | [3] | — |
@@ -536,6 +557,8 @@ Rusia declara Mach 8–9. El GUR registró como máximo Mach 6,8; Defense Expres
 | Velocidad terminal (picada) (m/s) | 690 | **1.150** | 1.500 | media | [2] [4] [3] | ≈Mach 4,5 en la aproximación; KNDISE midió ~2.500 km/h al final |
 | Altura de crucero (m) | 25.000 | **30.000** | 40.000 | media | [1] | — |
 | RCS frontal (X/S) (m²) | 0,05 | **0,15** | 0,5 | baja | — | est: 0,67 m de diámetro, nariz cónica; la "invisibilidad por plasma" no está verificada |
+| RCS lateral (X/S) (m²) | 0,3 | **1** | 3 | baja | — | est: cuerpo de 8–10 m visto de costado |
+| RCS de cola (X/S) (m²) | 0,1 | **0,3** | 1 | baja | — | est: tobera |
 | RCS en VHF (m²) | 0,2 | **0,5** | 1 | baja | — | est: con λ≈1,5–2 m el cuerpo entra en zona de resonancia y el conformado furtivo pierde efecto |
 | CEP (m) | 10 | **30** | 50 | baja | — | est |
 | Costo unitario | US$5 M | **US$5.4 M** | US$5.6 M | alta | [5] | — |
@@ -588,6 +611,8 @@ Vuelo rasante a 30–40 m guiado por mapa de terreno; al final hace un "bunt": t
 | Velocidad de crucero (m/s) | 270 | **275** | 323 | alta | [1] [2] | Mach 0,8–0,95 |
 | Altura de vuelo (m AGL) | 30 | **35** | 40 | alta | [2] | — |
 | RCS frontal (X/S) (m²) | 0,01 | **0,05** | 0,1 | baja | [3] [2] | est: sin medición pública; analogía con la tabla de GlobalSecurity (Tomahawk 0,5 m², ALCM furtivo <0,05, Harpoon/Exocet 0,1) y tamaño/forma |
+| RCS lateral (X/S) (m²) | 0,1 | **0,3** | 1 | baja | — | est: conformado de baja firma también de costado |
+| RCS de cola (X/S) (m²) | 0,03 | **0,1** | 0,3 | baja | — | est: tobera del turborreactor |
 | RCS en VHF (m²) | 0,2 | **0,5** | 1 | baja | — | est: con λ≈1,5–2 m el cuerpo entra en zona de resonancia y el conformado furtivo pierde efecto |
 | CEP (m) | 1 | **2** | 3 | baja | [2] | no hay CEP oficial; buscador IR de imagen |
 | Costo unitario | US$1.3 M | **US$2.5 M** | US$2.8 M | media | [1] [4] | — |
@@ -636,7 +661,8 @@ Balístico táctico lanzado desde HIMARS/M270, Mach 3+ en terminal. Apogeo hasta
 | Velocidad de crucero (m/s) | 900 | **1.000** | 1.200 | media | [1] | Mach 3+ |
 | Apogeo (km) | 25 | **40** | 50 | media | [1] | 50 km es el techo; a 300 km un tiro óptimo daría ~75 km, así que la trayectoria es deprimida |
 | RCS frontal (X/S) (m²) | 0,05 | **0,1** | 0,3 | baja | — | est: cuerpo de 0,61 m visto de nariz |
-| RCS lateral (X/S) (m²) | 1 | **3** | 10 | baja | — | est |
+| RCS lateral (X/S) (m²) | 1 | **3** | 10 | baja | — | est: cuerpo de 4 m y 0,61 m de diámetro visto de costado |
+| RCS de cola (X/S) (m²) | 0,1 | **0,3** | 1 | baja | — | est: base plana del cuerpo |
 | RCS en VHF (m²) | 0,1 | **0,3** | 1 | baja | — | est: con λ≈1,5–2 m el cuerpo entra en zona de resonancia y el conformado furtivo pierde efecto |
 | CEP (m) | 9 | **10** | 50 | media | [2] | — |
 | Costo unitario | US$820k | **US$1.5 M** | US$1.7 M | media | [1] | — |
@@ -680,6 +706,8 @@ Antibuque subsónico rasante (4–5 m sobre el agua en la fase final). Hundió a
 | Velocidad de crucero (m/s) | 250 | **260** | 270 | media | [1] | — |
 | Altura de vuelo (m AGL) | 3 | **15** | 100 | media | [1] | 4–5 m sobre el mar; est ~30 m sobre tierra |
 | RCS frontal (X/S) (m²) | 0,05 | **0,1** | 0,3 | baja | [2] | est: análogo a Harpoon/Exocet |
+| RCS lateral (X/S) (m²) | 0,3 | **1** | 3 | baja | — | est: análogo a Harpoon/Exocet de costado |
+| RCS de cola (X/S) (m²) | 0,05 | **0,2** | 0,5 | baja | — | est: tobera del turborreactor |
 | RCS en VHF (m²) | 0,2 | **0,5** | 1 | baja | — | est: con λ≈1,5–2 m el cuerpo entra en zona de resonancia y el conformado furtivo pierde efecto |
 | CEP (m) | 5 | **10** | 20 | baja | — | no público |
 | Costo unitario | US$500k | **US$1.5 M** | US$2 M | baja | — | sin cifra oficial; estimación de prensa |
@@ -719,6 +747,8 @@ Dron de ataque ucraniano de 250–300 kg usado contra refinerías y bases en Rus
 | Velocidad de crucero (m/s) | 44 | **56** | 83 | baja | [1] | fuentes entre 160 y 300 km/h |
 | Altura de vuelo (m AGL) | 50 | **500** | 3.000 | baja | — | est: análogo al Shahed |
 | RCS frontal (X/S) (m²) | 0,1 | **0,3** | 1 | baja | — | est: motor y hélice como reflectores principales |
+| RCS lateral (X/S) (m²) | 0,3 | **1** | 3 | baja | — | est: alas y fuselaje de 4,4 m de envergadura |
+| RCS de cola (X/S) (m²) | 0,1 | **0,3** | 1 | baja | — | est: cola y empenaje |
 | RCS en VHF (m²) | 0,3 | **1** | 2 | baja | — | est: con λ≈1,5–2 m el cuerpo entra en zona de resonancia y el conformado furtivo pierde efecto |
 | CEP (m) | 3 | **10** | 20 | baja | — | est |
 | Costo unitario | US$150k | **US$200k** | US$250k | media | [1] [2] | — |
@@ -755,6 +785,8 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 | Velocidad de crucero (m/s) | 194 | **245** | 264 | media | [1] [2] | 700 km/h crucero a 950 km/h máx. declarado |
 | Altura de vuelo (m AGL) | 15 | **35** | 114 | baja | [1] | — |
 | RCS frontal (X/S) (m²) | 0,3 | **1** | 2 | baja | — | est: fuselaje de composite pero góndola de motor dorsal grande |
+| RCS lateral (X/S) (m²) | 1 | **3** | 10 | baja | — | est: fuselaje largo y góndola dorsal del motor |
+| RCS de cola (X/S) (m²) | 1 | **2** | 5 | baja | — | est: tobera grande del turbofán dorsal |
 | RCS en VHF (m²) | 1 | **2** | 5 | baja | — | est: con λ≈1,5–2 m el cuerpo entra en zona de resonancia y el conformado furtivo pierde efecto |
 | CEP (m) | 14 | **14** | 50 | baja | [1] | 14 m declarado |
 | Costo unitario | US$500k | **US$600k** | US$1.1 M | media | [3] | — |

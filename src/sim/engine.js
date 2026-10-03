@@ -7,7 +7,7 @@ import { money } from '../util/format.js';
 import { nextId } from '../util/ids.js';
 import { rnd } from '../util/rng.js';
 import { surf, los } from '../physics/terrain.js';
-import { antZ, detR, inSector, jamJ } from '../physics/radar.js';
+import { antZ, aspectCos, detR, inSector, jamJ } from '../physics/radar.js';
 import { buildThreat, posAt, speedAt } from '../physics/kinematics.js';
 import { RADAR_GUID, isTBM, trackOK, solve, calcPk } from '../physics/engagement.js';
 import { damageAt, targetStatus } from '../physics/damage.js';
@@ -50,6 +50,8 @@ export function step(dt) {
     if (!th.alive) continue;
     const p = posAt(th, t);
     if (!p) { impact(th); continue; }
+    // velocidad 3D (m/s) del último paso: la usa el aspecto de la RCS (physics/radar.js#aspectCos)
+    if (th.p && dt > 0) th.vel = [(p.x - th.p.x) * 1000 / dt, (p.y - th.p.y) * 1000 / dt, (p.z - th.p.z) / dt];
     th.p = p;
     if (!th.trail.length || t - th.trail[th.trail.length - 1][2] > 3) { th.trail.push([p.x, p.y, t]); if (th.trail.length > 80) th.trail.shift(); }
     if (th.decoyRel && !th.released && p.rem < 40) {
@@ -79,8 +81,10 @@ export function step(dt) {
       else {
         const az = azOf(dx, dy); if (!inSector(u, az)) continue;
         const rr = Math.hypot(dh, (p.z - uz) / 1000);
-        if (rr > r.R1 * 1.2) continue;
-        const J = jamJ(u, az, S.jamsLive); const R = detR(u, th, J);
+        // primero el alcance sin interferencia (cota superior, barata) y recién después la interferencia
+        const ca = aspectCos(th, u.x, u.y, uz);
+        if (rr > detR(u, th, 0, ca)) continue;
+        const J = jamJ(u, az, S.jamsLive); const R = detR(u, th, J, ca);
         if (rr > R) continue;
         // probabilidad de detección por barrido: 95% hasta el 80% del alcance, cae a 30% en el límite
         const pd = rr < 0.8 * R ? 0.95 : 0.95 - (rr - 0.8 * R) / (0.2 * R) * 0.65;

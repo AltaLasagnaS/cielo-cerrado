@@ -7,11 +7,16 @@ import { HORIZON_K } from './constants.js';
 import { surf, los } from './terrain.js';
 
 /**
- * RCS (m²) de una amenaza en una banda. th.rcs = frontal en X/S; las reglas por banda están en
- * data/bands.js (BANDS[band].rcs). El aspecto (frente/costado) está en UNC (rcsSide) pero el
- * motor usa el frontal.
+ * RCS (m²) de una amenaza en una banda, vista con aspecto ca (ver aspectFactor; 1 = de frente).
+ * th.rcs = frontal en X/S; las reglas por banda están en data/bands.js (BANDS[band].rcs) y se
+ * aplican sobre el frente; después se multiplica por el factor de aspecto. Ver docs/FISICA.md §3.
  */
-export function rcsAt(th, band) {
+export function rcsAt(th, band, ca = 1) {
+  return rcsFront(th, band) * aspectFactor(th, band, ca);
+}
+
+/** RCS frontal en la banda (reglas de BANDS[band].rcs). */
+function rcsFront(th, band) {
   const b = th.rcs, m = BANDS[band]?.rcs;
   if (!m) return b;
   if (m.own && th[m.own] != null) return th[m.own];
@@ -19,6 +24,34 @@ export function rcsAt(th, band) {
   if (m.dron && th.cls === 'dron') return b * m.dron;
   if (m.smallBelow && b < m.smallBelow) return b * m.small;
   return b * (m.other ?? 1);
+}
+
+/**
+ * Cuánto cambia la RCS respecto del frente según el aspecto. ca = coseno del ángulo θ entre la
+ * velocidad del blanco y la línea blanco → radar: 1 de frente, 0 de costado, −1 de cola.
+ * Interpola en decibeles (la RCS cambia órdenes de magnitud):
+ *   ln σ(θ) = cos²θ · ln σ_frente|cola + sin²θ · ln σ_costado
+ * con rcsSide y rcsRear del catálogo (si faltan, valen lo mismo que el frente). En bandas bajas
+ * (BANDS[band].low: VHF, L) el contraste se reduce a la mitad en dB: cerca de la resonancia la
+ * forma pesa menos.
+ */
+export function aspectFactor(th, band, ca = 1) {
+  if (!(ca < 1)) return 1;
+  const f = th.rcs, side = th.rcsSide ?? f, rear = th.rcsRear ?? f, c2 = ca * ca;
+  const ln = c2 * (ca >= 0 ? 0 : Math.log(rear / f)) + (1 - c2) * Math.log(side / f);
+  return Math.exp(BANDS[band]?.low ? ln / 2 : ln);
+}
+
+/**
+ * Coseno del aspecto con que el radar (en ux, uy km; uz m) ve a la amenaza th: usa th.vel, la
+ * velocidad 3D (m/s) que guarda la simulación en cada paso. Sin velocidad conocida → 1 (frente).
+ */
+export function aspectCos(th, ux, uy, uz) {
+  const v = th.vel, p = th.p; if (!v || !p) return 1;
+  const lx = (ux - p.x) * 1000, ly = (uy - p.y) * 1000, lz = uz - p.z;
+  const nv = Math.hypot(v[0], v[1], v[2]), nl = Math.hypot(lx, ly, lz);
+  if (nv < 1e-6 || nl < 1e-6) return 1;
+  return Math.max(-1, Math.min(1, (v[0] * lx + v[1] * ly + v[2] * lz) / (nv * nl)));
 }
 
 /** Altura de la antena sobre el nivel del mar (m): terreno + mástil, o altitud de vuelo si es AEW. */
@@ -64,13 +97,14 @@ export function jamJ(u, az, list) {
 }
 
 /**
- * Alcance de detección (km) del radar de u contra la amenaza th con interferencia J/N = J:
- *   R = R1 · σ^¼ · (1 / (1 + J))^¼
+ * Alcance de detección (km) del radar de u contra la amenaza th con interferencia J/N = J, vista
+ * con aspecto ca (1 = de frente, el peor caso, que usan la cobertura y las fichas):
+ *   R = R1 · σ(banda, aspecto)^¼ · (1 / (1 + J))^¼
  * R1 es el alcance contra 1 m². Sensores acústicos y ópticos usan R1 fijo (no dependen del RCS).
  */
-export function detR(u, th, J) {
+export function detR(u, th, J, ca = 1) {
   const r = D(u).radar; if (r.band === 'ACU' || r.band === 'OPT') return r.R1;
-  return r.R1 * Math.pow(rcsAt(th.T || th, r.band), 0.25) * Math.pow(1 / (1 + J), 0.25);
+  return r.R1 * Math.pow(rcsAt(th.T || th, r.band, ca), 0.25) * Math.pow(1 / (1 + J), 0.25);
 }
 
 /** Horizonte de radar (km) entre una antena a hr metros y un blanco a ht metros, Tierra 4/3. */

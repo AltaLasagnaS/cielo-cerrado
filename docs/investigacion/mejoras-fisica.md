@@ -13,7 +13,7 @@ Fecha: 3 de octubre de 2026. **Todavía no se implementa nada**: este documento 
 
 | # | Mejora | Qué gana el juego | Dificultad | ¿Cambia resultados? |
 |---|---|---|---|---|
-| 1 | **RCS según el aspecto** (prioridad) | Un radar que ve la ruta de costado detecta hasta 2× más lejos. Ubicar sensores al costado de los corredores pasa a ser una decisión táctica | Baja–media | Sí **[sim]** |
+| 1 | **RCS según el aspecto** (prioridad) — **implementada** (v0.4, ver `docs/FISICA.md` §3) | Un radar que ve la ruta de costado detecta hasta 2× más lejos. Ubicar sensores al costado de los corredores pasa a ser una decisión táctica | Baja–media | Sí **[sim]** |
 | 2 | **Fluctuación de la RCS (Swerling)** | La primera detección deja de ser "casi segura" hasta el 80% del alcance; aparecen las detecciones intermitentes | Media | Sí **[sim]** |
 | 3 | **Clutter y Doppler** | Lo rasante sobre tierra o mar cuesta más de ver; volar "de costado" a un radar Doppler lo esconde (notch) | Media–alta | Sí **[sim]** |
 | 4 | **Integración de la defensa aérea: C2, enlaces de datos y niveles** (pedido nuevo) | Distinguir una defensa desconectada, una que solo recibe alertas, una coordinada y una integrada; quién comparte pistas con quién | Media–alta | Sí **[sim]** |

@@ -10,16 +10,16 @@ export const CLS_NAME = { dron: 'Dron de ataque / señuelo', crucero: 'Misil de 
 export const THREATS = {
   shahed: {
     name: 'Shahed-136 / Geran-2', short: 'Shahed', side: 'RU', cls: 'dron', prof: 'drone',
-    v: 51, agl: 2000, aglRange: [50, 5000], rcs: 0.05, rcsVHF: 0.3, gnss: 0.5, cep: 15, warhead: '50 kg (BCh-50); 90 kg (BCh-90, 62 kg de explosivo)', range: '≈1.350–1.800 km típico; 2.500 km máx. declarado; ≈650 km con ojiva de 90 kg',
+    v: 51, agl: 2000, aglRange: [50, 5000], rcs: 0.02, rcsSide: 0.14, rcsRear: 0.03, rcsVHF: 0.12, gnss: 0.5, cep: 15, warhead: '50 kg (BCh-50); 90 kg (BCh-90, 62 kg de explosivo)', range: '≈1.350–1.800 km típico; 2.500 km máx. declarado; ≈650 km con ojiva de 90 kg',
     cost: 0.035, costNote: 'Producción rusa US$20–80k (CSIS usa 35k); el precio de importación iraní era US$193k', maneuver: false,
     guidance: 'INS + GNSS con antena CRPA "Kometa-M" de 4–16 elementos', engine: 'Motor de pistón MD-550 (copia del Limbach L550E), hélice propulsora',
     profile: 'Vuela lento (≈185 km/h). Desde 2025 crucero a 2–5 km de altura para quedar fuera del alcance de ametralladoras y luego pica casi vertical sobre el blanco.',
-    notes: ['Se lanzan en oleadas de cientos por noche: 54.538 drones tipo Shahed en 2025, ~40% señuelos (ISIS).', 'Neutralización mensual 83–93% entre ago-2025 y may-2026, sumando derribos y "pérdidas" por guerra electrónica (ISIS).', 'Red acústica Sky Fortress (~10.000 micrófonos) para detectarlos a baja cota.', 'RCS: el único estudio técnico (Járkov, 2023) da mediana 0,23 m² en todos los aspectos; de frente queda en ~0,05 m².'],
+    notes: ['Se lanzan en oleadas de cientos por noche: 54.538 drones tipo Shahed en 2025, ~40% señuelos (ISIS).', 'Neutralización mensual 83–93% entre ago-2025 y may-2026, sumando derribos y "pérdidas" por guerra electrónica (ISIS).', 'Red acústica Sky Fortress (~10.000 micrófonos) para detectarlos a baja cota.', 'RCS: el único estudio técnico (Járkov, 2023) da mediana 0,23 m² en todos los aspectos y ~0,05 m² de frente; la base de CMO estima mucho menos (~0,008 de frente). El juego usa el punto medio: 0,02 de frente, 0,14 de costado y 0,03 de cola.'],
     sources: [WP('HESA_Shahed_136'), SRC.csis_geran, SRC.kharkiv_rcs]
   },
   geran3: {
     name: 'Geran-3 (Shahed a reacción)', short: 'Geran-3', side: 'RU', cls: 'dron', prof: 'drone',
-    v: 92, agl: 1500, aglRange: [100, 5000], rcs: 0.05, rcsVHF: 0.3, gnss: 0.5, cep: 15, warhead: '≈50 kg termobárica-fragmentación (TBBCh-50)', range: '≈1.000 km (GUR)',
+    v: 92, agl: 1500, aglRange: [100, 5000], rcs: 0.03, rcsSide: 0.2, rcsRear: 0.05, rcsVHF: 0.12, gnss: 0.5, cep: 15, warhead: '≈50 kg termobárica-fragmentación (TBBCh-50)', range: '≈1.000 km (GUR)',
     cost: 0.07, costNote: 'Sin cifra oficial: ≈Geran-2 + 40% (el motor JT80 cuesta US$18–35k en el mercado civil)', maneuver: false,
     guidance: 'INS + GNSS con CRPA Kometa-M12', engine: 'Turbojet chino Telefly JT80 (confirmado por el GUR en un ejemplar capturado)',
     profile: 'Crucero ≈300 km/h, hasta ≈370 km/h al cruzar zonas defendidas (GUR). Los 550–600 km/h que circulan son del Shahed-238 iraní, no de este.',
@@ -28,7 +28,7 @@ export const THREATS = {
   },
   gerbera: {
     name: 'Gerbera (señuelo)', short: 'Gerbera', side: 'RU', cls: 'dron', prof: 'drone', decoy: true,
-    v: 40, agl: 1200, aglRange: [100, 3000], rcs: 0.02, rcsVHF: 0.1, gnss: 0.3, cep: 50, warhead: 'Ninguna en la mayoría (algunas 2,5–5 kg o cámara)', range: '300–600 km',
+    v: 40, agl: 1200, aglRange: [100, 3000], rcs: 0.02, rcsSide: 0.05, rcsRear: 0.03, rcsVHF: 0.1, gnss: 0.3, cep: 50, warhead: 'Ninguna en la mayoría (algunas 2,5–5 kg o cámara)', range: '300–600 km',
     cost: 0.01, costNote: '≈US$10k según funcionarios ucranianos: espuma y terciado, motor de aeromodelismo', maneuver: false,
     guidance: 'INS + GNSS', engine: 'Motor de pistón chico (DLE60 / 70 cc)',
     profile: 'Imita a un Shahed en trayecto. Su único trabajo es hacer gastar munición y saturar canales de tiro.',
@@ -37,7 +37,7 @@ export const THREATS = {
   },
   kh101: {
     name: 'Kh-101 (misil de crucero aéreo)', short: 'Kh-101', side: 'RU', cls: 'crucero', prof: 'cruise', lo: true, ir: true,
-    v: 200, agl: 50, aglRange: [30, 300], rcs: 0.03, rcsVHF: 0.5, gnss: 0.7, cep: 15, warhead: '400–480 kg; ≈800 kg en la variante de dos ojivas', range: '≈2.500–2.800 km (CSIS); hasta 3.500 km según otras fuentes',
+    v: 200, agl: 50, aglRange: [30, 300], rcs: 0.03, rcsSide: 0.3, rcsRear: 0.06, rcsVHF: 0.5, gnss: 0.7, cep: 15, warhead: '400–480 kg; ≈800 kg en la variante de dos ojivas', range: '≈2.500–2.800 km (CSIS); hasta 3.500 km según otras fuentes',
     cost: 2.2, costNote: 'Contratos rusos filtrados: US$2,0 M (2024) y 2,0–2,4 M (2025). Forbes Ukraine estimaba US$13 M', maneuver: false,
     guidance: 'INS + GLONASS + correlación óptica del terreno + buscador terminal TV/IR', engine: 'Turbofán TRDD-50A',
     profile: 'Crucero a 700–720 km/h y 30–70 m sobre el terreno en la fase final, siguiendo valles para esconderse del radar. Forma de baja firma.',
@@ -46,7 +46,7 @@ export const THREATS = {
   },
   kalibr: {
     name: '3M-14 Kalibr (crucero naval)', short: 'Kalibr', side: 'RU', cls: 'crucero', prof: 'cruise',
-    v: 240, agl: 50, aglRange: [20, 300], rcs: 0.1, rcsVHF: 0.5, gnss: 0.7, cep: 10, warhead: '≈450–500 kg', range: '1.500–2.500 km (CSIS)',
+    v: 240, agl: 50, aglRange: [20, 300], rcs: 0.1, rcsSide: 1, rcsRear: 0.2, rcsVHF: 0.5, gnss: 0.7, cep: 10, warhead: '≈450–500 kg', range: '1.500–2.500 km (CSIS)',
     cost: 2.0, costNote: 'Contratos rusos filtrados: ≈US$2 M. Forbes Ukraine estimaba 6,5 M', maneuver: false,
     guidance: 'INS + GLONASS + correlación de terreno + buscador terminal', engine: 'Turbojet/turbofán con booster de lanzamiento',
     profile: 'Subsónico (Mach 0,7–0,8), ≈20 m sobre el agua y 50–150 m sobre tierra.',
@@ -55,7 +55,7 @@ export const THREATS = {
   },
   isk_k: {
     name: '9M728 Iskander-K (crucero)', short: '9M728', side: 'RU', cls: 'crucero', prof: 'cruise',
-    v: 250, agl: 50, aglRange: [20, 1000], rcs: 0.1, rcsVHF: 0.5, gnss: 0.7, cep: 10, warhead: '≈480–500 kg', range: '≈500 km (publicado)',
+    v: 250, agl: 50, aglRange: [20, 1000], rcs: 0.1, rcsSide: 1, rcsRear: 0.2, rcsVHF: 0.5, gnss: 0.7, cep: 10, warhead: '≈480–500 kg', range: '≈500 km (publicado)',
     cost: 1.6, costNote: 'Contratos rusos filtrados: ≈US$1,5–1,7 M', maneuver: false,
     guidance: 'INS + GNSS + buscador radar terminal (se activa a ~20 km)', engine: 'Turbofán',
     profile: 'Versión de crucero terrestre del sistema Iskander, derivada de la familia Kalibr. Puede bajar a pocos metros en la aproximación final.',
@@ -64,7 +64,7 @@ export const THREATS = {
   },
   isk_m: {
     name: '9M723 Iskander-M (cuasibalístico)', short: 'Iskander-M', side: 'RU', cls: 'balistico', prof: 'ballistic',
-    v: 1150, apogee: 45, launchDist: 300, rcs: 0.1, rcsVHF: 0.3, gnss: 0.9, cep: 25, warhead: '450–700 kg', range: '390–500 km (9M723-2: ≈550 km)',
+    v: 1150, apogee: 45, launchDist: 300, rcs: 0.1, rcsSide: 1, rcsRear: 0.3, rcsVHF: 0.3, gnss: 0.9, cep: 25, warhead: '450–700 kg', range: '390–500 km (9M723-2: ≈550 km)',
     cost: 2.7, costNote: 'Contratos rusos filtrados: US$2,4–3,0 M', maneuver: true, decoys: 6, manPk: 0.6,
     guidance: 'INS + GNSS (Kometa) + buscador óptico/radar terminal', engine: 'Cohete de combustible sólido, una etapa',
     profile: 'Trayectoria aplanada con apogeo típico de 40–50 km; hasta 2.100 m/s, ≈1.300–1.400 m/s cerca del blanco (GUR). Maniobra terminal y señuelos.',
@@ -73,7 +73,7 @@ export const THREATS = {
   },
   kinzhal: {
     name: 'Kh-47M2 Kinzhal (aerobalístico)', short: 'Kinzhal', side: 'RU', cls: 'balistico', prof: 'ballistic',
-    v: 1250, apogee: 45, launchDist: 450, rcs: 0.1, rcsVHF: 0.3, gnss: 0.9, cep: 20, warhead: '≈480 kg', range: '≈460–480 km tras el lanzamiento',
+    v: 1250, apogee: 45, launchDist: 450, rcs: 0.1, rcsSide: 1, rcsRear: 0.3, rcsVHF: 0.3, gnss: 0.9, cep: 20, warhead: '≈480 kg', range: '≈460–480 km tras el lanzamiento',
     cost: 4.5, costNote: 'Contratos rusos filtrados: ≈US$4,5 M. Forbes Ukraine estimaba 10–15 M', maneuver: true, manPk: 0.8,
     guidance: 'INS + corrección en vuelo + buscador terminal', engine: 'Cohete sólido (derivado del Iskander)',
     profile: 'Lanzado desde MiG-31K. Rusia lo vende como "Mach 10", pero un operador de Patriot midió ≈1.240 m/s (Mach 3,6) en el momento de la intercepción.',
@@ -82,7 +82,7 @@ export const THREATS = {
   },
   kh22: {
     name: 'Kh-22 / Kh-32 (supersónico pesado)', short: 'Kh-22', side: 'RU', cls: 'supersonico', prof: 'highdive',
-    v: 1100, vDive: 1100, cruiseAlt: 27000, diveDist: 35, launchDist: 450, rcs: 1, rcsVHF: 3, gnss: 1, cep: 150, warhead: '≈950–1.000 kg (Kh-32: ≈500 kg)', range: '≈600 km (Kh-32: hasta 1.000 km)',
+    v: 1100, vDive: 1100, cruiseAlt: 27000, diveDist: 35, launchDist: 450, rcs: 1, rcsSide: 10, rcsRear: 2, rcsVHF: 3, gnss: 1, cep: 150, warhead: '≈950–1.000 kg (Kh-32: ≈500 kg)', range: '≈600 km (Kh-32: hasta 1.000 km)',
     cost: 1, costNote: 'Stock soviético: estimación ucraniana ≈US$1 M (no figura en los contratos filtrados)', maneuver: false,
     guidance: 'INS + buscador radar activo (antibuque)', engine: 'Cohete de combustible líquido R-201',
     profile: 'Sube a ≈27 km, vuela a Mach 3,5–4,6 y pica casi vertical. Muy impreciso contra blancos terrestres porque el buscador es antibuque.',
@@ -91,7 +91,7 @@ export const THREATS = {
   },
   oniks: {
     name: 'P-800 Oniks (supersónico antibuque)', short: 'Oniks', side: 'RU', cls: 'supersonico', prof: 'hilo',
-    v: 750, vLow: 680, cruiseAlt: 14000, agl: 15, launchDist: 250, rcs: 0.3, rcsVHF: 1, gnss: 1, cep: 20, warhead: '200–300 kg', range: '300 km exportación; ≈600 km versión rusa',
+    v: 750, vLow: 680, cruiseAlt: 14000, agl: 15, launchDist: 250, rcs: 0.3, rcsSide: 2, rcsRear: 0.5, rcsVHF: 1, gnss: 1, cep: 20, warhead: '200–300 kg', range: '300 km exportación; ≈600 km versión rusa',
     cost: 1.25, costNote: 'Estimación Forbes Ukraine 2022: ≈US$1,25 M (no figura en los contratos filtrados)', maneuver: true,
     guidance: 'INS + buscador radar activo/pasivo', engine: 'Estatorreactor (ramjet) + booster sólido',
     profile: 'Mach 2,6 a ~14 km y baja a 10–15 m para el tramo final, a Mach 2.',
@@ -100,7 +100,7 @@ export const THREATS = {
   },
   zircon: {
     name: '3M22 Tsirkon (Zircon)', short: 'Tsirkon', side: 'RU', cls: 'hiper', prof: 'highdive',
-    v: 1500, vDive: 1150, cruiseAlt: 30000, diveDist: 45, launchDist: 400, rcs: 0.15, rcsVHF: 0.5, gnss: 1, cep: 30, warhead: '≈120 kg (KNDISE: ≤40 kg de explosivo)', range: '≈1.000 km (declarado, sin confirmar)',
+    v: 1500, vDive: 1150, cruiseAlt: 30000, diveDist: 45, launchDist: 400, rcs: 0.15, rcsSide: 1, rcsRear: 0.3, rcsVHF: 0.5, gnss: 1, cep: 30, warhead: '≈120 kg (KNDISE: ≤40 kg de explosivo)', range: '≈1.000 km (declarado, sin confirmar)',
     cost: 5.4, costNote: 'Contratos rusos filtrados: US$5,2–5,6 M', maneuver: true, manPk: 0.85,
     guidance: 'INS + buscador radar activo', engine: 'Dos etapas de combustible sólido según el GUR y los restos analizados (Rusia declara scramjet)',
     profile: 'Rusia declara Mach 8–9. El GUR registró como máximo Mach 6,8; Defense Express estimó Mach 5,5 a mitad de vuelo y ≈4,5 en la aproximación. Crucero a 30–40 km y picada final.',
@@ -109,7 +109,7 @@ export const THREATS = {
   },
   storm: {
     name: 'Storm Shadow / SCALP-EG', short: 'Storm Shadow', side: 'UA', cls: 'crucero', prof: 'bunt', lo: true,
-    v: 275, agl: 35, aglRange: [30, 300], rcs: 0.05, rcsVHF: 0.5, gnss: 0.85, cep: 2, warhead: '450 kg BROACH (penetrante en tándem)', range: '≈250 km (exportación, la entregada a Ucrania); ≈550 km versión UK/FR',
+    v: 275, agl: 35, aglRange: [30, 300], rcs: 0.05, rcsSide: 0.3, rcsRear: 0.1, rcsVHF: 0.5, gnss: 0.85, cep: 2, warhead: '450 kg BROACH (penetrante en tándem)', range: '≈250 km (exportación, la entregada a Ucrania); ≈550 km versión UK/FR',
     cost: 2.5, costNote: '≈£2 M (≈US$2,5 M, 2023); el precio original era £790k', maneuver: false,
     guidance: 'INS + GPS + TERPROM + buscador IR de imagen', engine: 'Turbojet Microturbo TRI 60-30',
     profile: 'Vuelo rasante a 30–40 m guiado por mapa de terreno; al final hace un "bunt": trepa para identificar el blanco con el IR y pica.',
@@ -118,7 +118,7 @@ export const THREATS = {
   },
   atacms: {
     name: 'MGM-140 ATACMS', short: 'ATACMS', side: 'UA', cls: 'balistico', prof: 'ballistic',
-    v: 1000, apogee: 40, launchDist: 250, rcs: 0.1, rcsVHF: 0.3, gnss: 0.6, cep: 10, warhead: '≈230 kg unitaria (M57) o submuniciones', range: '165 km (M39) / 300 km (M39A1, M48, M57)',
+    v: 1000, apogee: 40, launchDist: 250, rcs: 0.1, rcsSide: 3, rcsRear: 0.3, rcsVHF: 0.3, gnss: 0.6, cep: 10, warhead: '≈230 kg unitaria (M57) o submuniciones', range: '165 km (M39) / 300 km (M39A1, M48, M57)',
     cost: 1.5, costNote: '≈US$1,5 M (M39 actualizado a FY2022); M57 ≈1,7 M', maneuver: false,
     guidance: 'INS + GPS', engine: 'Cohete sólido, una etapa',
     profile: 'Balístico táctico lanzado desde HIMARS/M270, Mach 3+ en terminal. Apogeo hasta ~50 km en tiro máximo.',
@@ -127,7 +127,7 @@ export const THREATS = {
   },
   neptune: {
     name: 'R-360 Neptune', short: 'Neptune', side: 'UA', cls: 'crucero', prof: 'cruise',
-    v: 260, agl: 15, aglRange: [5, 300], rcs: 0.1, rcsVHF: 0.5, gnss: 0.7, cep: 10, warhead: '150 kg (Long Neptune ≈260 kg)', range: '280–300 km (Long Neptune ≈1.000 km)',
+    v: 260, agl: 15, aglRange: [5, 300], rcs: 0.1, rcsSide: 1, rcsRear: 0.2, rcsVHF: 0.5, gnss: 0.7, cep: 10, warhead: '150 kg (Long Neptune ≈260 kg)', range: '280–300 km (Long Neptune ≈1.000 km)',
     cost: 1.5, costNote: 'Sin cifra oficial; ≈US$1,5 M es una estimación de prensa', maneuver: true,
     guidance: 'INS + GNSS + buscador terminal', engine: 'Turbofán Motor Sich MS400 + booster',
     profile: 'Antibuque subsónico rasante (4–5 m sobre el agua en la fase final). Hundió al crucero Moskva en abril de 2022.',
@@ -136,7 +136,7 @@ export const THREATS = {
   },
   lyutyi: {
     name: 'AN-196 Liutyi (dron de largo alcance)', short: 'Liutyi', side: 'UA', cls: 'dron', prof: 'drone',
-    v: 56, agl: 500, aglRange: [50, 3000], rcs: 0.3, rcsVHF: 1, gnss: 0.5, cep: 10, warhead: '50–75 kg', range: '≈1.000–1.400 km (hasta 2.000 km con ojiva liviana)',
+    v: 56, agl: 500, aglRange: [50, 3000], rcs: 0.3, rcsSide: 1, rcsRear: 0.3, rcsVHF: 1, gnss: 0.5, cep: 10, warhead: '50–75 kg', range: '≈1.000–1.400 km (hasta 2.000 km con ojiva liviana)',
     cost: 0.2, costNote: '≈US$200k (reportado)', maneuver: false,
     guidance: 'INS + GNSS + terminal asistida por IA', engine: 'Motor de pistón bóxer con hélice',
     profile: 'Dron de ataque ucraniano de 250–300 kg usado contra refinerías y bases en Rusia.',
@@ -145,7 +145,7 @@ export const THREATS = {
   },
   flamingo: {
     name: 'FP-5 Flamingo', short: 'Flamingo', side: 'UA', cls: 'crucero', prof: 'cruise',
-    v: 245, agl: 35, aglRange: [15, 1000], rcs: 1, rcsVHF: 2, gnss: 0.6, cep: 14, warhead: '1.000–1.150 kg (declarado)', range: '3.000 km declarado; ≈950 km en línea recta demostrado',
+    v: 245, agl: 35, aglRange: [15, 1000], rcs: 1, rcsSide: 3, rcsRear: 2, rcsVHF: 2, gnss: 0.6, cep: 14, warhead: '1.000–1.150 kg (declarado)', range: '3.000 km declarado; ≈950 km en línea recta demostrado',
     cost: 0.6, costNote: '"Un poco menos de US$600k" según la CEO de Fire Point (jul-2026)', maneuver: false,
     guidance: 'INS + GNSS con antena CRPA', engine: 'Turbofán AI-25TL reacondicionado + booster',
     profile: 'Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura. No es furtivo, apuesta a cantidad y alcance.',

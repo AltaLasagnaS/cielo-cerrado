@@ -7,6 +7,10 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 ## [Sin publicar]
 
 ### Agregado
+- **RCS según el aspecto** **[sim]**: cada amenaza tiene RCS de frente, de costado y de cola (bandas X/S), y cada radar la ve según el ángulo desde el que mira el arma, interpolando en decibeles. En VHF y L el contraste es la mitad (resonancia). Datos de OSINT y de la base de CMO; donde difieren, el probable es la media geométrica y el rango cubre a las dos. Cambios de datos: Shahed frente 0,05 → 0,02 m², costado 1 → 0,14 m², VHF 0,3 → 0,12 m²; Geran-3 frente 0,05 → 0,03 m² y VHF 0,3 → 0,12 m²; costado y cola nuevos para todas las armas. Las fichas suman la RCS de costado y una columna "De costado"; la Academia, una calculadora por ángulo.
+
+### Corregido
+- **[sim]** El motor descartaba antes de tiempo los blancos a más de 1,2 veces el alcance del radar contra 1 m², aunque su RCS los hiciera visibles más lejos (por ejemplo, el Kh-22 en VHF). Ahora el descarte usa el alcance sin interferencia, que es una cota exacta.
 - Investigación de física: decisiones tomadas (dos ejes de C2 —nivel del bando y enlace de datos por unidad— y clima fijo), anexo sobre de dónde sacar la RCS por aspecto y por rango de frecuencia (comparando el catálogo, el modelado de Járkov y la base de CMO) y anexo sobre qué sistemas tienen enlace de datos comprobable.
 - Investigación `docs/investigacion/mejoras-fisica.md` (sin implementar): RCS según el aspecto (prioridad), Swerling, clutter y Doppler, integración de la defensa aérea (niveles de C2 y enlaces de datos), estados de clima, discriminación de señuelos, recarga y energía del interceptor. Para cada una: qué cambia, dificultad, datos necesarios, cómo probarla y cómo la resuelven *Command: Modern Operations* y *Fleet Command* (mod NWP).
 - **Escenario "Gotemburgo · defensa de la refinería de Hisingen"** (jugás la defensa): oleada de Shahed, Gerbera, Geran-3, Kalibr, Kh-101 y Kinzhal contra la refinería, la terminal de Skarvik y el puerto. Con la disposición inicial la refinería sobrevive ≈40% de las veces (Monte Carlo, 40 corridas).
