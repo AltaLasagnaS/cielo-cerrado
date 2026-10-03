@@ -65,3 +65,17 @@ test('escenarios: mapas, tipos y blancos válidos', () => {
 test('relieves: tamaño de la grilla coherente con los datos', () => {
   for (const [k, t] of Object.entries(TERRAIN)) assert.equal(atob(t.b64).length, t.W * t.H * 2, k);
 });
+
+test('los valores escritos en el catálogo coinciden con el probable de UNC (lectura cómoda)', async () => {
+  // Se importan los módulos crudos en un proceso aparte para ver los literales antes de applyProbable().
+  const { execFileSync } = await import('node:child_process');
+  const out = execFileSync(process.execPath, ['--input-type=module', '-e', `
+    const { THREATS } = await import('./src/data/threats.js'); const { DEFENSES } = await import('./src/data/defenses.js'); const { JAMMERS } = await import('./src/data/jammers.js');
+    console.log(JSON.stringify({ thr: THREATS, def: DEFENSES, jam: JAMMERS }));`], { encoding: 'utf8' });
+  const raw = JSON.parse(out), get = (o, p) => p.split('.').reduce((a, k) => a?.[k], o);
+  for (const [kind, set] of Object.entries(UNC)) for (const [k, params] of Object.entries(set)) for (const [path, u] of Object.entries(params)) {
+    if (path.startsWith('info.')) continue;
+    const v = get(raw[kind][k], path);
+    if (v !== undefined) assert.equal(v, u.p, `${kind}.${k}.${path}: literal ${v} ≠ probable ${u.p}`);
+  }
+});
