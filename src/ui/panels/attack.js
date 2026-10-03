@@ -1,5 +1,5 @@
 // Pestaña "Ataque": configurar una salva nueva, trazar su ruta y listar las programadas.
-import { CLS_NAME, THREATS, TARGET_TYPES } from '../../data/index.js';
+import { CLS_NAME, THREATS, TARGET_TYPES, CRPA_SIZES } from '../../data/index.js';
 import { targetName } from '../../sim/setup.js';
 import { esc, kmh, mach, money } from '../../util/format.js';
 import { isOffmap } from '../../physics/kinematics.js';
@@ -9,6 +9,7 @@ import { updateModebar, toast, setMode } from '../modes.js';
 import { schedCov } from '../coverage.js';
 import { openFicha } from '../fichas.js';
 import { renderSel } from './selection.js';
+import { infoBtn } from '../academy.js';
 
 export function renderAtk() {
   const el = $('#tab-atk');
@@ -37,6 +38,7 @@ export function renderAtk() {
       ${(T.maneuver || T.prof === 'ballistic' || T.cls === 'crucero') && T.prof !== 'glide' ? `<label class="check"><input type="checkbox" id="aMan" ${a.maneuver ? 'checked' : ''}> Maniobra evasiva terminal</label>` : ''}
       ${T.decoys ? `<label class="check"><input type="checkbox" id="aDec" ${a.decoys ? 'checked' : ''}> Liberar ${T.decoys} señuelos en fase terminal</label>` : ''}
       ${T.datalink ? `<label class="check" title="${esc(T.datalink)}: el operador ve la posición real y descarta el engaño GNSS, salvo dentro del radio de un antidrón que corta enlaces (Bukovel-AD)"><input type="checkbox" id="aLink" ${a.link ? 'checked' : ''}> Enlace de datos (${esc(T.datalink)})</label>` : ''}
+      ${T.gnss < 1 ? `<div class="field" title="Una antena CRPA de N elementos anula hasta N − 1 interferidores GNSS que lleguen desde direcciones distintas. Con más fuentes, el arma pierde el satélite."><label for="aCrpa">Antena GNSS ${infoBtn('gnss')}</label><select id="aCrpa" class="sel">${CRPA_SIZES.map(n => `<option value="${n}" ${(a.crpa ?? 0) === n ? 'selected' : ''}>${n ? 'CRPA de ' + n + ' elementos (anula ' + (n - 1) + ')' : 'Común (sin CRPA)'}</option>`).join('')}</select></div>` : ''}
       <button class="btn pri" id="aRoute">${S.mode === 'route' ? 'Trazando…' : 'Trazar ruta en el mapa'}</button>
       <p class="hint">${off ? 'Tocá un punto en la dirección desde donde viene y después el blanco. Se lanza a la distancia indicada, fuera del mapa.' : 'Tocá el punto de entrada, los waypoints (usá valles para esconderte del radar) y el blanco. Si el último punto cae sobre una unidad de defensa, la apunta.'}</p>
     </div>
@@ -52,6 +54,7 @@ export function renderAtk() {
   if ($('#aMan')) $('#aMan').onchange = e => { a.maneuver = e.target.checked; };
   if ($('#aDec')) $('#aDec').onchange = e => { a.decoys = e.target.checked; };
   if ($('#aLink')) $('#aLink').onchange = e => { a.link = e.target.checked; };
+  if ($('#aCrpa')) $('#aCrpa').onchange = e => { a.crpa = +e.target.value; };
   $('#aRoute').onclick = () => { if (S.started) { toast('Reiniciá para editar el escenario.'); return; } S.route = { pts: [], targetUnit: null }; S.mode = 'route'; updateModebar(); renderAtk(); };
   $('#objTypes').onclick = e => { const b = e.target.closest('[data-ot]'); if (!b) return; if (S.started) { toast('Reiniciá para editar el escenario.'); return; } if (S.mode === 'placeObj' && S.placeType === b.dataset.ot) setMode('select'); else setMode('placeObj', b.dataset.ot); renderAtk(); };
   $('#objList').onclick = e => {
@@ -66,7 +69,7 @@ export function renderAtk() {
   };
 }
 /** Valores iniciales del formulario al elegir un arma (conserva cantidad y sincronización previas). */
-export function defaultAtk(type, prev) { const T = THREATS[type]; return { type, count: prev ? prev.count : (T.cls === 'dron' ? 8 : 2), interval: T.cls === 'dron' ? 20 : 10, tStart: 0, sync: prev ? prev.sync : false, tArrive: prev ? prev.tArrive : 900, agl: T.agl ?? 0, launchDist: T.launchDist, maneuver: !!T.maneuver, decoys: !!T.decoys, link: false }; }
+export function defaultAtk(type, prev) { const T = THREATS[type]; return { type, count: prev ? prev.count : (T.cls === 'dron' ? 8 : 2), interval: T.cls === 'dron' ? 20 : 10, tStart: 0, sync: prev ? prev.sync : false, tArrive: prev ? prev.tArrive : 900, agl: T.agl ?? 0, launchDist: T.launchDist, maneuver: !!T.maneuver, decoys: !!T.decoys, link: false, crpa: prev && THREATS[prev.type].gnss < 1 ? prev.crpa ?? 0 : 0 }; }
 
 /** Borra un objetivo; las salvas que le apuntaban quedan apuntando al mismo punto, sin objetivo. */
 export function removeObj(id) {

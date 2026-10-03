@@ -33,3 +33,13 @@ export const JAMMERS = {
     notes: ['Los F-16 holandeses llegaron con AN/ALQ-131 y los daneses con ALQ-162 en pilones ECIPS; un escuadrón de guerra electrónica de la USAF los reprogramó contra amenazas rusas (ago-2024).', 'El ALQ-131 cubre 2–20 GHz en configuraciones de 1 a 3 bandas: no se sabe cuáles tiene Ucrania. Acá se asumen las bandas de control de tiro (C/X/Ku).', 'Es un pod de autoprotección, no un interferidor stand-off: en el juego representa una patrulla escoltando un ataque, con mucha menos potencia que un Il-22PP o un Krasukha. Confianza baja.'],
     sources: [SRC.ng_alq131, SRC.fas_alq131, SRC.dx_f16nl, SRC.afm_f16ew] }
 };
+
+/**
+ * Antenas CRPA que se pueden elegir para una salva (elementos; 0 = antena común). Una CRPA de N
+ * elementos anula hasta N − 1 interferidores desde direcciones distintas (physics/navigation.js).
+ * Referencias (confianza baja, docs/investigacion/guerra-electronica-ucraniana.md D3): Shahed 2022–23
+ * sin CRPA o de 4; Kometa de 8 y 12 en Shahed y UMPK desde 2025; Kometa-M de 16 (dic-2025) en Shahed
+ * e Iskander-K. Ingenieros ucranianos: contra 8 elementos hicieron falta 19 estaciones Lima; contra 16,
+ * ni 104 alcanzaron.
+ */
+export const CRPA_SIZES = [0, 4, 8, 12, 16];

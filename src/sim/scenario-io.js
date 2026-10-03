@@ -7,7 +7,7 @@
 // objetivos que existan en el catálogo, mapa conocido, posiciones dentro del mapa, números
 // finitos y en rango, y blancos de las salvas que existan. Solo se copian los campos conocidos.
 // Formato: ver docs/ARQUITECTURA.md § "Archivo de escenario".
-import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES, TERRAIN, SCENARIOS, C2_LEVELS, c2FromNet, WEATHER } from '../data/index.js';
+import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES, TERRAIN, SCENARIOS, C2_LEVELS, c2FromNet, WEATHER, CRPA_SIZES } from '../data/index.js';
 import { MAP } from '../physics/terrain.js';
 import { S } from './state.js';
 import { addObj, addDef, addSalvo, addJam } from './setup.js';
@@ -25,7 +25,7 @@ const DOCTRINES = ['salva', 'sls'];
 const pick = (o, keys) => { const r = {}; for (const k of keys) if (o[k] !== undefined) r[k] = structuredClone(o[k]); return r; };
 const OBJ_KEYS = ['id', 'type', 'x', 'y', 'name', 'short', 'maxHp', 'desc'];
 const DEF_KEYS = ['id', 'type', 'x', 'y', 'name', 'az', 'mast', 'alt', 'mag', 'salvo', 'noDrones', 'link', 'reserve'];
-const SALVO_KEYS = ['id', 'type', 'count', 'interval', 'tStart', 'sync', 'tArrive', 'agl', 'launchDist', 'maneuver', 'decoys', 'link', 'pts', 'targetUnit', 'targetObj'];
+const SALVO_KEYS = ['id', 'type', 'count', 'interval', 'tStart', 'sync', 'tArrive', 'agl', 'launchDist', 'maneuver', 'decoys', 'link', 'crpa', 'pts', 'targetUnit', 'targetObj'];
 const JAM_KEYS = ['id', 'type', 'x', 'y', 'alt', 'on'];
 const META_KEYS = ['name', 'player', 'time', 'description', 'forces', 'conditions', 'rulesText', 'goals', 'success', 'failure'];
 
@@ -155,7 +155,8 @@ export function validateScenario(raw) {
       count: num(w + ' · count', sv.count, 1, 500, { int: true }), interval: num(w + ' · interval', sv.interval, 0, T, { opt: true }),
       tStart: num(w + ' · tStart', sv.tStart, 0, T, { opt: true }), sync: bool(w + ' · sync', sv.sync), tArrive: num(w + ' · tArrive', sv.tArrive, 0, T, { opt: true }),
       agl: inLimits(w + ' · agl', num(w + ' · agl', sv.agl, 0, 30000, { opt: true }), THREATS[sv.type].aglRange, 'sus límites reales de vuelo'), launchDist: num(w + ' · launchDist', sv.launchDist, 1, 5000, { opt: true }),
-      maneuver: bool(w + ' · maneuver', sv.maneuver), decoys: bool(w + ' · decoys', sv.decoys), link: bool(w + ' · link', sv.link)
+      maneuver: bool(w + ' · maneuver', sv.maneuver), decoys: bool(w + ' · decoys', sv.decoys), link: bool(w + ' · link', sv.link),
+      crpa: CRPA_SIZES.includes(sv.crpa ?? 0) ? sv.crpa : (err(`${w} · crpa: ${JSON.stringify(sv.crpa)} no es una antena válida (${CRPA_SIZES.join(', ')} elementos).`), undefined)
     };
   });
   // interferidores

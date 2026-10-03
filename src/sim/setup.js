@@ -27,7 +27,7 @@ export function defaultAz(x, y) {
  */
 export function addSalvo(o) {
   const T = THREATS[o.type];
-  const sv = { id: nextId(), type: o.type, count: o.count || 1, interval: o.interval ?? 20, tStart: o.tStart || 0, sync: !!o.sync, tArrive: o.tArrive || 0, agl: o.agl ?? T.agl, launchDist: o.launchDist ?? T.launchDist, maneuver: o.maneuver ?? T.maneuver, decoys: !!o.decoys, link: !!o.link, pts: o.pts, targetUnit: null, targetObj: null };
+  const sv = { id: nextId(), type: o.type, count: o.count || 1, interval: o.interval ?? 20, tStart: o.tStart || 0, sync: !!o.sync, tArrive: o.tArrive || 0, agl: o.agl ?? T.agl, launchDist: o.launchDist ?? T.launchDist, maneuver: o.maneuver ?? T.maneuver, decoys: !!o.decoys, link: !!o.link, crpa: o.crpa ?? 0, pts: o.pts, targetUnit: null, targetObj: null };
   const find = (list, ref) => list.find(v => v.name === ref || v.id === ref);
   if (o.targetUnit) { const u = find(S.setup.defs, o.targetUnit); if (u) { sv.targetUnit = u.id; sv.pts[sv.pts.length - 1] = [u.x, u.y]; } }
   else if (o.targetObj) { const g = find(S.setup.objs, o.targetObj); if (g) { sv.targetObj = g.id; sv.pts[sv.pts.length - 1] = [g.x, g.y]; } }

@@ -172,6 +172,7 @@ Cambio sugerido para la entrada existente, conservando la clave:
 - Pokrova y Lima: `spoof`. Bukovel y Pole-21: `jam`.
 
 **D3. CRPA (Kometa) frente a cantidad de fuentes.**
+- **Estado:** hecho con la regla N − 1 por dirección y CRPA elegible por salva (`sv.crpa`), sin `crpaMax` por interferidor (ver `docs/FISICA.md` §4).
 - Campo nuevo en amenazas: `crpa: 0 | 4 | 8 | 12 | 16` (elementos).
 - Una CRPA de N elementos puede anular hasta ~N−1 fuentes. Regla: el efecto se aplica si `fuentesGNSS_que_cubren_el_punto ≥ crpa` o si el interferidor tiene `crpaMax ≥ crpa`. Lima-Quant tendría `crpaMax: 16`; Pokrova y Bukovel, `crpaMax: 4` (est).
 - Datos: "8 elementos → hicieron falta 19 Lima viejos; 16 elementos → ni 104" (ingenieros ucranianos vía Forbes/United24; *claim*).

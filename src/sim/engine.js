@@ -10,7 +10,7 @@ import { rnd } from '../util/rng.js';
 import { surf, los } from '../physics/terrain.js';
 import { antZ, aspectCos, belowCeiling, detR, inSector, jamJ, pdScan, PD_CUTOFF } from '../physics/radar.js';
 import { buildThreat, posAt, speedAt } from '../physics/kinematics.js';
-import { gnssNavError } from '../physics/navigation.js';
+import { gnssNavError, crpaOverwhelmed } from '../physics/navigation.js';
 import { RADAR_GUID, isTBM, trackOK, reactionStart, solve, calcPk, effectiveC2 } from '../physics/engagement.js';
 import { C2_LEVELS } from '../data/index.js';
 import { damageAt, targetStatus } from '../physics/damage.js';
@@ -68,8 +68,12 @@ export function step(dt) {
       event(label(th) + ' libera señuelos', 'decoys');
     }
     if (!th.gnssHit && th.T.gnss < 1) {
-      for (const j of S.jamsLive) {
-        const J = JAMMERS[j.type]; if (!J.gnssJam || !j.on) continue; if (Math.hypot(p.x - j.x, p.y - j.y) > J.radius) continue;
+      // fuentes anti-GNSS que cubren el punto; una antena CRPA de N elementos anula hasta N − 1 (por dirección)
+      const srcs = S.jamsLive.filter(j => JAMMERS[j.type].gnssJam && j.on && Math.hypot(p.x - j.x, p.y - j.y) <= JAMMERS[j.type].radius);
+      const held = th.crpa > 0 && srcs.length > 0 && !crpaOverwhelmed(th.crpa, p.x, p.y, srcs);
+      if (held && !th.crpaHeld) { th.crpaHeld = true; log('d', label(th) + ': su antena CRPA de ' + th.crpa + ' elementos anula la interferencia GNSS (' + srcs.length + ' fuente' + (srcs.length > 1 ? 's' : '') + ').'); }
+      for (const j of held ? [] : srcs) {
+        const J = JAMMERS[j.type];
         const link = th.link && !S.jamsLive.some(k => JAMMERS[k.type].linkJam && k.on && Math.hypot(p.x - k.x, p.y - k.y) <= JAMMERS[k.type].radius);   // un antidrón le corta el enlace
         const n = gnssNavError(th.T, J, link); th.gnssHit = true; th.navErr = n.err;
         if (n.corrected) log('w', label(th) + ' pierde el GNSS en la zona de ' + J.short + (n.rejected ? ' y descarta el engaño' : '') + ', pero su buscador terminal encuentra el blanco.');
