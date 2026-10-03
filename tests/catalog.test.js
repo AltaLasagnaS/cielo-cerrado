@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { THREATS, DEFENSES, JAMMERS, BANDS, CLS_NAME, UNC, OBS, SRC, SCENARIOS, TERRAIN, PL, TARGET_TYPES } from '../src/data/index.js';
 
-const PROFILES = ['drone', 'cruise', 'bunt', 'ballistic', 'highdive', 'hilo'];
+const PROFILES = ['drone', 'cruise', 'bunt', 'ballistic', 'highdive', 'hilo', 'glide'];
 
 test('amenazas: campos obligatorios y perfiles válidos', () => {
   for (const [k, t] of Object.entries(THREATS)) {
@@ -11,7 +11,7 @@ test('amenazas: campos obligatorios y perfiles válidos', () => {
     assert.ok(CLS_NAME[t.cls], `${k}: clase ${t.cls}`);
     assert.ok(PROFILES.includes(t.prof), `${k}: perfil ${t.prof}`);
     if (['ballistic'].includes(t.prof)) assert.ok(t.apogee && t.launchDist, `${k}: apogee/launchDist`);
-    if (['highdive', 'hilo'].includes(t.prof)) assert.ok(t.cruiseAlt && t.launchDist, `${k}: cruiseAlt/launchDist`);
+    if (['highdive', 'hilo', 'glide'].includes(t.prof)) assert.ok(t.cruiseAlt && t.launchDist, `${k}: cruiseAlt/launchDist`);
     if (['drone', 'cruise', 'bunt'].includes(t.prof)) assert.ok(t.agl !== undefined, `${k}: agl`);
   }
 });

@@ -154,6 +154,7 @@ Es un modelo **cinemático guiado por datos**: la amenaza recorre una ruta polig
 | `ballistic` | Parábola `z = 4·apogeo·f·(1−f)`, con `f` la fracción del recorrido. Lanzado a `launchDist` km |
 | `highdive` | Crucero a `cruiseAlt` a velocidad `v` y picada lineal en los últimos `diveDist` km a `vDive` |
 | `hilo` | Crucero alto, transición entre 60 y 40 km del blanco, y tramo final rasante a `vLow` |
+| `glide` | Bomba planeadora soltada fuera del mapa a `cruiseAlt` y `launchDist` km del blanco; baja sin motor a velocidad `v`: z = suelo + (cruiseAlt − suelo)·(rem/L)^0,7 (suave al principio, más empinada al final). `T.cold`: sin motor, ×0,3 de Pk para buscadores IR |
 
 - **Maniobra terminal:** desplazamiento lateral senoidal (amplitud 0,4 km para balísticos y 0,15 km para el resto) dentro de `termZone` (25 km balísticos, 15 km supersónicos, 10 km el resto).
 - **Salvas:** dispersión lateral de 0,25 km entre misiles, para que no se apilen.

@@ -33,8 +33,8 @@ export function renderAtk() {
       ${T.aglRange ? `<div class="field"><label for="aAgl">Altura de vuelo sobre el terreno</label><span class="val" id="aAglV">${a.agl} m</span><input id="aAgl" type="range" min="${T.aglRange[0]}" max="${T.aglRange[1]}" step="1" value="${a.agl}"></div>
       <div class="row" id="aAglModes"><button class="btn sm" data-agl="${T.agl}">Típica${(T.aglModes || []).filter(([, h]) => h === T.agl).map(([n]) => ' · ' + esc(n)).join('')} (${T.agl} m)</button>${(T.aglModes || []).filter(([, h]) => h !== T.agl).map(([n, h]) => `<button class="btn sm" data-agl="${h}">${esc(n)} (${h} m)</button>`).join('')}</div>
       <p class="hint">Límite real: ${T.aglRange[0]}–${T.aglRange[1]} m. ${esc(T.aglNote || '')}</p>` : ''}
-      ${off ? `<div class="field"><label for="aDist">Distancia real de lanzamiento (km)</label><input id="aDist" class="inp" type="number" min="60" max="1500" value="${a.launchDist}"></div>` : ''}
-      ${T.maneuver || T.prof === 'ballistic' || T.cls === 'crucero' ? `<label class="check"><input type="checkbox" id="aMan" ${a.maneuver ? 'checked' : ''}> Maniobra evasiva terminal</label>` : ''}
+      ${off ? `<div class="field"><label for="aDist">Distancia real de lanzamiento (km)</label><input id="aDist" class="inp" type="number" min="20" max="1500" value="${a.launchDist}"></div>` : ''}
+      ${(T.maneuver || T.prof === 'ballistic' || T.cls === 'crucero') && T.prof !== 'glide' ? `<label class="check"><input type="checkbox" id="aMan" ${a.maneuver ? 'checked' : ''}> Maniobra evasiva terminal</label>` : ''}
       ${T.decoys ? `<label class="check"><input type="checkbox" id="aDec" ${a.decoys ? 'checked' : ''}> Liberar ${T.decoys} señuelos en fase terminal</label>` : ''}
       ${T.datalink ? `<label class="check" title="${esc(T.datalink)}: el operador ve la posición real y descarta el engaño GNSS, salvo dentro del radio de un antidrón que corta enlaces (Bukovel-AD)"><input type="checkbox" id="aLink" ${a.link ? 'checked' : ''}> Enlace de datos (${esc(T.datalink)})</label>` : ''}
       <button class="btn pri" id="aRoute">${S.mode === 'route' ? 'Trazando…' : 'Trazar ruta en el mapa'}</button>

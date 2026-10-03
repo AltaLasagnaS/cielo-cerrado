@@ -8,8 +8,8 @@ Cada parámetro numérico relevante tiene un **rango** (mínimo, probable, máxi
 
 ## Índice
 
-- [Amenazas](#amenazas): Shahed, Geran-3, Gerbera, Kh-101, Kalibr, 9M728, Iskander-M, Kinzhal, Kh-22, Oniks, Tsirkon, Storm Shadow, ATACMS, Neptune, Liutyi, Flamingo
-- [Defensas y sensores](#defensas-y-sensores): Patriot, Patriot GEM-T, SAMP/T, IRIS-T, NASAMS, S-300P, Buk-M1, Gepard, Grupo móvil, MANPADS, Interceptores, Pantsir, Tor-M2, S-400, Radar 3D, Radar VHF, Acústico, Saab AEW, A-50U
+- [Amenazas](#amenazas): Shahed, Geran-3, Gerbera, Kh-101, Kalibr, 9M728, Iskander-M, Kinzhal, UMPK, Kh-22, Oniks, Tsirkon, Storm Shadow, ATACMS, Neptune, Liutyi, Flamingo
+- [Defensas y sensores](#defensas-y-sensores): Patriot, Patriot GEM-T, SAMP/T, IRIS-T, NASAMS, S-300P, Buk-M1, Gepard, Grupo móvil, MANPADS, Interceptores, Hawk, S-125, S-200, Pantsir, Tor-M2, S-400, Radar 3D, Radar VHF, Acústico, Saab AEW, A-50U
 - [Guerra electrónica](#guerra-electrónica): Jammer aéreo, Krasukha-4, Krasukha-2, Pole-21, Pokrova, Lima, Bukovel-AD, F-16 ECM
 - [Bandas](#bandas) · [Objetivos](#objetivos) · [Calibración de Pk](#calibración-de-pk)
 
@@ -457,6 +457,48 @@ Lanzado desde MiG-31K. Rusia lo vende como "Mach 10", pero un operador de Patrio
 - [CSIS Missile Threat: Kinzhal](https://missilethreat.csis.org/missile/kinzhal/)
 - [Defense Express: estadística de Syrskyi (24/02/2022–21/08/2024)](https://en.defence-ua.com/news/cinc_of_ukraines_forces_syrskii_releases_statistics_on_missiles_and_drones_usage_by_russians_number_of_destroyed_threats-11588.html)
 - [Defence Blog / Militarnyi: costos de contratos rusos filtrados 2024–2027](https://defence-blog.com/analysts-break-down-real-cost-of-russian-missiles/)
+
+### FAB-500M-62 con UMPK (bomba planeadora)
+
+`kab` · Rusia · Misil de crucero subsónico · perfil `glide`
+
+Un Su-34 la suelta a 9–12 km de altura y a ~1.000 km/h a 50–70 km de la línea del frente, fuera del alcance de casi toda la defensa. Planea sin motor y llega a ~700–800 km/h. No deja estela térmica y llegan muchas juntas.
+
+- **Guiado:** INS + GLONASS con antena CRPA Kometa; alas desplegables
+- **Propulsión:** Ninguno: planea (hay versiones nuevas con turborreactor)
+- **Ojiva:** 500 kg (≈200 kg de explosivo)
+- **Alcance:** 40–70 km (UMPK); 95–100 km las versiones nuevas soltadas a 12 km
+- **Costo:** Bomba FAB-500 de stock más kit UMPK de ≈US$20–30 mil (JAPCC)
+
+- El arma rusa más usada contra el frente y Járkov desde 2024: miles por mes.
+- Interceptarla con Patriot o NASAMS es posible pero insostenible (US$4–7 M contra US$25 mil): la respuesta habitual es derribar al avión o interferir su GLONASS.
+- En el juego usa la Pk de la clase "crucero" (blanco subsónico sin maniobra).
+
+#### Parámetros
+
+| Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
+|---|---:|---:|---:|---|---|---|
+| Velocidad de crucero (m/s) | 200 | **250** | 330 | media | [1] [2] | suelta a ~280 m/s (1.000 km/h), llega a 200–220 m/s (700–800 km/h); JAPCC habla de 300–400 m/s |
+| Altura de crucero (m) | 9.000 | **10.000** | 12.000 | media | [2] | Su-34 a 9–12 km |
+| RCS frontal (X/S) (m²) | 0,014 | **0,037** | 0,1 | baja | [3] | est por forma 0,1 m² (cuerpo de 0,4 m con alas); CMO (DB3K, UMPK FAB-500M-62): −18,7 dBsm ≈ 0,0135 m² de frente. Probable = media geométrica |
+| RCS lateral (X/S) (m²) | 0,029 | **0,12** | 0,5 | baja | [3] | est por forma 0,5 m²; CMO (DB3K): −15,4 dBsm ≈ 0,029 m² de costado. Probable = media geométrica |
+| RCS de cola (X/S) (m²) | 0,014 | **0,037** | 0,1 | baja | [3] | est por forma 0,1 m²; CMO (DB3K): cola = frente. Probable = media geométrica |
+| RCS en VHF (m²) | 0,014 | **0,064** | 0,3 | baja | [3] | est por resonancia 0,3 m²; CMO (DB3K): −18,7 dBsm ≈ 0,0135 m² en bandas A–D. Probable = media geométrica |
+| CEP (m) | 5 | **15** | 50 | baja | [1] | est: guiado satelital; el engaño GNSS la empeora mucho |
+| Costo unitario | US$20k | **US$30k** | US$50k | media | [1] | kit ≈US$20–30 mil + bomba de stock |
+| Distancia de lanzamiento (km) | 40 | **60** | 100 | media | [2] | 40–70 km el UMPK clásico; 95–100 km las versiones nuevas |
+| Alcance (km) | 40 | **60** | 100 | media | [2] | — |
+| Ojiva (kg) | 450 | **500** | 520 | alta | [2] | FAB-500M-62 |
+
+1. [JAPCC (OTAN): Countering Russia’s glide bomb warfare in Ukraine](https://www.japcc.org/articles/countering-russias-glide-bomb-warfare-in-ukraine/)
+2. [Wikipedia: UMPK (bomb kit)](https://en.wikipedia.org/wiki/UMPK_(bomb_kit))
+3. [Base de datos de Command: Modern Operations (DB3000 515): firma radar por arma (frente, costado y cola en bandas A–D y E–M). Son estimaciones del juego, no mediciones; se citan valor por valor](https://www.matrixgames.com/game/command-modern-operations)
+
+#### Fuentes generales
+
+- [Wikipedia: UMPK (bomb kit)](https://en.wikipedia.org/wiki/UMPK_(bomb_kit))
+- [JAPCC (OTAN): Countering Russia’s glide bomb warfare in Ukraine](https://www.japcc.org/articles/countering-russias-glide-bomb-warfare-in-ukraine/)
+- [Forbes (Axe): los interferidores ucranianos confunden a las bombas planeadoras (mar-2025)](https://www.forbes.com/sites/davidaxe/2025/03/23/ukraines-jammers-are-confusing-russias-glide-bombs-watch-one-stray-off-course/)
 
 ### Kh-22 / Kh-32 (supersónico pesado)
 
@@ -1271,6 +1313,115 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 - [Ukrinform: interceptores derriban >70% de los Shahed sobre Kyiv (feb-2026)](https://www.ukrinform.net/amp/rubric-ato/4097519-interceptor-drones-shot-down-over-70-of-shahed-drones-over-kyiv-in-feb-syrskyi.html)
 - [Defense News: drones interceptores (mar-2026)](https://www.defensenews.com/global/europe/2026/03/05/novel-interceptor-drones-bend-air-defense-economics-in-ukraines-favor/)
 - [Militarnyi: primer derribo de un Geran-3 con dron interceptor](https://militarnyi.com/en/news/ukrainian-interceptor-drone-downs-jet-powered-shahed-for-the-first-time/)
+
+### MIM-23B I-Hawk (Fase III)
+
+`hawk` · Ucrania / OTAN · tipo `sam`
+
+1,5–40 km, techo ≈17 km · MIM-23B: ≈Mach 2,5, semiactivo: el HPIR ilumina el blanco hasta el impacto
+
+- **Sensor:** AN/MPQ-61 HPIR (+ AN/MPQ-50 PAR, AN/MPQ-62 CWAR), Banda X (I/J OTAN), 70 km contra 1 m², sector 360°, refresco 2 s, ECCM 5 dB
+- **Altura de antena:** 4 m, fija. Fija: radares sobre remolques (altura estimada).
+- **Arma:** MIM-23B, guiado SARH, 1.5–40 km (balísticos: — km), 60 m–17.7 km, 2 canales, 9 disparos, Pk base dron 0.6 · crucero 0.7 · supersonico 0.4 · balistico 0 · hiper 0
+
+- España entregó baterías Fase III desde fines de 2022 (21 lanzadores, radares MPQ-61 y MPQ-62) y más lanzadores en 2023–24; EE. UU. aportó misiles.
+- Una sola unidad ucraniana reclamó 14 misiles de crucero y 40 Shahed derribados.
+- Cada HPIR guía contra un blanco a la vez: dos secciones de fuego = dos canales.
+
+#### Parámetros
+
+| Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
+|---|---:|---:|---:|---|---|---|
+| Radar: detección contra 1 m² (km) | 50 | **70** | 100 | baja | [1] | CMO: HPIR 45 nmi (83 km) y PAR 54 nmi (100 km) de alcance instrumentado; est contra 1 m² |
+| Alcance vs aeronaves/crucero (km) | 35 | **40** | 50 | media | [1] [2] | CMO 22 nmi ≈ 40 km; OSINT 35–50 km |
+| Velocidad media del interceptor (m/s) | 600 | **700** | 850 | baja | [2] | Mach 2,5 máx.; est media |
+| Blanco más rápido enfrentable (m/s) | 700 | **820** | 900 | baja | [1] | CMO: blancos hasta 1.600 nudos |
+| Tiempo de reacción (s) | 10 | **15** | 30 | baja | — | est |
+| Costo por disparo | US$200k | **US$300k** | US$500k | baja | — | est: misil viejo de stock reacondicionado |
+| Pk por disparo vs crucero | 0,5 | **0,7** | 0,85 | baja | [2] | analistas occidentales hablan de ~85%; est más conservadora. calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
+| Pk por disparo vs drones | 0,4 | **0,6** | 0,8 | baja | [2] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
+
+1. [Base de datos de Command: Modern Operations (DB3000 515): alcances, techos y velocidades de MIM-23, 5V28 y 5V27 (estimaciones de juego, en millas náuticas)](https://www.matrixgames.com/game/command-modern-operations)
+2. [Defence Blog: el veterano Hawk resulta eficaz contra misiles rusos (una unidad: 14 crucero y 40 Shahed)](https://defence-blog.com/vintage-hawk-system-proves-effective-against-russian-missiles/)
+
+#### Fuentes generales
+
+- [Wikipedia: MIM-23 Hawk](https://en.wikipedia.org/wiki/MIM-23_Hawk)
+- [Militarnyi: MIM-23 Hawk, un veterano al servicio de Ucrania](https://militarnyi.com/en/articles/mim-23-hawk-air-defense-veteran-in-the-service-of-the-armed-forces-of-ukraine/)
+- [Defence Blog: el veterano Hawk resulta eficaz contra misiles rusos (una unidad: 14 crucero y 40 Shahed)](https://defence-blog.com/vintage-hawk-system-proves-effective-against-russian-missiles/)
+- [Base de datos de Command: Modern Operations (DB3000 515): alcances, techos y velocidades de MIM-23, 5V28 y 5V27 (estimaciones de juego, en millas náuticas)](https://www.matrixgames.com/game/command-modern-operations)
+
+### S-125 Pechora / Newa-SC (modernizado)
+
+`s125` · Ucrania / OTAN · tipo `sam`
+
+2,5–25 km, techo 18 km · 5V27: guiado por radiocomando desde el SNR-125 (un blanco a la vez)
+
+- **Sensor:** SNR-125 "Low Blow" (+ P-18/P-19 de búsqueda), Banda X (I/J OTAN), 40 km contra 1 m², sector 360°, refresco 2 s, ECCM 3 dB
+- **Altura de antena:** 4 m por defecto, regulable 4–6 m. Cabina de radar sobre remolque; la versión polaca Newa-SC va sobre chasis MAZ-543 (≈4–6 m, estimado).
+- **Arma:** 5V27, guiado mando, 2.5–25 km (balísticos: — km), 25 m–18 km, 1 canales, 8 disparos, Pk base dron 0.45 · crucero 0.55 · supersonico 0.3 · balistico 0 · hiper 0
+
+- Sistema de los años 60, modernizado en Ucrania y en Polonia (Newa-SC, digital y sobre chasis con orugas o ruedas).
+- En su primer combate un S-125 ucraniano derribó un Kalibr; muy bueno a baja altura para su edad.
+- Un solo canal: se satura enseguida con oleadas.
+
+#### Parámetros
+
+| Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
+|---|---:|---:|---:|---|---|---|
+| Radar: detección contra 1 m² (km) | 30 | **40** | 60 | baja | [1] | CMO: SNR-125 32 nmi (59 km) instrumentado; est contra 1 m² |
+| Alcance vs aeronaves/crucero (km) | 18 | **25** | 30 | media | [2] [1] | Newa-SC con 5V27: 25 km; CMO 10–16 nmi |
+| Velocidad media del interceptor (m/s) | 500 | **600** | 900 | baja | — | est |
+| Tiempo de reacción (s) | 15 | **25** | 40 | baja | — | est |
+| Costo por disparo | US$100k | **US$150k** | US$300k | baja | — | est |
+| Pk por disparo vs crucero | 0,35 | **0,55** | 0,7 | baja | [3] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
+
+1. [Base de datos de Command: Modern Operations (DB3000 515): alcances, techos y velocidades de MIM-23, 5V28 y 5V27 (estimaciones de juego, en millas náuticas)](https://www.matrixgames.com/game/command-modern-operations)
+2. [Militarnyi: los S-125 Newa-SC polacos ya operan en Ucrania](https://militarnyi.com/en/news/polish-s-125-newa-sc-sam-are-already-operating-in-ukraine/)
+3. [Kyiv Post: Ucrania saca provecho de material soviético viejo (S-125 derriba un Kalibr)](https://www.kyivpost.com/post/35197)
+
+#### Fuentes generales
+
+- [Wikipedia: S-125 Neva/Pechora](https://en.wikipedia.org/wiki/S-125_Neva/Pechora)
+- [Militarnyi: los S-125 Newa-SC polacos ya operan en Ucrania](https://militarnyi.com/en/news/polish-s-125-newa-sc-sam-are-already-operating-in-ukraine/)
+- [Kyiv Post: Ucrania saca provecho de material soviético viejo (S-125 derriba un Kalibr)](https://www.kyivpost.com/post/35197)
+- [Base de datos de Command: Modern Operations (DB3000 515): alcances, techos y velocidades de MIM-23, 5V28 y 5V27 (estimaciones de juego, en millas náuticas)](https://www.matrixgames.com/game/command-modern-operations)
+
+### S-200V Vega (5V28)
+
+`s200` · Ucrania / OTAN · tipo `sam`
+
+17–250 km, techo ≈40 km; no baja de 300 m · 5V28: misil de 7 t con cohetes aceleradores, semiactivo (el 5N62 ilumina hasta el impacto)
+
+- **Sensor:** 5N62 "Square Pair" (iluminación; búsqueda con P-14/radar de la red), Banda C (G/H OTAN), 250 km contra 1 m², sector 120°, refresco 4 s, ECCM 3 dB
+- **Altura de antena:** 8 m, fija. Fija: antena del 5N62 sobre su base (altura estimada).
+- **Arma:** 5V28, guiado SARH, 17–250 km (balísticos: — km), 300 m–40 km, 1 canales, 6 disparos, Pk base dron 0.2 · crucero 0.25 · supersonico 0.2 · balistico 0 · hiper 0
+
+- Ucrania lo reactivó en 2022 (con aporte polaco) para cazar aviones: se le atribuyen un A-50 y un Tu-22M3 a ≈300 km. También se adaptó como misil de ataque a tierra.
+- Contra drones y misiles de crucero es un desperdicio: lento para reaccionar, un solo canal y piso de 300 m.
+- El juego todavía no tiene aviones como blanco: acá solo puede enfrentar drones altos, planeadoras y misiles.
+
+#### Parámetros
+
+| Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
+|---|---:|---:|---:|---|---|---|
+| Radar: detección contra 1 m² (km) | 150 | **250** | 400 | baja | [1] | CMO: 5N62 220 nmi (≈400 km) contra blancos grandes; est contra 1 m² |
+| Alcance vs aeronaves/crucero (km) | 150 | **250** | 300 | media | [1] [2] | 5V28 ≈250 km, 5V28M ≈300 km; derribo a ≈308 km reclamado |
+| Altura mínima de enfrentamiento (m) | 200 | **300** | 300 | media | [1] | CMO 198 m; fuentes clásicas 300 m |
+| Velocidad media del interceptor (m/s) | 900 | **1.100** | 1.300 | baja | — | est: ≈Mach 4 máx. |
+| Tiempo de reacción (s) | 40 | **60** | 120 | baja | — | est: sistema de los 60, mucha preparación |
+| Costo por disparo | US$300k | **US$600k** | US$1 M | baja | — | est |
+| Pk por disparo vs crucero | 0,1 | **0,25** | 0,4 | baja | — | est: pensado contra aviones grandes. calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
+
+1. [Base de datos de Command: Modern Operations (DB3000 515): alcances, techos y velocidades de MIM-23, 5V28 y 5V27 (estimaciones de juego, en millas náuticas)](https://www.matrixgames.com/game/command-modern-operations)
+2. [Defense Express: Polonia reconoce la entrega de S-200 a Ucrania (A-50 y Tu-22M3 derribados)](https://en.defence-ua.com/news/poland_officially_acknowledges_transfer_of_s_200_systems_to_ukraine_used_to_shoot_down_russian_a_50_tu_22m3_aircraft-19061.html)
+
+#### Fuentes generales
+
+- [Wikipedia: S-200 (missile)](https://en.wikipedia.org/wiki/S-200_(missile))
+- [The War Zone: el S-200 reactivado por Ucrania en acción](https://www.twz.com/air/our-best-look-at-ukraines-reactivated-s-200-air-defense-system-in-action)
+- [Defense Express: Polonia reconoce la entrega de S-200 a Ucrania (A-50 y Tu-22M3 derribados)](https://en.defence-ua.com/news/poland_officially_acknowledges_transfer_of_s_200_systems_to_ukraine_used_to_shoot_down_russian_a_50_tu_22m3_aircraft-19061.html)
+- [Base de datos de Command: Modern Operations (DB3000 515): alcances, techos y velocidades de MIM-23, 5V28 y 5V27 (estimaciones de juego, en millas náuticas)](https://www.matrixgames.com/game/command-modern-operations)
 
 ### Pantsir-S1
 

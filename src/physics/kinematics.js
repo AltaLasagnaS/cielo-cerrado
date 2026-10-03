@@ -10,6 +10,8 @@
 //   ballistic parábola con apogeo T.apogee (km), lanzado desde fuera del mapa
 //   highdive  crucero alto (T.cruiseAlt) y picada final en los últimos T.diveDist km
 //   hilo      crucero alto, transición entre 60 y 40 km del blanco y tramo final rasante
+//   glide     bomba planeadora: se suelta fuera del mapa a T.cruiseAlt y baja sin motor hasta el blanco,
+//             primero suave y al final más empinada: z = suelo + (cruiseAlt − suelo)·(rem/L)^0,7
 import { THREATS } from '../data/index.js';
 import { clamp } from '../util/math.js';
 import { nextId } from '../util/ids.js';
@@ -17,7 +19,7 @@ import { rnd } from '../util/rng.js';
 import { surf } from './terrain.js';
 
 /** Perfiles que se lanzan desde fuera del mapa: la ruta es solo dirección + blanco. */
-export const OFFMAP_PROFILES = ['ballistic', 'highdive', 'hilo'];
+export const OFFMAP_PROFILES = ['ballistic', 'highdive', 'hilo', 'glide'];
 export const isOffmap = T => OFFMAP_PROFILES.includes(T.prof);
 
 /**
@@ -83,6 +85,7 @@ export function posAt(th, Tm) {
     case 'bunt': { const base = ahead([0, 0.4, 0.8, 1.5]) + th.agl; if (rem > 8) z = base; else if (rem > 3) z = base + (8 - rem) / 5 * 1500; else z = th.gT + (base + 1500 - th.gT) * rem / 3; break; }
     case 'ballistic': { const f = s / L; z = 4 * T.apogee * 1000 * f * (1 - f) + th.gT * f; break; }
     case 'highdive': { const dd = Math.min(T.diveDist, L); z = rem > dd ? T.cruiseAlt : th.gT + (T.cruiseAlt - th.gT) * rem / dd; break; }
+    case 'glide': { z = th.gT + (T.cruiseAlt - th.gT) * Math.pow(rem / L, 0.7); break; }
     case 'hilo': { const low = ahead([0, 0.5, 1]) + th.agl; z = rem > 60 ? T.cruiseAlt : rem > 40 ? low + (T.cruiseAlt - low) * (rem - 40) / 20 : low; break; }
   }
   return { x, y, z, s, rem };
