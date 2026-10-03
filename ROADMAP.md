@@ -22,7 +22,7 @@ Propuesta detallada, con orden, dificultad, datos y pruebas: [docs/investigacion
 - Recarga de munición con tiempos y depósitos como objetivos.
 - Interceptor con perfil de energía y límite de g en lugar de velocidad media.
 - Daño funcional: un radar dañado pierde alcance, una base dañada no lanza.
-- Clima por **estados** (despejado, nublado, lluvia, tormenta, niebla, nieve): atenuación por lluvia según la banda (ITU-R P.838), restricciones ópticas e IR, estado del mar y viento.
+- Clima, segunda parte (los estados base ya están): día y noche para los sensores IR, nieve, clutter de lluvia, viento sobre los drones y clima que cambia durante la noche.
 - Integración de la defensa aérea, segunda parte: error de posición de las pistas de red, reparto "mejor tirador" en el nivel integrado e interrupción de comunicaciones (los cuatro niveles ya están).
 - **Enlaces de datos por sistema** (Link 16, red nacional ucraniana, red rusa tipo Polyana) con pasarelas: solo comparten pistas los sistemas compatibles.
 

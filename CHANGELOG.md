@@ -6,6 +6,9 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 
 ## [Sin publicar]
 
+### Agregado
+- **Clima** (pestaña Defensa → "Clima"), fijo durante todo el escenario: despejado, nublado con techo bajo, lluvia moderada, tormenta o niebla. La lluvia atenúa los radares según su banda con la fórmula oficial ITU-R P.838-3 (S y L casi no la notan; X y Ku pierden alcance, sobre todo en tormenta). Los sensores ópticos e infrarrojos (grupos móviles, MANPADS) pierden alcance con lluvia o niebla y no ven nada por encima del techo de nubes; la red acústica oye menos con lluvia. La cobertura del mapa refleja el clima. Se guarda en los archivos de escenario (`rules.weather`). Concepto nuevo en la Academia. Los escenarios incluidos siguen despejados: las golden no cambian.
+
 ### Corregido
 - Durante una partida, los botones **Ficha**, **Briefing** y **Ver debrief** a veces no respondían: los paneles se redibujan varias veces por segundo y el botón se reemplazaba entre que se apretaba y se soltaba. Ahora el panel no se redibuja mientras el puntero está sobre uno de sus botones.
 

@@ -1644,6 +1644,7 @@ table.t.mc td.pc{white-space:nowrap}
   var BANDS = {
     VHF: {
       name: "VHF (banda métrica)",
+      ghz: 0.17,
       bw: 6,
       note: 'Longitud de onda ~1–2 m: el "stealth" por forma pierde efecto (resonancia), pero precisión pobre: sirve para alerta, no para guiar misiles.',
       freq: "30–300 MHz (radares de alerta: ~150–200 MHz)",
@@ -1658,6 +1659,7 @@ table.t.mc td.pc{white-space:nowrap}
     },
     L: {
       name: "Banda L",
+      ghz: 1.3,
       bw: 3,
       note: "Alerta temprana de largo alcance.",
       freq: "1–2 GHz",
@@ -1672,6 +1674,7 @@ table.t.mc td.pc{white-space:nowrap}
     },
     S: {
       name: "Banda S (E/F OTAN)",
+      ghz: 3,
       bw: 2,
       note: "Buen compromiso alcance/clima; típica en radares de vigilancia 3D y AEW.",
       freq: "2–4 GHz",
@@ -1684,6 +1687,7 @@ table.t.mc td.pc{white-space:nowrap}
     },
     C: {
       name: "Banda C (G/H OTAN)",
+      ghz: 5.5,
       bw: 1.5,
       note: "Radares multifunción de defensa aérea (Patriot, TRML-4D del IRIS-T).",
       freq: "4–8 GHz",
@@ -1696,6 +1700,7 @@ table.t.mc td.pc{white-space:nowrap}
     },
     X: {
       name: "Banda X (I/J OTAN)",
+      ghz: 9.5,
       bw: 1,
       note: "Control de tiro: buena resolución, menos alcance y más afectada por lluvia.",
       freq: "8–12 GHz",
@@ -1708,6 +1713,7 @@ table.t.mc td.pc{white-space:nowrap}
     },
     Ku: {
       name: "Banda Ku/Ka",
+      ghz: 15,
       bw: 0.8,
       note: "Seguimiento de alta precisión a corto alcance, buscadores de misiles.",
       freq: "12–18 GHz (Ku) y 27–40 GHz (Ka)",
@@ -1862,8 +1868,8 @@ table.t.mc td.pc{white-space:nowrap}
         defensa: "Defensa por capas: radar 3D y VHF de alerta, Patriot (sector orientado al noroeste), IRIS-T, NASAMS, dos Gepard, grupos móviles, red acústica y drones interceptores. Red de mando integrada.",
         ataque: "20 Shahed, 8 Gerbera, 4 Kh-101, 3 Kalibr y 2 Iskander-M. Un avión de interferencia stand-off acompaña desde el noroeste."
       },
-      conditions: "Noche despejada. El motor no modela clima ni luz: la noche solo explica por qué los grupos móviles dependen de la alerta acústica.",
-      rules: { c2: "coordinada", doctrine: "salva" },
+      conditions: "Noche despejada (clima: despejado). El motor no modela la luz: la noche solo explica por qué los grupos móviles dependen de la alerta acústica. Probá cambiar el clima en la pestaña Defensa.",
+      rules: { c2: "coordinada", doctrine: "salva", weather: "despejado" },
       rulesText: ["Red integrada activa y doctrina de salva.", "No hay recarga: cada unidad cuenta solo con la munición inicial.", "Los Kh-101, Kalibr e Iskander están sincronizados para llegar casi juntos (T+24:40 a T+25:30)."],
       objectives: [
         { type: "fuel", name: "Depósito de combustible Salinas", short: "Combustible Salinas", x: 63.5, y: 55.8, desc: "Abastece a la región: es el blanco principal del ataque." },
@@ -1918,8 +1924,8 @@ table.t.mc td.pc{white-space:nowrap}
         defensa: "S-400 (sector hacia el sudoeste), dos Pantsir, Tor-M2, Buk-M1 y un radar VHF de alerta.",
         ataque: "6 Storm Shadow, 16 Liutyi, 2 Neptune y 4 ATACMS lanzados desde 220 km, todo sincronizado para llegar en menos de un minuto."
       },
-      conditions: "Despejado. El motor no modela clima ni luz.",
-      rules: { c2: "coordinada", doctrine: "salva" },
+      conditions: "Despejado. El motor no modela la luz. Probá cambiar el clima en la pestaña Defensa.",
+      rules: { c2: "coordinada", doctrine: "salva", weather: "despejado" },
       rulesText: ["Red integrada activa y doctrina de salva para la defensa rusa.", "El supresor GNSS desvía a las armas que dependen del satélite (los ATACMS y los Liutyi son los más sensibles).", "Llegada sincronizada entre T+24:00 y T+24:50 para saturar canales de tiro."],
       objectives: [
         { type: "ammo", name: "Depósito de munición", short: "Depósito munición", x: 57.8, y: 32.5, desc: "Arsenal de la base: blanco principal." },
@@ -1962,8 +1968,8 @@ table.t.mc td.pc{white-space:nowrap}
         defensa: "Defensa por capas con material sueco y donado: radar 3D sobre las colinas de Hisingen, un avión Saab AEW patrullando sobre el mar, Patriot (sector hacia el oeste), IRIS-T, NASAMS, dos puestos RBS 70 (MANPADS), dos grupos móviles, red acústica y drones interceptores. Red de mando integrada.",
         ataque: "16 Shahed, 8 Gerbera, 6 Geran-3 (a reacción), 6 Kalibr, 2 Kh-101 y 2 Kinzhal, con un avión de interferencia stand-off sobre el Kattegat."
       },
-      conditions: "Noche despejada sobre el mar. El motor no modela clima ni luz: la noche solo explica por qué los grupos móviles dependen de la alerta acústica y del radar.",
-      rules: { c2: "coordinada", doctrine: "salva" },
+      conditions: "Noche despejada sobre el mar (clima: despejado). El motor no modela la luz: la noche solo explica por qué los grupos móviles dependen de la alerta acústica y del radar.",
+      rules: { c2: "coordinada", doctrine: "salva", weather: "despejado" },
       rulesText: ["Red integrada activa y doctrina de salva.", "No hay recarga: cada unidad cuenta solo con la munición inicial.", "Los Kalibr y los Kh-101 llegan casi juntos (T+25:00 a T+25:10); los Kinzhal, medio minuto después.", "El Patriot mira al oeste: lo que entra por el norte lo tienen que resolver el IRIS-T y la defensa de punto."],
       objectives: [
         { type: "fuel", name: "Refinería de Hisingen", short: "Refinería", x: 51.1, y: 34.4, hp: 1600, desc: "Torres de destilación, tanques y cañerías sobre la costa norte del Göta älv. Blanco principal." },
@@ -2016,8 +2022,8 @@ table.t.mc td.pc{white-space:nowrap}
         defensa: "S-400 sobre las lomas del este (sector hacia el sudoeste), dos Pantsir y un Tor junto a los puentes, un Buk-M1, radar 3D y radar VHF de alerta. Red integrada.",
         ataque: "9 Storm Shadow y 2 Flamingo contra el puente carretero, 4 ATACMS contra el puente ferroviario, 2 Neptune contra el S-400 y 30 drones Liutyi contra la central eléctrica, que llegan un par de minutos antes para gastar la munición de la defensa de punto."
       },
-      conditions: "Despejado. El motor no modela clima ni luz.",
-      rules: { c2: "coordinada", doctrine: "salva" },
+      conditions: "Despejado. El motor no modela la luz. Probá cambiar el clima en la pestaña Defensa.",
+      rules: { c2: "coordinada", doctrine: "salva", weather: "despejado" },
       rulesText: ["Red integrada activa y doctrina de salva para la defensa rusa.", 'Un puente es un blanco duro y angosto: hace falta acertar varias ojivas grandes (la huella de "Infraestructura" es de 60 m).', "Sin guerra electrónica al empezar. Probá agregar un supresor GNSS Pole-21 junto al puente (pestaña EW) y repetir con Monte Carlo: con un desvío de 100–500 m casi ninguna ojiva acierta un blanco tan angosto.", "Los Liutyi llegan entre T+21:00 y T+23:00; los misiles, sincronizados entre T+24:40 y T+25:10."],
       objectives: [
         { type: "infra", name: "Puente de la autopista 1", short: "Puente Hwy 1", x: 51.8, y: 40.9, hp: 1200, desc: "Puente carretero sobre la boca del estero Elkhorn. Blanco principal." },
@@ -2062,8 +2068,8 @@ table.t.mc td.pc{white-space:nowrap}
         defensa: "Defensa por capas de la capital: radar 3D y radar VHF de alerta, Patriot (sector hacia el noreste), NASAMS, IRIS-T, dos Gepard junto a las centrales, tres grupos móviles, red acústica, drones interceptores y la red anti-GNSS Pokrova sobre la ciudad. Red de mando integrada.",
         ataque: "28 Shahed en dos oleadas, 10 Gerbera, 8 Kh-101, 6 Kalibr, 3 Iskander-M con señuelos y 2 Kinzhal."
       },
-      conditions: "Noche de invierno. El motor no modela clima ni luz: la noche solo explica por qué los grupos móviles dependen de la alerta acústica y del radar.",
-      rules: { c2: "coordinada", doctrine: "salva" },
+      conditions: "Noche de invierno, despejada. El motor no modela la luz: la noche solo explica por qué los grupos móviles dependen de la alerta acústica y del radar. Probá un techo de nubes bajo (pestaña Defensa): los grupos móviles dejan de ver a los Shahed que vuelan arriba.",
+      rules: { c2: "coordinada", doctrine: "salva", weather: "despejado" },
       rulesText: ["Red integrada activa y doctrina de salva.", "No hay recarga: cada unidad cuenta solo con la munición inicial.", "Los misiles de crucero y los balísticos llegan casi juntos (T+24:50 a T+25:30), después de una hora de drones.", "Pokrova engaña al GNSS de los Shahed y los Gerbera sobre la ciudad. Los Kh-101 y Kalibr la descartan con su corrección de terreno, y los misiles con buscador terminal corrigen al final: apagala (pestaña EW) y compará con Monte Carlo."],
       objectives: [
         { type: "infra", name: "Central CHP-5", short: "CHP-5", x: 40.3, y: 67.4, hp: 1500, desc: "Central de cogeneración de ~700 MW: luz y calefacción para buena parte de la margen derecha y de Darnytsia." },
@@ -2151,6 +2157,56 @@ table.t.mc td.pc{white-space:nowrap}
     }
   };
   var c2FromNet = (net) => net ? "coordinada" : "desconectada";
+
+  // src/data/weather.js
+  var WEATHER = {
+    despejado: {
+      name: "Despejado",
+      rain: 0,
+      rainKm: 0,
+      opt: 1,
+      ceiling: null,
+      acu: 1,
+      desc: "Sin efectos: todos los sensores rinden su alcance nominal."
+    },
+    nubes: {
+      name: "Nublado, techo bajo (≈600 m)",
+      rain: 0,
+      rainKm: 0,
+      opt: 1,
+      ceiling: 600,
+      acu: 1,
+      desc: "Capa de nubes a unos 600 m: los grupos móviles y los MANPADS no ven nada que vuele por encima, aunque lo escuchen. Los radares no se enteran."
+    },
+    lluvia: {
+      name: "Lluvia moderada (4 mm/h)",
+      rain: 4,
+      rainKm: 30,
+      opt: 0.3,
+      ceiling: 1e3,
+      acu: 0.7,
+      desc: "Lo visual y el infrarrojo caen a un tercio y las nubes tapan arriba de 1.000 m. La lluvia atenúa un poco los radares en X y Ku; S y L casi no la notan. La red acústica oye menos."
+    },
+    tormenta: {
+      name: "Tormenta (25 mm/h)",
+      rain: 25,
+      rainKm: 15,
+      opt: 0.1,
+      ceiling: 800,
+      acu: 0.4,
+      desc: "Lluvia fuerte en celdas de unos 15 km: los radares de banda X y Ku pierden bastante alcance, la óptica casi no sirve y la red acústica oye poco."
+    },
+    niebla: {
+      name: "Niebla",
+      rain: 0,
+      rainKm: 0,
+      opt: 0.1,
+      ceiling: 200,
+      acu: 1,
+      desc: "Visibilidad de unos cientos de metros: los sensores ópticos casi no sirven y no ven nada por encima de 200 m. Los radares no se enteran (la niebla casi no atenúa microondas) y el sonido viaja bien."
+    }
+  };
+  var WEATHER_DEFAULT = "despejado";
 
   // src/data/targets.js
   var TARGET_TYPES = {
@@ -2398,9 +2454,10 @@ table.t.mc td.pc{white-space:nowrap}
     setup: { objs: [], defs: [], salvos: [], jams: [] },
     // escenario cargado (data/scenarios.js) o null si es un relieve importado
     scen: null,
-    // opciones de mando (c2 = nivel de integración, ver data/c2.js) y de visualización
+    // opciones de mando (c2 = nivel de integración, ver data/c2.js), clima (data/weather.js) y de visualización
     c2: "coordinada",
     doctrine: "salva",
+    weather: "despejado",
     showCov: true,
     covRef: "kh101",
     covAgl: 50,
@@ -2515,6 +2572,30 @@ table.t.mc td.pc{white-space:nowrap}
     return Math.hypot(px - ax - dx * t, py - ay - dy * t);
   }
 
+  // src/physics/weather.js
+  var KH = { a: [-5.3398, -0.35351, -0.23789, -0.94158], b: [-0.10008, 1.2697, 0.86036, 0.64552], c: [1.13098, 0.454, 0.15354, 0.16817], m: -0.18961, k: 0.71147 };
+  var AH = { a: [-0.14318, 0.29591, 0.32177, -5.3761, 16.1721], b: [1.82442, 0.77564, 0.63773, -0.9623, -3.2998], c: [-0.55187, 0.19822, 0.13164, 1.47828, 3.4399], m: 0.67849, k: -1.95537 };
+  var gauss = (lf, T) => T.a.reduce((s, a, j) => s + a * Math.exp(-(((lf - T.b[j]) / T.c[j]) ** 2)), 0);
+  function rainCoef(f) {
+    const lf = Math.log10(f);
+    return [Math.pow(10, gauss(lf, KH) + KH.m * lf + KH.k), gauss(lf, AH) + AH.m * lf + AH.k];
+  }
+  function rainGamma(band, R) {
+    const f = BANDS[band]?.ghz;
+    if (!R || !f || f < 1) return 0;
+    const [k, a] = rainCoef(f);
+    return k * Math.pow(R, a);
+  }
+  function rainRange(R0, gamma, L) {
+    if (!(gamma > 0) || !(L > 0) || !(R0 > 0)) return R0;
+    const Rf = R0 * Math.pow(10, -gamma * L / 20);
+    if (Rf >= L) return Rf;
+    const c = gamma * Math.LN10 / 20, l0 = Math.log(R0);
+    let R = Math.min(R0, L);
+    for (let i = 0; i < 8; i++) R -= (Math.log(R) + c * R - l0) / (1 / R + c);
+    return R;
+  }
+
   // src/physics/radar.js
   function rcsAt(th, band, ca = 1) {
     return rcsFront(th, band) * aspectFactor(th, band, ca);
@@ -2583,11 +2664,14 @@ table.t.mc td.pc{white-space:nowrap}
     }
     return J * Math.pow(10, -(r.eccm || 0) / 10);
   }
-  function detR(u, th, J, ca = 1) {
+  function detR(u, th, J, ca = 1, wx = null) {
     const r = D(u).radar;
-    if (r.band === "ACU" || r.band === "OPT") return r.R1;
-    return r.R1 * Math.pow(rcsAt(th.T || th, r.band, ca), 0.25) * Math.pow(1 / (1 + J), 0.25);
+    if (r.band === "ACU") return r.R1 * (wx ? wx.acu : 1);
+    if (r.band === "OPT") return r.R1 * (wx ? wx.opt : 1);
+    const R = r.R1 * Math.pow(rcsAt(th.T || th, r.band, ca), 0.25) * Math.pow(1 / (1 + J), 0.25);
+    return wx && wx.rain ? rainRange(R, rainGamma(r.band, wx.rain), wx.rainKm) : R;
   }
+  var belowCeiling = (r, wx, agl) => !(r.band === "OPT" && wx && wx.ceiling != null && agl > wx.ceiling);
   function horizon(hr, ht) {
     return HORIZON_K * (Math.sqrt(Math.max(0, hr)) + Math.sqrt(Math.max(0, ht)));
   }
@@ -2952,22 +3036,22 @@ table.t.mc td.pc{white-space:nowrap}
       if (!d.radar) continue;
       if (t < u.nextScan) continue;
       u.nextScan = t + d.radar.scan;
-      const r = d.radar, uz = antZ(u);
+      const r = d.radar, uz = antZ(u), wx = WEATHER[S.weather];
       for (const th of S.threats) {
         if (!th.alive || !th.p) continue;
         const p = th.p;
         const dx = p.x - u.x, dy = p.y - u.y, dh = Math.hypot(dx, dy);
         let ok = false;
         if (r.band === "ACU") {
-          ok = th.cls === "dron" && dh <= r.R1 && p.z - surf(p.x, p.y) <= (r.altMax || 3e3);
+          ok = th.cls === "dron" && dh <= detR(u, th, 0, 1, wx) && p.z - surf(p.x, p.y) <= (r.altMax || 3e3);
         } else {
           const az = azOf(dx, dy);
           if (!inSector(u, az)) continue;
           const rr = Math.hypot(dh, (p.z - uz) / 1e3);
           const ca = aspectCos(th, u.x, u.y, uz);
-          if (rr > detR(u, th, 0, ca)) continue;
+          if (rr > detR(u, th, 0, ca, wx) || !belowCeiling(r, wx, p.z - surf(p.x, p.y))) continue;
           const J = jamJ(u, az, S.jamsLive);
-          const R = detR(u, th, J, ca);
+          const R = detR(u, th, J, ca, wx);
           if (rr > R) continue;
           const pd = rr < 0.8 * R ? 0.95 : 0.95 - (rr - 0.8 * R) / (0.2 * R) * 0.65;
           if (rnd() > pd) continue;
@@ -3219,6 +3303,7 @@ table.t.mc td.pc{white-space:nowrap}
       else if (sc2.rules.net !== void 0) S.c2 = c2FromNet(sc2.rules.net);
       if (sc2.rules.doctrine) S.doctrine = sc2.rules.doctrine;
     }
+    S.weather = WEATHER[sc2.rules?.weather] ? sc2.rules.weather : WEATHER_DEFAULT;
     S.scen = sc2;
   }
 
@@ -4080,7 +4165,7 @@ table.t.mc td.pc{white-space:nowrap}
   var toW = (sx, sy) => [(sx - cv.width / dpr / 2) / V.s + V.cx, (sy - cv.height / dpr / 2) / V.s + V.cy];
 
   // src/physics/coverage.js
-  function coverageGrid(units, jams, ref, agl) {
+  function coverageGrid(units, jams, ref, agl, wx = null) {
     const W = MAP.W, H = MAP.H, c = MAP.cellKm, data = MAP.data;
     const cov = new Uint8Array(W * H), stamp = new Int32Array(W * H).fill(-1);
     let ri = 0;
@@ -4090,7 +4175,7 @@ table.t.mc td.pc{white-space:nowrap}
       ri++;
       if (r.band === "ACU") {
         if (ref.cls !== "dron" || agl > (r.altMax || 3e3)) continue;
-        const R = r.R1, i0 = Math.max(0, (u.y - R) / c | 0), i1 = Math.min(H - 1, (u.y + R) / c | 0), j0 = Math.max(0, (u.x - R) / c | 0), j1 = Math.min(W - 1, (u.x + R) / c | 0);
+        const R = detR(u, ref, 0, 1, wx), i0 = Math.max(0, (u.y - R) / c | 0), i1 = Math.min(H - 1, (u.y + R) / c | 0), j0 = Math.max(0, (u.x - R) / c | 0), j1 = Math.min(W - 1, (u.x + R) / c | 0);
         for (let i = i0; i <= i1; i++) for (let j = j0; j <= j1; j++) {
           const k = i * W + j;
           if (stamp[k] !== ri && Math.hypot((j + 0.5) * c - u.x, (i + 0.5) * c - u.y) <= R) {
@@ -4101,13 +4186,14 @@ table.t.mc td.pc{white-space:nowrap}
         continue;
       }
       const hr = antZ(u), st = c * 0.6;
-      const Rmax = r.band === "OPT" ? r.R1 : detR(u, ref, 0);
+      if (!belowCeiling(r, wx, agl)) continue;
+      const Rmax = detR(u, ref, 0, 1, wx);
       const N = clamp(Math.ceil(2 * Math.PI * Math.min(Rmax, MAP.wKm + MAP.hKm) / (c * 0.7)), 360, 6e3);
       for (let a = 0; a < N; a++) {
         const az = a * 360 / N;
         if (!inSector(u, az)) continue;
         const J = jamJ(u, az, jams);
-        const R = r.band === "OPT" ? r.R1 : detR(u, ref, J);
+        const R = detR(u, ref, J, 1, wx);
         const dx = Math.sin(az * Math.PI / 180), dy = -Math.cos(az * Math.PI / 180);
         let tmin = 0, tmax = R;
         for (const [o, dd, lo, hi] of [[u.x, dx, 0, MAP.wKm], [u.y, dy, 0, MAP.hKm]]) {
@@ -4445,6 +4531,15 @@ table.t.mc td.pc{white-space:nowrap}
       engine: () => `<p>El nivel se elige en la pestaña Defensa (${code("S.c2")}) y lo usan ${code("trackOK()")} y ${code("reactionStart()")}:</p>
       <div class="tblwrap"><table class="t"><thead><tr><th>Nivel</th><th>Demora de la red</th><th>Tira con pista ajena</th><th>Reparto de blancos</th></tr></thead><tbody>${Object.values(C2_LEVELS).map((L) => `<tr><td>${esc(L.name)}</td><td>${L.share === "none" ? "—" : L.lag + " s"}</td><td>${{ none: "no", cue: "no (solo alerta)", track: "activos/IR e interceptores", fire: "también guiados por radar" }[L.share]}</td><td>${L.deconf ? "sí" : "no"}</td></tr>`).join("")}</tbody></table></div>
       <p>"Coordinada" y "desconectada" son el viejo interruptor "red integrada" encendido y apagado. Las demoras son estimaciones de juego. Todavía no se modelan el error de posición de las pistas de red ni los enlaces por sistema (Link 16 vs. red nacional): ver ROADMAP.</p>`
+    },
+    {
+      id: "clima",
+      group: "Radar y bandas",
+      title: "Clima: lluvia, nubes y niebla",
+      body: () => `<p>El tiempo no afecta igual a todos los sensores. La <b>lluvia</b> absorbe y dispersa las microondas, tanto más cuanto más alta es la frecuencia: un radar en banda S o L casi no la nota, uno en X la siente y uno en Ku pierde mucho alcance en una tormenta. Por eso los radares de alerta usan bandas bajas y los de guiado (X, Ku) sufren más.</p><p>Los sensores <b>ópticos e infrarrojos</b> (los grupos móviles con ametralladoras y cámaras térmicas, los MANPADS) son los más castigados: la lluvia o la niebla les achican el alcance a una fracción y las <b>nubes</b> les tapan todo lo que vuela por encima, aunque se escuche el motor. La red <b>acústica</b> oye menos con lluvia y viento.</p>`,
+      engine: () => `<p>El clima se elige en la pestaña Defensa (${code("S.weather")}) y queda fijo todo el escenario. La atenuación del radar sale de la Rec. ITU-R P.838-3: ${code("γ = k · R^α")} dB/km, con k y α según la frecuencia de cada banda (${code("BANDS[b].ghz")}), sobre un camino de lluvia de hasta ${code("rainKm")}. El alcance resuelve ${code("R = R0 · 10^(−γ·min(R, L)/20)")}. Con lluvia de 4 mm/h, γ por banda: ${["S", "C", "X", "Ku"].map((b) => b + " " + rainGamma(b, 4).toFixed(3)).join(" · ")} dB/km.</p>
+      <div class="tblwrap"><table class="t"><thead><tr><th>Clima</th><th>Lluvia</th><th>Óptico/IR</th><th>Techo para ópticos</th><th>Acústico</th></tr></thead><tbody>${Object.values(WEATHER).map((W) => `<tr><td>${esc(W.name)}</td><td>${W.rain ? W.rain + " mm/h en " + W.rainKm + " km" : "—"}</td><td>×${W.opt}</td><td>${W.ceiling != null ? W.ceiling + " m" : "—"}</td><td>×${W.acu}</td></tr>`).join("")}</tbody></table></div>
+      <p>Los factores ópticos y acústicos son estimaciones de juego (el manual de CMO dice que la lluvia deja lo visual en 1–5% y degrada mucho el IR). No se modelan el día y la noche, el viento sobre los drones, ni el clutter de lluvia.</p>`
     },
     {
       id: "saturation",
@@ -5642,6 +5737,10 @@ table.t.mc td.pc{white-space:nowrap}
       <p class="hint" id="c2Info">${esc(C2_LEVELS[S.c2].desc)}</p>
       <div class="field"><label for="optDoc">Doctrina de tiro</label><select id="optDoc" class="sel"><option value="salva" ${S.doctrine === "salva" ? "selected" : ""}>Salva (según unidad)</option><option value="sls" ${S.doctrine === "sls" ? "selected" : ""}>Disparar-observar-disparar</option></select></div>
     </div>
+    <div class="grp"><h3>Clima ${infoBtn("clima")}</h3>
+      <div class="field"><label for="optWx">Tiempo</label><select id="optWx" class="sel">${Object.entries(WEATHER).map(([k, W]) => `<option value="${k}" ${S.weather === k ? "selected" : ""}>${esc(W.name)}</option>`).join("")}</select></div>
+      <p class="hint" id="wxInfo">${esc(WEATHER[S.weather].desc)}</p>
+    </div>
     <div class="grp"><h3>Cobertura de radar ${infoBtn("horizon")} ${infoBtn("los")}</h3>
       <label class="check"><input type="checkbox" id="optCov" ${S.showCov ? "checked" : ""}> Mostrar cobertura sobre el mapa</label>
       <div class="field"><label for="optRef">Contra</label><select id="optRef" class="sel">${Object.entries(THREATS).map(([k, t]) => `<option value="${k}" ${k === S.covRef ? "selected" : ""}>${esc(t.short)} (RCS ${t.rcs} m²)</option>`).join("")}</select></div>
@@ -5675,6 +5774,16 @@ table.t.mc td.pc{white-space:nowrap}
     };
     $("#optDoc").onchange = (e) => {
       S.doctrine = e.target.value;
+    };
+    $("#optWx").onchange = (e) => {
+      if (S.started) {
+        toast("Reiniciá para cambiar el clima.");
+        e.target.value = S.weather;
+        return;
+      }
+      S.weather = e.target.value;
+      $("#wxInfo").textContent = WEATHER[S.weather].desc;
+      schedCov();
     };
     $("#optCov").onchange = (e) => {
       S.showCov = e.target.checked;
@@ -5712,7 +5821,7 @@ table.t.mc td.pc{white-space:nowrap}
     if (!MAP) return;
     const units = S.started ? S.units.filter((u) => u.alive) : S.setup.defs;
     const jams = S.started ? S.jamsLive : S.setup.jams;
-    const cov = coverageGrid(units, jams, THREATS[S.covRef], S.covAgl);
+    const cov = coverageGrid(units, jams, THREATS[S.covRef], S.covAgl, WEATHER[S.weather]);
     paintCoverage(cov, MAP.W, MAP.H);
     S._cov = cov;
     S.covStat = { pct: Math.round(100 * cov.reduce((a, v) => a + (v > 0), 0) / (MAP.W * MAP.H)) };
@@ -6040,7 +6149,7 @@ table.t.mc td.pc{white-space:nowrap}
       version: VERSION,
       saved: now.toISOString(),
       map: mapRef(),
-      rules: { c2: S.c2, doctrine: S.doctrine },
+      rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather },
       scenario: S.scen ? { base: baseKey(S.scen), ...pick(S.scen, META_KEYS) } : null,
       setup: {
         objs: s.objs.map((g) => pick(g, OBJ_KEYS)),
@@ -6223,7 +6332,8 @@ table.t.mc td.pc{white-space:nowrap}
     });
     const r = raw.rules || {};
     const net = bool("rules.net", r.net);
-    const rules = { c2: r.c2 ?? (net === void 0 ? void 0 : c2FromNet(net)), doctrine: r.doctrine };
+    const rules = { c2: r.c2 ?? (net === void 0 ? void 0 : c2FromNet(net)), doctrine: r.doctrine, weather: r.weather };
+    if (r.weather !== void 0 && !WEATHER[r.weather]) err(`rules.weather: "${String(r.weather)}" no es un clima válido (${Object.keys(WEATHER).join(", ")}).`);
     if (r.c2 !== void 0 && !C2_LEVELS[r.c2]) err(`rules.c2: "${String(r.c2)}" no es un nivel de mando y control válido (${Object.keys(C2_LEVELS).join(", ")}).`);
     if (r.doctrine !== void 0 && !DOCTRINES.includes(r.doctrine)) err(`rules.doctrine: "${String(r.doctrine)}" no es ${DOCTRINES.join(" ni ")}.`);
     let scenario = null;
@@ -6289,6 +6399,7 @@ table.t.mc td.pc{white-space:nowrap}
       if (j.on !== void 0) jj.on = j.on;
     }
     if (data.rules.c2) S.c2 = data.rules.c2;
+    S.weather = data.rules.weather || "despejado";
     if (data.rules.doctrine) S.doctrine = data.rules.doctrine;
     S.scen = data.scenario ? {
       ...data.scenario,

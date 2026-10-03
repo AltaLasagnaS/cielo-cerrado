@@ -21,6 +21,7 @@ export { U, PL, RCS_NOTE, VHF_NOTE, PK_NOTE, UNC } from './uncertainty.js';
 export { CAL } from './calibration.js';
 export { SCENARIOS } from './scenarios.js';
 export { C2_LEVELS, C2_DEFAULT, c2FromNet } from './c2.js';
+export { WEATHER, WEATHER_DEFAULT } from './weather.js';
 export { TARGET_TYPES, TARGET_STATUS, DAMAGED_AT, DAMAGE } from './targets.js';
 export { TERRAIN } from './terrain/index.js';
 
