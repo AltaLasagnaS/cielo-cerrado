@@ -24,7 +24,7 @@ Son ideas ordenadas por prioridad, no promesas. Cada ítem que cambie resultados
 
 ## Juego
 
-- Más escenarios: Kyiv (relieve SRTM), defensa de una refinería, ataque a un puente, corredor del mar Negro.
+- Más escenarios: Kyiv (relieve SRTM), corredor del mar Negro.
 - Plataformas aéreas propias: patrullas de cazas como interceptores con radio de acción.
 - Niebla de guerra más estricta: jugar solo con lo que ven tus sensores.
 - Editor de objetivos y metas desde la interfaz.

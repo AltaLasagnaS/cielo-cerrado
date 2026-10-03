@@ -1849,6 +1849,106 @@ table.t.mc td.pc{white-space:nowrap}
       success: "Ataque: el depósito de munición queda destruido.",
       failure: "Ataque: el depósito sigue en pie al terminar la oleada."
     },
+    gb_refineria: {
+      map: "goteborg",
+      name: "Gotemburgo · defensa de la refinería de Hisingen",
+      player: "defensa",
+      time: "03:10 hora local · noche",
+      description: "Ejercicio hipotético: una oleada al estilo de las campañas rusas contra la energía ucraniana cae sobre la refinería de la isla de Hisingen, en la desembocadura del Göta älv. Los drones Shahed y los señuelos Gerbera llegan desde el mar para gastar munición; detrás vienen misiles de crucero Kalibr rasantes sobre el agua, Kh-101 desde el norte y dos Kinzhal contra el puerto. La refinería es lo único que importa: sin ella no hay combustible para la región.",
+      forces: {
+        defensa: "Defensa por capas con material sueco y donado: radar 3D sobre las colinas de Hisingen, un avión Saab AEW patrullando sobre el mar, Patriot (sector hacia el oeste), IRIS-T, NASAMS, dos puestos RBS 70 (MANPADS), dos grupos móviles, red acústica y drones interceptores. Red de mando integrada.",
+        ataque: "16 Shahed, 8 Gerbera, 6 Geran-3 (a reacción), 6 Kalibr, 3 Kh-101 y 2 Kinzhal, con un avión de interferencia stand-off sobre el Kattegat."
+      },
+      conditions: "Noche despejada sobre el mar. El motor no modela clima ni luz: la noche solo explica por qué los grupos móviles dependen de la alerta acústica y del radar.",
+      rules: { net: true, doctrine: "salva" },
+      rulesText: ["Red integrada activa y doctrina de salva.", "No hay recarga: cada unidad cuenta solo con la munición inicial.", "Los Kalibr y los Kh-101 llegan casi juntos (T+25:00 a T+25:10); los Kinzhal, medio minuto después.", "El Patriot mira al oeste: lo que entra por el norte lo tienen que resolver el IRIS-T y la defensa de punto."],
+      objectives: [
+        { type: "fuel", name: "Refinería de Hisingen", short: "Refinería", x: 51.1, y: 34.4, hp: 1600, desc: "Torres de destilación, tanques y cañerías sobre la costa norte del Göta älv. Blanco principal." },
+        { type: "fuel", name: "Terminal petrolera de Skarvik", short: "Terminal Skarvik", x: 54.1, y: 34, desc: "Tanques de almacenamiento y muelles de carga de combustible." },
+        { type: "infra", name: "Puerto de Gotemburgo", short: "Puerto", x: 55.6, y: 33.9, desc: "Terminales de contenedores: blanco de los Kinzhal." }
+      ],
+      defs: [
+        { type: "ewr", x: 53, y: 29.5, name: "Radar 3D (Hisingen)" },
+        { type: "aew_s340", x: 30, y: 50, az: 0, name: "Saab AEW" },
+        { type: "patriot", x: 55, y: 32, az: 260, name: "Patriot-1" },
+        { type: "irist", x: 49.5, y: 33, name: "IRIS-T-1" },
+        { type: "nasams", x: 48, y: 32.5, name: "NASAMS-1" },
+        { type: "manpads", x: 50.6, y: 34, name: "RBS 70-1" },
+        { type: "manpads", x: 54.4, y: 33.6, name: "RBS 70-2" },
+        { type: "mfg", x: 47, y: 31, name: "Grupo móvil 1" },
+        { type: "mfg", x: 52.5, y: 35.2, name: "Grupo móvil 2" },
+        { type: "acoustic", x: 46, y: 33, name: "Acústico 1" },
+        { type: "acoustic", x: 50, y: 30, name: "Acústico 2" },
+        { type: "intdrone", x: 51.5, y: 32.5, name: "Interceptores-1" }
+      ],
+      salvos: [
+        { type: "shahed", count: 16, interval: 20, tStart: 0, agl: 1500, pts: [[0, 28], [30, 33], [51.1, 34.4]], targetObj: "Refinería de Hisingen" },
+        { type: "gerbera", count: 8, interval: 25, tStart: 60, agl: 900, pts: [[0, 42], [30, 38], [51, 34.6]] },
+        { type: "geran3", count: 6, interval: 30, tStart: 400, agl: 800, pts: [[30, 0], [45, 20], [54.1, 34]], targetObj: "Terminal petrolera de Skarvik" },
+        { type: "kalibr", count: 6, interval: 8, sync: true, tArrive: 1500, agl: 20, pts: [[0, 75], [32, 44], [51.1, 34.4]], targetObj: "Refinería de Hisingen" },
+        { type: "kh101", count: 3, interval: 15, sync: true, tArrive: 1510, agl: 40, pts: [[20, 0], [42, 18], [51.1, 34.4]], targetObj: "Refinería de Hisingen" },
+        { type: "kinzhal", count: 2, interval: 15, sync: true, tArrive: 1540, launchDist: 450, pts: [[59, 111], [55.6, 33.9]], targetObj: "Puerto de Gotemburgo" }
+      ],
+      jams: [
+        { type: "soj", x: 4, y: 20, alt: 8e3 }
+      ],
+      goals: [
+        { side: "ataque", primary: true, kind: "destroy", target: "Refinería de Hisingen", text: "Destruir la refinería de Hisingen" },
+        { side: "ataque", primary: false, kind: "damage", target: "Terminal petrolera de Skarvik", min: 0.3, text: "Dañar la terminal de Skarvik (≥ 30%)" },
+        { side: "ataque", primary: false, kind: "damage", target: "Puerto de Gotemburgo", min: 0.2, text: "Dañar el puerto (≥ 20%)" },
+        { side: "defensa", primary: true, kind: "survive", target: "Refinería de Hisingen", text: "Que la refinería no sea destruida" },
+        { side: "defensa", primary: false, kind: "protect", target: "Terminal petrolera de Skarvik", text: "Mantener operativa la terminal de Skarvik" },
+        { side: "defensa", primary: false, kind: "keepUnit", target: "Patriot-1", text: "Conservar la batería Patriot-1" }
+      ],
+      success: "Defensa: la refinería sigue en pie al terminar la oleada.",
+      failure: "Defensa: la refinería queda destruida."
+    },
+    mb_puente: {
+      map: "monterey",
+      name: "Monterey · ataque al puente de Moss Landing",
+      player: "ataque",
+      time: "05:20 hora local · antes del amanecer",
+      description: "Ejercicio hipotético inspirado en los ataques ucranianos a los puentes de Chonhar y Crimea: la autopista 1 cruza el estero Elkhorn en Moss Landing por un puente costero, con un puente ferroviario al lado. Por ahí pasa toda la logística del frente. Una defensa rusa con S-400, Pantsir, Tor y Buk lo protege. Tu tarea: cortar el puente carretero.",
+      forces: {
+        defensa: "S-400 sobre las lomas del este (sector hacia el sudoeste), dos Pantsir y un Tor junto a los puentes, un Buk-M1, radar 3D y radar VHF de alerta. Red integrada.",
+        ataque: "12 Storm Shadow y 2 Flamingo contra el puente carretero, 4 ATACMS contra el puente ferroviario, 2 Neptune contra el S-400 y 30 drones Liutyi contra la central eléctrica, que llegan un par de minutos antes para gastar la munición de la defensa de punto."
+      },
+      conditions: "Despejado. El motor no modela clima ni luz.",
+      rules: { net: true, doctrine: "salva" },
+      rulesText: ["Red integrada activa y doctrina de salva para la defensa rusa.", 'Un puente es un blanco duro y angosto: hace falta acertar varias ojivas grandes (la huella de "Infraestructura" es de 60 m).', "Sin guerra electrónica al empezar. Probá agregar un supresor GNSS Pole-21 junto al puente (pestaña EW) y repetir con Monte Carlo: con un desvío de 100–500 m casi ninguna ojiva acierta un blanco tan angosto.", "Los Liutyi llegan entre T+21:00 y T+23:00; los misiles, sincronizados entre T+24:40 y T+25:10."],
+      objectives: [
+        { type: "infra", name: "Puente de la autopista 1", short: "Puente Hwy 1", x: 51.8, y: 40.9, hp: 1200, desc: "Puente carretero sobre la boca del estero Elkhorn. Blanco principal." },
+        { type: "infra", name: "Puente ferroviario del estero Elkhorn", short: "Puente ferroviario", x: 52.4, y: 40.7, hp: 1e3, desc: "Vía férrea paralela: la alternativa para la logística pesada." },
+        { type: "infra", name: "Central eléctrica de Moss Landing", short: "Central eléctrica", x: 52.2, y: 41.6, hp: 2e3, desc: "Gran central térmica junto al puerto. Blanco de los drones." }
+      ],
+      defs: [
+        { type: "s400", x: 62, y: 48, az: 240, name: "S-400" },
+        { type: "pantsir", x: 52.8, y: 41.3, name: "Pantsir-1" },
+        { type: "pantsir", x: 51, y: 39.5, name: "Pantsir-2" },
+        { type: "tor", x: 53.5, y: 40, name: "Tor-M2" },
+        { type: "buk", x: 56, y: 44, name: "Buk-M1" },
+        { type: "ewr", x: 61, y: 40, name: "Radar 3D" },
+        { type: "p18", x: 58, y: 40, name: "Radar VHF" }
+      ],
+      salvos: [
+        { type: "storm", count: 12, interval: 5, sync: true, tArrive: 1500, agl: 35, pts: [[0, 58], [30, 52], [44, 45], [51.8, 40.9]], targetObj: "Puente de la autopista 1" },
+        { type: "flamingo", count: 2, interval: 10, sync: true, tArrive: 1510, agl: 35, pts: [[0, 30], [35, 37], [51.8, 40.9]], targetObj: "Puente de la autopista 1" },
+        { type: "atacms", count: 4, interval: 6, sync: true, tArrive: 1490, launchDist: 250, pts: [[52, 111], [52.4, 40.7]], targetObj: "Puente ferroviario del estero Elkhorn" },
+        { type: "neptune", count: 2, interval: 10, sync: true, tArrive: 1480, agl: 12, pts: [[0, 66], [40, 58], [62, 48]], targetUnit: "S-400" },
+        { type: "lyutyi", count: 30, interval: 4, sync: true, tArrive: 1380, agl: 300, pts: [[89, 100], [70, 62], [52.2, 41.6]], targetObj: "Central eléctrica de Moss Landing" }
+      ],
+      jams: [],
+      goals: [
+        { side: "ataque", primary: true, kind: "destroy", target: "Puente de la autopista 1", text: "Destruir el puente de la autopista 1" },
+        { side: "ataque", primary: false, kind: "damage", target: "Puente ferroviario del estero Elkhorn", min: 0.3, text: "Dañar el puente ferroviario (≥ 30%)" },
+        { side: "ataque", primary: false, kind: "killUnit", target: "S-400", text: "Destruir la batería S-400" },
+        { side: "ataque", primary: false, kind: "damage", target: "Central eléctrica de Moss Landing", min: 0.2, text: "Dañar la central eléctrica (≥ 20%)" },
+        { side: "defensa", primary: true, kind: "survive", target: "Puente de la autopista 1", text: "Que el puente carretero no sea destruido" },
+        { side: "defensa", primary: false, kind: "keepUnit", target: "S-400", text: "Conservar la batería S-400" }
+      ],
+      success: "Ataque: el puente de la autopista 1 queda destruido.",
+      failure: "Ataque: el puente sigue en pie al terminar la oleada."
+    },
     mb_vacio: { map: "monterey", name: "Monterey · vacío", player: "defensa", description: "Mapa libre para armar tu propio escenario: ubicá objetivos, defensas, ataques y guerra electrónica.", objectives: [], defs: [], salvos: [], jams: [], goals: [] },
     gb_vacio: { map: "goteborg", name: "Gotemburgo · vacío", player: "defensa", description: "Mapa libre para armar tu propio escenario: ubicá objetivos, defensas, ataques y guerra electrónica.", objectives: [], defs: [], salvos: [], jams: [], goals: [] }
   };

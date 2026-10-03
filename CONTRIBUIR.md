@@ -23,7 +23,7 @@ O todo junto: `npm run check`. La CI de GitHub hace lo mismo y además verifica 
 
 ## Las pruebas "golden"
 
-`tests/golden.json` guarda el resultado de 6 corridas completas con semilla fija. Si tu cambio toca la física o los datos, **van a fallar, y está bien**: es la forma de ver qué cambió.
+`tests/golden.json` guarda el resultado de 8 corridas completas con semilla fija (una o más por escenario jugable). Si tu cambio toca la física o los datos, **van a fallar, y está bien**: es la forma de ver qué cambió.
 
 1. Mirá la diferencia: ¿el cambio va en la dirección esperada? ¿El tamaño es razonable?
 2. Si lo es: `UPDATE_GOLDEN=1 npm test` y commiteá el `golden.json` nuevo.
@@ -44,7 +44,9 @@ Si las golden fallan y tu cambio *no* debería alterar la simulación (interfaz,
 Igual que un arma, en `defenses.js` y `UNC.def`. La Pk por clase debe estar justificada: idealmente con un caso en `calibration.js`.
 
 ### Agregar un escenario
-Agregá una entrada en `src/data/scenarios.js`. Todo es declarativo: objetivos, defensas, salvas, jammers, reglas y metas, documentado en el encabezado del archivo. La prueba de catálogo verifica que los tipos y nombres existan.
+Agregá una entrada en `src/data/scenarios.js`. Todo es declarativo: objetivos, defensas, salvas, jammers, reglas y metas, documentado en el encabezado del archivo. La prueba de catálogo verifica que los tipos y nombres existan, que todo esté dentro del mapa, que las metas apunten a objetivos o defensas reales y que el briefing esté completo (hora, descripción, fuerzas, condiciones, reglas, metas principales de los dos bandos, éxito y fracaso).
+
+Antes de darlo por bueno, balancealo con el modo Monte Carlo (20–40 corridas): un buen escenario no se gana ni se pierde siempre con la disposición inicial. Después sumale un caso a `tests/golden.test.js` y corré `UPDATE_GOLDEN=1 npm test` (verificá que las golden viejas no cambien).
 
 ### Agregar un concepto a la Academia
 Agregá un objeto en `src/edu/concepts.js` con `body()` (la explicación) y `engine()` (cómo lo hace el motor). Usá los datos y funciones reales en lugar de copiar números, así la explicación no queda desactualizada.
