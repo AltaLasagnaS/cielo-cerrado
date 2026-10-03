@@ -11,6 +11,7 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 
 ### Corregido
 - **[sim]** El techo de cada arma (`sam.altMax`) se comparaba contra la altura del blanco **sobre el nivel del mar** en lugar de la altura **sobre el lanzador**: en mapas altos (Kiev está a 100–200 m) los grupos móviles no tiraban a un Shahed a 1.500 m sobre el terreno aunque lo tuvieran al alcance. Cambia el escenario del puente de Monterey (el ataque gana ≈6 de cada 10 en vez de 5).
+- Durante una partida, los botones **Ficha**, **Briefing** y **Ver debrief** a veces no respondían: los paneles se redibujan varias veces por segundo y el botón se reemplazaba entre que se apretaba y se soltaba. Ahora el panel no se redibuja mientras el puntero está sobre uno de sus botones.
 
 ### Corregido
 - **[sim]** **El engaño GNSS (Pokrova, Lima) era demasiado fuerte contra los misiles de crucero.** Ahora el Kh-101, el Kalibr y el Storm Shadow descartan la posición falsa gracias a su corrección por terreno (quedan con el error del inercial, cientos de metros en vez de kilómetros), y las armas con buscador terminal (Kh-101, Kalibr, Iskander, Kinzhal, Storm Shadow, Neptune, Liutyi) corrigen al final si el error cabe en su ventana (90% de las veces). Los Shahed y Gerbera siguen siendo desviados como antes. Mensajes nuevos en el registro y concepto actualizado en la Academia.
