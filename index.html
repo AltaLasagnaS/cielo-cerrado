@@ -6422,10 +6422,11 @@ table.t.mc td.pc{white-space:nowrap}
     }
     draw();
     if (++uiTick % 10 === 0) {
-      renderStats();
+      const free = (id) => !document.querySelector(id + " button:hover");
+      if (free("#stats")) renderStats();
       renderLogIfDirty();
-      if (S.sel && S.started) renderSel(true);
-      if (S.started && S.objs.length) renderScenario();
+      if (S.sel && S.started && free("#selCard")) renderSel(true);
+      if (S.started && S.objs.length && free("#scenCard")) renderScenario();
     }
     requestAnimationFrame(loop);
   }

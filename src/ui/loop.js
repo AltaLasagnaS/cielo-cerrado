@@ -32,7 +32,15 @@ function loop(now) {
     $('#clock').textContent = fmtT(S.t);
   }
   draw();
-  if (++uiTick % 10 === 0) { renderStats(); renderLogIfDirty(); if (S.sel && S.started) renderSel(true); if (S.started && S.objs.length) renderScenario(); }
+  // refresco de paneles cada 10 cuadros, salvo el panel que tiene el puntero sobre un botón: si el
+  // botón se reemplaza entre que se aprieta y se suelta, el clic se pierde (Ficha, Ver debrief, Briefing)
+  if (++uiTick % 10 === 0) {
+    const free = id => !document.querySelector(id + ' button:hover');
+    if (free('#stats')) renderStats();
+    renderLogIfDirty();
+    if (S.sel && S.started && free('#selCard')) renderSel(true);
+    if (S.started && S.objs.length && free('#scenCard')) renderScenario();
+  }
   requestAnimationFrame(loop);
 }
 
