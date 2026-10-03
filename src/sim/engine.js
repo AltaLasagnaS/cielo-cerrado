@@ -2,12 +2,12 @@
 // Bucle de paso fijo: la interfaz llama a step(dt) con dt ≤ 0,25 s de tiempo simulado.
 // Cada paso: lanzamientos → movimiento/señuelos/GNSS → barridos de sensores → decisiones de tiro
 // → resolución de interceptores → fin de corrida. Ver docs/ARQUITECTURA.md.
-import { D, JAMMERS, TARGET_STATUS } from '../data/index.js';
+import { D, JAMMERS, TARGET_STATUS, WEATHER } from '../data/index.js';
 import { money } from '../util/format.js';
 import { nextId } from '../util/ids.js';
 import { rnd } from '../util/rng.js';
 import { surf, los } from '../physics/terrain.js';
-import { antZ, aspectCos, detR, inSector, jamJ } from '../physics/radar.js';
+import { antZ, aspectCos, belowCeiling, detR, inSector, jamJ } from '../physics/radar.js';
 import { buildThreat, posAt, speedAt } from '../physics/kinematics.js';
 import { gnssNavError } from '../physics/navigation.js';
 import { RADAR_GUID, isTBM, trackOK, reactionStart, solve, calcPk } from '../physics/engagement.js';
@@ -80,19 +80,19 @@ export function step(dt) {
   for (const u of S.units) {
     if (!u.alive) continue; const d = D(u); if (!d.radar) continue;
     if (t < u.nextScan) continue; u.nextScan = t + d.radar.scan;
-    const r = d.radar, uz = antZ(u);
+    const r = d.radar, uz = antZ(u), wx = WEATHER[S.weather];
     for (const th of S.threats) {
       if (!th.alive || !th.p) continue; const p = th.p;
       const dx = p.x - u.x, dy = p.y - u.y, dh = Math.hypot(dx, dy);
       let ok = false;
-      if (r.band === 'ACU') { ok = th.cls === 'dron' && dh <= r.R1 && (p.z - surf(p.x, p.y)) <= (r.altMax || 3000); }
+      if (r.band === 'ACU') { ok = th.cls === 'dron' && dh <= detR(u, th, 0, 1, wx) && (p.z - surf(p.x, p.y)) <= (r.altMax || 3000); }
       else {
         const az = azOf(dx, dy); if (!inSector(u, az)) continue;
         const rr = Math.hypot(dh, (p.z - uz) / 1000);
         // primero el alcance sin interferencia (cota superior, barata) y recién después la interferencia
         const ca = aspectCos(th, u.x, u.y, uz);
-        if (rr > detR(u, th, 0, ca)) continue;
-        const J = jamJ(u, az, S.jamsLive); const R = detR(u, th, J, ca);
+        if (rr > detR(u, th, 0, ca, wx) || !belowCeiling(r, wx, p.z - surf(p.x, p.y))) continue;
+        const J = jamJ(u, az, S.jamsLive); const R = detR(u, th, J, ca, wx);
         if (rr > R) continue;
         // probabilidad de detección por barrido: 95% hasta el 80% del alcance, cae a 30% en el límite
         const pd = rr < 0.8 * R ? 0.95 : 0.95 - (rr - 0.8 * R) / (0.2 * R) * 0.65;

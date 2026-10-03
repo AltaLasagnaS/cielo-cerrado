@@ -5,6 +5,7 @@ import { BANDS, JAMMERS, D } from '../data/index.js';
 import { angDiff, azOf } from '../util/math.js';
 import { HORIZON_K } from './constants.js';
 import { surf, los } from './terrain.js';
+import { rainGamma, rainRange } from './weather.js';
 
 /**
  * RCS (m²) de una amenaza en una banda, vista con aspecto ca (ver aspectFactor; 1 = de frente).
@@ -101,11 +102,20 @@ export function jamJ(u, az, list) {
  * con aspecto ca (1 = de frente, el peor caso, que usan la cobertura y las fichas):
  *   R = R1 · σ(banda, aspecto)^¼ · (1 / (1 + J))^¼
  * R1 es el alcance contra 1 m². Sensores acústicos y ópticos usan R1 fijo (no dependen del RCS).
+ * wx (data/weather.js, opcional): la lluvia atenúa el radar (physics/weather.js#rainRange) y el
+ * clima achica los alcances ópticos (wx.opt) y acústicos (wx.acu). El techo de nubes (wx.ceiling)
+ * lo aplican quienes conocen la altura del blanco (sim/engine.js, physics/coverage.js).
  */
-export function detR(u, th, J, ca = 1) {
-  const r = D(u).radar; if (r.band === 'ACU' || r.band === 'OPT') return r.R1;
-  return r.R1 * Math.pow(rcsAt(th.T || th, r.band, ca), 0.25) * Math.pow(1 / (1 + J), 0.25);
+export function detR(u, th, J, ca = 1, wx = null) {
+  const r = D(u).radar;
+  if (r.band === 'ACU') return r.R1 * (wx ? wx.acu : 1);
+  if (r.band === 'OPT') return r.R1 * (wx ? wx.opt : 1);
+  const R = r.R1 * Math.pow(rcsAt(th.T || th, r.band, ca), 0.25) * Math.pow(1 / (1 + J), 0.25);
+  return wx && wx.rain ? rainRange(R, rainGamma(r.band, wx.rain), wx.rainKm) : R;
 }
+
+/** ¿El techo de nubes o niebla de wx le tapa a un sensor óptico en tierra un blanco a agl m? */
+export const belowCeiling = (r, wx, agl) => !(r.band === 'OPT' && wx && wx.ceiling != null && agl > wx.ceiling);
 
 /** Horizonte de radar (km) entre una antena a hr metros y un blanco a ht metros, Tierra 4/3. */
 export function horizon(hr, ht) { return HORIZON_K * (Math.sqrt(Math.max(0, hr)) + Math.sqrt(Math.max(0, ht))); }

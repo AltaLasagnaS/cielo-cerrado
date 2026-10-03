@@ -1,5 +1,5 @@
 // Pestaña "Defensa": catálogo de sistemas para ubicar, mando y control, y opciones de cobertura.
-import { DEFENSES, THREATS, C2_LEVELS } from '../../data/index.js';
+import { DEFENSES, THREATS, C2_LEVELS, WEATHER } from '../../data/index.js';
 import { esc } from '../../util/format.js';
 import { S } from '../../sim/state.js';
 import { draw } from '../../render/draw.js';
@@ -23,6 +23,10 @@ export function renderDef() {
       <p class="hint" id="c2Info">${esc(C2_LEVELS[S.c2].desc)}</p>
       <div class="field"><label for="optDoc">Doctrina de tiro</label><select id="optDoc" class="sel"><option value="salva" ${S.doctrine === 'salva' ? 'selected' : ''}>Salva (según unidad)</option><option value="sls" ${S.doctrine === 'sls' ? 'selected' : ''}>Disparar-observar-disparar</option></select></div>
     </div>
+    <div class="grp"><h3>Clima ${infoBtn('clima')}</h3>
+      <div class="field"><label for="optWx">Tiempo</label><select id="optWx" class="sel">${Object.entries(WEATHER).map(([k, W]) => `<option value="${k}" ${S.weather === k ? 'selected' : ''}>${esc(W.name)}</option>`).join('')}</select></div>
+      <p class="hint" id="wxInfo">${esc(WEATHER[S.weather].desc)}</p>
+    </div>
     <div class="grp"><h3>Cobertura de radar ${infoBtn('horizon')} ${infoBtn('los')}</h3>
       <label class="check"><input type="checkbox" id="optCov" ${S.showCov ? 'checked' : ''}> Mostrar cobertura sobre el mapa</label>
       <div class="field"><label for="optRef">Contra</label><select id="optRef" class="sel">${Object.entries(THREATS).map(([k, t]) => `<option value="${k}" ${k === S.covRef ? 'selected' : ''}>${esc(t.short)} (RCS ${t.rcs} m²)</option>`).join('')}</select></div>
@@ -36,6 +40,7 @@ export function renderDef() {
   };
   $('#optC2').onchange = e => { if (S.started) { toast('Reiniciá para cambiar el mando y control.'); e.target.value = S.c2; return; } S.c2 = e.target.value; $('#c2Info').textContent = C2_LEVELS[S.c2].desc; };
   $('#optDoc').onchange = e => { S.doctrine = e.target.value; };
+  $('#optWx').onchange = e => { if (S.started) { toast('Reiniciá para cambiar el clima.'); e.target.value = S.weather; return; } S.weather = e.target.value; $('#wxInfo').textContent = WEATHER[S.weather].desc; schedCov(); };
   $('#optCov').onchange = e => { S.showCov = e.target.checked; draw(); };
   $('#optRef').onchange = e => { S.covRef = e.target.value; const T = THREATS[S.covRef]; S.covAgl = T.agl ?? (T.prof === 'ballistic' ? 10000 : (T.prof === 'hilo' ? 15 : 5000)); $('#optAgl').value = S.covAgl; $('#aglVal').textContent = S.covAgl + ' m'; schedCov(); };
   $('#optAgl').oninput = e => { S.covAgl = +e.target.value; $('#aglVal').textContent = S.covAgl + ' m'; schedCov(); };

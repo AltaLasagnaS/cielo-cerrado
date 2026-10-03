@@ -48,6 +48,23 @@ Es una aproximación a la curva de Swerling: lejos del límite casi siempre dete
 
 `radar.sector` < 360 limita la búsqueda a ±sector/2 alrededor de la orientación `u.az`. Los radares de antena lateral (`radar.side`, como el Erieye) ven dos sectores a ±90° del rumbo. Ver `inSector()`.
 
+### Clima
+
+El clima es fijo durante el escenario (`S.weather`, ver `data/weather.js`): despejado, nublado con techo bajo, lluvia moderada, tormenta o niebla.
+
+**Lluvia sobre el radar** (`physics/weather.js`). La atenuación específica de ida sale de la **Rec. ITU-R P.838-3** (polarización horizontal), con la frecuencia representativa de cada banda (`BANDS[b].ghz`):
+
+```
+γ = k(f) · R^α(f)                  [dB/km; R = lluvia en mm/h]
+R⁴ · 10^(2γ·min(R, L)/10) = R0⁴    →   R = R0 · 10^(−γ·min(R, L)/20)
+```
+
+L (`rainKm`) es el largo máximo del camino dentro de la lluvia: las celdas de lluvia no cubren todo el mapa. Con 4 mm/h, γ ≈ 0,0008 dB/km en S, 0,004 en C, 0,058 en X y 0,21 en Ku. Debajo de 1 GHz (VHF) se toma 0.
+
+**Ópticos, IR y acústicos.** Los sensores `OPT` multiplican su alcance por `wx.opt` y no ven blancos por encima del techo de nubes o niebla (`wx.ceiling`, m sobre el terreno). Los acústicos multiplican por `wx.acu`. Son estimaciones de juego apoyadas en el manual de CMO (la lluvia deja lo visual en 1–5% y degrada mucho el IR; las nubes cortan la línea de vista).
+
+**No se modela:** día y noche, el clutter de lluvia (eco de las gotas), el viento sobre los drones, ni el efecto del clima sobre los buscadores IR de los misiles.
+
 ### Sensores no radar
 
 - **Acústico:** detecta solo drones, dentro de `R1` km horizontales y por debajo de `radar.altMax`.
@@ -267,7 +284,7 @@ Es un modelo de juego: no representa estructuras, incendios, penetración ni sub
 |---|---|---|
 | RCS con tres aspectos | Sin aspecto arriba/abajo ni detalle angular fino | Tabla por ángulo (como el "3D radar splat" de CMO PE) |
 | Sin clutter ni Doppler | Los blancos rasantes sobre tierra son más fáciles de lo real (solo los esconde el relieve) | Factor de clutter según el AGL y el tipo de radar |
-| Sin clima | Sin atenuación por lluvia en X/Ku ni restricciones ópticas | Condición del escenario con pérdidas por banda |
+| Clima simple | Lluvia (ITU-R P.838-3), techo de nubes y factores ópticos/acústicos fijos por escenario | Día y noche, clutter de lluvia, viento, clima que cambia durante el escenario |
 | Sin recarga | Las baterías quedan vacías | Recarga con tiempo y depósito de munición como objetivo |
 | Pd por barrido simplificada | Sin fluctuación de RCS (Swerling) | Modelo Swerling 1/3 |
 | Interceptor en línea recta a velocidad media | Sin energía ni geometría de persecución | Perfil de velocidad y límite de g |
