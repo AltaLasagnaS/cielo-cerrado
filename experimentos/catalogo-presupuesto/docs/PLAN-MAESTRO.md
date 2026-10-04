@@ -181,6 +181,6 @@ Ver [REFERENCIAS.md](REFERENCIAS.md) para el alcance y las limitaciones de los m
 
 ## 11. Pedidos de interfaz y seguimiento
 
-También forman parte del rumbo los pedidos de cantidades enteras, explicación de C2 frente a enlace técnico, pertenencia C2 por unidad, doctrina de señuelos por unidad o selección múltiple, bandos visibles en EW y borrado con `Delete`. Ver [PENDIENTES.md](PENDIENTES.md) para IDs, criterios de aceptación y dependencias; y [NOTAS-USUARIO.md](NOTAS-USUARIO.md) para el contexto original.
+También forman parte del rumbo los pedidos de cantidades enteras, explicación de C2 frente a enlace técnico, pertenencia C2 por unidad, doctrina de señuelos por unidad o selección múltiple, bandos visibles en EW, borrado con `Delete`, regla de distancias y fijar una pista aérea con su información actualizada. Ver [PENDIENTES.md](PENDIENTES.md) para IDs, criterios de aceptación y dependencias; y [NOTAS-USUARIO.md](NOTAS-USUARIO.md) para el contexto original.
 
 La lista es un registro de intención, no una afirmación de que esos cambios ya existen. Lo ya implementado aquí permanece en el laboratorio experimental, sin conexión al simulador.

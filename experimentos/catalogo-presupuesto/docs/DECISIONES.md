@@ -13,7 +13,7 @@ Fecha: 4 de octubre de 2026. Este registro condensa intención explícita; no re
 | D07 | Coordinación C2 separada de datalink técnico | Alertas humanas no equivalen a solución de tiro ni lanzamiento/guía remotos |
 | D08 | Capacidad, compatibilidad y activación separadas | Pertenecer al mismo bando o familia no autoriza datalink universal; desconocido no es confirmado |
 | D09 | Movilidad, operación informada y logística antes que aviación | Despliegue, EMCON/ESM, recargas/repair con tiempo y recursos; aviones después |
-| D10 | Registrar observaciones de UX sin perderlas | Enteros, C2 por unidad, señuelos por unidad/grupo, selección múltiple, bandos EW y Delete |
+| D10 | Registrar observaciones de UX sin perderlas | Enteros, C2 por unidad, señuelos por unidad/grupo, selección múltiple, bandos EW, Delete, regla de distancias y fijar pistas aéreas con información |
 | D11 | Inspirarse en CMO/Fleet Command y corroborar por OSINT | Manuales como referencia de diseño, no prueba de física; no redistribuir bases comerciales |
 | D12 | Trabajar en paralelo sin pisar a Claude | Entregas aisladas y responsabilidad explícita por archivo compartido |
 | D13 | Conservar el trabajo y avanzar autónomamente dentro de ese límite | Versionar plan y prototipos con pruebas; no tomar el motor porque Claude esté temporalmente pausado |
