@@ -28,7 +28,7 @@ export function renderAtk() {
     <div class="grp"><h3>Nueva salva</h3>
       <div class="row"><select id="aType" class="sel" style="flex:1;min-width:0"><optgroup label="Rusia">${opts('RU')}</optgroup><optgroup label="Ucrania / OTAN">${opts('UA')}</optgroup></select><button class="btn sm" id="aInfo">Ficha</button></div>
       <p class="hint">${esc(CLS_NAME[T.cls])} · ${kmh(T.v)} (${mach(T.v)}) · RCS ≈${T.rcs} m² · ${money(T.cost)} c/u</p>
-      <div class="field"><label for="aCount">Cantidad</label><input id="aCount" class="inp" type="number" min="1" max="60" value="${a.count}"></div>
+      <div class="field"><label for="aCount">Cantidad</label><input id="aCount" class="inp" type="number" min="1" max="60" step="1" value="${a.count}"></div>
       <div class="field"><label for="aInt">Intervalo entre lanzamientos (s)</label><input id="aInt" class="inp" type="number" min="0" max="600" value="${a.interval}"></div>
       <label class="check"><input type="checkbox" id="aSync" ${a.sync ? 'checked' : ''}> Sincronizar llegada (en vez de hora de lanzamiento)</label>
       <div class="field"><label for="aTime">${a.sync ? 'Llegada del primero en T+ (s)' : 'Lanzamiento en T+ (s)'}</label><input id="aTime" class="inp" type="number" min="0" max="7200" value="${a.sync ? a.tArrive : a.tStart}"></div>
@@ -46,7 +46,7 @@ export function renderAtk() {
     <div class="grp"><h3>Salvas programadas (${S.setup.salvos.length})</h3><div class="list" id="svList">${S.setup.salvos.map(sv => { const t = THREATS[sv.type]; const tgt = targetName(sv); return `<div class="item red"><span class="t">${sv.count}× ${esc(t.short)}${tgt ? ' → ' + esc(tgt) : ''}</span><span class="s">${sv.sync ? 'llega T+' + sv.tArrive + 's' : 'sale T+' + sv.tStart + 's'} · c/${sv.interval}s</span><span class="a"><button class="btn sm" data-sel="${sv.id}">Ver</button><button class="btn sm danger" data-del="${sv.id}" aria-label="Borrar">✕</button></span></div>`; }).join('') || '<p class="hint">Todavía no hay ataques.</p>'}</div></div>`;
   $('#aType').onchange = e => { S.atk = defaultAtk(e.target.value, S.atk); renderAtk(); };
   $('#aInfo').onclick = () => openFicha('thr', a.type);
-  const num = (id, k) => bindNumber($(id), () => a[k], value => { a[k] = value; });
+  const num = (id, k) => bindNumber($(id), () => a[k], value => { a[k] = value; }, { integer: k === 'count' });
   num('#aCount', 'count'); num('#aInt', 'interval'); num('#aDist', 'launchDist');
   num('#aTime', a.sync ? 'tArrive' : 'tStart');
   $('#aSync').onchange = e => { a.sync = e.target.checked; renderAtk(); };

@@ -1406,5 +1406,149 @@
    ]
   ],
   "log": 249
+ },
+ "od_puertos_s1": {
+  "t": 1565.25,
+  "stats": {
+   "launched": 31,
+   "killed": 23,
+   "hits": 4,
+   "misses": 4,
+   "decoys": 0,
+   "decoysKilled": 0,
+   "shots": 35,
+   "defCost": 17.5,
+   "atkCost": 24.310000000000002,
+   "lost": 0,
+   "byUnit": {
+    "IRIS-T-1": 24,
+    "S-300-1": 11
+   },
+   "damage": 1938,
+   "dmgByWeapon": {
+    "Kh-22": 578,
+    "Oniks": 891,
+    "Kalibr": 469
+   },
+   "missSum": 798.8259656499522,
+   "missN": 8,
+   "objsDestroyed": 0,
+   "satChannels": {
+    "S-300-1": 3
+   },
+   "satMag": {},
+   "reloads": 0,
+   "unitsDamaged": 0
+  },
+  "impacts": [
+   [
+    56.5359,
+    55.4681,
+    "miss"
+   ],
+   [
+    56.5842,
+    55.4122,
+    "hit"
+   ],
+   [
+    56.3181,
+    55.4379,
+    "miss"
+   ],
+   [
+    56.6199,
+    55.3846,
+    "hit"
+   ],
+   [
+    50.4893,
+    74.5013,
+    "hit"
+   ],
+   [
+    56.6144,
+    55.4147,
+    "hit"
+   ],
+   [
+    56.4813,
+    55.567,
+    "miss"
+   ],
+   [
+    56.7362,
+    55.4304,
+    "miss"
+   ]
+  ],
+  "units": [
+   [
+    "Radar 3D",
+    true,
+    0
+   ],
+   [
+    "Radar VHF",
+    true,
+    0
+   ],
+   [
+    "S-300-1",
+    true,
+    5
+   ],
+   [
+    "IRIS-T-1",
+    true,
+    0
+   ],
+   [
+    "Gepard-1",
+    true,
+    20
+   ],
+   [
+    "Gepard-2",
+    true,
+    20
+   ],
+   [
+    "Grupo móvil 1",
+    true,
+    30
+   ],
+   [
+    "Grupo móvil 2",
+    true,
+    30
+   ],
+   [
+    "Grupo móvil 3",
+    true,
+    30
+   ],
+   [
+    "Acústico 1",
+    true,
+    0
+   ],
+   [
+    "Acústico 2",
+    true,
+    0
+   ],
+   [
+    "Acústico 3",
+    true,
+    0
+   ],
+   [
+    "Acústico 4",
+    true,
+    0
+   ]
+  ],
+  "log": 109
  }
 }

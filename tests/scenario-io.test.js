@@ -73,7 +73,7 @@ test('validación: rechaza lo que no es un escenario o es de otra versión', () 
 });
 
 test('validación: mapa desconocido o relieve importado que no está cargado', () => {
-  let file = exported('mb_noche'); file.map.key = 'odesa';
+  let file = exported('mb_noche'); file.map.key = 'atlantida';
   assert.match(validateScenario(file).errors[0], /Mapa desconocido/);
   file = exported('mb_noche'); file.map = { key: 'hgt', name: 'N50E030.hgt', latN: 51, lonW: 30, wKm: 70, hKm: 111 };
   assert.match(validateScenario(file).errors[0], /relieve importado/);

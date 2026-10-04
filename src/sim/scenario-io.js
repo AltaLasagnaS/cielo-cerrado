@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- GUARDAR Y CARGAR ESCENARIOS ----------------
 // Convierte el escenario armado por el jugador (S.setup + reglas + metas) en un objeto JSON y lo
 // vuelve a desplegar. Es puro (no toca el DOM): la interfaz (ui/scenario-file.js) se ocupa de
@@ -188,7 +189,8 @@ export function validateScenario(raw) {
     const sc = raw.scenario;
     if (typeof sc !== 'object') err('"scenario" tiene que ser un objeto.');
     else {
-      scenario = { base: typeof sc.base === 'string' && SCENARIOS[sc.base] ? sc.base : null, name: str('scenario.name', sc.name, 200) || 'Escenario cargado', player: sc.player ?? 'defensa' };
+      // se completa campo por campo más abajo: registro abierto para @ts-check
+      scenario = /** @type {Record<string, any>} */ ({ base: typeof sc.base === 'string' && SCENARIOS[sc.base] ? sc.base : null, name: str('scenario.name', sc.name, 200) || 'Escenario cargado', player: sc.player ?? 'defensa' });
       if (!SIDES.includes(scenario.player)) err(`scenario.player: "${String(sc.player)}" no es "ataque" ni "defensa".`);
       for (const k of ['time', 'conditions', 'success', 'failure']) scenario[k] = str('scenario.' + k, sc[k], 1000);
       scenario.description = str('scenario.description', sc.description, 5000);

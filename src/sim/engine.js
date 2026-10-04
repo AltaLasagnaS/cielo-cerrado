@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- SIMULACIÓN ----------------
 // Bucle de paso fijo: la interfaz llama a step(dt) con dt ≤ 0,25 s de tiempo simulado.
 // Cada paso: lanzamientos → movimiento/señuelos/GNSS → barridos de sensores → decisiones de tiro

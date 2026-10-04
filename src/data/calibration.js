@@ -1,3 +1,4 @@
+// @ts-check
 // ARCHIVO GENERADO por scripts/calibrar.mjs (npm run calibrar -- --write): no editar a mano.
 // Casos de calibración (geometría en data/calibration-cases.js) corridos con el motor: 40 noches, C2
 // coordinada, doctrina de salva. "real" = dato observado; "obj" = rango objetivo para la tasa de derribo
@@ -71,6 +72,16 @@ export const CAL = [
   "sim": 0,
   "lo": 0,
   "hi": 0,
+  "ok": true
+ },
+ {
+  "id": "kh22_s300",
+  "caso": "6 Kh-22 contra S-300PS + radar 3D, sin Patriot",
+  "real": "3 de más de 400 derribados antes de feb-2026 por la defensa sin Patriot, que incluía S-300 sobre las ciudades atacadas (IC95% 0–2%).",
+  "obj": "0–10%",
+  "sim": 0.05,
+  "lo": 0.021,
+  "hi": 0.104,
   "ok": true
  },
  {

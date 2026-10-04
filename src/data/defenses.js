@@ -1,3 +1,4 @@
+// @ts-check
 // Defensas y sensores. Ver docs/DATOS-Y-FUENTES.md para el significado de cada campo.
 import { WP, SRC } from './sources.js';
 
@@ -61,7 +62,7 @@ export const DEFENSES = {
     name: 'S-300PS/PT (5V55R)', short: 'S-300P', side: 'UA', kind: 'sam', color: '#62b6ff',
     datalinks: ['ua_c2'],
     radar: { name: '30N6 Flap Lid (en torre 40V6)', agile: true, lowSL: true, band: 'X', mti: 'pd', R1: 100, mast: 25, mastRange: [7, 39], mastNote: 'Sin torre, la antena queda a ≈7 m sobre su vehículo (estimado); en la torre 40V6M a ≈25 m y en la 40V6MD a ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h, no se cambia durante el combate.', sector: 90, eccm: 3, scan: 2 },
-    sam: { maxR: 75, maxRtbm: 25, minR: 5, altMin: 25, altMax: 27000, vInt: 1300, vmax: 2000, tb: 11, vmaxT: 1300, react: 12, ch: 4, mag: 16, reserve: 12, reloadS: 2400, salvo: 2, guid: 'TVM', shot: '5V55R', cost: 0.5, pk: { dron: 0.5, crucero: 0.5, supersonico: 0.4, balistico: 0.15, hiper: 0.05 } },
+    sam: { maxR: 75, maxRtbm: 25, minR: 5, altMin: 25, altMax: 27000, vInt: 1300, vmax: 2000, tb: 11, vmaxT: 1300, react: 12, ch: 4, mag: 16, reserve: 12, reloadS: 2400, salvo: 2, guid: 'TVM', shot: '5V55R', cost: 0.5, pk: { dron: 0.5, crucero: 0.5, supersonico: 0.1, balistico: 0.15, hiper: 0.05 } },
     range: '47 km (5V55K) / 75 km (5V55R), techo 27 km', interceptor: '5V55: hasta 2.000 m/s, guiado por mando (K) o TVM (R)',
     notes: ['Ucrania tenía 35 batallones S-300PS/PT en feb-2022 (RUSI), ~250 lanzadores: fue la columna vertebral de su defensa en 2022.', 'El 30N6 puede ir sobre la torre 40V6M (antena a ~24 m) o 40V6MD (~39 m): con 24 m ve un blanco a 25 m de altura a ~41 km.', 'Misiles soviéticos escasos: no hay producción nueva.'],
     sources: [WP('S-300_missile_system'), SRC.rusi_prelim, SRC.apa_fc, SRC.apa_40v6]

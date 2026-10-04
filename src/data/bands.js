@@ -1,3 +1,4 @@
+// @ts-check
 // Bandas de sensores: ÚNICA fuente de datos de bandas para la simulación, las fichas, el catálogo,
 // los tooltips y la Academia.
 //

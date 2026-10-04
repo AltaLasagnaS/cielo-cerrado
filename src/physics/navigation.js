@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- NAVEGACIÓN BAJO GUERRA ELECTRÓNICA GNSS ----------------
 // Error de navegación de un arma que entra en el radio de un anti-GNSS. Ver docs/FISICA.md §4 (GNSS).
 //

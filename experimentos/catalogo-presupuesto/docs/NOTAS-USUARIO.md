@@ -2,6 +2,8 @@
 
 Fecha: 4 de octubre de 2026 (America/Buenos_Aires). El usuario pidió ir anotando estas observaciones sin corregirlas inmediatamente. Esta lista no cambia el motor ni las reglas actuales.
 
+Actualización de interfaz posterior al merge de #48: UX01 (mag/reserve/salvo/count con mensajes), UX02 (Delete seguro) y rótulos/ayuda de UX03 están implementados y comprobados en `tests/browser/ux.browser.mjs`. Las observaciones originales de abajo conservan el contexto histórico; pertenencia C2 por unidad, selección múltiple, regla y pistas fijadas siguen pendientes.
+
 ## Enteros donde representan cantidades discretas
 
 Pedido: no admitir decimales donde no corresponden, por ejemplo munición, unidades y cantidades de disparos.

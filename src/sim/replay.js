@@ -1,3 +1,4 @@
+// @ts-check
 // Repetición de la corrida (línea de tiempo navegable en el debrief).
 //
 // No se graban fotos del estado: las trayectorias de las amenazas son deterministas (posAt), así que

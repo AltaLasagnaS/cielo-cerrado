@@ -17,7 +17,8 @@ const CASES = {
   gb_refineria_s1: ['gb_refineria', { seed: 1 }],
   mb_puente_s1: ['mb_puente', { seed: 1 }],
   kv_energia_s1: ['kv_energia', { seed: 1 }],
-  kh_umpk_s1: ['kh_umpk', { seed: 1 }]
+  kh_umpk_s1: ['kh_umpk', { seed: 1 }],
+  od_puertos_s1: ['od_puertos', { seed: 1 }]
 };
 
 const summarize = S => ({

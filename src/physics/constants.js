@@ -1,3 +1,4 @@
+// @ts-check
 // Constantes físicas del modelo. Ver docs/FISICA.md para la derivación de cada una.
 
 /**

@@ -1,3 +1,4 @@
+// @ts-check
 // Niveles de integración del mando y control (C2) de la defensa aérea: cómo circula la información
 // entre sensores y baterías de un mismo bando. Lo usa physics/engagement.js#trackOK y sim/engine.js.
 //

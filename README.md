@@ -6,10 +6,10 @@ Desplegás radares, baterías antiaéreas y guerra electrónica sobre relieve re
 
 ## Jugar
 
-**Abrí `index.html` en el navegador** (doble clic). Es un único archivo autocontenido: no necesita instalación ni conexión. Con internet carga tipografías más lindas; sin internet usa las del sistema.
+**Abrí `index.html` en el navegador** (doble clic). Es un único archivo autocontenido: no necesita instalación ni conexión. Incluye las tipografías y sus licencias; se ve igual con y sin internet. Procedencia y tamaño en [docs/TIPOGRAFIAS.md](docs/TIPOGRAFIAS.md).
 
 Primeros pasos:
-1. Elegí un escenario arriba a la derecha y leé el **briefing**. Hay seis jugables: la noche de ataque combinado sobre Monterey, el ataque a la base con S-400 en Gotemburgo, la **defensa de la refinería de Hisingen** (Gotemburgo), el **ataque al puente de Moss Landing** (Monterey), la **noche contra la energía de Kiev** y las **bombas planeadoras sobre Járkov**, las dos últimas sobre el relieve real de cada ciudad.
+1. Elegí un escenario arriba a la derecha y leé el **briefing**. Hay siete jugables: la noche de ataque combinado sobre Monterey, el ataque a la base con S-400 en Gotemburgo, la **defensa de la refinería de Hisingen** (Gotemburgo), el **ataque al puente de Moss Landing** (Monterey), la **noche contra la energía de Kiev**, las **bombas planeadoras sobre Járkov** y la **noche de los puertos de Odesa**, las tres últimas sobre el relieve real de cada ciudad. Con el botón **Metas** podés elegir de qué bando jugás y cambiar las metas de cada uno.
 2. Tocá **▶ Iniciar**. La velocidad **Auto** acelera cuando no pasa nada y frena cuando hay combate.
 3. Al terminar se abre el **debrief**, con un botón para **ver la repetición** de la corrida sobre el mapa con una línea de tiempo. ¿Fue suerte? El botón **Monte Carlo** corre la misma situación muchas veces y muestra la probabilidad de que cada objetivo sobreviva.
 4. Probá cambiar cosas: mové defensas (antes de iniciar), agregá ataques en la pestaña **Ataque** o activá la capa **Relieve → Puntos altos** para ubicar radares en cotas dominantes.
@@ -34,11 +34,12 @@ Catálogo: 16 amenazas, 19 defensas y sensores y 8 sistemas de guerra electróni
 Hace falta [Node.js](https://nodejs.org) 20 o más nuevo.
 
 ```bash
-npm install        # una vez: instala esbuild (la única dependencia)
+npm install        # una vez: instala las herramientas (esbuild, eslint, TypeScript solo para revisar tipos)
 npm run dev        # servidor en http://localhost:8000 que recarga al guardar
 npm test           # pruebas (física, catálogo, daño, corridas completas)
 npm run build      # regenera index.html (el juego en un solo archivo)
 npm run docs       # regenera docs/CATALOGO.md desde los datos
+npm run typecheck  # revisa los tipos (JSDoc + @ts-check) en util, data, physics y sim
 npm run check      # todo lo anterior y verifica que index.html y el catálogo estén al día
 npm run mc         # Monte Carlo de los escenarios en Node (40 noches)
 npm run calibrar   # casos de calibración de la Pk contra episodios reales

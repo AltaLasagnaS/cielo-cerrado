@@ -1,3 +1,4 @@
+// @ts-check
 // Integración NO coherente: suma de potencias de N pulsos, Swerling lento 1/3.
 // Ruido gaussiano complejo independiente; RCS constante dentro del barrido.
 // Modelo y derivación: docs/investigacion/integracion-pulsos.md. Sin azar ni DOM.

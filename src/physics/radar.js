@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- RADAR / DETECCIÓN ----------------
 // Ecuación del radar simplificada (R ∝ σ^¼), sectores de antena, horizonte e interferencia de ruido.
 // Ver docs/FISICA.md §2–§4.

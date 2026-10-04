@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- DEBRIEF ----------------
 // Análisis de una corrida terminada: qué pasó con cada objetivo, el ataque, el daño, la defensa,
 // una línea de tiempo y, sobre todo, POR QUÉ pasó (detección tardía, saturación, señuelos, Pk...).

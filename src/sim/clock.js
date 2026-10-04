@@ -1,3 +1,4 @@
+// @ts-check
 // La interfaz acumula fracciones entre cuadros, pero el motor siempre recibe el mismo paso.
 export const SIM_STEP = 0.25;
 

@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- TERRENO ----------------
 // Grilla de elevaciones (m) en celdas cuadradas de MAP.cell metros. Coordenadas de mundo en km
 // desde la esquina noroeste: x hacia el este, y hacia el sur. Elevación negativa = mar.

@@ -1,3 +1,4 @@
+// @ts-check
 // Casos de calibración de la Pk con su geometría guardada (docs/DATOS-Y-FUENTES.md §4). Los corre
 // scripts/calibrar.mjs (npm run calibrar) y el resultado queda en data/calibration.js (CAL).
 //
@@ -75,6 +76,14 @@ export const CAL_CASES = [
     real: '3 de más de 400 derribados antes de feb-2026 (IC95% 0–2%).',
     obj: [0, 0.1],
     defs: [['irist', 60, 62], ['nasams', 59, 63]],
+    salvos: [{ type: 'kh22', count: 6, interval: 10, pts: north }]
+  },
+  {
+    id: 'kh22_s300',
+    caso: '6 Kh-22 contra S-300PS + radar 3D, sin Patriot',
+    real: '3 de más de 400 derribados antes de feb-2026 por la defensa sin Patriot, que incluía S-300 sobre las ciudades atacadas (IC95% 0–2%).',
+    obj: [0, 0.1],
+    defs: [['s300', 60, 62, { az: 0 }], ['ewr', 62, 63]],
     salvos: [{ type: 'kh22', count: 6, interval: 10, pts: north }]
   },
   {

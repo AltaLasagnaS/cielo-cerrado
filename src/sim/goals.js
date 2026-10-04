@@ -1,3 +1,4 @@
+// @ts-check
 // Evaluación de las metas de un escenario (data/scenarios.js → goals) al terminar una corrida.
 import { DAMAGED_AT } from '../data/index.js';
 

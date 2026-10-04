@@ -2,3 +2,5 @@
 index.html linguist-generated=true -diff
 src/data/terrain/*.js linguist-generated=true -diff
 docs/CATALOGO.md linguist-generated=true
+# Avisos upstream íntegros: preservar CRLF/espacios originales y sus hashes al clonar.
+src/assets/fonts/*-OFL.txt -text whitespace=-blank-at-eol

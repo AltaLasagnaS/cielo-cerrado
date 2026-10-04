@@ -1,3 +1,4 @@
+// @ts-check
 // Formato de números y textos para la interfaz y el registro (locale es-AR).
 
 /** Reloj de simulación: segundos → "T+mm:ss". */

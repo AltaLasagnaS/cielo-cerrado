@@ -1,6 +1,6 @@
 // Tarjeta "Selección": detalle y parámetros editables de lo que esté seleccionado en el mapa
 // (defensa, jammer, salva o amenaza en vuelo).
-import { THREATS, JAMMERS, JAM_MODES, TARGET_TYPES, TARGET_STATUS, D, DATALINKS, datalinksOf, UNIT_TARGET } from '../../data/index.js';
+import { THREATS, JAMMERS, JAM_MODES, TARGET_TYPES, TARGET_STATUS, D, DATALINKS, datalinksOf, UNIT_TARGET, C2_LEVELS } from '../../data/index.js';
 import { esc, fmtT, kmh, money } from '../../util/format.js';
 import { releaseId } from '../../util/ids.js';
 import { surf, latlon } from '../../physics/terrain.js';
@@ -16,6 +16,17 @@ import { openFicha } from '../fichas.js';
 import { renderAtk, removeObj } from './attack.js';
 import { renderEW } from './ew.js';
 import { bindNumber } from '../number-input.js';
+import { isMonteCarloRunning } from '../../sim/montecarlo.js';
+
+/** Reutiliza los botones de borrado de la selección; nunca edita una corrida ni una serie. */
+export function deleteSelected() {
+  if (S.started || isMonteCarloRunning() || !S.sel) return false;
+  renderSel();
+  const id = { def: '#sDel', jam: '#jDel', salvo: '#vDel', obj: '#oDel' }[S.sel?.kind];
+  const button = id && $(id);
+  if (!button || button.disabled) return false;
+  button.click(); return true;
+}
 
 /** live = refresco periódico durante la corrida (no pisa un campo que el jugador está editando). */
 export function renderSel(live) {
@@ -31,7 +42,7 @@ export function renderSel(live) {
     if (r && r.band !== 'ACU') { const hor = horizon(antZ(u) - (d.kind === 'aew' ? 0 : ground), 50); html += `<dt>Radar</dt><dd>${esc(r.name)} · ${r.band}</dd><dt>Horizonte vs blanco a 50 m</dt><dd>${hor.toFixed(0)} km</dd>`; }
     if (d.sam) html += `<dt>Alcance</dt><dd>${d.sam.maxR} km${d.sam.maxRtbm ? ' (TBM ' + d.sam.maxRtbm + ')' : ''}</dd><dt>Guiado</dt><dd>${d.sam.guid}</dd>`;
     const links = datalinksOf(d).map(k => DATALINKS[k].name).join(', ');
-    if (d.sam || r) html += `<dt>Datalink nativo</dt><dd>${esc(links || 'ninguno; recibe alertas C2 si la integración lo permite')}</dd>`;
+    if (d.sam || r) html += `<dt>Enlace técnico de pistas</dt><dd>${esc(links || 'Sin enlace compatible')}</dd><dt>Coordinación C2 (general)</dt><dd>${esc(C2_LEVELS[S.c2].name)}</dd>`;
     if (S.started && d.sam) html += `<dt>Munición</dt><dd>${u.magLeft}/${u.mag} · reserva ${u.reserveLeft}</dd><dt>En vuelo</dt><dd>${u.active}/${d.sam.ch}</dd>${u.reloadUntil !== null ? `<dt>Recargando</dt><dd>faltan ${Math.ceil((u.reloadUntil - S.t) / 60)} min</dd>` : ''}`;
     if (S.started) {
       const hurt = u.alive && (u.dmgRadar || u.dmgLauncher), what = [u.dmgRadar ? 'radar: menos alcance y reacción más lenta' : '', u.dmgLauncher ? 'lanzador fuera de servicio' : ''].filter(Boolean).join('; ');
@@ -46,14 +57,17 @@ export function renderSel(live) {
       }
       if (d.kind === 'aew') html += `<div class="field"><label for="sAlt">Altitud de vuelo</label><span class="val">${u.alt} m</span><input id="sAlt" type="range" min="2000" max="11000" step="250" value="${u.alt}"></div>`;
       if (r && (r.sector < 360)) html += `<div class="field"><label for="sAz">${r.side ? 'Rumbo de vuelo' : 'Orientación del sector'}</label><span class="val">${u.az}°</span><input id="sAz" type="range" min="0" max="359" value="${u.az}"></div>`;
-      if (datalinksOf(d).length) html += `<label class="check" title="El C2 puede coordinar alertas aunque este interruptor esté apagado. Al apagarlo, la unidad deja de publicar y recibir pistas de tiro por sus datalinks compatibles."><input type="checkbox" id="sLink" ${u.link !== false ? 'checked' : ''}> Datalink activo (${esc(links)})</label>`;
+      if (d.sam || r) html += `<h3>Enlace técnico de pistas</h3>`;
+      if (datalinksOf(d).length) html += `<label class="check"><input type="checkbox" id="sLink" ${u.link !== false ? 'checked' : ''}> Datalink activo (${esc(links)})</label><p class="hint">Al apagarlo, esta unidad deja de publicar y recibir pistas de tiro por enlaces compatibles. Conserva su sensor propio y puede recibir alertas C2 si la coordinación general lo permite.</p>`;
+      else if (d.sam || r) html += `<p class="hint">Sin enlace técnico compatible: las alertas C2 no son una pista de tiro ni permiten guiar un misil con un sensor ajeno.</p>`;
+      if (d.sam || r) html += `<h3>Coordinación C2 (general)</h3><p class="hint">${esc(C2_LEVELS[S.c2].name)}. Se cambia en Defensa para toda la red. En Desconectada no hay alertas compartidas, pistas de red ni reparto de blancos; las unidades conservan sus sensores y disparos propios. El datalink de esta unidad no cambia ese nivel general.</p>`;
       if (d.sam) html += `<label class="check"><input type="checkbox" id="sNoD" ${u.noDrones ? 'checked' : ''}> No gastar en drones (reservar para misiles)</label><div class="field"><label for="sMag">Munición disponible</label><input id="sMag" class="inp" type="number" min="1" max="200" value="${u.mag}"></div><div class="field"><label for="sRes">Reserva para recargar (${Math.round(d.sam.reloadS / 60)} min por recarga)</label><input id="sRes" class="inp" type="number" min="0" max="500" value="${u.reserve ?? 0}"></div><div class="field"><label for="sSal">Interceptores por blanco</label><input id="sSal" class="inp" type="number" min="1" max="4" value="${u.salvo}"></div>`;
     }
     html += `<div class="row"><button class="btn sm" id="sInfo">Ficha</button>${ed ? '<button class="btn sm danger" id="sDel">Eliminar</button>' : ''}</div>`;
     el.innerHTML = html;
     $('#sInfo').onclick = () => openFicha('def', u.type);
     if (ed) {
-      const bind = (id, k, cov) => { const i = $(id); bindNumber(i, () => u[k], value => { u[k] = value; const v = i.parentElement.querySelector('.val'); if (v) v.textContent = u[k] + (k === 'az' ? '°' : ' m'); if (cov) schedCov(); }); };
+      const bind = (id, k, cov) => { const i = $(id); bindNumber(i, () => u[k], value => { u[k] = value; const v = i.parentElement.querySelector('.val'); if (v) v.textContent = u[k] + (k === 'az' ? '°' : ' m'); if (cov) schedCov(); }, { integer: ['mag', 'reserve', 'salvo'].includes(k) }); };
       bind('#sMast', 'mast', 1); bind('#sAlt', 'alt', 1); bind('#sAz', 'az', 1); bind('#sMag', 'mag'); bind('#sRes', 'reserve'); bind('#sSal', 'salvo');
       if ($('#sNoD')) $('#sNoD').onchange = e => { u.noDrones = e.target.checked; };
       if ($('#sLink')) $('#sLink').onchange = e => { u.link = e.target.checked; };

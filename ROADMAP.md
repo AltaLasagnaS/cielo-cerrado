@@ -23,10 +23,9 @@ Propuesta detallada, con orden, dificultad, datos y pruebas: [docs/investigacion
 
 ## Juego
 
-- Más escenarios: corredor del mar Negro, Odesa con `scripts/gen-terrain.mjs` (Kiev y Járkov ya están).
+- Más escenarios: corredor del mar Negro (Kiev, Járkov y Odesa ya están).
 - Plataformas aéreas propias: patrullas de cazas como interceptores con radio de acción.
 - Niebla de guerra más estricta: jugar solo con lo que ven tus sensores.
-- Editor de objetivos y metas desde la interfaz.
 - Idioma inglés (los textos ya están separados de la lógica en buena parte).
 
 ## Técnica
@@ -34,4 +33,4 @@ Propuesta detallada, con orden, dificultad, datos y pruebas: [docs/investigacion
 - Versión de escritorio opcional (Tauri o Electron) si hace falta acceso a archivos grandes.
 - Tipografías embebidas para el uso sin conexión.
 - Pruebas de interfaz en el navegador dentro de la CI (Playwright).
-- TypeScript gradual o `// @ts-check` sobre los tipos JSDoc de `src/types.js`.
+- `@ts-check`, segunda parte (ya está en `util`, `data`, `physics` y `sim`, y corre en la CI): sumar `render` y `ui` (falta tipar el DOM) y activar `strictNullChecks` (hoy da 49 avisos, todos por el mapa activo `MAP` que empieza en `null`, ninguno es un error real).

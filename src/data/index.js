@@ -1,3 +1,4 @@
+// @ts-check
 // ===================== CATÁLOGO =====================
 // Punto de entrada único a los datos del juego. Todo lo demás importa desde acá.
 //

@@ -6,7 +6,7 @@ import { join, resolve, sep, extname } from 'node:path';
 export async function startSourceServer(repoRoot) {
   const sourceRoot = join(repoRoot, 'src');
   const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
-    '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml' };
+    '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml', '.ttf': 'font/ttf' };
   const server = createServer(async (request, response) => {
     try {
       const pathname = decodeURIComponent(new URL(request.url, 'http://local').pathname);

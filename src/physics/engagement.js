@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- ENFRENTAMIENTO ----------------
 // Seguimiento, solución de tiro y probabilidad de derribo (Pk). Ver docs/FISICA.md §6–§7.
 import { D, C2_LEVELS, C2_ORDER, C2_NODES, datalinksOf } from '../data/index.js';

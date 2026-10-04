@@ -1,3 +1,4 @@
+// @ts-check
 // Fuentes públicas (OSINT) citadas por el catálogo. Cada entrada es [título, URL].
 // Para citar una fuente en un parámetro se usa su clave (por ejemplo 'csis_kh101') o 'wp:Artículo'
 // para un artículo de la Wikipedia en inglés.

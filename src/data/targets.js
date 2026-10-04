@@ -1,3 +1,4 @@
+// @ts-check
 // Objetivos físicos que las armas atacan y las defensas protegen.
 // hp = vida máxima por defecto (un escenario puede cambiarla), radius = huella en metros (un impacto
 // dentro de la huella cuenta como directo), vuln = vulnerabilidad relativa al daño explosivo.

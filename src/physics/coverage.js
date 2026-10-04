@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- COBERTURA ----------------
 // Mapa de cobertura: en qué celdas al menos un sensor ve a un blanco de referencia volando a una
 // altura fija sobre el terreno. Considera relieve, curvatura 4/3, RCS por banda, sectores e
