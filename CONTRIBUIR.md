@@ -21,6 +21,8 @@ npm run docs      # regenera docs/CATALOGO.md (si tocaste datos)
 
 O todo junto: `npm run check`. La CI de GitHub hace lo mismo y además verifica que `index.html` y `docs/CATALOGO.md` estén al día.
 
+Para verificar los campos numéricos y los controles de Monte Carlo en el navegador, dejá `npm run dev` en marcha y ejecutá `node tests/ui.browser.mjs` con Playwright y Chromium disponibles. Si están fuera del proyecto, indicá `PLAYWRIGHT_MODULE=/ruta/a/playwright/index.mjs` y `CHROMIUM_PATH=/ruta/a/chromium`; `TEST_URL` permite usar otro puerto. Esta prueba es adicional a `npm test` y bloquea pedidos externos de tipografías.
+
 ## Las pruebas "golden"
 
 `tests/golden.json` guarda el resultado de 8 corridas completas con semilla fija (una o más por escenario jugable). Si tu cambio toca la física o los datos, **van a fallar, y está bien**: es la forma de ver qué cambió.

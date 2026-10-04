@@ -6,6 +6,13 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 
 ## [Sin publicar]
 
+### Corregido
+- **[sim]** La partida usa pasos fijos de 0,25 s y conserva las fracciones entre cuadros: cambiar la velocidad o los FPS ya no cambia la secuencia de detecciones y disparos. Las golden y el Monte Carlo mantienen sus resultados.
+- Monte Carlo espera al último ataque y al fin de los interceptores, incluso en escenarios de más de 10.000 s. Una corrida que no termina se informa como error, sin contabilizarla como victoria.
+- La barra espaciadora y el control de iniciar/pausar no avanzan la partida mientras corre Monte Carlo. Los atajos de edición tampoco actúan detrás de ventanas abiertas.
+- Los campos de munición, reserva, salvas y vida de objetivos mantienen el último número válido al ingresar valores vacíos, fraccionarios o fuera de rango. La semilla de Monte Carlo también se valida antes de empezar.
+- Pruebas de regresión de tiempo fijo, ataques tardíos y bloqueo de series, más `tests/ui.browser.mjs` para validar entradas y controles en Chromium.
+
 ### Agregado
 - **`npm run mc`**: Monte Carlo de escenarios en Node (40 noches con los valores probables por defecto; `SAMPLE=1` para sortear parámetros, `N=` para otra cantidad). Es la vara de todas las cifras de balance.
 - **Revisión de tres valores estimados** (`docs/investigacion/valores-estimados.md`): `remotePk` 0,97, recarga del NASAMS de 30 min y corte de la detección a 1,2·R, con su sensibilidad medida en Kiev. La recarga del NASAMS tiene un efecto umbral (con 15 min Kiev pasa de 68% a 98%) y el corte pesa mucho (con 1,5·R, 88%).

@@ -18,11 +18,13 @@ import { S } from './state.js';
 import { hooks } from './hooks.js';
 import { startSim, step, resetState } from './engine.js';
 import { evaluateGoals } from './goals.js';
+import { SIM_STEP } from './clock.js';
 
 /** Paso de simulación (s): el mismo que usa la interfaz, así una corrida da lo mismo acá que en pantalla. */
-export const MC_STEP = 0.25;
-/** Tope de tiempo simulado por corrida (s), igual que tests/helpers.js. */
-const MAX_STEPS = 40000;
+export const MC_STEP = SIM_STEP;
+let active = null;
+/** La interfaz no debe avanzar ni reiniciar el estado compartido mientras corre una serie. */
+export const isMonteCarloRunning = () => active !== null;
 
 /** Semilla del sorteo de parámetros de la corrida con semilla s (independiente de la de la simulación). */
 export const paramSeed = s => (Math.imul(s, 0x9E3779B1) ^ 0x5bd1e995) >>> 0;
@@ -51,8 +53,10 @@ export function summarizeRun(S, seed) {
  * para no congelar la página); runMonteCarlo hace todo de una vez (Node, pruebas).
  */
 export function createMonteCarlo({ runs = 20, seed = 1, sample = true } = {}) {
+  if (active) throw new Error('Ya hay una serie Monte Carlo en curso.');
   const mc = { runs, seed, sample, results: [], done: false, cancelled: false, current: -1 };
-  let rng = null, steps = 0;
+  active = mc;
+  let rng = null, deadline = 0;
   const saved = { ...hooks }, quiet = { onLog() {}, onEnd() {}, onUnitLost() {}, defenderView: () => false };
 
   mc.tick = (budgetMs = 40) => {
@@ -67,15 +71,24 @@ export function createMonteCarlo({ runs = 20, seed = 1, sample = true } = {}) {
           mc.current = mc.results.length; if (mc.current >= runs) { finish(); break; }
           const s = seed + mc.current;
           if (sample) applySample(seeded(paramSeed(s)));
-          rng = seeded(s); setRandom(rng); startSim(); S.running = false; steps = 0;
+          rng = seeded(s); setRandom(rng); startSim(); S.running = false;
+          // Incluye el último lanzamiento y su vuelo; hasta 400 s para interceptores pendientes.
+          deadline = S.pending.reduce((end, th) => Math.max(end, th.tLaunch + th.ft), 0) + 401;
+          if (!Number.isFinite(deadline)) throw new Error('Monte Carlo: hay una ruta o un horario de ataque inválido.');
         } else {
           if (sample) applySample(seeded(paramSeed(seed + mc.current)));   // el mismo sorteo de esta corrida
           setRandom(rng);
         }
-        while (steps < MAX_STEPS && !ended()) { step(MC_STEP); steps++; if (Date.now() - t0 >= budgetMs) break; }
-        if (steps >= MAX_STEPS || ended()) { mc.results.push(summarizeRun(S, seed + mc.current)); rng = null; }
+        while (!ended()) {
+          if (S.t >= deadline) throw new Error('Monte Carlo: la corrida no terminó después del último ataque. No se contabilizó como resultado.');
+          step(MC_STEP);
+          if (Date.now() - t0 >= budgetMs) break;
+        }
+        if (ended()) { mc.results.push(summarizeRun(S, seed + mc.current)); rng = null; }
         setRandom(null); if (sample) applyProbable();
       } while (Date.now() - t0 < budgetMs && !mc.done);
+    } catch (error) {
+      finish(); throw error;
     } finally {
       setRandom(null); if (sample) applyProbable(); Object.assign(hooks, saved);
     }
@@ -83,7 +96,7 @@ export function createMonteCarlo({ runs = 20, seed = 1, sample = true } = {}) {
     return mc.done;
   };
   mc.cancel = () => { mc.cancelled = true; finish(); };
-  function finish() { if (mc.done) return; mc.done = true; resetState(); }
+  function finish() { if (mc.done) return; mc.done = true; active = null; resetState(); }
   return mc;
 }
 

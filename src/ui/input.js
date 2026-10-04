@@ -102,8 +102,9 @@ $('#zin').onclick = () => { V.s = clamp(V.s * 1.3, 1, 80); };
 $('#zout').onclick = () => { V.s = clamp(V.s / 1.3, 1, 80); };
 $('#zfit').onclick = fitView;
 document.addEventListener('keydown', e => {
-  if (e.target.matches('input,select,textarea')) return;
-  if (e.key === 'Escape') { if (!$('#modal').hidden) closeModal(); else if (S.preview) cancelPlacement(); else setMode('select'); }
+  if (e.target.matches?.('input,select,textarea,[contenteditable="true"]')) return;
+  if (!$('#modal').hidden) { if (e.key === 'Escape') closeModal(); return; }
+  if (e.key === 'Escape') { if (S.preview) cancelPlacement(); else setMode('select'); }
   if (e.key === 'Enter') { if (S.preview) confirmPlacement(); else if (S.mode === 'route') finishRoute(); }
   if (e.key === ' ') { e.preventDefault(); togglePlay(); }
 });

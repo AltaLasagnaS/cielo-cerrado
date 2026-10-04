@@ -4739,6 +4739,217 @@ table.t.mc td.pc{white-space:nowrap}
     return cov;
   }
 
+  // src/sim/goals.js
+  function goalMet(g, S2) {
+    const obj = S2.objs.find((o) => o.name === g.target), unit = S2.units.find((u) => u.name === g.target);
+    const frac2 = obj ? (obj.maxHp - obj.hp) / obj.maxHp : 0;
+    switch (g.kind) {
+      case "destroy":
+        return !!obj && obj.status === "destroyed";
+      case "damage":
+        return !!obj && frac2 >= (g.min ?? DAMAGED_AT);
+      case "protect":
+        return !!obj && obj.status === "operational";
+      case "survive":
+        return !!obj && obj.status !== "destroyed";
+      case "killUnit":
+        return !!unit && !unit.alive;
+      case "keepUnit":
+        return !!unit && unit.alive;
+      default:
+        return false;
+    }
+  }
+  function evaluateGoals(sc2, S2) {
+    const goals = (sc2?.goals || []).map((g) => ({ ...g, met: goalMet(g, S2) }));
+    const side = sc2?.player || null, mine = goals.filter((g) => g.side === side), prim = mine.filter((g) => g.primary);
+    let result = null;
+    if (prim.length) {
+      const n2 = prim.filter((g) => g.met).length;
+      result = n2 === prim.length ? "exito" : n2 ? "parcial" : "fracaso";
+    }
+    const sec = mine.filter((g) => !g.primary);
+    const text = result ? { exito: "Éxito", parcial: "Éxito parcial", fracaso: "Fracaso" }[result] + (sec.length ? ` · secundarias ${sec.filter((g) => g.met).length}/${sec.length}` : "") : "Sin metas definidas";
+    return { goals, outcome: { side, result, text } };
+  }
+
+  // src/sim/clock.js
+  var SIM_STEP = 0.25;
+  function createSimClock() {
+    let pending = 0;
+    return {
+      reset() {
+        pending = 0;
+      },
+      advance(seconds, step2) {
+        pending += seconds;
+        while (pending + 1e-9 >= SIM_STEP) {
+          pending = Math.max(0, pending - SIM_STEP);
+          if (step2(SIM_STEP) === false) {
+            pending = 0;
+            break;
+          }
+        }
+      }
+    };
+  }
+
+  // src/sim/montecarlo.js
+  var MC_STEP = SIM_STEP;
+  var active = null;
+  var isMonteCarloRunning = () => active !== null;
+  var paramSeed = (s) => (Math.imul(s, 2654435761) ^ 1540483477) >>> 0;
+  var ended = () => !S.pending.length && S.threats.every((t) => !t.alive) && S.ints.every((i) => i.done);
+  function summarizeRun(S2, seed) {
+    const { goals, outcome } = evaluateGoals(S2.scen, S2);
+    const st = S2.stats, real = S2.threats.filter((t) => !t.isDecoy).length;
+    return {
+      seed,
+      t: S2.t,
+      result: outcome.result,
+      goals: goals.map((g) => g.met),
+      objs: S2.objs.map((o) => ({ name: o.name, hp: Math.max(0, o.hp), maxHp: o.maxHp, status: o.status })),
+      lost: S2.units.filter((u) => !u.alive).map((u) => u.name),
+      real,
+      intercepted: st.killed - st.decoysKilled,
+      impacts: st.hits,
+      damage: st.damage,
+      shots: st.shots,
+      defCost: st.defCost,
+      atkCost: st.atkCost,
+      decoysKilled: st.decoysKilled
+    };
+  }
+  function createMonteCarlo({ runs = 20, seed = 1, sample = true } = {}) {
+    if (active) throw new Error("Ya hay una serie Monte Carlo en curso.");
+    const mc = { runs, seed, sample, results: [], done: false, cancelled: false, current: -1 };
+    active = mc;
+    let rng = null, deadline = 0;
+    const saved = { ...hooks }, quiet = { onLog() {
+    }, onEnd() {
+    }, onUnitLost() {
+    }, defenderView: () => false };
+    mc.tick = (budgetMs = 40) => {
+      if (mc.done) return true;
+      const t0 = Date.now();
+      Object.assign(hooks, quiet);
+      try {
+        do {
+          if (rng === null) {
+            mc.current = mc.results.length;
+            if (mc.current >= runs) {
+              finish();
+              break;
+            }
+            const s = seed + mc.current;
+            if (sample) applySample(seeded(paramSeed(s)));
+            rng = seeded(s);
+            setRandom(rng);
+            startSim();
+            S.running = false;
+            deadline = S.pending.reduce((end, th) => Math.max(end, th.tLaunch + th.ft), 0) + 401;
+            if (!Number.isFinite(deadline)) throw new Error("Monte Carlo: hay una ruta o un horario de ataque inválido.");
+          } else {
+            if (sample) applySample(seeded(paramSeed(seed + mc.current)));
+            setRandom(rng);
+          }
+          while (!ended()) {
+            if (S.t >= deadline) throw new Error("Monte Carlo: la corrida no terminó después del último ataque. No se contabilizó como resultado.");
+            step(MC_STEP);
+            if (Date.now() - t0 >= budgetMs) break;
+          }
+          if (ended()) {
+            mc.results.push(summarizeRun(S, seed + mc.current));
+            rng = null;
+          }
+          setRandom(null);
+          if (sample) applyProbable();
+        } while (Date.now() - t0 < budgetMs && !mc.done);
+      } catch (error) {
+        finish();
+        throw error;
+      } finally {
+        setRandom(null);
+        if (sample) applyProbable();
+        Object.assign(hooks, saved);
+      }
+      if (!mc.done && mc.results.length >= runs) finish();
+      return mc.done;
+    };
+    mc.cancel = () => {
+      mc.cancelled = true;
+      finish();
+    };
+    function finish() {
+      if (mc.done) return;
+      mc.done = true;
+      active = null;
+      resetState();
+    }
+    return mc;
+  }
+  function quantile(sorted, q) {
+    if (!sorted.length) return null;
+    const i = (sorted.length - 1) * q, a = Math.floor(i), b = Math.ceil(i);
+    return sorted[a] + (sorted[b] - sorted[a]) * (i - a);
+  }
+  function wilson(k, n2, z = 1.96) {
+    if (!n2) return [0, 1];
+    const p = k / n2, d = 1 + z * z / n2, c = p + z * z / (2 * n2), m = z * Math.sqrt(p * (1 - p) / n2 + z * z / (4 * n2 * n2));
+    return [Math.max(0, (c - m) / d), Math.min(1, (c + m) / d)];
+  }
+  var prop = (k, n2) => {
+    const [lo, hi] = wilson(k, n2);
+    return { k, n: n2, p: n2 ? k / n2 : 0, lo, hi };
+  };
+  function describe(values) {
+    const v = values.filter(Number.isFinite).sort((a, b) => a - b);
+    if (!v.length) return { n: 0, mean: null, min: null, p10: null, p50: null, p90: null, max: null };
+    return { n: v.length, mean: v.reduce((s, x) => s + x, 0) / v.length, min: v[0], p10: quantile(v, 0.1), p50: quantile(v, 0.5), p90: quantile(v, 0.9), max: v[v.length - 1] };
+  }
+  function histogram(values, lo, hi, bins = 10) {
+    const out = Array.from({ length: bins }, (_, i) => ({ from: lo + (hi - lo) * i / bins, to: lo + (hi - lo) * (i + 1) / bins, n: 0 }));
+    for (const x of values) {
+      if (!Number.isFinite(x)) continue;
+      const i = Math.min(bins - 1, Math.max(0, Math.floor((x - lo) / (hi - lo || 1) * bins)));
+      out[i].n++;
+    }
+    return out;
+  }
+  function aggregate(results, scen, { sample = true, seed = 1 } = {}) {
+    const n2 = results.length;
+    const count = (f) => results.filter(f).length;
+    const outcome = {};
+    for (const r of ["exito", "parcial", "fracaso"]) outcome[r] = prop(count((x) => x.result === r), n2);
+    outcome.none = prop(count((x) => x.result === null), n2);
+    const goals = (scen?.goals || []).map((g, i) => ({ ...g, met: prop(count((x) => x.goals[i]), n2) }));
+    const names = results[0]?.objs.map((o) => o.name) || [];
+    const objectives = names.map((name, i) => {
+      const os = results.map((r) => r.objs[i]);
+      return {
+        name,
+        maxHp: os[0].maxHp,
+        survive: prop(os.filter((o) => o.status !== "destroyed").length, n2),
+        operational: prop(os.filter((o) => o.status === "operational").length, n2),
+        destroyed: prop(os.filter((o) => o.status === "destroyed").length, n2),
+        dmgFrac: describe(os.map((o) => (o.maxHp - o.hp) / o.maxHp))
+      };
+    });
+    const lostNames = [...new Set(results.flatMap((r) => r.lost))];
+    const unitsLost = lostNames.map((name) => ({ name, lost: prop(count((r) => r.lost.includes(name)), n2) })).sort((a, b) => b.lost.p - a.lost.p);
+    const rate = results.map((r) => r.real ? r.intercepted / r.real : NaN);
+    const metrics = {
+      interceptRate: describe(rate),
+      intercepted: describe(results.map((r) => r.intercepted)),
+      impacts: describe(results.map((r) => r.impacts)),
+      damage: describe(results.map((r) => r.damage)),
+      shots: describe(results.map((r) => r.shots)),
+      defCost: describe(results.map((r) => r.defCost)),
+      atkCost: describe(results.map((r) => r.atkCost))
+    };
+    return { n: n2, sample, seed, scen, player: scen?.player || null, outcome, goals, objectives, unitsLost, metrics, interceptHist: histogram(rate, 0, 1, 10) };
+  }
+
   // src/sim/pace.js
   var AUTO_PHASES = {
     calm: { speed: 60, text: "calma" },
@@ -4779,6 +4990,7 @@ table.t.mc td.pc{white-space:nowrap}
     $("#defView").onchange = draw;
   }
   function togglePlay() {
+    if (isMonteCarloRunning()) return;
     if (!S.started) {
       if (!S.setup.salvos.length) {
         toast("Agregá al menos un ataque en la pestaña Ataque.");
@@ -5344,6 +5556,19 @@ table.t.mc td.pc{white-space:nowrap}
     };
   }
 
+  // src/ui/number-input.js
+  function bindNumber(input, get, set) {
+    if (!input) return;
+    const commit = () => {
+      if (input.value !== "" && Number.isFinite(input.valueAsNumber) && input.validity.valid) set(input.valueAsNumber);
+    };
+    input.addEventListener("input", commit);
+    input.addEventListener("change", commit);
+    input.addEventListener("blur", () => {
+      if (input.value === "" || !Number.isFinite(input.valueAsNumber) || !input.validity.valid) input.value = get();
+    });
+  }
+
   // src/ui/panels/selection.js
   function renderSel(live) {
     const el = $("#selCard");
@@ -5393,13 +5618,12 @@ table.t.mc td.pc{white-space:nowrap}
       if (ed) {
         const bind = (id, k, cov) => {
           const i = $(id);
-          if (!i) return;
-          i.oninput = (e) => {
-            u[k] = +e.target.value;
+          bindNumber(i, () => u[k], (value) => {
+            u[k] = value;
             const v = i.parentElement.querySelector(".val");
             if (v) v.textContent = u[k] + (k === "az" ? "°" : " m");
             if (cov) schedCov();
-          };
+          });
         };
         bind("#sMast", "mast", 1);
         bind("#sAlt", "alt", 1);
@@ -5487,9 +5711,9 @@ table.t.mc td.pc{white-space:nowrap}
       <dl class="kv"><dt>HP</dt><dd>${hp} / ${g.maxHp}</dd><dt>Tipo</dt><dd>${esc(tt.name)}</dd><dt>Posición</dt><dd>${g.x.toFixed(1)}, ${g.y.toFixed(1)} km</dd><dt>Lat/Lon</dt><dd>${ll[0].toFixed(3)}°, ${ll[1].toFixed(3)}°</dd><dt>Huella</dt><dd>${tt.radius} m de radio</dd><dt>Vulnerabilidad</dt><dd>×${tt.vuln}</dd>${S.started ? `<dt>Impactos con daño</dt><dd>${g.hits}</dd>${dmgBy ? `<dt>Daño por arma</dt><dd>${dmgBy}</dd>` : ""}` : ""}</dl>
       <p class="hint">${esc(g.desc || tt.desc)}</p>
       ${!S.started ? `<div class="field"><label for="oHp">Vida máxima</label><input id="oHp" class="inp" type="number" min="50" max="20000" step="50" value="${g.maxHp}"></div><div class="row"><button class="btn sm danger" id="oDel">Eliminar</button></div>` : ""}`;
-      if ($("#oHp")) $("#oHp").onchange = (e) => {
-        g.maxHp = Math.max(1, +e.target.value || tt.hp);
-      };
+      bindNumber($("#oHp"), () => g.maxHp, (value) => {
+        g.maxHp = value;
+      });
       if ($("#oDel")) $("#oDel").onclick = () => removeObj(g.id);
     } else if (sel.kind === "thr") {
       const th = S.threats.find((t) => t.id === sel.id);
@@ -5556,19 +5780,13 @@ table.t.mc td.pc{white-space:nowrap}
       renderAtk();
     };
     $("#aInfo").onclick = () => openFicha("thr", a.type);
-    const num2 = (id, k) => {
-      const i = $(id);
-      if (i) i.onchange = (e) => {
-        a[k] = +e.target.value;
-      };
-    };
+    const num2 = (id, k) => bindNumber($(id), () => a[k], (value) => {
+      a[k] = value;
+    });
     num2("#aCount", "count");
     num2("#aInt", "interval");
     num2("#aDist", "launchDist");
-    $("#aTime").onchange = (e) => {
-      if (a.sync) a.tArrive = +e.target.value;
-      else a.tStart = +e.target.value;
-    };
+    num2("#aTime", a.sync ? "tArrive" : "tStart");
     $("#aSync").onchange = (e) => {
       a.sync = e.target.checked;
       renderAtk();
@@ -5737,40 +5955,6 @@ table.t.mc td.pc{white-space:nowrap}
   </div>`, openBriefing);
   }
 
-  // src/sim/goals.js
-  function goalMet(g, S2) {
-    const obj = S2.objs.find((o) => o.name === g.target), unit = S2.units.find((u) => u.name === g.target);
-    const frac2 = obj ? (obj.maxHp - obj.hp) / obj.maxHp : 0;
-    switch (g.kind) {
-      case "destroy":
-        return !!obj && obj.status === "destroyed";
-      case "damage":
-        return !!obj && frac2 >= (g.min ?? DAMAGED_AT);
-      case "protect":
-        return !!obj && obj.status === "operational";
-      case "survive":
-        return !!obj && obj.status !== "destroyed";
-      case "killUnit":
-        return !!unit && !unit.alive;
-      case "keepUnit":
-        return !!unit && unit.alive;
-      default:
-        return false;
-    }
-  }
-  function evaluateGoals(sc2, S2) {
-    const goals = (sc2?.goals || []).map((g) => ({ ...g, met: goalMet(g, S2) }));
-    const side = sc2?.player || null, mine = goals.filter((g) => g.side === side), prim = mine.filter((g) => g.primary);
-    let result = null;
-    if (prim.length) {
-      const n2 = prim.filter((g) => g.met).length;
-      result = n2 === prim.length ? "exito" : n2 ? "parcial" : "fracaso";
-    }
-    const sec = mine.filter((g) => !g.primary);
-    const text = result ? { exito: "Éxito", parcial: "Éxito parcial", fracaso: "Fracaso" }[result] + (sec.length ? ` · secundarias ${sec.filter((g) => g.met).length}/${sec.length}` : "") : "Sin metas definidas";
-    return { goals, outcome: { side, result, text } };
-  }
-
   // src/sim/debrief.js
   var sum = (a, f) => a.reduce((s, x) => s + f(x), 0);
   var LOST_M = 2e3;
@@ -5859,154 +6043,6 @@ table.t.mc td.pc{white-space:nowrap}
     return out;
   }
 
-  // src/sim/montecarlo.js
-  var MC_STEP = 0.25;
-  var MAX_STEPS = 4e4;
-  var paramSeed = (s) => (Math.imul(s, 2654435761) ^ 1540483477) >>> 0;
-  var ended = () => !S.pending.length && S.threats.every((t) => !t.alive) && S.ints.every((i) => i.done);
-  function summarizeRun(S2, seed) {
-    const { goals, outcome } = evaluateGoals(S2.scen, S2);
-    const st = S2.stats, real = S2.threats.filter((t) => !t.isDecoy).length;
-    return {
-      seed,
-      t: S2.t,
-      result: outcome.result,
-      goals: goals.map((g) => g.met),
-      objs: S2.objs.map((o) => ({ name: o.name, hp: Math.max(0, o.hp), maxHp: o.maxHp, status: o.status })),
-      lost: S2.units.filter((u) => !u.alive).map((u) => u.name),
-      real,
-      intercepted: st.killed - st.decoysKilled,
-      impacts: st.hits,
-      damage: st.damage,
-      shots: st.shots,
-      defCost: st.defCost,
-      atkCost: st.atkCost,
-      decoysKilled: st.decoysKilled
-    };
-  }
-  function createMonteCarlo({ runs = 20, seed = 1, sample = true } = {}) {
-    const mc = { runs, seed, sample, results: [], done: false, cancelled: false, current: -1 };
-    let rng = null, steps = 0;
-    const saved = { ...hooks }, quiet = { onLog() {
-    }, onEnd() {
-    }, onUnitLost() {
-    }, defenderView: () => false };
-    mc.tick = (budgetMs = 40) => {
-      if (mc.done) return true;
-      const t0 = Date.now();
-      Object.assign(hooks, quiet);
-      try {
-        do {
-          if (rng === null) {
-            mc.current = mc.results.length;
-            if (mc.current >= runs) {
-              finish();
-              break;
-            }
-            const s = seed + mc.current;
-            if (sample) applySample(seeded(paramSeed(s)));
-            rng = seeded(s);
-            setRandom(rng);
-            startSim();
-            S.running = false;
-            steps = 0;
-          } else {
-            if (sample) applySample(seeded(paramSeed(seed + mc.current)));
-            setRandom(rng);
-          }
-          while (steps < MAX_STEPS && !ended()) {
-            step(MC_STEP);
-            steps++;
-            if (Date.now() - t0 >= budgetMs) break;
-          }
-          if (steps >= MAX_STEPS || ended()) {
-            mc.results.push(summarizeRun(S, seed + mc.current));
-            rng = null;
-          }
-          setRandom(null);
-          if (sample) applyProbable();
-        } while (Date.now() - t0 < budgetMs && !mc.done);
-      } finally {
-        setRandom(null);
-        if (sample) applyProbable();
-        Object.assign(hooks, saved);
-      }
-      if (!mc.done && mc.results.length >= runs) finish();
-      return mc.done;
-    };
-    mc.cancel = () => {
-      mc.cancelled = true;
-      finish();
-    };
-    function finish() {
-      if (mc.done) return;
-      mc.done = true;
-      resetState();
-    }
-    return mc;
-  }
-  function quantile(sorted, q) {
-    if (!sorted.length) return null;
-    const i = (sorted.length - 1) * q, a = Math.floor(i), b = Math.ceil(i);
-    return sorted[a] + (sorted[b] - sorted[a]) * (i - a);
-  }
-  function wilson(k, n2, z = 1.96) {
-    if (!n2) return [0, 1];
-    const p = k / n2, d = 1 + z * z / n2, c = p + z * z / (2 * n2), m = z * Math.sqrt(p * (1 - p) / n2 + z * z / (4 * n2 * n2));
-    return [Math.max(0, (c - m) / d), Math.min(1, (c + m) / d)];
-  }
-  var prop = (k, n2) => {
-    const [lo, hi] = wilson(k, n2);
-    return { k, n: n2, p: n2 ? k / n2 : 0, lo, hi };
-  };
-  function describe(values) {
-    const v = values.filter(Number.isFinite).sort((a, b) => a - b);
-    if (!v.length) return { n: 0, mean: null, min: null, p10: null, p50: null, p90: null, max: null };
-    return { n: v.length, mean: v.reduce((s, x) => s + x, 0) / v.length, min: v[0], p10: quantile(v, 0.1), p50: quantile(v, 0.5), p90: quantile(v, 0.9), max: v[v.length - 1] };
-  }
-  function histogram(values, lo, hi, bins = 10) {
-    const out = Array.from({ length: bins }, (_, i) => ({ from: lo + (hi - lo) * i / bins, to: lo + (hi - lo) * (i + 1) / bins, n: 0 }));
-    for (const x of values) {
-      if (!Number.isFinite(x)) continue;
-      const i = Math.min(bins - 1, Math.max(0, Math.floor((x - lo) / (hi - lo || 1) * bins)));
-      out[i].n++;
-    }
-    return out;
-  }
-  function aggregate(results, scen, { sample = true, seed = 1 } = {}) {
-    const n2 = results.length;
-    const count = (f) => results.filter(f).length;
-    const outcome = {};
-    for (const r of ["exito", "parcial", "fracaso"]) outcome[r] = prop(count((x) => x.result === r), n2);
-    outcome.none = prop(count((x) => x.result === null), n2);
-    const goals = (scen?.goals || []).map((g, i) => ({ ...g, met: prop(count((x) => x.goals[i]), n2) }));
-    const names = results[0]?.objs.map((o) => o.name) || [];
-    const objectives = names.map((name, i) => {
-      const os = results.map((r) => r.objs[i]);
-      return {
-        name,
-        maxHp: os[0].maxHp,
-        survive: prop(os.filter((o) => o.status !== "destroyed").length, n2),
-        operational: prop(os.filter((o) => o.status === "operational").length, n2),
-        destroyed: prop(os.filter((o) => o.status === "destroyed").length, n2),
-        dmgFrac: describe(os.map((o) => (o.maxHp - o.hp) / o.maxHp))
-      };
-    });
-    const lostNames = [...new Set(results.flatMap((r) => r.lost))];
-    const unitsLost = lostNames.map((name) => ({ name, lost: prop(count((r) => r.lost.includes(name)), n2) })).sort((a, b) => b.lost.p - a.lost.p);
-    const rate = results.map((r) => r.real ? r.intercepted / r.real : NaN);
-    const metrics = {
-      interceptRate: describe(rate),
-      intercepted: describe(results.map((r) => r.intercepted)),
-      impacts: describe(results.map((r) => r.impacts)),
-      damage: describe(results.map((r) => r.damage)),
-      shots: describe(results.map((r) => r.shots)),
-      defCost: describe(results.map((r) => r.defCost)),
-      atkCost: describe(results.map((r) => r.atkCost))
-    };
-    return { n: n2, sample, seed, scen, player: scen?.player || null, outcome, goals, objectives, unitsLost, metrics, interceptHist: histogram(rate, 0, 1, 10) };
-  }
-
   // src/ui/montecarlo.js
   var RUNS = [10, 20, 50, 100];
   var SIDE2 = { ataque: "Ataque", defensa: "Defensa" };
@@ -6026,7 +6062,8 @@ table.t.mc td.pc{white-space:nowrap}
     <div class="row"><button class="btn pri" id="mcGo">Correr</button></div>
   </div>`, openMonteCarlo);
     $("#mcGo").onclick = () => {
-      last = { runs: +$("#mcRuns").value, sample: $("#mcSample").checked, seed: Math.max(1, Math.floor(+$("#mcSeed").value) || 1) };
+      if (!$("#mcSeed").reportValidity() || !Number.isFinite($("#mcSeed").valueAsNumber)) return;
+      last = { runs: +$("#mcRuns").value, sample: $("#mcSample").checked, seed: $("#mcSeed").valueAsNumber };
       run(last);
     };
   }
@@ -6039,7 +6076,14 @@ table.t.mc td.pc{white-space:nowrap}
     $("#mcStop").onclick = () => mc.cancel();
     const frame = () => {
       if ($("#modal").hidden && !mc.done) mc.cancel();
-      mc.tick(40);
+      try {
+        mc.tick(40);
+      } catch (error) {
+        resetSim();
+        renderAll();
+        openModal(`<header><h2>Monte Carlo detenido</h2><button class="btn x">Cerrar</button></header><div class="bd"><p>${esc(error.message)}</p><p>La serie quedó incompleta. Revisá las rutas y los horarios antes de volver a correrla.</p></div>`);
+        return;
+      }
       const k = mc.results.length, el = (performance.now() - t0) / 1e3;
       if (!mc.done) {
         $("#mcTxt").textContent = `Corrida ${Math.min(k + 1, opts.runs)} de ${opts.runs}`;
@@ -6596,10 +6640,13 @@ table.t.mc td.pc{white-space:nowrap}
     };
     $("#zfit").onclick = fitView;
     document.addEventListener("keydown", (e) => {
-      if (e.target.matches("input,select,textarea")) return;
+      if (e.target.matches?.('input,select,textarea,[contenteditable="true"]')) return;
+      if (!$("#modal").hidden) {
+        if (e.key === "Escape") closeModal();
+        return;
+      }
       if (e.key === "Escape") {
-        if (!$("#modal").hidden) closeModal();
-        else if (S.preview) cancelPlacement();
+        if (S.preview) cancelPlacement();
         else setMode("select");
       }
       if (e.key === "Enter") {
@@ -7093,7 +7140,8 @@ table.t.mc td.pc{white-space:nowrap}
   }
 
   // src/ui/loop.js
-  var STEP = 0.25;
+  var clock = createSimClock();
+  var runUnits = null;
   var last2 = performance.now();
   var uiTick = 0;
   var holdUntil = 0;
@@ -7112,15 +7160,16 @@ table.t.mc td.pc{white-space:nowrap}
   function loop(now) {
     const dtr = Math.min(0.1, (now - last2) / 1e3);
     last2 = now;
+    if (runUnits !== S.units) {
+      clock.reset();
+      runUnits = S.units;
+    }
     if (S.running) {
       if (S.auto) updateAutoPhase(now);
-      let adv = dtr * currentSpeed();
-      while (adv > 0) {
-        const d = Math.min(STEP, adv);
-        step(d);
-        adv -= d;
-        if (!S.running) break;
-      }
+      clock.advance(dtr * currentSpeed(), (dt) => {
+        step(dt);
+        return S.running;
+      });
       $("#clock").textContent = fmtT(S.t);
     }
     draw();
