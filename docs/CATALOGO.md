@@ -1830,11 +1830,11 @@ El efecto depende del **rol**: los interferidores de radar degradan los radares 
 - [azov.one: ficha técnica de Bukovel (datos del fabricante)](https://azov.one/en/blog/electronics-warfare-systems/electronic-warfare-system-bukovel)
 - [Militarnyi: Bukovel-AD "aterriza" un ZALA 421-16E2 ruso](https://militarnyi.com/en/news/ukrainian-bukovel-ad-ew-system-landed-russian-zala-421-16e2-uav/)
 
-### F-16 ucraniano con pod de autoprotección (AN/ALQ-131)
+### F-16 ucraniano con autoprotección (ALQ-162 / ALQ-131)
 
 `f16ecm` · Ucrania / aliados · ruido contra radares en C/X/Ku, potencia relativa 3e+4
 
-- Los F-16 holandeses llegaron con AN/ALQ-131 y los daneses con ALQ-162 en pilones ECIPS; un escuadrón de guerra electrónica de la USAF los reprogramó contra amenazas rusas (ago-2024).
+- Los F-16 holandeses llegaron con AN/ALQ-131 y los daneses con ALQ-162 en pilones ECIPS (TWZ informa el ALQ-162(V)6 instalado en los ucranianos; el ALQ-131 en Ucrania no está confirmado); un escuadrón de guerra electrónica de la USAF los reprogramó contra amenazas rusas (ago-2024).
 - El ALQ-131 cubre 2–20 GHz en configuraciones de 1 a 3 bandas: no se sabe cuáles tiene Ucrania. Acá se asumen las bandas de control de tiro (C/X/Ku).
 - Es un pod de autoprotección, no un interferidor stand-off: en el juego representa una patrulla escoltando un ataque, con mucha menos potencia que un Il-22PP o un Krasukha. Confianza baja.
 

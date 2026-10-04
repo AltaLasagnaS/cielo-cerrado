@@ -6,7 +6,7 @@ Son ideas ordenadas por prioridad, no promesas. Cada ítem que cambie resultados
 
 ## Próximo (0.4)
 
-- **Verificar las fuentes de la investigación de EW ucraniana** (ver `docs/investigacion/`) y subir la confianza de lo confirmado.
+- **Leer completas las fuentes de la investigación de EW ucraniana** cuando la red de la sesión lo permita. La verificación cruzada con búsquedas ya está hecha (sección G de `docs/investigacion/guerra-electronica-ucraniana.md`).
 
 ## Física (cada ítem es **[sim]**)
 

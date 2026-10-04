@@ -4,6 +4,9 @@ Fecha de la investigación: 2 de octubre de 2026. Escrito para el catálogo `src
 
 > **Nota de método (leer primero).** En esta sesión, el proxy de red bloqueó la descarga directa de páginas (WebFetch dio `EGRESS_BLOCKED` en forbes.com, kyivpost.com, militarnyi.com, isis-online.org, united24media.com, wikipedia.org y spectrum.ieee.org). Todo lo que sigue sale de **búsquedas web**: el buscador devolvió el título, la URL y extractos o resúmenes de cada página. Las URL listadas existen y aparecieron en esos resultados, pero **no leí el texto completo de ninguna**. Antes de pasar a `alta` la confianza de una cifra, conviene abrir la fuente y confirmarla.
 
+
+> **Verificación cruzada (4 de octubre de 2026).** El proxy de red sigue bloqueando la lectura directa de las páginas, así que tampoco se leyeron los textos completos. Lo que sí se hizo es contrastar las cifras que usa el motor en **varias fuentes independientes** con búsquedas nuevas, que es lo que este documento llama confianza **alta**. Resultado en la sección G. Cuando la red lo permita, falta abrir las fuentes y confirmar las citas textuales.
+
 ---
 
 ## A) Resumen ejecutivo
@@ -184,7 +187,7 @@ un número inventado.
 - Datos: "8 elementos → hicieron falta 19 Lima viejos; 16 elementos → ni 104" (ingenieros ucranianos vía Forbes/United24; *claim*).
 - Esto exige cambiar el `break` del bucle GNSS (hoy corta en el primer interferidor) para **contar** las fuentes.
 - Valores sugeridos de `crpa` (todos 'baja'):
-  - Shahed 2022–23: 0–4. Shahed 2025: 8–12. Shahed desde dic-2025: 16 (Kometa-M).
+  - Shahed 2022–23: 0–4. Shahed 2025: 8–12. Shahed desde mediados de 2025: 16 (ver la sección G).
   - Iskander-K actual: 16 (NV).
   - Kh-101/Kalibr: desconocido. Igual combinan GNSS con correlación de terreno u óptica, así que conviene mantener su `T.gnss` alto.
 
@@ -310,3 +313,24 @@ Leyenda: **[F]** fabricante, **[G]** gobierno o fuerzas armadas (posible sesgo d
    - Las cifras de "intercepción" de la Fuerza Aérea ucraniana incluyen derribos con GE y no son auditables.
 9. **Las cifras de deriva inercial son aproximadas.** "≈2 km cada 100 km" (Politico) y "≈5 %" (otra fuente) difieren por un factor de 2,5. Dependen del arma, de la calidad de su INS y de si tiene navegación por terreno u óptica. Kh-101, Kalibr e Iskander-K tienen correlación de terreno u óptica, y por eso la GE solo GNSS los afecta mucho menos que a Shahed y UMPK.
 10. **Limitación de esta investigación:** el acceso directo a las páginas estuvo bloqueado y todo se extrajo de resúmenes de búsqueda (ver la nota del principio). Las URL existen, pero las citas puntuales deberían verificarse antes de subir la confianza.
+
+
+---
+
+## G) Verificación cruzada (oct-2026)
+
+Búsquedas nuevas, comparando qué dicen fuentes de distinto origen. "Independiente" quiere decir otra redacción, no otro origen del dato: una cifra del fabricante repetida por diez medios sigue siendo del fabricante.
+
+| Dato | Qué dicen las fuentes | Antes | Ahora |
+|---|---|---|---|
+| **Lima**: ~€58.000 por estación, 30–100 por ciudad, más de 400 entregadas, en uso desde el verano de 2024 | Coinciden Kyiv Post, NV (resume Politico) y Quwa. Las tres cifras salen de Cascade Systems | media | **Existencia y uso: alta. Precio y cantidades: media** (un solo origen, el fabricante) |
+| **Lima contra Kinzhal**: 58 de 59 desviados; "más de 60" a julio de 2026 | Quwa y NV, citando al fabricante | baja | **baja** (sigue siendo del fabricante; la cifra subió) |
+| **Pokrova**: supresión y engaño GNSS; 95 Shahed desviados en nov-2024, varios hacia Bielorrusia | Coinciden The Defense Post, Newsweek, Euronews, Kyiv Post y Militarnyi | alta (existencia) / baja (parámetros) | **Igual**. Los "desvíos de 5–10 km" **no aparecieron** en ninguna fuente nueva. Sí aparece una deriva inercial del Shahed de **≈5 km cada 100 km** sin GNSS, que coincide con el "≈5 %" de la sección D2 |
+| **Kometa**: 4 elementos en Iskander-K (2022), 12 en UMPK (abr-2025), **16 en Shahed e Iskander-K desde jun-2025**; 12 elementos (Kometa-M12R) en Iskander-M | Coinciden UNITED24, Militarnyi (dos notas), Forbes y un análisis independiente | baja | **media**. Corrección: los de 16 elementos aparecen desde **mediados de 2025**, no recién en dic-2025 (esa fecha venía de un agregador) |
+| **8 elementos → 19 estaciones; 16 → ni 104** | Forbes y el mismo análisis, citando a ingenieros ucranianos | baja (*claim*) | **baja** (un solo origen) |
+| **Bukovel-AD**: GNSS hasta 35 km, 4 antenas de 10 W | Coinciden Wikipedia, ArmedConflicts y folletos de Spetstechnoexport y Ukrspecexport | media | **media** (todas son la ficha del fabricante) |
+| **AN/ALQ-131**: 2–20 GHz, configuraciones de 1 a 3 bandas | Coinciden FAS y Forecast International | media | **alta** (ficha técnica). TWZ señala que los F-16 ucranianos tienen el **ALQ-162(V)6** instalado: el ALQ-131 no está confirmado en Ucrania |
+
+**Qué cambia en el juego:** nada de la simulación. Los parámetros que usa el motor (radio de cada estación, desvío por engaño, potencia relativa) no tienen dato público y siguen como estimaciones de confianza baja en `UNC.jam`. Se corrigen los textos sobre la fecha de los Kometa de 16 elementos (ficha del Shahed, `jammers.js`, FISICA §4) y se deja anotado que el pod del F-16 ucraniano probablemente sea el ALQ-162.
+
+Fuentes de esta verificación: [Quwa](https://quwa.org/pakistan/market-intelligence/ukraines-lima-and-the-convergence-of-electronic-and-cyber-warfare-what-it-signals-for-pakistan/), [NV/Politico](https://english.nv.ua/russian-war/ukraine-uses-lima-system-to-divert-russian-missiles-and-drones-politico-says-50610791.html), [The Defense Post](https://thedefensepost.com/2024/12/05/ukraine-spoofs-shahed-drones/), [Newsweek](https://www.newsweek.com/ukraine-russia-drones-belarus-spoofing-gps-1992969), [Euronews](https://www.euronews.com/my-europe/2024/12/04/lost-and-spoofed-how-ukraine-redirects-russian-drones-to-belarus), [Militarnyi: Pokrova](https://militarnyi.com/en/news/pokrova-ew-system-which-successfully-neutralizes-shaheds-has-been-launched-in-ukraine/), [UNITED24: Kometa de 12](https://united24media.com/latest-news/russia-equips-glide-bombs-with-12-channel-kometa-antennas-to-counter-ukrainian-jamming-7653), [Militarnyi: Kometa-M12R en Iskander-M](https://militarnyi.com/en/news/russia-equips-iskander-m-missile-with-new-12-element-kometa-m12r-vt-antenna/), [Militarnyi: CRPA china en Shahed](https://militarnyi.com/en/news/new-chinese-crpa-antenna-found-on-russian-shahed/), [Hans Boserup (análisis)](https://hansboserup.substack.com/p/russia-built-an-enigma-machine-for), [Forbes: Lima-Quant](https://www.forbes.com/sites/davidhambling/2026/04/03/new-ukrainian-jammer-makes-russias-latest-glide-bombs-useless-again/), [ArmedConflicts: Bukovel-AD](https://www.armedconflicts.com/Bukovel-AD-t283355), [FAS: ALQ-131](https://man.fas.org/dod-101/sys/ac/equip/an-alq-131.htm), [Forecast International: ALQ-131](https://www.forecastinternational.com/archive/disp_old_pdf.cfm?ARC_ID=636), [TWZ: F-16 ucranianos con pods](https://www.twz.com/air/f-16-officially-in-ukrainian-service-self-protection-pods-included).

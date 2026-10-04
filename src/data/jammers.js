@@ -29,8 +29,8 @@ export const JAMMERS = {
     notes: ['De Proximus, en servicio desde 2016. Detecta en 320–6.000 MHz hasta 70–100 km e interfiere enlaces de datos hasta 16–20 km. El fabricante declara supresión GNSS hasta 35 km, con 10 W por antena.', 'El motor solo representa la parte GNSS: cortar el enlace de control no detiene a un Shahed autónomo (sí "aterrizó" un ZALA 421-16E2 ruso).', 'Con 10 W y frente a receptores con CRPA, el radio real es mucho menor que el declarado: valor de juego conservador.'],
     sources: [WP('Bukovel_(counter_unmanned_aircraft_system)'), SRC.azov_bukovel, SRC.mil_bukovel] },
   // ---- contra radares: siempre a favor del ATACANTE (degradan los radares de la defensa) ----
-  f16ecm: { name: 'F-16 ucraniano con pod de autoprotección (AN/ALQ-131)', short: 'F-16 ECM', side: 'UA', air: true, alt: 4000, P: 3e4, bands: ['C', 'X', 'Ku'],
-    notes: ['Los F-16 holandeses llegaron con AN/ALQ-131 y los daneses con ALQ-162 en pilones ECIPS; un escuadrón de guerra electrónica de la USAF los reprogramó contra amenazas rusas (ago-2024).', 'El ALQ-131 cubre 2–20 GHz en configuraciones de 1 a 3 bandas: no se sabe cuáles tiene Ucrania. Acá se asumen las bandas de control de tiro (C/X/Ku).', 'Es un pod de autoprotección, no un interferidor stand-off: en el juego representa una patrulla escoltando un ataque, con mucha menos potencia que un Il-22PP o un Krasukha. Confianza baja.'],
+  f16ecm: { name: 'F-16 ucraniano con autoprotección (ALQ-162 / ALQ-131)', short: 'F-16 ECM', side: 'UA', air: true, alt: 4000, P: 3e4, bands: ['C', 'X', 'Ku'],
+    notes: ['Los F-16 holandeses llegaron con AN/ALQ-131 y los daneses con ALQ-162 en pilones ECIPS (TWZ informa el ALQ-162(V)6 instalado en los ucranianos; el ALQ-131 en Ucrania no está confirmado); un escuadrón de guerra electrónica de la USAF los reprogramó contra amenazas rusas (ago-2024).', 'El ALQ-131 cubre 2–20 GHz en configuraciones de 1 a 3 bandas: no se sabe cuáles tiene Ucrania. Acá se asumen las bandas de control de tiro (C/X/Ku).', 'Es un pod de autoprotección, no un interferidor stand-off: en el juego representa una patrulla escoltando un ataque, con mucha menos potencia que un Il-22PP o un Krasukha. Confianza baja.'],
     sources: [SRC.ng_alq131, SRC.fas_alq131, SRC.dx_f16nl, SRC.afm_f16ew] }
 };
 
@@ -38,7 +38,7 @@ export const JAMMERS = {
  * Antenas CRPA que se pueden elegir para una salva (elementos; 0 = antena común). Una CRPA de N
  * elementos anula hasta N − 1 interferidores desde direcciones distintas (physics/navigation.js).
  * Referencias (confianza baja, docs/investigacion/guerra-electronica-ucraniana.md D3): Shahed 2022–23
- * sin CRPA o de 4; Kometa de 8 y 12 en Shahed y UMPK desde 2025; Kometa-M de 16 (dic-2025) en Shahed
+ * sin CRPA o de 4; Kometa de 8 y 12 en Shahed y UMPK desde 2025; Kometa de 16 desde mediados de 2025 en Shahed
  * e Iskander-K. Ingenieros ucranianos: contra 8 elementos hicieron falta 19 estaciones Lima; contra 16,
  * ni 104 alcanzaron.
  */
