@@ -20,7 +20,7 @@ export const JAMMERS = {
     notes: ['No afecta radares: interfiere GPS/GLONASS. Las armas que dependen del satélite pasan a navegación inercial y se desvían.', 'Pole-21: ≥25 km por módulo, montado en torres de celular (fuente rusa). Protege bases e infraestructura rusas.', 'Las antenas CRPA y la navegación por terreno u óptica reducen el efecto (en el juego, el campo gnss de cada arma).'],
     sources: [SRC.topwar_pole21] },
   pokrova: { name: 'Pokrova (red ucraniana de supresión y engaño GNSS)', short: 'Pokrova', side: 'UA', air: false, gnssJam: true, radius: 25, spoofKm: 5,
-    notes: ['Red nacional de estaciones anunciada en nov-2023 y operativa desde ene/feb-2024: suprime GPS/GLONASS o los engaña (spoofing) con coordenadas falsas.', 'Engañar no es lo mismo que meter ruido: el arma cree estar en otro lugar y se desvía kilómetros sin darse cuenta. Los primeros reportes hablaban de 5–10 km; en algunas noches de nov/dic-2024, la mitad de los Shahed terminó "perdida localmente" o en Bielorrusia (esa categoría mezcla GE, señuelos y fallas).', 'No hay datos públicos de potencia, frecuencias ni radio por nodo: el radio y el desvío son valores de juego.', 'Las antenas CRPA rusas (Kometa de 8/12/16 elementos; Kometa-M desde dic-2025) le restan mucho efecto.'],
+    notes: ['Red nacional de estaciones anunciada en nov-2023 y operativa desde ene/feb-2024: suprime GPS/GLONASS o los engaña (spoofing) con coordenadas falsas.', 'Engañar no es lo mismo que meter ruido: el arma cree estar en otro lugar y se desvía kilómetros sin darse cuenta. No hay cifra pública para Pokrova; de Lima se dice "varios kilómetros". En algunas noches de nov/dic-2024, la mitad de los Shahed terminó "perdida localmente" o en Bielorrusia (esa categoría mezcla GE, señuelos y fallas).', 'No hay datos públicos de potencia, frecuencias ni radio por nodo: el radio y el desvío son valores de juego.', 'Las antenas CRPA rusas (Kometa-M de 4 elementos desde 2022, de 12 en las UMPK desde abr-2025 y de 16 desde mediados de 2025; CRPA chinas de 16 desde mar-2025) le restan mucho efecto.'],
     sources: [SRC.kp_pokrova, SRC.dx_pokrova, SRC.forbes_pokrova, SRC.dpost_spoof, SRC.euronews_lost, SRC.dx_lost] },
   lima: { name: 'Lima / Lima-Quant (estaciones anti-GNSS ucranianas)', short: 'Lima', side: 'UA', air: false, gnssJam: true, radius: 40, spoofKm: 3,
     notes: ['Interferencia, engaño y "ataque digital" al receptor GNSS. En uso desde 2024 contra bombas planeadoras UMPK/KAB y Shahed; según sus operadores, también contra crucero y Kinzhal.', '~€58.000 por estación; una ciudad grande necesita 30–100, porque contra una antena CRPA hacen falta muchas fuentes desde distintos puntos.', 'Cifras del fabricante y de la unidad, sin verificación independiente: más de 20.000 Shahed afectados, 58–61 Kinzhal "neutralizados", alcance de 300 km contra Kinzhal. Forbes y JAPCC confirman de forma independiente que la precisión de los KAB cayó en 2025.', 'Rusia respondió con Kometa-M24 y con planeadoras de mayor alcance (UMPK-PD, lanzadas desde más de 95 km).'],
@@ -38,8 +38,8 @@ export const JAMMERS = {
  * Antenas CRPA que se pueden elegir para una salva (elementos; 0 = antena común). Una CRPA de N
  * elementos anula hasta N − 1 interferidores desde direcciones distintas (physics/navigation.js).
  * Referencias (confianza baja, docs/investigacion/guerra-electronica-ucraniana.md D3): Shahed 2022–23
- * sin CRPA o de 4; Kometa de 8 y 12 en Shahed y UMPK desde 2025; Kometa de 16 desde mediados de 2025 en Shahed
- * e Iskander-K. Ingenieros ucranianos: contra 8 elementos hicieron falta 19 estaciones Lima; contra 16,
+ * sin CRPA o de 4; Kometa de 8 y 12 en Shahed y UMPK desde 2025; CRPA chinas de 16 en Shahed desde
+ * mar-2025 y Kometa-M de 16 en Iskander-K desde mediados de 2025. Ingenieros ucranianos: contra 8 elementos hicieron falta 19 estaciones Lima; contra 16,
  * ni 104 alcanzaron.
  */
 export const CRPA_SIZES = [0, 4, 8, 12, 16];

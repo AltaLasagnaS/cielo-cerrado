@@ -1750,16 +1750,16 @@ El efecto depende del **rol**: los interferidores de radar degradan los radares 
 `pokrova` · Ucrania / aliados · engaño GNSS, radio 25 km
 
 - Red nacional de estaciones anunciada en nov-2023 y operativa desde ene/feb-2024: suprime GPS/GLONASS o los engaña (spoofing) con coordenadas falsas.
-- Engañar no es lo mismo que meter ruido: el arma cree estar en otro lugar y se desvía kilómetros sin darse cuenta. Los primeros reportes hablaban de 5–10 km; en algunas noches de nov/dic-2024, la mitad de los Shahed terminó "perdida localmente" o en Bielorrusia (esa categoría mezcla GE, señuelos y fallas).
+- Engañar no es lo mismo que meter ruido: el arma cree estar en otro lugar y se desvía kilómetros sin darse cuenta. No hay cifra pública para Pokrova; de Lima se dice "varios kilómetros". En algunas noches de nov/dic-2024, la mitad de los Shahed terminó "perdida localmente" o en Bielorrusia (esa categoría mezcla GE, señuelos y fallas).
 - No hay datos públicos de potencia, frecuencias ni radio por nodo: el radio y el desvío son valores de juego.
-- Las antenas CRPA rusas (Kometa de 8/12/16 elementos; Kometa-M desde dic-2025) le restan mucho efecto.
+- Las antenas CRPA rusas (Kometa-M de 4 elementos desde 2022, de 12 en las UMPK desde abr-2025 y de 16 desde mediados de 2025; CRPA chinas de 16 desde mar-2025) le restan mucho efecto.
 
 #### Parámetros
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
 | Radio de efecto (km) | 10 | **25** | 50 | baja | [1] [2] | est: no hay radio por nodo publicado; mismo orden de magnitud que Pole-21. La red nacional son muchos nodos superpuestos |
-| Desvío típico por engaño GNSS (km) | 2 | **5** | 10 | baja | [1] [3] | primeros reportes ucranianos de 2024: desvíos de 5–10 km |
+| Desvío típico por engaño GNSS (km) | 2 | **5** | 10 | baja | [1] [3] | est: sin cifra pública para Pokrova (los "5–10 km" atribuidos a reportes de 2024 no aparecen en las fuentes leídas); mismo orden que Lima, "varios km" |
 
 1. [Defense Express: Pokrova, la GE que inutiliza los receptores GPS (ene-2024)](https://en.defence-ua.com/events/pokrova_ew_system_is_a_real_game_changer_in_ukrainian_fight_against_shahed_136_drones_and_cruise_missiles_that_renders_gps_receivers_useless-8462.html)
 2. [Kyiv Post: sistema ucraniano Pokrova](https://www.kyivpost.com/post/28059)

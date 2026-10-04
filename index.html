@@ -1270,7 +1270,7 @@ table.t.mc td.pc{white-space:nowrap}
       gnssJam: true,
       radius: 25,
       spoofKm: 5,
-      notes: ["Red nacional de estaciones anunciada en nov-2023 y operativa desde ene/feb-2024: suprime GPS/GLONASS o los engaña (spoofing) con coordenadas falsas.", 'Engañar no es lo mismo que meter ruido: el arma cree estar en otro lugar y se desvía kilómetros sin darse cuenta. Los primeros reportes hablaban de 5–10 km; en algunas noches de nov/dic-2024, la mitad de los Shahed terminó "perdida localmente" o en Bielorrusia (esa categoría mezcla GE, señuelos y fallas).', "No hay datos públicos de potencia, frecuencias ni radio por nodo: el radio y el desvío son valores de juego.", "Las antenas CRPA rusas (Kometa de 8/12/16 elementos; Kometa-M desde dic-2025) le restan mucho efecto."],
+      notes: ["Red nacional de estaciones anunciada en nov-2023 y operativa desde ene/feb-2024: suprime GPS/GLONASS o los engaña (spoofing) con coordenadas falsas.", 'Engañar no es lo mismo que meter ruido: el arma cree estar en otro lugar y se desvía kilómetros sin darse cuenta. No hay cifra pública para Pokrova; de Lima se dice "varios kilómetros". En algunas noches de nov/dic-2024, la mitad de los Shahed terminó "perdida localmente" o en Bielorrusia (esa categoría mezcla GE, señuelos y fallas).', "No hay datos públicos de potencia, frecuencias ni radio por nodo: el radio y el desvío son valores de juego.", "Las antenas CRPA rusas (Kometa-M de 4 elementos desde 2022, de 12 en las UMPK desde abr-2025 y de 16 desde mediados de 2025; CRPA chinas de 16 desde mar-2025) le restan mucho efecto."],
       sources: [SRC.kp_pokrova, SRC.dx_pokrova, SRC.forbes_pokrova, SRC.dpost_spoof, SRC.euronews_lost, SRC.dx_lost]
     },
     lima: {
@@ -1789,7 +1789,7 @@ table.t.mc td.pc{white-space:nowrap}
       gnss: { radius: U(15, 25, 50, "media", S_("topwar_pole21"), "≥25 km por módulo (fuente rusa)") },
       pokrova: {
         radius: U(10, 25, 50, "baja", S_("dx_pokrova", "kp_pokrova"), "est: no hay radio por nodo publicado; mismo orden de magnitud que Pole-21. La red nacional son muchos nodos superpuestos"),
-        spoofKm: U(2, 5, 10, "baja", S_("dx_pokrova", "forbes_pokrova"), "primeros reportes ucranianos de 2024: desvíos de 5–10 km")
+        spoofKm: U(2, 5, 10, "baja", S_("dx_pokrova", "forbes_pokrova"), 'est: sin cifra pública para Pokrova (los "5–10 km" atribuidos a reportes de 2024 no aparecen en las fuentes leídas); mismo orden que Lima, "varios km"')
       },
       lima: {
         radius: U(20, 40, 100, "baja", S_("kp_lima2", "forbes_limaq", "ki_kinzhal"), "fabricante: CRPA a 50 km, KAB a más de 100 km, Kinzhal a 300 km. Que una ciudad necesite 30–100 estaciones sugiere un radio efectivo menor contra CRPA; est"),
