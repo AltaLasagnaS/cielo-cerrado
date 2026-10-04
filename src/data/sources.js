@@ -145,6 +145,7 @@ export const SRC = {
   fas_alq131: ['FAS: AN/ALQ-131, pod de autoprotección', 'https://man.fas.org/dod-101/sys/ac/equip/an-alq-131.htm'],
   dx_f16nl: ['Defense Express: qué traen distinto los F-16 holandeses (ALQ-131, ECIPS)', 'https://en.defence-ua.com/news/ukraines_new_f_16s_from_the_netherlands_whats_different_from_danish_version-12107.html'],
   afm_f16ew: ['Air & Space Forces Magazine: la USAF reprogramó la GE de los F-16 ucranianos (ago-2024)', 'https://www.airandspaceforces.com/ukraine-f-16-electronic-warfare-us-air-force/'],
+  twz_f16pods: ['TWZ: los F-16 ucranianos, en servicio con pods de autoprotección (ALQ-162(V)6)', 'https://www.twz.com/air/f-16-officially-in-ukrainian-service-self-protection-pods-included'],
   rusi_storm: ['RUSI: Stormbreak (2023)', 'https://static.rusi.org/Stormbreak-Special-Report-web-final_0.pdf']
 };
 /** Azúcar para listas de claves de fuentes. */
