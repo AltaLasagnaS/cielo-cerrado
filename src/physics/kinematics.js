@@ -45,7 +45,7 @@ export function buildThreat(sv, k, tLaunch) {
   return {
     id: nextId(), type: sv.type, T, sv: sv.id, n: k + 1, tLaunch, pts, cum, L, ph, ft: acc, gT: surf(tg[0], tg[1]),
     agl: sv.agl ?? T.agl, maneuver: !!sv.maneuver, link: !!(sv.link && T.datalink), crpa: sv.crpa ?? 0, decoyRel: sv.decoys ? (T.decoys || 0) : 0, released: false,
-    alive: false, done: false, det: {}, lastNet: -1e9, firstDet: null, netFirst: null, clsT: 0, clsTau: null, clsAs: null, trail: [], navErr: 0, gnssHit: false,
+    alive: false, done: false, det: {}, net: {}, lastNet: -1e9, firstDet: null, cueFirst: null, netFirst: null, clsT: 0, clsTau: null, clsAs: null, trail: [], navErr: 0, gnssHit: false,
     targetUnit: sv.targetUnit ?? null, targetObj: sv.targetObj ?? null, cls: T.cls, isDecoy: !!T.decoy, phase: rnd() * 6.28
   };
 }

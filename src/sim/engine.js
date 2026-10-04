@@ -2,7 +2,7 @@
 // Bucle de paso fijo: la interfaz llama a step(dt) con dt ≤ 0,25 s de tiempo simulado.
 // Cada paso: lanzamientos → movimiento/señuelos/GNSS → barridos de sensores → decisiones de tiro
 // → resolución de interceptores → fin de corrida. Ver docs/ARQUITECTURA.md.
-import { BANDS, D, JAMMERS, TARGET_STATUS, WEATHER, UNIT_TARGET, UNIT_DAMAGE, UNIT_COMP_AT } from '../data/index.js';
+import { BANDS, D, JAMMERS, TARGET_STATUS, WEATHER, UNIT_TARGET, UNIT_DAMAGE, UNIT_COMP_AT, datalinksOf } from '../data/index.js';
 import { classify, classifyGain } from '../physics/decoys.js';
 import { money } from '../util/format.js';
 import { nextId } from '../util/ids.js';
@@ -61,7 +61,7 @@ export function step(dt) {
       th.released = true;
       for (let k = 0; k < th.decoyRel; k++) {
         const ang = rnd() * 6.28, dist = 1 + rnd() * 2.5;
-        const dc = { ...th, fly: [], id: nextId(), parent: th, isDecoy: true, isDecoyChild: true, decoyRel: 0, sRel: p.s, off: [Math.cos(ang) * dist, Math.sin(ang) * dist], det: {}, trail: [], lastNet: -1e9, firstDet: null, netFirst: null, clsT: 0, clsTau: null, clsAs: null, phase: th.phase + (k + 1) * 1.6180339, alive: true, targetUnit: null };
+        const dc = { ...th, fly: [], id: nextId(), parent: th, isDecoy: true, isDecoyChild: true, decoyRel: 0, sRel: p.s, off: [Math.cos(ang) * dist, Math.sin(ang) * dist], det: {}, net: {}, trail: [], lastNet: -1e9, firstDet: null, cueFirst: null, netFirst: null, clsT: 0, clsTau: null, clsAs: null, phase: th.phase + (k + 1) * 1.6180339, alive: true, targetUnit: null };
         S.threats.push(dc); S.stats.decoys++; S.stats.launched++;
       }
       log('w', label(th) + ' libera ' + th.decoyRel + ' señuelos a ' + p.rem.toFixed(0) + ' km del blanco.');
@@ -108,7 +108,15 @@ export function step(dt) {
         th.det[u.id] = t;
         const g = classifyGain(r);   // seguimiento con radar de tiro: aprende a distinguir señuelos
         if (g) { th.clsT = (th.clsT || 0) + g; th.clsTau = Math.min(th.clsTau ?? Infinity, BANDS[r.band].decoyTau); const c = classify(th); if (c && !th.clsAs) { th.clsAs = c; if (c === 'señuelo' && S.ignoreDecoys) log('d', 'Pista #' + th.id + ' clasificada como señuelo por ' + uLabel(u) + (th.isDecoy ? '.' : ' (¡error: era ' + th.T.short + '!).')); } }
-        if (u.link !== false) { th.lastNet = t; if (th.netFirst === null) th.netFirst = t; }   // solo los sensores con enlace alimentan la red
+        // La coordinación C2 puede repartir una alerta aun cuando el datalink de tiro esté apagado.
+        if (th.cueFirst === null) th.cueFirst = t;
+        // Una pista de tiro solo entra a la red por un transporte compatible y encendido.
+        if (u.link !== false) for (const key of datalinksOf(D(u))) {
+          const n = th.net[key] || (th.net[key] = { first: null, last: -1e9 });
+          if (n.first === null) n.first = t;
+          n.last = t;
+          th.lastNet = t; if (th.netFirst === null) th.netFirst = t;
+        }
         if (th.firstDet === null) { th.firstDet = t; th.detKm = p.rem; log('l', 'Primera detección: ' + label(th) + ' por ' + uLabel(u) + ' a ' + Math.hypot(p.x - u.x, p.y - u.y).toFixed(1) + ' km, ' + Math.round(p.z - surf(p.x, p.y)) + ' m AGL.'); event('Primera detección: ' + label(th) + ' por ' + uLabel(u), 'firstDet'); }
       }
     }

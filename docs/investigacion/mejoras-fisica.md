@@ -193,11 +193,13 @@ A media distancia detecta un poco menos y en el borde un poco más, como pasa en
 
 **Qué es.** Una batería no pelea sola. Recibe alertas de otros radares, comparte pistas y se reparte los blancos con las demás. Cuánto de eso funciona depende del **mando y control (C2)**: qué red hay, con qué demora llega la información, con qué precisión y quién decide a quién le tira cada uno.
 
-**Qué hace hoy el motor.** Un interruptor global, "red integrada" (`S.net`):
+**Qué hacía el motor antes de esta separación.** Un interruptor global, "red integrada" (`S.net`):
 - encendido: cualquier sensor comparte la pista durante 12 s, los misiles activos o IR pueden usarla, y una batería no le tira a un blanco que ya tiene interceptores en vuelo;
 - apagado: cada batería ve solo lo suyo y se pueden repetir blancos.
 
-No distingue sistemas ni demoras, y es todo o nada para todo el bando.
+No distinguía sistemas ni demoras, y era todo o nada para todo el bando.
+
+**Estado actual.** `S.c2` mantiene esos cuatro niveles para la coordinación general. Cada defensa declara `datalinks` (por ejemplo `['l16']`, `['ua_c2']` o `['ru_c2']`) y conserva el interruptor `link`. El C2 puede entregar alertas y repartir blancos aunque el interruptor esté apagado; una pista de tiro remota solo existe cuando emisor y receptor comparten una familia compatible y ambos tienen el enlace activo. Ver la [auditoría de C2 y datalink](c2-datalink.md) para el estado implementado y sus límites.
 
 **Cómo lo resuelve CMO.**
 - Imagen común por bando.
@@ -227,7 +229,7 @@ No distingue sistemas ni demoras, y es todo o nada para todo el bando.
 | **Integrada** (tipo IBCS/CEC) | Pista compuesta de calidad de tiro | 1–2 s · error de decenas de m | Sí, también *engage-on-remote* para interceptores compatibles | "El mejor tirador": mayor Pk o menor costo |
 
 **Enlaces de datos compatibles.**
-- Cada defensa declara sus redes, por ejemplo `links: ['L16']` para Patriot y NASAMS, `['UA-ACS']` para lo integrado a la red nacional ucraniana y `['RU-ACS']` para lo integrado con Polyana o Baikal.
+- Cada defensa declara sus redes, por ejemplo `datalinks: ['l16']` para Patriot y NASAMS, `['ua_c2']` para lo integrado a la red nacional ucraniana y `['ru_c2']` para lo integrado con Polyana o Baikal.
 - Solo se comparten pistas entre unidades con una red en común.
 - Una unidad **pasarela** (un puesto de mando, que se puede agregar como objetivo) conecta dos redes y suma demora.
 
@@ -244,12 +246,12 @@ No distingue sistemas ni demoras, y es todo o nada para todo el bando.
 - `sim/state.js`: `S.c2` reemplaza a `S.net`, con compatibilidad: `net = true` equivale a "coordinada";
 - `physics/engagement.js`: `trackOK` pasa a mirar la calidad y la edad de la pista;
 - `sim/engine.js`: pistas por red con demora y error, y reparto;
-- `data/defenses.js`: `links`;
+- `data/defenses.js`: `datalinks`;
 - `data/scenarios.js`: `rules.c2`;
 - `ui/panels/defense.js`: selector de nivel;
 - `sim/scenario-io.js`: guardar y cargar los ajustes, sumando una versión del formato.
 
-**Dificultad:** media–alta. Toca el corazón del enfrentamiento. Conviene hacerlo en dos PR: primero los niveles con demora y error; después las redes por sistema y las pasarelas.
+**Dificultad:** media–alta. Toca el corazón del enfrentamiento. La primera separación entre C2 y familias de datalink ya está implementada; quedan topología, pasarelas, pérdida por enlace y guía continua como cambios posteriores.
 
 **Datos.** Qué sistema usa qué red (fuentes de arriba, más fichas de fabricante). Las demoras y los errores típicos no son públicos: van como estimaciones con rango y confianza baja, y el Monte Carlo muestra cuánto pesan.
 
@@ -589,7 +591,7 @@ La diferencia frente–costado es la parte más incierta. Por eso el Monte Carlo
 | **Liutyi y Flamingo** | Sin datos firmes | Hay drones ucranianos con Starlink y *mesh* (Palytsia, Bucha), pero no encontré confirmación para estos dos [ua_mesh] | Baja |
 
 **Cómo queda en el juego:**
-- Cada defensa trae en el catálogo `links` (por ejemplo `['L16']`), con fuente y confianza.
+- Cada defensa trae en el catálogo `datalinks` (por ejemplo `['l16']`), con fuente y confianza.
 - En la tarjeta de la unidad, un interruptor **"Enlace de datos: Link 16 (encendido/apagado)"**. Sirve para escenarios donde el enlace está apagado, interferido o todavía no integrado, como el caso del IFF deshabilitado.
 - Las unidades con el mismo enlace encendido comparten pistas de tiro con 1–2 s de demora y error de decenas de metros, **cualquiera sea el nivel del bando**.
 - El resto recibe la información según el nivel del bando (sección C.4).

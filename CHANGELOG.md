@@ -14,6 +14,10 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 - Pruebas de regresión de tiempo fijo, ataques tardíos y bloqueo de series, más `tests/ui.browser.mjs` para validar entradas y controles en Chromium.
 
 ### Agregado
+- **[sim]** C2 y datalink quedan separados: el C2 puede repartir alertas y blancos aunque una unidad tenga apagado su enlace, pero una pista de tiro remota solo cruza entre familias compatibles (`l16`, `ua_c2`, `ru_c2`). NASAMS, Patriot e IRIS-T comparten la abstracción Link 16; S-300 no recibe esa pista. Se actualizan las golden y se agrega la auditoría reproducible en `docs/investigacion/c2-datalink.md`.
+- Línea de base reproducible de los seis escenarios (`npm run baseline`), con 40 semillas por modo y resultados individuales en `docs/mediciones/baseline.json`.
+
+### Agregado
 - **`npm run mc`**: Monte Carlo de escenarios en Node (40 noches con los valores probables por defecto; `SAMPLE=1` para sortear parámetros, `N=` para otra cantidad). Es la vara de todas las cifras de balance.
 - **Revisión de tres valores estimados** (`docs/investigacion/valores-estimados.md`): `remotePk` 0,97, recarga del NASAMS de 30 min y corte de la detección a 1,2·R, con su sensibilidad medida en Kiev. La recarga del NASAMS tiene un efecto umbral (con 15 min Kiev pasa de 68% a 98%) y el corte pesa mucho (con 1,5·R, 88%).
 

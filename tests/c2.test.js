@@ -52,24 +52,34 @@ test('C2 integrada: un guiado por radar no lanza con pista ajena si su sector no
   assert.ok(shots(180) > 0);          // de frente: dispara
 });
 
-test('C2: una unidad sin enlace de datos no recibe pistas de la red ni alertas', () => {
+test('C2 y datalink: apagar el datalink no quita la alerta C2, pero sí la pista de tiro', () => {
   const off = { id: 1, type: 'irist', link: false };
   for (const k of Object.keys(C2_LEVELS)) assert.equal(trackOK(off, th, 155, k), false, k);
   assert.equal(trackOK(off, { ...th, det: { 1: 154 } }, 155, 'coordinada'), true);   // con su propio radar, sí
-  assert.equal(reactionStart(th, 200, 'integrada', off), 200);
+  assert.equal(reactionStart({ ...th, cueFirst: 100 }, 200, 'integrada', off), 102);
 });
 
-test('C2: una detección de un sensor sin enlace no alimenta la red', () => {
+test('datalink: una detección sin transporte no alimenta la red compatible', () => {
   const run = link => {
     useMap('monterey', { flat: true }); clearSetup();
-    addDef('ewr', 50, 20, { name: 'R' }); addDef('irist', 50, 60, { name: 'I' });
+    addDef('ewr', 50, 20, { name: 'R' }); addDef('s300', 50, 60, { name: 'S' });
     S.setup.defs.find(d => d.name === 'R').link = link;
     addSalvo({ type: 'kh22', count: 1, pts: [[50, 0], [50, 59]] });
     runCurrent(2); return S.threats[0];
   };
   assert.ok(run(true).netFirst !== null);
   const th2 = run(false); assert.ok(th2.firstDet !== null);
-  assert.ok(th2.netFirst === null || th2.netFirst > th2.firstDet);   // la red se entera recién cuando lo ve el IRIS-T
+  assert.ok(th2.netFirst === null || th2.netFirst > th2.firstDet);   // el S-300 no recibe la pista del EWR si el sensor no publica
+});
+
+test('datalink: Link 16 une NASAMS y Patriot, no S-300', () => {
+  const remote = { det: {}, net: { l16: { first: 100, last: 150 } }, netFirst: 100, lastNet: 150 };
+  assert.equal(trackOK({ id: 1, type: 'patriot', link: true }, remote, 155, 'coordinada'), true);
+  assert.equal(trackOK({ id: 2, type: 'nasams', link: true }, remote, 155, 'coordinada'), true);
+  assert.equal(trackOK({ id: 3, type: 's300', link: true }, remote, 155, 'coordinada'), false);
+  const soviet = { det: {}, net: { ua_c2: { first: 100, last: 150 } } };
+  assert.equal(trackOK({ id: 3, type: 's300', link: true }, soviet, 155, 'integrada'), true);
+  assert.equal(trackOK({ id: 4, type: 'patriot', link: true }, soviet, 155, 'coordinada'), false);
 });
 
 test('C2: el puesto de mando y las comunicaciones destruidos bajan el nivel efectivo', () => {

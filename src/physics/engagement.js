@@ -1,6 +1,6 @@
 // ---------------- ENFRENTAMIENTO ----------------
 // Seguimiento, solución de tiro y probabilidad de derribo (Pk). Ver docs/FISICA.md §6–§7.
-import { D, C2_LEVELS, C2_ORDER, C2_NODES } from '../data/index.js';
+import { D, C2_LEVELS, C2_ORDER, C2_NODES, datalinksOf } from '../data/index.js';
 import { azOf, clamp } from '../util/math.js';
 import { surf } from './terrain.js';
 import { jamJ } from './radar.js';
@@ -25,7 +25,13 @@ export const isTBM = th => th.cls === 'balistico' || th.cls === 'hiper';
  */
 export function trackOK(u, th, t, c2) {
   const d = D(u), L = C2_LEVELS[c2], own = d.radar ? (t - (th.det[u.id] ?? -1e9)) <= d.radar.scan * 2 + 0.6 : false;
-  const netT = u.link !== false && (L.share === 'track' || L.share === 'fire') && th.netFirst != null && t - th.netFirst >= L.lag && (t - th.lastNet) <= L.window;
+  const compatible = datalinksOf(d).some(key => {
+    const n = th.net?.[key];
+    return n && n.first != null && t - n.first >= L.lag && t - n.last <= L.window;
+  });
+  // Fallback para pistas creadas por escenarios/archivos de la versión anterior al desglose por red.
+  const legacy = !th.net && th.netFirst != null && t - th.netFirst >= L.lag && t - th.lastNet <= L.window;
+  const netT = u.link !== false && (L.share === 'track' || L.share === 'fire') && (compatible || legacy);
   if (d.sam.guid === 'cañón') return own;
   if (RADAR_GUID.includes(d.sam.guid)) return own || (L.share === 'fire' && netT);
   if (d.sam.guid === 'operador') return netT;
@@ -39,7 +45,9 @@ export function trackOK(u, th, t, c2) {
  */
 export function reactionStart(th, t, c2, u = null) {
   const L = C2_LEVELS[c2];
-  if ((L.share === 'cue' || L.share === 'fire') && th.netFirst != null && u?.link !== false) return Math.min(t, th.netFirst + L.lag);
+  if ((L.share === 'cue' || L.share === 'fire') && th.cueFirst != null) return Math.min(t, th.cueFirst + L.lag);
+  // Compatibilidad con objetos de pruebas y escenarios guardados anteriores.
+  if ((L.share === 'cue' || L.share === 'fire') && th.cueFirst == null && th.netFirst != null && u?.link !== false) return Math.min(t, th.netFirst + L.lag);
   return t;
 }
 

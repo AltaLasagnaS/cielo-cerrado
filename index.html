@@ -919,6 +919,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
+      datalinks: ["l16"],
       radar: { name: "AN/MPQ-65", agile: true, slc: 1, band: "C", mti: "pd", R1: 100, mast: 4, mastRange: [4, 4], mastNote: "Fija: la antena va sobre el semirremolque M860, inclinada a 67,5°. El mástil de ≈30 m de la batería (AMG) es de comunicaciones, no del radar (FM 3-01.85).", sector: 90, eccm: 10, scan: 2 },
       sam: { maxR: 100, maxRtbm: 40, minR: 3, altMin: 50, altMax: 36e3, vInt: 1300, vmaxT: 3e3, react: 9, ch: 8, mag: 16, reserve: 16, reloadS: 2400, salvo: 2, guid: "activo", shot: "PAC-3 MSE", noDrones: true, cost: 4.2, pk: { dron: 0.9, crucero: 0.9, supersonico: 0.6, balistico: 0.7, hiper: 0.5 } },
       range: "≈40 km vs balísticos (estimado), ≈100 km vs aeronaves",
@@ -932,6 +933,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
+      datalinks: ["l16"],
       radar: { name: "AN/MPQ-65", agile: true, slc: 1, band: "C", mti: "pd", R1: 100, mast: 4, mastRange: [4, 4], mastNote: "Fija: la antena va sobre el semirremolque M860. El mástil de ≈30 m (AMG) es de comunicaciones, no del radar.", sector: 90, eccm: 10, scan: 2 },
       sam: { maxR: 160, maxRtbm: 20, minR: 3, altMin: 60, altMax: 24e3, vInt: 900, vmaxT: 2500, react: 9, ch: 8, mag: 16, reserve: 16, reloadS: 2400, salvo: 2, guid: "TVM", shot: "PAC-2 GEM-T", noDrones: true, cost: 3, pk: { dron: 0.8, crucero: 0.85, supersonico: 0.55, balistico: 0.4, hiper: 0.25 } },
       range: "≈160 km vs aeronaves, ≈20 km vs balísticos",
@@ -945,6 +947,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
+      datalinks: [],
       radar: { name: "Arabel", agile: true, lowSL: true, slc: 1, band: "X", mti: "pd", R1: 80, mast: 5, mastRange: [5, 5], mastNote: "Fija: Arabel montado sobre camión (altura estimada).", sector: 360, eccm: 10, scan: 1 },
       sam: { maxR: 100, maxRtbm: 25, minR: 3, altMin: 50, altMax: 2e4, vInt: 1050, vmaxT: 2500, react: 8, ch: 10, mag: 32, reserve: 16, reloadS: 2400, salvo: 2, guid: "activo", shot: "Aster 30", noDrones: true, cost: 2, pk: { dron: 0.85, crucero: 0.88, supersonico: 0.6, balistico: 0.6, hiper: 0.4 } },
       range: "≈100 km vs aeronaves (50 km por debajo de 3 km de altura), 20–35 km vs balísticos",
@@ -958,6 +961,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
+      datalinks: ["l16"],
       radar: { name: "Hensoldt TRML-4D", agile: true, lowSL: true, slc: 2, band: "C", mti: "pd", R1: 100, mast: 6, mastRange: [4, 12], mastNote: "Mástil hidráulico sobre el camión: la antena llega hasta 12 m (Hensoldt). Retraído ≈4 m (estimado).", sector: 360, eccm: 10, scan: 1 },
       sam: { maxR: 40, maxRtbm: 0, minR: 1, altMin: 10, altMax: 2e4, vInt: 750, vmaxT: 1200, react: 6, ch: 8, mag: 24, reserve: 8, reloadS: 1200, salvo: 1, guid: "IR", shot: "IRIS-T SL", cost: 0.5, pk: { dron: 0.9, crucero: 0.88, supersonico: 0.2, balistico: 0, hiper: 0 } },
       range: "40 km, techo 20 km (SLX: 80 km)",
@@ -971,6 +975,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
+      datalinks: ["l16"],
       radar: { name: "AN/MPQ-64 Sentinel", agile: true, lowSL: true, band: "X", mti: "pd", R1: 60, mast: 4, mastRange: [4, 4], mastNote: "Fija: Sentinel sobre remolque (altura estimada).", sector: 360, eccm: 8, scan: 2 },
       sam: { maxR: 35, maxRtbm: 0, minR: 1, altMin: 30, altMax: 15e3, vInt: 900, vmaxT: 1e3, react: 6, ch: 6, mag: 18, reserve: 12, reloadS: 1800, salvo: 1, guid: "activo", shot: "AIM-120", cost: 1.07, pk: { dron: 0.85, crucero: 0.88, supersonico: 0.4, balistico: 0, hiper: 0 } },
       range: "≈35–40 km (AMRAAM-ER: 50–60 km)",
@@ -984,6 +989,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
+      datalinks: ["ua_c2"],
       radar: { name: "30N6 Flap Lid (en torre 40V6)", agile: true, lowSL: true, band: "X", mti: "pd", R1: 100, mast: 25, mastRange: [7, 39], mastNote: "Sin torre, la antena queda a ≈7 m sobre su vehículo (estimado); en la torre 40V6M a ≈25 m y en la 40V6MD a ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h, no se cambia durante el combate.", sector: 90, eccm: 3, scan: 2 },
       sam: { maxR: 75, maxRtbm: 25, minR: 5, altMin: 25, altMax: 27e3, vInt: 1300, vmaxT: 1300, react: 12, ch: 4, mag: 16, reserve: 12, reloadS: 2400, salvo: 2, guid: "TVM", shot: "5V55R", cost: 0.5, pk: { dron: 0.5, crucero: 0.6, supersonico: 0.4, balistico: 0.15, hiper: 0.05 } },
       range: "47 km (5V55K) / 75 km (5V55R), techo 27 km",
@@ -997,6 +1003,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "both",
       kind: "sam",
       color: "#62b6ff",
+      datalinks: ["ua_c2", "ru_c2"],
       radar: { name: "9S35 Fire Dome (+9S18M1 Snow Drift)", band: "X", mti: "mti", R1: 50, mast: 4, mastRange: [4, 4], mastNote: "Fija: radar sobre el vehículo de orugas (altura estimada).", sector: 360, eccm: 3, scan: 2 },
       sam: { maxR: 35, maxRtbm: 10, minR: 3.3, altMin: 15, altMax: 22e3, vInt: 650, vmaxT: 830, react: 22, ch: 3, mag: 12, reserve: 12, reloadS: 780, salvo: 2, guid: "SARH", shot: "9M38", cost: 0.5, pk: { dron: 0.55, crucero: 0.6, supersonico: 0.35, balistico: 0.05, hiper: 0 } },
       range: "3,3–35 km, techo 22 km",
@@ -1010,6 +1017,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "gun",
       color: "#62b6ff",
+      datalinks: [],
       radar: { name: "Búsqueda S + seguimiento Ku", band: "S", mti: "pd", R1: 15, mast: 3, mastRange: [3, 3], mastNote: "Fija: radar sobre la torreta (altura estimada).", sector: 360, eccm: 0, scan: 1 },
       sam: { maxR: 4, maxRtbm: 0, minR: 0.1, altMin: 0, altMax: 3e3, vInt: 1100, vmaxT: 400, react: 3, ch: 1, mag: 20, reserve: 20, reloadS: 900, salvo: 1, guid: "cañón", shot: "ráfaga 35 mm", cost: 0.018, pk: { dron: 0.55, crucero: 0.35, supersonico: 0.05, balistico: 0, hiper: 0 } },
       range: "≈3,5–4 km típico (5,5 km con FAPDS)",
@@ -1023,6 +1031,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "gun",
       color: "#62b6ff",
+      datalinks: [],
       radar: { name: "Visual / térmico", band: "OPT", R1: 5, mast: 2, mastRange: [2, 2], mastNote: "Fija: ojos y óptica del equipo.", sector: 360, eccm: 99, scan: 1 },
       sam: { maxR: 1.5, maxRtbm: 0, minR: 0, altMin: 0, altMax: 1500, vInt: 800, vmaxT: 250, react: 5, ch: 1, mag: 30, reserve: 60, reloadS: 120, salvo: 1, guid: "cañón", shot: "ráfaga 12,7 mm", cost: 3e-4, pk: { dron: 0.2, crucero: 0.05, supersonico: 0, balistico: 0, hiper: 0 } },
       range: "≈1,5 km",
@@ -1036,6 +1045,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "both",
       kind: "sam",
       color: "#62b6ff",
+      datalinks: [],
       radar: { name: "Visual / IR", band: "OPT", R1: 7, mast: 2, mastRange: [2, 2], mastNote: "Fija: el tirador.", sector: 360, eccm: 99, scan: 1 },
       sam: { maxR: 4.8, maxRtbm: 0, minR: 0.2, altMin: 10, altMax: 3800, vInt: 550, vmaxT: 400, react: 6, ch: 1, mag: 4, reserve: 4, reloadS: 60, salvo: 1, guid: "IR", shot: "FIM-92 Stinger", cost: 0.45, pk: { dron: 0.5, crucero: 0.4, supersonico: 0.05, balistico: 0, hiper: 0 } },
       range: "≈4,8 km, techo ≈3,8 km",
@@ -1049,6 +1059,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
+      datalinks: ["ua_c2"],
       radar: null,
       sam: { maxR: 25, maxRtbm: 0, minR: 0.3, altMin: 50, altMax: 3e3, vInt: 85, vmaxT: 95, react: 20, ch: 4, mag: 20, reserve: 20, reloadS: 600, salvo: 1, guid: "operador", shot: "dron interceptor", cost: 3e-3, pk: { dron: 0.6, crucero: 0.05, supersonico: 0, balistico: 0, hiper: 0 } },
       range: "≈25 km",
@@ -1062,6 +1073,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
+      datalinks: [],
       radar: { name: "AN/MPQ-61 HPIR (+ AN/MPQ-50 PAR, AN/MPQ-62 CWAR)", band: "X", mti: "pd", R1: 70, mast: 4, mastRange: [4, 4], mastNote: "Fija: radares sobre remolques (altura estimada).", sector: 360, eccm: 5, scan: 2 },
       sam: { maxR: 40, maxRtbm: 0, minR: 1.5, altMin: 60, altMax: 17700, vInt: 700, vmaxT: 820, react: 15, ch: 2, mag: 9, reserve: 9, reloadS: 1200, salvo: 2, guid: "SARH", shot: "MIM-23B", cost: 0.3, pk: { dron: 0.6, crucero: 0.7, supersonico: 0.4, balistico: 0, hiper: 0 } },
       range: "1,5–40 km, techo ≈17 km",
@@ -1075,6 +1087,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
+      datalinks: ["ua_c2"],
       radar: { name: 'SNR-125 "Low Blow" (+ P-18/P-19 de búsqueda)', band: "X", mti: "none", R1: 40, mast: 4, mastRange: [4, 6], mastNote: "Cabina de radar sobre remolque; la versión polaca Newa-SC va sobre chasis MAZ-543 (≈4–6 m, estimado).", sector: 360, eccm: 3, scan: 2 },
       sam: { maxR: 25, maxRtbm: 0, minR: 2.5, altMin: 25, altMax: 18e3, vInt: 600, vmaxT: 700, react: 25, ch: 1, mag: 8, reserve: 8, reloadS: 1500, salvo: 2, guid: "mando", shot: "5V27", cost: 0.15, pk: { dron: 0.45, crucero: 0.55, supersonico: 0.3, balistico: 0, hiper: 0 } },
       range: "2,5–25 km, techo 18 km",
@@ -1088,6 +1101,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "sam",
       color: "#62b6ff",
+      datalinks: ["ua_c2"],
       radar: { name: '5N62 "Square Pair" (iluminación; búsqueda con P-14/radar de la red)', band: "C", mti: "pd", R1: 250, mast: 8, mastRange: [8, 8], mastNote: "Fija: antena del 5N62 sobre su base (altura estimada).", sector: 120, eccm: 3, scan: 4 },
       sam: { maxR: 250, maxRtbm: 0, minR: 17, altMin: 300, altMax: 4e4, vInt: 1100, vmaxT: 1180, react: 60, ch: 1, mag: 6, reserve: 6, reloadS: 3600, salvo: 2, guid: "SARH", shot: "5V28", cost: 0.6, pk: { dron: 0.2, crucero: 0.25, supersonico: 0.2, balistico: 0, hiper: 0 } },
       range: "17–250 km, techo ≈40 km; no baja de 300 m",
@@ -1101,6 +1115,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "RU",
       kind: "sam",
       color: "#ff9f5a",
+      datalinks: ["ru_c2"],
       radar: { name: "1RS1 búsqueda (S) + 1RS2 seguimiento (Ku)", agile: true, band: "S", mti: "pd", R1: 30, mast: 6, mastRange: [6, 6], mastNote: "Fija: radares sobre el camión (altura estimada).", sector: 360, eccm: 5, scan: 1 },
       sam: { maxR: 18, maxRtbm: 5, minR: 1, altMin: 5, altMax: 15e3, vInt: 900, vmaxT: 1e3, react: 5, ch: 3, mag: 12, reserve: 12, reloadS: 1800, salvo: 2, guid: "mando", shot: "57E6", cost: 0.15, pk: { dron: 0.65, crucero: 0.6, supersonico: 0.3, balistico: 0.1, hiper: 0 } },
       range: "18–20 km misil, 4 km cañones",
@@ -1114,6 +1129,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "RU",
       kind: "sam",
       color: "#ff9f5a",
+      datalinks: ["ru_c2"],
       radar: { name: "Búsqueda (banda F ≈ S) + seguimiento (G/H y Ku)", agile: true, band: "S", mti: "pd", R1: 25, mast: 4, mastRange: [4, 4], mastNote: "Fija: radar sobre el vehículo de orugas (altura estimada).", sector: 360, eccm: 5, scan: 1 },
       sam: { maxR: 15, maxRtbm: 5, minR: 1, altMin: 10, altMax: 1e4, vInt: 700, vmaxT: 700, react: 6, ch: 4, mag: 16, reserve: 8, reloadS: 1080, salvo: 1, guid: "mando", shot: "9M338", cost: 0.3, pk: { dron: 0.75, crucero: 0.7, supersonico: 0.35, balistico: 0.1, hiper: 0 } },
       range: "15–16 km, techo 10 km",
@@ -1127,6 +1143,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "RU",
       kind: "sam",
       color: "#ff9f5a",
+      datalinks: ["ru_c2"],
       radar: { name: "92N6 Grave Stone (en torre 40V6M)", agile: true, lowSL: true, slc: 1, band: "X", mti: "pd", R1: 200, mast: 25, mastRange: [7, 39], mastNote: "Sin torre, la antena queda a ≈7 m sobre su vehículo (estimado); en la torre 40V6M a ≈25 m y en la 40V6MD a ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h, no se cambia durante el combate.", sector: 120, eccm: 8, scan: 2 },
       sam: { maxR: 250, maxRtbm: 60, minR: 3, altMin: 10, altMax: 27e3, vInt: 1500, vmaxT: 4800, react: 9, ch: 10, mag: 32, reserve: 16, reloadS: 2400, salvo: 2, guid: "TVM", shot: "48N6", noDrones: true, cost: 1.5, pk: { dron: 0.75, crucero: 0.7, supersonico: 0.6, balistico: 0.5, hiper: 0.3 } },
       range: "48N6DM: 240–250 km; 40N6: hasta 380–400 km",
@@ -1140,6 +1157,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "both",
       kind: "sensor",
       color: "#62b6ff",
+      datalinks: ["ua_c2", "ru_c2"],
       radar: { name: '36D6 "Tin Shield"', slc: 2, band: "S", mti: "mti", R1: 175, mast: 10, mastRange: [10, 39], mastNote: "Sobre su remolque ≈10 m (estimado); puede ir en la torre 40V6M/MD hasta ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h.", sector: 360, eccm: 3, scan: 5 },
       range: "200 km instrumentados; contra 1 m² a 50 m de altura ≈110–115 km con mástil",
       notes: ["Radar de alerta y adquisición que alimenta a las baterías S-300. Rota a 6 o 12 rpm.", "Podés subirle el mástil (torre 40V6M) para ver más lejos a baja cota."],
@@ -1151,6 +1169,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "both",
       kind: "sensor",
       color: "#62b6ff",
+      datalinks: ["ua_c2", "ru_c2"],
       radar: { name: "P-18MR", band: "VHF", mti: "mti", R1: 160, mast: 8, mastRange: [8, 8], mastNote: "Fija: antenas Yagi sobre su soporte (altura estimada).", sector: 360, eccm: 0, scan: 6 },
       range: "P-18MR contra 1 m²: 35 km a 100 m de altura, 120 km a 5 km",
       notes: ['En VHF las formas furtivas pierden efecto: la RCS del Kh-101 o del Storm Shadow "crece" mucho.', "Precisión pobre: sirve para alerta y para pasar pistas a la red, no para guiar misiles."],
@@ -1162,6 +1181,7 @@ table.t.mc td.pc{white-space:nowrap}
       side: "UA",
       kind: "acoustic",
       color: "#62b6ff",
+      datalinks: ["ua_c2"],
       radar: { name: "Micrófonos en red", band: "ACU", R1: 5, mast: 0, mastRange: [0, 0], mastNote: "Micrófonos a nivel del suelo.", sector: 360, eccm: 99, scan: 2, altMax: 3e3 },
       range: "≈5 km por grupo de sensores (cada micrófono oye 1–3 km)",
       notes: ["~10.000 sensores de US$400–500 c/u conectados por celular.", "Solo detecta drones con motor; no ve misiles ni blancos muy altos.", "Inmune a la interferencia de radar y al RCS."],
@@ -1174,6 +1194,7 @@ table.t.mc td.pc{white-space:nowrap}
       kind: "aew",
       color: "#62b6ff",
       alt: 6e3,
+      datalinks: ["l16"],
       radar: { name: "Erieye (AESA, lateral)", agile: true, lowSL: true, band: "S", mti: "pd", R1: 240, mast: 6e3, sector: 150, side: true, eccm: 10, scan: 4 },
       range: "≈330–350 km contra cazas; 450 km instrumentados",
       notes: ["Suecia lo anunció en mayo de 2024; la transferencia se confirmó en agosto de 2025 y opera en combate desde marzo de 2026.", 'Antena lateral "tabla": ve a ambos costados (~150° c/u) y tiene zonas ciegas adelante y atrás. Orientá el rumbo de vuelo.', "Desde 6 km de altura ve misiles rasantes a más de 100 km, donde un radar terrestre no llega."],
@@ -1186,6 +1207,7 @@ table.t.mc td.pc{white-space:nowrap}
       kind: "aew",
       color: "#ff9f5a",
       alt: 9e3,
+      datalinks: ["ru_c2"],
       radar: { name: "Shmel-M (rotodomo)", band: "S", mti: "pd", R1: 230, mast: 9e3, sector: 360, eccm: 5, scan: 10 },
       range: "≈650 km contra blancos grandes; 150 pistas dentro de 230 km",
       notes: ["Rusia perdió dos A-50 en 2024 (14/1 y 23/2).", "Rotodomo de 360°. La banda del Shmel-M no es pública (se asume S)."],
@@ -2359,6 +2381,35 @@ table.t.mc td.pc{white-space:nowrap}
   var C2_NODES = { command: "all", comms: 1 };
   var c2FromNet = (net) => net ? "coordinada" : "desconectada";
 
+  // src/data/datalinks.js
+  var DATALINKS = {
+    l16: {
+      name: "Link 16 / MIDS",
+      capability: "track",
+      confidence: "media",
+      note: "Familia de intercambio táctico occidental; el acceso y la capacidad de engage-on-remote dependen de la integración concreta.",
+      sources: ["crs_nasams", "kongsberg"]
+    },
+    ua_c2: {
+      name: "Red C2 nacional ucraniana",
+      capability: "track",
+      confidence: "media",
+      note: "Gateway nacional para sistemas soviéticos y occidentales; no se presume interoperabilidad de calidad de tiro entre todos los usuarios.",
+      sources: ["ua_mix"]
+    },
+    ru_c2: {
+      name: "Red automatizada rusa",
+      capability: "track",
+      confidence: "media",
+      note: "Familia Polyana/Baikal/Senezh; el comportamiento real de cada despliegue no es público.",
+      sources: ["ru_polyana"]
+    }
+  };
+  var datalinksOf = (u) => {
+    const links = u?.datalinks ?? u?.links ?? [];
+    return Array.isArray(links) ? links.filter((k) => DATALINKS[k]) : [];
+  };
+
   // src/data/weather.js
   var WEATHER = {
     despejado: {
@@ -3228,8 +3279,10 @@ table.t.mc td.pc{white-space:nowrap}
       alive: false,
       done: false,
       det: {},
+      net: {},
       lastNet: -1e9,
       firstDet: null,
+      cueFirst: null,
       netFirst: null,
       clsT: 0,
       clsTau: null,
@@ -3369,7 +3422,12 @@ table.t.mc td.pc{white-space:nowrap}
   var isTBM = (th) => th.cls === "balistico" || th.cls === "hiper";
   function trackOK(u, th, t, c2) {
     const d = D(u), L = C2_LEVELS[c2], own = d.radar ? t - (th.det[u.id] ?? -1e9) <= d.radar.scan * 2 + 0.6 : false;
-    const netT = u.link !== false && (L.share === "track" || L.share === "fire") && th.netFirst != null && t - th.netFirst >= L.lag && t - th.lastNet <= L.window;
+    const compatible = datalinksOf(d).some((key) => {
+      const n2 = th.net?.[key];
+      return n2 && n2.first != null && t - n2.first >= L.lag && t - n2.last <= L.window;
+    });
+    const legacy = !th.net && th.netFirst != null && t - th.netFirst >= L.lag && t - th.lastNet <= L.window;
+    const netT = u.link !== false && (L.share === "track" || L.share === "fire") && (compatible || legacy);
     if (d.sam.guid === "cañón") return own;
     if (RADAR_GUID.includes(d.sam.guid)) return own || L.share === "fire" && netT;
     if (d.sam.guid === "operador") return netT;
@@ -3377,7 +3435,8 @@ table.t.mc td.pc{white-space:nowrap}
   }
   function reactionStart(th, t, c2, u = null) {
     const L = C2_LEVELS[c2];
-    if ((L.share === "cue" || L.share === "fire") && th.netFirst != null && u?.link !== false) return Math.min(t, th.netFirst + L.lag);
+    if ((L.share === "cue" || L.share === "fire") && th.cueFirst != null) return Math.min(t, th.cueFirst + L.lag);
+    if ((L.share === "cue" || L.share === "fire") && th.cueFirst == null && th.netFirst != null && u?.link !== false) return Math.min(t, th.netFirst + L.lag);
     return t;
   }
   function effectiveC2(c2, objs) {
@@ -3555,7 +3614,7 @@ table.t.mc td.pc{white-space:nowrap}
         th.released = true;
         for (let k = 0; k < th.decoyRel; k++) {
           const ang = rnd() * 6.28, dist = 1 + rnd() * 2.5;
-          const dc = { ...th, fly: [], id: nextId(), parent: th, isDecoy: true, isDecoyChild: true, decoyRel: 0, sRel: p.s, off: [Math.cos(ang) * dist, Math.sin(ang) * dist], det: {}, trail: [], lastNet: -1e9, firstDet: null, netFirst: null, clsT: 0, clsTau: null, clsAs: null, phase: th.phase + (k + 1) * 1.6180339, alive: true, targetUnit: null };
+          const dc = { ...th, fly: [], id: nextId(), parent: th, isDecoy: true, isDecoyChild: true, decoyRel: 0, sRel: p.s, off: [Math.cos(ang) * dist, Math.sin(ang) * dist], det: {}, net: {}, trail: [], lastNet: -1e9, firstDet: null, cueFirst: null, netFirst: null, clsT: 0, clsTau: null, clsAs: null, phase: th.phase + (k + 1) * 1.6180339, alive: true, targetUnit: null };
           S.threats.push(dc);
           S.stats.decoys++;
           S.stats.launched++;
@@ -3623,7 +3682,11 @@ table.t.mc td.pc{white-space:nowrap}
               if (c === "señuelo" && S.ignoreDecoys) log("d", "Pista #" + th.id + " clasificada como señuelo por " + uLabel(u) + (th.isDecoy ? "." : " (¡error: era " + th.T.short + "!)."));
             }
           }
-          if (u.link !== false) {
+          if (th.cueFirst === null) th.cueFirst = t;
+          if (u.link !== false) for (const key of datalinksOf(D(u))) {
+            const n2 = th.net[key] || (th.net[key] = { first: null, last: -1e9 });
+            if (n2.first === null) n2.first = t;
+            n2.last = t;
             th.lastNet = t;
             if (th.netFirst === null) th.netFirst = t;
           }
@@ -5595,6 +5658,8 @@ table.t.mc td.pc{white-space:nowrap}
         html += `<dt>Radar</dt><dd>${esc(r.name)} · ${r.band}</dd><dt>Horizonte vs blanco a 50 m</dt><dd>${hor.toFixed(0)} km</dd>`;
       }
       if (d.sam) html += `<dt>Alcance</dt><dd>${d.sam.maxR} km${d.sam.maxRtbm ? " (TBM " + d.sam.maxRtbm + ")" : ""}</dd><dt>Guiado</dt><dd>${d.sam.guid}</dd>`;
+      const links = datalinksOf(d).map((k) => DATALINKS[k].name).join(", ");
+      if (d.sam || r) html += `<dt>Datalink nativo</dt><dd>${esc(links || "ninguno; recibe alertas C2 si la integración lo permite")}</dd>`;
       if (S.started && d.sam) html += `<dt>Munición</dt><dd>${u.magLeft}/${u.mag} · reserva ${u.reserveLeft}</dd><dt>En vuelo</dt><dd>${u.active}/${d.sam.ch}</dd>${u.reloadUntil !== null ? `<dt>Recargando</dt><dd>faltan ${Math.ceil((u.reloadUntil - S.t) / 60)} min</dd>` : ""}`;
       if (S.started) {
         const hurt = u.alive && (u.dmgRadar || u.dmgLauncher), what = [u.dmgRadar ? "radar: menos alcance y reacción más lenta" : "", u.dmgLauncher ? "lanzador fuera de servicio" : ""].filter(Boolean).join("; ");
@@ -5609,7 +5674,7 @@ table.t.mc td.pc{white-space:nowrap}
         }
         if (d.kind === "aew") html += `<div class="field"><label for="sAlt">Altitud de vuelo</label><span class="val">${u.alt} m</span><input id="sAlt" type="range" min="2000" max="11000" step="250" value="${u.alt}"></div>`;
         if (r && r.sector < 360) html += `<div class="field"><label for="sAz">${r.side ? "Rumbo de vuelo" : "Orientación del sector"}</label><span class="val">${u.az}°</span><input id="sAz" type="range" min="0" max="359" value="${u.az}"></div>`;
-        if (d.sam || r) html += `<label class="check" title="Sin enlace no comparte lo que ve con la red ni recibe pistas ni alertas de otros sensores"><input type="checkbox" id="sLink" ${u.link !== false ? "checked" : ""}> Enlace de datos con la red</label>`;
+        if (datalinksOf(d).length) html += `<label class="check" title="El C2 puede coordinar alertas aunque este interruptor esté apagado. Al apagarlo, la unidad deja de publicar y recibir pistas de tiro por sus datalinks compatibles."><input type="checkbox" id="sLink" ${u.link !== false ? "checked" : ""}> Datalink activo (${esc(links)})</label>`;
         if (d.sam) html += `<label class="check"><input type="checkbox" id="sNoD" ${u.noDrones ? "checked" : ""}> No gastar en drones (reservar para misiles)</label><div class="field"><label for="sMag">Munición disponible</label><input id="sMag" class="inp" type="number" min="1" max="200" value="${u.mag}"></div><div class="field"><label for="sRes">Reserva para recargar (${Math.round(d.sam.reloadS / 60)} min por recarga)</label><input id="sRes" class="inp" type="number" min="0" max="500" value="${u.reserve ?? 0}"></div><div class="field"><label for="sSal">Interceptores por blanco</label><input id="sSal" class="inp" type="number" min="1" max="4" value="${u.salvo}"></div>`;
       }
       html += `<div class="row"><button class="btn sm" id="sInfo">Ficha</button>${ed ? '<button class="btn sm danger" id="sDel">Eliminar</button>' : ""}</div>`;

@@ -1,6 +1,6 @@
 // Tarjeta "Selección": detalle y parámetros editables de lo que esté seleccionado en el mapa
 // (defensa, jammer, salva o amenaza en vuelo).
-import { THREATS, JAMMERS, JAM_MODES, TARGET_TYPES, TARGET_STATUS, D, UNIT_TARGET } from '../../data/index.js';
+import { THREATS, JAMMERS, JAM_MODES, TARGET_TYPES, TARGET_STATUS, D, DATALINKS, datalinksOf, UNIT_TARGET } from '../../data/index.js';
 import { esc, fmtT, kmh, money } from '../../util/format.js';
 import { releaseId } from '../../util/ids.js';
 import { surf, latlon } from '../../physics/terrain.js';
@@ -30,6 +30,8 @@ export function renderSel(live) {
       <dl class="kv"><dt>Posición</dt><dd>${u.x.toFixed(1)}, ${u.y.toFixed(1)} km</dd><dt>Lat/Lon</dt><dd>${ll[0].toFixed(3)}°, ${ll[1].toFixed(3)}°</dd><dt>Terreno</dt><dd>${ground} m</dd>`;
     if (r && r.band !== 'ACU') { const hor = horizon(antZ(u) - (d.kind === 'aew' ? 0 : ground), 50); html += `<dt>Radar</dt><dd>${esc(r.name)} · ${r.band}</dd><dt>Horizonte vs blanco a 50 m</dt><dd>${hor.toFixed(0)} km</dd>`; }
     if (d.sam) html += `<dt>Alcance</dt><dd>${d.sam.maxR} km${d.sam.maxRtbm ? ' (TBM ' + d.sam.maxRtbm + ')' : ''}</dd><dt>Guiado</dt><dd>${d.sam.guid}</dd>`;
+    const links = datalinksOf(d).map(k => DATALINKS[k].name).join(', ');
+    if (d.sam || r) html += `<dt>Datalink nativo</dt><dd>${esc(links || 'ninguno; recibe alertas C2 si la integración lo permite')}</dd>`;
     if (S.started && d.sam) html += `<dt>Munición</dt><dd>${u.magLeft}/${u.mag} · reserva ${u.reserveLeft}</dd><dt>En vuelo</dt><dd>${u.active}/${d.sam.ch}</dd>${u.reloadUntil !== null ? `<dt>Recargando</dt><dd>faltan ${Math.ceil((u.reloadUntil - S.t) / 60)} min</dd>` : ''}`;
     if (S.started) {
       const hurt = u.alive && (u.dmgRadar || u.dmgLauncher), what = [u.dmgRadar ? 'radar: menos alcance y reacción más lenta' : '', u.dmgLauncher ? 'lanzador fuera de servicio' : ''].filter(Boolean).join('; ');
@@ -44,7 +46,7 @@ export function renderSel(live) {
       }
       if (d.kind === 'aew') html += `<div class="field"><label for="sAlt">Altitud de vuelo</label><span class="val">${u.alt} m</span><input id="sAlt" type="range" min="2000" max="11000" step="250" value="${u.alt}"></div>`;
       if (r && (r.sector < 360)) html += `<div class="field"><label for="sAz">${r.side ? 'Rumbo de vuelo' : 'Orientación del sector'}</label><span class="val">${u.az}°</span><input id="sAz" type="range" min="0" max="359" value="${u.az}"></div>`;
-      if (d.sam || r) html += `<label class="check" title="Sin enlace no comparte lo que ve con la red ni recibe pistas ni alertas de otros sensores"><input type="checkbox" id="sLink" ${u.link !== false ? 'checked' : ''}> Enlace de datos con la red</label>`;
+      if (datalinksOf(d).length) html += `<label class="check" title="El C2 puede coordinar alertas aunque este interruptor esté apagado. Al apagarlo, la unidad deja de publicar y recibir pistas de tiro por sus datalinks compatibles."><input type="checkbox" id="sLink" ${u.link !== false ? 'checked' : ''}> Datalink activo (${esc(links)})</label>`;
       if (d.sam) html += `<label class="check"><input type="checkbox" id="sNoD" ${u.noDrones ? 'checked' : ''}> No gastar en drones (reservar para misiles)</label><div class="field"><label for="sMag">Munición disponible</label><input id="sMag" class="inp" type="number" min="1" max="200" value="${u.mag}"></div><div class="field"><label for="sRes">Reserva para recargar (${Math.round(d.sam.reloadS / 60)} min por recarga)</label><input id="sRes" class="inp" type="number" min="0" max="500" value="${u.reserve ?? 0}"></div><div class="field"><label for="sSal">Interceptores por blanco</label><input id="sSal" class="inp" type="number" min="1" max="4" value="${u.salvo}"></div>`;
     }
     html += `<div class="row"><button class="btn sm" id="sInfo">Ficha</button>${ed ? '<button class="btn sm danger" id="sDel">Eliminar</button>' : ''}</div>`;
