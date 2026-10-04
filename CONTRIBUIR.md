@@ -43,7 +43,7 @@ Si las golden fallan y tu cambio *no* debería alterar la simulación (interfaz,
 5. `npm test && npm run docs && npm run build`.
 
 ### Agregar una defensa o un sensor
-Igual que un arma, en `defenses.js` y `UNC.def`. La Pk por clase debe estar justificada: idealmente con un caso en `calibration.js`.
+Igual que un arma, en `defenses.js` y `UNC.def`. La Pk por clase debe estar justificada: idealmente con un caso en `calibration-cases.js` (geometría) corrido con `npm run calibrar -- --write`, que regenera `calibration.js`.
 
 ### Agregar un escenario
 Agregá una entrada en `src/data/scenarios.js`. Todo es declarativo: objetivos, defensas, salvas, jammers, reglas y metas, documentado en el encabezado del archivo. La prueba de catálogo verifica que los tipos y nombres existan, que todo esté dentro del mapa, que las metas apunten a objetivos o defensas reales y que el briefing esté completo (hora, descripción, fuerzas, condiciones, reglas, metas principales de los dos bandos, éxito y fracaso).

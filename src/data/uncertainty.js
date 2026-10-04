@@ -108,7 +108,7 @@ export const UNC = {
       rcsVHF: U(0.1, 0.24, 1, 'baja', S_('cmo_db3k'), 'est por resonancia 0,3 m²; CMO (DB3K, SS-26 Stone [9M723 Iskander-M]): −7,3 dBsm ≈ 0,19 m² de frente en bandas A–D. Probable = media geométrica'),
       cep: U(5, 25, 30, 'media', S_('gur_isk', 'rusi_isk22', 'csis_isk'), 'GUR: 20–30 m; 5–7 m es valor de folleto'),
       cost: U(2.4, 2.7, 3.0, 'alta', S_('costs_leak'), ''),
-      decoys: U(2, 6, 6, 'media', S_('gur_isk', 'twz_9b899', 'rusi_isk25'), 'unos 6 señuelos 9B899 por misil (RUSI escribe 9B999). El juego no modela la discriminación del radar: el mínimo representa un radar que descarta la mayoría'),
+      decoys: U(2, 6, 6, 'media', S_('gur_isk', 'twz_9b899', 'rusi_isk25'), 'unos 6 señuelos 9B899 por misil (RUSI escribe 9B999). La discriminación del juego es solo por tiempo de seguimiento (BANDS.decoyTau): el mínimo representa un radar que descarta la mayoría'),
       manPk: U(0.4, 0.6, 0.85, 'baja', S_('ft_aerotime', 'rusi_isk25'), 'calibrado: perfil con la actualización de 2025; 0,85 ≈ perfil 2023–24'),
       'info.rangeKm': U(390, 450, 550, 'alta', S_('gur_isk'), ''),
       'info.warheadKg': U(450, 480, 700, 'media', S_('gur_isk', 'rusi_isk22'), '')

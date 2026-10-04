@@ -53,7 +53,11 @@ tasa observada ≈ C × [1 − (1 − Pk·m)ⁿ]
 
 Por eso no se calibró contra el promedio nacional (0,55% contra el Kh-22 o 4,5% contra balísticos hasta 2024, dominados por C ≈ 0). Se calibró contra **episodios donde el blanco cayó dentro de la cobertura de un sistema capaz**, por ejemplo 9 de 12 Kh-22 sobre Kyiv con Patriot, o 2 de 2 Zircon con SAMP/T y Patriot. Esos casos se corrieron en el motor (Monte Carlo) y se ajustaron las Pk hasta que la tasa simulada cayera dentro del intervalo de confianza del 95% del dato real. La tabla completa está en CATALOGO.md y en el juego (Catálogo → Calibración de Pk).
 
-**Limitación:** la geometría exacta de esos casos de prueba no quedó guardada en la versión original. Reconstruir un arnés de calibración reproducible está en el [ROADMAP](../ROADMAP.md).
+**Arnés reproducible:** `npm run calibrar` corre los casos de `src/data/calibration-cases.js` (geometría guardada, mapa plano, semillas 1–40) y muestra la tasa con las Pk probables y con todas en el mínimo y el máximo de `UNC`. `npm run calibrar -- --write` regenera `src/data/calibration.js` (la tabla `CAL`). La geometría de la versión original no quedó guardada, así que los casos son **reconstrucciones** a partir de su descripción.
+
+Estado (40 noches): 7 de 9 casos con objetivo caen dentro. Quedan dos **fuera**, pendientes de una decisión (ver ROADMAP):
+- **Iskander-M con señuelos contra un Patriot**: 18% (objetivo 35–65%). Ya daba 16% con el motor de hace 15 PRs, así que no es un cambio reciente: con 6 señuelos por misil, el Patriot gasta sus 16 misiles antes de clasificarlos. Sin señuelos da 77%. Ni la doctrina de ignorar señuelos, ni la C2 integrada ni espaciar los lanzamientos lo llevan al objetivo. Lo que hay que revisar es la cantidad de señuelos, la discriminación o el cargador de la batería, no la Pk.
+- **Kalibr contra S-300 + Buk**: 88% (objetivo 60–85%). Daba 73% con el motor de #19; subió con los cambios de física de #20–#33.
 
 ## 5. Sesgos de las fuentes
 

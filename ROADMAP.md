@@ -6,7 +6,7 @@ Son ideas ordenadas por prioridad, no promesas. Cada ítem que cambie resultados
 
 ## Próximo (0.4)
 
-- **Arnés de calibración reproducible** (`npm run calibrar`): reconstruir los casos de `CAL` con geometría guardada. El Monte Carlo de escenarios en Node ya está (`npm run mc`).
+- **Dos casos de calibración fuera de objetivo** (`npm run calibrar`, ver docs/DATOS-Y-FUENTES.md §4): Iskander-M con señuelos contra Patriot (18%, objetivo 35–65%: revisar señuelos, discriminación o cargador) y Kalibr contra S-300 + Buk (88%, objetivo 60–85%).
 - **Verificar las fuentes de la investigación de EW ucraniana** (ver `docs/investigacion/`) y subir la confianza de lo confirmado.
 
 ## Física (cada ítem es **[sim]**)

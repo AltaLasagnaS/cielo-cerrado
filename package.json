@@ -13,7 +13,8 @@
     "docs": "node scripts/gen-catalog-doc.mjs",
     "check": "npm run lint && npm test && npm run build && npm run docs && git diff --exit-code -- index.html docs/CATALOGO.md",
     "mc": "node scripts/montecarlo.mjs",
-    "baseline": "node scripts/baseline.mjs"
+    "baseline": "node scripts/baseline.mjs",
+    "calibrar": "node scripts/calibrar.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.28.2",
