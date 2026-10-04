@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
 // Read-only repository diagnosis in a disposable browser page. No source edits.
-// This observes the current baseline, NOT acceptance of the proposed Delete feature.
+// Cantidades y borrado en la interfaz actual; la observación histórica está en NOTAS-USUARIO.md.
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const url = process.env.TEST_SIM_URL || 'http://127.0.0.1:8768/index.html';
 const origin = new URL(url).origin;
@@ -42,9 +42,9 @@ try {
   await page.evaluate(id => { window.__S.sel = { kind: 'def', id }; window.__dbg.renderAll(); }, original.id);
   const beforeDelete = await page.evaluate(() => window.__S.setup.defs.length);
   await page.keyboard.press('Delete');
-  assert.equal(await page.evaluate(() => window.__S.setup.defs.length), beforeDelete,
-    'baseline observado: Delete todavía no borra, no darlo por implementado');
+  assert.equal(await page.evaluate(() => window.__S.setup.defs.length), beforeDelete - 1,
+    'Delete reutiliza el borrado de la defensa seleccionada');
   assert.deepEqual(errors, []);
   console.log('Observado: mag/reserve/salvo no guardan 1,5; blur restaura e importación lo rechaza.');
-  console.log('Observado: Delete todavía no elimina selección. Sin cambios al código del simulador.');
+  console.log('Verificado: Delete elimina la selección en preparación. Sin cambios al motor.');
 } finally { await browser.close(); }

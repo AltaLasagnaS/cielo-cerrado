@@ -132,6 +132,22 @@ try {
     await page.evaluate(() => window.__dbg.computeCov());
     assert.deepEqual(errors, [], 'no esconder excepciones del juego');
   });
+  await check('Delete y mensajes de cantidades también funcionan en el archivo descargable', async () => {
+    const id = await page.evaluate(() => {
+      const u = window.__S.setup.defs.find(u => window.DEFENSES_REF[u.type].sam);
+      window.__S.sel = { kind: 'def', id: u.id }; window.__dbg.renderAll(); return u.id;
+    });
+    const previous = await page.locator('#sMag').inputValue();
+    await page.locator('#sMag').fill('1.5');
+    assert.match(await page.locator('#sMag-error').innerText(), /sin decimales/);
+    await page.locator('#sMag').press('Delete');
+    assert.equal(await page.evaluate(id => window.__S.setup.defs.some(u => u.id === id), id), true, 'campo protegido');
+    await page.locator('#sMag').blur(); assert.equal(await page.locator('#sMag').inputValue(), previous);
+    await page.keyboard.press('Delete');
+    assert.equal(await page.evaluate(id => window.__S.setup.defs.some(u => u.id === id), id), false);
+    assert.equal(await page.evaluate(() => window.__S.sel), null);
+    assert.deepEqual(errors, []);
+  });
   await context.tracing.stop();
   await writeFile(join(artifacts, 'standalone-results.json'), JSON.stringify({ passed: checks.length, checks,
     protocol: new URL(standaloneUrl).protocol, javascriptErrors: errors, blockedExternalRequests: blocked.length }, null, 2));

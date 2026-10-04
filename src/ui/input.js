@@ -15,7 +15,7 @@ import { schedCov } from './coverage.js';
 import { togglePlay } from './controls.js';
 import { setMode, updateModebar, finishRoute, toast, proposePlacement, confirmPlacement, cancelPlacement } from './modes.js';
 import { closeModal } from './fichas.js';
-import { renderSel } from './panels/selection.js';
+import { renderSel, deleteSelected } from './panels/selection.js';
 
 /** Píxeles que tiene que moverse el puntero para que un toque cuente como arrastre y no como click. */
 const DRAG_PX = 6;
@@ -103,7 +103,8 @@ $('#zout').onclick = () => { V.s = clamp(V.s / 1.3, 1, 80); };
 $('#zfit').onclick = fitView;
 document.addEventListener('keydown', e => {
   if (!$('#modal').hidden) { if (e.key === 'Escape') { e.preventDefault(); closeModal(); } return; }
-  if (e.target.matches?.('input,select,textarea,[contenteditable="true"]')) return;
+  if (e.target.closest?.('input,select,textarea,[contenteditable]:not([contenteditable="false"]),[role="textbox"]')) return;
+  if (e.key === 'Delete') { if (deleteSelected()) e.preventDefault(); return; }
   if (e.key === 'Escape') { if (S.preview) cancelPlacement(); else setMode('select'); }
   if (e.key === 'Enter') { if (S.preview) confirmPlacement(); else if (S.mode === 'route') finishRoute(); }
   if (e.key === ' ') { e.preventDefault(); togglePlay(); }

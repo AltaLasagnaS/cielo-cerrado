@@ -37,6 +37,7 @@ try {
   // Reutiliza la prueba existente sin cambiarla: sus imports nativos usan el mismo S del juego.
   server = await startSourceServer(repoRoot);
   await run(join(repoRoot, 'tests/ui.browser.mjs'), { TEST_URL: server.url }, 'ui-native');
+  await run(join(packageRoot, 'ux.browser.mjs'), {}, 'ux');
   // El archivo descargable no puede usar imports /sim; se prueba por separado como file://.
   await run(join(packageRoot, 'standalone.browser.mjs'), process.env.STANDALONE_HTTP === '1'
     ? { STANDALONE_URL: server.url + '/__bundle__.html' } : {}, 'standalone');

@@ -6052,19 +6052,59 @@ table.t.mc td.pc{white-space:nowrap}
   }
 
   // src/ui/number-input.js
-  function bindNumber(input, get, set) {
+  function bindNumber(input, get, set, { integer = false } = {}) {
     if (!input) return;
+    let message;
+    if (integer) {
+      input.step = "1";
+      message = document.createElement("p");
+      message.id = input.id + "-error";
+      message.className = "hint";
+      message.style.color = "var(--red)";
+      message.style.gridColumn = "1 / -1";
+      message.hidden = true;
+      message.setAttribute("role", "status");
+      input.insertAdjacentElement("afterend", message);
+      input.setAttribute("aria-describedby", [input.getAttribute("aria-describedby"), message.id].filter(Boolean).join(" "));
+    }
+    const valid = () => input.value !== "" && Number.isFinite(input.valueAsNumber) && (!integer || Number.isInteger(input.valueAsNumber)) && input.validity.valid;
+    const error = (restored) => {
+      if (!message) return;
+      const value = input.valueAsNumber;
+      const why = input.value === "" || !Number.isFinite(value) ? "Ingresá un número entero." : !Number.isInteger(value) ? "Ingresá un número entero, sin decimales." : `Ingresá un entero entre ${input.min} y ${input.max}.`;
+      message.textContent = why + (restored ? ` Se conservó el último valor válido: ${get()}.` : " El valor anterior se conserva.");
+      message.hidden = false;
+      input.setAttribute("aria-invalid", String(!restored));
+    };
     const commit = () => {
-      if (input.value !== "" && Number.isFinite(input.valueAsNumber) && input.validity.valid) set(input.valueAsNumber);
+      if (valid()) {
+        set(input.valueAsNumber);
+        if (message) {
+          message.hidden = true;
+          input.removeAttribute("aria-invalid");
+        }
+      } else error(false);
     };
     input.addEventListener("input", commit);
     input.addEventListener("change", commit);
     input.addEventListener("blur", () => {
-      if (input.value === "" || !Number.isFinite(input.valueAsNumber) || !input.validity.valid) input.value = get();
+      if (!valid()) {
+        error(true);
+        input.value = get();
+      }
     });
   }
 
   // src/ui/panels/selection.js
+  function deleteSelected() {
+    if (S.started || isMonteCarloRunning() || !S.sel) return false;
+    renderSel();
+    const id = { def: "#sDel", jam: "#jDel", salvo: "#vDel", obj: "#oDel" }[S.sel?.kind];
+    const button = id && $(id);
+    if (!button || button.disabled) return false;
+    button.click();
+    return true;
+  }
   function renderSel(live) {
     const el = $("#selCard");
     const sel = S.sel;
@@ -6091,7 +6131,7 @@ table.t.mc td.pc{white-space:nowrap}
       }
       if (d.sam) html += `<dt>Alcance</dt><dd>${d.sam.maxR} km${d.sam.maxRtbm ? " (TBM " + d.sam.maxRtbm + ")" : ""}</dd><dt>Guiado</dt><dd>${d.sam.guid}</dd>`;
       const links = datalinksOf(d).map((k) => DATALINKS[k].name).join(", ");
-      if (d.sam || r) html += `<dt>Datalink nativo</dt><dd>${esc(links || "ninguno; recibe alertas C2 si la integración lo permite")}</dd>`;
+      if (d.sam || r) html += `<dt>Enlace técnico de pistas</dt><dd>${esc(links || "Sin enlace compatible")}</dd><dt>Coordinación C2 (general)</dt><dd>${esc(C2_LEVELS[S.c2].name)}</dd>`;
       if (S.started && d.sam) html += `<dt>Munición</dt><dd>${u.magLeft}/${u.mag} · reserva ${u.reserveLeft}</dd><dt>En vuelo</dt><dd>${u.active}/${d.sam.ch}</dd>${u.reloadUntil !== null ? `<dt>Recargando</dt><dd>faltan ${Math.ceil((u.reloadUntil - S.t) / 60)} min</dd>` : ""}`;
       if (S.started) {
         const hurt = u.alive && (u.dmgRadar || u.dmgLauncher), what = [u.dmgRadar ? "radar: menos alcance y reacción más lenta" : "", u.dmgLauncher ? "lanzador fuera de servicio" : ""].filter(Boolean).join("; ");
@@ -6106,7 +6146,10 @@ table.t.mc td.pc{white-space:nowrap}
         }
         if (d.kind === "aew") html += `<div class="field"><label for="sAlt">Altitud de vuelo</label><span class="val">${u.alt} m</span><input id="sAlt" type="range" min="2000" max="11000" step="250" value="${u.alt}"></div>`;
         if (r && r.sector < 360) html += `<div class="field"><label for="sAz">${r.side ? "Rumbo de vuelo" : "Orientación del sector"}</label><span class="val">${u.az}°</span><input id="sAz" type="range" min="0" max="359" value="${u.az}"></div>`;
-        if (datalinksOf(d).length) html += `<label class="check" title="El C2 puede coordinar alertas aunque este interruptor esté apagado. Al apagarlo, la unidad deja de publicar y recibir pistas de tiro por sus datalinks compatibles."><input type="checkbox" id="sLink" ${u.link !== false ? "checked" : ""}> Datalink activo (${esc(links)})</label>`;
+        if (d.sam || r) html += `<h3>Enlace técnico de pistas</h3>`;
+        if (datalinksOf(d).length) html += `<label class="check"><input type="checkbox" id="sLink" ${u.link !== false ? "checked" : ""}> Datalink activo (${esc(links)})</label><p class="hint">Al apagarlo, esta unidad deja de publicar y recibir pistas de tiro por enlaces compatibles. Conserva su sensor propio y puede recibir alertas C2 si la coordinación general lo permite.</p>`;
+        else if (d.sam || r) html += `<p class="hint">Sin enlace técnico compatible: las alertas C2 no son una pista de tiro ni permiten guiar un misil con un sensor ajeno.</p>`;
+        if (d.sam || r) html += `<h3>Coordinación C2 (general)</h3><p class="hint">${esc(C2_LEVELS[S.c2].name)}. Se cambia en Defensa para toda la red. En Desconectada no hay alertas compartidas, pistas de red ni reparto de blancos; las unidades conservan sus sensores y disparos propios. El datalink de esta unidad no cambia ese nivel general.</p>`;
         if (d.sam) html += `<label class="check"><input type="checkbox" id="sNoD" ${u.noDrones ? "checked" : ""}> No gastar en drones (reservar para misiles)</label><div class="field"><label for="sMag">Munición disponible</label><input id="sMag" class="inp" type="number" min="1" max="200" value="${u.mag}"></div><div class="field"><label for="sRes">Reserva para recargar (${Math.round(d.sam.reloadS / 60)} min por recarga)</label><input id="sRes" class="inp" type="number" min="0" max="500" value="${u.reserve ?? 0}"></div><div class="field"><label for="sSal">Interceptores por blanco</label><input id="sSal" class="inp" type="number" min="1" max="4" value="${u.salvo}"></div>`;
       }
       html += `<div class="row"><button class="btn sm" id="sInfo">Ficha</button>${ed ? '<button class="btn sm danger" id="sDel">Eliminar</button>' : ""}</div>`;
@@ -6120,7 +6163,7 @@ table.t.mc td.pc{white-space:nowrap}
             const v = i.parentElement.querySelector(".val");
             if (v) v.textContent = u[k] + (k === "az" ? "°" : " m");
             if (cov) schedCov();
-          });
+          }, { integer: ["mag", "reserve", "salvo"].includes(k) });
         };
         bind("#sMast", "mast", 1);
         bind("#sAlt", "alt", 1);
@@ -6252,7 +6295,7 @@ table.t.mc td.pc{white-space:nowrap}
     <div class="grp"><h3>Nueva salva</h3>
       <div class="row"><select id="aType" class="sel" style="flex:1;min-width:0"><optgroup label="Rusia">${opts("RU")}</optgroup><optgroup label="Ucrania / OTAN">${opts("UA")}</optgroup></select><button class="btn sm" id="aInfo">Ficha</button></div>
       <p class="hint">${esc(CLS_NAME[T.cls])} · ${kmh(T.v)} (${mach(T.v)}) · RCS ≈${T.rcs} m² · ${money(T.cost)} c/u</p>
-      <div class="field"><label for="aCount">Cantidad</label><input id="aCount" class="inp" type="number" min="1" max="60" value="${a.count}"></div>
+      <div class="field"><label for="aCount">Cantidad</label><input id="aCount" class="inp" type="number" min="1" max="60" step="1" value="${a.count}"></div>
       <div class="field"><label for="aInt">Intervalo entre lanzamientos (s)</label><input id="aInt" class="inp" type="number" min="0" max="600" value="${a.interval}"></div>
       <label class="check"><input type="checkbox" id="aSync" ${a.sync ? "checked" : ""}> Sincronizar llegada (en vez de hora de lanzamiento)</label>
       <div class="field"><label for="aTime">${a.sync ? "Llegada del primero en T+ (s)" : "Lanzamiento en T+ (s)"}</label><input id="aTime" class="inp" type="number" min="0" max="7200" value="${a.sync ? a.tArrive : a.tStart}"></div>
@@ -6279,7 +6322,7 @@ table.t.mc td.pc{white-space:nowrap}
     $("#aInfo").onclick = () => openFicha("thr", a.type);
     const num2 = (id, k) => bindNumber($(id), () => a[k], (value) => {
       a[k] = value;
-    });
+    }, { integer: k === "count" });
     num2("#aCount", "count");
     num2("#aInt", "interval");
     num2("#aDist", "launchDist");
@@ -7007,8 +7050,9 @@ table.t.mc td.pc{white-space:nowrap}
     ${grp("Rusia", (d) => d.side === "RU" && d.kind !== "aew")}
     ${grp("Sensores", (d) => ["sensor", "aew", "acoustic"].includes(d.kind))}
     <div class="grp"><h3>Mando y control ${infoBtn("detect")} ${infoBtn("saturation")}</h3>
-      <div class="field"><label for="optC2">Integración de la defensa ${infoBtn("c2")}</label><select id="optC2" class="sel">${Object.entries(C2_LEVELS).map(([k, L]) => `<option value="${k}" ${S.c2 === k ? "selected" : ""}>${esc(L.name)}</option>`).join("")}</select></div>
+      <div class="field"><label for="optC2">Coordinación C2 (general) ${infoBtn("c2")}</label><select id="optC2" class="sel">${Object.entries(C2_LEVELS).map(([k, L]) => `<option value="${k}" ${S.c2 === k ? "selected" : ""}>${esc(L.name)}</option>`).join("")}</select></div>
       <p class="hint" id="c2Info">${esc(C2_LEVELS[S.c2].desc)}</p>
+      <p class="hint">Desconectada desactiva alertas, pistas de red y reparto de blancos. El enlace técnico de cada unidad se configura aparte en Selección y solo intercambia pistas con sistemas compatibles.</p>
       <div class="field"><label for="optDoc">Doctrina de tiro</label><select id="optDoc" class="sel"><option value="salva" ${S.doctrine === "salva" ? "selected" : ""}>Salva (según unidad)</option><option value="sls" ${S.doctrine === "sls" ? "selected" : ""}>Disparar-observar-disparar</option></select></div>
       <label class="check" title="Los radares de tiro (S, C, X, Ku) aprenden a distinguir señuelos con el tiempo de seguimiento. Con esta opción no se dispara a pistas clasificadas como señuelo: ahorra munición, pero a veces un arma real se clasifica mal."><input type="checkbox" id="optDecoy" ${S.ignoreDecoys ? "checked" : ""}> No tirarle a pistas clasificadas como señuelo</label>
       <div class="field" title="Alcance efectivo = alcance máximo × geometría (menos contra un blanco que se aleja). Esperar a que el blanco se acerque deja menos tiempo para un segundo tiro, pero el misil llega con más energía y la Pk sube."><label for="optFR">Disparar dentro del ${'<span id="frVal">' + Math.round(S.fireRange * 100) + "%</span>"} del alcance ${infoBtn("energia")}</label><input type="range" id="optFR" min="50" max="100" step="5" value="${Math.round(S.fireRange * 100)}"></div>
@@ -7049,6 +7093,7 @@ table.t.mc td.pc{white-space:nowrap}
       }
       S.c2 = e.target.value;
       $("#c2Info").textContent = C2_LEVELS[S.c2].desc;
+      renderSel();
     };
     $("#optDoc").onchange = (e) => {
       S.doctrine = e.target.value;
@@ -7321,7 +7366,11 @@ table.t.mc td.pc{white-space:nowrap}
         }
         return;
       }
-      if (e.target.matches?.('input,select,textarea,[contenteditable="true"]')) return;
+      if (e.target.closest?.('input,select,textarea,[contenteditable]:not([contenteditable="false"]),[role="textbox"]')) return;
+      if (e.key === "Delete") {
+        if (deleteSelected()) e.preventDefault();
+        return;
+      }
       if (e.key === "Escape") {
         if (S.preview) cancelPlacement();
         else setMode("select");

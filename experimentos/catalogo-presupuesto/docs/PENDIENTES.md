@@ -4,9 +4,9 @@ Fecha/base: 4 de octubre de 2026, `9cafba0`. **Pendiente** no significa fallo re
 
 | ID | Pedido / estado | Criterio de cierre y dependencia |
 |---|---|---|
-| UX01 | Cantidades discretas sin decimales — parcialmente verificado | Chromium confirma rechazo en estado/blur/guardado para mag/reserve/salvo e importación de mag fraccionaria; ampliar cantidad de ataque, pegado/mensajes y otros campos; no redondear ni quitar decimales continuos |
-| UX02 | Delete elimina selección — ausencia observada, pendiente | Chromium confirma que no borra; reutilizar borrado existente sólo en preparación; ignorar inputs/textarea/select/contenteditable; probar referencias/objetivos/rutas y simulación activa |
-| UX03 | Explicar C2 frente a datalink — pendiente | Selector global, ficha y Academia coherentes; explicar coordinación humana, transporte y calidad/capacidad de empleo por separado |
+| UX01 | Cantidades mag/reserve/salvo/count — implementadas con mensajes | Rechazo explícito de fracciones, estado intacto y recuperación del último valor válido; Chromium. Otros campos se revisan según su semántica; magnitudes continuas conservan decimales |
+| UX02 | Delete elimina selección — implementado en preparación | Reutiliza los botones de borrado; ignora campos, contenido editable, ventanas, corridas y Monte Carlo; Chromium verifica objetivo/referencias y selección vacía |
+| UX03 | Explicar C2 frente a datalink — rótulos y ayuda implementados | Coordinación global separada del enlace técnico por unidad, con efectos al desconectar; no agrega pertenencia C2 individual ni modifica el motor |
 | UX04 | Academia con explicación vieja de enlaces — texto obsoleto localizado | Revisar `concepts.js`: dice que no hay enlaces por sistema pese al modelo actual; actualizar con pruebas de documentación/UI, no alterar capacidades |
 | UX05 | Etiquetas BLUEFOR/REDFOR claras, especialmente EW — pendiente | Texto/icono además de color; propietario separado de procedencia y rol; no prohibir material mixto |
 | UX06 | Regla para medir distancias en el mapa — pendiente | Modo de medición entre dos puntos, línea y distancia horizontal en km; independiente de zoom/pan; Escape cancela, sin mover unidades ni crear rutas; no consulta entidades ocultas |

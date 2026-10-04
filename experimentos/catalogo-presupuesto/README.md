@@ -58,7 +58,7 @@ Hay también una [nota matemática reproducible](docs/NOTA-INTERCEPTOR.md) sobre
 
 La prueba opcional de navegador se ejecuta con `node tests/demo.browser.mjs`, con el servidor estático y Playwright/Chromium disponibles. Acepta `PLAYWRIGHT_MODULE`, `CHROMIUM_PATH` y `TEST_URL`. La workflow mínima no instala navegadores: ejecuta las pruebas puras y los chequeos de catálogo/guardado; el smoke de navegador se verifica aparte.
 
-`node tests/simulator-observations.browser.mjs` es un diagnóstico opcional del juego base servido desde la raíz; usa `TEST_SIM_URL` (por defecto puerto 8768). Confirma rechazo de fracciones en tres cantidades y observa que Delete sigue pendiente. No cambia fuentes, no es un test de la feature futura y debe actualizarse o retirarse cuando ésta se implemente.
+`node tests/simulator-observations.browser.mjs` es un diagnóstico opcional del juego base servido desde la raíz; usa `TEST_SIM_URL` (por defecto puerto 8768). Confirma rechazo de fracciones en tres cantidades y borrado con Delete en preparación. La prueba completa de campos, ventanas, simulación y Monte Carlo está en `tests/browser/ux.browser.mjs` del repositorio principal.
 
 La primera integración debería ser una PR pequeña de datos y validación desacoplados, no una sustitución del motor. Antes de usar un registro físico nuevo: verificar fuentes, completar incertidumbre, comprobar muestras conjuntas, acordar su configuración y pasar las pruebas del proyecto.
 
