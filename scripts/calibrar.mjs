@@ -28,7 +28,7 @@ export function runCase(c, n = N) {
   let killed = 0, launched = 0;
   for (let seed = 1; seed <= n; seed++) {
     useMap('monterey', { flat: true }); clearSetup(); Object.assign(S, c.rules || {});
-    for (const [type, x, y, o] of c.defs) addDef(type, x, y, o);
+    for (const [type, x, y, o] of c.defs) { const u = addDef(type, x, y, o); if (o?.mag) u.mag = o.mag; }
     for (const s of c.salvos) addSalvo({ ...s, pts: s.pts.map(p => [...p]) });
     runCurrent(seed);
     for (const th of S.threats) {
