@@ -28,14 +28,25 @@ test('rangeFactor: ×1 de frente, ×0,8 de costado, ×0,6 de cola y creciente co
   for (let i = 0; i < 20; i++) assert.ok(rangeFactor(-1 + (i + 1) / 10) > rangeFactor(-1 + i / 10));
 });
 
-test('energía: entera hasta el 75% del alcance, mitad en el borde; energyPk relativa al tiro típico', () => {
+test('energía por tramos (misiles sin perfil): entera hasta el 75% del alcance, mitad en el borde; energyPk relativa al tiro típico', () => {
+  const sm = DEFENSES.hawk.sam;   // sin vmax ni tb
   assert.equal(energy(0.5), 1); assert.equal(energy(0.75), 1);
   assert.ok(Math.abs(energy(1) - 0.5) < 1e-12);
-  assert.ok(Math.abs(energyPk(ENERGY_REF) - 1) < 1e-12, 'el tiro típico (90%) no cambia la Pk calibrada');
-  assert.equal(energyPk(0.3), 1.25, 'un tiro corto sube la Pk, con tope ×1,25');
+  assert.ok(Math.abs(energyPk(sm, ENERGY_REF) - 1) < 1e-12, 'el tiro típico (90%) no cambia la Pk calibrada');
+  assert.equal(energyPk(sm, 0.3), 1.25, 'un tiro corto sube la Pk, con tope ×1,25');
   // decreciente cerca del borde
-  for (let f = 0.8; f < 1; f += 0.02) assert.ok(energyPk(f + 0.02) < energyPk(f), `f = ${f.toFixed(2)}`);
-  assert.ok(energyPk(1) < 0.75);
+  for (let f = 0.8; f < 1; f += 0.02) assert.ok(energyPk(sm, f + 0.02) < energyPk(sm, f), `f = ${f.toFixed(2)}`);
+  assert.ok(energyPk(sm, 1) < 0.75);
+});
+
+test('energía con perfil de motor y planeo: ×1 en el tiro típico, tope ×1,25, decreciente en el planeo', () => {
+  for (const k of ['patriot', 'nasams', 's300', 'pantsir']) {
+    const sm = DEFENSES[k].sam;
+    assert.ok(Math.abs(energyPk(sm, ENERGY_REF) - 1) < 1e-12, k);
+    assert.equal(energyPk(sm, 0.05), 1.25, `${k}: con el motor encendido, energía entera`);
+    for (let f = 0.8; f < 1; f += 0.02) assert.ok(energyPk(sm, f + 0.02) < energyPk(sm, f), `${k} f = ${f.toFixed(2)}`);
+    assert.ok(energyPk(sm, 1) < 1, k);
+  }
 });
 
 test('solve: de frente el alcance efectivo es el del catálogo; contra un blanco que se aleja, ≈60%', () => {
