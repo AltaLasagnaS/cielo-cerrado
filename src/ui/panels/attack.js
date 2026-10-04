@@ -10,6 +10,7 @@ import { schedCov } from '../coverage.js';
 import { openFicha } from '../fichas.js';
 import { renderSel } from './selection.js';
 import { infoBtn } from '../academy.js';
+import { bindNumber } from '../number-input.js';
 
 export function renderAtk() {
   const el = $('#tab-atk');
@@ -45,9 +46,9 @@ export function renderAtk() {
     <div class="grp"><h3>Salvas programadas (${S.setup.salvos.length})</h3><div class="list" id="svList">${S.setup.salvos.map(sv => { const t = THREATS[sv.type]; const tgt = targetName(sv); return `<div class="item red"><span class="t">${sv.count}× ${esc(t.short)}${tgt ? ' → ' + esc(tgt) : ''}</span><span class="s">${sv.sync ? 'llega T+' + sv.tArrive + 's' : 'sale T+' + sv.tStart + 's'} · c/${sv.interval}s</span><span class="a"><button class="btn sm" data-sel="${sv.id}">Ver</button><button class="btn sm danger" data-del="${sv.id}" aria-label="Borrar">✕</button></span></div>`; }).join('') || '<p class="hint">Todavía no hay ataques.</p>'}</div></div>`;
   $('#aType').onchange = e => { S.atk = defaultAtk(e.target.value, S.atk); renderAtk(); };
   $('#aInfo').onclick = () => openFicha('thr', a.type);
-  const num = (id, k) => { const i = $(id); if (i) i.onchange = e => { a[k] = +e.target.value; }; };
+  const num = (id, k) => bindNumber($(id), () => a[k], value => { a[k] = value; });
   num('#aCount', 'count'); num('#aInt', 'interval'); num('#aDist', 'launchDist');
-  $('#aTime').onchange = e => { if (a.sync) a.tArrive = +e.target.value; else a.tStart = +e.target.value; };
+  num('#aTime', a.sync ? 'tArrive' : 'tStart');
   $('#aSync').onchange = e => { a.sync = e.target.checked; renderAtk(); };
   if ($('#aAgl')) $('#aAgl').oninput = e => { a.agl = +e.target.value; $('#aAglV').textContent = a.agl + ' m'; };
   if ($('#aAglModes')) $('#aAglModes').onclick = e => { const b = e.target.closest('[data-agl]'); if (!b) return; a.agl = +b.dataset.agl; $('#aAgl').value = a.agl; $('#aAglV').textContent = a.agl + ' m'; };

@@ -80,7 +80,7 @@ Contenido de la Academia: cada concepto con su explicación y la sección "En el
 5. **Interceptores:** los que llegan al punto de encuentro resuelven derribo o falla con `calcPk`.
 6. **Fin:** si no quedan amenazas ni interceptores en vuelo, se registra el evento final y se abre el debrief.
 
-El bucle de la interfaz (`ui/loop.js`) llama a `step(0,25)` las veces necesarias según la velocidad, así que **el resultado no depende de la velocidad** elegida.
+El bucle de la interfaz (`ui/loop.js`) acumula el tiempo entre cuadros con `sim/clock.js` y llama siempre a `step(0,25)`: las fracciones se conservan para el cuadro siguiente. Así **el resultado no depende de la velocidad ni de la frecuencia de cuadros**. Una corrida nueva descarta el tiempo pendiente de la anterior.
 
 ## Reproducibilidad y pruebas
 
@@ -121,6 +121,8 @@ El botón **Guardar** descarga `S.setup` más las reglas y las metas como JSON (
 ## Modo Monte Carlo (`sim/montecarlo.js`)
 
 Corre N veces el mismo `S.setup`. La corrida *i* usa la semilla `seed + i` para la simulación y, si se pide sorteo, otra semilla derivada (`paramSeed`) para `applySample`, que reemplaza cada parámetro de `UNC` por un valor de una distribución triangular (mín, probable, máx). Lo que elige el jugador (posiciones, munición, mástil, rutas y alturas de las salvas) no se sortea porque se copia al ubicar cada cosa.
+
+Una corrida se contabiliza únicamente cuando no quedan ataques pendientes, amenazas ni interceptores en vuelo. El límite de seguridad se calcula con el último lanzamiento más su tiempo de vuelo y 401 s para interceptores pendientes; no hay un corte fijo a los 10.000 s. Si ese límite se supera, la serie se detiene con un error y la corrida incompleta no se presenta como un resultado. Mientras corre la serie, el control de iniciar/pausar está bloqueado, incluso al cerrar la ventana para cancelar.
 
 Para no ensuciar el juego normal ni las golden:
 

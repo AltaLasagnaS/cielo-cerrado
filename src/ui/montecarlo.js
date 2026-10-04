@@ -28,7 +28,8 @@ export function openMonteCarlo() {
     <div class="row"><button class="btn pri" id="mcGo">Correr</button></div>
   </div>`, openMonteCarlo);
   $('#mcGo').onclick = () => {
-    last = { runs: +$('#mcRuns').value, sample: $('#mcSample').checked, seed: Math.max(1, Math.floor(+$('#mcSeed').value) || 1) };
+    if (!$('#mcSeed').reportValidity() || !Number.isFinite($('#mcSeed').valueAsNumber)) return;
+    last = { runs: +$('#mcRuns').value, sample: $('#mcSample').checked, seed: $('#mcSeed').valueAsNumber };
     run(last);
   };
 }
@@ -44,7 +45,11 @@ function run(opts) {
   const frame = () => {
     // cerrar la ventana (clic afuera) también corta la serie
     if ($('#modal').hidden && !mc.done) mc.cancel();
-    mc.tick(40);
+    try { mc.tick(40); } catch (error) {
+      resetSim(); renderAll();
+      openModal(`<header><h2>Monte Carlo detenido</h2><button class="btn x">Cerrar</button></header><div class="bd"><p>${esc(error.message)}</p><p>La serie quedó incompleta. Revisá las rutas y los horarios antes de volver a correrla.</p></div>`);
+      return;
+    }
     const k = mc.results.length, el = (performance.now() - t0) / 1000;
     if (!mc.done) {
       $('#mcTxt').textContent = `Corrida ${Math.min(k + 1, opts.runs)} de ${opts.runs}`;

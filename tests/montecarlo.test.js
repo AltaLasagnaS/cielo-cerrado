@@ -7,12 +7,43 @@ import { SCENARIOS, THREATS, DEFENSES, JAMMERS } from '../src/data/index.js';
 import { rnd } from '../src/util/rng.js';
 import { S } from '../src/sim/state.js';
 import { hooks } from '../src/sim/hooks.js';
-import { applyScenario } from '../src/sim/setup.js';
-import { createMonteCarlo, runMonteCarlo, aggregate, summarizeRun, wilson, quantile, describe, histogram } from '../src/sim/montecarlo.js';
+import { applyScenario, addObj, addSalvo } from '../src/sim/setup.js';
+import { exportScenario, validateScenario } from '../src/sim/scenario-io.js';
+import { createMonteCarlo, runMonteCarlo, aggregate, summarizeRun, wilson, quantile, describe, histogram, isMonteCarloRunning } from '../src/sim/montecarlo.js';
 import { useMap, clearSetup, runCurrent, runScenario } from './helpers.js';
 
 const load = key => { useMap(SCENARIOS[key].map); clearSetup(); applyScenario(SCENARIOS[key]); };
 const catalog = () => JSON.stringify({ THREATS, DEFENSES, JAMMERS });
+
+test('un ataque posterior a 10.000 s se simula antes de evaluar las metas', () => {
+  useMap('monterey'); clearSetup();
+  addObj('fuel', 50, 50, { name: 'Depósito', hp: 1 });
+  S.scen = { name: 'Ataque tardío', player: 'defensa', goals: [{ side: 'defensa', primary: true, kind: 'protect', target: 'Depósito' }] };
+  addSalvo({ type: 'shahed', count: 1, tStart: 11000, pts: [[0, 50], [50, 50]] });
+  assert.ok(validateScenario(exportScenario()).ok, 'es un escenario válido');
+  const mc = createMonteCarlo({ runs: 1, sample: false, seed: 1 });
+  while (!mc.tick(1e9));
+  assert.equal(mc.results.length, 1);
+  const r = mc.results[0];
+  assert.ok(r.t > 11000); assert.equal(r.real, 1);
+  assert.equal(r.result, 'fracaso'); assert.equal(r.objs[0].status, 'destroyed');
+});
+
+test('una serie bloquea otra y libera el estado al cancelar o fallar', () => {
+  load('gb_ruso');
+  const mc = createMonteCarlo({ runs: 1 });
+  assert.ok(isMonteCarloRunning());
+  assert.throws(() => createMonteCarlo(), /en curso/);
+  mc.cancel(); assert.equal(isMonteCarloRunning(), false);
+  const before = catalog(), h = { ...hooks };
+  S.setup.salvos[0].tStart = Infinity;
+  S.setup.salvos[0].sync = false;
+  const invalid = createMonteCarlo({ runs: 1 });
+  assert.throws(() => invalid.tick(1e9), /inválido/);
+  assert.equal(invalid.results.length, 0);
+  assert.equal(invalid.done, true); assert.equal(isMonteCarloRunning(), false);
+  assert.equal(S.started, false); assert.equal(catalog(), before); assert.deepEqual({ ...hooks }, h);
+});
 
 test('sin sorteo, la corrida i es idéntica a una corrida normal con la semilla seed + i', () => {
   load('gb_ruso');

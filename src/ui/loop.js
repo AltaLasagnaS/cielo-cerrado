@@ -4,6 +4,7 @@
 import { fmtT } from '../util/format.js';
 import { S } from '../sim/state.js';
 import { step } from '../sim/engine.js';
+import { createSimClock } from '../sim/clock.js';
 import { draw } from '../render/draw.js';
 import { $ } from './dom.js';
 import { renderStats, renderLogIfDirty } from './panels/results.js';
@@ -12,8 +13,8 @@ import { renderScenario } from './panels/scenario.js';
 import { autoPhase, AUTO_PHASES } from '../sim/pace.js';
 import { currentSpeed, renderTimeScale } from './controls.js';
 
-/** Paso máximo de simulación (s). Más chico = más preciso y más lento. */
-const STEP = 0.25;
+const clock = createSimClock();
+let runUnits = null;
 let last = performance.now(), uiTick = 0, holdUntil = 0;
 
 /** Modo Auto: baja la velocidad apenas hay acción y la sube recién tras 2,5 s reales de calma. */
@@ -25,10 +26,11 @@ function updateAutoPhase(now) {
 
 function loop(now) {
   const dtr = Math.min(0.1, (now - last) / 1000); last = now;
+  // startSim/resetState crean otra lista: una corrida nueva no hereda fracciones de la anterior.
+  if (runUnits !== S.units) { clock.reset(); runUnits = S.units; }
   if (S.running) {
     if (S.auto) updateAutoPhase(now);
-    let adv = dtr * currentSpeed();
-    while (adv > 0) { const d = Math.min(STEP, adv); step(d); adv -= d; if (!S.running) break; }
+    clock.advance(dtr * currentSpeed(), dt => { step(dt); return S.running; });
     $('#clock').textContent = fmtT(S.t);
   }
   draw();

@@ -3,6 +3,7 @@
 import { fmtT } from '../util/format.js';
 import { S } from '../sim/state.js';
 import { startSim } from '../sim/engine.js';
+import { isMonteCarloRunning } from '../sim/montecarlo.js';
 import { draw } from '../render/draw.js';
 import { $ } from './dom.js';
 import { resetSim } from './app.js';
@@ -24,6 +25,7 @@ export function initControls() {
 
 /** Iniciar → pausar → seguir; al terminar, "nueva corrida" vuelve al modo edición. */
 export function togglePlay() {
+  if (isMonteCarloRunning()) return;
   if (!S.started) { if (!S.setup.salvos.length) { toast('Agregá al menos un ataque en la pestaña Ataque.'); return; } setMode('select'); startSim(); S.running = true; schedCov(); }
   else if (!S.pending.length && S.threats.every(t => !t.alive)) { resetSim(); return; }
   else S.running = !S.running;

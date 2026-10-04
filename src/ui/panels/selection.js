@@ -15,6 +15,7 @@ import { schedCov } from '../coverage.js';
 import { openFicha } from '../fichas.js';
 import { renderAtk, removeObj } from './attack.js';
 import { renderEW } from './ew.js';
+import { bindNumber } from '../number-input.js';
 
 /** live = refresco periódico durante la corrida (no pisa un campo que el jugador está editando). */
 export function renderSel(live) {
@@ -50,7 +51,7 @@ export function renderSel(live) {
     el.innerHTML = html;
     $('#sInfo').onclick = () => openFicha('def', u.type);
     if (ed) {
-      const bind = (id, k, cov) => { const i = $(id); if (!i) return; i.oninput = e => { u[k] = +e.target.value; const v = i.parentElement.querySelector('.val'); if (v) v.textContent = u[k] + (k === 'az' ? '°' : ' m'); if (cov) schedCov(); }; };
+      const bind = (id, k, cov) => { const i = $(id); bindNumber(i, () => u[k], value => { u[k] = value; const v = i.parentElement.querySelector('.val'); if (v) v.textContent = u[k] + (k === 'az' ? '°' : ' m'); if (cov) schedCov(); }); };
       bind('#sMast', 'mast', 1); bind('#sAlt', 'alt', 1); bind('#sAz', 'az', 1); bind('#sMag', 'mag'); bind('#sRes', 'reserve'); bind('#sSal', 'salvo');
       if ($('#sNoD')) $('#sNoD').onchange = e => { u.noDrones = e.target.checked; };
       if ($('#sLink')) $('#sLink').onchange = e => { u.link = e.target.checked; };
@@ -84,7 +85,7 @@ export function renderSel(live) {
       <dl class="kv"><dt>HP</dt><dd>${hp} / ${g.maxHp}</dd><dt>Tipo</dt><dd>${esc(tt.name)}</dd><dt>Posición</dt><dd>${g.x.toFixed(1)}, ${g.y.toFixed(1)} km</dd><dt>Lat/Lon</dt><dd>${ll[0].toFixed(3)}°, ${ll[1].toFixed(3)}°</dd><dt>Huella</dt><dd>${tt.radius} m de radio</dd><dt>Vulnerabilidad</dt><dd>×${tt.vuln}</dd>${S.started ? `<dt>Impactos con daño</dt><dd>${g.hits}</dd>${dmgBy ? `<dt>Daño por arma</dt><dd>${dmgBy}</dd>` : ''}` : ''}</dl>
       <p class="hint">${esc(g.desc || tt.desc)}</p>
       ${!S.started ? `<div class="field"><label for="oHp">Vida máxima</label><input id="oHp" class="inp" type="number" min="50" max="20000" step="50" value="${g.maxHp}"></div><div class="row"><button class="btn sm danger" id="oDel">Eliminar</button></div>` : ''}`;
-    if ($('#oHp')) $('#oHp').onchange = e => { g.maxHp = Math.max(1, +e.target.value || tt.hp); };
+    bindNumber($('#oHp'), () => g.maxHp, value => { g.maxHp = value; });
     if ($('#oDel')) $('#oDel').onclick = () => removeObj(g.id);
   } else if (sel.kind === 'thr') {
     const th = S.threats.find(t => t.id === sel.id); if (!th || !th.p) { el.innerHTML = '<h3>Selección</h3><p class="hint">La amenaza ya no está en vuelo.</p>'; return; }
