@@ -12,6 +12,7 @@ import { renderSel } from './panels/selection.js';
 import { renderScenario } from './panels/scenario.js';
 import { autoPhase, AUTO_PHASES } from '../sim/pace.js';
 import { currentSpeed, renderTimeScale } from './controls.js';
+import { tickReplay } from './replay.js';
 
 const clock = createSimClock();
 let runUnits = null;
@@ -33,6 +34,7 @@ function loop(now) {
     clock.advance(dtr * currentSpeed(), dt => { step(dt); return S.running; });
     $('#clock').textContent = fmtT(S.t);
   }
+  if (S.replay) tickReplay(dtr);
   draw();
   // refresco de paneles cada 10 cuadros, salvo el panel que tiene un botón apretado: si el botón se
   // reemplaza entre que se aprieta y se suelta, el clic se pierde (Ficha, Ver debrief, Briefing)

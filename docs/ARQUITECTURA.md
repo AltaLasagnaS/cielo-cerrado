@@ -49,6 +49,7 @@ El juego es una página web estática hecha con **JavaScript moderno (módulos E
 - `scenario-io.js`: guardar el escenario del jugador como JSON y validarlo y desplegarlo al cargar.
 - `engine.js`: `startSim`, `step(dt)`, `engage`, `impact`.
 - `log.js`: registro y eventos de la línea de tiempo.
+- `replay.js`: repetición de la corrida (anota los cambios y reconstruye el mapa en cualquier instante).
 - `goals.js`, `debrief.js`: evaluación de metas y análisis final.
 - `pace.js`: fases del modo de velocidad Auto.
 - `hooks.js`: enganches hacia la interfaz.
@@ -66,6 +67,7 @@ El juego es una página web estática hecha con **JavaScript moderno (módulos E
 - `fichas.js`: ventanas modales con historial ("← Volver").
 - `montecarlo.js`: ventanas de configuración, progreso y debrief del modo Monte Carlo.
 - `scenario-file.js`: botones Guardar y Cargar (descarga y lectura del archivo, cambio de mapa).
+- `replay.js`: barra de repetición sobre el mapa (línea de tiempo, velocidad, registro del instante).
 - `debrief.js`, `academy.js`, `relief.js`, `controls.js`, `loop.js`, `coverage.js`, `hgt.js`, `help.js`.
 
 ### `src/edu/concepts.js`
@@ -117,6 +119,10 @@ El botón **Guardar** descarga `S.setup` más las reglas y las metas como JSON (
 - **Al cargar** (`validateScenario`) se revisa todo antes de tocar el estado: formato y versión, mapa incluido (o, para un relieve `.hgt`, que ese mismo relieve esté cargado), tipos que existan en el catálogo (`DEFENSES`, `THREATS`, `JAMMERS`, `TARGET_TYPES`), posiciones dentro del mapa (±1 km), números finitos y en rango, ids únicos y blancos existentes. Si hay errores no se cambia nada y se listan; una meta sobre algo que ya no existe es solo un aviso. Solo se copian los campos conocidos.
 - Con la misma semilla, un escenario guardado y vuelto a cargar da **exactamente** la misma corrida (`tests/scenario-io.test.js`).
 - Si el formato cambia, subir `VERSION` y aceptar las versiones anteriores que se puedan convertir.
+
+## Repetición (`sim/replay.js`)
+
+El debrief tiene un botón **Ver repetición**: el mapa vuelve a mostrar la corrida con una línea de tiempo (reproducir, pausar, arrastrar y tres velocidades) y las últimas líneas del registro de ese instante. No se graban fotos del estado: las trayectorias de las amenazas son deterministas (`posAt`), así que durante la corrida solo se anota **cuándo** cambia cada cosa: fin de cada amenaza (`th.tEnd`) y nacimiento de cada señuelo (`th.tBorn`), todos los interceptores (`S.rec.ints`; `S.ints` se poda), el estado de unidades y objetivos después de cada cambio (`S.rec.units`, `S.rec.objs`), el registro completo (`S.rec.log`) y el instante de cada caída. `frameAt(T)` reconstruye el cuadro y `render/draw.js` lo dibuja en lugar del estado vivo; el panel de objetivos también sigue el instante elegido. Anotar no consume azar: las golden no cambian. `tests/replay.test.js` compara el cuadro reconstruido con el estado real de la simulación en seis instantes (posiciones, interceptores, unidades, objetivos, impactos y registro). Se muestra la verdad (como el debrief), no solo lo que veía la defensa.
 
 ## Modo Monte Carlo (`sim/montecarlo.js`)
 

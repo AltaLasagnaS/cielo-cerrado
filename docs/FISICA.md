@@ -222,6 +222,11 @@ Es un modelo **cinemático guiado por datos**: la amenaza recorre una ruta polig
 - **Salvas:** dispersión lateral de 0,25 km entre misiles, para que no se apilen.
 - **Señuelos:** se liberan a 40 km del blanco; se abren hasta 1–3,5 km del misil padre y suben hasta 300 m.
 - **Velocidad instantánea:** diferencia centrada de ±0,5 s (`speedAt`).
+- **Viento** (`S.wind = { v, from }`, pestaña Defensa → Clima, `rules.wind` en los archivos; por defecto calma): uniforme en todo el mapa y en altura, fijo toda la noche. Las armas con ruta en el mapa (drones y crucero) vuelan a su velocidad del catálogo **respecto del aire**: en cada tramo de la ruta, con rumbo `u` y viento `W` (hacia dónde sopla), corrigen la deriva y avanzan sobre el suelo a
+  ```
+  Vg = W·u + √(v² − (W×u)²)          (triángulo de velocidades; si el viento cruzado supera v, se acota a 0,1·v)
+  ```
+  Un Shahed (≈51 m/s) con 10 m/s de frente tarda un 24% más; un Kalibr (240 m/s), un 4%. Las salvas sincronizadas (`sync`) calculan el lanzamiento con el viento, como haría el planificador. No se aplica a lo lanzado desde fuera del mapa (balísticos, picada, `hilo`, planeadoras). Simplificaciones: sin cambio de viento con la altura, sin ráfagas y sin efecto sobre la altura de vuelo ni el consumo. Los escenarios de referencia no traen viento: no hay dato del viento de esas noches.
 
 ---
 

@@ -102,6 +102,11 @@ canvas#map{position:absolute;inset:0;width:100%;height:100%;touch-action:none;di
 .relief span{color:var(--muted);margin-right:4px;font-family:var(--f-disp);font-size:13px;letter-spacing:.05em;text-transform:uppercase}
 .relief button{background:var(--panel2);border:1px solid var(--line2);border-radius:3px;padding:2px 7px;font-size:11px}
 .relief button.act{border-color:var(--accent);color:var(--accent)}
+.replaybar{position:absolute;left:10px;right:10px;bottom:12px;z-index:3;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;background:rgba(12,18,25,.92);border:1px solid var(--accent);border-radius:6px;padding:6px 8px}
+.replaybar input[type=range]{flex:1 1 200px;min-width:120px}
+.rplog{flex:1 1 100%;margin:0;padding:0;list-style:none;font-size:11px;color:var(--muted);max-height:66px;overflow:hidden}
+.rplog time{font-family:var(--f-mono);color:var(--accent);margin-right:4px}
+#replayBar:not([hidden]) ~ .legend,#replayBar:not([hidden]) ~ .relief{display:none}
 .legend{position:absolute;left:10px;bottom:12px;background:rgba(12,18,25,.86);border:1px solid var(--line);border-radius:6px;padding:6px 9px;font-size:11px;color:var(--muted);display:flex;flex-direction:column;gap:3px}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .sw{width:12px;height:8px;border-radius:2px;display:inline-block}
@@ -247,6 +252,7 @@ table.t.mc td.pc{white-space:nowrap}
         <div class="speeds" id="speeds"></div>
         <label class="check" style="font-size:12px"><input type="checkbox" id="defView"> Vista del defensor</label>
       </div>
+      <div class="replaybar" id="replayBar" role="group" aria-label="Repetición de la corrida" hidden></div>
       <div class="relief" id="relief" role="group" aria-label="Lectura del relieve"><span>Relieve</span></div>
       <div class="zoom"><button id="zin" aria-label="Acercar">+</button><button id="zout" aria-label="Alejar">−</button><button id="zfit" aria-label="Encuadrar" style="font-size:12px">⤢</button></div>
       <div class="legend" id="legend">
@@ -2783,6 +2789,7 @@ table.t.mc td.pc{white-space:nowrap}
     doctrine: "salva",
     fireRange: 1,
     weather: "despejado",
+    wind: { v: 0, from: 0 },
     ignoreDecoys: false,
     showCov: true,
     covRef: "kh101",
@@ -3372,7 +3379,14 @@ table.t.mc td.pc{white-space:nowrap}
   // src/physics/kinematics.js
   var OFFMAP_PROFILES = ["ballistic", "highdive", "hilo", "glide"];
   var isOffmap = (T) => OFFMAP_PROFILES.includes(T.prof);
-  function buildThreat(sv, k, tLaunch) {
+  function groundSpeed(v, ux, uy, wind) {
+    if (!wind || !(wind.v > 0)) return v;
+    const a = wind.from * Math.PI / 180, wx = -wind.v * Math.sin(a), wy = wind.v * Math.cos(a);
+    const along = wx * ux + wy * uy, cross = wx * uy - wy * ux;
+    if (cross * cross >= v * v) return 0.1 * v;
+    return Math.max(0.1 * v, along + Math.sqrt(v * v - cross * cross));
+  }
+  function buildThreat(sv, k, tLaunch, wind = null) {
     const T = THREATS[sv.type];
     let pts = sv.pts.map((p) => [p[0], p[1]]);
     const offmap = isOffmap(T);
@@ -3396,6 +3410,16 @@ table.t.mc td.pc{white-space:nowrap}
     if (T.prof === "highdive") ph = [[0, Math.max(0, L - T.diveDist), T.v], [Math.max(0, L - T.diveDist), L, T.vDive]];
     else if (T.prof === "hilo") ph = [[0, Math.max(0, L - 60), T.v], [Math.max(0, L - 60), L, T.vLow]];
     else ph = [[0, L, T.v]];
+    if (wind?.v > 0 && !offmap) {
+      const out = [];
+      for (const [s0, s1, v] of ph) for (let i = 1; i < pts.length; i++) {
+        const a0 = Math.max(s0, cum[i - 1]), a1 = Math.min(s1, cum[i]);
+        if (a1 <= a0) continue;
+        const seg = cum[i] - cum[i - 1] || 1e-6;
+        out.push([a0, a1, groundSpeed(v, (pts[i][0] - pts[i - 1][0]) / seg, (pts[i][1] - pts[i - 1][1]) / seg, wind)]);
+      }
+      ph = out;
+    }
     let acc = 0;
     ph = ph.map((p) => {
       const o = { s0: p[0], s1: p[1], v: p[2], t0: acc };
@@ -3728,8 +3752,10 @@ table.t.mc td.pc{white-space:nowrap}
 
   // src/sim/log.js
   function log(cls, msg) {
-    S.log.unshift({ t: S.t, cls, msg });
+    const e = { t: S.t, cls, msg };
+    S.log.unshift(e);
     if (S.log.length > 300) S.log.pop();
+    S.rec?.log.push(e);
     hooks.onLog();
   }
   function label(th) {
@@ -3742,6 +3768,51 @@ table.t.mc td.pc{white-space:nowrap}
     if (key && S.events.some((e) => e.key === key)) return;
     S.events.push({ t: S.t, text, key: key || null });
   }
+
+  // src/sim/replay.js
+  function recReset() {
+    S.rec = { ints: [], units: [], objs: [], log: [] };
+  }
+  function recUnit(u) {
+    S.rec?.units.push({ t: S.t, id: u.id, alive: u.alive, dmgRadar: u.dmgRadar, dmgLauncher: u.dmgLauncher, magLeft: u.magLeft });
+  }
+  function recObj(g) {
+    S.rec?.objs.push({ t: S.t, id: g.id, hp: g.hp, status: g.status, hits: g.hits });
+  }
+  var canReplay = () => !!(S.rec && S.started && S.threats.length);
+  function stateAt(base, events, T) {
+    const out = base.map((o) => ({ ...o })), byId = new Map(out.map((o) => [o.id, o]));
+    for (const e of events) {
+      if (e.t > T) break;
+      const o = byId.get(e.id);
+      if (o) Object.assign(o, e);
+    }
+    return out;
+  }
+  function trailAt(th, T) {
+    const tr = [];
+    for (let t = Math.max(th.tBorn ?? th.tLaunch, T - 240); t < T; t += 3) {
+      const p = posAt(th, t);
+      if (p) tr.push([p.x, p.y, t]);
+    }
+    return tr;
+  }
+  function frameAt(T) {
+    const threats = [];
+    for (const th of S.threats) {
+      if (T <= 0 || (th.tBorn ?? th.tLaunch) > T || (th.tEnd ?? Infinity) <= T) continue;
+      const p = posAt(th, T);
+      if (!p) continue;
+      threats.push({ ...th, p, trail: trailAt(th, T), alive: true, lastNet: T });
+    }
+    const ints = S.rec.ints.filter((it) => it.tL <= T && T < it.tH).map((it) => ({ ...it, done: false }));
+    const units = stateAt(S.setup.defs.map((d) => ({ ...d, alive: true, dmgRadar: false, dmgLauncher: false, magLeft: d.mag })), S.rec.units, T);
+    const objs = stateAt(S.setup.objs.map((g) => ({ ...g, hp: g.maxHp, status: "operational", hits: 0 })), S.rec.objs, T);
+    const impacts = S.impacts.filter((im) => (im.t ?? 0) <= T);
+    const log2 = S.rec.log.filter((l) => l.t <= T);
+    return { t: T, threats, ints, units, objs, impacts, log: log2 };
+  }
+  var replayEnd = () => S.t;
 
   // src/sim/engine.js
   function startSim() {
@@ -3757,13 +3828,14 @@ table.t.mc td.pc{white-space:nowrap}
     S.events = [];
     S.arrivals = [];
     S.pending = [];
+    recReset();
     for (const sv of S.setup.salvos) {
       let t0 = sv.tStart || 0;
       if (sv.sync) {
-        const probe = buildThreat(sv, 0, 0);
+        const probe = buildThreat(sv, 0, 0, S.wind);
         t0 = Math.max(0, (sv.tArrive || 0) - probe.ft);
       }
-      for (let k = 0; k < sv.count; k++) S.pending.push(buildThreat(sv, k, t0 + k * (sv.interval || 0)));
+      for (let k = 0; k < sv.count; k++) S.pending.push(buildThreat(sv, k, t0 + k * (sv.interval || 0), S.wind));
     }
     S.pending.sort((a, b) => a.tLaunch - b.tLaunch);
     S.t = 0;
@@ -3771,6 +3843,8 @@ table.t.mc td.pc{white-space:nowrap}
     log("d", "Inicio de la simulación: " + S.pending.length + " amenazas programadas, " + S.units.length + " unidades de defensa.");
   }
   function resetState() {
+    S.rec = null;
+    S.replay = null;
     S.autoPhase = "calm";
     S.running = false;
     S.started = false;
@@ -3817,7 +3891,7 @@ table.t.mc td.pc{white-space:nowrap}
         th.released = true;
         for (let k = 0; k < th.decoyRel; k++) {
           const ang = rnd() * 6.28, dist = 1 + rnd() * 2.5;
-          const dc = { ...th, fly: [], id: nextId(), parent: th, isDecoy: true, isDecoyChild: true, decoyRel: 0, sRel: p.s, off: [Math.cos(ang) * dist, Math.sin(ang) * dist], det: {}, mn: {}, mnT: {}, net: {}, trail: [], lastNet: -1e9, firstDet: null, cueFirst: null, netFirst: null, clsT: 0, clsTau: null, clsAs: null, phase: th.phase + (k + 1) * 1.6180339, alive: true, targetUnit: null };
+          const dc = { ...th, fly: [], id: nextId(), parent: th, tBorn: t, isDecoy: true, isDecoyChild: true, decoyRel: 0, sRel: p.s, off: [Math.cos(ang) * dist, Math.sin(ang) * dist], det: {}, mn: {}, mnT: {}, net: {}, trail: [], lastNet: -1e9, firstDet: null, cueFirst: null, netFirst: null, clsT: 0, clsTau: null, clsAs: null, phase: th.phase + (k + 1) * 1.6180339, alive: true, targetUnit: null };
           S.threats.push(dc);
           S.stats.decoys++;
           S.stats.launched++;
@@ -3918,6 +3992,7 @@ table.t.mc td.pc{white-space:nowrap}
         u.reserveLeft -= n2;
         u.reloadUntil = null;
         S.stats.reloads++;
+        recUnit(u);
         log("l", uLabel(u) + " termina de recargar: " + n2 + " listos, quedan " + u.reserveLeft + " en reserva.");
       } else if (u.reloadUntil === null && u.magLeft === 0 && u.active === 0 && u.reserveLeft > 0 && canResupply(u)) {
         u.reloadUntil = t + D(u).sam.reloadS;
@@ -3948,6 +4023,7 @@ table.t.mc td.pc{white-space:nowrap}
       if (rnd() < pk) {
         th.alive = false;
         th.killed = true;
+        th.tEnd = t;
         S.stats.killed++;
         if (th.isDecoy) S.stats.decoysKilled++;
         const p = th.p || it;
@@ -4064,10 +4140,12 @@ table.t.mc td.pc{white-space:nowrap}
         const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f };
         S.ints.push(it);
         (th.fly = th.fly || []).push(it);
+        S.rec?.ints.push(it);
         u.magLeft--;
         u.active++;
         S.stats.shots++;
         S.stats.defCost += sm.cost;
+        recUnit(u);
         S.stats.byUnit[uLabel(u)] = (S.stats.byUnit[uLabel(u)] || 0) + 1;
       }
       event("Primer interceptor lanzado: " + uLabel(u) + " contra " + label(th), "firstShot");
@@ -4081,6 +4159,7 @@ table.t.mc td.pc{white-space:nowrap}
   function impact(th) {
     th.alive = false;
     th.done = true;
+    th.tEnd = S.t;
     const tg = th.pts[th.pts.length - 1];
     let x = tg[0], y = tg[1];
     if (th.parent) {
@@ -4093,7 +4172,7 @@ table.t.mc td.pc{white-space:nowrap}
     x += Math.cos(ang) * r / 1e3;
     y += Math.sin(ang) * r / 1e3;
     if (th.isDecoy) {
-      S.impacts.push({ x, y, k: "decoy" });
+      S.impacts.push({ x, y, k: "decoy", t: S.t });
       log("d", label(th) + " cae sin efecto.");
       return;
     }
@@ -4111,13 +4190,14 @@ table.t.mc td.pc{white-space:nowrap}
     const dtxt = dmg.map((d) => ` · −${d.dmg} HP a ${d.g.name} (${Math.max(0, d.g.hp)}/${d.g.maxHp})`).join("");
     if (hit) {
       S.stats.hits++;
-      S.impacts.push({ x, y, k: "hit" });
+      S.impacts.push({ x, y, k: "hit", t: S.t });
       S.fx.push({ x, y, rt: performance.now(), c: "#ff5b4d", big: true });
       let msg = label(th) + " impacta en el blanco";
       if (th.targetUnit) {
         const u = S.units.find((v) => v.id === th.targetUnit && v.alive);
         if (u) {
           u.alive = false;
+          recUnit(u);
           S.stats.lost++;
           msg += " y destruye " + uLabel(u);
           hooks.onUnitLost();
@@ -4127,7 +4207,7 @@ table.t.mc td.pc{white-space:nowrap}
       log("x", msg + dtxt + ".");
     } else {
       S.stats.misses++;
-      S.impacts.push({ x, y, k: "miss" });
+      S.impacts.push({ x, y, k: "miss", t: S.t });
       log("w", label(th) + " cae a " + Math.round(r) + " m del blanco" + (th.navErr > 150 ? " (desviado por interferencia GNSS)" : "") + dtxt + ".");
     }
     damageUnits(th.T, x, y);
@@ -4153,6 +4233,7 @@ table.t.mc td.pc{white-space:nowrap}
       g.hits++;
       g.dmgBy[th.T.short] = (g.dmgBy[th.T.short] || 0) + dmg;
       g.status = targetStatus(g.hp, g.maxHp);
+      recObj(g);
       S.stats.damage += dmg;
       S.stats.dmgByWeapon[th.T.short] = (S.stats.dmgByWeapon[th.T.short] || 0) + dmg;
       out.push({ g, dmg, dist, before });
@@ -4168,6 +4249,7 @@ table.t.mc td.pc{white-space:nowrap}
       u.hp -= Math.round(res.dmg);
       if (u.hp <= 0) {
         u.alive = false;
+        recUnit(u);
         S.stats.lost++;
         hooks.onUnitLost();
         log("x", uLabel(u) + " queda destruida por la explosión de " + T.short + " a " + Math.round(res.edge + UNIT_TARGET.radius) + " m.");
@@ -4190,6 +4272,7 @@ table.t.mc td.pc{white-space:nowrap}
         }
         S.stats.unitsDamaged++;
         event(uLabel(u) + " dañada por " + T.short, "dmgUnit:" + u.id + ":" + c);
+        recUnit(u);
       }
     }
   }
@@ -4263,6 +4346,7 @@ table.t.mc td.pc{white-space:nowrap}
       if (sc2.rules.doctrine) S.doctrine = sc2.rules.doctrine;
     }
     S.weather = WEATHER[sc2.rules?.weather] ? sc2.rules.weather : WEATHER_DEFAULT;
+    S.wind = { v: sc2.rules?.wind?.v ?? 0, from: sc2.rules?.wind?.from ?? 0 };
     S.ignoreDecoys = !!sc2.rules?.ignoreDecoys;
     S.fireRange = sc2.rules?.fireRange ?? 1;
     S.scen = sc2;
@@ -4472,6 +4556,7 @@ table.t.mc td.pc{white-space:nowrap}
   // src/render/draw.js
   function draw() {
     if (!MAP) return;
+    const R = S.replay ? frameAt(S.replay.t) : null, tNow = R ? R.t : S.t;
     const w = cv.width / dpr, h = cv.height / dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = "#0a1520";
@@ -4516,7 +4601,7 @@ table.t.mc td.pc{white-space:nowrap}
       ctx.fillStyle = "rgba(235,240,245,.85)";
       ctx.fillText(p[0], sx + 5, sy + 4);
     }
-    const units = S.started ? S.units : S.setup.defs;
+    const units = R ? R.units : S.started ? S.units : S.setup.defs;
     const jams = S.started ? S.jamsLive : S.setup.jams;
     for (const u of units) {
       const d = D(u);
@@ -4578,9 +4663,9 @@ table.t.mc td.pc{white-space:nowrap}
         ctx.setLineDash([]);
       }
     }
-    if (!S.started || !S.running) for (const sv of S.setup.salvos) drawRoute(sv, S.sel && S.sel.kind === "salvo" && S.sel.id === sv.id);
+    if (!R && (!S.started || !S.running)) for (const sv of S.setup.salvos) drawRoute(sv, S.sel && S.sel.kind === "salvo" && S.sel.id === sv.id);
     if (S.route) drawRoute({ type: S.atk.type, pts: S.route.pts, preview: true }, true);
-    for (const g of S.started ? S.objs : S.setup.objs) drawObjective(g, S.sel && S.sel.kind === "obj" && S.sel.id === g.id);
+    for (const g of R ? R.objs : S.started ? S.objs : S.setup.objs) drawObjective(g, S.sel && S.sel.kind === "obj" && S.sel.id === g.id);
     for (const j of jams) {
       const J = JAMMERS[j.type], [sx, sy] = toS(j.x, j.y);
       const isSel = S.sel && S.sel.kind === "jam" && S.sel.id === j.id;
@@ -4658,7 +4743,7 @@ table.t.mc td.pc{white-space:nowrap}
       labelAt(sx, sy, (u.name || d.short) + ammo, dead ? "#6b7888" : "#e6eef6");
     }
     if (S.preview) drawPreview(S.preview);
-    for (const im of S.impacts) {
+    for (const im of R ? R.impacts : S.impacts) {
       const [sx, sy] = toS(im.x, im.y);
       ctx.strokeStyle = im.k === "hit" ? "#ff5b4d" : im.k === "miss" ? "#e6a53c" : "#6b7888";
       ctx.lineWidth = 2;
@@ -4670,9 +4755,9 @@ table.t.mc td.pc{white-space:nowrap}
       ctx.stroke();
     }
     const dv = hooks.defenderView();
-    for (const th of S.threats) {
+    for (const th of R ? R.threats : S.threats) {
       if (!th.alive || !th.p) continue;
-      const tracked = S.t - th.lastNet <= 12;
+      const tracked = tNow - th.lastNet <= 12;
       if (dv && !tracked) continue;
       const decoyLook = th.isDecoy && !dv;
       const col = tracked ? "#ff5b4d" : "rgba(255,91,77,.55)";
@@ -4689,7 +4774,7 @@ table.t.mc td.pc{white-space:nowrap}
       }
       ctx.stroke();
       const [sx, sy] = toS(th.p.x, th.p.y);
-      const nx = posAt(th, S.t + 2);
+      const nx = posAt(th, tNow + 2);
       const hd = nx ? Math.atan2(nx.y - th.p.y, nx.x - th.p.x) : 0;
       ctx.save();
       ctx.translate(sx, sy);
@@ -4723,10 +4808,10 @@ table.t.mc td.pc{white-space:nowrap}
         ctx.fillText(dv ? "#" + th.id : th.T.short, sx + 7, sy - 6);
       }
     }
-    for (const it of S.ints) {
-      if (it.done || S.t < it.tL) continue;
+    for (const it of R ? R.ints : S.ints) {
+      if (it.done || tNow < it.tL) continue;
       const P = profileOf(D(it.u).sam), fl = Math.max(0.1, it.tH - it.tL);
-      const f = clamp(distAt(P, S.t - it.tL) / Math.max(1, distAt(P, fl)), 0, 1);
+      const f = clamp(distAt(P, tNow - it.tL) / Math.max(1, distAt(P, fl)), 0, 1);
       const [a, b] = toS(it.x0, it.y0), [c2, d2] = toS(it.x0 + (it.px - it.x0) * f, it.y0 + (it.py - it.y0) * f);
       ctx.strokeStyle = "rgba(120,220,255,.75)";
       ctx.lineWidth = 1.2;
@@ -5566,7 +5651,7 @@ table.t.mc td.pc{white-space:nowrap}
       body: () => `<p>El tiempo no afecta igual a todos los sensores. La <b>lluvia</b> absorbe y dispersa las microondas, tanto más cuanto más alta es la frecuencia: un radar en banda S o L casi no la nota, uno en X la siente y uno en Ku pierde mucho alcance en una tormenta. Por eso los radares de alerta usan bandas bajas y los de guiado (X, Ku) sufren más.</p><p>Los sensores <b>ópticos e infrarrojos</b> (los grupos móviles con ametralladoras y cámaras térmicas, los MANPADS) son los más castigados: la lluvia o la niebla les achican el alcance a una fracción y las <b>nubes</b> les tapan todo lo que vuela por encima, aunque se escuche el motor. La red <b>acústica</b> oye menos con lluvia y viento.</p>`,
       engine: () => `<p>El clima se elige en la pestaña Defensa (${code("S.weather")}) y queda fijo todo el escenario. La atenuación del radar sale de la Rec. ITU-R P.838-3: ${code("γ = k · R^α")} dB/km, con k y α según la frecuencia de cada banda (${code("BANDS[b].ghz")}), sobre un camino de lluvia de hasta ${code("rainKm")}. El alcance resuelve ${code("R = R0 · 10^(−γ·min(R, L)/20)")}. Con lluvia de 4 mm/h, γ por banda: ${["S", "C", "X", "Ku"].map((b) => b + " " + rainGamma(b, 4).toFixed(3)).join(" · ")} dB/km.</p>
       <div class="tblwrap"><table class="t"><thead><tr><th>Clima</th><th>Lluvia</th><th>Óptico/IR</th><th>Techo para ópticos</th><th>Acústico</th></tr></thead><tbody>${Object.values(WEATHER).map((W) => `<tr><td>${esc(W.name)}</td><td>${W.rain ? W.rain + " mm/h en " + W.rainKm + " km" : "—"}</td><td>×${W.opt}</td><td>${W.ceiling != null ? W.ceiling + " m" : "—"}</td><td>×${W.acu}</td></tr>`).join("")}</tbody></table></div>
-      <p>Los factores ópticos y acústicos son estimaciones de juego (el manual de CMO dice que la lluvia deja lo visual en 1–5% y degrada mucho el IR). No se modelan el día y la noche, el viento sobre los drones, ni el clutter de lluvia.</p>`
+      <p>Los factores ópticos y acústicos son estimaciones de juego (el manual de CMO dice que la lluvia deja lo visual en 1–5% y degrada mucho el IR). El <b>viento</b> (${code("S.wind")}) cambia la velocidad sobre el suelo de drones y misiles de crucero en cada tramo de su ruta: ${code("Vg = W·u + √(v² − (W×u)²)")} (corrigen la deriva). Con 10 m/s de frente, un Shahed tarda un 24% más y un Kalibr un 4%. No se modelan el día y la noche ni el clutter de lluvia.</p>`
     },
     {
       id: "saturation",
@@ -5743,6 +5828,17 @@ table.t.mc td.pc{white-space:nowrap}
     <div class="warn">Lo que esta calibración no captura: la discriminación de señuelos por parte del radar, la escasez de munición real (2025–2026: se dispara 1 PAC-3 por blanco en vez de 2–3), y que las tasas ucranianas no tienen auditoría independiente.</div>
   </div>`, openCal);
   }
+  function energyTable(s) {
+    const P = profileOf(s), prof = hasProfile(s), pct3 = (x) => Math.round(x * 100) + "%", n1 = (x) => x.toLocaleString("es-AR", { maximumFractionDigits: 1 });
+    const rows = [0.25, 0.5, 0.75, ENERGY_REF, 1].map((f) => {
+      const d = f * s.maxR * 1e3, t = timeTo(P, d);
+      return `<tr><td>${pct3(f)}</td><td>${n1(f * s.maxR)} km</td><td>${n1(t)} s</td><td>${kmh(prof ? velAt(P, t) : s.vInt)}</td><td>×${energyPk(s, f).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td></tr>`;
+    }).join("");
+    return `<div><h3>Alcance, tiempo de vuelo y energía ${infoBtn("energia")}</h3>
+    <p>Alcance efectivo: de frente ${n1(s.maxR)} km · de costado ${n1(s.maxR * rangeFactor(0))} km · contra un blanco que se aleja ${n1(s.maxR * rangeFactor(-1))} km. Ese último es la <b>zona de no escape</b> del modelo: un blanco que da la vuelta al ver el lanzamiento no se escapa si está más cerca.</p>
+    <div class="tblwrap"><table class="t"><thead><tr><th>Fracción del alcance</th><th>Distancia</th><th>Tiempo de vuelo</th><th>Velocidad al llegar</th><th>Factor de Pk</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <p class="hint">${prof ? `Perfil de motor y planeo: acelera hasta ${kmh(s.vmax)} en ${s.tb} s y después planea; al alcance máximo llega en el mismo tiempo que a la velocidad media de ${kmh(s.vInt)}.` : `Sin datos de perfil: vuela a ${kmh(s.vInt)} constante y la energía baja por tramos cerca del borde.`} El factor de Pk es relativo al tiro típico al 90% del alcance (×1), con el que están calibradas las Pk. Contra un blanco que se aleja, el misil gasta la energía de un tiro de frente más largo: un encuentro de cola a 0,6 del alcance llega con la energía del borde.</p></div>`;
+  }
   function openFicha(kind, k) {
     if (kind === "thr") {
       const t = THREATS[k];
@@ -5777,6 +5873,7 @@ table.t.mc td.pc{white-space:nowrap}
       if (r) h += `<p class="hint">${esc(BANDS[r.band].note)}</p>`;
       h += `<div><h3>Notas</h3><ul>${d.notes.map((n2) => `<li>${esc(n2)}</li>`).join("")}</ul></div>`;
       if (s) h += `<div><h3>Pk por clase de blanco (modelo del simulador) ${infoBtn("pk")}</h3><div class="tblwrap"><table class="t"><thead><tr><th>Clase</th><th>Pk base</th></tr></thead><tbody>${Object.entries(s.pk).map(([c, v]) => `<tr><td>${esc(CLS_NAME[c])}</td><td>${Math.round(v * 100)}%</td></tr>`).join("")}</tbody></table></div><p class="hint">Es la Pk de un interceptor que llega al punto de encuentro. Se reduce con maniobra terminal (×0,6–0,85 según el arma; ×0,85 para cañones), bengalas contra IR (×0,85), blancos furtivos (×0,85 con buscador activo, ×0,75 con mando/TVM/semiactivo), interferencia sobre su radar y blancos cerca de su velocidad máxima. <button class="btn sm" id="fCal">Ver calibración</button></p></div>`;
+      if (s && usesEnergy(s.guid)) h += energyTable(s);
       if (r && r.band !== "ACU") {
         h += `<div><h3>Detección de cada amenaza por este sensor</h3><div class="tblwrap"><table class="t"><thead><tr><th>Amenaza</th><th>RCS de frente en ${r.band}</th><th>Por señal</th><th>De costado</th><th>Horizonte</th><th>Detección</th></tr></thead><tbody>${Object.values(THREATS).map((t) => {
           const rc = rcsAt(t, r.band), R = r.band === "OPT" ? r.R1 : r.R1 * Math.pow(rc, 0.25), Rs = r.band === "OPT" ? r.R1 : r.R1 * Math.pow(rcsAt(t, r.band, 0), 0.25), ht = t.agl ?? (t.cruiseAlt || t.apogee * 1e3), hz = horizon(d.kind === "aew" ? d.alt : r.mast, ht);
@@ -5997,7 +6094,7 @@ table.t.mc td.pc{white-space:nowrap}
         return renderSel();
       }
       const T = THREATS[sv.type];
-      const probe = buildThreat(sv, 0, 0);
+      const probe = buildThreat(sv, 0, 0, S.wind);
       releaseId();
       el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${sv.count}× ${esc(T.name)}</b><dl class="kv"><dt>Blanco</dt><dd>${esc(targetName(sv) || "punto del mapa")}</dd><dt>Ojiva</dt><dd>${warheadKg(T) ? warheadKg(T) + " kg · " + Math.round(directDamage(T)) + " HP por impacto directo" : "sin ojiva"}</dd><dt>Recorrido</dt><dd>${probe.L.toFixed(0)} km</dd><dt>Tiempo de vuelo</dt><dd>${fmtT(probe.ft).slice(2)}</dd><dt>${sv.sync ? "Llegada" : "Lanzamiento"}</dt><dd>T+${sv.sync ? sv.tArrive : sv.tStart} s</dd>${T.aglRange ? "<dt>Altura</dt><dd>" + sv.agl + " m AGL</dd>" : ""}<dt>Maniobra</dt><dd>${sv.maneuver ? "sí" : "no"}</dd><dt>Costo salva</dt><dd>${money(T.cost * sv.count)}</dd>${sv.crpa ? `<dt>Antena GNSS</dt><dd>CRPA de ${sv.crpa} elementos: anula hasta ${sv.crpa - 1} interferidores</dd>` : ""}</dl>
       <div class="row"><button class="btn sm" id="vInfo">Ficha</button>${!S.started ? '<button class="btn sm danger" id="vDel">Eliminar</button>' : ""}</div>`;
@@ -6232,7 +6329,7 @@ table.t.mc td.pc{white-space:nowrap}
       el.innerHTML = `<h3>Escenario</h3><p class="hint">Relieve importado: escenario libre. Ubicá objetivos en la pestaña Ataque.</p>`;
       return;
     }
-    const objs = S.started ? S.objs : S.setup.objs;
+    const objs = S.replay ? frameAt(S.replay.t).objs : S.started ? S.objs : S.setup.objs;
     const mine = (sc2.goals || []).filter((g) => g.side === sc2.player);
     el.innerHTML = `<div class="row" style="justify-content:space-between"><h3>Escenario</h3><button class="btn sm" id="briefBtn">Briefing</button></div>
     <p class="hint">${sc2.time ? esc(sc2.time) + " · " : ""}Jugás: <b>${SIDE[sc2.player] || "—"}</b></p>
@@ -6447,6 +6544,76 @@ table.t.mc td.pc{white-space:nowrap}
     $("#mcAgain").onclick = openMonteCarlo;
   }
 
+  // src/ui/replay.js
+  var SPEEDS2 = [5, 30, 120];
+  function openReplay(t = 0) {
+    if (!canReplay()) {
+      toast("Primero corré el escenario hasta el final.");
+      return;
+    }
+    closeModal();
+    S.running = false;
+    S.replay = { t, playing: true, speed: 30 };
+    renderReplayBar();
+  }
+  function closeReplay() {
+    S.replay = null;
+    renderReplayBar();
+  }
+  function renderReplayBar() {
+    const el = $("#replayBar");
+    if (!el) return;
+    if (!S.replay) {
+      el.hidden = true;
+      el.innerHTML = "";
+      return;
+    }
+    const end = Math.ceil(replayEnd());
+    el.hidden = false;
+    el.innerHTML = `<button class="btn pri sm" id="rpPlay"></button>
+    <input type="range" id="rpT" min="0" max="${end}" step="1" value="${Math.round(S.replay.t)}" aria-label="Instante de la repetición">
+    <span class="clock" id="rpClock"></span>
+    <div class="speeds">${SPEEDS2.map((s) => `<button data-s="${s}" class="${s === S.replay.speed ? "act" : ""}">${s}×</button>`).join("")}</div>
+    <button class="btn sm" id="rpExit">Salir</button>
+    <ol class="rplog" id="rpLog" aria-live="polite"></ol>`;
+    $("#rpPlay").onclick = () => {
+      const R = S.replay;
+      if (R.t >= end) R.t = 0;
+      R.playing = !R.playing;
+      updateReplayBar();
+    };
+    $("#rpT").oninput = (e) => {
+      S.replay.t = +e.target.value;
+      S.replay.playing = false;
+      updateReplayBar();
+    };
+    el.querySelector(".speeds").onclick = (e) => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      S.replay.speed = +b.dataset.s;
+      for (const c of b.parentNode.children) c.classList.toggle("act", c === b);
+    };
+    $("#rpExit").onclick = closeReplay;
+    updateReplayBar();
+  }
+  function updateReplayBar() {
+    const R = S.replay;
+    if (!R || !$("#rpPlay")) return;
+    $("#rpPlay").textContent = R.playing ? "❚❚" : "▶";
+    $("#rpT").value = Math.round(R.t);
+    $("#rpClock").textContent = "Repetición " + fmtT(R.t);
+    const log2 = frameAt(R.t).log.slice(-4).reverse();
+    $("#rpLog").innerHTML = log2.map((l) => `<li class="${esc(l.cls)}"><time>${fmtT(l.t)}</time> ${esc(l.msg)}</li>`).join("");
+  }
+  function tickReplay(dtr) {
+    const R = S.replay;
+    if (!R?.playing) return;
+    const end = replayEnd();
+    R.t = Math.min(end, R.t + dtr * R.speed);
+    if (R.t >= end) R.playing = false;
+    updateReplayBar();
+  }
+
   // src/ui/debrief.js
   var pct2 = (a, b) => b ? Math.round(100 * a / b) + "%" : "—";
   var SIDE3 = { ataque: "Ataque", defensa: "Defensa" };
@@ -6487,9 +6654,10 @@ table.t.mc td.pc{white-space:nowrap}
     <div><h3>Línea de tiempo</h3><ol class="timeline">${tl}</ol></div>
     <div><h3>Por tipo de arma</h3><div class="tblwrap"><table class="t"><thead><tr><th>Arma</th><th>Lanzadas</th><th>Derribadas</th><th>Llegaron</th><th>Interceptores recibidos</th></tr></thead><tbody>${typeRows}</tbody></table></div></div>
     <p class="hint">Todo lo de arriba sale de lo que registró el motor durante la corrida. Corré de nuevo con otra disposición: el azar (detección, Pk, dispersión) cambia el resultado de una corrida a otra.</p>
-    <div class="row"><button class="btn" id="dbMc">¿Fue suerte? Repetir muchas veces (Monte Carlo)</button></div>
+    <div class="row"><button class="btn pri" id="dbReplay" title="Volver a ver la corrida sobre el mapa, con una línea de tiempo">Ver repetición</button><button class="btn" id="dbMc">¿Fue suerte? Repetir muchas veces (Monte Carlo)</button></div>
   </div>`, openDebrief);
     $("#dbMc").onclick = openMonteCarlo;
+    $("#dbReplay").onclick = () => openReplay(0);
   }
 
   // src/ui/panels/results.js
@@ -6648,6 +6816,8 @@ table.t.mc td.pc{white-space:nowrap}
   }
 
   // src/ui/panels/defense.js
+  var WIND_DIRS = [["Norte", 0], ["Noreste", 45], ["Este", 90], ["Sudeste", 135], ["Sur", 180], ["Sudoeste", 225], ["Oeste", 270], ["Noroeste", 315]];
+  var windTxt = () => S.wind.v ? `${S.wind.v} m/s (${Math.round(S.wind.v * 3.6)} km/h) desde ${(WIND_DIRS.find(([, a]) => a === S.wind.from) || [S.wind.from + "°"])[0].toLowerCase()}` : "calma";
   function unitBtn(key, def, act, cls) {
     return `<button class="ub ${cls} ${act ? "act" : ""}" data-k="${key}" title="${esc(def.name)}"><span>${esc(def.short)}</span><i data-info="${key}" role="button" aria-label="Ficha">i</i></button>`;
   }
@@ -6671,6 +6841,8 @@ table.t.mc td.pc{white-space:nowrap}
     <div class="grp"><h3>Clima ${infoBtn("clima")}</h3>
       <div class="field"><label for="optWx">Tiempo</label><select id="optWx" class="sel">${Object.entries(WEATHER).map(([k, W]) => `<option value="${k}" ${S.weather === k ? "selected" : ""}>${esc(W.name)}</option>`).join("")}</select></div>
       <p class="hint" id="wxInfo">${esc(WEATHER[S.weather].desc)}</p>
+      <div class="field" title="Viento a la altura de vuelo, igual en todo el mapa. Los drones y misiles de crucero vuelan a su velocidad respecto del aire: con viento de frente tardan más y con viento de cola llegan antes. A un Shahed (≈185 km/h) le pesa mucho; a un misil de crucero, poco. No afecta a balísticos ni planeadoras."><label for="optWind">Viento ${infoBtn("clima")}</label><span class="val" id="windVal">${windTxt()}</span><input type="range" id="optWind" min="0" max="30" step="1" value="${S.wind.v}"></div>
+      <div class="field"><label for="optWindFrom">Sopla desde</label><select id="optWindFrom" class="sel">${WIND_DIRS.map(([n2, a]) => `<option value="${a}" ${S.wind.from === a ? "selected" : ""}>${n2} (${a}°)</option>`).join("")}</select></div>
     </div>
     <div class="grp"><h3>Cobertura de radar ${infoBtn("horizon")} ${infoBtn("los")}</h3>
       <label class="check"><input type="checkbox" id="optCov" ${S.showCov ? "checked" : ""}> Mostrar cobertura sobre el mapa</label>
@@ -6722,6 +6894,22 @@ table.t.mc td.pc{white-space:nowrap}
       S.weather = e.target.value;
       $("#wxInfo").textContent = WEATHER[S.weather].desc;
       schedCov();
+    };
+    const windLock = (e, v) => {
+      if (!S.started) return false;
+      toast("Reiniciá para cambiar el viento.");
+      e.target.value = v;
+      return true;
+    };
+    $("#optWind").oninput = (e) => {
+      if (windLock(e, S.wind.v)) return;
+      S.wind = { ...S.wind, v: +e.target.value };
+      $("#windVal").textContent = windTxt();
+    };
+    $("#optWindFrom").onchange = (e) => {
+      if (windLock(e, S.wind.from)) return;
+      S.wind = { ...S.wind, from: +e.target.value };
+      $("#windVal").textContent = windTxt();
     };
     $("#optCov").onchange = (e) => {
       S.showCov = e.target.checked;
@@ -6775,6 +6963,7 @@ table.t.mc td.pc{white-space:nowrap}
   }
   function resetSim() {
     resetState();
+    renderReplayBar();
     markLogDirty();
     updatePlay();
     schedCov();
@@ -7093,7 +7282,7 @@ table.t.mc td.pc{white-space:nowrap}
       version: VERSION,
       saved: now.toISOString(),
       map: mapRef(),
-      rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather, ignoreDecoys: S.ignoreDecoys, fireRange: S.fireRange },
+      rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather, wind: { ...S.wind }, ignoreDecoys: S.ignoreDecoys, fireRange: S.fireRange },
       scenario: S.scen ? { base: baseKey(S.scen), ...pick(S.scen, META_KEYS) } : null,
       setup: {
         objs: s.objs.map((g) => pick(g, OBJ_KEYS)),
@@ -7283,6 +7472,10 @@ table.t.mc td.pc{white-space:nowrap}
     const r = raw.rules || {};
     const net = bool("rules.net", r.net);
     const rules = { c2: r.c2 ?? (net === void 0 ? void 0 : c2FromNet(net)), doctrine: r.doctrine, weather: r.weather, ignoreDecoys: bool("rules.ignoreDecoys", r.ignoreDecoys), fireRange: num2("rules.fireRange", r.fireRange, 0.3, 1, { opt: true }) };
+    if (r.wind !== void 0) {
+      if (r.wind === null || typeof r.wind !== "object") err("rules.wind: tiene que ser { v, from } (m/s y grados de donde sopla).");
+      else rules.wind = { v: num2("rules.wind.v", r.wind.v, 0, 40), from: num2("rules.wind.from", r.wind.from, 0, 360) };
+    }
     if (r.weather !== void 0 && !WEATHER[r.weather]) err(`rules.weather: "${String(r.weather)}" no es un clima válido (${Object.keys(WEATHER).join(", ")}).`);
     if (r.c2 !== void 0 && !C2_LEVELS[r.c2]) err(`rules.c2: "${String(r.c2)}" no es un nivel de mando y control válido (${Object.keys(C2_LEVELS).join(", ")}).`);
     if (r.doctrine !== void 0 && !DOCTRINES.includes(r.doctrine)) err(`rules.doctrine: "${String(r.doctrine)}" no es ${DOCTRINES.join(" ni ")}.`);
@@ -7350,6 +7543,7 @@ table.t.mc td.pc{white-space:nowrap}
     }
     if (data.rules.c2) S.c2 = data.rules.c2;
     S.weather = data.rules.weather || "despejado";
+    S.wind = { v: data.rules.wind?.v ?? 0, from: data.rules.wind?.from ?? 0 };
     S.ignoreDecoys = !!data.rules.ignoreDecoys;
     S.fireRange = data.rules.fireRange ?? 1;
     if (data.rules.doctrine) S.doctrine = data.rules.doctrine;
@@ -7485,6 +7679,7 @@ table.t.mc td.pc{white-space:nowrap}
       });
       $("#clock").textContent = fmtT(S.t);
     }
+    if (S.replay) tickReplay(dtr);
     draw();
     if (++uiTick % 10 === 0) {
       const free = (id) => !(pressedBtn && document.querySelector(id)?.contains(pressedBtn));

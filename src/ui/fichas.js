@@ -4,6 +4,8 @@
 import { BANDS, CLS_NAME, THREATS, DEFENSES, JAMMERS, OBS, UNC, PL, CAL, SRC_REF, JAM_MODES } from '../data/index.js';
 import { esc, kmh, mach, money } from '../util/format.js';
 import { rcsAt, horizon, singleJam, burnThrough } from '../physics/radar.js';
+import { rangeFactor, energyPk, ENERGY_REF, usesEnergy } from '../physics/engagement.js';
+import { profileOf, hasProfile, timeTo, velAt } from '../physics/interceptor.js';
 import { $ } from './dom.js';
 import { infoBtn, bandChip } from './academy.js';
 
@@ -67,6 +69,22 @@ export function openCal() {
   </div>`, openCal);
 }
 /** Ficha de una amenaza (kind = thr), defensa (def) o jammer (jam). */
+/**
+ * Alcance según el aspecto, tiempo de vuelo, velocidad al llegar y factor de Pk por energía de un misil
+ * (physics/engagement.js e interceptor.js, docs/FISICA.md §6–§7): lo mismo que usa la simulación.
+ */
+function energyTable(s) {
+  const P = profileOf(s), prof = hasProfile(s), pct = x => Math.round(x * 100) + '%', n1 = x => x.toLocaleString('es-AR', { maximumFractionDigits: 1 });
+  const rows = [0.25, 0.5, 0.75, ENERGY_REF, 1].map(f => {
+    const d = f * s.maxR * 1000, t = timeTo(P, d);
+    return `<tr><td>${pct(f)}</td><td>${n1(f * s.maxR)} km</td><td>${n1(t)} s</td><td>${kmh(prof ? velAt(P, t) : s.vInt)}</td><td>×${energyPk(s, f).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td></tr>`;
+  }).join('');
+  return `<div><h3>Alcance, tiempo de vuelo y energía ${infoBtn('energia')}</h3>
+    <p>Alcance efectivo: de frente ${n1(s.maxR)} km · de costado ${n1(s.maxR * rangeFactor(0))} km · contra un blanco que se aleja ${n1(s.maxR * rangeFactor(-1))} km. Ese último es la <b>zona de no escape</b> del modelo: un blanco que da la vuelta al ver el lanzamiento no se escapa si está más cerca.</p>
+    <div class="tblwrap"><table class="t"><thead><tr><th>Fracción del alcance</th><th>Distancia</th><th>Tiempo de vuelo</th><th>Velocidad al llegar</th><th>Factor de Pk</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <p class="hint">${prof ? `Perfil de motor y planeo: acelera hasta ${kmh(s.vmax)} en ${s.tb} s y después planea; al alcance máximo llega en el mismo tiempo que a la velocidad media de ${kmh(s.vInt)}.` : `Sin datos de perfil: vuela a ${kmh(s.vInt)} constante y la energía baja por tramos cerca del borde.`} El factor de Pk es relativo al tiro típico al 90% del alcance (×1), con el que están calibradas las Pk. Contra un blanco que se aleja, el misil gasta la energía de un tiro de frente más largo: un encuentro de cola a 0,6 del alcance llega con la energía del borde.</p></div>`;
+}
+
 export function openFicha(kind, k) {
   if (kind === 'thr') {
     const t = THREATS[k];
@@ -93,6 +111,7 @@ export function openFicha(kind, k) {
     if (r) h += `<p class="hint">${esc(BANDS[r.band].note)}</p>`;
     h += `<div><h3>Notas</h3><ul>${d.notes.map(n => `<li>${esc(n)}</li>`).join('')}</ul></div>`;
     if (s) h += `<div><h3>Pk por clase de blanco (modelo del simulador) ${infoBtn('pk')}</h3><div class="tblwrap"><table class="t"><thead><tr><th>Clase</th><th>Pk base</th></tr></thead><tbody>${Object.entries(s.pk).map(([c, v]) => `<tr><td>${esc(CLS_NAME[c])}</td><td>${Math.round(v * 100)}%</td></tr>`).join('')}</tbody></table></div><p class="hint">Es la Pk de un interceptor que llega al punto de encuentro. Se reduce con maniobra terminal (×0,6–0,85 según el arma; ×0,85 para cañones), bengalas contra IR (×0,85), blancos furtivos (×0,85 con buscador activo, ×0,75 con mando/TVM/semiactivo), interferencia sobre su radar y blancos cerca de su velocidad máxima. <button class="btn sm" id="fCal">Ver calibración</button></p></div>`;
+    if (s && usesEnergy(s.guid)) h += energyTable(s);
     if (r && r.band !== 'ACU') { h += `<div><h3>Detección de cada amenaza por este sensor</h3><div class="tblwrap"><table class="t"><thead><tr><th>Amenaza</th><th>RCS de frente en ${r.band}</th><th>Por señal</th><th>De costado</th><th>Horizonte</th><th>Detección</th></tr></thead><tbody>${Object.values(THREATS).map(t => { const rc = rcsAt(t, r.band), R = r.band === 'OPT' ? r.R1 : r.R1 * Math.pow(rc, 0.25), Rs = r.band === 'OPT' ? r.R1 : r.R1 * Math.pow(rcsAt(t, r.band, 0), 0.25), ht = t.agl ?? (t.cruiseAlt || t.apogee * 1000), hz = horizon(d.kind === 'aew' ? d.alt : r.mast, ht); return `<tr><td>${esc(t.short)}</td><td>${rc < 0.1 ? rc.toFixed(3) : rc.toFixed(2)}</td><td>${R.toFixed(0)} km</td><td>${Rs.toFixed(0)} km</td><td>${hz.toFixed(0)} km</td><td><b>${Math.min(R, hz).toFixed(0)} km</b></td></tr>`; }).join('')}</tbody></table></div><p class="hint">"Por señal" y "Detección" son de frente (peor caso); "De costado" es el alcance por señal si el blanco pasa de costado a este radar.</p></div>`; }
     h += `<div class="warn">Parámetros aproximados a partir de fuentes abiertas. Pk, RCS y alcances de radar contra blancos chicos son estimaciones calibradas, no datos oficiales.</div>${confTable('def', k)}${srcs(d.sources)}</div>`;
     openModal(h, () => openFicha(kind, k)); if ($('#fCal')) $('#fCal').onclick = () => pushModalFn(openCal);

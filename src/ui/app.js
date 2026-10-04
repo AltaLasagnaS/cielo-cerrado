@@ -11,12 +11,13 @@ import { updatePlay } from './controls.js';
 import { renderAll } from './panels/index.js';
 import { renderSel } from './panels/selection.js';
 import { markLogDirty } from './panels/results.js';
+import { renderReplayBar } from './replay.js';
 
 /** Activa un mapa: lo carga en la física, pinta el relieve y lo encuadra. */
 export function applyMap(m) { setMap(m); buildBase(); fitView(); }
 
 /** Descarta la corrida y vuelve al modo edición. */
-export function resetSim() { resetState(); markLogDirty(); updatePlay(); schedCov(); renderSel(); }
+export function resetSim() { resetState(); renderReplayBar(); markLogDirty(); updatePlay(); schedCov(); renderSel(); }
 
 /** Carga uno de los escenarios incluidos (data/scenarios.js). */
 export function loadScenario(key) {

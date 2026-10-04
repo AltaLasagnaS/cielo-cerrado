@@ -3,6 +3,7 @@ import { TARGET_TYPES, TARGET_STATUS, TERRAIN } from '../../data/index.js';
 import { esc } from '../../util/format.js';
 import { MAP } from '../../physics/terrain.js';
 import { S } from '../../sim/state.js';
+import { frameAt } from '../../sim/replay.js';
 import { $ } from '../dom.js';
 import { openModal } from '../fichas.js';
 import { renderSel } from './selection.js';
@@ -18,7 +19,7 @@ const objRow = g => {
 export function renderScenario() {
   const el = $('#scenCard'), sc = S.scen;
   if (!sc) { el.innerHTML = `<h3>Escenario</h3><p class="hint">Relieve importado: escenario libre. Ubicá objetivos en la pestaña Ataque.</p>`; return; }
-  const objs = S.started ? S.objs : S.setup.objs;
+  const objs = S.replay ? frameAt(S.replay.t).objs : S.started ? S.objs : S.setup.objs;   // en la repetición, los del instante elegido
   const mine = (sc.goals || []).filter(g => g.side === sc.player);
   el.innerHTML = `<div class="row" style="justify-content:space-between"><h3>Escenario</h3><button class="btn sm" id="briefBtn">Briefing</button></div>
     <p class="hint">${sc.time ? esc(sc.time) + ' · ' : ''}Jugás: <b>${SIDE[sc.player] || '—'}</b></p>

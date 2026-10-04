@@ -7,7 +7,7 @@ import { hooks } from './hooks.js';
  * Agrega un evento. cls = tipo, que la interfaz pinta de distinto color:
  * 'd' general, 'l' detección/disparo, 'k' derribo, 'x' falla o impacto, 'w' advertencia.
  */
-export function log(cls, msg) { S.log.unshift({ t: S.t, cls, msg }); if (S.log.length > 300) S.log.pop(); hooks.onLog(); }
+export function log(cls, msg) { const e = { t: S.t, cls, msg }; S.log.unshift(e); if (S.log.length > 300) S.log.pop(); S.rec?.log.push(e); hooks.onLog(); }
 
 /** Nombre de una amenaza para el registro ("Kh-101 #34" o "Señuelo de Iskander-M #51"). */
 export function label(th) { return (th.isDecoyChild ? 'Señuelo de ' : '') + th.T.short + ' #' + th.id; }

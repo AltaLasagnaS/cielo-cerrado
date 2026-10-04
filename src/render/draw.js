@@ -10,12 +10,15 @@ import { isOffmap, posAt } from '../physics/kinematics.js';
 import { profileOf, distAt } from '../physics/interceptor.js';
 import { S } from '../sim/state.js';
 import { hooks } from '../sim/hooks.js';
+import { frameAt } from '../sim/replay.js';
 import { cv, ctx, dpr, V, toS } from './view.js';
 import { drawTerrain, drawPeaks } from './terrain.js';
 import { covCanvas } from './coverage.js';
 
 export function draw() {
   if (!MAP) return;
+  // repetición: se dibuja el cuadro reconstruido en S.replay.t en lugar del estado vivo (sim/replay.js)
+  const R = S.replay ? frameAt(S.replay.t) : null, tNow = R ? R.t : S.t;
   const w = cv.width / dpr, h = cv.height / dpr;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.fillStyle = '#0a1520'; ctx.fillRect(0, 0, w, h);
@@ -36,7 +39,7 @@ export function draw() {
   // lugares
   ctx.font = '600 12px "IBM Plex Sans", sans-serif';
   for (const p of MAP.places || []) { const [sx, sy] = toS(p[1], p[2]); ctx.fillStyle = 'rgba(10,15,22,.75)'; ctx.fillRect(sx - 2, sy - 2, 4, 4); ctx.fillStyle = 'rgba(235,240,245,.85)'; ctx.fillText(p[0], sx + 5, sy + 4); }
-  const units = S.started ? S.units : S.setup.defs;
+  const units = R ? R.units : S.started ? S.units : S.setup.defs;
   const jams = S.started ? S.jamsLive : S.setup.jams;
   // anillos de alcance y sectores
   for (const u of units) {
@@ -63,10 +66,10 @@ export function draw() {
       const [a, b] = toS(u.x, u.y), [c2, d2] = toS(j.x, j.y); ctx.strokeStyle = `rgba(197,140,255,${clamp(0.25 + Math.log10(J + 1) * 0.3, 0.25, 0.9)})`; ctx.lineWidth = 1.2; ctx.setLineDash([8, 4]); ctx.beginPath(); ctx.moveTo(a, b); ctx.lineTo(c2, d2); ctx.stroke(); ctx.setLineDash([]); }
   }
   // rutas de salvas (setup)
-  if (!S.started || !S.running) for (const sv of S.setup.salvos) drawRoute(sv, S.sel && S.sel.kind === 'salvo' && S.sel.id === sv.id);
+  if (!R && (!S.started || !S.running)) for (const sv of S.setup.salvos) drawRoute(sv, S.sel && S.sel.kind === 'salvo' && S.sel.id === sv.id);
   if (S.route) drawRoute({ type: S.atk.type, pts: S.route.pts, preview: true }, true);
   // objetivos (debajo de las unidades)
-  for (const g of S.started ? S.objs : S.setup.objs) drawObjective(g, S.sel && S.sel.kind === 'obj' && S.sel.id === g.id);
+  for (const g of R ? R.objs : S.started ? S.objs : S.setup.objs) drawObjective(g, S.sel && S.sel.kind === 'obj' && S.sel.id === g.id);
   // jammers
   for (const j of jams) {
     const J = JAMMERS[j.type], [sx, sy] = toS(j.x, j.y); const isSel = S.sel && S.sel.kind === 'jam' && S.sel.id === j.id;
@@ -96,19 +99,19 @@ export function draw() {
   // posición propuesta, pendiente de confirmar
   if (S.preview) drawPreview(S.preview);
   // impactos
-  for (const im of S.impacts) { const [sx, sy] = toS(im.x, im.y); ctx.strokeStyle = im.k === 'hit' ? '#ff5b4d' : im.k === 'miss' ? '#e6a53c' : '#6b7888'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(sx - 5, sy - 5); ctx.lineTo(sx + 5, sy + 5); ctx.moveTo(sx + 5, sy - 5); ctx.lineTo(sx - 5, sy + 5); ctx.stroke(); }
+  for (const im of R ? R.impacts : S.impacts) { const [sx, sy] = toS(im.x, im.y); ctx.strokeStyle = im.k === 'hit' ? '#ff5b4d' : im.k === 'miss' ? '#e6a53c' : '#6b7888'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(sx - 5, sy - 5); ctx.lineTo(sx + 5, sy + 5); ctx.moveTo(sx + 5, sy - 5); ctx.lineTo(sx - 5, sy + 5); ctx.stroke(); }
   // amenazas
   const dv = hooks.defenderView();
-  for (const th of S.threats) {
+  for (const th of R ? R.threats : S.threats) {
     if (!th.alive || !th.p) continue;
-    const tracked = S.t - th.lastNet <= 12;
+    const tracked = tNow - th.lastNet <= 12;
     if (dv && !tracked) continue;
     const decoyLook = th.isDecoy && !dv;
     const col = tracked ? '#ff5b4d' : 'rgba(255,91,77,.55)';
     ctx.strokeStyle = 'rgba(255,91,77,.35)'; ctx.lineWidth = 1; ctx.beginPath();
     for (const p of th.trail) { const [a, b] = toS(p[0], p[1]); ctx.lineTo(a, b); } { const [a, b] = toS(th.p.x, th.p.y); ctx.lineTo(a, b); } ctx.stroke();
     const [sx, sy] = toS(th.p.x, th.p.y);
-    const nx = posAt(th, S.t + 2); const hd = nx ? Math.atan2(nx.y - th.p.y, nx.x - th.p.x) : 0;
+    const nx = posAt(th, tNow + 2); const hd = nx ? Math.atan2(nx.y - th.p.y, nx.x - th.p.x) : 0;
     ctx.save(); ctx.translate(sx, sy); ctx.rotate(hd);
     ctx.fillStyle = decoyLook ? 'transparent' : col; ctx.strokeStyle = decoyLook ? '#e6a53c' : (tracked ? '#2a0806' : col); ctx.lineWidth = 1.2;
     ctx.beginPath();
@@ -119,11 +122,11 @@ export function draw() {
     if (V.s > 9) { ctx.font = '10px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(255,190,180,.9)'; ctx.fillText(dv ? '#' + th.id : th.T.short, sx + 7, sy - 6); }
   }
   // interceptores
-  for (const it of S.ints) {
-    if (it.done || S.t < it.tL) continue;
+  for (const it of R ? R.ints : S.ints) {
+    if (it.done || tNow < it.tL) continue;
     // fracción del camino recorrida según el perfil de motor y planeo (acelera al salir, frena al final)
     const P = profileOf(D(it.u).sam), fl = Math.max(0.1, it.tH - it.tL);
-    const f = clamp(distAt(P, S.t - it.tL) / Math.max(1, distAt(P, fl)), 0, 1);
+    const f = clamp(distAt(P, tNow - it.tL) / Math.max(1, distAt(P, fl)), 0, 1);
     const [a, b] = toS(it.x0, it.y0), [c2, d2] = toS(it.x0 + (it.px - it.x0) * f, it.y0 + (it.py - it.y0) * f);
     ctx.strokeStyle = 'rgba(120,220,255,.75)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(a, b); ctx.lineTo(c2, d2); ctx.stroke();
     ctx.fillStyle = '#bff0ff'; ctx.beginPath(); ctx.arc(c2, d2, 2.2, 0, 7); ctx.fill();
