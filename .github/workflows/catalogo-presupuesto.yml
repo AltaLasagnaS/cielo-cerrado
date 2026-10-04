@@ -1,0 +1,30 @@
+name: Catálogo y presupuesto experimental
+
+on:
+  pull_request:
+    paths:
+      - 'experimentos/catalogo-presupuesto/**'
+      - '.github/workflows/catalogo-presupuesto.yml'
+  push:
+    paths:
+      - 'experimentos/catalogo-presupuesto/**'
+      - '.github/workflows/catalogo-presupuesto.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Validación del catálogo independiente
+        run: node experimentos/catalogo-presupuesto/scripts/check.mjs
+      - name: Pruebas de catálogo y contabilidad
+        run: node --test experimentos/catalogo-presupuesto/tests/*.test.mjs
+      - name: Demostración reproducible de guardado y recursos
+        run: node experimentos/catalogo-presupuesto/scripts/demo.mjs

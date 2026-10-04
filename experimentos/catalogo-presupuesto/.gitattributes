@@ -1,0 +1,2 @@
+# Keep this small hand-written demo reviewable despite the root *.html rule.
+demo/*.html text diff

@@ -1,0 +1,13 @@
+import { CATALOG } from '../data/catalog.mjs';
+import { validateCatalog, catalogReadiness } from '../lib/catalog-validation.mjs';
+
+const result = validateCatalog(CATALOG);
+if (!result.ok) {
+  for (const error of result.errors) console.error(error);
+  process.exitCode = 1;
+} else {
+  const pending = catalogReadiness(CATALOG);
+  console.log(`Referencia válida: ${CATALOG.families.length} familias, ${CATALOG.weapons.length} entradas de munición, ${CATALOG.components.length} componentes.`);
+  console.log(`${CATALOG.configurations.length} candidatos de configuración; ${pending.filter(row => row.runtimeEnabled).length} habilitados para el simulador.`);
+  console.log('Las prestaciones y precios desconocidos permanecen pendientes; no se rellenan con cero.');
+}
