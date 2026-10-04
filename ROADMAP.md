@@ -8,7 +8,6 @@ Son ideas ordenadas por prioridad, no promesas. Cada ítem que cambie resultados
 
 - **Arnés de calibración reproducible** (`npm run calibrar`): reconstruir los casos de `CAL` con geometría guardada. El Monte Carlo de escenarios en Node ya está (`npm run mc`).
 - **`remotePk` con rango en `UNC`** (ver `docs/investigacion/valores-estimados.md`).
-- **Recalibrar** "Monterey · noche" (la defensa gana siempre) y "Gotemburgo · base con S-400" (el ataque no gana nunca).
 - **Verificar las fuentes de la investigación de EW ucraniana** (ver `docs/investigacion/`) y subir la confianza de lo confirmado.
 - **Documentar el origen de los relieves** incluidos.
 
