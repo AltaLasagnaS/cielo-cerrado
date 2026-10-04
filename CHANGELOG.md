@@ -7,6 +7,7 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 ## [Sin publicar]
 
 ### Agregado
+- **Lectura completa de las fuentes de guerra electrónica ucraniana** (sección H de `docs/investigacion/guerra-electronica-ucraniana.md`). Corrige fechas: las CRPA chinas de 16 elementos se ven en Shahed desde mar-2025 y las UMPK llevan 12 desde abr-2025; "Kometa-M" existe desde 2022 (no desde dic-2025). Los "5–10 km" de desvío de Pokrova no aparecen en ninguna fuente: el valor de `spoofKm` queda como estimación. No cambia la simulación. Forbes sigue bloqueando el acceso.
 - **Verificación cruzada de la investigación de guerra electrónica ucraniana** (sección G de `docs/investigacion/guerra-electronica-ucraniana.md`): sube la confianza de lo que confirman fuentes independientes (Kometa de 12/16 elementos, especificaciones del ALQ-131, existencia y uso de Lima). Corrige la fecha de los Kometa de 16 elementos (mediados de 2025, no dic-2025) y anota que el pod del F-16 ucraniano probablemente sea el ALQ-162. No cambia la simulación. Las páginas no se pudieron abrir completas: la red de la sesión las bloquea.
 
 ### Cambiado

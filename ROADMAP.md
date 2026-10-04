@@ -6,7 +6,7 @@ Son ideas ordenadas por prioridad, no promesas. Cada ítem que cambie resultados
 
 ## Próximo (0.4)
 
-- **Leer completas las fuentes de la investigación de EW ucraniana** cuando la red de la sesión lo permita. La verificación cruzada con búsquedas ya está hecha (sección G de `docs/investigacion/guerra-electronica-ucraniana.md`).
+- (vacío: la lectura completa de las fuentes de EW ucraniana está hecha, sección H de `docs/investigacion/guerra-electronica-ucraniana.md`).
 
 ## Física (cada ítem es **[sim]**)
 

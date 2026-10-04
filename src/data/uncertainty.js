@@ -447,7 +447,7 @@ export const UNC = {
     gnss: { radius: U(15, 25, 50, 'media', S_('topwar_pole21'), '≥25 km por módulo (fuente rusa)') },
     pokrova: {
       radius: U(10, 25, 50, 'baja', S_('dx_pokrova', 'kp_pokrova'), 'est: no hay radio por nodo publicado; mismo orden de magnitud que Pole-21. La red nacional son muchos nodos superpuestos'),
-      spoofKm: U(2, 5, 10, 'baja', S_('dx_pokrova', 'forbes_pokrova'), 'primeros reportes ucranianos de 2024: desvíos de 5–10 km')
+      spoofKm: U(2, 5, 10, 'baja', S_('dx_pokrova', 'forbes_pokrova'), 'est: sin cifra pública para Pokrova (los "5–10 km" atribuidos a reportes de 2024 no aparecen en las fuentes leídas); mismo orden que Lima, "varios km"')
     },
     lima: {
       radius: U(20, 40, 100, 'baja', S_('kp_lima2', 'forbes_limaq', 'ki_kinzhal'), 'fabricante: CRPA a 50 km, KAB a más de 100 km, Kinzhal a 300 km. Que una ciudad necesite 30–100 estaciones sugiere un radio efectivo menor contra CRPA; est'),
