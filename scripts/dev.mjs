@@ -11,7 +11,7 @@ import { dirname, extname, join, normalize } from 'node:path';
 
 const SRC = join(dirname(fileURLToPath(import.meta.url)), '..', 'src');
 const PORT = +process.env.PORT || 8000;
-const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml' };
+const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml', '.ttf': 'font/ttf' };
 const RELOAD = '<script>new EventSource("/__reload").onmessage = () => location.reload();</script>';
 const clients = new Set();
 
