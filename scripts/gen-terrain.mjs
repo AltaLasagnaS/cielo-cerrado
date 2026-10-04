@@ -35,6 +35,16 @@ const MAPS = {
   // Járkov está en 49,99° N: justo en el borde norte del tile N49E036. Para tener la ciudad entera y
   // la frontera rusa al norte, la ventana va de 49,5° a 50,5° N (mitad sur de N50E036 + mitad norte
   // de N49E036), con el mismo tamaño que un tile.
+  odesa: {
+    tile: 'N46E030', name: 'Odesa (Ucrania)',
+    // posiciones (±1 km): Wikidata P625 (Odesa, Chornomorsk, puerto de Chornomorsk, Teplodar) y Wikipedia
+    // (puerto de Odesa, aeropuerto, Ovidiopol, Bilhorod-Dnistrovskyi, Usatove, Dobroslav)
+    places: [
+      ['Odesa (centro)', 46.47747, 30.73262], ['Puerto de Odesa', 46.50361, 30.74444], ['Chornomorsk', 46.30132, 30.65452],
+      ['Puerto de Chornomorsk', 46.32889, 30.65944], ['Aeropuerto de Odesa', 46.42694, 30.67806], ['Teplodar', 46.50361, 30.32444],
+      ['Ovidiopol', 46.24472, 30.44472], ['Bilhorod-Dnistrovskyi', 46.18333, 30.35], ['Usatove', 46.53639, 30.65667], ['Dobroslav', 46.81944, 30.94167]
+    ]
+  },
   kharkiv: {
     tiles: ['N50E036', 'N49E036'], latS: 49.5, lonW: 36, name: 'Járkov (Ucrania)',
     // posiciones (±1 km): Wikipedia/Wikidata (ciudades, aeropuerto) y Global Energy Monitor (centrales)

@@ -74,6 +74,16 @@ export const CAL = [
   "ok": true
  },
  {
+  "id": "kh22_s300",
+  "caso": "6 Kh-22 contra S-300PS + radar 3D, sin Patriot",
+  "real": "3 de más de 400 derribados antes de feb-2026 por la defensa sin Patriot, que incluía S-300 sobre las ciudades atacadas (IC95% 0–2%).",
+  "obj": "0–10%",
+  "sim": 0.05,
+  "lo": 0.021,
+  "hi": 0.104,
+  "ok": true
+ },
+ {
   "id": "oniks_iris_nasams",
   "caso": "6 Oniks (perfil hi-lo) contra IRIS-T + NASAMS ubicados en el blanco",
   "real": "5,7% a nivel nacional (12 de 211). No hay datos dentro de cobertura: caso de control, sin objetivo.",

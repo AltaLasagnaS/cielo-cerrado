@@ -319,6 +319,57 @@ export const SCENARIOS = {
     success: 'Defensa: la central CHP-5 sigue en pie al terminar el ataque.',
     failure: 'Defensa: la central CHP-5 queda destruida.'
   },
+  od_puertos: {
+    map: 'odesa', name: 'Odesa · noche de los puertos (defensa ucraniana)',
+    player: 'defensa',
+    time: '03:30 hora local · verano',
+    description: 'Inspirado en la noche del 19 de julio de 2023, días después de que Rusia se retiró del acuerdo de granos del mar Negro: misiles y drones contra las terminales de granos y los puertos de la región de Odesa. Aquella oleada (16 Kalibr, 8 Kh-22, 6 Oniks, 1 Kh-59 y 32 Shahed contra varias regiones; ISW) destruyó 60.000 t de granos en el puerto de Chornomorsk. Acá llega una parte, escalada a una ciudad. Los Kalibr y los Shahed se pueden derribar; los Kh-22 y los Oniks, casi no: esa noche no se derribó ninguno. La composición y las posiciones de la defensa son ilustrativas: las reales no son públicas.',
+    forces: {
+      defensa: 'Radar 3D al norte de Odesa y radar VHF de alerta tierra adentro, una batería S-300PS con el sector hacia el mar, un IRIS-T sobre la ciudad, dos Gepard (puerto de Odesa y Chornomorsk), tres grupos móviles sobre la costa y red acústica. Red de mando coordinada.',
+      ataque: '16 Shahed que entran desde el mar, 8 Kalibr lanzados desde barcos al sudeste, 4 Kh-22 desde bombarderos sobre el mar y 3 Oniks desde Crimea.'
+    },
+    conditions: 'Noche de verano despejada, sin viento (probá agregarlo en Defensa → Clima: con viento del sudeste los Shahed llegan antes).',
+    rules: { c2: 'coordinada', doctrine: 'salva', weather: 'despejado' },
+    rulesText: ['Red coordinada y doctrina de salva.', 'Cada batería recarga desde su reserva cuando se vacía, pero una recarga lleva de 2 min (grupos móviles) a 40 min (S-300).', 'Los Kalibr llegan rasantes sobre el agua; los Kh-22 bajan en picada a más de Mach 3 y los Oniks hacen el tramo final a ras del mar. Contra estos dos, el S-300 casi no tiene tiempo ni Pk.', 'Los misiles llegan casi juntos (T+25:00 a T+25:30), después de los drones.'],
+    objectives: [
+      { type: 'storage', name: 'Terminal de granos de Chornomorsk', short: 'Terminal Chornomorsk', x: 50.5, y: 74.5, desc: 'Silos y muelles de carga de granos del puerto de Chornomorsk (Wikidata). La noche del 19/7/2023 se destruyeron 60.000 t de granos.' },
+      { type: 'infra', name: 'Puerto de Odesa', short: 'Puerto Odesa', x: 56.6, y: 55.4, desc: 'Terminales y muelles del puerto de Odesa (posición de Wikipedia, corrida 400 m a tierra firme).' },
+      { type: 'infra', name: 'Centro de Odesa', short: 'Centro', x: 56.1, y: 58, hp: 2500, desc: 'Centro histórico y administrativo de la ciudad.' }
+    ],
+    defs: [
+      { type: 'ewr', x: 49, y: 81, name: 'Radar 3D' },
+      { type: 'p18', x: 40, y: 60, name: 'Radar VHF' },
+      { type: 's300', x: 49.5, y: 78, az: 135, name: 'S-300-1' },
+      { type: 'irist', x: 48.5, y: 82, name: 'IRIS-T-1' },
+      { type: 'gepard', x: 55, y: 56.5, name: 'Gepard-1' },
+      { type: 'gepard', x: 49.5, y: 73.5, name: 'Gepard-2' },
+      { type: 'mfg', x: 54.5, y: 62, name: 'Grupo móvil 1' },
+      { type: 'mfg', x: 51, y: 70, name: 'Grupo móvil 2' },
+      { type: 'mfg', x: 54, y: 47, name: 'Grupo móvil 3' },
+      { type: 'acoustic', x: 55, y: 66, name: 'Acústico 1' },
+      { type: 'acoustic', x: 46, y: 78, name: 'Acústico 2' },
+      { type: 'acoustic', x: 53, y: 45, name: 'Acústico 3' },
+      { type: 'acoustic', x: 47, y: 84, name: 'Acústico 4' }
+    ],
+    salvos: [
+      { type: 'shahed', count: 10, interval: 30, tStart: 0, agl: 1500, pts: [[76.5, 100], [64, 80], [50.5, 74.5]], targetObj: 'Terminal de granos de Chornomorsk' },
+      { type: 'shahed', count: 6, interval: 30, tStart: 120, agl: 1500, pts: [[76.5, 70], [56.6, 55.4]], targetObj: 'Puerto de Odesa' },
+      { type: 'kalibr', count: 8, interval: 6, sync: true, tArrive: 1500, agl: 20, pts: [[76.5, 111], [66, 90], [50.5, 74.5]], targetObj: 'Terminal de granos de Chornomorsk' },
+      { type: 'kh22', count: 4, interval: 15, sync: true, tArrive: 1520, pts: [[76.5, 100], [56.6, 55.4]], targetObj: 'Puerto de Odesa' },
+      { type: 'oniks', count: 3, interval: 10, sync: true, tArrive: 1530, pts: [[76.5, 95], [56.6, 55.4]], targetObj: 'Puerto de Odesa' }
+    ],
+    jams: [],
+    goals: [
+      { side: 'ataque', primary: true, kind: 'damage', target: 'Terminal de granos de Chornomorsk', min: 0.5, text: 'Dañar la terminal de granos de Chornomorsk (≥ 50%)' },
+      { side: 'ataque', primary: false, kind: 'damage', target: 'Puerto de Odesa', min: 0.3, text: 'Dañar el puerto de Odesa (≥ 30%)' },
+      { side: 'defensa', primary: true, kind: 'protect', target: 'Terminal de granos de Chornomorsk', text: 'Mantener operativa la terminal de granos de Chornomorsk' },
+      { side: 'defensa', primary: false, kind: 'survive', target: 'Puerto de Odesa', text: 'Que el puerto de Odesa no sea destruido' },
+      { side: 'defensa', primary: false, kind: 'keepUnit', target: 'S-300-1', text: 'Conservar la batería S-300-1' }
+    ],
+    success: 'Defensa: la terminal de granos de Chornomorsk sigue operativa al terminar el ataque.',
+    failure: 'Defensa: la terminal de granos queda dañada o destruida.'
+  },
+  od_vacio: { map: 'odesa', name: 'Odesa · vacío', player: 'defensa', description: 'Mapa libre sobre el relieve real de Odesa y la costa del mar Negro (SRTM): ubicá objetivos, defensas, ataques y guerra electrónica.', objectives: [], defs: [], salvos: [], jams: [], goals: [] },
   kh_vacio: { map: 'kharkiv', name: 'Járkov · vacío', player: 'defensa', description: 'Mapa libre sobre el relieve real de Járkov (SRTM): ubicá objetivos, defensas, ataques y guerra electrónica.', objectives: [], defs: [], salvos: [], jams: [], goals: [] },
   kv_vacio: { map: 'kyiv', name: 'Kiev · vacío', player: 'defensa', description: 'Mapa libre sobre el relieve real de Kiev (SRTM): ubicá objetivos, defensas, ataques y guerra electrónica.', objectives: [], defs: [], salvos: [], jams: [], goals: [] },
   mb_vacio: { map: 'monterey', name: 'Monterey · vacío', player: 'defensa', description: 'Mapa libre para armar tu propio escenario: ubicá objetivos, defensas, ataques y guerra electrónica.', objectives: [], defs: [], salvos: [], jams: [], goals: [] },

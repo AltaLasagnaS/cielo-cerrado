@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { parseArgs, collect, PLAYABLE } from '../scripts/baseline.mjs';
 
 test('baseline rechaza semillas que se repiten, conteos inválidos y escenarios desconocidos', () => {
-  assert.equal(PLAYABLE.length, 6);
+  assert.equal(PLAYABLE.length, 7);
   assert.throws(() => parseArgs(['--runs', '0']), /entero positivo/);
   assert.throws(() => parseArgs(['--runs', '1.5']), /entero positivo/);
   assert.throws(() => parseArgs(['--seed', '4294967295', '--runs', '2']), /semillas/);

@@ -341,6 +341,7 @@ export const UNC = {
       'sam.ch': U(4, 4, 6, 'media', S_('apa_fc', 'wp:S-300_missile_system'), 'PT: 4 blancos; PS: 6'),
       'sam.cost': U(0.3, 0.5, 1, 'baja', [], 'est: sin precio público'),
       'sam.pk.crucero': U(0.4, 0.5, 0.75, 'media', S_('syrskyi'), PK_NOTE + '. Bajada de 0,6 a 0,5 al recalibrar con npm run calibrar: la energía del interceptor (#26) ya premia los tiros cortos contra crucero rasante'),
+      'sam.pk.supersonico': U(0.03, 0.1, 0.2, 'baja', S_('syrskyi', 'rbc_kh22'), PK_NOTE + '. Caso Kh-22 contra S-300 sin Patriot: 3 de más de 400 Kh-22 derribados antes de feb-2026. Con 0,4 (valor anterior, sin calibrar) el caso daba 18%'),
       'sam.pk.balistico': U(0.05, 0.15, 0.3, 'baja', S_('syrskyi'), PK_NOTE)
     },
     buk: {

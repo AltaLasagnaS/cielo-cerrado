@@ -23,7 +23,7 @@ Propuesta detallada, con orden, dificultad, datos y pruebas: [docs/investigacion
 
 ## Juego
 
-- Más escenarios: corredor del mar Negro, Odesa con `scripts/gen-terrain.mjs` (Kiev y Járkov ya están).
+- Más escenarios: corredor del mar Negro (Kiev, Járkov y Odesa ya están).
 - Plataformas aéreas propias: patrullas de cazas como interceptores con radio de acción.
 - Niebla de guerra más estricta: jugar solo con lo que ven tus sensores.
 - Editor de objetivos y metas desde la interfaz.

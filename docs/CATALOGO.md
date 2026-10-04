@@ -1143,7 +1143,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 - **Sensor:** 30N6 Flap Lid (en torre 40V6), Banda X (I/J OTAN), 100 km contra 1 m², sector 90°, refresco 2 s, ECCM 3 dB
 - **Altura de antena:** 25 m por defecto, regulable 7–39 m. Sin torre, la antena queda a ≈7 m sobre su vehículo (estimado); en la torre 40V6M a ≈25 m y en la 40V6MD a ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h, no se cambia durante el combate.
-- **Arma:** 5V55R, guiado TVM, 5–75 km (balísticos: 25 km), 25 m–27 km, 4 canales, 16 disparos, Pk base dron 0.5 · crucero 0.5 · supersonico 0.4 · balistico 0.15 · hiper 0.05
+- **Arma:** 5V55R, guiado TVM, 5–75 km (balísticos: 25 km), 25 m–27 km, 4 canales, 16 disparos, Pk base dron 0.5 · crucero 0.5 · supersonico 0.1 · balistico 0.15 · hiper 0.05
 
 - Ucrania tenía 35 batallones S-300PS/PT en feb-2022 (RUSI), ~250 lanzadores: fue la columna vertebral de su defensa en 2022.
 - El 30N6 puede ir sobre la torre 40V6M (antena a ~24 m) o 40V6MD (~39 m): con 24 m ve un blanco a 25 m de altura a ~41 km.
@@ -1162,11 +1162,13 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 | Canales simultáneos | 4 | **4** | 6 | media | [1] [2] | PT: 4 blancos; PS: 6 |
 | Costo por disparo | US$300k | **US$500k** | US$1 M | baja | — | est: sin precio público |
 | Pk por disparo vs crucero | 0,4 | **0,5** | 0,75 | media | [3] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk"). Bajada de 0,6 a 0,5 al recalibrar con npm run calibrar: la energía del interceptor (#26) ya premia los tiros cortos contra crucero rasante |
+| Pk por disparo vs supersónicos | 0,03 | **0,1** | 0,2 | baja | [3] [4] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk"). Caso Kh-22 contra S-300 sin Patriot: 3 de más de 400 Kh-22 derribados antes de feb-2026. Con 0,4 (valor anterior, sin calibrar) el caso daba 18% |
 | Pk por disparo vs balísticos | 0,05 | **0,15** | 0,3 | baja | [3] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
 
 1. [Ausairpower: radares de control de tiro rusos](https://www.ausairpower.net/APA-Engagement-Fire-Control.html)
 2. [Wikipedia: S-300 missile system](https://en.wikipedia.org/wiki/S-300_missile_system)
 3. [Defense Express: estadística de Syrskyi (24/02/2022–21/08/2024)](https://en.defence-ua.com/news/cinc_of_ukraines_forces_syrskii_releases_statistics_on_missiles_and_drones_usage_by_russians_number_of_destroyed_threats-11588.html)
+4. [RBC-Ukraine: 9 de 12 Kh-22 derribados sobre Kyiv (feb-2026)](https://newsukraine.rbc.ua/news/kyiv-attack-air-force-shoots-down-9-kh-22-1770042905.html)
 
 #### Fuentes generales
 
@@ -1920,5 +1922,6 @@ Casos corridos con el motor (Monte Carlo) para ajustar las Pk contra episodios r
 | 6 Kinzhal contra 1 Patriot MSE | 6 de 6 sobre Kyiv el 16/5/2023 (IC95% 61–100%); 25% a nivel nacional. | 61–100% | 98% | 80–100% |
 | 12 Kh-22 (cada 5 s) contra 1 Patriot MSE (16 misiles) | 9 de 12 sobre Kyiv el 2/2/2026 (IC95% 47–91%). | 47–91% | 62% | 48–67% |
 | 6 Kh-22 contra IRIS-T + NASAMS, sin Patriot | 3 de más de 400 derribados antes de feb-2026 (IC95% 0–2%). | 0–10% | 0% | 0–0% |
+| 6 Kh-22 contra S-300PS + radar 3D, sin Patriot | 3 de más de 400 derribados antes de feb-2026 por la defensa sin Patriot, que incluía S-300 sobre las ciudades atacadas (IC95% 0–2%). | 0–10% | 5% | 2–10% |
 | 6 Oniks (perfil hi-lo) contra IRIS-T + NASAMS ubicados en el blanco | 5,7% a nivel nacional (12 de 211). No hay datos dentro de cobertura: caso de control, sin objetivo. | — | 57% | 38–86% |
 | 4 Zircon contra Patriot + SAMP/T | 2 de 2 sobre Kyiv el 25/3/2024 (IC95% 34–100%); 33% nacional hasta ago-24. | 34–100% | 99% | 79–100% |
