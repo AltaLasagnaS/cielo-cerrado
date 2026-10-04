@@ -40,6 +40,8 @@ npm test           # pruebas (física, catálogo, daño, corridas completas)
 npm run build      # regenera index.html (el juego en un solo archivo)
 npm run docs       # regenera docs/CATALOGO.md desde los datos
 npm run check      # todo lo anterior y verifica que index.html y el catálogo estén al día
+npm run mc         # Monte Carlo de los escenarios en Node (40 noches)
+npm run calibrar   # casos de calibración de la Pk contra episodios reales
 ```
 
 El código está en `src/`, separado en capas: **datos → física → simulación → dibujo → interfaz**. La física y la simulación no dependen del navegador, por eso se pueden probar en Node.

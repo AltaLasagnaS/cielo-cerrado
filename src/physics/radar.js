@@ -119,6 +119,9 @@ export function jamJ(u, az, list) {
   let J = 0; const bw = BANDS[r.band].bw, uz = antZ(u), sl = r.lowSL ? LOW_SIDELOBES : SIDELOBES, side = r.slc ? [] : null;
   for (const j of list) {
     const JJ = JAMMERS[j.type]; if (!j.on || j.dead || JJ.gnssJam || !JJ.bands.includes(r.band)) continue;
+    // Un interferidor de un bando no degrada sus propios radares. `both` queda reservado para
+    // equipos cuyo rol puede cambiar; no asumimos fratricidio como efecto normal.
+    if (JJ.side !== 'both' && D(u).side !== 'both' && JJ.side === D(u).side) continue;
     const key = u.id + '|' + u.x.toFixed(2) + '|' + u.y.toFixed(2) + '|' + j.x.toFixed(2) + '|' + j.y.toFixed(2) + '|' + (u.mast || 0) + '|' + (u.alt || 0) + '|' + (j.alt || 0);
     j._losMap = j._losMap || {};
     if (j._losMap[key] === undefined) { const p = jamPos(j); j._losMap[key] = los(p[0], p[1], p[2], u.x, u.y, uz); }
@@ -170,10 +173,29 @@ export const PFA = 1e-6;
 /** SNR que da Pd = 50% con Swerling 1 y PFA: ln(PFA)/ln(0,5) − 1 ≈ 18,9 (12,8 dB). */
 export const SNR50 = Math.log(PFA) / Math.log(0.5) - 1;
 /**
- * Más allá de este múltiplo del alcance la Pd por barrido es < 26%: ecos sueltos que no alcanzan para
- * confirmar una pista (regla "M de N" de los extractores de pistas). No se sortea.
+ * Confirmación de pistas "M de N" (extractor de pistas): un radar abre una pista nueva cuando detecta el
+ * blanco en TRACK_M de sus últimos TRACK_N barridos; una pista abierta se mantiene con una detección por
+ * barrido (sim/engine.js#trackScan). Los sensores ópticos y acústicos confirman con un solo contacto.
  */
-export const PD_CUTOFF = 1.2;
+export const TRACK_M = 2, TRACK_N = 3;
+/**
+ * Corte de RENDIMIENTO (no físico): más allá de este múltiplo del alcance la Pd por barrido es menor que
+ * 10⁻⁴ (Swerling 1) y no vale la pena calcular interferencia ni sortear.
+ */
+export const PD_CUTOFF = 2.5;
+
+/** ¿Una historia de barridos (bits, el más nuevo en el bit 0) alcanza para abrir una pista? */
+export const confirms = bits => { let n = 0; for (let k = 0; k < TRACK_N; k++) n += (bits >> k) & 1; return n >= TRACK_M; };
+
+/**
+ * Historia de barridos de un radar contra un blanco (bits, el más nuevo en el bit 0) después de un barrido
+ * en t con resultado hit. last = hora del barrido anterior que lo sorteó (undefined si es el primero). Los
+ * barridos del medio en que no se sorteó (fuera del sector, más allá de PD_CUTOFF) cuentan como "no visto".
+ */
+export function scanHistory(bits, last, t, scan, hit) {
+  const shift = last === undefined ? 1 : Math.min(TRACK_N, Math.max(1, Math.round((t - last) / scan)));
+  return ((bits << shift) | (hit ? 1 : 0)) & ((1 << TRACK_N) - 1);
+}
 
 /** Pd de un barrido, Swerling 1. */
 export const pdSwerling1 = snr => (snr > 0 ? Math.pow(PFA, 1 / (1 + snr)) : 0);

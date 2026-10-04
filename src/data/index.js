@@ -10,6 +10,7 @@ import { THREATS } from './threats.js';
 import { DEFENSES } from './defenses.js';
 import { JAMMERS } from './jammers.js';
 import { UNC } from './uncertainty.js';
+import { C2_LEVELS } from './c2.js';
 
 export { WP, SRC, S_, SRC_REF } from './sources.js';
 export { BANDS } from './bands.js';
@@ -35,7 +36,7 @@ export function getPath(o, path) { return path.split('.').reduce((a, k) => (a ==
 export function setPath(o, path, v) { const ks = path.split('.'); let a = o; for (let i = 0; i < ks.length - 1; i++) { if (a[ks[i]] == null) a[ks[i]] = {}; a = a[ks[i]]; } a[ks[ks.length - 1]] = v; }
 
 /** Qué catálogo corresponde a cada sección de UNC. */
-export const CAT_OF = { thr: THREATS, def: DEFENSES, jam: JAMMERS };
+export const CAT_OF = { thr: THREATS, def: DEFENSES, jam: JAMMERS, c2: C2_LEVELS };
 
 /** Escribe el valor probable (u.p) de cada parámetro con incertidumbre sobre el catálogo. */
 export function applyProbable() {

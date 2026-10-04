@@ -1,7 +1,8 @@
 // ARCHIVO DE DATOS: relieve de "Bahía de Monterey (California, EE.UU.)".
 // Grilla de 446×555 celdas de 200 m (enteros de 16 bits con signo, little-endian, en metros;
 // negativos = mar). Se decodifica con decodeB64() (physics/terrain.js).
-// La fuente exacta del raster no quedó documentada en la versión original: ver docs/DATOS-Y-FUENTES.md.
+// Fuente probable: Terrain Tiles de Mapzen/AWS (terrarium: SRTM/NED en tierra, ETOPO1 y NOAA en el mar).
+// Reconstruida con scripts/verificar-relieves.mjs; el remuestreo exacto no se pudo reproducir: ver docs/DATOS-Y-FUENTES.md §6.
 export default {
   name: "Bahía de Monterey (California, EE.UU.)",
   W: 446,

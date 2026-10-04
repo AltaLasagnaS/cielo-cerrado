@@ -14,7 +14,7 @@ export const DEFENSES = {
   patriot: {
     name: 'Patriot (PAC-3 MSE)', short: 'Patriot', side: 'UA', kind: 'sam', color: '#62b6ff',
     datalinks: ['l16'],
-    radar: { name: 'AN/MPQ-65', agile: true, slc: 1, band: 'C', mti: 'pd', R1: 100, mast: 4, mastRange: [4, 4], mastNote: 'Fija: la antena va sobre el semirremolque M860, inclinada a 67,5°. El mástil de ≈30 m de la batería (AMG) es de comunicaciones, no del radar (FM 3-01.85).', sector: 90, eccm: 10, scan: 2 },
+    radar: { name: 'AN/MPQ-65', agile: true, slc: 1, discrim: 4, band: 'C', mti: 'pd', R1: 100, mast: 4, mastRange: [4, 4], mastNote: 'Fija: la antena va sobre el semirremolque M860, inclinada a 67,5°. El mástil de ≈30 m de la batería (AMG) es de comunicaciones, no del radar (FM 3-01.85).', sector: 90, eccm: 10, scan: 2 },
     sam: { maxR: 100, maxRtbm: 40, minR: 3, altMin: 50, altMax: 36000, vInt: 1300, vmaxT: 3000, react: 9, ch: 8, mag: 16, reserve: 16, reloadS: 2400, salvo: 2, guid: 'activo', shot: 'PAC-3 MSE', noDrones: true, cost: 4.2, pk: { dron: 0.9, crucero: 0.9, supersonico: 0.6, balistico: 0.7, hiper: 0.5 } },
     range: '≈40 km vs balísticos (estimado), ≈100 km vs aeronaves', interceptor: 'PAC-3 MSE: hit-to-kill, buscador activo, motor de doble pulso, techo ≈36 km',
     notes: ['El AN/MPQ-65 busca en un sector de ~90° (sigue en ~120°): hay que orientarlo hacia la amenaza. El LTAMDS nuevo tiene 3 paneles y 360°.', 'El radar guía hasta ~9 misiles a la vez.', 'Lanzador M903: hasta 12 MSE (o 16 CRI); una batería tiene 6–8 lanzadores.', 'Costo: US$4,19 M por misil en el presupuesto FY2025; el contrato plurianual de 2025 da ≈4,97 M con costos asociados.'],
@@ -23,7 +23,7 @@ export const DEFENSES = {
   patriot2: {
     name: 'Patriot (PAC-2 GEM-T)', short: 'Patriot GEM-T', side: 'UA', kind: 'sam', color: '#62b6ff',
     datalinks: ['l16'],
-    radar: { name: 'AN/MPQ-65', agile: true, slc: 1, band: 'C', mti: 'pd', R1: 100, mast: 4, mastRange: [4, 4], mastNote: 'Fija: la antena va sobre el semirremolque M860. El mástil de ≈30 m (AMG) es de comunicaciones, no del radar.', sector: 90, eccm: 10, scan: 2 },
+    radar: { name: 'AN/MPQ-65', agile: true, slc: 1, discrim: 4, band: 'C', mti: 'pd', R1: 100, mast: 4, mastRange: [4, 4], mastNote: 'Fija: la antena va sobre el semirremolque M860. El mástil de ≈30 m (AMG) es de comunicaciones, no del radar.', sector: 90, eccm: 10, scan: 2 },
     sam: { maxR: 160, maxRtbm: 20, minR: 3, altMin: 60, altMax: 24000, vInt: 900, vmaxT: 2500, react: 9, ch: 8, mag: 16, reserve: 16, reloadS: 2400, salvo: 2, guid: 'TVM', shot: 'PAC-2 GEM-T', noDrones: true, cost: 3, pk: { dron: 0.8, crucero: 0.85, supersonico: 0.55, balistico: 0.4, hiper: 0.25 } },
     range: '≈160 km vs aeronaves, ≈20 km vs balísticos', interceptor: 'GEM-T: fragmentación, guiado TVM (necesita que el radar propio vea el blanco), Mach ≈3,5',
     notes: ['Mayor alcance contra aviones y misiles de crucero que el MSE, pero peor contra balísticos.', '4 misiles por lanzador M901/M903.', 'Precio unitario no publicado: US$2–4 M según estimaciones de prensa.'],

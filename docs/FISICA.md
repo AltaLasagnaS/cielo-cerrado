@@ -55,7 +55,13 @@ Cada amenaza tiene su modelo de fluctuación (`T.swerling`, por defecto 1):
 
 Las dos fórmulas están **verificadas** contra una integración numérica independiente (Marcum Q₁ de un blanco fijo promediada sobre la distribución de la RCS) en `tests/swerling.test.js`: coinciden a 10⁻⁴.
 
-Más allá de **1,2·R** no se sortea: con menos de 26% por barrido los ecos sueltos no alcanzan para confirmar una pista (regla "M de N"). Con varios barridos seguidos la detección acumulada sube rápido. Con Swerling 3 el corte a 1,2·R deja 18% por barrido.
+**Confirmación de pistas "2 de 3"** (`TRACK_M`, `TRACK_N`, `sim/engine.js`): un eco suelto no alcanza para abrir una pista. El radar guarda, para cada blanco, si lo vio o no en cada uno de sus últimos 3 barridos (`th.mn`), y abre la pista cuando lo vio en 2. Una pista ya abierta (vista en los últimos 2 barridos) se mantiene con un eco por barrido. Los sensores ópticos y acústicos confirman con un solo contacto. Así la detección lejana es gradual: a 1,2·R la confirmación es poco probable (16% por tanda de tres barridos) pero un blanco lento que pasa muchos barridos ahí puede terminar detectado.
+
+| r / R | 1,0 | 1,1 | 1,2 | 1,3 | 1,4 | 1,5 |
+|---|---|---|---|---|---|---|
+| Confirmar "2 de 3", Swerling 1 | 0,50 | 0,31 | 0,16 | 0,07 | 0,03 | 0,01 |
+
+Más allá de **2,5·R** no se calcula nada: es un corte de **rendimiento**, no físico (la Pd ya es menor que 10⁻⁴). Antes había un corte a 1,2·R que compensaba a lo bruto que se abría pista con un solo eco; la regla 2 de 3 lo reemplaza (ver `docs/investigacion/valores-estimados.md`).
 
 **Clutter** (eco del suelo): si el blanco vuela a menos de 300 m sobre el terreno, la SNR pierde hasta `CLUTTER_DB[radar.mti]` dB: 20 sin filtro de blancos móviles (`'none'`, S-125), 10 con MTI clásico (`'mti'`: Buk, 36D6, P-18) y 3 con pulso-Doppler (`'pd'`: Patriot, IRIS-T, NASAMS, S-300/400, Pantsir, Tor, Gepard, Hawk, AEW). La pérdida escala con lo rasante (0 a 300 m, máxima a 0 m) y con la rugosidad del suelo (pendiente local: ×0,5 en el llano a ×1,5 en zonas quebradas; ×0,7 sobre el mar). Valores estimados.
 
@@ -157,7 +163,7 @@ G ×= 0,1     si el jammer está fuera del sector del radar
 
 **Distancia de quemado:** con la interferencia J, el radar ve hasta `R' = R1·(1/(1+J))^¼` contra 1 m². Más cerca, el eco del blanco le gana al ruido. La ficha de cada jammer de radar muestra esa distancia para cada radar de sus bandas, con el jammer a 100 km de frente o de costado, en barrera o puntual (`physics/radar.js#singleJam`, `burnThrough`).
 
-Solo suman los jammers activos de la **misma banda** con **línea de vista** radar–jammer. `d` es la distancia 3D en km (+1 para evitar la división por cero). `P` es una **potencia relativa de juego**: las potencias reales no son públicas.
+Solo suman los jammers activos de la **misma banda**, de un **bando distinto**, con **línea de vista** radar–jammer. Un equipo con `side: 'both'` es la excepción. `d` es la distancia 3D en km (+1 para evitar la división por cero). `P` es una **potencia relativa de juego**: las potencias reales no son públicas.
 
 El alcance queda en `R' = R·(1/(1+J))^¼`. La Pk de los guiados que dependen del radar se multiplica por `1/(1 + 0,08·J)`, con un piso de 0,5 (§7).
 
@@ -237,6 +243,12 @@ altMin ≤ AGL   y   z − z_lanzador ≤ altMax
 r / vInt ≤ τ   (el interceptor llega a tiempo, con ≤ 3 s de holgura)
 ```
 
+Cuando `fireRange` es menor que 1, la misma envolvente se exige también en el momento del
+lanzamiento: la batería retiene el tiro hasta que el blanco entra en el porcentaje elegido. Así la
+doctrina tiene un costo temporal real: puede quedar menos ventana para un segundo disparo y un
+blanco que cruza el piso, el techo o el punto de impacto puede quedar sin solución. Con `fireRange = 1`
+se conserva la conducta histórica.
+
 **Alcance efectivo según el aspecto** (`rangeFactor`): un misil quema el motor en segundos y después planea, así que llega más lejos contra un blanco que viene de frente que contra uno que se aleja (tiene que alcanzarlo).
 
 ```
@@ -271,7 +283,7 @@ La dirección del blanco sale de su posición 0,5 s antes del punto evaluado (3D
 
 **Enlace de datos del atacante** (`sv.link`, armas con `T.datalink`: Shahed, Geran-3 y Gerbera con módem 4G/mesh o Starlink): el operador ve la posición real, así que el arma descarta el engaño GNSS como si tuviera corrección por terreno (§4). Dentro del radio de un antidrón que corta enlaces (`J.linkJam`, Bukovel-AD) pierde esa ventaja.
 
-**Señuelos** (`physics/decoys.js`): cada barrido de un radar de tiro (bandas con `decoyTau`: S 60 s, C 25 s, X 18 s, Ku 12 s; VHF y L no clasifican) que ve una pista suma `radar.scan` segundos de seguimiento. La pista queda clasificada cuando `1 − exp(−t/τ)` supera un umbral fijo de esa pista (sale de `th.phase`, ya sorteado: no cambia la secuencia de azar). τ es el de la banda más rápida que la siguió, ×4 para los señuelos que suelta un balístico (acompañan al misil). Un arma real se toma por señuelo con probabilidad 3%. Con la opción **"no tirarle a pistas clasificadas como señuelo"** (pestaña Defensa) se ahorra munición con ese riesgo; el debrief cuenta los señuelos reconocidos y las armas mal clasificadas.
+**Señuelos** (`physics/decoys.js`): cada barrido de un radar de tiro (bandas con `decoyTau`: S 60 s, C 25 s, X 18 s, Ku 12 s; VHF y L no clasifican) que ve una pista suma `radar.scan` segundos de seguimiento. La pista queda clasificada cuando `1 − exp(−t/τ)` supera un umbral fijo de esa pista (sale de `th.phase`, ya sorteado: no cambia la secuencia de azar). τ es el más rápido de los radares que la siguieron: el de su banda dividido por `radar.discrim`, la capacidad propia de discriminación (Patriot MPQ-65: ×4, rango 1–8, estimado), ×4 para los señuelos que suelta un balístico (acompañan al misil). Un arma real se toma por señuelo con probabilidad 3%. Con la opción **"no tirarle a pistas clasificadas como señuelo"** (pestaña Defensa) se ahorra munición con ese riesgo; el debrief cuenta los señuelos reconocidos y las armas mal clasificadas.
 
 **Recarga:** cada batería tiene munición lista (`mag`) y una **reserva** (`sam.reserve`, editable en el panel de selección). Cuando se vacía y no tiene interceptores en vuelo, recarga toda la batería en `sam.reloadS` segundos (Patriot ≈40 min, NASAMS e IRIS-T ≈20–30 min, Buk ≈13 min, grupos móviles ≈2 min; estimaciones con rango en `UNC`). Si el mapa tiene objetivos **depósito de munición**, solo recarga si alguno sigue en pie a menos de 30 km: destruirlo corta el reabastecimiento.
 

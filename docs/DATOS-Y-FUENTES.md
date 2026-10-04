@@ -53,7 +53,11 @@ tasa observada ≈ C × [1 − (1 − Pk·m)ⁿ]
 
 Por eso no se calibró contra el promedio nacional (0,55% contra el Kh-22 o 4,5% contra balísticos hasta 2024, dominados por C ≈ 0). Se calibró contra **episodios donde el blanco cayó dentro de la cobertura de un sistema capaz**, por ejemplo 9 de 12 Kh-22 sobre Kyiv con Patriot, o 2 de 2 Zircon con SAMP/T y Patriot. Esos casos se corrieron en el motor (Monte Carlo) y se ajustaron las Pk hasta que la tasa simulada cayera dentro del intervalo de confianza del 95% del dato real. La tabla completa está en CATALOGO.md y en el juego (Catálogo → Calibración de Pk).
 
-**Limitación:** la geometría exacta de esos casos de prueba no quedó guardada en la versión original. Reconstruir un arnés de calibración reproducible está en el [ROADMAP](../ROADMAP.md).
+**Arnés reproducible:** `npm run calibrar` corre los casos de `src/data/calibration-cases.js` (geometría guardada, mapa plano, semillas 1–40) y muestra la tasa con las Pk probables y con todas en el mínimo y el máximo de `UNC`. `npm run calibrar -- --write` regenera `src/data/calibration.js` (la tabla `CAL`). La geometría de la versión original no quedó guardada, así que los casos son **reconstrucciones** a partir de su descripción.
+
+Estado (40 noches): 7 de 9 casos con objetivo caen dentro. Quedan dos **fuera**, pendientes de una decisión (ver ROADMAP):
+- **Iskander-M con señuelos contra un Patriot**: 21% (objetivo 35–65%), ya con la discriminación propia del MPQ-65 (`radar.discrim` ×4; con ×8 llega a 28%). Ya daba 16% con el motor de hace 15 PRs, así que no es un cambio reciente: con 6 señuelos por misil, el Patriot gasta sus 16 misiles antes de clasificarlos. Sin señuelos da 77%. Ni la doctrina de ignorar señuelos, ni la C2 integrada ni espaciar los lanzamientos lo llevan al objetivo. Lo que hay que revisar es la cantidad de señuelos, la discriminación o el cargador de la batería, no la Pk.
+- **Kalibr contra S-300 + Buk**: 88% (objetivo 60–85%). Daba 73% con el motor de #19; subió con los cambios de física de #20–#33.
 
 ## 5. Sesgos de las fuentes
 
@@ -72,7 +76,14 @@ Ejemplos de cómo se trató esto:
 
 ## 6. Relieves
 
-Los dos relieves incluidos (Monterey y Gotemburgo) son grillas de 200 m con batimetría. **La fuente exacta del raster no quedó documentada en la versión original**; por la resolución y el formato, probablemente sean SRTM para tierra y una batimetría pública para el mar. Documentarla está pendiente (ver ROADMAP). Los relieves que carga el jugador son tiles SRTM `.hgt` (NASA, dominio público).
+Los dos relieves de la versión original (Monterey y Gotemburgo) son grillas de 200 m cuya fuente no quedó anotada. Se reconstruyó comparándolos contra las fuentes públicas candidatas con `node scripts/verificar-relieves.mjs` (baja los tiles de AWS y vuelve a hacer la cuenta):
+
+| Relieve | Fuente identificada | Coincidencia | Confianza |
+|---|---|---|---|
+| **Gotemburgo** (57–58° N, 11–12° E) | Tile **SRTM N57E011** de 1″ (NASA, dominio público), promedio por celda de 200 m. **Sin batimetría**: todo el mar está a −5 m, como en el importador `.hgt` del juego | Correlación 0,997; diferencia mediana 1 m; 92% de las celdas de tierra a ±3 m | Alta |
+| **Monterey** (36,18–37,18° N, 122,37–121,37° O) | Elevación **con batimetría** (el cañón de Monterey llega a −2.804 m). Coincide con las *Terrain Tiles* de Mapzen/AWS en formato *terrarium*, que combinan SRTM/NED en tierra con ETOPO1 y modelos costeros de NOAA en el mar | Correlación 0,999 contra el zoom 9; diferencia mediana 9 m (los píxeles del zoom 9 son de ≈200 m y no caen alineados con las celdas) | Media: no se pudo reproducir celda por celda, así que la fuente exacta de la batimetría y el método de remuestreo siguen sin confirmar |
+
+Atribución de las Terrain Tiles: <https://github.com/tilezen/joerd/blob/master/docs/attribution.md>. Los relieves que carga el jugador son tiles SRTM `.hgt` (NASA, dominio público).
 
 **Kiev** se genera con `scripts/gen-terrain.mjs` a partir del tile SRTM N50E030 (NASA, dominio público), bajado de las *Terrain Tiles* de Mapzen/AWS (formato skadi; atribución en <https://github.com/tilezen/joerd/blob/master/docs/attribution.md>). Cada celda de 200 m es el promedio de las muestras de 1" que contiene. Trae una **máscara de ríos y lagos** detectada en el propio SRTM (los espejos de agua están aplanados): solo sirve para el dibujo y la lectura del terreno, la física usa la elevación real. Las posiciones de los objetivos del escenario salen de Global Energy Monitor (centrales CHP-5 y CHP-6) y Wikipedia (represa de Kiev); las de las defensas son ilustrativas.
 

@@ -1,87 +1,138 @@
 {
  "mb_noche_s1": {
-  "t": 1550,
+  "t": 1552,
   "stats": {
-   "launched": 49,
-   "killed": 40,
-   "hits": 3,
+   "launched": 53,
+   "killed": 35,
+   "hits": 10,
    "misses": 0,
    "decoys": 20,
-   "decoysKilled": 14,
-   "shots": 68,
-   "defCost": 91.21600000000005,
-   "atkCost": 20.98,
-   "lost": 0,
+   "decoysKilled": 12,
+   "shots": 79,
+   "defCost": 92.41290000000005,
+   "atkCost": 29.779999999999998,
+   "lost": 1,
    "byUnit": {
     "IRIS-T-1": 24,
     "Interceptores-1": 4,
-    "NASAMS-1": 11,
-    "Gepard-1": 2,
-    "Gepard-2": 11,
+    "NASAMS-1": 12,
+    "Grupo móvil 2": 3,
+    "Gepard-2": 20,
     "Patriot-1": 16
    },
-   "damage": 1266,
+   "damage": 2066,
    "dmgByWeapon": {
-    "Kalibr": 1266
+    "Kalibr": 1266,
+    "Kh-101": 800
    },
-   "missSum": 47.31016199919808,
-   "missN": 3,
-   "objsDestroyed": 0,
+   "missSum": 195.90569990066626,
+   "missN": 10,
+   "objsDestroyed": 1,
    "satChannels": {
+    "IRIS-T-1": 4,
     "Interceptores-1": 1,
+    "NASAMS-1": 1,
+    "Gepard-2": 10,
     "Patriot-1": 3
    },
    "satMag": {
-    "Patriot-1": 1
+    "IRIS-T-1": 1,
+    "Patriot-1": 1,
+    "Gepard-2": 1
    },
    "reloads": 0,
    "unitsDamaged": 0
   },
   "impacts": [
    [
-    42.1924,
-    64.2987,
+    42.2073,
+    64.297,
     "hit"
    ],
    [
-    42.2028,
-    64.2798,
+    42.1982,
+    64.2991,
     "hit"
    ],
    [
-    42.2184,
-    64.2944,
+    42.2089,
+    64.3077,
     "hit"
    ],
    [
-    58.4606,
-    57.0472,
+    63.5153,
+    55.7888,
+    "hit"
+   ],
+   [
+    63.4988,
+    55.7653,
+    "hit"
+   ],
+   [
+    57.9946,
+    58.0168,
+    "hit"
+   ],
+   [
+    60.1511,
+    56.4387,
     "decoy"
    ],
    [
-    61.2335,
-    57.9288,
+    57.7809,
+    59.1148,
     "decoy"
    ],
    [
-    57.4319,
-    56.1639,
+    63.5071,
+    55.8165,
+    "hit"
+   ],
+   [
+    63.5218,
+    55.8044,
+    "hit"
+   ],
+   [
+    57.9657,
+    57.9838,
+    "hit"
+   ],
+   [
+    56.6472,
+    58.8549,
     "decoy"
    ],
    [
-    59.0803,
-    59.7604,
+    56.941,
+    60.4477,
     "decoy"
    ],
    [
-    57.1029,
-    59.7341,
+    59.0693,
+    55.9784,
     "decoy"
    ],
    [
-    60.1058,
-    60.3539,
+    56.7826,
+    55.6533,
     "decoy"
+   ],
+   [
+    58.7759,
+    59.4223,
+    "decoy"
+   ],
+   [
+    56.752,
+    58.0117,
+    "decoy"
+   ],
+   [
+    63.5125,
+    55.7786,
+    "hit"
    ]
   ],
   "units": [
@@ -97,314 +148,7 @@
    ],
    [
     "Patriot-1",
-    true,
-    0
-   ],
-   [
-    "IRIS-T-1",
-    true,
-    0
-   ],
-   [
-    "NASAMS-1",
-    true,
-    7
-   ],
-   [
-    "Gepard-1",
-    true,
-    18
-   ],
-   [
-    "Gepard-2",
-    true,
-    9
-   ],
-   [
-    "Grupo móvil 1",
-    true,
-    30
-   ],
-   [
-    "Grupo móvil 2",
-    true,
-    30
-   ],
-   [
-    "Grupo móvil 3",
-    true,
-    30
-   ],
-   [
-    "Acústico 1",
-    true,
-    0
-   ],
-   [
-    "Acústico 2",
-    true,
-    0
-   ],
-   [
-    "Acústico 3",
-    true,
-    0
-   ],
-   [
-    "Interceptores-1",
-    true,
-    16
-   ]
-  ],
-  "log": 195
- },
- "mb_noche_s42": {
-  "t": 1550,
-  "stats": {
-   "launched": 49,
-   "killed": 40,
-   "hits": 2,
-   "misses": 0,
-   "decoys": 20,
-   "decoysKilled": 13,
-   "shots": 64,
-   "defCost": 91.14400000000005,
-   "atkCost": 20.98,
-   "lost": 0,
-   "byUnit": {
-    "IRIS-T-1": 24,
-    "Interceptores-1": 4,
-    "NASAMS-1": 11,
-    "Gepard-1": 3,
-    "Gepard-2": 6,
-    "Patriot-1": 16
-   },
-   "damage": 844,
-   "dmgByWeapon": {
-    "Kalibr": 844
-   },
-   "missSum": 13.48244479818972,
-   "missN": 2,
-   "objsDestroyed": 0,
-   "satChannels": {
-    "Interceptores-1": 1,
-    "Patriot-1": 4
-   },
-   "satMag": {
-    "Patriot-1": 1
-   },
-   "reloads": 0,
-   "unitsDamaged": 0
-  },
-  "impacts": [
-   [
-    42.2037,
-    64.3081,
-    "hit"
-   ],
-   [
-    42.1991,
-    64.2955,
-    "hit"
-   ],
-   [
-    56.9566,
-    58.6087,
-    "decoy"
-   ],
-   [
-    56.9172,
-    57.8356,
-    "decoy"
-   ],
-   [
-    55.9447,
-    59.334,
-    "decoy"
-   ],
-   [
-    57.1983,
-    60.5572,
-    "decoy"
-   ],
-   [
-    61.161,
-    57.15,
-    "decoy"
-   ],
-   [
-    55.4793,
-    58.9332,
-    "decoy"
-   ],
-   [
-    59.746,
-    57.4933,
-    "decoy"
-   ]
-  ],
-  "units": [
-   [
-    "Radar 3D (cerro Gabilan)",
-    true,
-    0
-   ],
-   [
-    "Radar VHF",
-    true,
-    0
-   ],
-   [
-    "Patriot-1",
-    true,
-    0
-   ],
-   [
-    "IRIS-T-1",
-    true,
-    0
-   ],
-   [
-    "NASAMS-1",
-    true,
-    7
-   ],
-   [
-    "Gepard-1",
-    true,
-    17
-   ],
-   [
-    "Gepard-2",
-    true,
-    14
-   ],
-   [
-    "Grupo móvil 1",
-    true,
-    30
-   ],
-   [
-    "Grupo móvil 2",
-    true,
-    30
-   ],
-   [
-    "Grupo móvil 3",
-    true,
-    30
-   ],
-   [
-    "Acústico 1",
-    true,
-    0
-   ],
-   [
-    "Acústico 2",
-    true,
-    0
-   ],
-   [
-    "Acústico 3",
-    true,
-    0
-   ],
-   [
-    "Interceptores-1",
-    true,
-    16
-   ]
-  ],
-  "log": 187
- },
- "mb_noche_sls_sin_red": {
-  "t": 1550,
-  "stats": {
-   "launched": 49,
-   "killed": 41,
-   "hits": 3,
-   "misses": 0,
-   "decoys": 20,
-   "decoysKilled": 15,
-   "shots": 65,
-   "defCost": 92.27400000000004,
-   "atkCost": 20.98,
-   "lost": 0,
-   "byUnit": {
-    "IRIS-T-1": 24,
-    "NASAMS-1": 12,
-    "Gepard-1": 2,
-    "Gepard-2": 11,
-    "Patriot-1": 16
-   },
-   "damage": 1266,
-   "dmgByWeapon": {
-    "Kalibr": 1266
-   },
-   "missSum": 24.60088993192315,
-   "missN": 3,
-   "objsDestroyed": 0,
-   "satChannels": {},
-   "satMag": {},
-   "reloads": 0,
-   "unitsDamaged": 0
-  },
-  "impacts": [
-   [
-    42.2069,
-    64.2998,
-    "hit"
-   ],
-   [
-    42.194,
-    64.3049,
-    "hit"
-   ],
-   [
-    42.2055,
-    64.3082,
-    "hit"
-   ],
-   [
-    58.1752,
-    59.2,
-    "decoy"
-   ],
-   [
-    55.2269,
-    56.8746,
-    "decoy"
-   ],
-   [
-    56.9208,
-    58.4254,
-    "decoy"
-   ],
-   [
-    58.8861,
-    55.5794,
-    "decoy"
-   ],
-   [
-    56.4837,
-    57.502,
-    "decoy"
-   ]
-  ],
-  "units": [
-   [
-    "Radar 3D (cerro Gabilan)",
-    true,
-    0
-   ],
-   [
-    "Radar VHF",
-    true,
-    0
-   ],
-   [
-    "Patriot-1",
-    true,
+    false,
     0
    ],
    [
@@ -420,12 +164,12 @@
    [
     "Gepard-1",
     true,
-    18
+    20
    ],
    [
     "Gepard-2",
     true,
-    9
+    0
    ],
    [
     "Grupo móvil 1",
@@ -435,7 +179,330 @@
    [
     "Grupo móvil 2",
     true,
+    27
+   ],
+   [
+    "Grupo móvil 3",
+    true,
     30
+   ],
+   [
+    "Acústico 1",
+    true,
+    0
+   ],
+   [
+    "Acústico 2",
+    true,
+    0
+   ],
+   [
+    "Acústico 3",
+    true,
+    0
+   ],
+   [
+    "Interceptores-1",
+    true,
+    16
+   ]
+  ],
+  "log": 233
+ },
+ "mb_noche_s42": {
+  "t": 1552,
+  "stats": {
+   "launched": 53,
+   "killed": 41,
+   "hits": 5,
+   "misses": 0,
+   "decoys": 20,
+   "decoysKilled": 13,
+   "shots": 82,
+   "defCost": 92.46690000000005,
+   "atkCost": 29.779999999999998,
+   "lost": 1,
+   "byUnit": {
+    "IRIS-T-1": 24,
+    "Interceptores-1": 4,
+    "NASAMS-1": 12,
+    "Grupo móvil 2": 3,
+    "Gepard-1": 3,
+    "Patriot-1": 16,
+    "Gepard-2": 20
+   },
+   "damage": 800,
+   "dmgByWeapon": {
+    "Kh-101": 800
+   },
+   "missSum": 94.73112267176285,
+   "missN": 5,
+   "objsDestroyed": 1,
+   "satChannels": {
+    "Interceptores-1": 1,
+    "Patriot-1": 1,
+    "Gepard-2": 8
+   },
+   "satMag": {
+    "Gepard-2": 1
+   },
+   "reloads": 0,
+   "unitsDamaged": 0
+  },
+  "impacts": [
+   [
+    63.5193,
+    55.7947,
+    "hit"
+   ],
+   [
+    58.6423,
+    60.0215,
+    "decoy"
+   ],
+   [
+    63.4861,
+    55.7802,
+    "hit"
+   ],
+   [
+    63.4915,
+    55.8151,
+    "hit"
+   ],
+   [
+    58.0141,
+    58.0209,
+    "hit"
+   ],
+   [
+    58.986,
+    59.0003,
+    "decoy"
+   ],
+   [
+    58.711,
+    57.1484,
+    "decoy"
+   ],
+   [
+    55.331,
+    56.5994,
+    "decoy"
+   ],
+   [
+    57.002,
+    57.5384,
+    "decoy"
+   ],
+   [
+    55.6438,
+    58.1656,
+    "decoy"
+   ],
+   [
+    59.9372,
+    55.0879,
+    "decoy"
+   ],
+   [
+    63.4947,
+    55.794,
+    "hit"
+   ]
+  ],
+  "units": [
+   [
+    "Radar 3D (cerro Gabilan)",
+    true,
+    0
+   ],
+   [
+    "Radar VHF",
+    true,
+    0
+   ],
+   [
+    "Patriot-1",
+    false,
+    0
+   ],
+   [
+    "IRIS-T-1",
+    true,
+    0
+   ],
+   [
+    "NASAMS-1",
+    true,
+    6
+   ],
+   [
+    "Gepard-1",
+    true,
+    17
+   ],
+   [
+    "Gepard-2",
+    true,
+    0
+   ],
+   [
+    "Grupo móvil 1",
+    true,
+    30
+   ],
+   [
+    "Grupo móvil 2",
+    true,
+    27
+   ],
+   [
+    "Grupo móvil 3",
+    true,
+    30
+   ],
+   [
+    "Acústico 1",
+    true,
+    0
+   ],
+   [
+    "Acústico 2",
+    true,
+    0
+   ],
+   [
+    "Acústico 3",
+    true,
+    0
+   ],
+   [
+    "Interceptores-1",
+    true,
+    16
+   ]
+  ],
+  "log": 233
+ },
+ "mb_noche_sls_sin_red": {
+  "t": 1550,
+  "stats": {
+   "launched": 53,
+   "killed": 46,
+   "hits": 3,
+   "misses": 0,
+   "decoys": 20,
+   "decoysKilled": 16,
+   "shots": 72,
+   "defCost": 89.19090000000004,
+   "atkCost": 29.779999999999998,
+   "lost": 0,
+   "byUnit": {
+    "IRIS-T-1": 24,
+    "NASAMS-1": 9,
+    "Grupo móvil 2": 3,
+    "Gepard-2": 20,
+    "Patriot-1": 16
+   },
+   "damage": 1266,
+   "dmgByWeapon": {
+    "Kalibr": 1266
+   },
+   "missSum": 34.31249429039685,
+   "missN": 3,
+   "objsDestroyed": 0,
+   "satChannels": {
+    "Gepard-2": 2
+   },
+   "satMag": {
+    "Patriot-1": 1
+   },
+   "reloads": 0,
+   "unitsDamaged": 0
+  },
+  "impacts": [
+   [
+    42.1905,
+    64.2972,
+    "hit"
+   ],
+   [
+    42.2153,
+    64.2905,
+    "hit"
+   ],
+   [
+    42.1938,
+    64.3014,
+    "hit"
+   ],
+   [
+    61.199,
+    57.2346,
+    "decoy"
+   ],
+   [
+    56.2273,
+    57.9174,
+    "decoy"
+   ],
+   [
+    61.2549,
+    57.769,
+    "decoy"
+   ],
+   [
+    56.0891,
+    57.7366,
+    "decoy"
+   ]
+  ],
+  "units": [
+   [
+    "Radar 3D (cerro Gabilan)",
+    true,
+    0
+   ],
+   [
+    "Radar VHF",
+    true,
+    0
+   ],
+   [
+    "Patriot-1",
+    true,
+    0
+   ],
+   [
+    "IRIS-T-1",
+    true,
+    0
+   ],
+   [
+    "NASAMS-1",
+    true,
+    9
+   ],
+   [
+    "Gepard-1",
+    true,
+    20
+   ],
+   [
+    "Gepard-2",
+    true,
+    0
+   ],
+   [
+    "Grupo móvil 1",
+    true,
+    30
+   ],
+   [
+    "Grupo móvil 2",
+    true,
+    27
    ],
    [
     "Grupo móvil 3",
@@ -463,41 +530,40 @@
     20
    ]
   ],
-  "log": 195
+  "log": 214
  },
  "mb_noche_plano": {
   "t": 1550,
   "stats": {
-   "launched": 49,
-   "killed": 37,
-   "hits": 3,
+   "launched": 53,
+   "killed": 45,
+   "hits": 2,
    "misses": 0,
    "decoys": 20,
-   "decoysKilled": 11,
-   "shots": 64,
-   "defCost": 95.35200000000005,
-   "atkCost": 20.98,
+   "decoysKilled": 14,
+   "shots": 66,
+   "defCost": 98.55900000000005,
+   "atkCost": 29.779999999999998,
    "lost": 0,
    "byUnit": {
     "IRIS-T-1": 24,
-    "NASAMS-1": 15,
-    "Interceptores-1": 4,
+    "NASAMS-1": 18,
+    "Interceptores-1": 3,
     "Gepard-1": 5,
     "Patriot-1": 16
    },
-   "damage": 1266,
+   "damage": 844,
    "dmgByWeapon": {
-    "Kalibr": 1266
+    "Kalibr": 844
    },
-   "missSum": 20.7466541131853,
-   "missN": 3,
+   "missSum": 31.034988907987092,
+   "missN": 2,
    "objsDestroyed": 0,
    "satChannels": {
-    "IRIS-T-1": 3,
-    "Interceptores-1": 1,
     "Patriot-1": 4
    },
    "satMag": {
+    "IRIS-T-1": 1,
     "Patriot-1": 1
    },
    "reloads": 0,
@@ -505,63 +571,43 @@
   },
   "impacts": [
    [
-    42.1945,
-    64.2884,
+    42.209,
+    64.2934,
     "hit"
    ],
    [
-    42.1977,
-    64.3011,
+    42.1922,
+    64.2817,
     "hit"
    ],
    [
-    42.2027,
-    64.2954,
-    "hit"
-   ],
-   [
-    59.6859,
-    58.6506,
+    58.4996,
+    56.0957,
     "decoy"
    ],
    [
-    57.4351,
-    56.9664,
+    56.2057,
+    59.6056,
     "decoy"
    ],
    [
-    58.8241,
-    56.6154,
+    57.8527,
+    60.1874,
     "decoy"
    ],
    [
-    56.6263,
-    56.411,
+    60.3336,
+    56.6768,
     "decoy"
    ],
    [
-    56.0853,
-    55.1622,
+    58.9745,
+    56.6841,
     "decoy"
    ],
    [
-    59.4273,
-    58.4555,
-    "decoy"
-   ],
-   [
-    59.8137,
-    57.5496,
-    "decoy"
-   ],
-   [
-    61.1028,
-    59.1369,
-    "decoy"
-   ],
-   [
-    57.0403,
-    56.4639,
+    58.4559,
+    56.7363,
     "decoy"
    ]
   ],
@@ -589,7 +635,7 @@
    [
     "NASAMS-1",
     true,
-    3
+    0
    ],
    [
     "Gepard-1",
@@ -634,203 +680,243 @@
    [
     "Interceptores-1",
     true,
-    16
+    17
    ]
   ],
-  "log": 190
+  "log": 196
  },
  "gb_ruso_s1": {
-  "t": 1483.5,
+  "t": 1551.5,
   "stats": {
-   "launched": 28,
-   "killed": 28,
-   "hits": 0,
-   "misses": 0,
+   "launched": 38,
+   "killed": 32,
+   "hits": 4,
+   "misses": 2,
    "decoys": 0,
    "decoysKilled": 0,
-   "shots": 50,
-   "defCost": 53.099999999999994,
-   "atkCost": 27.200000000000003,
-   "lost": 0,
+   "shots": 60,
+   "defCost": 54.59999999999998,
+   "atkCost": 52.2,
+   "lost": 1,
    "byUnit": {
     "Tor-M2": 16,
     "S-400": 32,
-    "Pantsir-1": 2
+    "Pantsir-1": 12
    },
-   "damage": 0,
-   "dmgByWeapon": {},
-   "missSum": 0,
-   "missN": 0,
-   "objsDestroyed": 0,
-   "satChannels": {
-    "Tor-M2": 9
-   },
-   "satMag": {},
-   "reloads": 0,
-   "unitsDamaged": 0
-  },
-  "impacts": [],
-  "units": [
-   [
-    "S-400",
-    true,
-    0
-   ],
-   [
-    "Pantsir-1",
-    true,
-    10
-   ],
-   [
-    "Pantsir-2",
-    true,
-    12
-   ],
-   [
-    "Tor-M2",
-    true,
-    0
-   ],
-   [
-    "Buk-M1",
-    true,
-    12
-   ],
-   [
-    "Radar VHF",
-    true,
-    0
-   ]
-  ],
-  "log": 137
- },
- "gb_ruso_s9": {
-  "t": 1475,
-  "stats": {
-   "launched": 28,
-   "killed": 28,
-   "hits": 0,
-   "misses": 0,
-   "decoys": 0,
-   "decoysKilled": 0,
-   "shots": 50,
-   "defCost": 47.69999999999999,
-   "atkCost": 27.200000000000003,
-   "lost": 0,
-   "byUnit": {
-    "Tor-M2": 16,
-    "S-400": 28,
-    "Pantsir-1": 6
-   },
-   "damage": 0,
-   "dmgByWeapon": {},
-   "missSum": 0,
-   "missN": 0,
-   "objsDestroyed": 0,
-   "satChannels": {
-    "Tor-M2": 9
-   },
-   "satMag": {
-    "Tor-M2": 1
-   },
-   "reloads": 0,
-   "unitsDamaged": 0
-  },
-  "impacts": [],
-  "units": [
-   [
-    "S-400",
-    true,
-    4
-   ],
-   [
-    "Pantsir-1",
-    true,
-    6
-   ],
-   [
-    "Pantsir-2",
-    true,
-    12
-   ],
-   [
-    "Tor-M2",
-    true,
-    0
-   ],
-   [
-    "Buk-M1",
-    true,
-    12
-   ],
-   [
-    "Radar VHF",
-    true,
-    0
-   ]
-  ],
-  "log": 135
- },
- "gb_refineria_s1": {
-  "t": 1531.25,
-  "stats": {
-   "launched": 38,
-   "killed": 33,
-   "hits": 5,
-   "misses": 0,
-   "decoys": 8,
-   "decoysKilled": 8,
-   "shots": 54,
-   "defCost": 66.66000000000004,
-   "atkCost": 26.32,
-   "lost": 0,
-   "byUnit": {
-    "IRIS-T-1": 24,
-    "NASAMS-1": 18,
-    "Patriot-1": 8,
-    "RBS 70-1": 4
-   },
-   "damage": 1600,
+   "damage": 900,
    "dmgByWeapon": {
-    "Kalibr": 1600
+    "Storm Shadow": 900
    },
-   "missSum": 55.90373581427589,
-   "missN": 5,
+   "missSum": 759.2318639068981,
+   "missN": 6,
    "objsDestroyed": 1,
    "satChannels": {
-    "IRIS-T-1": 6,
-    "NASAMS-1": 5
+    "Tor-M2": 12,
+    "S-400": 10,
+    "Pantsir-1": 1
    },
    "satMag": {
-    "IRIS-T-1": 1
+    "Tor-M2": 1,
+    "S-400": 1
    },
    "reloads": 0,
    "unitsDamaged": 0
   },
   "impacts": [
    [
-    51.0984,
-    34.3997,
+    51.9945,
+    28.0067,
     "hit"
    ],
    [
-    51.0893,
-    34.4113,
+    51.8754,
+    28.5719,
+    "miss"
+   ],
+   [
+    52.0063,
+    28.0105,
     "hit"
    ],
    [
-    51.1053,
-    34.3926,
+    52.1448,
+    28.0386,
+    "miss"
+   ],
+   [
+    57.8001,
+    32.5009,
     "hit"
    ],
    [
-    51.1078,
-    34.4128,
+    57.7981,
+    32.4988,
+    "hit"
+   ]
+  ],
+  "units": [
+   [
+    "S-400",
+    false,
+    0
+   ],
+   [
+    "Pantsir-1",
+    true,
+    0
+   ],
+   [
+    "Pantsir-2",
+    true,
+    12
+   ],
+   [
+    "Tor-M2",
+    true,
+    0
+   ],
+   [
+    "Buk-M1",
+    true,
+    12
+   ],
+   [
+    "Radar VHF",
+    true,
+    0
+   ]
+  ],
+  "log": 192
+ },
+ "gb_ruso_s9": {
+  "t": 1551.5,
+  "stats": {
+   "launched": 38,
+   "killed": 35,
+   "hits": 3,
+   "misses": 0,
+   "decoys": 0,
+   "decoysKilled": 0,
+   "shots": 60,
+   "defCost": 54.59999999999998,
+   "atkCost": 52.2,
+   "lost": 1,
+   "byUnit": {
+    "Tor-M2": 16,
+    "S-400": 32,
+    "Pantsir-1": 12
+   },
+   "damage": 657,
+   "dmgByWeapon": {
+    "Storm Shadow": 657
+   },
+   "missSum": 20.0416798469808,
+   "missN": 3,
+   "objsDestroyed": 0,
+   "satChannels": {
+    "Tor-M2": 9,
+    "S-400": 12,
+    "Pantsir-1": 5
+   },
+   "satMag": {
+    "Tor-M2": 1,
+    "S-400": 1
+   },
+   "reloads": 0,
+   "unitsDamaged": 0
+  },
+  "impacts": [
+   [
+    52.0072,
+    27.9894,
     "hit"
    ],
    [
-    51.088,
-    34.4083,
+    52.0058,
+    27.9991,
+    "hit"
+   ],
+   [
+    57.8004,
+    32.4987,
+    "hit"
+   ]
+  ],
+  "units": [
+   [
+    "S-400",
+    false,
+    0
+   ],
+   [
+    "Pantsir-1",
+    true,
+    0
+   ],
+   [
+    "Pantsir-2",
+    true,
+    12
+   ],
+   [
+    "Tor-M2",
+    true,
+    0
+   ],
+   [
+    "Buk-M1",
+    true,
+    12
+   ],
+   [
+    "Radar VHF",
+    true,
+    0
+   ]
+  ],
+  "log": 187
+ },
+ "gb_refineria_s1": {
+  "t": 1528,
+  "stats": {
+   "launched": 36,
+   "killed": 35,
+   "hits": 1,
+   "misses": 0,
+   "decoys": 8,
+   "decoysKilled": 8,
+   "shots": 52,
+   "defCost": 58.26000000000003,
+   "atkCost": 22.32,
+   "lost": 0,
+   "byUnit": {
+    "IRIS-T-1": 24,
+    "NASAMS-1": 18,
+    "Patriot-1": 6,
+    "RBS 70-1": 4
+   },
+   "damage": 610,
+   "dmgByWeapon": {
+    "Kalibr": 610
+   },
+   "missSum": 11.595837934112783,
+   "missN": 1,
+   "objsDestroyed": 0,
+   "satChannels": {
+    "IRIS-T-1": 6,
+    "NASAMS-1": 4
+   },
+   "satMag": {
+    "IRIS-T-1": 1,
+    "NASAMS-1": 1
+   },
+   "reloads": 0,
+   "unitsDamaged": 0
+  },
+  "impacts": [
+   [
+    51.1038,
+    34.389,
     "hit"
    ]
   ],
@@ -848,7 +934,7 @@
    [
     "Patriot-1",
     true,
-    8
+    10
    ],
    [
     "IRIS-T-1",
@@ -896,20 +982,20 @@
     20
    ]
   ],
-  "log": 156
+  "log": 146
  },
  "mb_puente_s1": {
-  "t": 1541.5,
+  "t": 1537.5,
   "stats": {
-   "launched": 49,
+   "launched": 48,
    "killed": 39,
-   "hits": 10,
-   "misses": 0,
+   "hits": 8,
+   "misses": 1,
    "decoys": 0,
    "decoysKilled": 0,
    "shots": 84,
    "defCost": 62.40000000000002,
-   "atkCost": 43.7,
+   "atkCost": 41.2,
    "lost": 0,
    "byUnit": {
     "Buk-M1": 12,
@@ -918,80 +1004,75 @@
     "Tor-M2": 16,
     "S-400": 32
    },
-   "damage": 2346,
+   "damage": 1920,
    "dmgByWeapon": {
-    "Liutyi": 864,
-    "ATACMS": 282,
+    "Liutyi": 720,
     "Storm Shadow": 1200
    },
-   "missSum": 65.303707786518,
-   "missN": 10,
+   "missSum": 52.708601165718,
+   "missN": 9,
    "objsDestroyed": 1,
    "satChannels": {
-    "Buk-M1": 6,
-    "Pantsir-1": 7,
-    "Pantsir-2": 6,
-    "Tor-M2": 10,
-    "S-400": 11
+    "Buk-M1": 5,
+    "Pantsir-1": 9,
+    "Pantsir-2": 9,
+    "Tor-M2": 12,
+    "S-400": 9
    },
    "satMag": {
     "Buk-M1": 1,
     "Pantsir-1": 1,
     "Pantsir-2": 1,
-    "Tor-M2": 1
+    "Tor-M2": 1,
+    "S-400": 1
    },
    "reloads": 0,
    "unitsDamaged": 0
   },
   "impacts": [
    [
-    52.2078,
-    41.5928,
+    52.197,
+    41.6078,
     "hit"
    ],
    [
-    52.2044,
-    41.5981,
+    52.2032,
+    41.6068,
     "hit"
    ],
    [
-    52.1996,
-    41.6098,
+    52.2185,
+    41.5904,
+    "miss"
+   ],
+   [
+    52.2009,
+    41.6033,
     "hit"
    ],
    [
-    52.1949,
-    41.5937,
+    52.2007,
+    41.6048,
     "hit"
    ],
    [
-    52.193,
-    41.6083,
+    51.8019,
+    40.9016,
     "hit"
    ],
    [
-    52.1898,
-    41.6005,
+    51.8003,
+    40.9006,
     "hit"
    ],
    [
-    52.4032,
-    40.7005,
+    51.7975,
+    40.8982,
     "hit"
    ],
    [
-    51.8011,
-    40.9002,
-    "hit"
-   ],
-   [
-    51.7955,
-    40.8991,
-    "hit"
-   ],
-   [
-    51.8017,
-    40.8996,
+    51.7985,
+    40.8997,
     "hit"
    ]
   ],
@@ -1032,41 +1113,41 @@
     0
    ]
   ],
-  "log": 218
+  "log": 220
  },
  "kv_energia_s1": {
-  "t": 1724,
+  "t": 1550,
   "stats": {
    "launched": 70,
-   "killed": 45,
-   "hits": 6,
-   "misses": 1,
+   "killed": 55,
+   "hits": 3,
+   "misses": 0,
    "decoys": 28,
-   "decoysKilled": 10,
-   "shots": 86,
-   "defCost": 98.81400000000005,
+   "decoysKilled": 16,
+   "shots": 80,
+   "defCost": 98.73600000000005,
    "atkCost": 45.44,
    "lost": 0,
    "byUnit": {
     "NASAMS-1": 18,
-    "Interceptores-1": 10,
+    "Interceptores-1": 8,
     "IRIS-T-1": 24,
-    "Patriot-1": 16,
-    "Gepard-1": 18
+    "Gepard-1": 14,
+    "Patriot-1": 16
    },
-   "damage": 3022,
+   "damage": 1300,
    "dmgByWeapon": {
-    "Kalibr": 422,
-    "Iskander-M": 1317,
-    "Kh-101": 844,
-    "Kinzhal": 439
+    "Kh-101": 422,
+    "Kinzhal": 439,
+    "Iskander-M": 439
    },
-   "missSum": 151.3273737652963,
-   "missN": 7,
+   "missSum": 40.35665340050826,
+   "missN": 3,
    "objsDestroyed": 0,
    "satChannels": {
     "Interceptores-1": 5,
-    "Gepard-1": 17
+    "Gepard-1": 9,
+    "Patriot-1": 4
    },
    "satMag": {
     "NASAMS-1": 1,
@@ -1077,128 +1158,78 @@
   },
   "impacts": [
    [
-    40.3104,
-    67.3891,
+    48.5921,
+    50.3367,
+    "decoy"
+   ],
+   [
+    46.1683,
+    54.0826,
+    "decoy"
+   ],
+   [
+    46.609,
+    49.6194,
+    "decoy"
+   ],
+   [
+    46.1307,
+    51.2639,
+    "decoy"
+   ],
+   [
+    49.7778,
+    50.0868,
+    "decoy"
+   ],
+   [
+    45.1565,
+    49.2135,
+    "decoy"
+   ],
+   [
+    40.2836,
+    67.3952,
     "hit"
    ],
    [
-    46.8978,
-    51.9945,
+    36.2891,
+    45.7028,
     "hit"
    ],
    [
-    49.7231,
-    51.124,
-    "decoy"
-   ],
-   [
-    45.7264,
-    50.1962,
-    "decoy"
-   ],
-   [
-    48.5409,
-    51.6775,
-    "decoy"
-   ],
-   [
-    45.899,
-    54.1343,
-    "decoy"
-   ],
-   [
-    43.5403,
-    52.5034,
-    "decoy"
-   ],
-   [
-    46.8841,
-    52.033,
+    46.9034,
+    52.0115,
     "hit"
    ],
    [
-    48.0625,
-    53.1942,
+    49.4982,
+    51.403,
     "decoy"
    ],
    [
-    47.4471,
-    50.1342,
+    47.6304,
+    53.4629,
     "decoy"
    ],
    [
-    45.5167,
-    50.7243,
+    46.421,
+    55.2592,
     "decoy"
    ],
    [
-    44.2448,
-    52.9185,
+    45.6361,
+    53.9615,
     "decoy"
    ],
    [
-    43.7499,
-    51.4766,
+    49.2768,
+    50.5197,
     "decoy"
    ],
    [
-    45.7118,
-    53.7771,
-    "decoy"
-   ],
-   [
-    40.2726,
-    67.3989,
-    "hit"
-   ],
-   [
-    36.3019,
-    45.7515,
-    "miss"
-   ],
-   [
-    46.903,
-    52.0008,
-    "hit"
-   ],
-   [
-    47.862,
-    49.3591,
-    "decoy"
-   ],
-   [
-    46.534,
-    50.369,
-    "decoy"
-   ],
-   [
-    46.1623,
-    54.9364,
-    "decoy"
-   ],
-   [
-    49.7432,
-    51.7005,
-    "decoy"
-   ],
-   [
-    46.5426,
-    55.0893,
-    "decoy"
-   ],
-   [
-    46.3394,
-    50.9486,
-    "decoy"
-   ],
-   [
-    40.3113,
-    67.3974,
-    "hit"
-   ],
-   [
-    43.6921,
-    51.1839,
+    44.8358,
+    50.558,
     "decoy"
    ]
   ],
@@ -1231,7 +1262,7 @@
    [
     "Gepard-1",
     true,
-    2
+    6
    ],
    [
     "Gepard-2",
@@ -1271,17 +1302,17 @@
    [
     "Interceptores-1",
     true,
-    10
+    12
    ]
   ],
-  "log": 300
+  "log": 295
  },
  "kh_umpk_s1": {
   "t": 1716.25,
   "stats": {
    "launched": 42,
-   "killed": 33,
-   "hits": 6,
+   "killed": 38,
+   "hits": 1,
    "misses": 3,
    "decoys": 0,
    "decoysKilled": 0,
@@ -1290,72 +1321,48 @@
    "atkCost": 1.320000000000001,
    "lost": 0,
    "byUnit": {
-    "IRIS-T-1": 24,
     "Patriot-1": 16,
+    "IRIS-T-1": 24,
     "NASAMS-1": 18,
     "Gepard-1": 20
    },
-   "damage": 1500,
+   "damage": 450,
    "dmgByWeapon": {
-    "UMPK": 1500
+    "UMPK": 450
    },
-   "missSum": 4992.157290262772,
-   "missN": 9,
-   "objsDestroyed": 1,
+   "missSum": 2838.2855832193395,
+   "missN": 4,
+   "objsDestroyed": 0,
    "satChannels": {
-    "IRIS-T-1": 1,
-    "Gepard-1": 18
+    "IRIS-T-1": 2,
+    "Gepard-1": 15
    },
    "satMag": {
-    "Gepard-1": 1
+    "IRIS-T-1": 1,
+    "NASAMS-1": 1
    },
    "reloads": 0,
    "unitsDamaged": 0
   },
   "impacts": [
    [
-    7.1875,
-    58.6848,
+    7.2196,
+    58.7097,
     "hit"
    ],
    [
-    7.2162,
-    58.6902,
-    "hit"
-   ],
-   [
-    7.1984,
-    58.7107,
-    "hit"
-   ],
-   [
-    7.1893,
-    58.6848,
-    "hit"
-   ],
-   [
-    7.1965,
-    58.7187,
-    "hit"
-   ],
-   [
-    7.2173,
-    58.6909,
-    "hit"
-   ],
-   [
-    14.7047,
-    56.6247,
+    15.6769,
+    56.4906,
     "miss"
    ],
    [
-    17.7062,
-    54.7518,
+    17.0686,
+    57.0761,
     "miss"
    ],
    [
-    17.181,
-    57.162,
+    15.7782,
+    55.5944,
     "miss"
    ]
   ],
@@ -1411,6 +1418,6 @@
     0
    ]
   ],
-  "log": 252
+  "log": 244
  }
 }

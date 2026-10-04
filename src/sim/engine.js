@@ -2,13 +2,13 @@
 // Bucle de paso fijo: la interfaz llama a step(dt) con dt ≤ 0,25 s de tiempo simulado.
 // Cada paso: lanzamientos → movimiento/señuelos/GNSS → barridos de sensores → decisiones de tiro
 // → resolución de interceptores → fin de corrida. Ver docs/ARQUITECTURA.md.
-import { BANDS, D, JAMMERS, TARGET_STATUS, WEATHER, UNIT_TARGET, UNIT_DAMAGE, UNIT_COMP_AT, datalinksOf } from '../data/index.js';
-import { classify, classifyGain } from '../physics/decoys.js';
+import { D, JAMMERS, TARGET_STATUS, WEATHER, UNIT_TARGET, UNIT_DAMAGE, UNIT_COMP_AT, datalinksOf } from '../data/index.js';
+import { classify, classifyGain, classifyTau } from '../physics/decoys.js';
 import { money } from '../util/format.js';
 import { nextId } from '../util/ids.js';
 import { rnd } from '../util/rng.js';
 import { surf, los } from '../physics/terrain.js';
-import { antZ, aspectCos, belowCeiling, detR, inSector, jamJ, pdScan, PD_CUTOFF } from '../physics/radar.js';
+import { antZ, aspectCos, belowCeiling, detR, inSector, jamJ, pdScan, PD_CUTOFF, confirms, scanHistory } from '../physics/radar.js';
 import { buildThreat, posAt, speedAt } from '../physics/kinematics.js';
 import { gnssNavError, crpaOverwhelmed } from '../physics/navigation.js';
 import { RADAR_GUID, isTBM, trackOK, reactionStart, solve, calcPk, effectiveC2 } from '../physics/engagement.js';
@@ -61,7 +61,7 @@ export function step(dt) {
       th.released = true;
       for (let k = 0; k < th.decoyRel; k++) {
         const ang = rnd() * 6.28, dist = 1 + rnd() * 2.5;
-        const dc = { ...th, fly: [], id: nextId(), parent: th, isDecoy: true, isDecoyChild: true, decoyRel: 0, sRel: p.s, off: [Math.cos(ang) * dist, Math.sin(ang) * dist], det: {}, net: {}, trail: [], lastNet: -1e9, firstDet: null, cueFirst: null, netFirst: null, clsT: 0, clsTau: null, clsAs: null, phase: th.phase + (k + 1) * 1.6180339, alive: true, targetUnit: null };
+        const dc = { ...th, fly: [], id: nextId(), parent: th, isDecoy: true, isDecoyChild: true, decoyRel: 0, sRel: p.s, off: [Math.cos(ang) * dist, Math.sin(ang) * dist], det: {}, mn: {}, mnT: {}, net: {}, trail: [], lastNet: -1e9, firstDet: null, cueFirst: null, netFirst: null, clsT: 0, clsTau: null, clsAs: null, phase: th.phase + (k + 1) * 1.6180339, alive: true, targetUnit: null };
         S.threats.push(dc); S.stats.decoys++; S.stats.launched++;
       }
       log('w', label(th) + ' libera ' + th.decoyRel + ' señuelos a ' + p.rem.toFixed(0) + ' km del blanco.');
@@ -74,6 +74,7 @@ export function step(dt) {
       if (held && !th.crpaHeld) { th.crpaHeld = true; log('d', label(th) + ': su antena CRPA de ' + th.crpa + ' elementos anula la interferencia GNSS (' + srcs.length + ' fuente' + (srcs.length > 1 ? 's' : '') + ').'); }
       for (const j of held ? [] : srcs) {
         const J = JAMMERS[j.type];
+        if (J.side !== 'both' && th.T.side !== 'both' && J.side === th.T.side) continue;
         const link = th.link && !S.jamsLive.some(k => JAMMERS[k.type].linkJam && k.on && Math.hypot(p.x - k.x, p.y - k.y) <= JAMMERS[k.type].radius);   // un antidrón le corta el enlace
         const n = gnssNavError(th.T, J, link); th.gnssHit = true; th.navErr = n.err;
         if (n.corrected) log('w', label(th) + ' pierde el GNSS en la zona de ' + J.short + (n.rejected ? ' y descarta el engaño' : '') + ', pero su buscador terminal encuentra el blanco.');
@@ -101,13 +102,21 @@ export function step(dt) {
         const J = jamJ(u, az, S.jamsLive); const R = detR(u, th, J, ca, wx);
         // probabilidad de detección del barrido: SNR con fluctuación Swerling 1, clutter y notch Doppler
         const pd = pdScan(u, th, rr, R, agl, p.x, p.y, ca);
-        if (pd <= 0 || rnd() > pd) continue;
-        ok = los(u.x, u.y, uz, p.x, p.y, p.z);
+        const hit = pd > 0 && rnd() <= pd && los(u.x, u.y, uz, p.x, p.y, p.z);
+        if (r.band === 'OPT') ok = hit;
+        else {
+          // confirmación "M de N": abrir una pista exige TRACK_M ecos en los últimos TRACK_N barridos;
+          // una pista ya abierta (vista en los últimos 2 barridos) se mantiene con uno solo
+          // los barridos en que el blanco no llegó a sortearse (fuera del sector o muy lejos) cuentan como "no visto"
+          const mnT = th.mnT || (th.mnT = {});
+          const bits = scanHistory(th.mn[u.id] ?? 0, mnT[u.id], t, r.scan, hit); th.mn[u.id] = bits; mnT[u.id] = t;
+          ok = hit && (t - (th.det[u.id] ?? -1e9) <= r.scan * 2 + 0.6 || confirms(bits));
+        }
       }
       if (ok) {
         th.det[u.id] = t;
         const g = classifyGain(r);   // seguimiento con radar de tiro: aprende a distinguir señuelos
-        if (g) { th.clsT = (th.clsT || 0) + g; th.clsTau = Math.min(th.clsTau ?? Infinity, BANDS[r.band].decoyTau); const c = classify(th); if (c && !th.clsAs) { th.clsAs = c; if (c === 'señuelo' && S.ignoreDecoys) log('d', 'Pista #' + th.id + ' clasificada como señuelo por ' + uLabel(u) + (th.isDecoy ? '.' : ' (¡error: era ' + th.T.short + '!).')); } }
+        if (g) { th.clsT = (th.clsT || 0) + g; th.clsTau = Math.min(th.clsTau ?? Infinity, classifyTau(r)); const c = classify(th); if (c && !th.clsAs) { th.clsAs = c; if (c === 'señuelo' && S.ignoreDecoys) log('d', 'Pista #' + th.id + ' clasificada como señuelo por ' + uLabel(u) + (th.isDecoy ? '.' : ' (¡error: era ' + th.T.short + '!).')); } }
         // La coordinación C2 puede repartir una alerta aun cuando el datalink de tiro esté apagado.
         if (th.cueFirst === null) th.cueFirst = t;
         // Una pista de tiro solo entra a la red por un transporte compatible y encendido.
@@ -145,6 +154,8 @@ export function step(dt) {
     it.done = true; const u = it.u; u.active = Math.max(0, u.active - 1);
     const th = it.th;
     if (!th.alive) { log('d', it.shot + ' de ' + uLabel(u) + ': blanco ya destruido, autodestrucción.'); continue; }
+    // guiado por el radar de la batería (SARH, TVM, mando): si la batería cayó, el misil queda sin guía
+    if (!u.alive && RADAR_GUID.includes(D(u).sam.guid)) { log('x', it.shot + ' de ' + uLabel(u) + ' pierde la guía: su batería fue destruida.'); continue; }
     const pk = calcPk(u, th, t, S.jamsLive, it.f ?? null) * (it.remote ? C2_LEVELS[it.c2].remotePk : 1);   // error de posición de la pista de red
     if (rnd() < pk) {
       th.alive = false; th.killed = true; S.stats.killed++; if (th.isDecoy) S.stats.decoysKilled++;

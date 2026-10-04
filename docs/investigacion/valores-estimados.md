@@ -20,6 +20,8 @@ Tres valores del motor no tienen una fuente firme y pesan en los resultados. Ac�
 
 **Qué haría falta.** Una fuente sobre la calidad de pista de Link 16 (error de posición típico) y el tamaño de la canasta del AIM-120 o del IRIS-T SL; con eso, `remotePk` se podría calcular en vez de estimar. Mientras tanto conviene **sumarlo a `UNC`** con un rango 0,9–1,0, para que el Monte Carlo con sorteo lo tenga en cuenta.
 
+**Estado:** hecho. `UNC.c2.coordinada.remotePk` = 0,9 / 0,97 / 1,0 (confianza baja). El valor probable no cambia, así que las golden tampoco; el Monte Carlo con sorteo (`SAMPLE=1` o el botón de la interfaz) ahora lo varía.
+
 ## 2. Recarga del NASAMS: 30 min
 
 **Qué es.** El tiempo para recargar la batería entera desde su reserva (`sam.reloadS` = 1.800 s; rango en `UNC` 15–60 min).
@@ -31,6 +33,8 @@ Tres valores del motor no tienen una fuente firme y pesan en los resultados. Ac�
 **Qué haría falta.** Un dato primario (manual de Kongsberg/Raytheon o un informe de uso en Ucrania) del tiempo de recarga por lanzador y de cuántos lanzadores se recargan a la vez. Mientras tanto, conviene recordar que **Kiev depende de que la recarga sea mayor que ≈25 min**.
 
 ## 3. Corte de la detección a 1,2·R
+
+**Estado:** resuelto. El corte se reemplazó por la confirmación "2 de 3" (ver `docs/FISICA.md` §2); queda un corte de rendimiento a 2,5·R, donde la Pd es menor que 10⁻⁴.
 
 **Qué es.** Más allá de 1,2 veces el alcance del catálogo (el de Pd 50%), el motor no sortea la detección: la da por perdida (`PD_CUTOFF`).
 
@@ -52,4 +56,6 @@ A 1,2·R confirmar una pista ya es improbable (16%), y más allá cae rápido. P
 
 - **Valores probables contra sorteo.** Las cifras del CHANGELOG ("Kiev ≈70%", "puente ≈40%") son con los valores **probables**. El botón Monte Carlo de la interfaz sortea los parámetros dentro de su incertidumbre y da otra cosa: por ejemplo, el puente de Monterey baja a ≈10% para el ataque. Ninguna está mal: responden preguntas distintas. `npm run mc` usa los probables; `SAMPLE=1 npm run mc` sortea.
 - **La doctrina de alcance domina.** Con la energía del interceptor (#26), tirar dentro del 90% o del 80% del alcance hace que Kiev se gane 40 de 40 noches: en el modelo, esperar no tiene un costo visible contra blancos lentos. Una mejora sería que esperar cueste algo (menos tiempo para un segundo tiro ya existe, pero casi nunca pesa).
+  **Estado:** resuelto. La batería retiene el lanzamiento hasta que el blanco entra en el porcentaje elegido (docs/FISICA.md §6).
 - **Escenarios desbalanceados.** "Monterey · noche de ataque combinado" se gana 40 de 40 noches y en "Gotemburgo · base con S-400" el ataque gana 0 de 40. Ya pasaba en `main`, no es por estos cambios. Conviene recalibrarlos.
+  **Estado:** resuelto. Con la confirmación 2 de 3, C2/datalink y la doctrina de alcance con costo, se recalibraron los tres escenarios que quedaron fuera de rango (40 noches, valores probables): Monterey noche 8 Kh-101 en vez de 4 (la defensa gana 65%), Gotemburgo base 16 Storm Shadow en vez de 6 (el ataque gana 38%) y refinería 4 Kalibr en vez de 6 (la defensa gana 68%; con 6 había caído a 3%). Ver CHANGELOG.

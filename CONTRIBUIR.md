@@ -43,7 +43,7 @@ Si las golden fallan y tu cambio *no* debería alterar la simulación (interfaz,
 5. `npm test && npm run docs && npm run build`.
 
 ### Agregar una defensa o un sensor
-Igual que un arma, en `defenses.js` y `UNC.def`. La Pk por clase debe estar justificada: idealmente con un caso en `calibration.js`.
+Igual que un arma, en `defenses.js` y `UNC.def`. La Pk por clase debe estar justificada: idealmente con un caso en `calibration-cases.js` (geometría) corrido con `npm run calibrar -- --write`, que regenera `calibration.js`.
 
 ### Agregar un escenario
 Agregá una entrada en `src/data/scenarios.js`. Todo es declarativo: objetivos, defensas, salvas, jammers, reglas y metas, documentado en el encabezado del archivo. La prueba de catálogo verifica que los tipos y nombres existan, que todo esté dentro del mapa, que las metas apunten a objetivos o defensas reales y que el briefing esté completo (hora, descripción, fuerzas, condiciones, reglas, metas principales de los dos bandos, éxito y fracaso).
@@ -51,7 +51,7 @@ Agregá una entrada en `src/data/scenarios.js`. Todo es declarativo: objetivos, 
 Antes de darlo por bueno, balancealo con el modo Monte Carlo (20–40 corridas; en Node, `npm run mc -- <escenario>`, 40 noches con los valores probables): un buen escenario no se gana ni se pierde siempre con la disposición inicial. Después sumale un caso a `tests/golden.test.js` y corré `UPDATE_GOLDEN=1 npm test` (verificá que las golden viejas no cambien).
 
 ### Agregar un relieve real
-`scripts/gen-terrain.mjs` convierte un tile SRTM de 1° × 1° en un relieve del juego (con máscara de ríos y lagos). Agregá una entrada en `MAPS` (tile y lugares con latitud y longitud), corré `node scripts/gen-terrain.mjs <clave>` (o pasale un `.hgt` local) y sumá el módulo a `src/data/terrain/index.js`. Ojo: cada relieve agrega ~0,5 MB a `index.html`.
+`scripts/gen-terrain.mjs` convierte un tile SRTM de 1° × 1° en un relieve del juego (con máscara de ríos y lagos). Agregá una entrada en `MAPS` (tile y lugares con latitud y longitud), corré `node scripts/gen-terrain.mjs <clave>` (o pasale un `.hgt` local) y sumá el módulo a `src/data/terrain/index.js`. Ojo: cada relieve agrega ~0,5 MB a `index.html`. Monterey y Gotemburgo vienen de la versión original; `node scripts/verificar-relieves.mjs` los compara contra sus fuentes (docs/DATOS-Y-FUENTES.md §6).
 
 ### Agregar un concepto a la Academia
 Agregá un objeto en `src/edu/concepts.js` con `body()` (la explicación) y `engine()` (cómo lo hace el motor). Usá los datos y funciones reales en lugar de copiar números, así la explicación no queda desactualizada.

@@ -6,12 +6,32 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 
 ## [Sin publicar]
 
+### Agregado
+- El radar del Patriot (MPQ-65) **discrimina señuelos más rápido** que un radar genérico de banda C (`radar.discrim` = ×4, rango 1–8 en `UNC`, estimado). Pesa con la doctrina "no tirarle a pistas clasificadas como señuelo": los escenarios con sus reglas de inicio no cambian.
+- **Arnés de calibración reproducible** (`npm run calibrar`): los casos de la tabla de calibración de Pk tienen ahora su geometría guardada (`src/data/calibration-cases.js`) y `npm run calibrar -- --write` regenera `CAL`. Son reconstrucciones: la geometría original no se había guardado. 7 de 9 casos caen dentro de su objetivo; Iskander-M con señuelos contra Patriot (21%) y Kalibr contra S-300 (88%) quedan fuera y están en el ROADMAP. La ventana "Calibración de Pk" y el catálogo muestran los valores nuevos.
+- `remotePk` de la C2 coordinada tiene rango en `UNC` (0,9 – **0,97** – 1,0, confianza baja): el Monte Carlo con sorteo ahora lo varía. El valor probable no cambia.
+- **Origen de los relieves de Monterey y Gotemburgo**, reconstruido con `node scripts/verificar-relieves.mjs` (docs/DATOS-Y-FUENTES.md §6). Gotemburgo es el tile SRTM N57E011 promediado a 200 m (sin batimetría: la documentación decía lo contrario). Monterey coincide con las Terrain Tiles de Mapzen/AWS con batimetría (correlación 0,999), pero no celda por celda.
+
+### Cambiado
+- **[sim]** **Confirmación de pistas "2 de 3"** en lugar del corte de la detección a 1,2·R. Un eco suelto ya no abre una pista: el radar necesita ver el blanco en 2 de sus últimos 3 barridos; una pista abierta se mantiene con un eco por barrido (ópticos y acústicos siguen con un contacto). La detección lejana pasa a ser gradual (un blanco lento que pasa muchos barridos a 1,2–1,5 veces el alcance puede terminar detectado) y queda solo un corte de rendimiento a 2,5·R. Ver docs/FISICA.md §2 y `docs/investigacion/valores-estimados.md`.
+- **[sim]** **Recalibración de los seis escenarios** (40 noches, `npm run mc`, valores probables) con todo lo de esta versión junto: C2 y datalink separados, ECM según el bando, doctrina de alcance con costo y confirmación 2 de 3. Puente de Monterey: Storm Shadow 11 → 10 (el ataque gana ≈43%). Refinería de Hisingen: Kalibr 6 → 4 (la defensa gana ≈68%; con 6 había caído a ≈3%, porque los RBS 70 ya no disparan con la pista de la red contra misiles rasantes que el tirador todavía no ve detrás del relieve). Monterey noche: Kh-101 4 → 8, que llegan cada 8 s (la defensa gana ≈65%; antes 100%). Gotemburgo base con S-400: Storm Shadow 6 → 16 (el ataque gana ≈38%; antes 0%). Kiev (≈78%) y Járkov (≈48%) sin cambios de escenario.
+- La prueba "el S-125 enfrenta misiles de crucero" suma tres noches en vez de una: contra un Kalibr a 50 m el S-125 (sin filtro de blancos móviles y con 25 s de reacción) queda al límite y en una de las tres noches no llega.
+
 ### Corregido
+- **[sim]** Un interceptor guiado por el radar de su batería (TVM, SARH o por mando) pierde la guía si la batería es destruida durante el vuelo; antes podía derribar igual. Los activos, IR y drones interceptores siguen solos. Las golden de los escenarios no cambian.
+- **[sim]** Confirmación 2 de 3: los barridos en que el blanco no llegó a sortearse (fuera del sector o más allá del corte) cuentan como "no visto". Antes dos ecos separados por minutos podían abrir una pista.
+- `render/draw.js` importaba de `ui/` y rompía la regla de capas. Prueba nueva (`tests/layers.test.js`) que revisa los imports de todo `src/`.
 - **[sim]** La partida usa pasos fijos de 0,25 s y conserva las fracciones entre cuadros: cambiar la velocidad o los FPS ya no cambia la secuencia de detecciones y disparos. Las golden y el Monte Carlo mantienen sus resultados.
 - Monte Carlo espera al último ataque y al fin de los interceptores, incluso en escenarios de más de 10.000 s. Una corrida que no termina se informa como error, sin contabilizarla como victoria.
 - La barra espaciadora y el control de iniciar/pausar no avanzan la partida mientras corre Monte Carlo. Los atajos de edición tampoco actúan detrás de ventanas abiertas.
 - Los campos de munición, reserva, salvas y vida de objetivos mantienen el último número válido al ingresar valores vacíos, fraccionarios o fuera de rango. La semilla de Monte Carlo también se valida antes de empezar.
 - Pruebas de regresión de tiempo fijo, ataques tardíos y bloqueo de series, más `tests/ui.browser.mjs` para validar entradas y controles en Chromium.
+
+### Agregado
+- **[sim]** La doctrina de alcance ahora retiene el lanzamiento hasta que el blanco entra en el porcentaje elegido. Esperar reduce la ventana de tiro y puede dejar pasar la solución; `fireRange = 1` mantiene el comportamiento anterior.
+
+### Agregado
+- **[sim]** Segunda parte de ECM/ECCM: los jammers de radar y anti-GNSS respetan el bando (`side`) del equipo afectado. Un interferidor ruso no degrada sus propios radares ni sus propias armas; el fratricidio parcial queda documentado como pendiente por falta de datos.
 
 ### Agregado
 - **[sim]** C2 y datalink quedan separados: el C2 puede repartir alertas y blancos aunque una unidad tenga apagado su enlace, pero una pista de tiro remota solo cruza entre familias compatibles (`l16`, `ua_c2`, `ru_c2`). NASAMS, Patriot e IRIS-T comparten la abstracción Link 16; S-300 no recibe esa pista. Se actualizan las golden y se agrega la auditoría reproducible en `docs/investigacion/c2-datalink.md`.

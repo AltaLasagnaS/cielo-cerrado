@@ -1,7 +1,8 @@
 // ARCHIVO DE DATOS: relieve de "Costa de Gotemburgo (Suecia)".
 // Grilla de 299×555 celdas de 200 m (enteros de 16 bits con signo, little-endian, en metros;
 // negativos = mar). Se decodifica con decodeB64() (physics/terrain.js).
-// La fuente exacta del raster no quedó documentada en la versión original: ver docs/DATOS-Y-FUENTES.md.
+// Fuente: tile SRTM N57E011 de 1″ (NASA, dominio público), promediado a celdas de 200 m; sin batimetría (mar = −5).
+// Reconstruida con scripts/verificar-relieves.mjs: ver docs/DATOS-Y-FUENTES.md §6.
 export default {
   name: "Costa de Gotemburgo (Suecia)",
   W: 299,

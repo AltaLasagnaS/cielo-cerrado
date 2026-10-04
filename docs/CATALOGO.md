@@ -365,7 +365,7 @@ Trayectoria aplanada con apogeo típico de 40–50 km; hasta 2.100 m/s, ≈1.300
 | RCS en VHF (m²) | 0,1 | **0,24** | 1 | baja | [5] | est por resonancia 0,3 m²; CMO (DB3K, SS-26 Stone [9M723 Iskander-M]): −7,3 dBsm ≈ 0,19 m² de frente en bandas A–D. Probable = media geométrica |
 | CEP (m) | 5 | **25** | 30 | media | [1] [6] [7] | GUR: 20–30 m; 5–7 m es valor de folleto |
 | Costo unitario | US$2.4 M | **US$2.7 M** | US$3 M | alta | [8] | — |
-| Señuelos por misil | 2 | **6** | 6 | media | [1] [9] [3] | unos 6 señuelos 9B899 por misil (RUSI escribe 9B999). El juego no modela la discriminación del radar: el mínimo representa un radar que descarta la mayoría |
+| Señuelos por misil | 2 | **6** | 6 | media | [1] [9] [3] | unos 6 señuelos 9B899 por misil (RUSI escribe 9B999). La discriminación del juego es solo por tiempo de seguimiento (BANDS.decoyTau): el mínimo representa un radar que descarta la mayoría |
 | Efecto de su maniobra terminal sobre la Pk (×) | 0,4 | **0,6** | 0,85 | baja | [10] [3] | calibrado: perfil con la actualización de 2025; 0,85 ≈ perfil 2023–24 |
 | Alcance (km) | 390 | **450** | 550 | alta | [1] | — |
 | Ojiva (kg) | 450 | **480** | 700 | media | [1] [6] | — |
@@ -918,6 +918,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 | Radar: detección contra 1 m² (km) | 90 | **100** | 120 | baja | [2] | est: 170 km es el alcance instrumentado; avión grande 150–170 km, escalado con σ^¼ |
 | Radar: sector de búsqueda (°) | 90 | **90** | 120 | media | [2] | búsqueda 90°, seguimiento 120° |
 | Radar: refresco (s) | 1 | **2** | 3 | baja | — | est: barrido electrónico en sector fijo |
+| Radar: discriminación de señuelos (×, divide el τ de su banda) (×) | 1 | **4** | 8 | baja | — | est: el MPQ-65 es un arreglo de fase multifunción con modos de discriminación de blancos balísticos; no hay cifra pública. ×4 compensa la dificultad de los señuelos de balístico (DECOY_HARD) y los clasifica al ritmo de un señuelo común |
 | Alcance vs aeronaves/crucero (km) | 60 | **100** | 120 | baja | [3] | — |
 | Alcance vs balísticos (km) | 30 | **40** | 60 | baja | [3] | — |
 | Techo (m) | 35.000 | **36.000** | 40.000 | media | [3] | — |
@@ -971,6 +972,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
 | Radar: detección contra 1 m² (km) | 90 | **100** | 120 | baja | [1] | mismo radar que el MSE |
+| Radar: discriminación de señuelos (×, divide el τ de su banda) (×) | 1 | **4** | 8 | baja | — | est: mismo radar que el MSE |
 | Radar: sector de búsqueda (°) | 90 | **90** | 120 | media | [1] | — |
 | Alcance vs aeronaves/crucero (km) | 120 | **160** | 160 | baja | [2] | — |
 | Alcance vs balísticos (km) | 15 | **20** | 30 | baja | — | — |
@@ -1888,11 +1890,11 @@ Casos corridos con el motor (Monte Carlo) para ajustar las Pk contra episodios r
 | Caso | Dato real | Objetivo | Simulado | Con Pk mín–máx |
 |---|---|---|---:|---|
 | 16 Kh-101 (cada 5 s) contra IRIS-T + NASAMS + radar 3D | NASAMS: 94% reclamado; IRIS-T: "casi 100%" (≈240 derribos). Datos de operador/fabricante, sesgados hacia arriba. | 85–100% | 100% | 100–100% |
-| 20 Kalibr (cada 3 s) contra S-300PS + Buk-M1 + radar 3D | 67% para crucero a nivel nacional (feb-22 → ago-24), con defensa mayormente soviética. | 60–85% | 74% | 49–92% |
-| 60 Shahed + 30 Gerbera contra 2 Gepard, 3 grupos móviles, 2 equipos de interceptores, red acústica | Derribo cinético 52% (mar–may 25) a 63% (2022–24); el resto de la neutralización es guerra electrónica, que el juego no modela como pérdida. | 50–70% | 59% | 38–76% |
-| 8 Iskander-M con maniobra 2025 y señuelos contra 1 Patriot MSE (16 misiles) | 37% nacional en jun–sep 25 (IC95% 31–45%), cota inferior de lo que pasa dentro de cobertura; 6–17% en otoño 2025. | 35–65% | 46% | 34–49% |
-| 6 Kinzhal contra 1 Patriot MSE | 6 de 6 sobre Kyiv el 16/5/2023 (IC95% 61–100%); 25% a nivel nacional. | 61–100% | 99% | 77–100% |
-| 12 Kh-22 (cada 5 s) contra 1 Patriot MSE (16 misiles) | 9 de 12 sobre Kyiv el 2/2/2026 (IC95% 47–91%). | 47–91% | 65% | 47–77% |
+| 20 Kalibr (cada 3 s) contra S-300PS + Buk-M1 + radar 3D | 67% para crucero a nivel nacional (feb-22 → ago-24), con defensa mayormente soviética. | 60–85% | 88% | 62–97% |
+| 60 Shahed + 30 Gerbera contra 2 Gepard, 3 grupos móviles, 2 equipos de interceptores, red acústica | Derribo cinético 52% (mar–may 25) a 63% (2022–24); el resto de la neutralización es guerra electrónica, que el juego no modela como pérdida. | 50–70% | 64% | 45–78% |
+| 8 Iskander-M con maniobra 2025 y señuelos contra 1 Patriot MSE (16 misiles) | 37% nacional en jun–sep 25 (IC95% 31–45%), cota inferior de lo que pasa dentro de cobertura; 6–17% en otoño 2025. | 35–65% | 21% | 16–25% |
+| 6 Kinzhal contra 1 Patriot MSE | 6 de 6 sobre Kyiv el 16/5/2023 (IC95% 61–100%); 25% a nivel nacional. | 61–100% | 99% | 84–100% |
+| 12 Kh-22 (cada 5 s) contra 1 Patriot MSE (16 misiles) | 9 de 12 sobre Kyiv el 2/2/2026 (IC95% 47–91%). | 47–91% | 62% | 48–67% |
 | 6 Kh-22 contra IRIS-T + NASAMS, sin Patriot | 3 de más de 400 derribados antes de feb-2026 (IC95% 0–2%). | 0–10% | 0% | 0–0% |
-| 6 Oniks (perfil hi-lo) contra IRIS-T + NASAMS ubicados en el blanco | 5,7% a nivel nacional (12 de 211). No hay datos dentro de cobertura: caso de control, sin objetivo. | — | 62% | 29–83% |
-| 4 Zircon contra Patriot + SAMP/T | 2 de 2 sobre Kyiv el 25/3/2024 (IC95% 34–100%); 33% nacional hasta ago-24. | 34–100% | 98% | 81–100% |
+| 6 Oniks (perfil hi-lo) contra IRIS-T + NASAMS ubicados en el blanco | 5,7% a nivel nacional (12 de 211). No hay datos dentro de cobertura: caso de control, sin objetivo. | — | 67% | 35–88% |
+| 4 Zircon contra Patriot + SAMP/T | 2 de 2 sobre Kyiv el 25/3/2024 (IC95% 34–100%); 33% nacional hasta ago-24. | 34–100% | 99% | 90–100% |

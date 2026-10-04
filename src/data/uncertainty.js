@@ -12,13 +12,13 @@ export const PL = {
   rcs: ['RCS frontal (X/S)', 'm²'], rcsSide: ['RCS lateral (X/S)', 'm²'], rcsRear: ['RCS de cola (X/S)', 'm²'], rcsVHF: ['RCS en VHF', 'm²'], cep: ['CEP', 'm'], cost: ['Costo unitario', 'M US$'],
   decoys: ['Señuelos por misil', ''], manPk: ['Efecto de su maniobra terminal sobre la Pk', '×'],
   'info.rangeKm': ['Alcance', 'km'], 'info.warheadKg': ['Ojiva', 'kg'],
-  'radar.R1': ['Radar: detección contra 1 m²', 'km'], 'radar.sector': ['Radar: sector de búsqueda', '°'], 'radar.scan': ['Radar: refresco', 's'], 'radar.altMax': ['Altura máxima detectable', 'm'],
+  'radar.R1': ['Radar: detección contra 1 m²', 'km'], 'radar.sector': ['Radar: sector de búsqueda', '°'], 'radar.scan': ['Radar: refresco', 's'], 'radar.altMax': ['Altura máxima detectable', 'm'], 'radar.discrim': ['Radar: discriminación de señuelos (×, divide el τ de su banda)', '×'],
   'sam.maxR': ['Alcance vs aeronaves/crucero', 'km'], 'sam.maxRtbm': ['Alcance vs balísticos', 'km'], 'sam.altMax': ['Techo', 'm'], 'sam.altMin': ['Altura mínima de enfrentamiento', 'm'],
   'sam.vInt': ['Velocidad media del interceptor', 'm/s'], 'sam.vmaxT': ['Blanco más rápido enfrentable', 'm/s'], 'sam.react': ['Tiempo de reacción', 's'],
   'sam.ch': ['Canales simultáneos', ''], 'sam.mag': ['Munición de la unidad', ''], 'sam.reloadS': ['Tiempo de recarga de la batería', 's'], 'sam.reserve': ['Reserva para recargar', ''], 'sam.cost': ['Costo por disparo', 'M US$'],
   'sam.pk.dron': ['Pk por disparo vs drones', ''], 'sam.pk.crucero': ['Pk por disparo vs crucero', ''], 'sam.pk.supersonico': ['Pk por disparo vs supersónicos', ''],
   'sam.pk.balistico': ['Pk por disparo vs balísticos', ''], 'sam.pk.hiper': ['Pk por disparo vs hipersónicos', ''],
-  alt: ['Altitud de patrulla', 'm'], radius: ['Radio de efecto', 'km'], spoofKm: ['Desvío típico por engaño GNSS', 'km'], P: ['Potencia relativa (juego)', '']
+  alt: ['Altitud de patrulla', 'm'], remotePk: ['Pk de un disparo con pista de red (factor)', '×'], radius: ['Radio de efecto', 'km'], spoofKm: ['Desvío típico por engaño GNSS', 'km'], P: ['Potencia relativa (juego)', '']
 };
 export const RCS_NOTE = 'est: sin medición pública; analogía con la tabla de GlobalSecurity (Tomahawk 0,5 m², ALCM furtivo <0,05, Harpoon/Exocet 0,1) y tamaño/forma';
 export const VHF_NOTE = 'est: con λ≈1,5–2 m el cuerpo entra en zona de resonancia y el conformado furtivo pierde efecto';
@@ -108,7 +108,7 @@ export const UNC = {
       rcsVHF: U(0.1, 0.24, 1, 'baja', S_('cmo_db3k'), 'est por resonancia 0,3 m²; CMO (DB3K, SS-26 Stone [9M723 Iskander-M]): −7,3 dBsm ≈ 0,19 m² de frente en bandas A–D. Probable = media geométrica'),
       cep: U(5, 25, 30, 'media', S_('gur_isk', 'rusi_isk22', 'csis_isk'), 'GUR: 20–30 m; 5–7 m es valor de folleto'),
       cost: U(2.4, 2.7, 3.0, 'alta', S_('costs_leak'), ''),
-      decoys: U(2, 6, 6, 'media', S_('gur_isk', 'twz_9b899', 'rusi_isk25'), 'unos 6 señuelos 9B899 por misil (RUSI escribe 9B999). El juego no modela la discriminación del radar: el mínimo representa un radar que descarta la mayoría'),
+      decoys: U(2, 6, 6, 'media', S_('gur_isk', 'twz_9b899', 'rusi_isk25'), 'unos 6 señuelos 9B899 por misil (RUSI escribe 9B999). La discriminación del juego es solo por tiempo de seguimiento (BANDS.decoyTau): el mínimo representa un radar que descarta la mayoría'),
       manPk: U(0.4, 0.6, 0.85, 'baja', S_('ft_aerotime', 'rusi_isk25'), 'calibrado: perfil con la actualización de 2025; 0,85 ≈ perfil 2023–24'),
       'info.rangeKm': U(390, 450, 550, 'alta', S_('gur_isk'), ''),
       'info.warheadKg': U(450, 480, 700, 'media', S_('gur_isk', 'rusi_isk22'), '')
@@ -251,6 +251,7 @@ export const UNC = {
       'radar.R1': U(90, 100, 120, 'baja', S_('rt_mpq53'), 'est: 170 km es el alcance instrumentado; avión grande 150–170 km, escalado con σ^¼'),
       'radar.sector': U(90, 90, 120, 'media', S_('rt_mpq53'), 'búsqueda 90°, seguimiento 120°'),
       'radar.scan': U(1, 2, 3, 'baja', [], 'est: barrido electrónico en sector fijo'),
+      'radar.discrim': U(1, 4, 8, 'baja', [], 'est: el MPQ-65 es un arreglo de fase multifunción con modos de discriminación de blancos balísticos; no hay cifra pública. ×4 compensa la dificultad de los señuelos de balístico (DECOY_HARD) y los clasifica al ritmo de un señuelo común'),
       'sam.maxR': U(60, 100, 120, 'baja', S_('wp:MIM-104_Patriot'), ''),
       'sam.maxRtbm': U(30, 40, 60, 'baja', S_('wp:MIM-104_Patriot'), ''),
       'sam.altMax': U(35000, 36000, 40000, 'media', S_('wp:MIM-104_Patriot'), ''),
@@ -267,6 +268,7 @@ export const UNC = {
     },
     patriot2: {
       'radar.R1': U(90, 100, 120, 'baja', S_('rt_mpq53'), 'mismo radar que el MSE'),
+      'radar.discrim': U(1, 4, 8, 'baja', [], 'est: mismo radar que el MSE'),
       'radar.sector': U(90, 90, 120, 'media', S_('rt_mpq53'), ''),
       'sam.maxR': U(120, 160, 160, 'baja', S_('wp:MIM-104_Patriot'), ''),
       'sam.maxRtbm': U(15, 20, 30, 'baja', [], ''),
@@ -456,5 +458,9 @@ export const UNC = {
       P: U(1e4, 3e4, 1e5, 'baja', S_('ng_alq131', 'fas_alq131'), 'parámetro de juego: potencia y bandas del pod no son públicas. Un orden de magnitud menos que el Il-22PP (3e5): un pod de caza tiene menos potencia y antenas mucho más chicas; est'),
       alt: U(300, 4000, 8000, 'baja', [], 'est: los F-16 ucranianos vuelan bajo para sobrevivir y suben para lanzar; altura de patrulla de juego')
     }
+  },
+  // niveles de C2 (data/c2.js); ver docs/investigacion/valores-estimados.md §1
+  c2: {
+    coordinada: { remotePk: U(0.9, 0.97, 1, 'baja', [], 'est de juego: la imagen común entrega la posición con error y demora de segundos y el buscador tiene una canasta de adquisición limitada; no hay dato público de cuánto baja la Pk. Muy sensible: 0,9 → Kiev ≈48%, 1,0 → ≈75% (medido antes de la confirmación 2 de 3)') }
   }
 };
