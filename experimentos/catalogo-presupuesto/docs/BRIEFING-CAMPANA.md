@@ -1,6 +1,6 @@
 # Presupuesto, briefing y campaña: contratos de diseño
 
-Esta parte es diseño de integración, no una campaña implementada. El libro de recursos de `lib/budget.mjs` es el prototipo ejecutable; no calcula misiones ni combate.
+Esta parte es diseño de integración, no una campaña implementada. El libro de recursos de `lib/budget.mjs` es el prototipo ejecutable; no calcula misiones ni combate. Ahora admite continuidad de recursos entre etapas y `lib/briefing.mjs` una proyección de preparación: ver [contrato ejecutable y límites](PROTOCOLO-PROTOTIPO.md).
 
 ## Flujo de una misión
 
@@ -40,6 +40,7 @@ Un reporte puede referirse a una instalación fija conocida o a una posición es
 - Distinción entre existencias reservadas, asignadas como listas y consumidas.
 - Eventos con ID, reintentos idempotentes y rechazo de comandos de otro libro/bando.
 - Guardado por configuración inicial y eventos, con validación al reconstruir.
+- Continuidad de recursos mediante `begin-mission` después de `finish`, sin reset de saldo, disponibilidad ni consumidos. Pedidos comprometidos no se reembolsan en etapas posteriores.
 
 El campo `ready` todavía no asigna munición a un lanzador concreto. La integración futura deberá respetar capacidades, compatibilidad y localización. El prototipo no puede certificar que una batería real esté desplegada u operativa.
 
@@ -68,7 +69,7 @@ Transición entre misiones:
 5. Construir el briefing siguiente con la inteligencia persistente y sus reportes nuevos. No revelar automáticamente la verdad anterior.
 6. Ofrecer recursos realmente disponibles para la misión siguiente y crear una nueva preparación.
 
-No reutilizar simplemente `createPlan()` para iniciar cada misión con dinero y ofertas originales: regeneraría recursos. El estado de campaña debe autorizar el presupuesto, reservas y disponibilidad iniciales del siguiente plan.
+No reutilizar simplemente `createPlan()` para iniciar cada misión con dinero y ofertas originales: regeneraría recursos. El prototipo ahora continúa el mismo libro con `begin-mission`. La campaña real deberá añadir únicamente los cambios autorizados por su estado físico/logístico, sin fabricar otro presupuesto inicial.
 
 El estado verdadero de campaña y su panorama conocido se guardan por separado. Una unidad destruida y no confirmada no reaparece; puede continuar como contacto/reportes inciertos. La reparación usa el tiempo simulado y recursos; un cambio de escenario no cura equipos por defecto.
 

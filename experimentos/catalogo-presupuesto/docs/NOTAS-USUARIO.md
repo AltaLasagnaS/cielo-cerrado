@@ -6,7 +6,7 @@ Fecha: 4 de octubre de 2026 (America/Buenos_Aires). El usuario pidió ir anotand
 
 Pedido: no admitir decimales donde no corresponden, por ejemplo munición, unidades y cantidades de disparos.
 
-Lectura actual: `bindNumber` ya consulta validez del input; campos de munición/cantidad usan el paso entero por defecto y recuperan el valor válido al perder foco. El importador JSON exige enteros para `mag`, `reserve`, `salvo` y `count`. Todavía debe completarse la comprobación visual del simulador: poder escribir provisionalmente un decimal no equivale a que llegue al estado. No afirmar una regresión sin reproducirla.
+Lectura actual: `bindNumber` ya consulta validez del input; campos de munición/cantidad usan el paso entero por defecto y recuperan el valor válido al perder foco. El importador JSON exige enteros para `mag`, `reserve`, `salvo` y `count`. La comprobación posterior en Chromium sobre la base `9cafba0` confirma que introducir 1,5 en `mag`, `reserve` o `salvo` no llega al estado, blur recupera el valor válido, el guardado conserva enteros e importar `mag: 1.5` se rechaza. Poder escribir provisionalmente un decimal no equivale a guardarlo. Queda ampliar otros campos y la comunicación del error; no se demostró un bug de estado en esos tres campos.
 
 Propuesta a revisar: declarar explícitamente los campos enteros y sus mensajes de error, validarlos por su semántica además del control HTML y ampliar pruebas de pegado/edición/guardar-cargar. No redondear silenciosamente munición fraccionaria. Conservar decimales legítimos en magnitudes continuas; no forzar todas las cifras del juego a enteros.
 
@@ -60,6 +60,30 @@ Pedido: al apretar `Delete`, borrar la unidad seleccionada.
 Criterios propuestos: sólo durante edición/preparación; no cuando el foco está en input, textarea, select o contenido editable; no borrar unidades durante simulación. Mantener consistencia con el botón de eliminar y sus efectos sobre referencias/objetivos/rutas.
 
 Con selección múltiple, definir confirmación y alcance antes de borrar un grupo. No confundir borrar del editor con una baja de campaña. No implementar por ahora, conforme al pedido de registrar las ideas.
+
+Observación posterior en Chromium: `Delete` no elimina la defensa seleccionada en el main base. Se conservó como pendiente, sin tocar `src/ui/input.js`. Diagnóstico reproducible en `tests/simulator-observations.browser.mjs`; observa la situación actual, no es una prueba de aceptación de la feature futura.
+
+## Regla para medir distancias en el mapa
+
+Pedido posterior: una herramienta tipo regla para medir distancias.
+
+Propuesta inicial: activar «Medir», marcar punto inicial y final, mostrar segmento y distancia horizontal en km. Debe usar coordenadas del mapa, no píxeles, y mantenerse correcta al hacer zoom o desplazar la vista. Escape cancela y salir del modo no deja una colocación/ruta accidental ni mueve unidades. Decimales legítimos para la distancia, sin confundirla con distancia oblicua 3D, tiempo de vuelo o alcance efectivo de un arma.
+
+Disponible sobre puntos del mapa tanto en preparación como en ejecución, sin pausar/alterar el motor. No ajustar el extremo a unidades ocultas ni resolver posiciones reales de contactos inciertos. Una pista estimada sigue siendo una estimación. Varios segmentos, rumbo y seguimiento de extremos móviles son ampliaciones posibles, no requisitos confirmados.
+
+Queda registrado como UX06; no se implementa en los archivos de input/render compartidos sin coordinación con Claude.
+
+## Fijar una pista aérea y ver su información
+
+Pedido posterior: poder «lockear un track en el aire y ver su info».
+
+Interpretación de interfaz para revisar: fijar la selección de una pista y mantener abierto su panel mientras se actualiza. No supone una orden de disparo, iluminación, designación ni lock de radar. El juego ya ofrece selección e información básica de amenazas en vuelo; falta revisar continuidad, datos mostrados y seguimiento frente a este pedido.
+
+En vista restringida, mostrar sólo identificación estimada, posición/marcación, altura/velocidad cuando estén disponibles, sensor/fuente, calidad e instante del último reporte. No obtener modelo exacto, ruta futura, coordenadas actuales o guiado desde la verdad oculta del motor. La vista de laboratorio puede mostrar más, claramente identificada.
+
+Al perder la pista, mantener último reporte y su antigüedad con estado «pista perdida/sin actualización»; no seguir la unidad real fuera de detección ni inventar una posición precisa. Una extrapolación, si se ofrece, debe rotularse como estimada. Reidentificación exige el mecanismo de contactos acordado, no enlazar automáticamente IDs secretos. El cierre del panel y la liberación de selección deben ser explícitos.
+
+Seguir automáticamente con la cámara es una opción a revisar, no un requisito confirmado ni sinónimo de fijar selección. Queda registrado como UX07 y depende de la perspectiva/contactos que coordine Claude.
 
 ## Realismo, no ajuste de balance
 
