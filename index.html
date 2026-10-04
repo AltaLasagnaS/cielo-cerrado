@@ -5762,6 +5762,17 @@ table.t.mc td.pc{white-space:nowrap}
     <div class="warn">Lo que esta calibración no captura: la discriminación de señuelos por parte del radar, la escasez de munición real (2025–2026: se dispara 1 PAC-3 por blanco en vez de 2–3), y que las tasas ucranianas no tienen auditoría independiente.</div>
   </div>`, openCal);
   }
+  function energyTable(s) {
+    const P = profileOf(s), prof = hasProfile(s), pct3 = (x) => Math.round(x * 100) + "%", n1 = (x) => x.toLocaleString("es-AR", { maximumFractionDigits: 1 });
+    const rows = [0.25, 0.5, 0.75, ENERGY_REF, 1].map((f) => {
+      const d = f * s.maxR * 1e3, t = timeTo(P, d);
+      return `<tr><td>${pct3(f)}</td><td>${n1(f * s.maxR)} km</td><td>${n1(t)} s</td><td>${kmh(prof ? velAt(P, t) : s.vInt)}</td><td>×${energyPk(s, f).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td></tr>`;
+    }).join("");
+    return `<div><h3>Alcance, tiempo de vuelo y energía ${infoBtn("energia")}</h3>
+    <p>Alcance efectivo: de frente ${n1(s.maxR)} km · de costado ${n1(s.maxR * rangeFactor(0))} km · contra un blanco que se aleja ${n1(s.maxR * rangeFactor(-1))} km. Ese último es la <b>zona de no escape</b> del modelo: un blanco que da la vuelta al ver el lanzamiento no se escapa si está más cerca.</p>
+    <div class="tblwrap"><table class="t"><thead><tr><th>Fracción del alcance</th><th>Distancia</th><th>Tiempo de vuelo</th><th>Velocidad al llegar</th><th>Factor de Pk</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <p class="hint">${prof ? `Perfil de motor y planeo: acelera hasta ${kmh(s.vmax)} en ${s.tb} s y después planea; al alcance máximo llega en el mismo tiempo que a la velocidad media de ${kmh(s.vInt)}.` : `Sin datos de perfil: vuela a ${kmh(s.vInt)} constante y la energía baja por tramos cerca del borde.`} El factor de Pk es relativo al tiro típico al 90% del alcance (×1), con el que están calibradas las Pk. Contra un blanco que se aleja, el misil gasta la energía de un tiro de frente más largo: un encuentro de cola a 0,6 del alcance llega con la energía del borde.</p></div>`;
+  }
   function openFicha(kind, k) {
     if (kind === "thr") {
       const t = THREATS[k];
@@ -5796,6 +5807,7 @@ table.t.mc td.pc{white-space:nowrap}
       if (r) h += `<p class="hint">${esc(BANDS[r.band].note)}</p>`;
       h += `<div><h3>Notas</h3><ul>${d.notes.map((n2) => `<li>${esc(n2)}</li>`).join("")}</ul></div>`;
       if (s) h += `<div><h3>Pk por clase de blanco (modelo del simulador) ${infoBtn("pk")}</h3><div class="tblwrap"><table class="t"><thead><tr><th>Clase</th><th>Pk base</th></tr></thead><tbody>${Object.entries(s.pk).map(([c, v]) => `<tr><td>${esc(CLS_NAME[c])}</td><td>${Math.round(v * 100)}%</td></tr>`).join("")}</tbody></table></div><p class="hint">Es la Pk de un interceptor que llega al punto de encuentro. Se reduce con maniobra terminal (×0,6–0,85 según el arma; ×0,85 para cañones), bengalas contra IR (×0,85), blancos furtivos (×0,85 con buscador activo, ×0,75 con mando/TVM/semiactivo), interferencia sobre su radar y blancos cerca de su velocidad máxima. <button class="btn sm" id="fCal">Ver calibración</button></p></div>`;
+      if (s && usesEnergy(s.guid)) h += energyTable(s);
       if (r && r.band !== "ACU") {
         h += `<div><h3>Detección de cada amenaza por este sensor</h3><div class="tblwrap"><table class="t"><thead><tr><th>Amenaza</th><th>RCS de frente en ${r.band}</th><th>Por señal</th><th>De costado</th><th>Horizonte</th><th>Detección</th></tr></thead><tbody>${Object.values(THREATS).map((t) => {
           const rc = rcsAt(t, r.band), R = r.band === "OPT" ? r.R1 : r.R1 * Math.pow(rc, 0.25), Rs = r.band === "OPT" ? r.R1 : r.R1 * Math.pow(rcsAt(t, r.band, 0), 0.25), ht = t.agl ?? (t.cruiseAlt || t.apogee * 1e3), hz = horizon(d.kind === "aew" ? d.alt : r.mast, ht);
