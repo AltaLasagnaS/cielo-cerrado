@@ -170,10 +170,19 @@ export const PFA = 1e-6;
 /** SNR que da Pd = 50% con Swerling 1 y PFA: ln(PFA)/ln(0,5) − 1 ≈ 18,9 (12,8 dB). */
 export const SNR50 = Math.log(PFA) / Math.log(0.5) - 1;
 /**
- * Más allá de este múltiplo del alcance la Pd por barrido es < 26%: ecos sueltos que no alcanzan para
- * confirmar una pista (regla "M de N" de los extractores de pistas). No se sortea.
+ * Confirmación de pistas "M de N" (extractor de pistas): un radar abre una pista nueva cuando detecta el
+ * blanco en TRACK_M de sus últimos TRACK_N barridos; una pista abierta se mantiene con una detección por
+ * barrido (sim/engine.js#trackScan). Los sensores ópticos y acústicos confirman con un solo contacto.
  */
-export const PD_CUTOFF = 1.2;
+export const TRACK_M = 2, TRACK_N = 3;
+/**
+ * Corte de RENDIMIENTO (no físico): más allá de este múltiplo del alcance la Pd por barrido es menor que
+ * 10⁻⁴ (Swerling 1) y no vale la pena calcular interferencia ni sortear.
+ */
+export const PD_CUTOFF = 2.5;
+
+/** ¿Una historia de barridos (bits, el más nuevo en el bit 0) alcanza para abrir una pista? */
+export const confirms = bits => { let n = 0; for (let k = 0; k < TRACK_N; k++) n += (bits >> k) & 1; return n >= TRACK_M; };
 
 /** Pd de un barrido, Swerling 1. */
 export const pdSwerling1 = snr => (snr > 0 ? Math.pow(PFA, 1 / (1 + snr)) : 0);

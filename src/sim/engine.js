@@ -8,7 +8,7 @@ import { money } from '../util/format.js';
 import { nextId } from '../util/ids.js';
 import { rnd } from '../util/rng.js';
 import { surf, los } from '../physics/terrain.js';
-import { antZ, aspectCos, belowCeiling, detR, inSector, jamJ, pdScan, PD_CUTOFF } from '../physics/radar.js';
+import { antZ, aspectCos, belowCeiling, detR, inSector, jamJ, pdScan, PD_CUTOFF, TRACK_N, confirms } from '../physics/radar.js';
 import { buildThreat, posAt, speedAt } from '../physics/kinematics.js';
 import { gnssNavError, crpaOverwhelmed } from '../physics/navigation.js';
 import { RADAR_GUID, isTBM, trackOK, reactionStart, solve, calcPk, effectiveC2 } from '../physics/engagement.js';
@@ -61,7 +61,7 @@ export function step(dt) {
       th.released = true;
       for (let k = 0; k < th.decoyRel; k++) {
         const ang = rnd() * 6.28, dist = 1 + rnd() * 2.5;
-        const dc = { ...th, fly: [], id: nextId(), parent: th, isDecoy: true, isDecoyChild: true, decoyRel: 0, sRel: p.s, off: [Math.cos(ang) * dist, Math.sin(ang) * dist], det: {}, trail: [], lastNet: -1e9, firstDet: null, netFirst: null, clsT: 0, clsTau: null, clsAs: null, phase: th.phase + (k + 1) * 1.6180339, alive: true, targetUnit: null };
+        const dc = { ...th, fly: [], id: nextId(), parent: th, isDecoy: true, isDecoyChild: true, decoyRel: 0, sRel: p.s, off: [Math.cos(ang) * dist, Math.sin(ang) * dist], det: {}, mn: {}, trail: [], lastNet: -1e9, firstDet: null, netFirst: null, clsT: 0, clsTau: null, clsAs: null, phase: th.phase + (k + 1) * 1.6180339, alive: true, targetUnit: null };
         S.threats.push(dc); S.stats.decoys++; S.stats.launched++;
       }
       log('w', label(th) + ' libera ' + th.decoyRel + ' señuelos a ' + p.rem.toFixed(0) + ' km del blanco.');
@@ -101,8 +101,14 @@ export function step(dt) {
         const J = jamJ(u, az, S.jamsLive); const R = detR(u, th, J, ca, wx);
         // probabilidad de detección del barrido: SNR con fluctuación Swerling 1, clutter y notch Doppler
         const pd = pdScan(u, th, rr, R, agl, p.x, p.y, ca);
-        if (pd <= 0 || rnd() > pd) continue;
-        ok = los(u.x, u.y, uz, p.x, p.y, p.z);
+        const hit = pd > 0 && rnd() <= pd && los(u.x, u.y, uz, p.x, p.y, p.z);
+        if (r.band === 'OPT') ok = hit;
+        else {
+          // confirmación "M de N": abrir una pista exige TRACK_M ecos en los últimos TRACK_N barridos;
+          // una pista ya abierta (vista en los últimos 2 barridos) se mantiene con uno solo
+          const bits = (((th.mn[u.id] ?? 0) << 1) | (hit ? 1 : 0)) & ((1 << TRACK_N) - 1); th.mn[u.id] = bits;
+          ok = hit && (t - (th.det[u.id] ?? -1e9) <= r.scan * 2 + 0.6 || confirms(bits));
+        }
       }
       if (ok) {
         th.det[u.id] = t;

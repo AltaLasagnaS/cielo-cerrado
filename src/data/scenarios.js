@@ -122,7 +122,7 @@ export const SCENARIOS = {
     description: 'Ejercicio hipotético: una oleada al estilo de las campañas rusas contra la energía ucraniana cae sobre la refinería de la isla de Hisingen, en la desembocadura del Göta älv. Los drones Shahed y los señuelos Gerbera llegan desde el mar para gastar munición; detrás vienen misiles de crucero Kalibr rasantes sobre el agua, Kh-101 desde el norte y dos Kinzhal contra el puerto. La refinería es lo único que importa: sin ella no hay combustible para la región.',
     forces: {
       defensa: 'Defensa por capas con material sueco y donado: radar 3D sobre las colinas de Hisingen, un avión Saab AEW patrullando sobre el mar, Patriot (sector hacia el oeste), IRIS-T, NASAMS, dos puestos RBS 70 (MANPADS), dos grupos móviles, red acústica y drones interceptores. Red de mando integrada.',
-      ataque: '16 Shahed, 8 Gerbera, 4 Geran-3 (a reacción), 6 Kalibr, 2 Kh-101 y 2 Kinzhal, con un avión de interferencia stand-off sobre el Kattegat.'
+      ataque: '16 Shahed, 8 Gerbera, 3 Geran-3 (a reacción), 6 Kalibr, 2 Kh-101 y 2 Kinzhal, con un avión de interferencia stand-off sobre el Kattegat.'
     },
     conditions: 'Noche despejada sobre el mar (clima: despejado). El motor no modela la luz: la noche solo explica por qué los grupos móviles dependen de la alerta acústica y del radar.',
     rules: { c2: 'coordinada', doctrine: 'salva', weather: 'despejado' },
@@ -149,7 +149,7 @@ export const SCENARIOS = {
     salvos: [
       { type: 'shahed', count: 16, interval: 20, tStart: 0, agl: 1500, pts: [[0, 28], [30, 33], [51.1, 34.4]], targetObj: 'Refinería de Hisingen' },
       { type: 'gerbera', count: 8, interval: 25, tStart: 60, agl: 900, pts: [[0, 42], [30, 38], [51, 34.6]] },
-      { type: 'geran3', count: 4, interval: 30, tStart: 400, agl: 800, pts: [[30, 0], [45, 20], [54.1, 34.0]], targetObj: 'Terminal petrolera de Skarvik' },
+      { type: 'geran3', count: 3, interval: 30, tStart: 400, agl: 800, pts: [[30, 0], [45, 20], [54.1, 34.0]], targetObj: 'Terminal petrolera de Skarvik' },
       { type: 'kalibr', count: 6, interval: 8, sync: true, tArrive: 1500, agl: 20, pts: [[0, 75], [32, 44], [51.1, 34.4]], targetObj: 'Refinería de Hisingen' },
       { type: 'kh101', count: 2, interval: 15, sync: true, tArrive: 1510, agl: 40, pts: [[20, 0], [42, 18], [51.1, 34.4]], targetObj: 'Refinería de Hisingen' },
       { type: 'kinzhal', count: 2, interval: 15, sync: true, tArrive: 1540, launchDist: 450, pts: [[59, 111], [55.6, 33.9]], targetObj: 'Puerto de Gotemburgo' }
@@ -175,7 +175,7 @@ export const SCENARIOS = {
     description: 'Ejercicio hipotético inspirado en los ataques ucranianos a los puentes de Chonhar y Crimea: la autopista 1 cruza el estero Elkhorn en Moss Landing por un puente costero, con un puente ferroviario al lado. Por ahí pasa toda la logística del frente. Una defensa rusa con S-400, Pantsir, Tor y Buk lo protege. Tu tarea: cortar el puente carretero.',
     forces: {
       defensa: 'S-400 sobre las lomas del este (sector hacia el sudoeste), dos Pantsir y un Tor junto a los puentes, un Buk-M1, radar 3D y radar VHF de alerta. Red integrada.',
-      ataque: '11 Storm Shadow y 2 Flamingo contra el puente carretero, 4 ATACMS contra el puente ferroviario, 2 Neptune contra el S-400 y 30 drones Liutyi contra la central eléctrica, que llegan un par de minutos antes para gastar la munición de la defensa de punto.'
+      ataque: '10 Storm Shadow y 2 Flamingo contra el puente carretero, 4 ATACMS contra el puente ferroviario, 2 Neptune contra el S-400 y 30 drones Liutyi contra la central eléctrica, que llegan un par de minutos antes para gastar la munición de la defensa de punto.'
     },
     conditions: 'Despejado. El motor no modela la luz. Probá cambiar el clima en la pestaña Defensa.',
     rules: { c2: 'coordinada', doctrine: 'salva', weather: 'despejado' },
@@ -195,7 +195,7 @@ export const SCENARIOS = {
       { type: 'p18', x: 58, y: 40, name: 'Radar VHF' }
     ],
     salvos: [
-      { type: 'storm', count: 11, interval: 5, sync: true, tArrive: 1500, agl: 35, pts: [[0, 58], [30, 52], [44, 45], [51.8, 40.9]], targetObj: 'Puente de la autopista 1' },
+      { type: 'storm', count: 10, interval: 5, sync: true, tArrive: 1500, agl: 35, pts: [[0, 58], [30, 52], [44, 45], [51.8, 40.9]], targetObj: 'Puente de la autopista 1' },
       { type: 'flamingo', count: 2, interval: 10, sync: true, tArrive: 1510, agl: 35, pts: [[0, 30], [35, 37], [51.8, 40.9]], targetObj: 'Puente de la autopista 1' },
       { type: 'atacms', count: 4, interval: 6, sync: true, tArrive: 1490, launchDist: 250, pts: [[52, 111], [52.4, 40.7]], targetObj: 'Puente ferroviario del estero Elkhorn' },
       { type: 'neptune', count: 2, interval: 10, sync: true, tArrive: 1480, agl: 12, pts: [[0, 66], [40, 58], [62, 48]], targetUnit: 'S-400' },

@@ -55,7 +55,13 @@ Cada amenaza tiene su modelo de fluctuación (`T.swerling`, por defecto 1):
 
 Las dos fórmulas están **verificadas** contra una integración numérica independiente (Marcum Q₁ de un blanco fijo promediada sobre la distribución de la RCS) en `tests/swerling.test.js`: coinciden a 10⁻⁴.
 
-Más allá de **1,2·R** no se sortea: con menos de 26% por barrido los ecos sueltos no alcanzan para confirmar una pista (regla "M de N"). Con varios barridos seguidos la detección acumulada sube rápido. Con Swerling 3 el corte a 1,2·R deja 18% por barrido.
+**Confirmación de pistas "2 de 3"** (`TRACK_M`, `TRACK_N`, `sim/engine.js`): un eco suelto no alcanza para abrir una pista. El radar guarda, para cada blanco, si lo vio o no en cada uno de sus últimos 3 barridos (`th.mn`), y abre la pista cuando lo vio en 2. Una pista ya abierta (vista en los últimos 2 barridos) se mantiene con un eco por barrido. Los sensores ópticos y acústicos confirman con un solo contacto. Así la detección lejana es gradual: a 1,2·R la confirmación es poco probable (16% por tanda de tres barridos) pero un blanco lento que pasa muchos barridos ahí puede terminar detectado.
+
+| r / R | 1,0 | 1,1 | 1,2 | 1,3 | 1,4 | 1,5 |
+|---|---|---|---|---|---|---|
+| Confirmar "2 de 3", Swerling 1 | 0,50 | 0,31 | 0,16 | 0,07 | 0,03 | 0,01 |
+
+Más allá de **2,5·R** no se calcula nada: es un corte de **rendimiento**, no físico (la Pd ya es menor que 10⁻⁴). Antes había un corte a 1,2·R que compensaba a lo bruto que se abría pista con un solo eco; la regla 2 de 3 lo reemplaza (ver `docs/investigacion/valores-estimados.md`).
 
 **Clutter** (eco del suelo): si el blanco vuela a menos de 300 m sobre el terreno, la SNR pierde hasta `CLUTTER_DB[radar.mti]` dB: 20 sin filtro de blancos móviles (`'none'`, S-125), 10 con MTI clásico (`'mti'`: Buk, 36D6, P-18) y 3 con pulso-Doppler (`'pd'`: Patriot, IRIS-T, NASAMS, S-300/400, Pantsir, Tor, Gepard, Hawk, AEW). La pérdida escala con lo rasante (0 a 300 m, máxima a 0 m) y con la rugosidad del suelo (pendiente local: ×0,5 en el llano a ×1,5 en zonas quebradas; ×0,7 sobre el mar). Valores estimados.
 

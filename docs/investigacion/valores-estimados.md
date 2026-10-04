@@ -32,6 +32,8 @@ Tres valores del motor no tienen una fuente firme y pesan en los resultados. Ac�
 
 ## 3. Corte de la detección a 1,2·R
 
+**Estado:** resuelto. El corte se reemplazó por la confirmación "2 de 3" (ver `docs/FISICA.md` §2); queda un corte de rendimiento a 2,5·R, donde la Pd es menor que 10⁻⁴.
+
 **Qué es.** Más allá de 1,2 veces el alcance del catálogo (el de Pd 50%), el motor no sortea la detección: la da por perdida (`PD_CUTOFF`).
 
 **Por qué existe.** El motor confirma una pista con **un solo eco**. Los radares reales piden una regla "M de N", por ejemplo 2 detecciones en 3 barridos. Con un solo eco, un blanco lento que pasa muchos barridos lejos terminaría detectado por pura suerte. El corte compensa eso a lo bruto. La cuenta con la fórmula del motor:
