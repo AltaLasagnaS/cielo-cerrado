@@ -237,6 +237,12 @@ altMin ≤ AGL   y   z − z_lanzador ≤ altMax
 r / vInt ≤ τ   (el interceptor llega a tiempo, con ≤ 3 s de holgura)
 ```
 
+Cuando `fireRange` es menor que 1, la misma envolvente se exige también en el momento del
+lanzamiento: la batería retiene el tiro hasta que el blanco entra en el porcentaje elegido. Así la
+doctrina tiene un costo temporal real: puede quedar menos ventana para un segundo disparo y un
+blanco que cruza el piso, el techo o el punto de impacto puede quedar sin solución. Con `fireRange = 1`
+se conserva la conducta histórica.
+
 **Alcance efectivo según el aspecto** (`rangeFactor`): un misil quema el motor en segundos y después planea, así que llega más lejos contra un blanco que viene de frente que contra uno que se aleja (tiene que alcanzarlo).
 
 ```

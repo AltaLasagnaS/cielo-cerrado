@@ -3470,6 +3470,13 @@ table.t.mc td.pc{white-space:nowrap}
     const sm = D(u).sam, tbm = isTBM(th);
     const maxR = tbm ? sm.maxRtbm : sm.maxR;
     const lz = surf(u.x, u.y) + 2;
+    if (pct3 < 1) {
+      const p0 = posAt(th, t);
+      if (!p0) return null;
+      const r0 = Math.hypot(p0.x - u.x, p0.y - u.y, (p0.z - lz) / 1e3);
+      const ca0 = closingCos(th, t, p0, u.x, u.y, lz);
+      if (r0 > maxR * rangeFactor(ca0) * pct3) return null;
+    }
     const tEnd = th.tLaunch + th.ft - 0.5;
     let tau = 0.5;
     while (t + tau < tEnd && tau < 400) {
