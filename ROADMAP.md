@@ -14,7 +14,7 @@ Propuesta detallada, con orden, dificultad, datos y pruebas: [docs/investigacion
 
 
 - Detección, tercera parte: integración de pulsos, clutter de mar según el estado del mar y de lluvia, visibilidad sub-clutter por radar con datos (Swerling 3 ya está, verificado).
-- Interceptor con perfil de velocidad (motor y planeo) y límite de g en lugar de velocidad media (el paso A, alcance según el aspecto y Pk según la energía, ya está).
+- Interceptor, segunda parte (el perfil de motor y planeo ya está): maniobra según la altura (densidad del aire), zona de no escape en la ficha y curva de alcance contra blancos que se acercan o se alejan.
 - Daño funcional, segunda parte: reparación con el tiempo, daño por lanzador y objetivos con capacidades (una base aérea dañada no lanza aviones, cuando haya aviones).
 - Clima, segunda parte (los estados base ya están): día y noche para los sensores IR, nieve, clutter de lluvia, viento sobre los drones y clima que cambia durante la noche.
 - **Enlaces de datos por sistema** (Link 16, red nacional ucraniana, red rusa tipo Polyana) con pasarelas: solo comparten pistas los sistemas compatibles.

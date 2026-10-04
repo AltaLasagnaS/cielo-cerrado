@@ -5,6 +5,7 @@ import { azOf, clamp } from '../util/math.js';
 import { surf } from './terrain.js';
 import { jamJ } from './radar.js';
 import { posAt, speedAt, termZone } from './kinematics.js';
+import { profileOf, hasProfile, timeTo, energyAt } from './interceptor.js';
 
 /** Guiados que necesitan que el radar PROPIO de la batería vea el blanco hasta el final. */
 export const RADAR_GUID = ['TVM', 'SARH', 'mando', 'cañón'];
@@ -74,9 +75,9 @@ export function effectiveC2(c2, objs) {
 export const rangeFactor = ca => 0.8 + 0.2 * clamp(ca, -1, 1);
 
 /**
- * Energía que le queda al interceptor según la fracción f = r / alcance efectivo cinemático
- * (maxR × rangeFactor): entera hasta el 75% del alcance y después baja lineal hasta la mitad en el
- * borde (el motor ya se apagó y el misil planea perdiendo velocidad y capacidad de maniobra).
+ * Energía por tramos (paso A), para los misiles sin perfil de motor y planeo en el catálogo: según la
+ * fracción f = r / alcance efectivo cinemático (maxR × rangeFactor), entera hasta el 75% del alcance y
+ * después baja lineal hasta la mitad en el borde.
  */
 export const energy = f => f <= 0.75 ? 1 : Math.max(0.5, 1 - 2 * (f - 0.75));
 
@@ -85,10 +86,17 @@ export const ENERGY_REF = 0.9;
 
 /**
  * Factor de Pk por energía, RELATIVO al tiro típico: las Pk de data/calibration.js salen de episodios
- * reales con tiros cerca del alcance máximo, así que un tiro al 90% vale ×1, uno corto hasta ×1,25 y
- * uno en el borde ×0,71. (Una versión absoluta bajaba todas las Pk y Kiev caía de ≈70% a ≈25%.)
+ * reales con tiros cerca del alcance máximo, así que un tiro al 90% vale ×1 y uno corto hasta ×1,25.
+ * (Una versión absoluta bajaba todas las Pk y Kiev caía de ≈70% a ≈25%.)
+ * Con perfil de motor y planeo (physics/interceptor.js), la energía es la del misil después de recorrer
+ * f × alcance (el de balísticos contra balísticos): contra un blanco que se aleja f es mayor que r/maxR,
+ * porque tiene que alcanzarlo. Sin perfil, la energía por tramos.
  */
-export const energyPk = f => Math.min(1.25, energy(f) / energy(ENERGY_REF));
+export function energyPk(sm, f, tbm = false) {
+  if (!hasProfile(sm)) return Math.min(1.25, energy(f) / energy(ENERGY_REF));
+  const P = profileOf(sm), R = (tbm ? sm.maxRtbm : sm.maxR) * 1000;
+  return Math.min(1.25, energyAt(P, f * R) / energyAt(P, ENERGY_REF * R));
+}
 
 /** ¿El guiado depende de la energía de un misil? Los cañones y los drones interceptores (con motor todo el vuelo) no. */
 export const usesEnergy = guid => guid !== 'cañón' && guid !== 'operador';
@@ -110,7 +118,8 @@ function closingCos(th, tt, p, x, y, z) {
  * Busca el primer punto de intercepción posible: recorre la trayectoria futura del blanco
  * (pasos de 0,5 s hasta 30 s y luego de 2 s, hasta 400 s) y devuelve el primer instante tau en que
  * el blanco está dentro de la envolvente (alcance, alcance mínimo, piso y techo) y el interceptor,
- * volando a sam.vInt en línea recta, llega a tiempo (con ≤ 3 s de holgura).
+ * volando en línea recta con su perfil de motor y planeo (physics/interceptor.js; a sam.vInt constante
+ * si no tiene perfil), llega a tiempo (con ≤ 3 s de holgura).
  * El alcance es el efectivo: maxR × rangeFactor(aspecto) × pct, con pct la doctrina "disparar dentro
  * del X% del alcance" (S.fireRange, 1 = todo el alcance).
  * → { tau (s desde t), p (posición del blanco), r (km), f (r / alcance cinemático, para energyPk) } o null.
@@ -118,6 +127,7 @@ function closingCos(th, tt, p, x, y, z) {
 export function solve(u, th, t, pct = 1) {
   const sm = D(u).sam, tbm = isTBM(th);
   const maxR = tbm ? sm.maxRtbm : sm.maxR; const lz = surf(u.x, u.y) + 2;
+  const P = profileOf(sm);
   // Una doctrina menor que el 100% retiene el lanzamiento hasta que el blanco entra en su
   // envolvente de disparo. Antes solo se comprobaba el alcance en el punto futuro de encuentro:
   // el misil podía salir mientras el blanco todavía estaba fuera del porcentaje elegido, de modo
@@ -139,7 +149,7 @@ export function solve(u, th, t, pct = 1) {
     if (r <= maxR * pct && r >= sm.minR && agl >= sm.altMin && p.z - lz <= sm.altMax) {
       const kin = maxR * rangeFactor(closingCos(th, t + tau, p, u.x, u.y, lz));
       if (r <= kin * pct) {
-        const tf = r * 1000 / sm.vInt;
+        const tf = timeTo(P, r * 1000);
         if (tf <= tau) return (tau - tf <= 3) ? { tau, p, r, f: r / kin } : null;
       }
     }
@@ -154,7 +164,7 @@ export function solve(u, th, t, pct = 1) {
  * Modificadores: maniobra terminal (×manPk del blanco, ×0,85 contra cañones), bengalas contra IR
  * (×0,85), blanco sin motor contra IR (×0,3, T.cold: planeadoras), baja firma (×0,85 buscador activo, ×0,75 guiado desde tierra), interferencia sobre el
  * radar de la batería (×1/(1+0,08·J), mín. ×0,5), blanco a más del 80% de vmaxT (×0,8) y energía
- * del misil en el punto de encuentro (×energyPk(f), solo si se pasa f = r / alcance cinemático de solve).
+ * del misil en el punto de encuentro (×energyPk, solo si se pasa f = r / alcance cinemático de solve).
  * jams = interferidores activos de la corrida.
  */
 export function calcPk(u, th, t, jams, f = null) {
@@ -166,6 +176,6 @@ export function calcPk(u, th, t, jams, f = null) {
   if (th.T.lo && sm.guid !== 'IR' && sm.guid !== 'cañón') pk *= sm.guid === 'activo' ? 0.85 : 0.75;
   if (RADAR_GUID.includes(sm.guid) || sm.guid === 'activo') { const J = jamJ(u, azOf(p.x - u.x, p.y - u.y), jams); if (J > 1) pk *= Math.max(0.5, 1 / (1 + 0.08 * J)); }
   const v = speedAt(th, t); if (v > 0.8 * sm.vmaxT) pk *= 0.8;
-  if (f !== null && usesEnergy(sm.guid)) pk *= energyPk(f);
+  if (f !== null && usesEnergy(sm.guid)) pk *= energyPk(sm, f, isTBM(th));
   return clamp(pk, 0, 0.98);
 }

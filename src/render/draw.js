@@ -7,6 +7,7 @@ import { MAP } from '../physics/terrain.js';
 import { jamJ, horizon } from '../physics/radar.js';
 import { surf } from '../physics/terrain.js';
 import { isOffmap, posAt } from '../physics/kinematics.js';
+import { profileOf, distAt } from '../physics/interceptor.js';
 import { S } from '../sim/state.js';
 import { hooks } from '../sim/hooks.js';
 import { cv, ctx, dpr, V, toS } from './view.js';
@@ -120,7 +121,9 @@ export function draw() {
   // interceptores
   for (const it of S.ints) {
     if (it.done || S.t < it.tL) continue;
-    const f = clamp((S.t - it.tL) / Math.max(0.1, it.tH - it.tL), 0, 1);
+    // fracción del camino recorrida según el perfil de motor y planeo (acelera al salir, frena al final)
+    const P = profileOf(D(it.u).sam), fl = Math.max(0.1, it.tH - it.tL);
+    const f = clamp(distAt(P, S.t - it.tL) / Math.max(1, distAt(P, fl)), 0, 1);
     const [a, b] = toS(it.x0, it.y0), [c2, d2] = toS(it.x0 + (it.px - it.x0) * f, it.y0 + (it.py - it.y0) * f);
     ctx.strokeStyle = 'rgba(120,220,255,.75)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(a, b); ctx.lineTo(c2, d2); ctx.stroke();
     ctx.fillStyle = '#bff0ff'; ctx.beginPath(); ctx.arc(c2, d2, 2.2, 0, 7); ctx.fill();
