@@ -4,13 +4,13 @@
 
 Este paquete se incorpora exclusivamente en `experimentos/catalogo-presupuesto/`, con una workflow independiente. No modifica consumidores del motor ni archivos de Claude. La preparación original estaba fuera del checkout; esta entrega permite revisarla en una PR aislada.
 
-Base local examinada: `bb0d718`, anterior al interceptor de #41. Sobre #41, la última actualización de Claude informa calibración y comparaciones terminadas, `npm run check` completo y CI verde en el último commit. Estos resultados no se verificaron de forma independiente aquí.
+Base actual revisada: `9cafba0`, merge #43, después de #42. El perfil físico y la primera entrega experimental ya están en main. La continuación usa una nueva rama desde ese commit. El historial original está preservado como archivo, no como estado presente: ver [ESTADO-Y-RELEVO.md](ESTADO-Y-RELEVO.md).
 
-Actualización verificada después: `git fetch --no-tags origin main` y lectura de `FETCH_HEAD` confirman `main` en `4bbb5a2`, merge del #42, con los commits del perfil y la tabla nueva. #41 no había llevado el cambio al main correcto; #42 lo incorpora. La copia de trabajo sigue en `bb0d718`, sin checkout/pull ni cambios de archivos. Se verificó presencia de código y escenario, no se ejecutó aquí la suite del main nuevo ni se consultó su CI.
+La primera entrega pasó `npm run check` (167 aprobadas, una omitida), 36 pruebas experimentales y smoke de navegador; también se verificó CI verde antes del merge de #43. La continuación agrega sus propias pruebas y se verifica por separado; un resultado anterior no certifica código nuevo.
 
 El usuario confirmó que prioriza realismo. Recomendación comunicada: conservar Kiev con sus siete Kh-101 de referencia, sin el incremento a nueve destinado sólo a recuperar el porcentaje anterior. No se aplicó aquí esa reversión ni se cambió el PR.
 
-En `4bbb5a2` Kiev todavía declara nueve Kh-101, tanto en briefing como en la salva. El pedido de revertirlo aparece en la captura después del bloqueo por límite de la sesión de Claude; no hay confirmación de su ejecución.
+En la base actual Kiev todavía declara nueve Kh-101, tanto en briefing como en la salva. El pedido de revertirlo aparece en la captura después del bloqueo por límite de la sesión de Claude; no hay confirmación de su ejecución. No se toca desde esta línea de trabajo.
 
 ## Responsables
 
@@ -20,8 +20,8 @@ En `4bbb5a2` Kiev todavía declara nueve Kh-101, tanto en briefing como en la sa
 
 ## Secuencia recomendada de PR
 
-1. Claude cierra su rama de física y sus dependencias. Revisar el escenario de Kiev y las simplificaciones del MANPADS; no mezclar nuevas unidades todavía.
-2. Revisar este paquete de referencia. Elegir ubicaciones nuevas para datos/validación sin cambiar consumidores ni archivos generados.
+1. Confirmar tareas y rama actuales de Claude: #42 ya cerró el perfil. Revisar el escenario de Kiev y las simplificaciones del MANPADS; no asumir que su pausa libera archivos.
+2. Revisar este paquete de referencia y su continuación. La ubicación experimental ya está acordada e incorporada por #43; no cambiar consumidores ni archivos generados todavía.
 3. Completar una configuración y su evidencia por vez. Preparar adaptador de datos y migración explícita del legado. No activar diez candidatos simultáneamente.
 4. Integrar una primera misión con presupuesto y briefing desde un bando, aprovechando la perspectiva que implemente Claude. El libro económico no consulta la verdad enemiga.
 5. Asociar munición lista/reserva a componentes concretos y enlazar eventos de logística/daño de un único motor.

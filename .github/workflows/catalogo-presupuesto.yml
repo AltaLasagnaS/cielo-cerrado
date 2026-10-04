@@ -28,3 +28,5 @@ jobs:
         run: node --test experimentos/catalogo-presupuesto/tests/*.test.mjs
       - name: Demostración reproducible de guardado y recursos
         run: node experimentos/catalogo-presupuesto/scripts/demo.mjs
+      - name: Continuidad de recursos y briefing propios
+        run: node experimentos/catalogo-presupuesto/scripts/campaign-demo.mjs

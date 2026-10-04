@@ -6,7 +6,7 @@ Fecha: 4 de octubre de 2026 (America/Buenos_Aires). El usuario pidió ir anotand
 
 Pedido: no admitir decimales donde no corresponden, por ejemplo munición, unidades y cantidades de disparos.
 
-Lectura actual: `bindNumber` ya consulta validez del input; campos de munición/cantidad usan el paso entero por defecto y recuperan el valor válido al perder foco. El importador JSON exige enteros para `mag`, `reserve`, `salvo` y `count`. Todavía debe completarse la comprobación visual del simulador: poder escribir provisionalmente un decimal no equivale a que llegue al estado. No afirmar una regresión sin reproducirla.
+Lectura actual: `bindNumber` ya consulta validez del input; campos de munición/cantidad usan el paso entero por defecto y recuperan el valor válido al perder foco. El importador JSON exige enteros para `mag`, `reserve`, `salvo` y `count`. La comprobación posterior en Chromium sobre la base `9cafba0` confirma que introducir 1,5 en `mag`, `reserve` o `salvo` no llega al estado, blur recupera el valor válido, el guardado conserva enteros e importar `mag: 1.5` se rechaza. Poder escribir provisionalmente un decimal no equivale a guardarlo. Queda ampliar otros campos y la comunicación del error; no se demostró un bug de estado en esos tres campos.
 
 Propuesta a revisar: declarar explícitamente los campos enteros y sus mensajes de error, validarlos por su semántica además del control HTML y ampliar pruebas de pegado/edición/guardar-cargar. No redondear silenciosamente munición fraccionaria. Conservar decimales legítimos en magnitudes continuas; no forzar todas las cifras del juego a enteros.
 
@@ -60,6 +60,8 @@ Pedido: al apretar `Delete`, borrar la unidad seleccionada.
 Criterios propuestos: sólo durante edición/preparación; no cuando el foco está en input, textarea, select o contenido editable; no borrar unidades durante simulación. Mantener consistencia con el botón de eliminar y sus efectos sobre referencias/objetivos/rutas.
 
 Con selección múltiple, definir confirmación y alcance antes de borrar un grupo. No confundir borrar del editor con una baja de campaña. No implementar por ahora, conforme al pedido de registrar las ideas.
+
+Observación posterior en Chromium: `Delete` no elimina la defensa seleccionada en el main base. Se conservó como pendiente, sin tocar `src/ui/input.js`. Diagnóstico reproducible en `tests/simulator-observations.browser.mjs`; observa la situación actual, no es una prueba de aceptación de la feature futura.
 
 ## Realismo, no ajuste de balance
 

@@ -9,6 +9,8 @@ Trabajo original en una carpeta experimental independiente. No cambia `src/`, es
 - Validación de IDs, referencias, unidades, fuentes, niveles de evidencia y habilitación accidental.
 - Comprobación de las ramas del contrato de perfil: velocidad constante legada, candidato a frenado calibrado, alternativa sin frenado y límite inferior que requiere revisión. No implementa vuelo, no calcula Pk ni muestrea parámetros.
 - Prototipo puro e inmutable de presupuesto, disponibilidad, compras, cancelaciones, asignación previa, consumo y guardado por eventos.
+- Continuidad del mismo libro entre etapas: conserva recursos/cotizaciones/consumo, registra intervalo y no reembolsa adquisiciones comprometidas en misiones anteriores.
+- Proyección de briefing de preparación con tareas públicas, recursos propios y reportes fechados; no recibe verdad enemiga ni funciona como vista de combate.
 - Pruebas sin dependencias y demostración ejecutable en Node.
 
 ## Ejecutar
@@ -19,6 +21,7 @@ Desde esta carpeta:
 node scripts/check.mjs
 node --test tests/*.test.mjs
 node scripts/demo.mjs
+node scripts/campaign-demo.mjs
 ```
 
 No necesita `npm install`, servidor ni acceso a internet para estas comprobaciones. `research/extract-html.py` es una ayuda opcional para leer páginas públicas; las pruebas no lo ejecutan.
@@ -45,11 +48,17 @@ Cada evento lleva bando e ID. Repetir exactamente un comando no duplica compras 
 
 Ver las [fichas](docs/FICHAS.md), el [diseño de briefing/campaña](docs/BRIEFING-CAMPANA.md) y la [guía de integración](docs/INTEGRACION.md).
 
+Para retomar todo lo hablado: [estado e índice de continuidad](docs/ESTADO-Y-RELEVO.md), [plan maestro](docs/PLAN-MAESTRO.md), [decisiones](docs/DECISIONES.md) y [pendientes](docs/PENDIENTES.md). Se preservaron también las referencias y los documentos externos originales, distinguiendo sus estados históricos.
+
+El contrato ejecutable de varias etapas y briefing está en [PROTOCOLO-PROTOTIPO.md](docs/PROTOCOLO-PROTOTIPO.md). No implementa cambio de escenario, daño, reparación, contactos ni campaña jugable. Los intervalos contables no son el reloj del combate.
+
 Las observaciones nuevas sobre enteros, C2 por unidad, señuelos, selección múltiple, bandos y `Delete` están en [NOTAS-USUARIO.md](docs/NOTAS-USUARIO.md); se registraron sin implementar cambios al juego.
 
 Hay también una [nota matemática reproducible](docs/NOTA-INTERCEPTOR.md) sobre el main nuevo; no se modificó ese módulo ni se comprobó impacto en parámetros actuales.
 
-La prueba opcional de navegador se ejecuta con `node tests/demo.browser.mjs`, con el servidor estático y Playwright/Chromium disponibles. Acepta `PLAYWRIGHT_MODULE`, `CHROMIUM_PATH` y `TEST_URL`. La workflow mínima no instala navegadores: ejecuta las 36 pruebas puras y los chequeos de catálogo/guardado.
+La prueba opcional de navegador se ejecuta con `node tests/demo.browser.mjs`, con el servidor estático y Playwright/Chromium disponibles. Acepta `PLAYWRIGHT_MODULE`, `CHROMIUM_PATH` y `TEST_URL`. La workflow mínima no instala navegadores: ejecuta las pruebas puras y los chequeos de catálogo/guardado; el smoke de navegador se verifica aparte.
+
+`node tests/simulator-observations.browser.mjs` es un diagnóstico opcional del juego base servido desde la raíz; usa `TEST_SIM_URL` (por defecto puerto 8768). Confirma rechazo de fracciones en tres cantidades y observa que Delete sigue pendiente. No cambia fuentes, no es un test de la feature futura y debe actualizarse o retirarse cuando ésta se implemente.
 
 La primera integración debería ser una PR pequeña de datos y validación desacoplados, no una sustitución del motor. Antes de usar un registro físico nuevo: verificar fuentes, completar incertidumbre, comprobar muestras conjuntas, acordar su configuración y pasar las pruebas del proyecto.
 

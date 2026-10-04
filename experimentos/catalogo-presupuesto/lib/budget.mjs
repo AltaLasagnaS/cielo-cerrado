@@ -5,6 +5,7 @@ import { deepFreeze, id, integer, safeProduct, safeSum } from './common.mjs';
 // or instant replenishment. Every command returns an immutable new state.
 const knownStates = new WeakSet();
 const MAX_COMMANDS = 10000;
+const MAX_MISSIONS = 100;
 const KEYS = {
   buy: ['orderId', 'offerId', 'quantity'],
   cancel: ['orderId'],
@@ -12,7 +13,8 @@ const KEYS = {
   unload: ['itemId', 'quantity'],
   activate: [],
   consume: ['itemId', 'quantity'],
-  finish: []
+  finish: [],
+  'begin-mission': ['missionId', 'elapsedSeconds']
 };
 
 function keep(state) {
@@ -68,7 +70,7 @@ function normalizeInitial(input) {
       quantityLimit: integer(offer.quantityLimit, 'disponibilidad'), bundle,
       costBasis: { kind: basis.kind, note: basis.note, sourceIds: [...basis.sourceIds] } };
   });
-  return { sideId, budget, unit, offers };
+  return { sideId, budget, unit, offers, missionId: id(input.missionId ?? 'mission-initial', 'missionId') };
 }
 
 export function createPlan(input) {
@@ -77,7 +79,9 @@ export function createPlan(input) {
     version: 1, initial, sideId: initial.sideId, unit: initial.unit,
     balance: initial.budget, phase: 'planning',
     offers: initial.offers.map(offer => ({ ...structuredClone(offer), remaining: offer.quantityLimit })),
-    orders: [], inventory: Object.create(null), audit: []
+    orders: [], inventory: Object.create(null), audit: [],
+    elapsedSeconds: 0,
+    missions: [{ id: initial.missionId, elapsedBeforeSeconds: 0, status: 'planning' }]
   });
 }
 
@@ -87,7 +91,8 @@ function normalizeCommand(raw) {
   if (Object.keys(raw).some(key => !fields.includes(key))) throw new Error('Campo de comando no admitido');
   const command = { commandId: id(raw.commandId, 'commandId'), sideId: id(raw.sideId, 'sideId'), kind: raw.kind };
   for (const key of KEYS[raw.kind]) command[key] = key === 'quantity'
-    ? integer(raw[key], key, 1) : id(raw[key], key);
+    ? integer(raw[key], key, 1)
+    : key === 'elapsedSeconds' ? integer(raw[key], key) : id(raw[key], key);
   return command;
 }
 
@@ -158,7 +163,12 @@ export function applyCommand(state, raw) {
       break;
     }
     case 'activate':
-      requirePlanning(next); next.phase = 'active'; break;
+      requirePlanning(next);
+      // Acquisition committed to an earlier mission cannot be refunded later.
+      for (const order of next.orders) if (order.status === 'reserved') order.status = 'committed';
+      next.phase = 'active';
+      next.missions.at(-1).status = 'active';
+      break;
     case 'consume': {
       if (next.phase !== 'active') throw new Error('Consumo requiere misión activa');
       const item = next.initial.offers.flatMap(offer => offer.bundle).find(row => row.itemId === command.itemId);
@@ -172,7 +182,20 @@ export function applyCommand(state, raw) {
     }
     case 'finish':
       if (next.phase !== 'active') throw new Error('Finalización requiere misión activa');
-      next.phase = 'completed'; break;
+      next.phase = 'completed';
+      next.missions.at(-1).status = 'completed';
+      break;
+    case 'begin-mission': {
+      if (next.phase !== 'completed') throw new Error('Cerrar la misión anterior antes de continuar');
+      if (next.missions.length >= MAX_MISSIONS) throw new Error('Límite de misiones alcanzado');
+      if (next.missions.some(mission => mission.id === command.missionId)) throw new Error('missionId ya utilizado');
+      next.elapsedSeconds = safeSum(next.elapsedSeconds, command.elapsedSeconds);
+      next.missions.push({ id: command.missionId, elapsedBeforeSeconds: command.elapsedSeconds, status: 'planning' });
+      next.phase = 'planning';
+      // No reset of balance, availability, quotes, ready/reserve or consumption.
+      // Elapsed time is recorded, not used to invent repairs or deliveries.
+      break;
+    }
   }
   next.audit.push(command);
   return keep(next);

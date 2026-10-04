@@ -29,7 +29,8 @@
     a { color: #9ecfff; }
     summary { cursor: pointer; }
     li { margin: 10px 0; line-height: 1.45; }
-    #saved-plan { width: 100%; min-height: 130px; font: .8rem monospace; color: inherit; background: #111921; border: 1px solid #668398; margin: 12px 0; padding: 12px; }
+    #saved-plan, #briefing-output { width: 100%; min-height: 130px; font: .8rem monospace; color: inherit; background: #111921; border: 1px solid #668398; margin: 12px 0; padding: 12px; }
+    #briefing-output { white-space: pre-wrap; overflow-wrap: anywhere; }
     :focus-visible { outline: 3px solid #e9bd65; outline-offset: 3px; }
   </style>
 </head>
@@ -48,6 +49,7 @@
       <h2>Recursos disponibles</h2>
       <p class="large"><span id="balance"></span> créditos</p>
       <p>Estado: <span id="phase"></span></p>
+      <p>Misión contable: <span id="mission"></span> · intervalo acumulado: <span id="elapsed"></span> s</p>
       <p>Paquete de ejemplo: un equipo durable y cuatro consumibles. Precio: 20 créditos. Disponibilidad restante: <span id="available"></span>.</p>
       <button id="buy" type="button">Reservar un paquete</button>
       <div id="orders"></div>
@@ -74,6 +76,21 @@
       </table>
     </section>
   </div>
+  <section>
+    <h2>Continuidad y briefing de preparación</h2>
+    <p class="muted">Otra etapa conserva recursos: no crea una batalla, entrega suministros ni repara equipos. El tiempo sólo registra el intervalo entre etapas.</p>
+    <p class="controls">
+      <label for="elapsed-input">Intervalo (s)</label>
+      <input id="elapsed-input" type="number" value="3600" min="0" step="1">
+      <button id="next-mission" type="button">Preparar siguiente etapa</button>
+    </p>
+    <p class="controls">
+      <label for="role">Rol del briefing ficticio</label>
+      <select id="role"><option value="defence">Defensa</option><option value="attack">Ataque</option></select>
+      <button id="briefing" type="button">Generar briefing propio</button>
+    </p>
+    <pre id="briefing-output" aria-label="Briefing de preparación"></pre>
+  </section>
   <section>
     <h2>Guardar y cargar</h2>
     <p class="muted">Se guardan la preparación inicial y los eventos. No es una partida del simulador ni protección contra la edición del archivo local.</p>
