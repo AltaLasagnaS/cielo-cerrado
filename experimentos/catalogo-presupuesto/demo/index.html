@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cielo Cerrado · laboratorio de presupuesto</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #111921; color: #e7eef4; }
+    * { box-sizing: border-box; }
+    body { max-width: 1000px; margin: 0 auto; padding: 28px 18px 60px; }
+    h1 { font-size: clamp(1.5rem, 4vw, 2rem); margin-bottom: 8px; }
+    h2 { font-size: 1.1rem; margin-top: 0; }
+    p { line-height: 1.6; }
+    .notice { border-left: 3px solid #e9bd65; padding-left: 14px; color: #dfd1ac; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; }
+    section { background: #1b2732; border: 1px solid #354858; border-radius: 12px; padding: 20px; margin: 16px 0; }
+    button, input, select { font: inherit; color: inherit; background: #26394a; border: 1px solid #668398; border-radius: 6px; padding: 10px; }
+    button { cursor: pointer; }
+    button:hover:not(:disabled) { background: #36556d; }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    input { width: 90px; }
+    .controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .muted { color: #b5c6d1; font-size: .9rem; }
+    .large { font-size: 2rem; font-variant-numeric: tabular-nums; margin: 8px 0; }
+    #status { min-height: 1.6em; color: #94e1b6; }
+    #status.error { color: #ffb4a8; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { text-align: left; padding: 10px 4px; border-bottom: 1px solid #354858; font-size: .9rem; }
+    a { color: #9ecfff; }
+    summary { cursor: pointer; }
+    li { margin: 10px 0; line-height: 1.45; }
+    #saved-plan { width: 100%; min-height: 130px; font: .8rem monospace; color: inherit; background: #111921; border: 1px solid #668398; margin: 12px 0; padding: 12px; }
+    :focus-visible { outline: 3px solid #e9bd65; outline-offset: 3px; }
+  </style>
+</head>
+<body>
+  <h1>Laboratorio de presupuesto</h1>
+  <p class="notice">Prototipo contable separado de Cielo Cerrado. Los equipos y los precios de esta demo son ficticios. No cambia capacidades ni balancea escenarios.</p>
+  <div class="controls">
+    <label for="side">Libro de recursos</label>
+    <select id="side"><option value="blue">Bando azul · 100 créditos</option><option value="red">Bando rojo · 60 créditos</option></select>
+    <button id="reset" type="button">Reiniciar este libro</button>
+  </div>
+  <p class="muted">Cambiar de libro sirve para probar el prototipo: no es un modo de juego con inteligencia limitada.</p>
+  <p id="status" role="status" aria-live="polite"></p>
+  <div class="grid">
+    <section>
+      <h2>Recursos disponibles</h2>
+      <p class="large"><span id="balance"></span> créditos</p>
+      <p>Estado: <span id="phase"></span></p>
+      <p>Paquete de ejemplo: un equipo durable y cuatro consumibles. Precio: 20 créditos. Disponibilidad restante: <span id="available"></span>.</p>
+      <button id="buy" type="button">Reservar un paquete</button>
+      <div id="orders"></div>
+    </section>
+    <section>
+      <h2>Preparación y ejecución</h2>
+      <div class="controls">
+        <label for="quantity">Consumibles</label>
+        <input id="quantity" type="number" value="1" min="1" max="100" step="1">
+      </div>
+      <p class="controls">
+        <button id="load" type="button">Preparar</button>
+        <button id="unload" type="button">Devolver a reserva</button>
+      </p>
+      <p class="muted">Preparar es una asignación previa, no una recarga durante combate.</p>
+      <p class="controls">
+        <button id="activate" type="button">Iniciar misión de prueba</button>
+        <button id="consume" type="button">Consumir listos</button>
+        <button id="finish" type="button">Finalizar</button>
+      </p>
+      <table>
+        <thead><tr><th>Recurso</th><th>Reserva</th><th>Listos</th><th>Usados</th></tr></thead>
+        <tbody id="inventory"></tbody>
+      </table>
+    </section>
+  </div>
+  <section>
+    <h2>Guardar y cargar</h2>
+    <p class="muted">Se guardan la preparación inicial y los eventos. No es una partida del simulador ni protección contra la edición del archivo local.</p>
+    <button id="save" type="button">Generar guardado</button>
+    <textarea id="saved-plan" aria-label="Plan guardado en JSON" spellcheck="false"></textarea>
+    <button id="restore" type="button">Restaurar este libro</button>
+  </section>
+  <section>
+    <details><summary>Variantes investigadas · todavía no habilitadas</summary>
+      <p class="muted">Son referencias con evidencia y pendientes, no unidades disponibles para comprar.</p>
+      <ul id="variants"></ul>
+    </details>
+    <p><a href="../README.md">Documentación del prototipo</a></p>
+  </section>
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>
