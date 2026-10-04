@@ -31,7 +31,7 @@ export const JAMMERS = {
   // ---- contra radares: siempre a favor del ATACANTE (degradan los radares de la defensa) ----
   f16ecm: { name: 'F-16 ucraniano con autoprotección (ALQ-162 / ALQ-131)', short: 'F-16 ECM', side: 'UA', air: true, alt: 4000, P: 3e4, bands: ['C', 'X', 'Ku'],
     notes: ['Los F-16 holandeses llegaron con AN/ALQ-131 y los daneses con ALQ-162 en pilones ECIPS (TWZ informa el ALQ-162(V)6 instalado en los ucranianos; el ALQ-131 en Ucrania no está confirmado); un escuadrón de guerra electrónica de la USAF los reprogramó contra amenazas rusas (ago-2024).', 'El ALQ-131 cubre 2–20 GHz en configuraciones de 1 a 3 bandas: no se sabe cuáles tiene Ucrania. Acá se asumen las bandas de control de tiro (C/X/Ku).', 'Es un pod de autoprotección, no un interferidor stand-off: en el juego representa una patrulla escoltando un ataque, con mucha menos potencia que un Il-22PP o un Krasukha. Confianza baja.'],
-    sources: [SRC.ng_alq131, SRC.fas_alq131, SRC.dx_f16nl, SRC.afm_f16ew] }
+    sources: [SRC.ng_alq131, SRC.fas_alq131, SRC.dx_f16nl, SRC.afm_f16ew, SRC.twz_f16pods] }
 };
 
 /**
