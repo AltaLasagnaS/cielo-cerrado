@@ -7,6 +7,13 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 ## [Sin publicar]
 
 ### Agregado
+- **Verificación cruzada de la investigación de guerra electrónica ucraniana** (sección G de `docs/investigacion/guerra-electronica-ucraniana.md`): sube la confianza de lo que confirman fuentes independientes (Kometa de 12/16 elementos, especificaciones del ALQ-131, existencia y uso de Lima). Corrige la fecha de los Kometa de 16 elementos (mediados de 2025, no dic-2025) y anota que el pod del F-16 ucraniano probablemente sea el ALQ-162. No cambia la simulación. Las páginas no se pudieron abrir completas: la red de la sesión las bloquea.
+
+### Cambiado
+- **[sim]** Pk contra crucero del S-300 y del Buk: 0,6 → 0,5. El caso de calibración Kalibr contra S-300 + Buk había subido de 73% a 88% con la energía del interceptor (#26), que premia los tiros cortos contra crucero rasante, porque las Pk se habían calibrado sin ese bonus. Ahora da 77% (objetivo 60–85%). Los escenarios no cambian de balance (puente 43%, Gotemburgo base 38%).
+- El caso de calibración del Iskander-M con señuelos se corre contra una batería de 3 lanzadores (36 PAC-3 MSE): 43% (objetivo 35–65%). Con los 16 misiles del catálogo, que siguen representando la escasez en los escenarios, la batería se vacía con los señuelos. **Los 8 casos de calibración quedan dentro de su objetivo.**
+
+### Agregado
 - El radar del Patriot (MPQ-65) **discrimina señuelos más rápido** que un radar genérico de banda C (`radar.discrim` = ×4, rango 1–8 en `UNC`, estimado). Pesa con la doctrina "no tirarle a pistas clasificadas como señuelo": los escenarios con sus reglas de inicio no cambian.
 - **Arnés de calibración reproducible** (`npm run calibrar`): los casos de la tabla de calibración de Pk tienen ahora su geometría guardada (`src/data/calibration-cases.js`) y `npm run calibrar -- --write` regenera `CAL`. Son reconstrucciones: la geometría original no se había guardado. 7 de 9 casos caen dentro de su objetivo; Iskander-M con señuelos contra Patriot (21%) y Kalibr contra S-300 (88%) quedan fuera y están en el ROADMAP. La ventana "Calibración de Pk" y el catálogo muestran los valores nuevos.
 - `remotePk` de la C2 coordinada tiene rango en `UNC` (0,9 – **0,97** – 1,0, confianza baja): el Monte Carlo con sorteo ahora lo varía. El valor probable no cambia.

@@ -1132,7 +1132,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 - **Sensor:** 30N6 Flap Lid (en torre 40V6), Banda X (I/J OTAN), 100 km contra 1 m², sector 90°, refresco 2 s, ECCM 3 dB
 - **Altura de antena:** 25 m por defecto, regulable 7–39 m. Sin torre, la antena queda a ≈7 m sobre su vehículo (estimado); en la torre 40V6M a ≈25 m y en la 40V6MD a ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h, no se cambia durante el combate.
-- **Arma:** 5V55R, guiado TVM, 5–75 km (balísticos: 25 km), 25 m–27 km, 4 canales, 16 disparos, Pk base dron 0.5 · crucero 0.6 · supersonico 0.4 · balistico 0.15 · hiper 0.05
+- **Arma:** 5V55R, guiado TVM, 5–75 km (balísticos: 25 km), 25 m–27 km, 4 canales, 16 disparos, Pk base dron 0.5 · crucero 0.5 · supersonico 0.4 · balistico 0.15 · hiper 0.05
 
 - Ucrania tenía 35 batallones S-300PS/PT en feb-2022 (RUSI), ~250 lanzadores: fue la columna vertebral de su defensa en 2022.
 - El 30N6 puede ir sobre la torre 40V6M (antena a ~24 m) o 40V6MD (~39 m): con 24 m ve un blanco a 25 m de altura a ~41 km.
@@ -1148,7 +1148,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 | Velocidad media del interceptor (m/s) | 1.100 | **1.300** | 1.500 | baja | — | est: 2.000 m/s máx. |
 | Canales simultáneos | 4 | **4** | 6 | media | [1] [2] | PT: 4 blancos; PS: 6 |
 | Costo por disparo | US$300k | **US$500k** | US$1 M | baja | — | est: sin precio público |
-| Pk por disparo vs crucero | 0,4 | **0,6** | 0,75 | media | [3] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
+| Pk por disparo vs crucero | 0,4 | **0,5** | 0,75 | media | [3] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk"). Bajada de 0,6 a 0,5 al recalibrar con npm run calibrar: la energía del interceptor (#26) ya premia los tiros cortos contra crucero rasante |
 | Pk por disparo vs balísticos | 0,05 | **0,15** | 0,3 | baja | [3] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
 
 1. [Ausairpower: radares de control de tiro rusos](https://www.ausairpower.net/APA-Engagement-Fire-Control.html)
@@ -1170,7 +1170,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 - **Sensor:** 9S35 Fire Dome (+9S18M1 Snow Drift), Banda X (I/J OTAN), 50 km contra 1 m², sector 360°, refresco 2 s, ECCM 3 dB
 - **Altura de antena:** 4 m, fija. Fija: radar sobre el vehículo de orugas (altura estimada).
-- **Arma:** 9M38, guiado SARH, 3.3–35 km (balísticos: 10 km), 15 m–22 km, 3 canales, 12 disparos, Pk base dron 0.55 · crucero 0.6 · supersonico 0.35 · balistico 0.05 · hiper 0
+- **Arma:** 9M38, guiado SARH, 3.3–35 km (balísticos: 10 km), 15 m–22 km, 3 canales, 12 disparos, Pk base dron 0.55 · crucero 0.5 · supersonico 0.35 · balistico 0.05 · hiper 0
 
 - Lo usan ambos bandos (Rusia con versiones M2/M3). Ucrania tenía 15 divisiones en 2022.
 - El 9S18M1 (banda centimétrica) detecta a ~85 km a altura; a 100 m de altura solo ~35 km.
@@ -1186,7 +1186,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 | Blanco más rápido enfrentable (m/s) | 800 | **830** | 1.000 | media | [1] | — |
 | Tiempo de reacción (s) | 15 | **22** | 25 | media | [2] | — |
 | Costo por disparo | US$300k | **US$500k** | US$1 M | baja | — | est |
-| Pk por disparo vs crucero | 0,4 | **0,6** | 0,75 | media | [3] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
+| Pk por disparo vs crucero | 0,4 | **0,5** | 0,75 | media | [3] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk"). Bajada de 0,6 a 0,5 al recalibrar con npm run calibrar: la energía del interceptor (#26) ya premia los tiros cortos contra crucero rasante |
 
 1. [Wikipedia: Buk missile system](https://en.wikipedia.org/wiki/Buk_missile_system)
 2. [Missilery.info: Buk-M1](https://en.missilery.info/missile/bukm1)
@@ -1830,11 +1830,11 @@ El efecto depende del **rol**: los interferidores de radar degradan los radares 
 - [azov.one: ficha técnica de Bukovel (datos del fabricante)](https://azov.one/en/blog/electronics-warfare-systems/electronic-warfare-system-bukovel)
 - [Militarnyi: Bukovel-AD "aterriza" un ZALA 421-16E2 ruso](https://militarnyi.com/en/news/ukrainian-bukovel-ad-ew-system-landed-russian-zala-421-16e2-uav/)
 
-### F-16 ucraniano con pod de autoprotección (AN/ALQ-131)
+### F-16 ucraniano con autoprotección (ALQ-162 / ALQ-131)
 
 `f16ecm` · Ucrania / aliados · ruido contra radares en C/X/Ku, potencia relativa 3e+4
 
-- Los F-16 holandeses llegaron con AN/ALQ-131 y los daneses con ALQ-162 en pilones ECIPS; un escuadrón de guerra electrónica de la USAF los reprogramó contra amenazas rusas (ago-2024).
+- Los F-16 holandeses llegaron con AN/ALQ-131 y los daneses con ALQ-162 en pilones ECIPS (TWZ informa el ALQ-162(V)6 instalado en los ucranianos; el ALQ-131 en Ucrania no está confirmado); un escuadrón de guerra electrónica de la USAF los reprogramó contra amenazas rusas (ago-2024).
 - El ALQ-131 cubre 2–20 GHz en configuraciones de 1 a 3 bandas: no se sabe cuáles tiene Ucrania. Acá se asumen las bandas de control de tiro (C/X/Ku).
 - Es un pod de autoprotección, no un interferidor stand-off: en el juego representa una patrulla escoltando un ataque, con mucha menos potencia que un Il-22PP o un Krasukha. Confianza baja.
 
@@ -1854,6 +1854,7 @@ El efecto depende del **rol**: los interferidores de radar degradan los radares 
 - [FAS: AN/ALQ-131, pod de autoprotección](https://man.fas.org/dod-101/sys/ac/equip/an-alq-131.htm)
 - [Defense Express: qué traen distinto los F-16 holandeses (ALQ-131, ECIPS)](https://en.defence-ua.com/news/ukraines_new_f_16s_from_the_netherlands_whats_different_from_danish_version-12107.html)
 - [Air & Space Forces Magazine: la USAF reprogramó la GE de los F-16 ucranianos (ago-2024)](https://www.airandspaceforces.com/ukraine-f-16-electronic-warfare-us-air-force/)
+- [TWZ: los F-16 ucranianos, en servicio con pods de autoprotección (ALQ-162(V)6)](https://www.twz.com/air/f-16-officially-in-ukrainian-service-self-protection-pods-included)
 
 ## Bandas
 
@@ -1890,9 +1891,9 @@ Casos corridos con el motor (Monte Carlo) para ajustar las Pk contra episodios r
 | Caso | Dato real | Objetivo | Simulado | Con Pk mín–máx |
 |---|---|---|---:|---|
 | 16 Kh-101 (cada 5 s) contra IRIS-T + NASAMS + radar 3D | NASAMS: 94% reclamado; IRIS-T: "casi 100%" (≈240 derribos). Datos de operador/fabricante, sesgados hacia arriba. | 85–100% | 100% | 100–100% |
-| 20 Kalibr (cada 3 s) contra S-300PS + Buk-M1 + radar 3D | 67% para crucero a nivel nacional (feb-22 → ago-24), con defensa mayormente soviética. | 60–85% | 88% | 62–97% |
+| 20 Kalibr (cada 3 s) contra S-300PS + Buk-M1 + radar 3D | 67% para crucero a nivel nacional (feb-22 → ago-24), con defensa mayormente soviética. | 60–85% | 77% | 62–97% |
 | 60 Shahed + 30 Gerbera contra 2 Gepard, 3 grupos móviles, 2 equipos de interceptores, red acústica | Derribo cinético 52% (mar–may 25) a 63% (2022–24); el resto de la neutralización es guerra electrónica, que el juego no modela como pérdida. | 50–70% | 64% | 45–78% |
-| 8 Iskander-M con maniobra 2025 y señuelos contra 1 Patriot MSE (16 misiles) | 37% nacional en jun–sep 25 (IC95% 31–45%), cota inferior de lo que pasa dentro de cobertura; 6–17% en otoño 2025. | 35–65% | 21% | 16–25% |
+| 8 Iskander-M con maniobra 2025 y señuelos contra una batería Patriot de 3 lanzadores (36 PAC-3 MSE) | 37% nacional en jun–sep 25 (IC95% 31–45%), cota inferior de lo que pasa dentro de cobertura; 6–17% en otoño 2025. | 35–65% | 43% | 35–48% |
 | 6 Kinzhal contra 1 Patriot MSE | 6 de 6 sobre Kyiv el 16/5/2023 (IC95% 61–100%); 25% a nivel nacional. | 61–100% | 99% | 84–100% |
 | 12 Kh-22 (cada 5 s) contra 1 Patriot MSE (16 misiles) | 9 de 12 sobre Kyiv el 2/2/2026 (IC95% 47–91%). | 47–91% | 62% | 48–67% |
 | 6 Kh-22 contra IRIS-T + NASAMS, sin Patriot | 3 de más de 400 derribados antes de feb-2026 (IC95% 0–2%). | 0–10% | 0% | 0–0% |

@@ -55,9 +55,9 @@ Por eso no se calibró contra el promedio nacional (0,55% contra el Kh-22 o 4,5%
 
 **Arnés reproducible:** `npm run calibrar` corre los casos de `src/data/calibration-cases.js` (geometría guardada, mapa plano, semillas 1–40) y muestra la tasa con las Pk probables y con todas en el mínimo y el máximo de `UNC`. `npm run calibrar -- --write` regenera `src/data/calibration.js` (la tabla `CAL`). La geometría de la versión original no quedó guardada, así que los casos son **reconstrucciones** a partir de su descripción.
 
-Estado (40 noches): 7 de 9 casos con objetivo caen dentro. Quedan dos **fuera**, pendientes de una decisión (ver ROADMAP):
-- **Iskander-M con señuelos contra un Patriot**: 21% (objetivo 35–65%), ya con la discriminación propia del MPQ-65 (`radar.discrim` ×4; con ×8 llega a 28%). Ya daba 16% con el motor de hace 15 PRs, así que no es un cambio reciente: con 6 señuelos por misil, el Patriot gasta sus 16 misiles antes de clasificarlos. Sin señuelos da 77%. Ni la doctrina de ignorar señuelos, ni la C2 integrada ni espaciar los lanzamientos lo llevan al objetivo. Lo que hay que revisar es la cantidad de señuelos, la discriminación o el cargador de la batería, no la Pk.
-- **Kalibr contra S-300 + Buk**: 88% (objetivo 60–85%). Daba 73% con el motor de #19; subió con los cambios de física de #20–#33.
+Estado (40 noches): los 8 casos con objetivo caen dentro. Dos se ajustaron así:
+- **Iskander-M con señuelos contra Patriot** se corre contra una batería de 3 lanzadores con 36 PAC-3 MSE (M903: 12 MSE por lanzador, hasta 8 lanzadores por batería): 43%. Con los 16 misiles del catálogo, que representan la escasez de los escenarios, daba ≈21% (16% ya con el motor de #19): con 6 señuelos por misil la batería se vacía antes de clasificarlos, y eso no es "dentro de cobertura". La discriminación propia del MPQ-65 (`radar.discrim` ×4) ayuda poco sin munición; sin señuelos el caso da 77%.
+- **Kalibr contra S-300 + Buk**: daba 73% con el motor de #19 y subió a 88% con la energía del interceptor (#26), que premia los tiros cortos contra crucero rasante: las Pk se habían calibrado sin ese bonus. La Pk contra crucero del S-300 y del Buk bajó de 0,6 a 0,5: 77%.
 
 ## 5. Sesgos de las fuentes
 

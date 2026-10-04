@@ -44,10 +44,13 @@ export const CAL_CASES = [
   },
   {
     id: 'iskm_patriot',
-    caso: '8 Iskander-M con maniobra 2025 y señuelos contra 1 Patriot MSE (16 misiles)',
+    caso: '8 Iskander-M con maniobra 2025 y señuelos contra una batería Patriot de 3 lanzadores (36 PAC-3 MSE)',
     real: '37% nacional en jun–sep 25 (IC95% 31–45%), cota inferior de lo que pasa dentro de cobertura; 6–17% en otoño 2025.',
     obj: [0.35, 0.65], rules: { ignoreDecoys: true },
-    defs: [['patriot', 60, 63, { az: 0 }]],
+    // "dentro de cobertura" = una batería desplegada de verdad: 3 lanzadores M903 con 12 MSE cada uno (una
+    // batería completa tiene hasta 8). Con los 16 del catálogo (escasez) el Patriot se vacía con los señuelos
+    // y da ≈21%; con 48, ≈62%.
+    defs: [['patriot', 60, 63, { az: 0, mag: 36 }]],
     salvos: [{ type: 'isk_m', count: 8, interval: 20, launchDist: 300, maneuver: true, decoys: true, pts: north }]
   },
   {

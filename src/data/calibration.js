@@ -18,10 +18,10 @@ export const CAL = [
   "caso": "20 Kalibr (cada 3 s) contra S-300PS + Buk-M1 + radar 3D",
   "real": "67% para crucero a nivel nacional (feb-22 → ago-24), con defensa mayormente soviética.",
   "obj": "60–85%",
-  "sim": 0.884,
+  "sim": 0.766,
   "lo": 0.624,
   "hi": 0.965,
-  "ok": false
+  "ok": true
  },
  {
   "id": "shahed_capas",
@@ -35,13 +35,13 @@ export const CAL = [
  },
  {
   "id": "iskm_patriot",
-  "caso": "8 Iskander-M con maniobra 2025 y señuelos contra 1 Patriot MSE (16 misiles)",
+  "caso": "8 Iskander-M con maniobra 2025 y señuelos contra una batería Patriot de 3 lanzadores (36 PAC-3 MSE)",
   "real": "37% nacional en jun–sep 25 (IC95% 31–45%), cota inferior de lo que pasa dentro de cobertura; 6–17% en otoño 2025.",
   "obj": "35–65%",
-  "sim": 0.209,
-  "lo": 0.159,
-  "hi": 0.25,
-  "ok": false
+  "sim": 0.425,
+  "lo": 0.35,
+  "hi": 0.478,
+  "ok": true
  },
  {
   "id": "kinzhal_patriot",

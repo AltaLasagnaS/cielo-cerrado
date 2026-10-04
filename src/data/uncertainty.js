@@ -328,7 +328,7 @@ export const UNC = {
       'sam.vInt': U(1100, 1300, 1500, 'baja', [], 'est: 2.000 m/s máx.'),
       'sam.ch': U(4, 4, 6, 'media', S_('apa_fc', 'wp:S-300_missile_system'), 'PT: 4 blancos; PS: 6'),
       'sam.cost': U(0.3, 0.5, 1, 'baja', [], 'est: sin precio público'),
-      'sam.pk.crucero': U(0.4, 0.6, 0.75, 'media', S_('syrskyi'), PK_NOTE),
+      'sam.pk.crucero': U(0.4, 0.5, 0.75, 'media', S_('syrskyi'), PK_NOTE + '. Bajada de 0,6 a 0,5 al recalibrar con npm run calibrar: la energía del interceptor (#26) ya premia los tiros cortos contra crucero rasante'),
       'sam.pk.balistico': U(0.05, 0.15, 0.3, 'baja', S_('syrskyi'), PK_NOTE)
     },
     buk: {
@@ -338,7 +338,7 @@ export const UNC = {
       'sam.vmaxT': U(800, 830, 1000, 'media', S_('wp:Buk_missile_system'), ''),
       'sam.react': U(15, 22, 25, 'media', S_('missilery_buk'), ''),
       'sam.cost': U(0.3, 0.5, 1, 'baja', [], 'est'),
-      'sam.pk.crucero': U(0.4, 0.6, 0.75, 'media', S_('syrskyi'), PK_NOTE)
+      'sam.pk.crucero': U(0.4, 0.5, 0.75, 'media', S_('syrskyi'), PK_NOTE + '. Bajada de 0,6 a 0,5 al recalibrar con npm run calibrar: la energía del interceptor (#26) ya premia los tiros cortos contra crucero rasante')
     },
     gepard: {
       'sam.maxR': U(3.5, 4, 5.5, 'media', S_('wp:Flakpanzer_Gepard'), ''),

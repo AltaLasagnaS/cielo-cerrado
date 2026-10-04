@@ -192,7 +192,7 @@ pierde el GNSS  ⇔  direcciones > N − 1
 
 Mientras la CRPA alcanza, el arma conserva el satélite y no suma error; se vuelve a revisar en cada paso, así que al entrar en el radio de más estaciones puede perderlo más adelante. Cuando lo pierde, el efecto es el de arriba (con la primera estación de la lista, como antes). Por defecto las salvas van sin CRPA: los escenarios no cambian.
 
-Referencias de tamaño (confianza baja, `docs/investigacion/guerra-electronica-ucraniana.md` D3): Shahed 2022–23 sin CRPA o de 4; Kometa de 8 y 12 en Shahed y UMPK desde 2025; Kometa-M de 16 (dic-2025) en Shahed e Iskander-K. Ingenieros ucranianos: contra 8 elementos hicieron falta 19 estaciones Lima; contra 16, ni 104. La regla N − 1 es la cota clásica de un arreglo adaptativo; los 10° de separación son una estimación de juego (en la realidad depende de la geometría del arreglo y de la potencia de cada fuente).
+Referencias de tamaño (confianza baja, `docs/investigacion/guerra-electronica-ucraniana.md` D3): Shahed 2022–23 sin CRPA o de 4; Kometa de 8 y 12 en Shahed y UMPK desde 2025; de 16 elementos desde mediados de 2025 en Shahed e Iskander-K (verificación cruzada en la sección G de la investigación). Ingenieros ucranianos: contra 8 elementos hicieron falta 19 estaciones Lima; contra 16, ni 104. La regla N − 1 es la cota clásica de un arreglo adaptativo; los 10° de separación son una estimación de juego (en la realidad depende de la geometría del arreglo y de la potencia de cada fuente).
 
 ### Rol
 

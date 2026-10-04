@@ -6,8 +6,7 @@ Son ideas ordenadas por prioridad, no promesas. Cada ítem que cambie resultados
 
 ## Próximo (0.4)
 
-- **Dos casos de calibración fuera de objetivo** (`npm run calibrar`, ver docs/DATOS-Y-FUENTES.md §4): Iskander-M con señuelos contra Patriot (21%, objetivo 35–65%: aun discriminando mejor, la batería de 16 misiles se vacía con los señuelos; revisar el cargador o la cantidad de señuelos) y Kalibr contra S-300 + Buk (88%, objetivo 60–85%).
-- **Verificar las fuentes de la investigación de EW ucraniana** (ver `docs/investigacion/`) y subir la confianza de lo confirmado.
+- **Leer completas las fuentes de la investigación de EW ucraniana** cuando la red de la sesión lo permita. La verificación cruzada con búsquedas ya está hecha (sección G de `docs/investigacion/guerra-electronica-ucraniana.md`).
 
 ## Física (cada ítem es **[sim]**)
 
