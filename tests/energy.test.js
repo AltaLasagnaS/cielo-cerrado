@@ -58,6 +58,9 @@ test('solve: la doctrina "disparar dentro del X%" acorta el tiro y sube la Pk', 
   const u = unit('nasams', 40, 40), th = kalibr([0, 40], [40, 40]);
   const full = firstSol(u, th), half = firstSol(u, th, 0.5);
   assert.ok(full && half);
+  const launchR = Math.hypot(posAt(th, half.t).x - u.x, posAt(th, half.t).y - u.y);
+  assert.ok(launchR <= 0.5 * DEFENSES.nasams.sam.maxR + 1e-9, 'la doctrina retiene el lanzamiento hasta entrar en el umbral');
+  assert.ok(half.t > full.t, 'esperar la distancia elegida retrasa el lanzamiento');
   assert.ok(half.r <= 0.5 * (half.r / half.f) + 1e-9, 'el encuentro queda dentro de la mitad del alcance');
   assert.ok(half.t + half.tau > full.t + full.tau, 'se espera a que el blanco se acerque');
   const pkAt = sol => { const tt = sol.t + sol.tau; th.p = posAt(th, tt); return calcPk(u, th, tt, [], sol.f); };

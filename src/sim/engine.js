@@ -74,6 +74,7 @@ export function step(dt) {
       if (held && !th.crpaHeld) { th.crpaHeld = true; log('d', label(th) + ': su antena CRPA de ' + th.crpa + ' elementos anula la interferencia GNSS (' + srcs.length + ' fuente' + (srcs.length > 1 ? 's' : '') + ').'); }
       for (const j of held ? [] : srcs) {
         const J = JAMMERS[j.type];
+        if (J.side !== 'both' && th.T.side !== 'both' && J.side === th.T.side) continue;
         const link = th.link && !S.jamsLive.some(k => JAMMERS[k.type].linkJam && k.on && Math.hypot(p.x - k.x, p.y - k.y) <= JAMMERS[k.type].radius);   // un antidrón le corta el enlace
         const n = gnssNavError(th.T, J, link); th.gnssHit = true; th.navErr = n.err;
         if (n.corrected) log('w', label(th) + ' pierde el GNSS en la zona de ' + J.short + (n.rejected ? ' y descarta el engaño' : '') + ', pero su buscador terminal encuentra el blanco.');

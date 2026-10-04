@@ -119,6 +119,9 @@ export function jamJ(u, az, list) {
   let J = 0; const bw = BANDS[r.band].bw, uz = antZ(u), sl = r.lowSL ? LOW_SIDELOBES : SIDELOBES, side = r.slc ? [] : null;
   for (const j of list) {
     const JJ = JAMMERS[j.type]; if (!j.on || j.dead || JJ.gnssJam || !JJ.bands.includes(r.band)) continue;
+    // Un interferidor de un bando no degrada sus propios radares. `both` queda reservado para
+    // equipos cuyo rol puede cambiar; no asumimos fratricidio como efecto normal.
+    if (JJ.side !== 'both' && D(u).side !== 'both' && JJ.side === D(u).side) continue;
     const key = u.id + '|' + u.x.toFixed(2) + '|' + u.y.toFixed(2) + '|' + j.x.toFixed(2) + '|' + j.y.toFixed(2) + '|' + (u.mast || 0) + '|' + (u.alt || 0) + '|' + (j.alt || 0);
     j._losMap = j._losMap || {};
     if (j._losMap[key] === undefined) { const p = jamPos(j); j._losMap[key] = los(p[0], p[1], p[2], u.x, u.y, uz); }

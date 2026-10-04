@@ -14,6 +14,12 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 - Pruebas de regresión de tiempo fijo, ataques tardíos y bloqueo de series, más `tests/ui.browser.mjs` para validar entradas y controles en Chromium.
 
 ### Agregado
+- **[sim]** La doctrina de alcance ahora retiene el lanzamiento hasta que el blanco entra en el porcentaje elegido. Esperar reduce la ventana de tiro y puede dejar pasar la solución; `fireRange = 1` mantiene el comportamiento anterior.
+
+### Agregado
+- **[sim]** Segunda parte de ECM/ECCM: los jammers de radar y anti-GNSS respetan el bando (`side`) del equipo afectado. Un interferidor ruso no degrada sus propios radares ni sus propias armas; el fratricidio parcial queda documentado como pendiente por falta de datos.
+
+### Agregado
 - **[sim]** C2 y datalink quedan separados: el C2 puede repartir alertas y blancos aunque una unidad tenga apagado su enlace, pero una pista de tiro remota solo cruza entre familias compatibles (`l16`, `ua_c2`, `ru_c2`). NASAMS, Patriot e IRIS-T comparten la abstracción Link 16; S-300 no recibe esa pista. Se actualizan las golden y se agrega la auditoría reproducible en `docs/investigacion/c2-datalink.md`.
 - Línea de base reproducible de los seis escenarios (`npm run baseline`), con 40 semillas por modo y resultados individuales en `docs/mediciones/baseline.json`.
 

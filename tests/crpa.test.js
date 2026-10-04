@@ -31,7 +31,8 @@ test('dos fuentes casi en la misma dirección caen en el mismo nulo', () => {
 /** Shahed contra un blanco con k estaciones Pole-21 repartidas alrededor; → navErr medio. */
 function navErr(crpa, k) {
   useMap('monterey', { flat: true }); clearSetup();
-  for (let i = 0; i < k; i++) { const a = i * 2 * Math.PI / Math.max(1, k); addJam('gnss', 60 + 8 * Math.cos(a), 60 + 8 * Math.sin(a)); }
+  // El blanco es RU; usamos un anti-GNSS UA para que el filtro de bando no lo trate como fratricidio.
+  for (let i = 0; i < k; i++) { const a = i * 2 * Math.PI / Math.max(1, k); addJam('pokrova', 60 + 8 * Math.cos(a), 60 + 8 * Math.sin(a)); }
   addSalvo({ type: 'shahed', count: 4, interval: 30, agl: 1500, crpa, pts: [[5, 60], [60, 60]] });
   runCurrent(5);
   const arr = S.arrivals.filter(a => a.type === 'shahed');

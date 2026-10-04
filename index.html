@@ -3148,6 +3148,7 @@ table.t.mc td.pc{white-space:nowrap}
     for (const j of list) {
       const JJ = JAMMERS[j.type];
       if (!j.on || j.dead || JJ.gnssJam || !JJ.bands.includes(r.band)) continue;
+      if (JJ.side !== "both" && D(u).side !== "both" && JJ.side === D(u).side) continue;
       const key = u.id + "|" + u.x.toFixed(2) + "|" + u.y.toFixed(2) + "|" + j.x.toFixed(2) + "|" + j.y.toFixed(2) + "|" + (u.mast || 0) + "|" + (u.alt || 0) + "|" + (j.alt || 0);
       j._losMap = j._losMap || {};
       if (j._losMap[key] === void 0) {
@@ -3469,6 +3470,13 @@ table.t.mc td.pc{white-space:nowrap}
     const sm = D(u).sam, tbm = isTBM(th);
     const maxR = tbm ? sm.maxRtbm : sm.maxR;
     const lz = surf(u.x, u.y) + 2;
+    if (pct3 < 1) {
+      const p0 = posAt(th, t);
+      if (!p0) return null;
+      const r0 = Math.hypot(p0.x - u.x, p0.y - u.y, (p0.z - lz) / 1e3);
+      const ca0 = closingCos(th, t, p0, u.x, u.y, lz);
+      if (r0 > maxR * rangeFactor(ca0) * pct3) return null;
+    }
     const tEnd = th.tLaunch + th.ft - 0.5;
     let tau = 0.5;
     while (t + tau < tEnd && tau < 400) {
@@ -3631,6 +3639,7 @@ table.t.mc td.pc{white-space:nowrap}
         }
         for (const j of held ? [] : srcs2) {
           const J = JAMMERS[j.type];
+          if (J.side !== "both" && th.T.side !== "both" && J.side === th.T.side) continue;
           const link = th.link && !S.jamsLive.some((k) => JAMMERS[k.type].linkJam && k.on && Math.hypot(p.x - k.x, p.y - k.y) <= JAMMERS[k.type].radius);
           const n2 = gnssNavError(th.T, J, link);
           th.gnssHit = true;

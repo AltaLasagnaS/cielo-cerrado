@@ -118,6 +118,17 @@ function closingCos(th, tt, p, x, y, z) {
 export function solve(u, th, t, pct = 1) {
   const sm = D(u).sam, tbm = isTBM(th);
   const maxR = tbm ? sm.maxRtbm : sm.maxR; const lz = surf(u.x, u.y) + 2;
+  // Una doctrina menor que el 100% retiene el lanzamiento hasta que el blanco entra en su
+  // envolvente de disparo. Antes solo se comprobaba el alcance en el punto futuro de encuentro:
+  // el misil podía salir mientras el blanco todavía estaba fuera del porcentaje elegido, de modo
+  // que "esperar" no tenía costo temporal. El 100% conserva el comportamiento histórico.
+  if (pct < 1) {
+    const p0 = posAt(th, t);
+    if (!p0) return null;
+    const r0 = Math.hypot(p0.x - u.x, p0.y - u.y, (p0.z - lz) / 1000);
+    const ca0 = closingCos(th, t, p0, u.x, u.y, lz);
+    if (r0 > maxR * rangeFactor(ca0) * pct) return null;
+  }
   const tEnd = th.tLaunch + th.ft - 0.5;
   let tau = 0.5;
   while (t + tau < tEnd && tau < 400) {
