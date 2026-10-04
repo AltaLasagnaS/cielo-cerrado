@@ -32,7 +32,7 @@ La workflow `browser.yml` corre en push, pull request y manualmente. No reemplaz
 
 Cada ejecución genera un subdirectorio propio en `tests/browser/artifacts/` (ignorado por Git), con logs de ambas suites y resultados del autocontenido. En caso de fallo del autocontenido también guarda screenshot, traza de Playwright y detalle del paso fallido. `BROWSER_ARTIFACTS` permite elegir otra carpeta de resultados. Los artefactos de GitHub se retienen siete días; no se suben dependencias.
 
-Las tipografías externas se bloquean deliberadamente. Eso verifica funcionalidad básica sin red, pero **no** significa que se hayan embebido las fuentes: ese punto del roadmap sigue pendiente. Excepciones JavaScript del juego sí hacen fallar el smoke. Los textos obsoletos de ayuda/Academia, Delete, regla, fijar pistas y vista restringida siguen siendo tareas aparte.
+Se bloquea la red externa y se comprueba que **ningún pedido externo se intente**, además de cargar las tres familias y sus ocho pesos con `document.fonts.load`: tiene que devolver fuentes reales cargadas, no sólo un respaldo del sistema. Se verifica también que el archivo descargable conserve los avisos OFL. La CI ejecuta estas comprobaciones en `file://`; el fallback local administrado queda registrado como `http:`. Excepciones JavaScript del juego hacen fallar el smoke. Regla, fijar pistas y vista restringida siguen siendo tareas aparte.
 
 No se certifica compatibilidad con todos los navegadores o tamaños de pantalla, ni niebla de guerra sin fugas, física real, seguridad del archivo local o balance de escenarios. Esta primera CI usa Chromium en escritorio y escenarios incluidos en el repo.
 

@@ -6,7 +6,7 @@ Desplegás radares, baterías antiaéreas y guerra electrónica sobre relieve re
 
 ## Jugar
 
-**Abrí `index.html` en el navegador** (doble clic). Es un único archivo autocontenido: no necesita instalación ni conexión. Con internet carga tipografías más lindas; sin internet usa las del sistema.
+**Abrí `index.html` en el navegador** (doble clic). Es un único archivo autocontenido: no necesita instalación ni conexión. Incluye las tipografías y sus licencias; se ve igual con y sin internet. Procedencia y tamaño en [docs/TIPOGRAFIAS.md](docs/TIPOGRAFIAS.md).
 
 Primeros pasos:
 1. Elegí un escenario arriba a la derecha y leé el **briefing**. Hay seis jugables: la noche de ataque combinado sobre Monterey, el ataque a la base con S-400 en Gotemburgo, la **defensa de la refinería de Hisingen** (Gotemburgo), el **ataque al puente de Moss Landing** (Monterey), la **noche contra la energía de Kiev** y las **bombas planeadoras sobre Járkov**, las dos últimas sobre el relieve real de cada ciudad.

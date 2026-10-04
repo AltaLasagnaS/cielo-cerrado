@@ -14,6 +14,9 @@ test('servidor de pruebas usa puerto propio y sirve fuentes y bundle exactos', a
   assert.equal(await source.text(), await readFile(new URL('../../src/index.html', import.meta.url), 'utf8'));
   const main = await fetch(server.url + '/main.js'); assert.equal(main.status, 200);
   assert.match(main.headers.get('content-type'), /javascript/);
+  const font = await fetch(server.url + '/assets/fonts/IBMPlexMono-Regular.ttf');
+  assert.equal(font.status, 200); assert.equal(font.headers.get('content-type'), 'font/ttf');
+  assert.deepEqual(Buffer.from(await font.arrayBuffer()), await readFile(new URL('../../src/assets/fonts/IBMPlexMono-Regular.ttf', import.meta.url)));
   const bundle = await fetch(server.url + '/__bundle__.html'); assert.equal(bundle.status, 200);
   assert.equal(await bundle.text(), await readFile(new URL('../../index.html', import.meta.url), 'utf8'));
 });

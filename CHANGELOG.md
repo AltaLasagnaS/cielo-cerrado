@@ -7,6 +7,9 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 ## [Sin publicar]
 
 ### Agregado
+- **Tipografías incluidas sin conexión**: IBM Plex Sans/Mono y Barlow Condensed originales, con sus avisos OFL completos también dentro del HTML descargable. El build no usa red y el archivo ya no pide Google Fonts. Integridad/procedencia fijadas por SHA-256 y Chromium exige fuentes cargadas sin intentos de red externa. Bundle: 4,03 MiB sobre la base #48; detalles en `docs/TIPOGRAFIAS.md`. No cambia la simulación.
+
+### Agregado
 - **Repetición de la corrida**: desde el debrief, "Ver repetición" vuelve a mostrar la noche sobre el mapa con una línea de tiempo (reproducir, pausar, arrastrar, 5×/30×/120×) y las últimas líneas del registro de cada instante; el panel de objetivos sigue el instante elegido. No graba fotos: anota cuándo cambia cada cosa y reconstruye el mapa con las mismas trayectorias del motor (`sim/replay.js`, docs/ARQUITECTURA.md). Una prueba compara el cuadro reconstruido con el estado real de la simulación. No cambia resultados.
 - **Ficha de cada misil: alcance, tiempo de vuelo y energía.** Alcance efectivo de frente, de costado y contra un blanco que se aleja (la zona de no escape del modelo), y una tabla con el tiempo de vuelo, la velocidad al llegar y el factor de Pk al 25, 50, 75, 90 y 100% del alcance. Usa las mismas funciones que la simulación; no cambia resultados. La maniobra según la altura queda pendiente por falta de datos (ver ROADMAP).
 - **Viento** sobre drones y misiles de crucero (`S.wind`, pestaña Defensa → Clima, `rules.wind` en los archivos). Vuelan a su velocidad respecto del aire y el viento cambia la velocidad sobre el suelo en cada tramo de la ruta (triángulo de velocidades, docs/FISICA.md §5): con 10 m/s de frente, un Shahed tarda un 24% más y un Kalibr un 4%. No afecta a balísticos ni planeadoras. Por defecto calma: los escenarios, las golden y la calibración no cambian.

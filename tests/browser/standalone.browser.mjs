@@ -19,7 +19,7 @@ const blocked = [];
 try {
   context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, acceptDownloads: true });
   await context.tracing.start({ screenshots: true, snapshots: true });
-  // Funcionalidad sin red. Las tipografías externas fallan de forma deliberada, no se ignoran errores JS.
+  // Sin red externa: las fuentes deben cargarse del bundle, sin intentar pedirlas a un proveedor.
   await context.route(/^https?:\/\//, route => {
     const url = route.request().url();
     if (allowedOrigin && url.startsWith(allowedOrigin + '/')) return route.continue();
@@ -42,6 +42,26 @@ try {
     });
     assert.ok((await page.locator('#scenario option').count()) >= 6);
     assert.ok(await page.locator('#play').isVisible());
+  });
+
+  await check('las tres familias y sus pesos cargan desde el bundle, sin pedidos de red', async () => {
+    const fonts = await page.evaluate(async () => {
+      const rows = [];
+      for (const [family, weights] of [['IBM Plex Sans', [400, 500, 600]], ['IBM Plex Mono', [400, 500]], ['Barlow Condensed', [500, 600, 700]]]) {
+        for (const weight of weights) {
+          const faces = await document.fonts.load(`${weight} 16px "${family}"`, 'Defensa aérea: ñ áéíóú ü ¿¡ 123');
+          rows.push({ family, weight, count: faces.length, loaded: faces.every(face => face.status === 'loaded') });
+        }
+      }
+      await document.fonts.ready;
+      return rows;
+    });
+    for (const row of fonts) {
+      assert.ok(row.count > 0 && row.loaded, `Fuente real cargada: ${row.family} ${row.weight}`);
+    }
+    assert.deepEqual(blocked, [], 'Ninguna solicitud externa, ni siquiera una que se haya bloqueado');
+    assert.match(await page.locator('#font-licenses').textContent(), /SIL OPEN FONT LICENSE Version 1\.1/);
+    assert.match(await page.locator('#font-licenses').textContent(), /The Barlow Project Authors/);
   });
 
   await check('pestañas, ficha de catálogo, Academia y cierre por Escape', async () => {
@@ -132,6 +152,7 @@ try {
     await page.evaluate(() => window.__dbg.computeCov());
     assert.deepEqual(errors, [], 'no esconder excepciones del juego');
   });
+  assert.deepEqual(blocked, [], 'No se intentaron solicitudes externas durante toda la suite');
   await context.tracing.stop();
   await writeFile(join(artifacts, 'standalone-results.json'), JSON.stringify({ passed: checks.length, checks,
     protocol: new URL(standaloneUrl).protocol, javascriptErrors: errors, blockedExternalRequests: blocked.length }, null, 2));
