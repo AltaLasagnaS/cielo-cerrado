@@ -18,9 +18,9 @@ export const CAL = [
   "caso": "20 Kalibr (cada 3 s) contra S-300PS + Buk-M1 + radar 3D",
   "real": "67% para crucero a nivel nacional (feb-22 → ago-24), con defensa mayormente soviética.",
   "obj": "60–85%",
-  "sim": 0.766,
-  "lo": 0.624,
-  "hi": 0.965,
+  "sim": 0.736,
+  "lo": 0.608,
+  "hi": 0.963,
   "ok": true
  },
  {
@@ -38,9 +38,9 @@ export const CAL = [
   "caso": "8 Iskander-M con maniobra 2025 y señuelos contra una batería Patriot de 3 lanzadores (36 PAC-3 MSE)",
   "real": "37% nacional en jun–sep 25 (IC95% 31–45%), cota inferior de lo que pasa dentro de cobertura; 6–17% en otoño 2025.",
   "obj": "35–65%",
-  "sim": 0.425,
-  "lo": 0.35,
-  "hi": 0.478,
+  "sim": 0.525,
+  "lo": 0.344,
+  "hi": 0.559,
   "ok": true
  },
  {
@@ -48,8 +48,8 @@ export const CAL = [
   "caso": "6 Kinzhal contra 1 Patriot MSE",
   "real": "6 de 6 sobre Kyiv el 16/5/2023 (IC95% 61–100%); 25% a nivel nacional.",
   "obj": "61–100%",
-  "sim": 0.992,
-  "lo": 0.842,
+  "sim": 0.983,
+  "lo": 0.796,
   "hi": 1,
   "ok": true
  },
@@ -58,9 +58,9 @@ export const CAL = [
   "caso": "12 Kh-22 (cada 5 s) contra 1 Patriot MSE (16 misiles)",
   "real": "9 de 12 sobre Kyiv el 2/2/2026 (IC95% 47–91%).",
   "obj": "47–91%",
-  "sim": 0.617,
-  "lo": 0.477,
-  "hi": 0.669,
+  "sim": 0.615,
+  "lo": 0.481,
+  "hi": 0.667,
   "ok": true
  },
  {
@@ -78,9 +78,9 @@ export const CAL = [
   "caso": "6 Oniks (perfil hi-lo) contra IRIS-T + NASAMS ubicados en el blanco",
   "real": "5,7% a nivel nacional (12 de 211). No hay datos dentro de cobertura: caso de control, sin objetivo.",
   "obj": "—",
-  "sim": 0.671,
-  "lo": 0.346,
-  "hi": 0.875,
+  "sim": 0.575,
+  "lo": 0.375,
+  "hi": 0.858,
   "ok": null
  },
  {
@@ -88,8 +88,8 @@ export const CAL = [
   "caso": "4 Zircon contra Patriot + SAMP/T",
   "real": "2 de 2 sobre Kyiv el 25/3/2024 (IC95% 34–100%); 33% nacional hasta ago-24.",
   "obj": "34–100%",
-  "sim": 0.994,
-  "lo": 0.9,
+  "sim": 0.988,
+  "lo": 0.788,
   "hi": 1,
   "ok": true
  }

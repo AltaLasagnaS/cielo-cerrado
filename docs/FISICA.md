@@ -240,8 +240,27 @@ Es un modelo **cinemático guiado por datos**: la amenaza recorre una ruta polig
 ```
 minR ≤ r ≤ R_ef = maxR × rangeFactor(ca) × fireRange   (maxRtbm si es balístico/hipersónico)
 altMin ≤ AGL   y   z − z_lanzador ≤ altMax
-r / vInt ≤ τ   (el interceptor llega a tiempo, con ≤ 3 s de holgura)
+t_vuelo(r) ≤ τ   (el interceptor llega a tiempo, con ≤ 3 s de holgura)
 ```
+
+**Perfil de velocidad del interceptor** (`physics/interceptor.js`): el misil acelera parejo hasta su velocidad máxima y después planea frenado por el arrastre.
+
+```
+motor  (t ≤ tb):  v(t) = vmax·t/tb                  s(t) = vmax·t²/(2·tb)
+planeo (t > tb):  v(t) = vmax / (1 + (t − tb)/τd)    s(t) = vmax·tb/2 + vmax·τd·ln(1 + (t − tb)/τd)
+t_vuelo(r) = √(2·r·tb/vmax)                          si r ≤ vmax·tb/2
+           = tb + τd·(exp((r − vmax·tb/2)/(vmax·τd)) − 1)   si no
+```
+
+Unidades: `t`, `tb` y `τd` en s; `v`, `vmax` y `vInt` en m/s; `s` y `r` en **m** (el catálogo guarda los alcances en km: el código multiplica por 1.000).
+
+- `vmax` (`sam.vmax`): velocidad máxima del interceptor.
+- `tb` (`sam.tb`): segundos desde el lanzamiento hasta llegar a `vmax`, con aceleración pareja (la velocidad media en ese tramo es `vmax/2`). No es necesariamente la combustión total: con booster y sostenedor, si el booster hace casi toda la aceleración y el sostenedor solo compensa el arrastre, va la duración del booster y el sostenedor queda dentro del planeo (S-125, Pantsir); con motor de una etapa o de dos regímenes que acelera hasta el final, la combustión total (Buk: unos 15 s).
+- `τd` (frenado) no es un dato: se despeja (bisección) para que el tiempo de vuelo hasta `maxR` sea `T = 1.000·maxR / vInt`, el de la velocidad media de antes. Así, en el borde de la envolvente el misil llega cuando llegaba y la calibración casi no se mueve; adentro llega antes (acelera al salir) y el tiempo de vuelo crece más rápido que lineal con la distancia.
+- Hay solución solo si `vmax·(T − tb/2) > 1.000·maxR` (con `T > tb`): sin frenar, el misil tiene que poder pasar el alcance máximo en `T`. Si no (puede pasar en un sorteo de Monte Carlo con valores extremos), `τd` queda infinito: el misil no frena y tarda un poco más que `T`.
+- Sin `vmax` y `tb` (cañones, drones interceptores, Hawk, S-200, MANPADS) el perfil es la velocidad constante `vInt` de siempre (`tb = 0`, `τd` infinito). El MANPADS queda sin perfil a propósito: tira a menos de 1–2 km, donde el resultado depende casi solo de cuánto tarda en acelerar, y ese dato no es público (con un `tb` estimado de 2 s, la defensa de la refinería de Hisingen caía de 65% a 28%).
+
+El dibujo del interceptor en el mapa usa el mismo perfil: sale lento, acelera y llega frenando.
 
 Cuando `fireRange` es menor que 1, la misma envolvente se exige también en el momento del
 lanzamiento: la batería retiene el tiro hasta que el blanco entra en el porcentaje elegido. Así la
@@ -305,9 +324,19 @@ Pk = sam.pk[clase] × modificadores, acotada a [0; 0,98]           (physics/enga
 | Baja firma contra mando, TVM o semiactivo | 0,75 |
 | Interferencia sobre el radar de la batería (J > 1) | 1/(1 + 0,08·J), mínimo 0,5 |
 | Blanco a más del 80% de `vmaxT` | 0,8 |
-| Energía del misil en el encuentro (no cañones ni drones interceptores) | `energyPk(f)`, de 0,71 a 1,25 |
+| Energía del misil en el encuentro (no cañones ni drones interceptores) | `energyPk(f)`, hasta 1,25 |
 
-**Energía** (`energyPk`): con `f = r / (maxR × rangeFactor)` (fracción del alcance cinemático, **sin** la doctrina: la energía depende de la física, no de la regla de tiro),
+**Energía** (`energyPk`): con `f = r / (maxR × rangeFactor)` (fracción del alcance cinemático, **sin** la doctrina: la energía depende de la física, no de la regla de tiro).
+
+Con perfil de motor y planeo (§6), la energía es la del misil después de recorrer `d = f × maxR` (el alcance de balísticos si el blanco es balístico). Contra un blanco que se aleja, `d` es mayor que la distancia real del encuentro, porque tiene que alcanzarlo:
+
+```
+energía(d) = 1                        mientras quema el motor (d ≤ vmax·tb/2)
+           = (v(t_vuelo(d)) / vmax)²  en el planeo: la aceleración lateral disponible es ∝ ½ρv²
+energyPk(f) = min(1,25; energía(f·maxR) / energía(0,9·maxR))
+```
+
+Sin perfil, la energía por tramos de antes:
 
 ```
 energía(f) = 1                       si f ≤ 0,75
@@ -315,7 +344,7 @@ energía(f) = 1                       si f ≤ 0,75
 energyPk(f) = min(1,25; energía(f) / energía(0,9))
 ```
 
-Es **relativa al tiro típico** (f = 0,9 → ×1) porque las Pk base ya están calibradas con episodios reales de tiros cerca del alcance máximo: aplicarla en absoluto contaría dos veces la pérdida de energía (una versión así bajaba Kiev de ≈70% a ≈25% de noches defendidas). Un tiro corto vale hasta ×1,25 (todavía acotado por el tope de 0,98); uno en el borde, ×0,71. Los valores 0,75, 0,5 y 0,9 son estimaciones de juego; la forma sigue la propuesta "paso A" de `docs/investigacion/mejoras-fisica.md` §8.
+Es **relativa al tiro típico** (f = 0,9 → ×1) porque las Pk base ya están calibradas con episodios reales de tiros cerca del alcance máximo: aplicarla en absoluto contaría dos veces la pérdida de energía (una versión así bajaba Kiev de ≈70% a ≈25% de noches defendidas). Un tiro corto vale hasta ×1,25 (todavía acotado por el tope de 0,98). En el borde, con perfil, ×0,85–0,93 según el misil; sin perfil, ×0,71. Los valores 0,75, 0,5 y 0,9 son estimaciones de juego; la forma sigue los pasos A y B de `docs/investigacion/mejoras-fisica.md` §8. Todavía no cuenta la altura (aire menos denso arriba, menos maniobra).
 
 Las Pk base están **calibradas** contra episodios reales dentro de la cobertura de sistemas capaces (ver `CAL` en `data/calibration.js` y la ventana "Calibración de Pk"). Con `n` interceptores independientes: `P(derribo) = 1 − (1 − Pk)ⁿ`.
 

@@ -423,7 +423,7 @@ No distinguía sistemas ni demoras, y era todo o nada para todo el bando.
 
 **Cómo lo resuelve Fleet Command (NWP).** Velocidad constante. Algunas doctrinas apagan el arma cuando se cumple su tiempo máximo de vuelo (alcance ÷ velocidad). Y el motor, según el manual del mod, dispara SAM y AAM al **75% del alcance máximo** [nwp_man, nwp_doc].
 
-**Estado:** paso A hecho (alcance según el aspecto, Pk relativa al tiro típico y doctrina de alcance; ver `docs/FISICA.md` §6–§7). Desde octubre de 2026 la doctrina menor que 100% también retiene el lanzamiento hasta que el blanco entra en ese umbral: esperar reduce la ventana para reintentar y puede dejar al blanco sin solución. El perfil de velocidad del paso B queda pendiente.
+**Estado:** paso A hecho (alcance según el aspecto, Pk relativa al tiro típico y doctrina de alcance; ver `docs/FISICA.md` §6–§7). Desde octubre de 2026 la doctrina menor que 100% también retiene el lanzamiento hasta que el blanco entra en ese umbral: esperar reduce la ventana para reintentar y puede dejar al blanco sin solución. Paso B hecho en octubre de 2026: perfil de motor y planeo con `vmax` y `tb` por misil, `τd` despejado para conservar el tiempo de vuelo a `maxR`, y Pk según la velocidad que le queda (`docs/FISICA.md` §6–§7). Quedan pendientes la zona de no escape en la ficha y la maniobra según la altura.
 
 **Propuesta, en dos pasos:**
 - **Paso A (barato, estilo NWP).**

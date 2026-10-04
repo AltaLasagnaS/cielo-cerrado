@@ -74,7 +74,9 @@
  * @property {number} minR     Alcance mínimo (km)
  * @property {number} altMin   Piso (m AGL)
  * @property {number} altMax   Techo (m)
- * @property {number} vInt     Velocidad media del interceptor (m/s)
+ * @property {number} vInt     Velocidad media del interceptor hasta maxR (m/s)
+ * @property {number} [vmax]   Velocidad máxima del interceptor (m/s); con tb, perfil de motor y planeo
+ * @property {number} [tb]     Segundos hasta llegar a vmax con aceleración pareja (physics/interceptor.js)
  * @property {number} vmaxT    Blanco más rápido enfrentable (m/s)
  * @property {number} react    Tiempo de reacción (s)
  * @property {number} ch       Canales simultáneos

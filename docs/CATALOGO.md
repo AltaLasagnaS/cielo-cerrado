@@ -922,7 +922,9 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 | Alcance vs aeronaves/crucero (km) | 60 | **100** | 120 | baja | [3] | — |
 | Alcance vs balísticos (km) | 30 | **40** | 60 | baja | [3] | — |
 | Techo (m) | 35.000 | **36.000** | 40.000 | media | [3] | — |
-| Velocidad media del interceptor (m/s) | 1.100 | **1.300** | 1.500 | baja | — | est: ≈0,75 × velocidad máxima |
+| Velocidad media del interceptor hasta el alcance máximo (m/s) | 1.100 | **1.300** | 1.500 | baja | — | est: ≈0,75 × velocidad máxima |
+| Velocidad máxima del interceptor (m/s) | 1.400 | **1.700** | 2.000 | baja | — | est: Mach 4–5 según prensa; sin dato oficial del PAC-3 MSE |
+| Duración del motor del interceptor (s) | 6 | **10** | 15 | baja | — | est: motor de doble pulso; sin dato público de duración |
 | Tiempo de reacción (s) | 8 | **9** | 15 | baja | [4] | — |
 | Canales simultáneos | 6 | **8** | 9 | media | [2] | 9 misiles guiados a la vez |
 | Munición de la unidad | 12 | **16** | 48 | media | [5] | M903: 12 MSE; 6–8 lanzadores por batería |
@@ -977,7 +979,9 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 | Alcance vs aeronaves/crucero (km) | 120 | **160** | 160 | baja | [2] | — |
 | Alcance vs balísticos (km) | 15 | **20** | 30 | baja | — | — |
 | Techo (m) | 24.000 | **24.000** | 32.000 | baja | [2] | — |
-| Velocidad media del interceptor (m/s) | 800 | **900** | 1.100 | baja | — | est: Mach 3,5 máx. |
+| Velocidad media del interceptor hasta el alcance máximo (m/s) | 800 | **900** | 1.100 | baja | — | est: Mach 3,5 máx. |
+| Velocidad máxima del interceptor (m/s) | 1.200 | **1.500** | 1.600 | baja | [2] | Wikipedia: PAC-2 GEM+ 5.630 km/h ≈ 1.560 m/s; otras fuentes dan Mach 3,5 |
+| Duración del motor del interceptor (s) | 9 | **12** | 15 | baja | — | est: motor de una etapa |
 | Costo por disparo | US$2 M | **US$3 M** | US$4 M | baja | [3] | precio oficial no público |
 | Pk por disparo vs crucero | 0,7 | **0,85** | 0,9 | baja | — | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
 | Pk por disparo vs supersónicos | 0,4 | **0,55** | 0,7 | baja | — | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
@@ -1016,7 +1020,9 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 | Alcance vs aeronaves/crucero (km) | 50 | **100** | 120 | media | [1] [2] | 100 km por encima de 3 km de altura, 50 km por debajo |
 | Alcance vs balísticos (km) | 20 | **25** | 35 | baja | [1] | prueba: intercepción a 26 km de distancia |
 | Techo (m) | 20.000 | **20.000** | 20.000 | media | [1] | — |
-| Velocidad media del interceptor (m/s) | 950 | **1.050** | 1.200 | baja | — | est: 1,4 km/s máx. |
+| Velocidad media del interceptor hasta el alcance máximo (m/s) | 950 | **1.050** | 1.200 | baja | — | est: 1,4 km/s máx. |
+| Velocidad máxima del interceptor (m/s) | 1.200 | **1.400** | 1.500 | baja | [1] | 1,4 km/s máx. |
+| Duración del motor del interceptor (s) | 4 | **6** | 10 | baja | — | est: booster de unos 3,5 s y sostenedor |
 | Tiempo de reacción (s) | 5 | **8** | 10 | baja | [3] | — |
 | Canales simultáneos | 10 | **10** | 10 | media | [2] | — |
 | Munición de la unidad | 24 | **32** | 48 | media | [1] | 4–6 lanzadores × 8 |
@@ -1061,7 +1067,9 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 | Alcance vs balísticos (km) | 0 | **0** | 10 | baja | — | sin datos públicos de capacidad antibalística (se quitó del modelo) |
 | Techo (m) | 20.000 | **20.000** | 20.000 | alta | [2] | — |
 | Altura mínima de enfrentamiento (m) | 5 | **10** | 30 | baja | — | est: no publicado; buscador IR de imagen, sin problema de clutter de mar |
-| Velocidad media del interceptor (m/s) | 650 | **750** | 850 | baja | — | est: ≈Mach 3 máx. |
+| Velocidad media del interceptor hasta el alcance máximo (m/s) | 650 | **750** | 850 | baja | — | est: ≈Mach 3 máx. |
+| Velocidad máxima del interceptor (m/s) | 900 | **1.000** | 1.100 | baja | — | est: ≈Mach 3 (la versión corta SLS: Mach 2, 680 m/s) |
+| Duración del motor del interceptor (s) | 4 | **6** | 10 | baja | — | est |
 | Blanco más rápido enfrentable (m/s) | 1.000 | **1.200** | 1.500 | baja | — | est: no hay datos contra blancos de Mach 3+ |
 | Canales simultáneos | 8 | **8** | 12 | baja | [3] | "100% en oleadas de más de 12 blancos" |
 | Costo por disparo | US$430k | **US$500k** | US$610k | media | [2] | €400–565k |
@@ -1104,17 +1112,20 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 | Alcance vs aeronaves/crucero (km) | 25 | **35** | 40 | media | [2] | — |
 | Techo (m) | 12.000 | **15.000** | 21.000 | baja | [3] | est |
 | Altura mínima de enfrentamiento (m) | 15 | **30** | 60 | baja | — | est: buscador radar activo contra clutter de superficie |
-| Velocidad media del interceptor (m/s) | 800 | **900** | 1.000 | baja | — | est |
-| Costo por disparo | US$1 M | **US$1.07 M** | US$2.5 M | alta | [4] | AIM-120 ≈1,07 M (P-1 FY2025); AMRAAM-ER sin precio oficial |
-| Pk por disparo vs drones | 0,75 | **0,85** | 0,94 | media | [5] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
-| Pk por disparo vs crucero | 0,75 | **0,88** | 0,94 | media | [5] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk"); Noruega reclama 94% |
+| Velocidad media del interceptor hasta el alcance máximo (m/s) | 800 | **900** | 1.000 | baja | — | est |
+| Velocidad máxima del interceptor (m/s) | 1.200 | **1.370** | 1.400 | media | [4] | AIM-120: Mach 4 (1.372 m/s) |
+| Duración del motor del interceptor (s) | 5 | **8** | 10 | baja | — | est |
+| Costo por disparo | US$1 M | **US$1.07 M** | US$2.5 M | alta | [5] | AIM-120 ≈1,07 M (P-1 FY2025); AMRAAM-ER sin precio oficial |
+| Pk por disparo vs drones | 0,75 | **0,85** | 0,94 | media | [6] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
+| Pk por disparo vs crucero | 0,75 | **0,88** | 0,94 | media | [6] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk"); Noruega reclama 94% |
 | Pk por disparo vs supersónicos | 0,25 | **0,4** | 0,6 | baja | — | est |
 
 1. [Wikipedia: AN/MPQ-64 Sentinel](https://en.wikipedia.org/wiki/AN/MPQ-64_Sentinel)
 2. [CRS IF12230: NASAMS](https://www.everycrsreport.com/reports/IF12230.html)
 3. [Kongsberg: AMRAAM-ER](https://www.kongsberg.com/what-we-do/defence-and-security/integrated-air-and-missile-defence/raytheon-missiles/)
-4. [DoD FY2025 P-1 (AMRAAM, PAC-3)](https://comptroller.defense.gov/Portals/45/Documents/defbudget/FY2025/FY2025_p1.pdf)
-5. [Aviation Week: Noruega reclama 94% para NASAMS en Ucrania](https://aviationweek.com/defense/missile-defense-weapons/norway-claims-94-success-rate-nasams-deployed-ukraine)
+4. [Wikipedia: AIM-120 AMRAAM](https://en.wikipedia.org/wiki/AIM-120_AMRAAM)
+5. [DoD FY2025 P-1 (AMRAAM, PAC-3)](https://comptroller.defense.gov/Portals/45/Documents/defbudget/FY2025/FY2025_p1.pdf)
+6. [Aviation Week: Noruega reclama 94% para NASAMS en Ucrania](https://aviationweek.com/defense/missile-defense-weapons/norway-claims-94-success-rate-nasams-deployed-ukraine)
 
 #### Fuentes generales
 
@@ -1145,7 +1156,9 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 | Radar: detección contra 1 m² (km) | 80 | **100** | 130 | baja | [1] | est |
 | Radar: sector de búsqueda (°) | 90 | **90** | 90 | alta | [1] | — |
 | Alcance vs aeronaves/crucero (km) | 47 | **75** | 75 | alta | [2] | 5V55K 47 km / 5V55R 75 km |
-| Velocidad media del interceptor (m/s) | 1.100 | **1.300** | 1.500 | baja | — | est: 2.000 m/s máx. |
+| Velocidad media del interceptor hasta el alcance máximo (m/s) | 1.100 | **1.300** | 1.500 | baja | — | est: 2.000 m/s máx. |
+| Velocidad máxima del interceptor (m/s) | 1.700 | **2.000** | 2.000 | baja | [2] | 2.000 m/s máx. |
+| Duración del motor del interceptor (s) | 8 | **11** | 15 | baja | — | est |
 | Canales simultáneos | 4 | **4** | 6 | media | [1] [2] | PT: 4 blancos; PS: 6 |
 | Costo por disparo | US$300k | **US$500k** | US$1 M | baja | — | est: sin precio público |
 | Pk por disparo vs crucero | 0,4 | **0,5** | 0,75 | media | [3] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk"). Bajada de 0,6 a 0,5 al recalibrar con npm run calibrar: la energía del interceptor (#26) ya premia los tiros cortos contra crucero rasante |
@@ -1182,7 +1195,9 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 |---|---:|---:|---:|---|---|---|
 | Radar: detección contra 1 m² (km) | 35 | **50** | 85 | baja | [1] | 9S18M1 85 km a altura; 9S35 est 40–50 km |
 | Alcance vs aeronaves/crucero (km) | 33 | **35** | 42 | media | [2] | — |
-| Velocidad media del interceptor (m/s) | 550 | **650** | 750 | baja | — | est: ≈850 m/s máx. |
+| Velocidad media del interceptor hasta el alcance máximo (m/s) | 550 | **650** | 750 | baja | — | est: ≈850 m/s máx. |
+| Velocidad máxima del interceptor (m/s) | 800 | **850** | 1.000 | media | [1] | ≈850 m/s máx. |
+| Duración del motor del interceptor (s) | 12 | **15** | 18 | media | [1] | 9M38: motor de dos regímenes con unos 15 s de combustión total |
 | Blanco más rápido enfrentable (m/s) | 800 | **830** | 1.000 | media | [1] | — |
 | Tiempo de reacción (s) | 15 | **22** | 25 | media | [2] | — |
 | Costo por disparo | US$300k | **US$500k** | US$1 M | baja | — | est |
@@ -1275,7 +1290,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
 | Alcance vs aeronaves/crucero (km) | 4,5 | **4,8** | 6 | alta | [1] [2] | — |
-| Velocidad media del interceptor (m/s) | 450 | **550** | 650 | baja | — | est |
+| Velocidad media del interceptor hasta el alcance máximo (m/s) | 450 | **550** | 650 | baja | — | est |
 | Costo por disparo | US$60k | **US$450k** | US$500k | media | [1] [2] | Igla 60–80k; Stinger >400k |
 | Pk por disparo vs drones | 0,3 | **0,5** | 0,7 | baja | — | est |
 
@@ -1304,7 +1319,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
 | Alcance vs aeronaves/crucero (km) | 10 | **25** | 25 | media | [1] | — |
-| Velocidad media del interceptor (m/s) | 70 | **85** | 95 | media | [1] | 343 km/h máx. |
+| Velocidad media del interceptor hasta el alcance máximo (m/s) | 70 | **85** | 95 | media | [1] | 343 km/h máx. |
 | Blanco más rápido enfrentable (m/s) | 70 | **95** | 100 | baja | [2] | derribó un Geran-3 de frente |
 | Tiempo de reacción (s) | 10 | **20** | 40 | baja | — | est: despegue y aproximación |
 | Costo por disparo | US$2k | **US$3k** | US$5k | media | [1] [3] | — |
@@ -1341,7 +1356,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 |---|---:|---:|---:|---|---|---|
 | Radar: detección contra 1 m² (km) | 50 | **70** | 100 | baja | [1] | CMO: HPIR 45 nmi (83 km) y PAR 54 nmi (100 km) de alcance instrumentado; est contra 1 m² |
 | Alcance vs aeronaves/crucero (km) | 35 | **40** | 50 | media | [1] [2] | CMO 22 nmi ≈ 40 km; OSINT 35–50 km |
-| Velocidad media del interceptor (m/s) | 600 | **700** | 850 | baja | [2] | Mach 2,5 máx.; est media |
+| Velocidad media del interceptor hasta el alcance máximo (m/s) | 600 | **700** | 850 | baja | [2] | Mach 2,5 máx.; est media |
 | Blanco más rápido enfrentable (m/s) | 700 | **820** | 900 | baja | [1] | CMO: blancos hasta 1.600 nudos |
 | Tiempo de reacción (s) | 10 | **15** | 30 | baja | — | est |
 | Costo por disparo | US$200k | **US$300k** | US$500k | baja | — | est: misil viejo de stock reacondicionado |
@@ -1378,7 +1393,9 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 |---|---:|---:|---:|---|---|---|
 | Radar: detección contra 1 m² (km) | 30 | **40** | 60 | baja | [1] | CMO: SNR-125 32 nmi (59 km) instrumentado; est contra 1 m² |
 | Alcance vs aeronaves/crucero (km) | 18 | **25** | 30 | media | [2] [1] | Newa-SC con 5V27: 25 km; CMO 10–16 nmi |
-| Velocidad media del interceptor (m/s) | 500 | **600** | 900 | baja | — | est |
+| Velocidad media del interceptor hasta el alcance máximo (m/s) | 500 | **600** | 900 | baja | — | est |
+| Velocidad máxima del interceptor (m/s) | 900 | **1.000** | 1.100 | baja | — | est: Mach 3 aprox. |
+| Duración del motor del interceptor (s) | 2 | **3** | 5 | baja | — | est: booster de unos 3 s (lo que hace casi toda la aceleración); el sostenedor queda dentro del planeo ajustado |
 | Tiempo de reacción (s) | 15 | **25** | 40 | baja | — | est |
 | Costo por disparo | US$100k | **US$150k** | US$300k | baja | — | est |
 | Pk por disparo vs crucero | 0,35 | **0,55** | 0,7 | baja | [3] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
@@ -1415,7 +1432,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 | Radar: detección contra 1 m² (km) | 150 | **250** | 400 | baja | [1] | CMO: 5N62 220 nmi (≈400 km) contra blancos grandes; est contra 1 m² |
 | Alcance vs aeronaves/crucero (km) | 150 | **250** | 300 | media | [1] [2] | 5V28 ≈250 km, 5V28M ≈300 km; derribo a ≈308 km reclamado |
 | Altura mínima de enfrentamiento (m) | 200 | **300** | 300 | media | [1] | CMO 198 m; fuentes clásicas 300 m |
-| Velocidad media del interceptor (m/s) | 900 | **1.100** | 1.300 | baja | — | est: ≈Mach 4 máx. |
+| Velocidad media del interceptor hasta el alcance máximo (m/s) | 900 | **1.100** | 1.300 | baja | — | est: ≈Mach 4 máx. |
 | Tiempo de reacción (s) | 40 | **60** | 120 | baja | — | est: sistema de los 60, mucha preparación |
 | Costo por disparo | US$300k | **US$600k** | US$1 M | baja | — | est |
 | Pk por disparo vs crucero | 0,1 | **0,25** | 0,4 | baja | — | est: pensado contra aviones grandes. calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
@@ -1450,7 +1467,9 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 |---|---:|---:|---:|---|---|---|
 | Radar: detección contra 1 m² (km) | 25 | **30** | 36 | media | [1] | 36 km vs 2 m² |
 | Alcance vs aeronaves/crucero (km) | 18 | **18** | 20 | media | [2] | — |
-| Velocidad media del interceptor (m/s) | 780 | **900** | 1.000 | media | [2] [1] | — |
+| Velocidad media del interceptor hasta el alcance máximo (m/s) | 780 | **900** | 1.000 | media | [2] [1] | — |
+| Velocidad máxima del interceptor (m/s) | 1.100 | **1.300** | 1.300 | media | [1] | el booster lo lleva a 1.300 m/s |
+| Duración del motor del interceptor (s) | 1,5 | **2** | 2,5 | media | [1] | booster de 1,5–2 s; la segunda etapa es un dardo sin motor |
 | Canales simultáneos | 2 | **3** | 4 | baja | [1] | — |
 | Costo por disparo | US$100k | **US$150k** | US$200k | baja | — | est |
 | Pk por disparo vs crucero | 0,4 | **0,6** | 0,75 | baja | — | est |
@@ -1483,7 +1502,9 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 |---|---:|---:|---:|---|---|---|
 | Radar: detección contra 1 m² (km) | 20 | **25** | 32 | media | [1] [2] | >30 km contra cazas |
 | Alcance vs aeronaves/crucero (km) | 15 | **15** | 16 | media | [3] [1] | — |
-| Velocidad media del interceptor (m/s) | 600 | **700** | 850 | baja | — | est |
+| Velocidad media del interceptor hasta el alcance máximo (m/s) | 600 | **700** | 850 | baja | — | est |
+| Velocidad máxima del interceptor (m/s) | 850 | **1.000** | 1.000 | baja | — | est: Mach 3 aprox. |
+| Duración del motor del interceptor (s) | 3 | **4** | 6 | baja | — | est |
 | Costo por disparo | US$200k | **US$300k** | US$500k | baja | — | est |
 | Pk por disparo vs crucero | 0,5 | **0,7** | 0,8 | baja | — | est |
 
@@ -1518,7 +1539,9 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 | Radar: detección contra 1 m² (km) | 150 | **200** | 250 | baja | [1] | 92N6: 250–340 km contra blancos grandes |
 | Alcance vs aeronaves/crucero (km) | 240 | **250** | 250 | alta | [2] | — |
 | Alcance vs balísticos (km) | 40 | **60** | 60 | media | [3] | — |
-| Velocidad media del interceptor (m/s) | 1.300 | **1.500** | 1.700 | baja | — | est: 2.000 m/s máx. |
+| Velocidad media del interceptor hasta el alcance máximo (m/s) | 1.300 | **1.500** | 1.700 | baja | — | est: 2.000 m/s máx. |
+| Velocidad máxima del interceptor (m/s) | 1.800 | **2.000** | 2.000 | baja | — | est: 2.000 m/s máx. |
+| Duración del motor del interceptor (s) | 8 | **12** | 15 | baja | — | est |
 | Costo por disparo | US$1 M | **US$1.5 M** | US$2.5 M | baja | — | est: sin precio público |
 | Pk por disparo vs crucero | 0,5 | **0,7** | 0,85 | baja | — | est |
 | Pk por disparo vs balísticos | 0,3 | **0,5** | 0,7 | baja | [4] | las cifras rusas contra ATACMS (≈79%) no son verificables |
@@ -1891,11 +1914,11 @@ Casos corridos con el motor (Monte Carlo) para ajustar las Pk contra episodios r
 | Caso | Dato real | Objetivo | Simulado | Con Pk mín–máx |
 |---|---|---|---:|---|
 | 16 Kh-101 (cada 5 s) contra IRIS-T + NASAMS + radar 3D | NASAMS: 94% reclamado; IRIS-T: "casi 100%" (≈240 derribos). Datos de operador/fabricante, sesgados hacia arriba. | 85–100% | 100% | 100–100% |
-| 20 Kalibr (cada 3 s) contra S-300PS + Buk-M1 + radar 3D | 67% para crucero a nivel nacional (feb-22 → ago-24), con defensa mayormente soviética. | 60–85% | 77% | 62–97% |
+| 20 Kalibr (cada 3 s) contra S-300PS + Buk-M1 + radar 3D | 67% para crucero a nivel nacional (feb-22 → ago-24), con defensa mayormente soviética. | 60–85% | 74% | 61–96% |
 | 60 Shahed + 30 Gerbera contra 2 Gepard, 3 grupos móviles, 2 equipos de interceptores, red acústica | Derribo cinético 52% (mar–may 25) a 63% (2022–24); el resto de la neutralización es guerra electrónica, que el juego no modela como pérdida. | 50–70% | 64% | 45–78% |
-| 8 Iskander-M con maniobra 2025 y señuelos contra una batería Patriot de 3 lanzadores (36 PAC-3 MSE) | 37% nacional en jun–sep 25 (IC95% 31–45%), cota inferior de lo que pasa dentro de cobertura; 6–17% en otoño 2025. | 35–65% | 43% | 35–48% |
-| 6 Kinzhal contra 1 Patriot MSE | 6 de 6 sobre Kyiv el 16/5/2023 (IC95% 61–100%); 25% a nivel nacional. | 61–100% | 99% | 84–100% |
+| 8 Iskander-M con maniobra 2025 y señuelos contra una batería Patriot de 3 lanzadores (36 PAC-3 MSE) | 37% nacional en jun–sep 25 (IC95% 31–45%), cota inferior de lo que pasa dentro de cobertura; 6–17% en otoño 2025. | 35–65% | 53% | 34–56% |
+| 6 Kinzhal contra 1 Patriot MSE | 6 de 6 sobre Kyiv el 16/5/2023 (IC95% 61–100%); 25% a nivel nacional. | 61–100% | 98% | 80–100% |
 | 12 Kh-22 (cada 5 s) contra 1 Patriot MSE (16 misiles) | 9 de 12 sobre Kyiv el 2/2/2026 (IC95% 47–91%). | 47–91% | 62% | 48–67% |
 | 6 Kh-22 contra IRIS-T + NASAMS, sin Patriot | 3 de más de 400 derribados antes de feb-2026 (IC95% 0–2%). | 0–10% | 0% | 0–0% |
-| 6 Oniks (perfil hi-lo) contra IRIS-T + NASAMS ubicados en el blanco | 5,7% a nivel nacional (12 de 211). No hay datos dentro de cobertura: caso de control, sin objetivo. | — | 67% | 35–88% |
-| 4 Zircon contra Patriot + SAMP/T | 2 de 2 sobre Kyiv el 25/3/2024 (IC95% 34–100%); 33% nacional hasta ago-24. | 34–100% | 99% | 90–100% |
+| 6 Oniks (perfil hi-lo) contra IRIS-T + NASAMS ubicados en el blanco | 5,7% a nivel nacional (12 de 211). No hay datos dentro de cobertura: caso de control, sin objetivo. | — | 57% | 38–86% |
+| 4 Zircon contra Patriot + SAMP/T | 2 de 2 sobre Kyiv el 25/3/2024 (IC95% 34–100%); 33% nacional hasta ago-24. | 34–100% | 99% | 79–100% |
