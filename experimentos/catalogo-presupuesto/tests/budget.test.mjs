@@ -13,10 +13,10 @@ const buy = (state = createPlan(fixture()), fields = {}) => applyCommand(state,
   cmd('buy', { orderId: 'order-one', offerId: 'kit', quantity: 1, ...fields }));
 
 function conserved(state) {
-  const paid = state.orders.filter(order => order.status === 'reserved').reduce((total, order) => total + order.paid, 0);
+  const paid = state.orders.filter(order => order.status !== 'cancelled').reduce((total, order) => total + order.paid, 0);
   assert.equal(state.balance + paid, state.initial.budget);
   const totals = Object.create(null);
-  for (const order of state.orders.filter(order => order.status === 'reserved')) {
+  for (const order of state.orders.filter(order => order.status !== 'cancelled')) {
     for (const item of state.initial.offers.find(offer => offer.id === order.offerId).bundle) {
       totals[item.itemId] = (totals[item.itemId] || 0) + item.quantity * order.quantity;
     }

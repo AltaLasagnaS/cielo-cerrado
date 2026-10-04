@@ -1713,7 +1713,7 @@ table.t.mc td.pc{white-space:nowrap}
       },
       manpads: {
         "sam.maxR": U(4.5, 4.8, 6, "alta", S_("wp:FIM-92_Stinger", "wp:9K38_Igla"), ""),
-        "sam.vInt": U(450, 550, 650, "baja", [], "est"),
+        "sam.vInt": U(450, 550, 650, "baja", [], "est: modelo legado de velocidad constante, sin perfil de motor por falta de datos (docs/FISICA.md §6). Una sola entrada para Stinger, Igla y RBS 70: no implica que sean equivalentes"),
         "sam.cost": U(0.06, 0.45, 0.5, "media", S_("wp:FIM-92_Stinger", "wp:9K38_Igla"), "Igla 60–80k; Stinger >400k"),
         "sam.pk.dron": U(0.3, 0.5, 0.7, "baja", [], "est")
       },
@@ -2317,7 +2317,7 @@ table.t.mc td.pc{white-space:nowrap}
       description: "Una noche típica de la campaña rusa contra la energía ucraniana: oleadas de Shahed desde el norte y el este, señuelos Gerbera para gastar munición, misiles de crucero Kh-101 y Kalibr, y balísticos Iskander-M y Kinzhal al final, todo para llegar casi junto. Los blancos son las centrales de cogeneración que dan luz y calefacción a la ciudad y la represa de Kiev. Las posiciones de la defensa son ilustrativas, no las reales.",
       forces: {
         defensa: "Defensa por capas de la capital: radar 3D y radar VHF de alerta, Patriot (sector hacia el noreste), NASAMS, IRIS-T, dos Gepard junto a las centrales, tres grupos móviles, red acústica, drones interceptores y la red anti-GNSS Pokrova sobre la ciudad. Red de mando integrada.",
-        ataque: "24 Shahed en dos oleadas, 10 Gerbera, 9 Kh-101, 6 Kalibr, 3 Iskander-M con señuelos y 2 Kinzhal."
+        ataque: "24 Shahed en dos oleadas, 10 Gerbera, 7 Kh-101, 6 Kalibr, 3 Iskander-M con señuelos y 2 Kinzhal."
       },
       conditions: "Noche de invierno, despejada. El motor no modela la luz: la noche solo explica por qué los grupos móviles dependen de la alerta acústica y del radar. Probá un techo de nubes bajo (pestaña Defensa): los grupos móviles dejan de ver a los Shahed que vuelan arriba.",
       rules: { c2: "coordinada", doctrine: "salva", weather: "despejado" },
@@ -2347,7 +2347,7 @@ table.t.mc td.pc{white-space:nowrap}
         { type: "shahed", count: 18, interval: 20, tStart: 0, agl: 1500, pts: [[40, 0], [42, 30], [46.9, 52]], targetObj: "Central CHP-6" },
         { type: "gerbera", count: 10, interval: 25, tStart: 60, agl: 900, pts: [[70, 5], [50, 30], [44, 55]] },
         { type: "shahed", count: 6, interval: 30, tStart: 120, agl: 2e3, pts: [[70, 40], [55, 55], [40.3, 67.4]], targetObj: "Central CHP-5" },
-        { type: "kh101", count: 9, interval: 10, sync: true, tArrive: 1500, agl: 40, pts: [[0, 30], [20, 50], [40.3, 67.4]], targetObj: "Central CHP-5" },
+        { type: "kh101", count: 7, interval: 10, sync: true, tArrive: 1500, agl: 40, pts: [[0, 30], [20, 50], [40.3, 67.4]], targetObj: "Central CHP-5" },
         { type: "kalibr", count: 6, interval: 8, sync: true, tArrive: 1490, agl: 50, pts: [[45, 111], [42, 90], [40.3, 67.4]], targetObj: "Central CHP-5" },
         { type: "isk_m", count: 3, interval: 15, sync: true, tArrive: 1520, launchDist: 400, maneuver: true, decoys: true, pts: [[70, 0], [46.9, 52]], targetObj: "Central CHP-6" },
         { type: "kinzhal", count: 2, interval: 15, sync: true, tArrive: 1530, launchDist: 450, pts: [[70, 20], [36.3, 45.7]], targetObj: "Represa de Kiev" }
@@ -3123,6 +3123,93 @@ table.t.mc td.pc{white-space:nowrap}
     return res;
   }
 
+  // src/physics/pulse-integration.js
+  var PFA = 1e-6;
+  var MAX_INTEGRATION_PULSES = 128;
+  var EPS = 1e-15;
+  var profiles = /* @__PURE__ */ new Map();
+  var anchors = /* @__PURE__ */ new Map();
+  var logFactorial = [0];
+  for (let i = 1; i <= 2048; i++) logFactorial[i] = logFactorial[i - 1] + Math.log(i);
+  function validate(pulses, model) {
+    if (!Number.isInteger(pulses) || pulses < 1 || pulses > MAX_INTEGRATION_PULSES)
+      throw new RangeError(`integrationPulses debe ser entero entre 1 y ${MAX_INTEGRATION_PULSES}`);
+    if (model !== 1 && model !== 3) throw new RangeError("Swerling debe ser 1 o 3");
+  }
+  function gammaUpper(n2, x) {
+    let term = 1, sum2 = 1;
+    for (let j = 1; j < n2; j++) {
+      term *= x / j;
+      sum2 += term;
+    }
+    return Math.exp(-x) * sum2;
+  }
+  function gammaLower(n2, x) {
+    let term = Math.exp(-x + n2 * Math.log(x) - logFactorial[n2]), sum2 = term;
+    for (let j = n2 + 1; j <= 2048; j++) {
+      term *= x / j;
+      sum2 += term;
+      if (j > x && term < sum2 * EPS * 0.1) return Math.min(1, sum2);
+    }
+    throw new Error("No convergió la cola Gamma de integración de pulsos");
+  }
+  function profile(pulses) {
+    if (profiles.has(pulses)) return profiles.get(pulses);
+    let lo = 0, hi = 2 * pulses + 64;
+    while (gammaUpper(pulses, hi) > PFA) hi *= 2;
+    for (let j = 0; j < 80; j++) {
+      const mid = (lo + hi) / 2;
+      if (gammaUpper(pulses, mid) > PFA) lo = mid;
+      else hi = mid;
+    }
+    const threshold = (lo + hi) / 2, miss = [];
+    for (let k = 0; k < 1024; k++) {
+      const p = gammaLower(pulses + k, threshold);
+      miss.push(p);
+      if (p < EPS) {
+        const value = { threshold, miss };
+        profiles.set(pulses, value);
+        return value;
+      }
+    }
+    throw new Error("No convergió el perfil de integración de pulsos");
+  }
+  function noncoherentPd(snr, pulses = 1, model = 1) {
+    validate(pulses, model);
+    if (typeof snr !== "number" || Number.isNaN(snr) || snr < 0)
+      throw new RangeError("La SNR debe ser un número no negativo");
+    if (snr === 0) return PFA;
+    if (snr === Infinity) return 1;
+    if (pulses === 1) {
+      const T = -Math.log(PFA);
+      return model === 1 ? Math.pow(PFA, 1 / (1 + snr)) : (1 + 2 * (snr / (2 + snr)) * (T / (2 + snr))) * Math.exp(-2 * T / (2 + snr));
+    }
+    const a = model === 3 ? 2 : 1, scale = pulses * snr / a;
+    const p = 1 / (1 + scale), q = scale / (1 + scale);
+    if (p === 0) return 1;
+    let weight = p ** a, missed = 0;
+    const { miss } = profile(pulses);
+    for (let k = 0; k < miss.length; k++) {
+      missed += weight * miss[k];
+      weight *= q * (k + a) / (k + 1);
+    }
+    return Math.max(PFA, Math.min(1, 1 - missed));
+  }
+  function integratedSnr50(pulses = 1, model = 1) {
+    validate(pulses, model);
+    const key = `${pulses}/${model}`;
+    if (anchors.has(key)) return anchors.get(key);
+    let lo = 0, hi = 64;
+    for (let j = 0; j < 80; j++) {
+      const mid = (lo + hi) / 2;
+      if (noncoherentPd(mid, pulses, model) < 0.5) lo = mid;
+      else hi = mid;
+    }
+    const value = (lo + hi) / 2;
+    anchors.set(key, value);
+    return value;
+  }
+
   // src/physics/radar.js
   function rcsAt(th, band, ca = 1) {
     return rcsFront(th, band) * aspectFactor(th, band, ca);
@@ -3225,7 +3312,6 @@ table.t.mc td.pc{white-space:nowrap}
     return wx && wx.rain ? rainRange(R, rainGamma(r.band, wx.rain), wx.rainKm) : R;
   }
   var belowCeiling = (r, wx, agl) => !(r.band === "OPT" && wx && wx.ceiling != null && agl > wx.ceiling);
-  var PFA = 1e-6;
   var SNR50 = Math.log(PFA) / Math.log(0.5) - 1;
   var TRACK_M = 2;
   var TRACK_N = 3;
@@ -3252,7 +3338,11 @@ table.t.mc td.pc{white-space:nowrap}
     return (lo + hi) / 2;
   })();
   var swerlingOf = (th) => (th.T || th).swerling === 3 ? 3 : 1;
-  var pdRel = (m, k) => m === 3 ? pdSwerling3(SNR50_3 * k) : pdSwerling1(SNR50 * k);
+  var pdRel = (m, k, pulses = 1) => {
+    if (pulses === 1) return m === 3 ? pdSwerling3(SNR50_3 * k) : pdSwerling1(SNR50 * k);
+    const anchor = integratedSnr50(pulses, m);
+    return k > 0 ? noncoherentPd(anchor * k, pulses, m) : 0;
+  };
   var CLUTTER_DB = { none: 20, mti: 10, pd: 3 };
   var CLUTTER_AGL = 300;
   var NOTCH_MS = { mti: 15, pd: 8 };
@@ -3272,7 +3362,8 @@ table.t.mc td.pc{white-space:nowrap}
     if (rr > PD_CUTOFF * R) return 0;
     if (r.band !== "OPT" && r.band !== "ACU" && inNotch(r, th, ca)) return 0;
     const loss = r.band === "OPT" || r.band === "ACU" ? 0 : clutterLossDb(r, agl, x, y);
-    return pdRel(swerlingOf(th), Math.pow(R / Math.max(rr, 1e-3), 4) / Math.pow(10, loss / 10));
+    const pulses = r.band === "OPT" || r.band === "ACU" ? 1 : r.integrationPulses;
+    return pdRel(swerlingOf(th), Math.pow(R / Math.max(rr, 1e-3), 4) / Math.pow(10, loss / 10), pulses);
   }
   function horizon(hr, ht) {
     return HORIZON_K * (Math.sqrt(Math.max(0, hr)) + Math.sqrt(Math.max(0, ht)));
@@ -3495,9 +3586,9 @@ table.t.mc td.pc{white-space:nowrap}
   }
   function solveTd(tb, vmax, R, T) {
     const reach = (td) => distAt({ tb, vmax, td }, T);
-    if (T <= tb || reach(Infinity) <= R) return Infinity;
+    if (T <= tb || R <= vmax * tb / 2 || reach(Infinity) <= R) return Infinity;
     let lo = 1e-3, hi = 1e6;
-    if (reach(hi) < R) return Infinity;
+    if (reach(hi) < R || reach(lo) >= R) return Infinity;
     for (let i = 0; i < 80; i++) {
       const mid = Math.sqrt(lo * hi);
       if (reach(mid) < R) lo = mid;
@@ -5326,6 +5417,35 @@ table.t.mc td.pc{white-space:nowrap}
       }
     },
     {
+      id: "pulseIntegration",
+      group: "Radar y bandas",
+      title: "Integración de pulsos: varios ecos por barrido",
+      body: () => `<p>Un radar puede sumar la <b>potencia de varios ecos</b> durante una pasada del haz. Eso es integración no coherente: con la misma señal por pulso, combinar muestras independientes ayuda a distinguirla del ruido. El umbral también debe subir, para conservar la misma probabilidad de falsa alarma.</p>
+      <p>No es la confirmación <b>2 de 3 barridos</b>: primero se combinan los pulsos dentro de un barrido; después se decide si los contactos de varios barridos forman una pista.</p>
+      <p>El alcance publicado de un radar ya incorpora su procesamiento. En este ejemplo lo conservamos como el punto de <b>50% de detección</b>: al integrar cambia la curva alrededor de ese alcance, sin sumar otra ganancia al mismo dato.</p>`,
+      engine: () => `<p>El motor admite integración no coherente para Swerling lento 1/3: la RCS permanece constante dentro del barrido y cambia entre barridos. <b>El catálogo conserva la aproximación de un pulso por falta de datos de integración por radar.</b> Eso no significa que los radares reales usen uno. El ejemplo no cambia unidades ni escenarios; el período de barrido no alcanza para deducir el número de pulsos.</p>`,
+      widget: {
+        html: () => `<div class="widget"><p class="hint">Ejemplo hipotético sin clutter ni interferencia; no representa un radar del catálogo.</p>
+        <div class="field"><label for="pulseN">Pulsos independientes por decisión</label><select id="pulseN" class="sel">${[1, 2, 4, 8, 16, 32, 64, 128].map((v) => `<option value="${v}" ${v === 8 ? "selected" : ""}>${v}</option>`).join("")}</select></div>
+        <div class="field"><label for="pulseM">Fluctuación del blanco</label><select id="pulseM" class="sel"><option value="1">Swerling 1: muchos reflectores parecidos</option><option value="3">Swerling 3: un reflector dominante</option></select></div>
+        <div class="field"><label for="pulseDistance">Distancia como porcentaje del alcance publicado</label><span class="val" id="pulseDistanceV"></span><input id="pulseDistance" type="range" min="30" max="180" step="1" value="120"></div>
+        <p class="wout" id="pulsePd"></p><div class="tblwrap"><table class="t" id="pulseTable"></table></div></div>`,
+        mount: (el) => {
+          const update = () => {
+            const pulses = +el.querySelector("#pulseN").value, model = +el.querySelector("#pulseM").value;
+            const distance = +el.querySelector("#pulseDistance").value, k = (distance / 100) ** -4;
+            el.querySelector("#pulseDistanceV").textContent = distance + "%";
+            el.querySelector("#pulsePd").textContent = `Pd por barrido: ${n(100 * pdRel(model, k, pulses), 1)}% con ${pulses} pulsos · ${n(100 * pdRel(model, k), 1)}% con la aproximación de un pulso`;
+            el.querySelector("#pulseTable").innerHTML = `<thead><tr><th>Distancia / alcance</th><th>Pd, 1 pulso</th><th>Pd, ${pulses} pulsos</th></tr></thead><tbody>${[0.5, 0.8, 1, 1.2, 1.5].map((f) => `<tr><td>${n(100 * f)}%</td><td>${n(100 * pdRel(model, f ** -4), 1)}%</td><td>${n(100 * pdRel(model, f ** -4, pulses), 1)}%</td></tr>`).join("")}</tbody>`;
+          };
+          el.querySelector("#pulseN").onchange = update;
+          el.querySelector("#pulseM").onchange = update;
+          el.querySelector("#pulseDistance").oninput = update;
+          update();
+        }
+      }
+    },
+    {
       id: "horizon",
       group: "Detección y terreno",
       title: "Horizonte de radar",
@@ -5437,7 +5557,7 @@ table.t.mc td.pc{white-space:nowrap}
       <p>En Ucrania conviven niveles muy distintos: sistemas occidentales con enlace Link 16 (Patriot, NASAMS), sistemas soviéticos que entran a la imagen aérea nacional mediante "cajas negras" de conversión y unidades que reciben la situación aérea en tabletas (Virazh-Planshet). Del lado ruso, puestos automatizados como Polyana-D4M1 integran brigadas de S-300, Buk, Tor y Pantsir.</p>`,
       engine: () => `<p>El nivel se elige en la pestaña Defensa (${code("S.c2")}) y lo usan ${code("trackOK()")} y ${code("reactionStart()")}:</p>
       <div class="tblwrap"><table class="t"><thead><tr><th>Nivel</th><th>Demora de la red</th><th>Tira con pista ajena</th><th>Reparto de blancos</th></tr></thead><tbody>${Object.values(C2_LEVELS).map((L) => `<tr><td>${esc(L.name)}</td><td>${L.share === "none" ? "—" : L.lag + " s"}</td><td>${{ none: "no", cue: "no (solo alerta)", track: "activos/IR e interceptores", fire: "también guiados por radar" }[L.share]}</td><td>${L.deconf ? "sí" : "no"}</td></tr>`).join("")}</tbody></table></div>
-      <p>Además: un disparo con pista ajena pierde un poco de Pk en coordinada (×${C2_LEVELS.coordinada.remotePk}, error de posición de la pista); cada unidad puede tener o no <b>enlace de datos</b> (casilla en el panel de selección); en integrada, cada blanco va al <b>mejor tirador</b> y los drones se dejan a la capa más barata que los espera más adelante; y si el atacante destruye un <b>puesto de mando</b> la defensa queda desconectada (cada sitio de comunicaciones destruido la baja un nivel). No se modelan los enlaces por sistema (Link 16 contra la red nacional): ver ROADMAP.</p>`
+      <p>Además: un disparo con pista ajena pierde un poco de Pk en coordinada (×${C2_LEVELS.coordinada.remotePk}, error de posición de la pista); cada unidad puede tener o no <b>enlace de datos</b> (casilla en el panel de selección); en integrada, cada blanco va al <b>mejor tirador</b> y los drones se dejan a la capa más barata que los espera más adelante; y si el atacante destruye un <b>puesto de mando</b> la defensa queda desconectada (cada sitio de comunicaciones destruido la baja un nivel). Las pistas de red viajan por <b>familias de enlace</b> (${Object.values(DATALINKS).map((l) => esc(l.name)).join(", ")}): una unidad recibe la pista de un sensor solo si comparten alguna (la ficha muestra la de cada sistema). La casilla de enlace apaga esos transportes, pero no la coordinación de C2: las alertas pueden seguir llegando. No hay todavía pasarelas entre familias ni un control de pertenencia a la red de mando por unidad: ver ROADMAP.</p>`
     },
     {
       id: "clima",
@@ -6830,11 +6950,14 @@ table.t.mc td.pc{white-space:nowrap}
     };
     $("#zfit").onclick = fitView;
     document.addEventListener("keydown", (e) => {
-      if (e.target.matches?.('input,select,textarea,[contenteditable="true"]')) return;
       if (!$("#modal").hidden) {
-        if (e.key === "Escape") closeModal();
+        if (e.key === "Escape") {
+          e.preventDefault();
+          closeModal();
+        }
         return;
       }
+      if (e.target.matches?.('input,select,textarea,[contenteditable="true"]')) return;
       if (e.key === "Escape") {
         if (S.preview) cancelPlacement();
         else setMode("select");

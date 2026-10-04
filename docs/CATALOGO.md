@@ -1290,7 +1290,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
 | Alcance vs aeronaves/crucero (km) | 4,5 | **4,8** | 6 | alta | [1] [2] | — |
-| Velocidad media del interceptor hasta el alcance máximo (m/s) | 450 | **550** | 650 | baja | — | est |
+| Velocidad media del interceptor hasta el alcance máximo (m/s) | 450 | **550** | 650 | baja | — | est: modelo legado de velocidad constante, sin perfil de motor por falta de datos (docs/FISICA.md §6). Una sola entrada para Stinger, Igla y RBS 70: no implica que sean equivalentes |
 | Costo por disparo | US$60k | **US$450k** | US$500k | media | [1] [2] | Igla 60–80k; Stinger >400k |
 | Pk por disparo vs drones | 0,3 | **0,5** | 0,7 | baja | — | est |
 

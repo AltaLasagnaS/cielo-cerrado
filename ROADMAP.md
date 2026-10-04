@@ -13,11 +13,11 @@ Son ideas ordenadas por prioridad, no promesas. Cada ítem que cambie resultados
 Propuesta detallada, con orden, dificultad, datos y pruebas: [docs/investigacion/mejoras-fisica.md](docs/investigacion/mejoras-fisica.md).
 
 
-- Detección, tercera parte: integración de pulsos, clutter de mar según el estado del mar y de lluvia, visibilidad sub-clutter por radar con datos (Swerling 3 ya está, verificado).
+- Detección, tercera parte: asignar integración de pulsos por radar **cuando haya datos** (modelo no coherente opcional Swerling 1/3 implementado y verificado; catálogo conserva la aproximación de un pulso), clutter de mar según el estado del mar y de lluvia, visibilidad sub-clutter por radar con datos. Ver [investigación de integración de pulsos](docs/investigacion/integracion-pulsos.md).
 - Interceptor, segunda parte (el perfil de motor y planeo ya está): maniobra según la altura (densidad del aire), zona de no escape en la ficha y curva de alcance contra blancos que se acercan o se alejan.
 - Daño funcional, segunda parte: reparación con el tiempo, daño por lanzador y objetivos con capacidades (una base aérea dañada no lanza aviones, cuando haya aviones).
 - Clima, segunda parte (los estados base ya están): día y noche para los sensores IR, nieve, clutter de lluvia, viento sobre los drones y clima que cambia durante la noche.
-- **Enlaces de datos por sistema** (Link 16, red nacional ucraniana, red rusa tipo Polyana) con pasarelas: solo comparten pistas los sistemas compatibles.
+- Enlaces de datos, segunda parte (las familias por sistema ya están: Link 16, red nacional ucraniana y red rusa, y solo comparten pistas los compatibles): pasarelas entre familias con demora y pérdida, y pertenencia a la red de mando por unidad, separada del interruptor de enlace técnico.
 
 - ECM/ECCM, segunda parte: engaño (DRFM, robo de ventana de distancia) contra los radares de tiro, supresión de lóbulos laterales (SLB) contra pulsos, home-on-jam (misiles que van contra el avión de interferencia) y triangulación de jammers con varios radares.
 

@@ -38,16 +38,18 @@ export function timeTo(P, d) {
 /**
  * τd (s) para que el misil recorra R metros en T segundos. distAt crece con τd, así que se busca por
  * bisección en escala logarítmica. Unidades: tb y T en s, vmax en m/s, R en m. Hay solución si T > tb y
- * vmax·(T − tb/2) > R. Si no (vmax demasiado baja para ese vInt o motor más largo que el vuelo, lo que
- * puede pasar con un sorteo de Monte Carlo en los extremos de UNC), devuelve Infinity: el misil vuela
- * sin frenar y su tiempo hasta R no es exactamente T.
+ * vmax·tb/2 < R < vmax·(T − tb/2). Si no (vmax demasiado baja o demasiado alta para ese vInt, o motor más
+ * largo que el vuelo, lo que puede pasar con un sorteo de Monte Carlo en los extremos de UNC), devuelve
+ * Infinity: el misil vuela sin frenar y su tiempo hasta R no es exactamente T.
  */
 export function solveTd(tb, vmax, R, T) {
   const reach = td => distAt({ tb, vmax, td }, T);
-  // con el motor todavía encendido en T, τd no cambia nada: no hay frenado que ajustar
-  if (T <= tb || reach(Infinity) <= R) return Infinity;
+  // Sin solución finita: con el motor todavía encendido en T, τd no cambia nada; si R ≤ vmax·tb/2, el
+  // misil ya pasó R acelerando y ningún frenado posterior lo vuelve atrás (vInt incoherente con vmax y
+  // tb); y si ni sin frenar llega, tampoco. En los tres casos el misil vuela sin frenar.
+  if (T <= tb || R <= vmax * tb / 2 || reach(Infinity) <= R) return Infinity;
   let lo = 1e-3, hi = 1e6;
-  if (reach(hi) < R) return Infinity;
+  if (reach(hi) < R || reach(lo) >= R) return Infinity;   // la bisección tiene que encerrar la solución
   for (let i = 0; i < 80; i++) { const mid = Math.sqrt(lo * hi); if (reach(mid) < R) lo = mid; else hi = mid; }
   return hi;
 }

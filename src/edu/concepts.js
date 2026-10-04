@@ -4,10 +4,10 @@
 // desde el catálogo (no hay valores copiados a mano: si cambia un dato, cambia la explicación).
 //
 // Cada concepto: { id, group, title, body() → HTML, engine() → HTML, widget? { html(), mount(el) } }
-import { BANDS, THREATS, DEFENSES, JAMMERS, UNC, CLS_NAME, TARGET_TYPES, DAMAGE, C2_LEVELS, WEATHER, UNIT_TARGET, UNIT_DAMAGE, UNIT_COMP_AT } from '../data/index.js';
+import { BANDS, THREATS, DEFENSES, JAMMERS, UNC, CLS_NAME, TARGET_TYPES, DAMAGE, C2_LEVELS, DATALINKS, WEATHER, UNIT_TARGET, UNIT_DAMAGE, UNIT_COMP_AT } from '../data/index.js';
 import { esc, kmh } from '../util/format.js';
 import { KR, HORIZON_K, LOS_MARGIN } from '../physics/constants.js';
-import { rcsAt, horizon } from '../physics/radar.js';
+import { rcsAt, horizon, pdRel } from '../physics/radar.js';
 import { directDamage, radius50, warheadKg } from '../physics/damage.js';
 import { RELIEF_RADIUS_KM } from '../physics/terrain-analysis.js';
 import { SEEKER_ACQ } from '../physics/navigation.js';
@@ -114,6 +114,31 @@ export const CONCEPTS = [
     }
   },
   {
+    id: 'pulseIntegration', group: 'Radar y bandas', title: 'Integración de pulsos: varios ecos por barrido',
+    body: () => `<p>Un radar puede sumar la <b>potencia de varios ecos</b> durante una pasada del haz. Eso es integración no coherente: con la misma señal por pulso, combinar muestras independientes ayuda a distinguirla del ruido. El umbral también debe subir, para conservar la misma probabilidad de falsa alarma.</p>
+      <p>No es la confirmación <b>2 de 3 barridos</b>: primero se combinan los pulsos dentro de un barrido; después se decide si los contactos de varios barridos forman una pista.</p>
+      <p>El alcance publicado de un radar ya incorpora su procesamiento. En este ejemplo lo conservamos como el punto de <b>50% de detección</b>: al integrar cambia la curva alrededor de ese alcance, sin sumar otra ganancia al mismo dato.</p>`,
+    engine: () => `<p>El motor admite integración no coherente para Swerling lento 1/3: la RCS permanece constante dentro del barrido y cambia entre barridos. <b>El catálogo conserva la aproximación de un pulso por falta de datos de integración por radar.</b> Eso no significa que los radares reales usen uno. El ejemplo no cambia unidades ni escenarios; el período de barrido no alcanza para deducir el número de pulsos.</p>`,
+    widget: {
+      html: () => `<div class="widget"><p class="hint">Ejemplo hipotético sin clutter ni interferencia; no representa un radar del catálogo.</p>
+        <div class="field"><label for="pulseN">Pulsos independientes por decisión</label><select id="pulseN" class="sel">${[1, 2, 4, 8, 16, 32, 64, 128].map(v => `<option value="${v}" ${v === 8 ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
+        <div class="field"><label for="pulseM">Fluctuación del blanco</label><select id="pulseM" class="sel"><option value="1">Swerling 1: muchos reflectores parecidos</option><option value="3">Swerling 3: un reflector dominante</option></select></div>
+        <div class="field"><label for="pulseDistance">Distancia como porcentaje del alcance publicado</label><span class="val" id="pulseDistanceV"></span><input id="pulseDistance" type="range" min="30" max="180" step="1" value="120"></div>
+        <p class="wout" id="pulsePd"></p><div class="tblwrap"><table class="t" id="pulseTable"></table></div></div>`,
+      mount: el => {
+        const update = () => {
+          const pulses = +el.querySelector('#pulseN').value, model = +el.querySelector('#pulseM').value;
+          const distance = +el.querySelector('#pulseDistance').value, k = (distance / 100) ** -4;
+          el.querySelector('#pulseDistanceV').textContent = distance + '%';
+          el.querySelector('#pulsePd').textContent = `Pd por barrido: ${n(100 * pdRel(model, k, pulses), 1)}% con ${pulses} pulsos · ${n(100 * pdRel(model, k), 1)}% con la aproximación de un pulso`;
+          el.querySelector('#pulseTable').innerHTML = `<thead><tr><th>Distancia / alcance</th><th>Pd, 1 pulso</th><th>Pd, ${pulses} pulsos</th></tr></thead><tbody>${[0.5, 0.8, 1, 1.2, 1.5].map(f => `<tr><td>${n(100 * f)}%</td><td>${n(100 * pdRel(model, f ** -4), 1)}%</td><td>${n(100 * pdRel(model, f ** -4, pulses), 1)}%</td></tr>`).join('')}</tbody>`;
+        };
+        el.querySelector('#pulseN').onchange = update; el.querySelector('#pulseM').onchange = update;
+        el.querySelector('#pulseDistance').oninput = update; update();
+      }
+    }
+  },
+  {
     id: 'horizon', group: 'Detección y terreno', title: 'Horizonte de radar',
     body: () => `<p>Las ondas de radar viajan casi en línea recta y la Tierra es curva: más allá del horizonte un blanco bajo queda escondido, por más potente que sea el radar. La atmósfera curva un poco el haz hacia abajo; se modela con una Tierra "más grande", de radio 4/3 del real (≈ 8.500 km). Así:</p>
       <p class="formula">d ≈ ${HORIZON_K} · (√h_radar + √h_blanco)   [km, con alturas en m]</p>
@@ -192,7 +217,7 @@ export const CONCEPTS = [
       <p>En Ucrania conviven niveles muy distintos: sistemas occidentales con enlace Link 16 (Patriot, NASAMS), sistemas soviéticos que entran a la imagen aérea nacional mediante "cajas negras" de conversión y unidades que reciben la situación aérea en tabletas (Virazh-Planshet). Del lado ruso, puestos automatizados como Polyana-D4M1 integran brigadas de S-300, Buk, Tor y Pantsir.</p>`,
     engine: () => `<p>El nivel se elige en la pestaña Defensa (${code('S.c2')}) y lo usan ${code('trackOK()')} y ${code('reactionStart()')}:</p>
       <div class="tblwrap"><table class="t"><thead><tr><th>Nivel</th><th>Demora de la red</th><th>Tira con pista ajena</th><th>Reparto de blancos</th></tr></thead><tbody>${Object.values(C2_LEVELS).map(L => `<tr><td>${esc(L.name)}</td><td>${L.share === 'none' ? '—' : L.lag + ' s'}</td><td>${{ none: 'no', cue: 'no (solo alerta)', track: 'activos/IR e interceptores', fire: 'también guiados por radar' }[L.share]}</td><td>${L.deconf ? 'sí' : 'no'}</td></tr>`).join('')}</tbody></table></div>
-      <p>Además: un disparo con pista ajena pierde un poco de Pk en coordinada (×${C2_LEVELS.coordinada.remotePk}, error de posición de la pista); cada unidad puede tener o no <b>enlace de datos</b> (casilla en el panel de selección); en integrada, cada blanco va al <b>mejor tirador</b> y los drones se dejan a la capa más barata que los espera más adelante; y si el atacante destruye un <b>puesto de mando</b> la defensa queda desconectada (cada sitio de comunicaciones destruido la baja un nivel). No se modelan los enlaces por sistema (Link 16 contra la red nacional): ver ROADMAP.</p>`
+      <p>Además: un disparo con pista ajena pierde un poco de Pk en coordinada (×${C2_LEVELS.coordinada.remotePk}, error de posición de la pista); cada unidad puede tener o no <b>enlace de datos</b> (casilla en el panel de selección); en integrada, cada blanco va al <b>mejor tirador</b> y los drones se dejan a la capa más barata que los espera más adelante; y si el atacante destruye un <b>puesto de mando</b> la defensa queda desconectada (cada sitio de comunicaciones destruido la baja un nivel). Las pistas de red viajan por <b>familias de enlace</b> (${Object.values(DATALINKS).map(l => esc(l.name)).join(', ')}): una unidad recibe la pista de un sensor solo si comparten alguna (la ficha muestra la de cada sistema). La casilla de enlace apaga esos transportes, pero no la coordinación de C2: las alertas pueden seguir llegando. No hay todavía pasarelas entre familias ni un control de pertenencia a la red de mando por unidad: ver ROADMAP.</p>`
   },
   {
     id: 'clima', group: 'Radar y bandas', title: 'Clima: lluvia, nubes y niebla',

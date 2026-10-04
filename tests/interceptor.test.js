@@ -56,6 +56,9 @@ test('catálogo: cada perfil llega al alcance máximo en maxR / vInt, con vmax >
 test('solveTd: sin solución (vmax demasiado baja) vuela sin frenar', () => {
   assert.equal(solveTd(10, 500, 40000, 40000 / 600), Infinity);
   assert.equal(solveTd(60, 2000, 40000, 40000 / 900), Infinity, 'motor encendido todo el vuelo hasta R');
+  // caso de Codex (docs de experimentos/catalogo-presupuesto, NOTA-INTERCEPTOR): R ya recorrido acelerando
+  assert.equal(solveTd(20, 200, 1000, 100), Infinity, 'R ≤ vmax·tb/2: ningún frenado lo vuelve atrás');
+  assert.equal(solveTd(20, 200, 2000, 100), Infinity, 'R = vmax·tb/2 es límite, no solución finita');
   const td = solveTd(10, 1400, 40000, 40000 / 900);
   close(distAt({ tb: 10, vmax: 1400, td }, 40000 / 900), 40000, 1e-6, 'llega a R en T');
 });
