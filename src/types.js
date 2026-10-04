@@ -63,6 +63,7 @@
  * @property {boolean} [side] Antena lateral (dos sectores a ±90°)
  * @property {number} eccm   Margen contra interferencia (dB; 99 = inmune)
  * @property {number} scan   Período de barrido (s)
+ * @property {number} [integrationPulses] Pulsos integrados no coherentemente por decisión: entero 1–128, Swerling lento 1/3. Ausente = aproximación anterior (no dato real de un pulso); requiere fuente/UNC antes de asignarlo. No se deduce de scan.
  * @property {number} [altMax] Altura máxima detectable (m, acústico)
  */
 

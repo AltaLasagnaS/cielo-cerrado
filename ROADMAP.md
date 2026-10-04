@@ -13,7 +13,7 @@ Son ideas ordenadas por prioridad, no promesas. Cada ítem que cambie resultados
 Propuesta detallada, con orden, dificultad, datos y pruebas: [docs/investigacion/mejoras-fisica.md](docs/investigacion/mejoras-fisica.md).
 
 
-- Detección, tercera parte: integración de pulsos, clutter de mar según el estado del mar y de lluvia, visibilidad sub-clutter por radar con datos (Swerling 3 ya está, verificado).
+- Detección, tercera parte: asignar integración de pulsos por radar **cuando haya datos** (modelo no coherente opcional Swerling 1/3 implementado y verificado; catálogo conserva la aproximación de un pulso), clutter de mar según el estado del mar y de lluvia, visibilidad sub-clutter por radar con datos. Ver [investigación de integración de pulsos](docs/investigacion/integracion-pulsos.md).
 - Interceptor, segunda parte (el perfil de motor y planeo ya está): maniobra según la altura (densidad del aire), zona de no escape en la ficha y curva de alcance contra blancos que se acercan o se alejan.
 - Daño funcional, segunda parte: reparación con el tiempo, daño por lanzador y objetivos con capacidades (una base aérea dañada no lanza aviones, cuando haya aviones).
 - Clima, segunda parte (los estados base ya están): día y noche para los sensores IR, nieve, clutter de lluvia, viento sobre los drones y clima que cambia durante la noche.

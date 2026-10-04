@@ -8,6 +8,7 @@ import { surf, los } from './terrain.js';
 import { rainGamma, rainRange } from './weather.js';
 import { slopeAt } from './terrain-analysis.js';
 import { clamp } from '../util/math.js';
+import { PFA, noncoherentPd, integratedSnr50 } from './pulse-integration.js';
 
 /**
  * RCS (m²) de una amenaza en una banda, vista con aspecto ca (ver aspectFactor; 1 = de frente).
@@ -167,9 +168,11 @@ export const belowCeiling = (r, wx, agl) => !(r.band === 'OPT' && wx && wx.ceili
 //   Swerling 3: un reflector dominante más otros chicos (balísticos) → fórmula de pdSwerling3.
 // Las dos fórmulas son de un pulso con detector de ley cuadrática y están verificadas contra una
 // integración numérica independiente en tests/swerling.test.js. Ver docs/FISICA.md §2.
+// Opcional: radar.integrationPulses > 1 usa la suma no coherente de potencias para Swerling lento.
+// El catálogo actual no asigna N por falta de datos; ausencia conserva la aproximación anterior.
 
 /** Probabilidad de falsa alarma de diseño (valor típico de libro). */
-export const PFA = 1e-6;
+export { PFA } from './pulse-integration.js';
 /** SNR que da Pd = 50% con Swerling 1 y PFA: ln(PFA)/ln(0,5) − 1 ≈ 18,9 (12,8 dB). */
 export const SNR50 = Math.log(PFA) / Math.log(0.5) - 1;
 /**
@@ -216,8 +219,16 @@ export const SNR50_3 = (() => { let lo = 0.1, hi = 1000; for (let k = 0; k < 100
 /** Modelo de fluctuación de la amenaza (1 o 3). */
 export const swerlingOf = th => ((th.T || th).swerling === 3 ? 3 : 1);
 
-/** Pd de un barrido para el modelo m (1 o 3) con SNR relativa k = SNR / SNR50 (k = 1 → 50%). */
-export const pdRel = (m, k) => (m === 3 ? pdSwerling3(SNR50_3 * k) : pdSwerling1(SNR50 * k));
+/**
+ * Pd con SNR relativa k; el alcance publicado conserva Pd=50% (k=1).
+ * N=1 mantiene exactamente el modelo anterior. N>1 cambia la curva, sin aplicar otra ganancia
+ * de alcance: R1 ya incluye el procesamiento. Ver docs/FISICA.md §2.
+ */
+export const pdRel = (m, k, pulses = 1) => {
+  if (pulses === 1) return m === 3 ? pdSwerling3(SNR50_3 * k) : pdSwerling1(SNR50 * k);
+  const anchor = integratedSnr50(pulses, m);
+  return k > 0 ? noncoherentPd(anchor * k, pulses, m) : 0;
+};
 
 /**
  * Clutter: un blanco a menos de CLUTTER_AGL m sobre el suelo se ve "contra el suelo" y compite con
@@ -250,7 +261,8 @@ export function pdScan(u, th, rr, R, agl, x, y, ca) {
   const r = D(u).radar; if (rr > PD_CUTOFF * R) return 0;
   if (r.band !== 'OPT' && r.band !== 'ACU' && inNotch(r, th, ca)) return 0;
   const loss = r.band === 'OPT' || r.band === 'ACU' ? 0 : clutterLossDb(r, agl, x, y);
-  return pdRel(swerlingOf(th), Math.pow(R / Math.max(rr, 1e-3), 4) / Math.pow(10, loss / 10));
+  const pulses = r.band === 'OPT' || r.band === 'ACU' ? 1 : r.integrationPulses;
+  return pdRel(swerlingOf(th), Math.pow(R / Math.max(rr, 1e-3), 4) / Math.pow(10, loss / 10), pulses);
 }
 
 /** Horizonte de radar (km) entre una antena a hr metros y un blanco a ht metros, Tierra 4/3. */

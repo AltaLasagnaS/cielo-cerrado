@@ -78,6 +78,19 @@ try {
   await page.waitForFunction(() => document.querySelector('#sheet h2')?.textContent === 'Monte Carlo detenido');
   assert.match(await page.locator('#sheet').innerText(), /inválido/);
   assert.equal(await page.evaluate(async () => (await import('/sim/montecarlo.js')).isMonteCarloRunning()), false);
+  await page.locator('#sheet .x').click();
+  const setup = await page.evaluate(() => JSON.stringify(window.__S.setup));
+  await page.locator('[data-tab="edu"]').click();
+  await page.locator('#tab-edu [data-concept="pulseIntegration"]').click();
+  await page.locator('#pulseN').selectOption('8');
+  await page.locator('#pulseM').selectOption('3');
+  await page.locator('#pulseDistance').fill('100');
+  assert.match(await page.locator('#pulsePd').innerText(), /50,0% con 8 pulsos/);
+  await page.locator('#pulseDistance').press(' ');
+  assert.equal(await page.evaluate(() => window.__S.running), false, 'el ejemplo no inicia la simulación');
+  await page.locator('#pulseDistance').press('Escape');
+  await page.locator('#modal').waitFor({ state: 'hidden' });
+  assert.equal(await page.evaluate(() => JSON.stringify(window.__S.setup)), setup, 'el ejemplo no altera el escenario');
   assert.deepEqual(errors, []);
-  console.log('Interfaz: valores numéricos, atajos, bloqueo y finalización de Monte Carlo OK');
+  console.log('Interfaz: valores numéricos, atajos, Monte Carlo y Academia de pulsos OK');
 } finally { await browser.close(); }
