@@ -3729,6 +3729,10 @@ table.t.mc td.pc{white-space:nowrap}
         log("d", it.shot + " de " + uLabel(u) + ": blanco ya destruido, autodestrucción.");
         continue;
       }
+      if (!u.alive && RADAR_GUID.includes(D(u).sam.guid)) {
+        log("x", it.shot + " de " + uLabel(u) + " pierde la guía: su batería fue destruida.");
+        continue;
+      }
       const pk = calcPk(u, th, t, S.jamsLive, it.f ?? null) * (it.remote ? C2_LEVELS[it.c2].remotePk : 1);
       if (rnd() < pk) {
         th.alive = false;
@@ -4052,10 +4056,6 @@ table.t.mc td.pc{white-space:nowrap}
     S.fireRange = sc2.rules?.fireRange ?? 1;
     S.scen = sc2;
   }
-
-  // src/ui/dom.js
-  var $ = (s) => document.querySelector(s);
-  var isDefenderView = () => $("#defView").checked;
 
   // src/render/terrain.js
   var RELIEF_MODES = { normal: "Normal", peaks: "Puntos altos", contours: "Curvas de nivel", shade: "Sombreado" };
@@ -4458,7 +4458,7 @@ table.t.mc td.pc{white-space:nowrap}
       ctx.lineTo(sx - 5, sy + 5);
       ctx.stroke();
     }
-    const dv = isDefenderView();
+    const dv = hooks.defenderView();
     for (const th of S.threats) {
       if (!th.alive || !th.p) continue;
       const tracked = S.t - th.lastNet <= 12;
@@ -4733,6 +4733,10 @@ table.t.mc td.pc{white-space:nowrap}
   }
   var toS = (x, y) => [(x - V.cx) * V.s + cv.width / dpr / 2, (y - V.cy) * V.s + cv.height / dpr / 2];
   var toW = (sx, sy) => [(sx - cv.width / dpr / 2) / V.s + V.cx, (sy - cv.height / dpr / 2) / V.s + V.cy];
+
+  // src/ui/dom.js
+  var $ = (s) => document.querySelector(s);
+  var isDefenderView = () => $("#defView").checked;
 
   // src/physics/coverage.js
   function coverageGrid(units, jams, ref, agl, wx = null) {

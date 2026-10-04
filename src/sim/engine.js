@@ -145,6 +145,8 @@ export function step(dt) {
     it.done = true; const u = it.u; u.active = Math.max(0, u.active - 1);
     const th = it.th;
     if (!th.alive) { log('d', it.shot + ' de ' + uLabel(u) + ': blanco ya destruido, autodestrucción.'); continue; }
+    // guiado por el radar de la batería (SARH, TVM, mando): si la batería cayó, el misil queda sin guía
+    if (!u.alive && RADAR_GUID.includes(D(u).sam.guid)) { log('x', it.shot + ' de ' + uLabel(u) + ' pierde la guía: su batería fue destruida.'); continue; }
     const pk = calcPk(u, th, t, S.jamsLive, it.f ?? null) * (it.remote ? C2_LEVELS[it.c2].remotePk : 1);   // error de posición de la pista de red
     if (rnd() < pk) {
       th.alive = false; th.killed = true; S.stats.killed++; if (th.isDecoy) S.stats.decoysKilled++;

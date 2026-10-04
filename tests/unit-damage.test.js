@@ -7,7 +7,7 @@ import { damageAt } from '../src/physics/damage.js';
 import { detR } from '../src/physics/radar.js';
 import { S } from '../src/sim/state.js';
 import { addDef, addSalvo } from '../src/sim/setup.js';
-import { startSim, damageUnits } from '../src/sim/engine.js';
+import { startSim, step, damageUnits } from '../src/sim/engine.js';
 import { setRandom, seeded } from '../src/util/rng.js';
 import { useMap, clearSetup, runCurrent } from './helpers.js';
 
@@ -78,4 +78,27 @@ test('lanzador dañado: no dispara aunque tenga misiles; radar dañado: dispara 
   assert.equal(noLaunch.n, 0, 'con el lanzador dañado no tira');
   assert.ok(slow.n > 0, 'con el radar dañado todavía tira');
   assert.ok(slow.first > ok.first, `primer tiro ${slow.first} vs ${ok.first}`);
+});
+
+/** Dispara type contra 4 Kalibr, destruye la batería apenas lanza y deja terminar la corrida. */
+function shootThenDie(type) {
+  useMap('monterey', { flat: true }); clearSetup();
+  addDef(type, 40, 40, { name: 'U' });
+  addSalvo({ type: 'kalibr', count: 4, interval: 20, agl: 500, pts: [[5, 40], [80, 40]] });
+  setRandom(seeded(2)); startSim();
+  try {
+    for (let n = 0; n < 20000 && !S.ints.length; n++) step(0.25);
+    S.units[0].alive = false;
+    for (let n = 0; n < 20000 && S.ints.some(i => !i.done); n++) step(0.25);
+  } finally { setRandom(null); }
+  return S;
+}
+
+test('una batería destruida deja sin guía a sus misiles guiados por radar (TVM, SARH, mando)', () => {
+  const s = shootThenDie('patriot2');   // PAC-2 GEM-T, guiado TVM
+  assert.ok(s.ints.length > 0, 'llegó a disparar');
+  assert.equal(s.stats.killed, 0, 'sin el radar de la batería no hay derribo');
+  assert.ok(s.log.some(l => /pierde la guía/.test(l.msg)));
+  // un buscador activo (NASAMS) sigue solo después del lanzamiento
+  assert.ok(shootThenDie('nasams').stats.killed > 0, 'el AMRAAM no depende de la batería');
 });

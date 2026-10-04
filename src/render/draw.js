@@ -8,7 +8,7 @@ import { jamJ, horizon } from '../physics/radar.js';
 import { surf } from '../physics/terrain.js';
 import { isOffmap, posAt } from '../physics/kinematics.js';
 import { S } from '../sim/state.js';
-import { isDefenderView } from '../ui/dom.js';
+import { hooks } from '../sim/hooks.js';
 import { cv, ctx, dpr, V, toS } from './view.js';
 import { drawTerrain, drawPeaks } from './terrain.js';
 import { covCanvas } from './coverage.js';
@@ -97,7 +97,7 @@ export function draw() {
   // impactos
   for (const im of S.impacts) { const [sx, sy] = toS(im.x, im.y); ctx.strokeStyle = im.k === 'hit' ? '#ff5b4d' : im.k === 'miss' ? '#e6a53c' : '#6b7888'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(sx - 5, sy - 5); ctx.lineTo(sx + 5, sy + 5); ctx.moveTo(sx + 5, sy - 5); ctx.lineTo(sx - 5, sy + 5); ctx.stroke(); }
   // amenazas
-  const dv = isDefenderView();
+  const dv = hooks.defenderView();
   for (const th of S.threats) {
     if (!th.alive || !th.p) continue;
     const tracked = S.t - th.lastNet <= 12;
