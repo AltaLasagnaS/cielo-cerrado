@@ -41,7 +41,7 @@ test('notch Doppler: de costado lo pierde un radar pulso-Doppler, no uno sin fil
   assert.equal(inNotch({ mti: 'none' }, th, 0), false);
 });
 
-test('pdScan: corta más allá de 1,2·R y aplica notch y clutter', () => {
+test('pdScan: corta más allá de PD_CUTOFF·R (rendimiento) y aplica notch y clutter', () => {
   useMap('monterey', { flat: true });
   const u = { id: 1, type: 'patriot', x: 0, y: 0 }, th = { vel: [200, 0, 0] };
   assert.equal(pdScan(u, th, PD_CUTOFF * 50 + 0.1, 50, 5000, 10, 10, 1), 0);

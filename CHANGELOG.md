@@ -6,6 +6,11 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 
 ## [Sin publicar]
 
+### Cambiado
+- **[sim]** **Confirmación de pistas "2 de 3"** en lugar del corte de la detección a 1,2·R. Un eco suelto ya no abre una pista: el radar necesita ver el blanco en 2 de sus últimos 3 barridos; una pista abierta se mantiene con un eco por barrido (ópticos y acústicos siguen con un contacto). La detección lejana pasa a ser gradual (un blanco lento que pasa muchos barridos a 1,2–1,5 veces el alcance puede terminar detectado) y queda solo un corte de rendimiento a 2,5·R. Ver docs/FISICA.md §2 y `docs/investigacion/valores-estimados.md`.
+- **[sim]** Rebalanceo (40 noches, `npm run mc`): los rasantes se confirman más tarde y el puente de Monterey pasaba a 78% para el ataque y la refinería a 28% para la defensa. Puente: Storm Shadow 11 → 10 (≈43%); refinería: Geran-3 4 → 3 (≈38%). Kiev (≈70%) y Járkov (≈63%) quedan dentro del ruido.
+- La prueba "el S-125 enfrenta misiles de crucero" suma tres noches en vez de una: contra un Kalibr a 50 m el S-125 (sin filtro de blancos móviles y con 25 s de reacción) queda al límite y en una de las tres noches no llega.
+
 ### Corregido
 - **[sim]** La partida usa pasos fijos de 0,25 s y conserva las fracciones entre cuadros: cambiar la velocidad o los FPS ya no cambia la secuencia de detecciones y disparos. Las golden y el Monte Carlo mantienen sus resultados.
 - Monte Carlo espera al último ataque y al fin de los interceptores, incluso en escenarios de más de 10.000 s. Una corrida que no termina se informa como error, sin contabilizarla como victoria.

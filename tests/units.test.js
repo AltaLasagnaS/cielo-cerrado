@@ -21,11 +21,16 @@ test('planeadora: se suelta a su altura fuera del mapa y baja sin subir nunca ha
   assert.ok(Math.abs(th.ft - th.L * 1000 / THREATS.kab.v) < 1, 'velocidad constante');
 });
 
+/** Tres noches (semillas 3–5) de una defensa contra una salva; suma disparos y derribos. */
 const fight = (def, threat, opts) => {
-  useMap('monterey', { flat: true }); clearSetup();
-  addDef(def, 50, 60, { name: 'D', az: 0 }); addDef('ewr', 50, 58, { name: 'R' });
-  addSalvo({ type: threat, count: 3, interval: 40, pts: [[50, 0], [50, 61]], ...opts });
-  runCurrent(3); return { shots: S.stats.byUnit.D || 0, killed: S.stats.killed };
+  let shots = 0, killed = 0;
+  for (const seed of [3, 4, 5]) {
+    useMap('monterey', { flat: true }); clearSetup();
+    addDef(def, 50, 60, { name: 'D', az: 0 }); addDef('ewr', 50, 58, { name: 'R' });
+    addSalvo({ type: threat, count: 3, interval: 40, pts: [[50, 0], [50, 61]], ...opts });
+    runCurrent(seed); shots += S.stats.byUnit.D || 0; killed += S.stats.killed;
+  }
+  return { shots, killed };
 };
 
 test('Hawk y S-125 enfrentan misiles de crucero; el S-200 no baja de 300 m', () => {
