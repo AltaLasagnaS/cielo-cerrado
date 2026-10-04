@@ -16,6 +16,13 @@ export const MISCLASS = 0.03;
 
 const frac = x => x - Math.floor(x);
 
+/**
+ * τ de clasificación de un radar (s): el de su banda dividido por radar.discrim, la capacidad propia de
+ * discriminación (un radar de arreglo de fase con modos dedicados clasifica más rápido que uno genérico
+ * de la misma banda). Sin discrim, ×1.
+ */
+export const classifyTau = r => BANDS[r.band].decoyTau / (r.discrim || 1);
+
 /** Segundos de seguimiento que suma un barrido de este radar a la clasificación (0 si no clasifica). */
 export const classifyGain = r => (BANDS[r.band]?.decoyTau ? r.scan : 0);
 

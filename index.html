@@ -920,7 +920,7 @@ table.t.mc td.pc{white-space:nowrap}
       kind: "sam",
       color: "#62b6ff",
       datalinks: ["l16"],
-      radar: { name: "AN/MPQ-65", agile: true, slc: 1, band: "C", mti: "pd", R1: 100, mast: 4, mastRange: [4, 4], mastNote: "Fija: la antena va sobre el semirremolque M860, inclinada a 67,5°. El mástil de ≈30 m de la batería (AMG) es de comunicaciones, no del radar (FM 3-01.85).", sector: 90, eccm: 10, scan: 2 },
+      radar: { name: "AN/MPQ-65", agile: true, slc: 1, discrim: 4, band: "C", mti: "pd", R1: 100, mast: 4, mastRange: [4, 4], mastNote: "Fija: la antena va sobre el semirremolque M860, inclinada a 67,5°. El mástil de ≈30 m de la batería (AMG) es de comunicaciones, no del radar (FM 3-01.85).", sector: 90, eccm: 10, scan: 2 },
       sam: { maxR: 100, maxRtbm: 40, minR: 3, altMin: 50, altMax: 36e3, vInt: 1300, vmaxT: 3e3, react: 9, ch: 8, mag: 16, reserve: 16, reloadS: 2400, salvo: 2, guid: "activo", shot: "PAC-3 MSE", noDrones: true, cost: 4.2, pk: { dron: 0.9, crucero: 0.9, supersonico: 0.6, balistico: 0.7, hiper: 0.5 } },
       range: "≈40 km vs balísticos (estimado), ≈100 km vs aeronaves",
       interceptor: "PAC-3 MSE: hit-to-kill, buscador activo, motor de doble pulso, techo ≈36 km",
@@ -934,7 +934,7 @@ table.t.mc td.pc{white-space:nowrap}
       kind: "sam",
       color: "#62b6ff",
       datalinks: ["l16"],
-      radar: { name: "AN/MPQ-65", agile: true, slc: 1, band: "C", mti: "pd", R1: 100, mast: 4, mastRange: [4, 4], mastNote: "Fija: la antena va sobre el semirremolque M860. El mástil de ≈30 m (AMG) es de comunicaciones, no del radar.", sector: 90, eccm: 10, scan: 2 },
+      radar: { name: "AN/MPQ-65", agile: true, slc: 1, discrim: 4, band: "C", mti: "pd", R1: 100, mast: 4, mastRange: [4, 4], mastNote: "Fija: la antena va sobre el semirremolque M860. El mástil de ≈30 m (AMG) es de comunicaciones, no del radar.", sector: 90, eccm: 10, scan: 2 },
       sam: { maxR: 160, maxRtbm: 20, minR: 3, altMin: 60, altMax: 24e3, vInt: 900, vmaxT: 2500, react: 9, ch: 8, mag: 16, reserve: 16, reloadS: 2400, salvo: 2, guid: "TVM", shot: "PAC-2 GEM-T", noDrones: true, cost: 3, pk: { dron: 0.8, crucero: 0.85, supersonico: 0.55, balistico: 0.4, hiper: 0.25 } },
       range: "≈160 km vs aeronaves, ≈20 km vs balísticos",
       interceptor: "GEM-T: fragmentación, guiado TVM (necesita que el radar propio vea el blanco), Mach ≈3,5",
@@ -1338,6 +1338,7 @@ table.t.mc td.pc{white-space:nowrap}
     "radar.sector": ["Radar: sector de búsqueda", "°"],
     "radar.scan": ["Radar: refresco", "s"],
     "radar.altMax": ["Altura máxima detectable", "m"],
+    "radar.discrim": ["Radar: discriminación de señuelos (×, divide el τ de su banda)", "×"],
     "sam.maxR": ["Alcance vs aeronaves/crucero", "km"],
     "sam.maxRtbm": ["Alcance vs balísticos", "km"],
     "sam.altMax": ["Techo", "m"],
@@ -1591,6 +1592,7 @@ table.t.mc td.pc{white-space:nowrap}
         "radar.R1": U(90, 100, 120, "baja", S_("rt_mpq53"), "est: 170 km es el alcance instrumentado; avión grande 150–170 km, escalado con σ^¼"),
         "radar.sector": U(90, 90, 120, "media", S_("rt_mpq53"), "búsqueda 90°, seguimiento 120°"),
         "radar.scan": U(1, 2, 3, "baja", [], "est: barrido electrónico en sector fijo"),
+        "radar.discrim": U(1, 4, 8, "baja", [], "est: el MPQ-65 es un arreglo de fase multifunción con modos de discriminación de blancos balísticos; no hay cifra pública. ×4 compensa la dificultad de los señuelos de balístico (DECOY_HARD) y los clasifica al ritmo de un señuelo común"),
         "sam.maxR": U(60, 100, 120, "baja", S_("wp:MIM-104_Patriot"), ""),
         "sam.maxRtbm": U(30, 40, 60, "baja", S_("wp:MIM-104_Patriot"), ""),
         "sam.altMax": U(35e3, 36e3, 4e4, "media", S_("wp:MIM-104_Patriot"), ""),
@@ -1607,6 +1609,7 @@ table.t.mc td.pc{white-space:nowrap}
       },
       patriot2: {
         "radar.R1": U(90, 100, 120, "baja", S_("rt_mpq53"), "mismo radar que el MSE"),
+        "radar.discrim": U(1, 4, 8, "baja", [], "est: mismo radar que el MSE"),
         "radar.sector": U(90, 90, 120, "media", S_("rt_mpq53"), ""),
         "sam.maxR": U(120, 160, 160, "baja", S_("wp:MIM-104_Patriot"), ""),
         "sam.maxRtbm": U(15, 20, 30, "baja", [], ""),
@@ -2022,9 +2025,9 @@ table.t.mc td.pc{white-space:nowrap}
       "caso": "8 Iskander-M con maniobra 2025 y señuelos contra 1 Patriot MSE (16 misiles)",
       "real": "37% nacional en jun–sep 25 (IC95% 31–45%), cota inferior de lo que pasa dentro de cobertura; 6–17% en otoño 2025.",
       "obj": "35–65%",
-      "sim": 0.175,
-      "lo": 0.125,
-      "hi": 0.219,
+      "sim": 0.209,
+      "lo": 0.159,
+      "hi": 0.25,
       "ok": false
     },
     {
@@ -2840,6 +2843,7 @@ table.t.mc td.pc{white-space:nowrap}
   var DECOY_HARD = 4;
   var MISCLASS = 0.03;
   var frac = (x) => x - Math.floor(x);
+  var classifyTau = (r) => BANDS[r.band].decoyTau / (r.discrim || 1);
   var classifyGain = (r) => BANDS[r.band]?.decoyTau ? r.scan : 0;
   function classify(th) {
     if (!th.clsT || !th.clsTau) return null;
@@ -3718,7 +3722,7 @@ table.t.mc td.pc{white-space:nowrap}
           const g = classifyGain(r);
           if (g) {
             th.clsT = (th.clsT || 0) + g;
-            th.clsTau = Math.min(th.clsTau ?? Infinity, BANDS[r.band].decoyTau);
+            th.clsTau = Math.min(th.clsTau ?? Infinity, classifyTau(r));
             const c = classify(th);
             if (c && !th.clsAs) {
               th.clsAs = c;

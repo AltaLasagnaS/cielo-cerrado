@@ -7,7 +7,8 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 ## [Sin publicar]
 
 ### Agregado
-- **Arnés de calibración reproducible** (`npm run calibrar`): los casos de la tabla de calibración de Pk tienen ahora su geometría guardada (`src/data/calibration-cases.js`) y `npm run calibrar -- --write` regenera `CAL`. Son reconstrucciones: la geometría original no se había guardado. 7 de 9 casos caen dentro de su objetivo; Iskander-M con señuelos contra Patriot (18%) y Kalibr contra S-300 (88%) quedan fuera y están en el ROADMAP. La ventana "Calibración de Pk" y el catálogo muestran los valores nuevos.
+- El radar del Patriot (MPQ-65) **discrimina señuelos más rápido** que un radar genérico de banda C (`radar.discrim` = ×4, rango 1–8 en `UNC`, estimado). Pesa con la doctrina "no tirarle a pistas clasificadas como señuelo": los escenarios con sus reglas de inicio no cambian.
+- **Arnés de calibración reproducible** (`npm run calibrar`): los casos de la tabla de calibración de Pk tienen ahora su geometría guardada (`src/data/calibration-cases.js`) y `npm run calibrar -- --write` regenera `CAL`. Son reconstrucciones: la geometría original no se había guardado. 7 de 9 casos caen dentro de su objetivo; Iskander-M con señuelos contra Patriot (21%) y Kalibr contra S-300 (88%) quedan fuera y están en el ROADMAP. La ventana "Calibración de Pk" y el catálogo muestran los valores nuevos.
 - `remotePk` de la C2 coordinada tiene rango en `UNC` (0,9 – **0,97** – 1,0, confianza baja): el Monte Carlo con sorteo ahora lo varía. El valor probable no cambia.
 - **Origen de los relieves de Monterey y Gotemburgo**, reconstruido con `node scripts/verificar-relieves.mjs` (docs/DATOS-Y-FUENTES.md §6). Gotemburgo es el tile SRTM N57E011 promediado a 200 m (sin batimetría: la documentación decía lo contrario). Monterey coincide con las Terrain Tiles de Mapzen/AWS con batimetría (correlación 0,999), pero no celda por celda.
 

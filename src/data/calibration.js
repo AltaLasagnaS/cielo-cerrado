@@ -38,9 +38,9 @@ export const CAL = [
   "caso": "8 Iskander-M con maniobra 2025 y señuelos contra 1 Patriot MSE (16 misiles)",
   "real": "37% nacional en jun–sep 25 (IC95% 31–45%), cota inferior de lo que pasa dentro de cobertura; 6–17% en otoño 2025.",
   "obj": "35–65%",
-  "sim": 0.175,
-  "lo": 0.125,
-  "hi": 0.219,
+  "sim": 0.209,
+  "lo": 0.159,
+  "hi": 0.25,
   "ok": false
  },
  {
