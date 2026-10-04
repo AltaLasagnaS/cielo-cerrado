@@ -3,9 +3,9 @@
 // spoofKm = desvío típico por ENGAÑO GNSS (km); sin él, el anti-GNSS solo interfiere (error menor).
 // linkJam = además corta los enlaces de datos (módem/mesh) de las armas dentro de su radio.
 //
-// El efecto depende del ROL, no de la bandera: los interferidores de radar degradan los radares de la
-// defensa (herramienta del atacante) y los anti-GNSS desvían las armas del atacante (herramienta del
-// defensor). Así cada bando puede usar los suyos según le toque atacar o defender.
+// El efecto depende del ROL y del bando: los interferidores de radar degradan radares del bando
+// contrario (herramienta del atacante) y los anti-GNSS desvían armas del bando contrario (herramienta
+// del defensor). `both` queda reservado para equipos que pueden cambiar de operador.
 import { WP, SRC } from './sources.js';
 
 export const JAMMERS = {
