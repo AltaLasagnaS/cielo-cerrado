@@ -23,6 +23,21 @@ Resultados centrales (probable; `éxito` es la meta principal del jugador):
 
 El modo `sampled` queda en el JSON para mostrar sensibilidad al rango de datos; no se mezcla con el probable. Los resultados anteriores son comparadores del motor viejo: el cambio de C2/datalink altera golden y probabilidades de forma intencional y debe medirse en un informe nuevo, con otro `--out`, antes de ajustar números.
 
+## Después de separar C2 y datalink
+
+`baseline-c2-datalink.json` repite exactamente el protocolo con el commit `43c7193`. Comparado con `baseline.json`, el efecto en modo probable fue:
+
+| Escenario | Éxito nuevo | Interceptación nueva | Cambio de éxito |
+|---|---:|---:|---:|
+| Monterey · noche | 40/40 | 90,6% | 0 |
+| Gotemburgo · base rusa | 0/40 | 99,1% | 0 |
+| Gotemburgo · refinería | 3/40 | 86,1% | −13 |
+| Monterey · puente | 21/40 | 88,9% | 0 |
+| Kiev · energía | 38/40 | 87,0% | +11 |
+| Járkov · bombas planeadoras | 23/40 | 82,4% | +1 |
+
+No conviene leer estos cambios como balance final: una misma corrección puede beneficiar o perjudicar un escenario según qué sensores y baterías compartan familia. La refinería queda especialmente sensible y Kiev más defendida; son candidatos para revisar la composición de redes del escenario con fuentes, antes de tocar Pk o munición.
+
 Para una corrida corta de desarrollo:
 
 ```sh
