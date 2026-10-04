@@ -52,6 +52,8 @@ El código está en `src/`, separado en capas: **datos → física → simulaci�
 | [docs/CATALOGO.md](docs/CATALOGO.md) | Todo el catálogo con rangos y fuentes (autogenerado) |
 | [CONTRIBUIR.md](CONTRIBUIR.md) | Cómo agregar armas, escenarios o cambiar la física sin romper nada |
 | [docs/investigacion/](docs/investigacion/) | Investigaciones: guerra electrónica ucraniana y cómo mejorar los modelos físicos |
+| [docs/investigacion/c2-datalink.md](docs/investigacion/c2-datalink.md) | Auditoría de C2, compatibilidad de datalinks y límites del modelo |
+| [docs/mediciones/README.md](docs/mediciones/README.md) | Línea de base reproducible y resultados Monte Carlo por escenario |
 | [ROADMAP.md](ROADMAP.md) | Hacia dónde va el proyecto |
 | [CHANGELOG.md](CHANGELOG.md) | Historial de cambios |
 

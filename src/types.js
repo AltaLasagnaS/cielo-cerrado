@@ -27,6 +27,7 @@
  * @property {boolean} [ir]   Lanza bengalas contra buscadores IR
  * @property {boolean} [cold] Sin motor (planeadora): casi invisible para buscadores IR
  * @property {string} [datalink] Enlace de datos que puede llevar (módem/mesh): descarta el engaño GNSS
+ * @property {string[]} [datalinks] Familias de enlace compatibles para una defensa o sensor
  * @property {number} gnss    Dependencia del GNSS: 0 = total, 1 = inmune
  * @property {string} [navFix] Corrección de navegación independiente del satélite (descarta el engaño GNSS)
  * @property {number} [seekerKm] Ventana que corrige el buscador terminal (km)
