@@ -67,6 +67,7 @@ El juego es una página web estática hecha con **JavaScript moderno (módulos E
 - `fichas.js`: ventanas modales con historial ("← Volver").
 - `montecarlo.js`: ventanas de configuración, progreso y debrief del modo Monte Carlo.
 - `scenario-file.js`: botones Guardar y Cargar (descarga y lectura del archivo, cambio de mapa).
+- `goals-editor.js`: editor de metas (bando del jugador, metas de cada bando sobre objetivos o unidades); trabaja sobre una copia de `S.scen`.
 - `replay.js`: barra de repetición sobre el mapa (línea de tiempo, velocidad, registro del instante).
 - `debrief.js`, `academy.js`, `relief.js`, `controls.js`, `loop.js`, `coverage.js`, `hgt.js`, `help.js`.
 

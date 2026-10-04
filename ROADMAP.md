@@ -26,7 +26,6 @@ Propuesta detallada, con orden, dificultad, datos y pruebas: [docs/investigacion
 - Más escenarios: corredor del mar Negro (Kiev, Járkov y Odesa ya están).
 - Plataformas aéreas propias: patrullas de cazas como interceptores con radio de acción.
 - Niebla de guerra más estricta: jugar solo con lo que ven tus sensores.
-- Editor de objetivos y metas desde la interfaz.
 - Idioma inglés (los textos ya están separados de la lógica en buena parte).
 
 ## Técnica

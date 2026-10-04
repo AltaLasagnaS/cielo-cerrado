@@ -7,6 +7,7 @@ import { frameAt } from '../../sim/replay.js';
 import { $ } from '../dom.js';
 import { openModal } from '../fichas.js';
 import { renderSel } from './selection.js';
+import { openGoalsEditor, setGoalsSavedHook } from '../goals-editor.js';
 
 const SIDE = { ataque: 'Ataque', defensa: 'Defensa' };
 const KIND = { destroy: 'destruir', damage: 'dañar', protect: 'proteger', survive: 'que sobreviva', killUnit: 'destruir unidad', keepUnit: 'conservar unidad' };
@@ -18,14 +19,17 @@ const objRow = g => {
 
 export function renderScenario() {
   const el = $('#scenCard'), sc = S.scen;
-  if (!sc) { el.innerHTML = `<h3>Escenario</h3><p class="hint">Relieve importado: escenario libre. Ubicá objetivos en la pestaña Ataque.</p>`; return; }
+  setGoalsSavedHook(renderScenario);
+  const goalsBtn = S.started ? '' : '<button class="btn sm" id="goalsBtn" title="Elegir de qué bando jugás y definir las metas de cada uno">Metas</button>';
+  if (!sc) { el.innerHTML = `<div class="row" style="justify-content:space-between"><h3>Escenario</h3>${goalsBtn}</div><p class="hint">Relieve importado: escenario libre. Ubicá objetivos en la pestaña Ataque.</p>`; if ($('#goalsBtn')) $('#goalsBtn').onclick = openGoalsEditor; return; }
   const objs = S.replay ? frameAt(S.replay.t).objs : S.started ? S.objs : S.setup.objs;   // en la repetición, los del instante elegido
   const mine = (sc.goals || []).filter(g => g.side === sc.player);
-  el.innerHTML = `<div class="row" style="justify-content:space-between"><h3>Escenario</h3><button class="btn sm" id="briefBtn">Briefing</button></div>
+  el.innerHTML = `<div class="row" style="justify-content:space-between"><h3>Escenario</h3><span class="row">${goalsBtn}<button class="btn sm" id="briefBtn">Briefing</button></span></div>
     <p class="hint">${sc.time ? esc(sc.time) + ' · ' : ''}Jugás: <b>${SIDE[sc.player] || '—'}</b></p>
     ${objs.length ? `<div class="sobjs">${objs.map(objRow).join('')}</div>` : '<p class="hint">Sin objetivos: agregalos en la pestaña Ataque.</p>'}
     ${mine.length ? `<ul class="sgoals">${mine.map(g => `<li>${g.primary ? '<b>Principal:</b> ' : ''}${esc(g.text)}</li>`).join('')}</ul>` : ''}`;
   $('#briefBtn').onclick = openBriefing;
+  if ($('#goalsBtn')) $('#goalsBtn').onclick = openGoalsEditor;
   el.onclick = e => { const r = e.target.closest('[data-oid]'); if (r) { S.sel = { kind: 'obj', id: +r.dataset.oid }; renderSel(); } };
 }
 

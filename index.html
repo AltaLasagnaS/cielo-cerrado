@@ -6406,8 +6406,89 @@ table.t.mc td.pc{white-space:nowrap}
     ${CONCEPT_GROUPS.map((g) => `<div class="grp"><h3>${esc(g)}</h3>${g === "Radar y bandas" ? `<div class="row">${Object.keys(BANDS).map((b) => `<button class="chip" data-concept="band:${b}" title="${esc(BANDS[b].name + " · " + BANDS[b].freq)}">${esc(b)}</button>`).join("")}</div>` : ""}<div class="list">${CONCEPTS.filter((c) => c.group === g && !c.id.startsWith("band:")).map(item).join("")}</div></div>`).join("")}`;
   }
 
+  // src/ui/goals-editor.js
+  var SIDE = { defensa: "Defensa", ataque: "Ataque" };
+  var GOAL_TYPES = {
+    destroy: { on: "obj", name: "Destruir objetivo", text: (t) => `Destruir ${t}` },
+    damage: { on: "obj", name: "Dañar objetivo (≥ %)", text: (t, g) => `Dañar ${t} (≥ ${Math.round((g.min ?? DAMAGED_AT) * 100)}%)` },
+    protect: { on: "obj", name: "Mantener operativo", text: (t) => `Mantener operativo ${t}` },
+    survive: { on: "obj", name: "Que no sea destruido", text: (t) => `Que ${t} no sea destruido` },
+    killUnit: { on: "unit", name: "Destruir unidad", text: (t) => `Destruir la unidad ${t}` },
+    keepUnit: { on: "unit", name: "Conservar unidad", text: (t) => `Conservar la unidad ${t}` }
+  };
+  var goalText = (g) => GOAL_TYPES[g.kind]?.text(g.target || "—", g) ?? g.text;
+  var targetsFor = (kind) => GOAL_TYPES[kind].on === "obj" ? S.setup.objs.map((o) => o.name) : S.setup.defs.map((u) => u.name);
+  function draft() {
+    const sc2 = S.scen || { name: "Escenario libre", player: "defensa", goals: [] };
+    return { ...sc2, player: sc2.player || "defensa", goals: (sc2.goals || []).map((g) => ({ ...g })) };
+  }
+  function openGoalsEditor() {
+    if (S.started) {
+      toast("Reiniciá para editar las metas.");
+      return;
+    }
+    const d = draft();
+    const row = (g, i) => {
+      const names = targetsFor(g.kind), missing = g.target && !names.includes(g.target);
+      return `<tr data-i="${i}">
+      <td><select class="sel" data-f="side" aria-label="Bando">${Object.entries(SIDE).map(([k, v]) => `<option value="${k}" ${g.side === k ? "selected" : ""}>${v}</option>`).join("")}</select></td>
+      <td><label class="check"><input type="checkbox" data-f="primary" ${g.primary ? "checked" : ""}> Principal</label></td>
+      <td><select class="sel" data-f="kind" aria-label="Tipo de meta">${Object.entries(GOAL_TYPES).map(([k, v]) => `<option value="${k}" ${g.kind === k ? "selected" : ""}>${v.name}</option>`).join("")}</select></td>
+      <td><select class="sel" data-f="target" aria-label="Blanco">${missing ? `<option value="${esc(g.target)}" selected>⚠ ${esc(g.target)} (ya no existe)</option>` : ""}${names.map((n2) => `<option value="${esc(n2)}" ${g.target === n2 ? "selected" : ""}>${esc(n2)}</option>`).join("") || '<option value="">(no hay)</option>'}</select></td>
+      <td>${g.kind === "damage" ? `<input class="inp" type="number" data-f="min" min="5" max="100" step="5" value="${Math.round((g.min ?? DAMAGED_AT) * 100)}" aria-label="Daño mínimo (%)" style="width:5em">%` : ""}</td>
+      <td><button class="btn sm danger" data-del="${i}" aria-label="Borrar meta">✕</button></td></tr>`;
+    };
+    const render = () => {
+      openModal(`<header><div><span class="chip">${esc(d.name || "Escenario")}</span><h2>Metas del escenario</h2></div><button class="btn x">Cerrar</button></header><div class="bd">
+      <div class="field"><label for="gPlayer">Jugás</label><select id="gPlayer" class="sel">${Object.entries(SIDE).map(([k, v]) => `<option value="${k}" ${d.player === k ? "selected" : ""}>${v}</option>`).join("")}</select></div>
+      <p class="hint">El resultado se juzga con tus metas <b>principales</b>: todas cumplidas es éxito, algunas es éxito parcial, ninguna es fracaso. Las secundarias se cuentan aparte. Las metas apuntan a objetivos o unidades por su nombre: si renombrás o borrás uno, la meta queda marcada con ⚠.</p>
+      <div class="tblwrap"><table class="t"><thead><tr><th>Bando</th><th></th><th>Meta</th><th>Sobre</th><th>Mínimo</th><th></th></tr></thead><tbody>${d.goals.map(row).join("") || '<tr><td colspan="6" class="hint">Sin metas.</td></tr>'}</tbody></table></div>
+      <ul class="goals">${d.goals.map((g) => `<li>${SIDE[g.side]} · ${g.primary ? "<b>Principal:</b> " : "Secundaria: "}${esc(goalText(g))}</li>`).join("")}</ul>
+      <div class="row"><button class="btn" id="gAdd">+ Agregar meta</button><button class="btn pri" id="gSave">Guardar metas</button></div>
+    </div>`, null);
+      $("#gPlayer").onchange = (e) => {
+        d.player = e.target.value;
+      };
+      $("#gAdd").onclick = () => {
+        const kind = S.setup.objs.length ? "survive" : "keepUnit";
+        d.goals.push({ side: d.player, primary: !d.goals.some((g) => g.side === d.player && g.primary), kind, target: targetsFor(kind)[0] || "" });
+        render();
+      };
+      $("#gSave").onclick = () => {
+        const goals = d.goals.filter((g) => g.target).map((g) => ({ ...g, text: goalText(g) }));
+        S.scen = { ...d, goals };
+        toast(goals.length + " meta" + (goals.length === 1 ? "" : "s") + " guardada" + (goals.length === 1 ? "" : "s") + ".");
+        onSaved?.();
+        $("#modal").hidden = true;
+      };
+      for (const tr of $("#sheet").querySelectorAll("tr[data-i]")) {
+        const g = d.goals[+tr.dataset.i];
+        tr.onchange = (e) => {
+          const f = e.target.dataset.f;
+          if (!f) return;
+          if (f === "primary") g.primary = e.target.checked;
+          else if (f === "min") {
+            const v = +e.target.value;
+            if (Number.isFinite(v) && v >= 5 && v <= 100) g.min = v / 100;
+          } else g[f] = e.target.value;
+          if (f === "kind" && !targetsFor(g.kind).includes(g.target)) g.target = targetsFor(g.kind)[0] || "";
+          render();
+        };
+      }
+      for (const b of $("#sheet").querySelectorAll("[data-del]")) b.onclick = () => {
+        d.goals.splice(+b.dataset.del, 1);
+        render();
+      };
+    };
+    render();
+  }
+  var onSaved = null;
+  function setGoalsSavedHook(fn) {
+    onSaved = fn;
+  }
+
   // src/ui/panels/scenario.js
-  var SIDE = { ataque: "Ataque", defensa: "Defensa" };
+  var SIDE2 = { ataque: "Ataque", defensa: "Defensa" };
   var KIND = { destroy: "destruir", damage: "dañar", protect: "proteger", survive: "que sobreviva", killUnit: "destruir unidad", keepUnit: "conservar unidad" };
   var objRow = (g) => {
     const hp = g.hp ?? g.maxHp, st = g.status || "operational";
@@ -6415,17 +6496,21 @@ table.t.mc td.pc{white-space:nowrap}
   };
   function renderScenario() {
     const el = $("#scenCard"), sc2 = S.scen;
+    setGoalsSavedHook(renderScenario);
+    const goalsBtn = S.started ? "" : '<button class="btn sm" id="goalsBtn" title="Elegir de qué bando jugás y definir las metas de cada uno">Metas</button>';
     if (!sc2) {
-      el.innerHTML = `<h3>Escenario</h3><p class="hint">Relieve importado: escenario libre. Ubicá objetivos en la pestaña Ataque.</p>`;
+      el.innerHTML = `<div class="row" style="justify-content:space-between"><h3>Escenario</h3>${goalsBtn}</div><p class="hint">Relieve importado: escenario libre. Ubicá objetivos en la pestaña Ataque.</p>`;
+      if ($("#goalsBtn")) $("#goalsBtn").onclick = openGoalsEditor;
       return;
     }
     const objs = S.replay ? frameAt(S.replay.t).objs : S.started ? S.objs : S.setup.objs;
     const mine = (sc2.goals || []).filter((g) => g.side === sc2.player);
-    el.innerHTML = `<div class="row" style="justify-content:space-between"><h3>Escenario</h3><button class="btn sm" id="briefBtn">Briefing</button></div>
-    <p class="hint">${sc2.time ? esc(sc2.time) + " · " : ""}Jugás: <b>${SIDE[sc2.player] || "—"}</b></p>
+    el.innerHTML = `<div class="row" style="justify-content:space-between"><h3>Escenario</h3><span class="row">${goalsBtn}<button class="btn sm" id="briefBtn">Briefing</button></span></div>
+    <p class="hint">${sc2.time ? esc(sc2.time) + " · " : ""}Jugás: <b>${SIDE2[sc2.player] || "—"}</b></p>
     ${objs.length ? `<div class="sobjs">${objs.map(objRow).join("")}</div>` : '<p class="hint">Sin objetivos: agregalos en la pestaña Ataque.</p>'}
     ${mine.length ? `<ul class="sgoals">${mine.map((g) => `<li>${g.primary ? "<b>Principal:</b> " : ""}${esc(g.text)}</li>`).join("")}</ul>` : ""}`;
     $("#briefBtn").onclick = openBriefing;
+    if ($("#goalsBtn")) $("#goalsBtn").onclick = openGoalsEditor;
     el.onclick = (e) => {
       const r = e.target.closest("[data-oid]");
       if (r) {
@@ -6438,9 +6523,9 @@ table.t.mc td.pc{white-space:nowrap}
     const sc2 = S.scen;
     if (!sc2) return;
     const goals = (side) => (sc2.goals || []).filter((g) => g.side === side);
-    const goalList = (side) => goals(side).length ? `<div><b>${SIDE[side]}${sc2.player === side ? " (vos)" : ""}</b><ul class="goals">${goals(side).map((g) => `<li>${g.primary ? "<b>Principal:</b> " : "Secundaria: "}${esc(g.text)} <span class="dim">(${KIND[g.kind]})</span></li>`).join("")}</ul></div>` : "";
+    const goalList = (side) => goals(side).length ? `<div><b>${SIDE2[side]}${sc2.player === side ? " (vos)" : ""}</b><ul class="goals">${goals(side).map((g) => `<li>${g.primary ? "<b>Principal:</b> " : "Secundaria: "}${esc(g.text)} <span class="dim">(${KIND[g.kind]})</span></li>`).join("")}</ul></div>` : "";
     openModal(`<header><div><span class="chip">Briefing · ${esc(TERRAIN[sc2.map]?.name || MAP?.name || "")}</span><h2>${esc(sc2.name)}</h2></div><button class="btn x">Cerrar</button></header><div class="bd">
-    <div class="specs">${[["Hora", sc2.time || "—"], ["Jugás", SIDE[sc2.player] || "—"], ["Mapa", TERRAIN[sc2.map]?.name || "—"]].map(([a, b]) => `<div class="spec"><small>${a}</small><b>${esc(b)}</b></div>`).join("")}</div>
+    <div class="specs">${[["Hora", sc2.time || "—"], ["Jugás", SIDE2[sc2.player] || "—"], ["Mapa", TERRAIN[sc2.map]?.name || "—"]].map(([a, b]) => `<div class="spec"><small>${a}</small><b>${esc(b)}</b></div>`).join("")}</div>
     <p>${esc(sc2.description || "")}</p>
     ${sc2.forces ? `<div class="dbcols"><div><h3>Defensa</h3><p>${esc(sc2.forces.defensa)}</p></div><div><h3>Ataque</h3><p>${esc(sc2.forces.ataque)}</p></div></div>` : ""}
     ${sc2.conditions ? `<div><h3>Condiciones iniciales</h3><p>${esc(sc2.conditions)}</p></div>` : ""}
@@ -6542,7 +6627,7 @@ table.t.mc td.pc{white-space:nowrap}
 
   // src/ui/montecarlo.js
   var RUNS = [10, 20, 50, 100];
-  var SIDE2 = { ataque: "Ataque", defensa: "Defensa" };
+  var SIDE3 = { ataque: "Ataque", defensa: "Defensa" };
   var last = { runs: 20, sample: true, seed: 1 };
   function openMonteCarlo() {
     if (!S.setup.salvos.length) {
@@ -6609,14 +6694,14 @@ table.t.mc td.pc{white-space:nowrap}
     const o = a.outcome, side = a.player;
     const resTxt = o.none.k === a.n ? "Sin metas definidas" : `Éxito ${pct(o.exito.p)} · parcial ${pct(o.parcial.p)} · fracaso ${pct(o.fracaso.p)}`;
     const objRows = a.objectives.map((x) => `<tr><td>${esc(x.name)}</td>${pcell(x.survive)}${pcell(x.operational)}<td>${pct(x.dmgFrac.mean)}</td><td>${pct(x.dmgFrac.p10)}–${pct(x.dmgFrac.p90)}</td></tr>`).join("");
-    const goalRows = a.goals.map((g) => `<tr><td class="nt">${g.primary ? "<b>Principal:</b> " : ""}${esc(g.text)}</td><td>${SIDE2[g.side]}${g.side === side ? " (vos)" : ""}</td>${pcell(g.met)}</tr>`).join("");
+    const goalRows = a.goals.map((g) => `<tr><td class="nt">${g.primary ? "<b>Principal:</b> " : ""}${esc(g.text)}</td><td>${SIDE3[g.side]}${g.side === side ? " (vos)" : ""}</td>${pcell(g.met)}</tr>`).join("");
     const unitRows = a.unitsLost.map((u) => `<tr><td>${esc(u.name)}</td>${pcell(u.lost)}</tr>`).join("");
     const m = a.metrics;
     const mrow = (lab, d, f = (v) => num(v)) => `<tr><td>${lab}</td><td>${f(d.mean)}</td><td>${f(d.p10)}</td><td>${f(d.p50)}</td><td>${f(d.p90)}</td><td>${f(d.min)}–${f(d.max)}</td></tr>`;
     const hmax = Math.max(1, ...a.interceptHist.map((h) => h.n));
     const hist = a.interceptHist.map((h) => `<div class="hb" title="${pct(h.from)}–${pct(h.to)} interceptadas: ${h.n} corrida(s)"><i style="height:${(100 * h.n / hmax).toFixed(1)}%"></i>${h.n ? `<span>${h.n}</span>` : ""}</div>`).join("");
     openModal(`<header><div><span class="chip">${esc(a.scen?.name || "Escenario libre")}</span><h2>Debrief Monte Carlo</h2></div><button class="btn x">Cerrar</button></header><div class="bd debrief">
-    <div class="dbres"><b>${side ? esc(SIDE2[side]) + ": " : ""}${resTxt}</b><span>${a.n} corridas${cancelled ? " (cancelado antes de terminar)" : ""} · ${a.sample ? "parámetros sorteados en su rango" : "valores probables del catálogo"} · semillas ${a.seed}–${a.seed + a.n - 1}</span></div>
+    <div class="dbres"><b>${side ? esc(SIDE3[side]) + ": " : ""}${resTxt}</b><span>${a.n} corridas${cancelled ? " (cancelado antes de terminar)" : ""} · ${a.sample ? "parámetros sorteados en su rango" : "valores probables del catálogo"} · semillas ${a.seed}–${a.seed + a.n - 1}</span></div>
     ${a.objectives.length ? `<div><h3>Objetivos: probabilidad de que sobrevivan</h3><div class="tblwrap"><table class="t mc"><thead><tr><th>Objetivo</th><th>No destruido</th><th>Operativo</th><th>Daño medio</th><th>Daño p10–p90</th></tr></thead><tbody>${objRows}</tbody></table></div></div>` : ""}
     ${goalRows ? `<div><h3>Metas: probabilidad de cumplirlas</h3><div class="tblwrap"><table class="t mc"><thead><tr><th>Meta</th><th>Bando</th><th>Se cumple</th></tr></thead><tbody>${goalRows}</tbody></table></div></div>` : ""}
     ${unitRows ? `<div><h3>Unidades de defensa perdidas</h3><div class="tblwrap"><table class="t mc"><thead><tr><th>Unidad</th><th>Probabilidad de perderla</th></tr></thead><tbody>${unitRows}</tbody></table></div></div>` : ""}
@@ -6706,7 +6791,7 @@ table.t.mc td.pc{white-space:nowrap}
 
   // src/ui/debrief.js
   var pct2 = (a, b) => b ? Math.round(100 * a / b) + "%" : "—";
-  var SIDE3 = { ataque: "Ataque", defensa: "Defensa" };
+  var SIDE4 = { ataque: "Ataque", defensa: "Defensa" };
   function openDebrief() {
     const d = buildDebrief(S), a = d.attack, g = d.damage, f = d.defense;
     const res = d.outcome.result, resCls = { exito: "st-operational", parcial: "st-damaged", fracaso: "st-destroyed" }[res] || "";
@@ -6714,12 +6799,12 @@ table.t.mc td.pc{white-space:nowrap}
     const goalRows = ["ataque", "defensa"].map((side) => {
       const gs = d.goals.filter((x) => x.side === side);
       if (!gs.length) return "";
-      return `<div><b>${SIDE3[side]}${d.outcome.side === side ? " (vos)" : ""}</b><ul class="goals">${gs.map((x) => `<li class="${x.met ? "ok" : "no"}">${x.met ? "✔" : "✘"} ${x.primary ? "<b>Principal:</b> " : "Secundaria: "}${esc(x.text)}</li>`).join("")}</ul></div>`;
+      return `<div><b>${SIDE4[side]}${d.outcome.side === side ? " (vos)" : ""}</b><ul class="goals">${gs.map((x) => `<li class="${x.met ? "ok" : "no"}">${x.met ? "✔" : "✘"} ${x.primary ? "<b>Principal:</b> " : "Secundaria: "}${esc(x.text)}</li>`).join("")}</ul></div>`;
     }).join("");
     const typeRows = Object.entries(a.byType).map(([k, b]) => `<tr><td>${esc(k)}</td><td>${b.launched}</td><td>${b.killed}</td><td>${b.arrived}</td><td>${b.shotsAt}</td></tr>`).join("");
     const tl = d.timeline.map((e) => `<li><time>${fmtT(e.t)}</time> — ${esc(e.text)}</li>`).join("") || "<li>Sin eventos.</li>";
     openModal(`<header><div><span class="chip">${esc(d.scen?.name || "Escenario libre")}</span><h2>Debrief</h2></div><button class="btn x">Cerrar</button></header><div class="bd debrief">
-    <div class="dbres ${resCls}"><b>${esc(d.outcome.side ? SIDE3[d.outcome.side] + ": " : "")}${esc(d.outcome.text)}</b><span>Duración ${fmtT(d.t).slice(2)} de tiempo simulado</span></div>
+    <div class="dbres ${resCls}"><b>${esc(d.outcome.side ? SIDE4[d.outcome.side] + ": " : "")}${esc(d.outcome.text)}</b><span>Duración ${fmtT(d.t).slice(2)} de tiempo simulado</span></div>
     ${goalRows ? `<div><h3>Metas del escenario</h3><div class="dbgoals">${goalRows}</div></div>` : ""}
     <div><h3>Objetivos</h3>${objRows}</div>
     <div class="dbcols">
