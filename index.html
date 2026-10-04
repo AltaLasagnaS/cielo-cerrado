@@ -3123,6 +3123,93 @@ table.t.mc td.pc{white-space:nowrap}
     return res;
   }
 
+  // src/physics/pulse-integration.js
+  var PFA = 1e-6;
+  var MAX_INTEGRATION_PULSES = 128;
+  var EPS = 1e-15;
+  var profiles = /* @__PURE__ */ new Map();
+  var anchors = /* @__PURE__ */ new Map();
+  var logFactorial = [0];
+  for (let i = 1; i <= 2048; i++) logFactorial[i] = logFactorial[i - 1] + Math.log(i);
+  function validate(pulses, model) {
+    if (!Number.isInteger(pulses) || pulses < 1 || pulses > MAX_INTEGRATION_PULSES)
+      throw new RangeError(`integrationPulses debe ser entero entre 1 y ${MAX_INTEGRATION_PULSES}`);
+    if (model !== 1 && model !== 3) throw new RangeError("Swerling debe ser 1 o 3");
+  }
+  function gammaUpper(n2, x) {
+    let term = 1, sum2 = 1;
+    for (let j = 1; j < n2; j++) {
+      term *= x / j;
+      sum2 += term;
+    }
+    return Math.exp(-x) * sum2;
+  }
+  function gammaLower(n2, x) {
+    let term = Math.exp(-x + n2 * Math.log(x) - logFactorial[n2]), sum2 = term;
+    for (let j = n2 + 1; j <= 2048; j++) {
+      term *= x / j;
+      sum2 += term;
+      if (j > x && term < sum2 * EPS * 0.1) return Math.min(1, sum2);
+    }
+    throw new Error("No convergió la cola Gamma de integración de pulsos");
+  }
+  function profile(pulses) {
+    if (profiles.has(pulses)) return profiles.get(pulses);
+    let lo = 0, hi = 2 * pulses + 64;
+    while (gammaUpper(pulses, hi) > PFA) hi *= 2;
+    for (let j = 0; j < 80; j++) {
+      const mid = (lo + hi) / 2;
+      if (gammaUpper(pulses, mid) > PFA) lo = mid;
+      else hi = mid;
+    }
+    const threshold = (lo + hi) / 2, miss = [];
+    for (let k = 0; k < 1024; k++) {
+      const p = gammaLower(pulses + k, threshold);
+      miss.push(p);
+      if (p < EPS) {
+        const value = { threshold, miss };
+        profiles.set(pulses, value);
+        return value;
+      }
+    }
+    throw new Error("No convergió el perfil de integración de pulsos");
+  }
+  function noncoherentPd(snr, pulses = 1, model = 1) {
+    validate(pulses, model);
+    if (typeof snr !== "number" || Number.isNaN(snr) || snr < 0)
+      throw new RangeError("La SNR debe ser un número no negativo");
+    if (snr === 0) return PFA;
+    if (snr === Infinity) return 1;
+    if (pulses === 1) {
+      const T = -Math.log(PFA);
+      return model === 1 ? Math.pow(PFA, 1 / (1 + snr)) : (1 + 2 * (snr / (2 + snr)) * (T / (2 + snr))) * Math.exp(-2 * T / (2 + snr));
+    }
+    const a = model === 3 ? 2 : 1, scale = pulses * snr / a;
+    const p = 1 / (1 + scale), q = scale / (1 + scale);
+    if (p === 0) return 1;
+    let weight = p ** a, missed = 0;
+    const { miss } = profile(pulses);
+    for (let k = 0; k < miss.length; k++) {
+      missed += weight * miss[k];
+      weight *= q * (k + a) / (k + 1);
+    }
+    return Math.max(PFA, Math.min(1, 1 - missed));
+  }
+  function integratedSnr50(pulses = 1, model = 1) {
+    validate(pulses, model);
+    const key = `${pulses}/${model}`;
+    if (anchors.has(key)) return anchors.get(key);
+    let lo = 0, hi = 64;
+    for (let j = 0; j < 80; j++) {
+      const mid = (lo + hi) / 2;
+      if (noncoherentPd(mid, pulses, model) < 0.5) lo = mid;
+      else hi = mid;
+    }
+    const value = (lo + hi) / 2;
+    anchors.set(key, value);
+    return value;
+  }
+
   // src/physics/radar.js
   function rcsAt(th, band, ca = 1) {
     return rcsFront(th, band) * aspectFactor(th, band, ca);
@@ -3225,7 +3312,6 @@ table.t.mc td.pc{white-space:nowrap}
     return wx && wx.rain ? rainRange(R, rainGamma(r.band, wx.rain), wx.rainKm) : R;
   }
   var belowCeiling = (r, wx, agl) => !(r.band === "OPT" && wx && wx.ceiling != null && agl > wx.ceiling);
-  var PFA = 1e-6;
   var SNR50 = Math.log(PFA) / Math.log(0.5) - 1;
   var TRACK_M = 2;
   var TRACK_N = 3;
@@ -3252,7 +3338,11 @@ table.t.mc td.pc{white-space:nowrap}
     return (lo + hi) / 2;
   })();
   var swerlingOf = (th) => (th.T || th).swerling === 3 ? 3 : 1;
-  var pdRel = (m, k) => m === 3 ? pdSwerling3(SNR50_3 * k) : pdSwerling1(SNR50 * k);
+  var pdRel = (m, k, pulses = 1) => {
+    if (pulses === 1) return m === 3 ? pdSwerling3(SNR50_3 * k) : pdSwerling1(SNR50 * k);
+    const anchor = integratedSnr50(pulses, m);
+    return k > 0 ? noncoherentPd(anchor * k, pulses, m) : 0;
+  };
   var CLUTTER_DB = { none: 20, mti: 10, pd: 3 };
   var CLUTTER_AGL = 300;
   var NOTCH_MS = { mti: 15, pd: 8 };
@@ -3272,7 +3362,8 @@ table.t.mc td.pc{white-space:nowrap}
     if (rr > PD_CUTOFF * R) return 0;
     if (r.band !== "OPT" && r.band !== "ACU" && inNotch(r, th, ca)) return 0;
     const loss = r.band === "OPT" || r.band === "ACU" ? 0 : clutterLossDb(r, agl, x, y);
-    return pdRel(swerlingOf(th), Math.pow(R / Math.max(rr, 1e-3), 4) / Math.pow(10, loss / 10));
+    const pulses = r.band === "OPT" || r.band === "ACU" ? 1 : r.integrationPulses;
+    return pdRel(swerlingOf(th), Math.pow(R / Math.max(rr, 1e-3), 4) / Math.pow(10, loss / 10), pulses);
   }
   function horizon(hr, ht) {
     return HORIZON_K * (Math.sqrt(Math.max(0, hr)) + Math.sqrt(Math.max(0, ht)));
@@ -5326,6 +5417,35 @@ table.t.mc td.pc{white-space:nowrap}
       }
     },
     {
+      id: "pulseIntegration",
+      group: "Radar y bandas",
+      title: "Integración de pulsos: varios ecos por barrido",
+      body: () => `<p>Un radar puede sumar la <b>potencia de varios ecos</b> durante una pasada del haz. Eso es integración no coherente: con la misma señal por pulso, combinar muestras independientes ayuda a distinguirla del ruido. El umbral también debe subir, para conservar la misma probabilidad de falsa alarma.</p>
+      <p>No es la confirmación <b>2 de 3 barridos</b>: primero se combinan los pulsos dentro de un barrido; después se decide si los contactos de varios barridos forman una pista.</p>
+      <p>El alcance publicado de un radar ya incorpora su procesamiento. En este ejemplo lo conservamos como el punto de <b>50% de detección</b>: al integrar cambia la curva alrededor de ese alcance, sin sumar otra ganancia al mismo dato.</p>`,
+      engine: () => `<p>El motor admite integración no coherente para Swerling lento 1/3: la RCS permanece constante dentro del barrido y cambia entre barridos. <b>El catálogo conserva la aproximación de un pulso por falta de datos de integración por radar.</b> Eso no significa que los radares reales usen uno. El ejemplo no cambia unidades ni escenarios; el período de barrido no alcanza para deducir el número de pulsos.</p>`,
+      widget: {
+        html: () => `<div class="widget"><p class="hint">Ejemplo hipotético sin clutter ni interferencia; no representa un radar del catálogo.</p>
+        <div class="field"><label for="pulseN">Pulsos independientes por decisión</label><select id="pulseN" class="sel">${[1, 2, 4, 8, 16, 32, 64, 128].map((v) => `<option value="${v}" ${v === 8 ? "selected" : ""}>${v}</option>`).join("")}</select></div>
+        <div class="field"><label for="pulseM">Fluctuación del blanco</label><select id="pulseM" class="sel"><option value="1">Swerling 1: muchos reflectores parecidos</option><option value="3">Swerling 3: un reflector dominante</option></select></div>
+        <div class="field"><label for="pulseDistance">Distancia como porcentaje del alcance publicado</label><span class="val" id="pulseDistanceV"></span><input id="pulseDistance" type="range" min="30" max="180" step="1" value="120"></div>
+        <p class="wout" id="pulsePd"></p><div class="tblwrap"><table class="t" id="pulseTable"></table></div></div>`,
+        mount: (el) => {
+          const update = () => {
+            const pulses = +el.querySelector("#pulseN").value, model = +el.querySelector("#pulseM").value;
+            const distance = +el.querySelector("#pulseDistance").value, k = (distance / 100) ** -4;
+            el.querySelector("#pulseDistanceV").textContent = distance + "%";
+            el.querySelector("#pulsePd").textContent = `Pd por barrido: ${n(100 * pdRel(model, k, pulses), 1)}% con ${pulses} pulsos · ${n(100 * pdRel(model, k), 1)}% con la aproximación de un pulso`;
+            el.querySelector("#pulseTable").innerHTML = `<thead><tr><th>Distancia / alcance</th><th>Pd, 1 pulso</th><th>Pd, ${pulses} pulsos</th></tr></thead><tbody>${[0.5, 0.8, 1, 1.2, 1.5].map((f) => `<tr><td>${n(100 * f)}%</td><td>${n(100 * pdRel(model, f ** -4), 1)}%</td><td>${n(100 * pdRel(model, f ** -4, pulses), 1)}%</td></tr>`).join("")}</tbody>`;
+          };
+          el.querySelector("#pulseN").onchange = update;
+          el.querySelector("#pulseM").onchange = update;
+          el.querySelector("#pulseDistance").oninput = update;
+          update();
+        }
+      }
+    },
+    {
       id: "horizon",
       group: "Detección y terreno",
       title: "Horizonte de radar",
@@ -6830,11 +6950,14 @@ table.t.mc td.pc{white-space:nowrap}
     };
     $("#zfit").onclick = fitView;
     document.addEventListener("keydown", (e) => {
-      if (e.target.matches?.('input,select,textarea,[contenteditable="true"]')) return;
       if (!$("#modal").hidden) {
-        if (e.key === "Escape") closeModal();
+        if (e.key === "Escape") {
+          e.preventDefault();
+          closeModal();
+        }
         return;
       }
+      if (e.target.matches?.('input,select,textarea,[contenteditable="true"]')) return;
       if (e.key === "Escape") {
         if (S.preview) cancelPlacement();
         else setMode("select");
