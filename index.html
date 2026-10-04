@@ -102,6 +102,11 @@ canvas#map{position:absolute;inset:0;width:100%;height:100%;touch-action:none;di
 .relief span{color:var(--muted);margin-right:4px;font-family:var(--f-disp);font-size:13px;letter-spacing:.05em;text-transform:uppercase}
 .relief button{background:var(--panel2);border:1px solid var(--line2);border-radius:3px;padding:2px 7px;font-size:11px}
 .relief button.act{border-color:var(--accent);color:var(--accent)}
+.replaybar{position:absolute;left:10px;right:10px;bottom:12px;z-index:3;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;background:rgba(12,18,25,.92);border:1px solid var(--accent);border-radius:6px;padding:6px 8px}
+.replaybar input[type=range]{flex:1 1 200px;min-width:120px}
+.rplog{flex:1 1 100%;margin:0;padding:0;list-style:none;font-size:11px;color:var(--muted);max-height:66px;overflow:hidden}
+.rplog time{font-family:var(--f-mono);color:var(--accent);margin-right:4px}
+#replayBar:not([hidden]) ~ .legend,#replayBar:not([hidden]) ~ .relief{display:none}
 .legend{position:absolute;left:10px;bottom:12px;background:rgba(12,18,25,.86);border:1px solid var(--line);border-radius:6px;padding:6px 9px;font-size:11px;color:var(--muted);display:flex;flex-direction:column;gap:3px}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .sw{width:12px;height:8px;border-radius:2px;display:inline-block}
@@ -247,6 +252,7 @@ table.t.mc td.pc{white-space:nowrap}
         <div class="speeds" id="speeds"></div>
         <label class="check" style="font-size:12px"><input type="checkbox" id="defView"> Vista del defensor</label>
       </div>
+      <div class="replaybar" id="replayBar" role="group" aria-label="Repetición de la corrida" hidden></div>
       <div class="relief" id="relief" role="group" aria-label="Lectura del relieve"><span>Relieve</span></div>
       <div class="zoom"><button id="zin" aria-label="Acercar">+</button><button id="zout" aria-label="Alejar">−</button><button id="zfit" aria-label="Encuadrar" style="font-size:12px">⤢</button></div>
       <div class="legend" id="legend">
@@ -3746,8 +3752,10 @@ table.t.mc td.pc{white-space:nowrap}
 
   // src/sim/log.js
   function log(cls, msg) {
-    S.log.unshift({ t: S.t, cls, msg });
+    const e = { t: S.t, cls, msg };
+    S.log.unshift(e);
     if (S.log.length > 300) S.log.pop();
+    S.rec?.log.push(e);
     hooks.onLog();
   }
   function label(th) {
@@ -3760,6 +3768,51 @@ table.t.mc td.pc{white-space:nowrap}
     if (key && S.events.some((e) => e.key === key)) return;
     S.events.push({ t: S.t, text, key: key || null });
   }
+
+  // src/sim/replay.js
+  function recReset() {
+    S.rec = { ints: [], units: [], objs: [], log: [] };
+  }
+  function recUnit(u) {
+    S.rec?.units.push({ t: S.t, id: u.id, alive: u.alive, dmgRadar: u.dmgRadar, dmgLauncher: u.dmgLauncher, magLeft: u.magLeft });
+  }
+  function recObj(g) {
+    S.rec?.objs.push({ t: S.t, id: g.id, hp: g.hp, status: g.status, hits: g.hits });
+  }
+  var canReplay = () => !!(S.rec && S.started && S.threats.length);
+  function stateAt(base, events, T) {
+    const out = base.map((o) => ({ ...o })), byId = new Map(out.map((o) => [o.id, o]));
+    for (const e of events) {
+      if (e.t > T) break;
+      const o = byId.get(e.id);
+      if (o) Object.assign(o, e);
+    }
+    return out;
+  }
+  function trailAt(th, T) {
+    const tr = [];
+    for (let t = Math.max(th.tBorn ?? th.tLaunch, T - 240); t < T; t += 3) {
+      const p = posAt(th, t);
+      if (p) tr.push([p.x, p.y, t]);
+    }
+    return tr;
+  }
+  function frameAt(T) {
+    const threats = [];
+    for (const th of S.threats) {
+      if (T <= 0 || (th.tBorn ?? th.tLaunch) > T || (th.tEnd ?? Infinity) <= T) continue;
+      const p = posAt(th, T);
+      if (!p) continue;
+      threats.push({ ...th, p, trail: trailAt(th, T), alive: true, lastNet: T });
+    }
+    const ints = S.rec.ints.filter((it) => it.tL <= T && T < it.tH).map((it) => ({ ...it, done: false }));
+    const units = stateAt(S.setup.defs.map((d) => ({ ...d, alive: true, dmgRadar: false, dmgLauncher: false, magLeft: d.mag })), S.rec.units, T);
+    const objs = stateAt(S.setup.objs.map((g) => ({ ...g, hp: g.maxHp, status: "operational", hits: 0 })), S.rec.objs, T);
+    const impacts = S.impacts.filter((im) => (im.t ?? 0) <= T);
+    const log2 = S.rec.log.filter((l) => l.t <= T);
+    return { t: T, threats, ints, units, objs, impacts, log: log2 };
+  }
+  var replayEnd = () => S.t;
 
   // src/sim/engine.js
   function startSim() {
@@ -3775,6 +3828,7 @@ table.t.mc td.pc{white-space:nowrap}
     S.events = [];
     S.arrivals = [];
     S.pending = [];
+    recReset();
     for (const sv of S.setup.salvos) {
       let t0 = sv.tStart || 0;
       if (sv.sync) {
@@ -3789,6 +3843,8 @@ table.t.mc td.pc{white-space:nowrap}
     log("d", "Inicio de la simulación: " + S.pending.length + " amenazas programadas, " + S.units.length + " unidades de defensa.");
   }
   function resetState() {
+    S.rec = null;
+    S.replay = null;
     S.autoPhase = "calm";
     S.running = false;
     S.started = false;
@@ -3835,7 +3891,7 @@ table.t.mc td.pc{white-space:nowrap}
         th.released = true;
         for (let k = 0; k < th.decoyRel; k++) {
           const ang = rnd() * 6.28, dist = 1 + rnd() * 2.5;
-          const dc = { ...th, fly: [], id: nextId(), parent: th, isDecoy: true, isDecoyChild: true, decoyRel: 0, sRel: p.s, off: [Math.cos(ang) * dist, Math.sin(ang) * dist], det: {}, mn: {}, mnT: {}, net: {}, trail: [], lastNet: -1e9, firstDet: null, cueFirst: null, netFirst: null, clsT: 0, clsTau: null, clsAs: null, phase: th.phase + (k + 1) * 1.6180339, alive: true, targetUnit: null };
+          const dc = { ...th, fly: [], id: nextId(), parent: th, tBorn: t, isDecoy: true, isDecoyChild: true, decoyRel: 0, sRel: p.s, off: [Math.cos(ang) * dist, Math.sin(ang) * dist], det: {}, mn: {}, mnT: {}, net: {}, trail: [], lastNet: -1e9, firstDet: null, cueFirst: null, netFirst: null, clsT: 0, clsTau: null, clsAs: null, phase: th.phase + (k + 1) * 1.6180339, alive: true, targetUnit: null };
           S.threats.push(dc);
           S.stats.decoys++;
           S.stats.launched++;
@@ -3936,6 +3992,7 @@ table.t.mc td.pc{white-space:nowrap}
         u.reserveLeft -= n2;
         u.reloadUntil = null;
         S.stats.reloads++;
+        recUnit(u);
         log("l", uLabel(u) + " termina de recargar: " + n2 + " listos, quedan " + u.reserveLeft + " en reserva.");
       } else if (u.reloadUntil === null && u.magLeft === 0 && u.active === 0 && u.reserveLeft > 0 && canResupply(u)) {
         u.reloadUntil = t + D(u).sam.reloadS;
@@ -3966,6 +4023,7 @@ table.t.mc td.pc{white-space:nowrap}
       if (rnd() < pk) {
         th.alive = false;
         th.killed = true;
+        th.tEnd = t;
         S.stats.killed++;
         if (th.isDecoy) S.stats.decoysKilled++;
         const p = th.p || it;
@@ -4082,10 +4140,12 @@ table.t.mc td.pc{white-space:nowrap}
         const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f };
         S.ints.push(it);
         (th.fly = th.fly || []).push(it);
+        S.rec?.ints.push(it);
         u.magLeft--;
         u.active++;
         S.stats.shots++;
         S.stats.defCost += sm.cost;
+        recUnit(u);
         S.stats.byUnit[uLabel(u)] = (S.stats.byUnit[uLabel(u)] || 0) + 1;
       }
       event("Primer interceptor lanzado: " + uLabel(u) + " contra " + label(th), "firstShot");
@@ -4099,6 +4159,7 @@ table.t.mc td.pc{white-space:nowrap}
   function impact(th) {
     th.alive = false;
     th.done = true;
+    th.tEnd = S.t;
     const tg = th.pts[th.pts.length - 1];
     let x = tg[0], y = tg[1];
     if (th.parent) {
@@ -4111,7 +4172,7 @@ table.t.mc td.pc{white-space:nowrap}
     x += Math.cos(ang) * r / 1e3;
     y += Math.sin(ang) * r / 1e3;
     if (th.isDecoy) {
-      S.impacts.push({ x, y, k: "decoy" });
+      S.impacts.push({ x, y, k: "decoy", t: S.t });
       log("d", label(th) + " cae sin efecto.");
       return;
     }
@@ -4129,13 +4190,14 @@ table.t.mc td.pc{white-space:nowrap}
     const dtxt = dmg.map((d) => ` · −${d.dmg} HP a ${d.g.name} (${Math.max(0, d.g.hp)}/${d.g.maxHp})`).join("");
     if (hit) {
       S.stats.hits++;
-      S.impacts.push({ x, y, k: "hit" });
+      S.impacts.push({ x, y, k: "hit", t: S.t });
       S.fx.push({ x, y, rt: performance.now(), c: "#ff5b4d", big: true });
       let msg = label(th) + " impacta en el blanco";
       if (th.targetUnit) {
         const u = S.units.find((v) => v.id === th.targetUnit && v.alive);
         if (u) {
           u.alive = false;
+          recUnit(u);
           S.stats.lost++;
           msg += " y destruye " + uLabel(u);
           hooks.onUnitLost();
@@ -4145,7 +4207,7 @@ table.t.mc td.pc{white-space:nowrap}
       log("x", msg + dtxt + ".");
     } else {
       S.stats.misses++;
-      S.impacts.push({ x, y, k: "miss" });
+      S.impacts.push({ x, y, k: "miss", t: S.t });
       log("w", label(th) + " cae a " + Math.round(r) + " m del blanco" + (th.navErr > 150 ? " (desviado por interferencia GNSS)" : "") + dtxt + ".");
     }
     damageUnits(th.T, x, y);
@@ -4171,6 +4233,7 @@ table.t.mc td.pc{white-space:nowrap}
       g.hits++;
       g.dmgBy[th.T.short] = (g.dmgBy[th.T.short] || 0) + dmg;
       g.status = targetStatus(g.hp, g.maxHp);
+      recObj(g);
       S.stats.damage += dmg;
       S.stats.dmgByWeapon[th.T.short] = (S.stats.dmgByWeapon[th.T.short] || 0) + dmg;
       out.push({ g, dmg, dist, before });
@@ -4186,6 +4249,7 @@ table.t.mc td.pc{white-space:nowrap}
       u.hp -= Math.round(res.dmg);
       if (u.hp <= 0) {
         u.alive = false;
+        recUnit(u);
         S.stats.lost++;
         hooks.onUnitLost();
         log("x", uLabel(u) + " queda destruida por la explosión de " + T.short + " a " + Math.round(res.edge + UNIT_TARGET.radius) + " m.");
@@ -4208,6 +4272,7 @@ table.t.mc td.pc{white-space:nowrap}
         }
         S.stats.unitsDamaged++;
         event(uLabel(u) + " dañada por " + T.short, "dmgUnit:" + u.id + ":" + c);
+        recUnit(u);
       }
     }
   }
@@ -4491,6 +4556,7 @@ table.t.mc td.pc{white-space:nowrap}
   // src/render/draw.js
   function draw() {
     if (!MAP) return;
+    const R = S.replay ? frameAt(S.replay.t) : null, tNow = R ? R.t : S.t;
     const w = cv.width / dpr, h = cv.height / dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = "#0a1520";
@@ -4535,7 +4601,7 @@ table.t.mc td.pc{white-space:nowrap}
       ctx.fillStyle = "rgba(235,240,245,.85)";
       ctx.fillText(p[0], sx + 5, sy + 4);
     }
-    const units = S.started ? S.units : S.setup.defs;
+    const units = R ? R.units : S.started ? S.units : S.setup.defs;
     const jams = S.started ? S.jamsLive : S.setup.jams;
     for (const u of units) {
       const d = D(u);
@@ -4597,9 +4663,9 @@ table.t.mc td.pc{white-space:nowrap}
         ctx.setLineDash([]);
       }
     }
-    if (!S.started || !S.running) for (const sv of S.setup.salvos) drawRoute(sv, S.sel && S.sel.kind === "salvo" && S.sel.id === sv.id);
+    if (!R && (!S.started || !S.running)) for (const sv of S.setup.salvos) drawRoute(sv, S.sel && S.sel.kind === "salvo" && S.sel.id === sv.id);
     if (S.route) drawRoute({ type: S.atk.type, pts: S.route.pts, preview: true }, true);
-    for (const g of S.started ? S.objs : S.setup.objs) drawObjective(g, S.sel && S.sel.kind === "obj" && S.sel.id === g.id);
+    for (const g of R ? R.objs : S.started ? S.objs : S.setup.objs) drawObjective(g, S.sel && S.sel.kind === "obj" && S.sel.id === g.id);
     for (const j of jams) {
       const J = JAMMERS[j.type], [sx, sy] = toS(j.x, j.y);
       const isSel = S.sel && S.sel.kind === "jam" && S.sel.id === j.id;
@@ -4677,7 +4743,7 @@ table.t.mc td.pc{white-space:nowrap}
       labelAt(sx, sy, (u.name || d.short) + ammo, dead ? "#6b7888" : "#e6eef6");
     }
     if (S.preview) drawPreview(S.preview);
-    for (const im of S.impacts) {
+    for (const im of R ? R.impacts : S.impacts) {
       const [sx, sy] = toS(im.x, im.y);
       ctx.strokeStyle = im.k === "hit" ? "#ff5b4d" : im.k === "miss" ? "#e6a53c" : "#6b7888";
       ctx.lineWidth = 2;
@@ -4689,9 +4755,9 @@ table.t.mc td.pc{white-space:nowrap}
       ctx.stroke();
     }
     const dv = hooks.defenderView();
-    for (const th of S.threats) {
+    for (const th of R ? R.threats : S.threats) {
       if (!th.alive || !th.p) continue;
-      const tracked = S.t - th.lastNet <= 12;
+      const tracked = tNow - th.lastNet <= 12;
       if (dv && !tracked) continue;
       const decoyLook = th.isDecoy && !dv;
       const col = tracked ? "#ff5b4d" : "rgba(255,91,77,.55)";
@@ -4708,7 +4774,7 @@ table.t.mc td.pc{white-space:nowrap}
       }
       ctx.stroke();
       const [sx, sy] = toS(th.p.x, th.p.y);
-      const nx = posAt(th, S.t + 2);
+      const nx = posAt(th, tNow + 2);
       const hd = nx ? Math.atan2(nx.y - th.p.y, nx.x - th.p.x) : 0;
       ctx.save();
       ctx.translate(sx, sy);
@@ -4742,10 +4808,10 @@ table.t.mc td.pc{white-space:nowrap}
         ctx.fillText(dv ? "#" + th.id : th.T.short, sx + 7, sy - 6);
       }
     }
-    for (const it of S.ints) {
-      if (it.done || S.t < it.tL) continue;
+    for (const it of R ? R.ints : S.ints) {
+      if (it.done || tNow < it.tL) continue;
       const P = profileOf(D(it.u).sam), fl = Math.max(0.1, it.tH - it.tL);
-      const f = clamp(distAt(P, S.t - it.tL) / Math.max(1, distAt(P, fl)), 0, 1);
+      const f = clamp(distAt(P, tNow - it.tL) / Math.max(1, distAt(P, fl)), 0, 1);
       const [a, b] = toS(it.x0, it.y0), [c2, d2] = toS(it.x0 + (it.px - it.x0) * f, it.y0 + (it.py - it.y0) * f);
       ctx.strokeStyle = "rgba(120,220,255,.75)";
       ctx.lineWidth = 1.2;
@@ -6263,7 +6329,7 @@ table.t.mc td.pc{white-space:nowrap}
       el.innerHTML = `<h3>Escenario</h3><p class="hint">Relieve importado: escenario libre. Ubicá objetivos en la pestaña Ataque.</p>`;
       return;
     }
-    const objs = S.started ? S.objs : S.setup.objs;
+    const objs = S.replay ? frameAt(S.replay.t).objs : S.started ? S.objs : S.setup.objs;
     const mine = (sc2.goals || []).filter((g) => g.side === sc2.player);
     el.innerHTML = `<div class="row" style="justify-content:space-between"><h3>Escenario</h3><button class="btn sm" id="briefBtn">Briefing</button></div>
     <p class="hint">${sc2.time ? esc(sc2.time) + " · " : ""}Jugás: <b>${SIDE[sc2.player] || "—"}</b></p>
@@ -6478,6 +6544,76 @@ table.t.mc td.pc{white-space:nowrap}
     $("#mcAgain").onclick = openMonteCarlo;
   }
 
+  // src/ui/replay.js
+  var SPEEDS2 = [5, 30, 120];
+  function openReplay(t = 0) {
+    if (!canReplay()) {
+      toast("Primero corré el escenario hasta el final.");
+      return;
+    }
+    closeModal();
+    S.running = false;
+    S.replay = { t, playing: true, speed: 30 };
+    renderReplayBar();
+  }
+  function closeReplay() {
+    S.replay = null;
+    renderReplayBar();
+  }
+  function renderReplayBar() {
+    const el = $("#replayBar");
+    if (!el) return;
+    if (!S.replay) {
+      el.hidden = true;
+      el.innerHTML = "";
+      return;
+    }
+    const end = Math.ceil(replayEnd());
+    el.hidden = false;
+    el.innerHTML = `<button class="btn pri sm" id="rpPlay"></button>
+    <input type="range" id="rpT" min="0" max="${end}" step="1" value="${Math.round(S.replay.t)}" aria-label="Instante de la repetición">
+    <span class="clock" id="rpClock"></span>
+    <div class="speeds">${SPEEDS2.map((s) => `<button data-s="${s}" class="${s === S.replay.speed ? "act" : ""}">${s}×</button>`).join("")}</div>
+    <button class="btn sm" id="rpExit">Salir</button>
+    <ol class="rplog" id="rpLog" aria-live="polite"></ol>`;
+    $("#rpPlay").onclick = () => {
+      const R = S.replay;
+      if (R.t >= end) R.t = 0;
+      R.playing = !R.playing;
+      updateReplayBar();
+    };
+    $("#rpT").oninput = (e) => {
+      S.replay.t = +e.target.value;
+      S.replay.playing = false;
+      updateReplayBar();
+    };
+    el.querySelector(".speeds").onclick = (e) => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      S.replay.speed = +b.dataset.s;
+      for (const c of b.parentNode.children) c.classList.toggle("act", c === b);
+    };
+    $("#rpExit").onclick = closeReplay;
+    updateReplayBar();
+  }
+  function updateReplayBar() {
+    const R = S.replay;
+    if (!R || !$("#rpPlay")) return;
+    $("#rpPlay").textContent = R.playing ? "❚❚" : "▶";
+    $("#rpT").value = Math.round(R.t);
+    $("#rpClock").textContent = "Repetición " + fmtT(R.t);
+    const log2 = frameAt(R.t).log.slice(-4).reverse();
+    $("#rpLog").innerHTML = log2.map((l) => `<li class="${esc(l.cls)}"><time>${fmtT(l.t)}</time> ${esc(l.msg)}</li>`).join("");
+  }
+  function tickReplay(dtr) {
+    const R = S.replay;
+    if (!R?.playing) return;
+    const end = replayEnd();
+    R.t = Math.min(end, R.t + dtr * R.speed);
+    if (R.t >= end) R.playing = false;
+    updateReplayBar();
+  }
+
   // src/ui/debrief.js
   var pct2 = (a, b) => b ? Math.round(100 * a / b) + "%" : "—";
   var SIDE3 = { ataque: "Ataque", defensa: "Defensa" };
@@ -6518,9 +6654,10 @@ table.t.mc td.pc{white-space:nowrap}
     <div><h3>Línea de tiempo</h3><ol class="timeline">${tl}</ol></div>
     <div><h3>Por tipo de arma</h3><div class="tblwrap"><table class="t"><thead><tr><th>Arma</th><th>Lanzadas</th><th>Derribadas</th><th>Llegaron</th><th>Interceptores recibidos</th></tr></thead><tbody>${typeRows}</tbody></table></div></div>
     <p class="hint">Todo lo de arriba sale de lo que registró el motor durante la corrida. Corré de nuevo con otra disposición: el azar (detección, Pk, dispersión) cambia el resultado de una corrida a otra.</p>
-    <div class="row"><button class="btn" id="dbMc">¿Fue suerte? Repetir muchas veces (Monte Carlo)</button></div>
+    <div class="row"><button class="btn pri" id="dbReplay" title="Volver a ver la corrida sobre el mapa, con una línea de tiempo">Ver repetición</button><button class="btn" id="dbMc">¿Fue suerte? Repetir muchas veces (Monte Carlo)</button></div>
   </div>`, openDebrief);
     $("#dbMc").onclick = openMonteCarlo;
+    $("#dbReplay").onclick = () => openReplay(0);
   }
 
   // src/ui/panels/results.js
@@ -6826,6 +6963,7 @@ table.t.mc td.pc{white-space:nowrap}
   }
   function resetSim() {
     resetState();
+    renderReplayBar();
     markLogDirty();
     updatePlay();
     schedCov();
@@ -7541,6 +7679,7 @@ table.t.mc td.pc{white-space:nowrap}
       });
       $("#clock").textContent = fmtT(S.t);
     }
+    if (S.replay) tickReplay(dtr);
     draw();
     if (++uiTick % 10 === 0) {
       const free = (id) => !(pressedBtn && document.querySelector(id)?.contains(pressedBtn));

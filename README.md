@@ -11,7 +11,7 @@ Desplegás radares, baterías antiaéreas y guerra electrónica sobre relieve re
 Primeros pasos:
 1. Elegí un escenario arriba a la derecha y leé el **briefing**. Hay seis jugables: la noche de ataque combinado sobre Monterey, el ataque a la base con S-400 en Gotemburgo, la **defensa de la refinería de Hisingen** (Gotemburgo), el **ataque al puente de Moss Landing** (Monterey), la **noche contra la energía de Kiev** y las **bombas planeadoras sobre Járkov**, las dos últimas sobre el relieve real de cada ciudad.
 2. Tocá **▶ Iniciar**. La velocidad **Auto** acelera cuando no pasa nada y frena cuando hay combate.
-3. Al terminar se abre el **debrief**. ¿Fue suerte? El botón **Monte Carlo** corre la misma situación muchas veces y muestra la probabilidad de que cada objetivo sobreviva.
+3. Al terminar se abre el **debrief**, con un botón para **ver la repetición** de la corrida sobre el mapa con una línea de tiempo. ¿Fue suerte? El botón **Monte Carlo** corre la misma situación muchas veces y muestra la probabilidad de que cada objetivo sobreviva.
 4. Probá cambiar cosas: mové defensas (antes de iniciar), agregá ataques en la pestaña **Ataque** o activá la capa **Relieve → Puntos altos** para ubicar radares en cotas dominantes.
 5. **Guardar** descarga lo que armaste como archivo `.json`; **Cargar** lo vuelve a abrir (también en otra computadora).
 6. ¿No sabés qué es la RCS o por qué un radar VHF ve misiles furtivos? Pestaña **Academia** o los botones **ⓘ**.
