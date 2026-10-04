@@ -1,3 +1,4 @@
+// @ts-check
 // Registro de eventos de la corrida (lo que se ve en el panel "Registro").
 import { D } from '../data/index.js';
 import { S } from './state.js';

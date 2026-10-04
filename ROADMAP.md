@@ -33,4 +33,4 @@ Propuesta detallada, con orden, dificultad, datos y pruebas: [docs/investigacion
 - Versión de escritorio opcional (Tauri o Electron) si hace falta acceso a archivos grandes.
 - Tipografías embebidas para el uso sin conexión.
 - Pruebas de interfaz en el navegador dentro de la CI (Playwright).
-- TypeScript gradual o `// @ts-check` sobre los tipos JSDoc de `src/types.js`.
+- `@ts-check`, segunda parte (ya está en `util`, `data`, `physics` y `sim`, y corre en la CI): sumar `render` y `ui` (falta tipar el DOM) y activar `strictNullChecks` (hoy da 49 avisos, todos por el mapa activo `MAP` que empieza en `null`, ninguno es un error real).

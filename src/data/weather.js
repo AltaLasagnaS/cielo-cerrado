@@ -1,3 +1,4 @@
+// @ts-check
 // Estados del tiempo, fijos durante todo el escenario. Los usan physics/weather.js (atenuación del
 // radar por lluvia) y physics/radar.js#detR / sim/engine.js (sensores ópticos y acústicos).
 //

@@ -1,3 +1,4 @@
+// @ts-check
 // Tasas de intercepción reportadas (nivel nacional salvo que se indique). Se muestran en la ficha.
 // [período, lanzados, derribados, tasa, fuente, nota]
 export const OBS = {

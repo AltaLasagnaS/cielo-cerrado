@@ -1,3 +1,4 @@
+// @ts-check
 // Tipos de datos del catálogo y de los escenarios, en JSDoc. No se ejecuta: documenta los campos y
 // le da autocompletado al editor (VS Code lo toma solo). Si agregás un campo, documentalo acá.
 
@@ -8,7 +9,7 @@
  * @property {string} short  Nombre corto (mapa, registro)
  * @property {'RU'|'UA'} side
  * @property {'dron'|'crucero'|'supersonico'|'balistico'|'hiper'} cls  Clase: decide qué Pk usa cada defensa
- * @property {'drone'|'cruise'|'bunt'|'ballistic'|'highdive'|'hilo'} prof  Perfil de vuelo (docs/FISICA.md §5)
+ * @property {'drone'|'cruise'|'bunt'|'ballistic'|'highdive'|'hilo'|'glide'} prof  Perfil de vuelo (docs/FISICA.md §5)
  * @property {number} v       Velocidad de crucero (m/s)
  * @property {number} [vDive] Velocidad en picada (m/s, perfil highdive)
  * @property {number} [vLow]  Velocidad del tramo rasante (m/s, perfil hilo)

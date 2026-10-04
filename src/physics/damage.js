@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- DAÑO ----------------
 // Modelo simple y parametrizable: más ojiva → más daño y mayor radio; impacto directo → daño
 // completo; impacto cercano → daño que cae con el cuadrado de la distancia escalada.

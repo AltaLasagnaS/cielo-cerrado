@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- MODO MONTE CARLO ----------------
 // Corre N veces la misma situación (S.setup) con semillas distintas y, si se pide, sorteando los
 // parámetros del catálogo dentro de su rango de incertidumbre (applySample). Resume cada corrida y

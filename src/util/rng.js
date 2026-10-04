@@ -1,3 +1,4 @@
+// @ts-check
 // Fuente de azar de la simulación. Por defecto usa Math.random; los tests y el modo
 // Monte Carlo (sim/montecarlo.js) la reemplazan por un generador con semilla para que las corridas sean reproducibles.
 let source = null;

@@ -1,3 +1,4 @@
+// @ts-check
 // Utilidades matemáticas y de geometría plana.
 // Convención del mapa: x crece hacia el este, y hacia el sur (como la pantalla), distancias en km.
 // Azimut: 0° = norte, sentido horario.

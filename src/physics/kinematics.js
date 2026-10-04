@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- AMENAZAS: CINEMÁTICA ----------------
 // Las amenazas siguen una ruta poligonal en planta con velocidad constante por fase. La altura sale
 // del perfil de vuelo (T.prof). No se integran fuerzas: es un modelo cinemático guiado por datos,

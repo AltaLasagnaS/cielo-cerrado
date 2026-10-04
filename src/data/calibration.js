@@ -1,3 +1,4 @@
+// @ts-check
 // ARCHIVO GENERADO por scripts/calibrar.mjs (npm run calibrar -- --write): no editar a mano.
 // Casos de calibración (geometría en data/calibration-cases.js) corridos con el motor: 40 noches, C2
 // coordinada, doctrina de salva. "real" = dato observado; "obj" = rango objetivo para la tasa de derribo

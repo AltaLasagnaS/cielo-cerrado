@@ -1,3 +1,4 @@
+// @ts-check
 // Casos de calibración de la Pk con su geometría guardada (docs/DATOS-Y-FUENTES.md §4). Los corre
 // scripts/calibrar.mjs (npm run calibrar) y el resultado queda en data/calibration.js (CAL).
 //

@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- CLASIFICACIÓN DE SEÑUELOS ----------------
 // Un radar de tiro (bandas con BANDS[b].decoyTau) que sigue una pista aprende con el tiempo si es
 // un arma o un señuelo: por cómo se mueve, cómo cambia su eco y cómo frena. La probabilidad de haberla

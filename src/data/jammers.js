@@ -1,3 +1,4 @@
+// @ts-check
 // Guerra electrónica: interferidores de ruido contra radares y supresores/engañadores GNSS.
 // P = potencia relativa (parámetro de juego, no es una potencia física en watts).
 // spoofKm = desvío típico por ENGAÑO GNSS (km); sin él, el anti-GNSS solo interfiere (error menor).

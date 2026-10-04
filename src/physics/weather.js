@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- CLIMA ----------------
 // Atenuación del radar por lluvia (Rec. ITU-R P.838-3) y su efecto en el alcance de detección.
 // Ver docs/FISICA.md §2 ("Clima") y data/weather.js.

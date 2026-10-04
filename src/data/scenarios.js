@@ -1,3 +1,4 @@
+// @ts-check
 // Escenarios incluidos. Son datos puros: sim/setup.js#applyScenario los despliega en este orden:
 // objetivos, defensas, salvas e interferidores (el orden define los ids).
 //

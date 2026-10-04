@@ -7659,7 +7659,8 @@ table.t.mc td.pc{white-space:nowrap}
       const sc2 = raw.scenario;
       if (typeof sc2 !== "object") err('"scenario" tiene que ser un objeto.');
       else {
-        scenario = { base: typeof sc2.base === "string" && SCENARIOS[sc2.base] ? sc2.base : null, name: str("scenario.name", sc2.name, 200) || "Escenario cargado", player: sc2.player ?? "defensa" };
+        scenario = /** @type {Record<string, any>} */
+        { base: typeof sc2.base === "string" && SCENARIOS[sc2.base] ? sc2.base : null, name: str("scenario.name", sc2.name, 200) || "Escenario cargado", player: sc2.player ?? "defensa" };
         if (!SIDES.includes(scenario.player)) err(`scenario.player: "${String(sc2.player)}" no es "ataque" ni "defensa".`);
         for (const k of ["time", "conditions", "success", "failure"]) scenario[k] = str("scenario." + k, sc2[k], 1e3);
         scenario.description = str("scenario.description", sc2.description, 5e3);

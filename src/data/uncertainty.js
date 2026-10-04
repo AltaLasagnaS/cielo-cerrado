@@ -1,3 +1,4 @@
+// @ts-check
 // Rangos de incertidumbre: cada parámetro numérico relevante tiene {min, p (probable), max, c (confianza), src, nota}.
 // El valor "p" es el que usa la simulación (applyProbable lo escribe sobre el catálogo al cargar);
 // min y max quedan para el modo Monte Carlo (applySample).

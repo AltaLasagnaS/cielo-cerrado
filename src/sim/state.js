@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- ESTADO ----------------
 // Estado único y mutable del juego. Se separa en dos partes:
 //   setup   → lo que arma el jugador (objetivos, defensas, salvas, jammers). Es lo que se guarda y carga.

@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- LECTURA DEL RELIEVE ----------------
 // Análisis visual/educativo del terreno: puntos altos, relieve relativo, pendiente y curvas de nivel.
 // Usa exactamente la misma grilla que surf() y los cálculos de línea de vista, pero NO modifica el

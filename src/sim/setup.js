@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- ARMADO DEL ESCENARIO ----------------
 // Funciones para agregar defensas, salvas y jammers a S.setup (antes de iniciar la corrida).
 import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES, C2_LEVELS, c2FromNet, WEATHER, WEATHER_DEFAULT } from '../data/index.js';

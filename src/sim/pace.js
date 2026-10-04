@@ -1,3 +1,4 @@
+// @ts-check
 // Compresión de tiempo automática (estilo CMO): rápido cuando no pasa nada y lento cuando hay
 // combate, para no perderse lo importante ni esperar minutos reales a que los drones crucen el mapa.
 

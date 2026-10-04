@@ -34,11 +34,12 @@ Catálogo: 16 amenazas, 19 defensas y sensores y 8 sistemas de guerra electróni
 Hace falta [Node.js](https://nodejs.org) 20 o más nuevo.
 
 ```bash
-npm install        # una vez: instala esbuild (la única dependencia)
+npm install        # una vez: instala las herramientas (esbuild, eslint, TypeScript solo para revisar tipos)
 npm run dev        # servidor en http://localhost:8000 que recarga al guardar
 npm test           # pruebas (física, catálogo, daño, corridas completas)
 npm run build      # regenera index.html (el juego en un solo archivo)
 npm run docs       # regenera docs/CATALOGO.md desde los datos
+npm run typecheck  # revisa los tipos (JSDoc + @ts-check) en util, data, physics y sim
 npm run check      # todo lo anterior y verifica que index.html y el catálogo estén al día
 npm run mc         # Monte Carlo de los escenarios en Node (40 noches)
 npm run calibrar   # casos de calibración de la Pk contra episodios reales

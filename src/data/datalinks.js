@@ -1,3 +1,4 @@
+// @ts-check
 // Familias de enlaces de datos del modelo. Son interfaces de juego, no una afirmación de que dos
 // equipos puedan intercambiar directamente mensajes en el mundo real. La confianza y las fuentes
 // quedan documentadas para que una futura investigación OSINT pueda reemplazar la estimación.

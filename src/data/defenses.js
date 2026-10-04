@@ -1,3 +1,4 @@
+// @ts-check
 // Defensas y sensores. Ver docs/DATOS-Y-FUENTES.md para el significado de cada campo.
 import { WP, SRC } from './sources.js';
 

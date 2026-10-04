@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- PERFIL DE VELOCIDAD DEL INTERCEPTOR ----------------
 // Motor y planeo (docs/FISICA.md §6): el misil acelera parejo mientras quema el motor y después planea
 // perdiendo velocidad por el arrastre.
