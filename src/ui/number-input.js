@@ -4,6 +4,7 @@ export function bindNumber(input, get, set, { integer = false } = {}) {
   if (!input) return;
   let message;
   if (integer) {
+    input.step = '1';
     message = document.createElement('p'); message.id = input.id + '-error';
     message.className = 'hint'; message.style.color = 'var(--red)'; message.style.gridColumn = '1 / -1';
     message.hidden = true; message.setAttribute('role', 'status');
