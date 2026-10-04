@@ -369,7 +369,7 @@ export const UNC = {
     },
     manpads: {
       'sam.maxR': U(4.5, 4.8, 6, 'alta', S_('wp:FIM-92_Stinger', 'wp:9K38_Igla'), ''),
-      'sam.vInt': U(450, 550, 650, 'baja', [], 'est'),
+      'sam.vInt': U(450, 550, 650, 'baja', [], 'est: modelo legado de velocidad constante, sin perfil de motor por falta de datos (docs/FISICA.md §6). Una sola entrada para Stinger, Igla y RBS 70: no implica que sean equivalentes'),
       'sam.cost': U(0.06, 0.45, 0.5, 'media', S_('wp:FIM-92_Stinger', 'wp:9K38_Igla'), 'Igla 60–80k; Stinger >400k'),
       'sam.pk.dron': U(0.3, 0.5, 0.7, 'baja', [], 'est')
     },

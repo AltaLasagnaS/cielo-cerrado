@@ -220,7 +220,7 @@ export const SCENARIOS = {
     description: 'Una noche típica de la campaña rusa contra la energía ucraniana: oleadas de Shahed desde el norte y el este, señuelos Gerbera para gastar munición, misiles de crucero Kh-101 y Kalibr, y balísticos Iskander-M y Kinzhal al final, todo para llegar casi junto. Los blancos son las centrales de cogeneración que dan luz y calefacción a la ciudad y la represa de Kiev. Las posiciones de la defensa son ilustrativas, no las reales.',
     forces: {
       defensa: 'Defensa por capas de la capital: radar 3D y radar VHF de alerta, Patriot (sector hacia el noreste), NASAMS, IRIS-T, dos Gepard junto a las centrales, tres grupos móviles, red acústica, drones interceptores y la red anti-GNSS Pokrova sobre la ciudad. Red de mando integrada.',
-      ataque: '24 Shahed en dos oleadas, 10 Gerbera, 9 Kh-101, 6 Kalibr, 3 Iskander-M con señuelos y 2 Kinzhal.'
+      ataque: '24 Shahed en dos oleadas, 10 Gerbera, 7 Kh-101, 6 Kalibr, 3 Iskander-M con señuelos y 2 Kinzhal.'
     },
     conditions: 'Noche de invierno, despejada. El motor no modela la luz: la noche solo explica por qué los grupos móviles dependen de la alerta acústica y del radar. Probá un techo de nubes bajo (pestaña Defensa): los grupos móviles dejan de ver a los Shahed que vuelan arriba.',
     rules: { c2: 'coordinada', doctrine: 'salva', weather: 'despejado' },
@@ -250,7 +250,7 @@ export const SCENARIOS = {
       { type: 'shahed', count: 18, interval: 20, tStart: 0, agl: 1500, pts: [[40, 0], [42, 30], [46.9, 52]], targetObj: 'Central CHP-6' },
       { type: 'gerbera', count: 10, interval: 25, tStart: 60, agl: 900, pts: [[70, 5], [50, 30], [44, 55]] },
       { type: 'shahed', count: 6, interval: 30, tStart: 120, agl: 2000, pts: [[70, 40], [55, 55], [40.3, 67.4]], targetObj: 'Central CHP-5' },
-      { type: 'kh101', count: 9, interval: 10, sync: true, tArrive: 1500, agl: 40, pts: [[0, 30], [20, 50], [40.3, 67.4]], targetObj: 'Central CHP-5' },
+      { type: 'kh101', count: 7, interval: 10, sync: true, tArrive: 1500, agl: 40, pts: [[0, 30], [20, 50], [40.3, 67.4]], targetObj: 'Central CHP-5' },
       { type: 'kalibr', count: 6, interval: 8, sync: true, tArrive: 1490, agl: 50, pts: [[45, 111], [42, 90], [40.3, 67.4]], targetObj: 'Central CHP-5' },
       { type: 'isk_m', count: 3, interval: 15, sync: true, tArrive: 1520, launchDist: 400, maneuver: true, decoys: true, pts: [[70, 0], [46.9, 52]], targetObj: 'Central CHP-6' },
       { type: 'kinzhal', count: 2, interval: 15, sync: true, tArrive: 1530, launchDist: 450, pts: [[70, 20], [36.3, 45.7]], targetObj: 'Represa de Kiev' }
