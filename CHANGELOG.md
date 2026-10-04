@@ -6,6 +6,10 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 
 ## [Sin publicar]
 
+### Agregado
+- `remotePk` de la C2 coordinada tiene rango en `UNC` (0,9 – **0,97** – 1,0, confianza baja): el Monte Carlo con sorteo ahora lo varía. El valor probable no cambia.
+- **Origen de los relieves de Monterey y Gotemburgo**, reconstruido con `node scripts/verificar-relieves.mjs` (docs/DATOS-Y-FUENTES.md §6). Gotemburgo es el tile SRTM N57E011 promediado a 200 m (sin batimetría: la documentación decía lo contrario). Monterey coincide con las Terrain Tiles de Mapzen/AWS con batimetría (correlación 0,999), pero no celda por celda.
+
 ### Cambiado
 - **[sim]** **Confirmación de pistas "2 de 3"** en lugar del corte de la detección a 1,2·R. Un eco suelto ya no abre una pista: el radar necesita ver el blanco en 2 de sus últimos 3 barridos; una pista abierta se mantiene con un eco por barrido (ópticos y acústicos siguen con un contacto). La detección lejana pasa a ser gradual (un blanco lento que pasa muchos barridos a 1,2–1,5 veces el alcance puede terminar detectado) y queda solo un corte de rendimiento a 2,5·R. Ver docs/FISICA.md §2 y `docs/investigacion/valores-estimados.md`.
 - **[sim]** **Recalibración de los seis escenarios** (40 noches, `npm run mc`, valores probables) con todo lo de esta versión junto: C2 y datalink separados, ECM según el bando, doctrina de alcance con costo y confirmación 2 de 3. Puente de Monterey: Storm Shadow 11 → 10 (el ataque gana ≈43%). Refinería de Hisingen: Kalibr 6 → 4 (la defensa gana ≈68%; con 6 había caído a ≈3%, porque los RBS 70 ya no disparan con la pista de la red contra misiles rasantes que el tirador todavía no ve detrás del relieve). Monterey noche: Kh-101 4 → 8, que llegan cada 8 s (la defensa gana ≈65%; antes 100%). Gotemburgo base con S-400: Storm Shadow 6 → 16 (el ataque gana ≈38%; antes 0%). Kiev (≈78%) y Járkov (≈48%) sin cambios de escenario.

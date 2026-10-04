@@ -72,7 +72,14 @@ Ejemplos de cómo se trató esto:
 
 ## 6. Relieves
 
-Los dos relieves incluidos (Monterey y Gotemburgo) son grillas de 200 m con batimetría. **La fuente exacta del raster no quedó documentada en la versión original**; por la resolución y el formato, probablemente sean SRTM para tierra y una batimetría pública para el mar. Documentarla está pendiente (ver ROADMAP). Los relieves que carga el jugador son tiles SRTM `.hgt` (NASA, dominio público).
+Los dos relieves de la versión original (Monterey y Gotemburgo) son grillas de 200 m cuya fuente no quedó anotada. Se reconstruyó comparándolos contra las fuentes públicas candidatas con `node scripts/verificar-relieves.mjs` (baja los tiles de AWS y vuelve a hacer la cuenta):
+
+| Relieve | Fuente identificada | Coincidencia | Confianza |
+|---|---|---|---|
+| **Gotemburgo** (57–58° N, 11–12° E) | Tile **SRTM N57E011** de 1″ (NASA, dominio público), promedio por celda de 200 m. **Sin batimetría**: todo el mar está a −5 m, como en el importador `.hgt` del juego | Correlación 0,997; diferencia mediana 1 m; 92% de las celdas de tierra a ±3 m | Alta |
+| **Monterey** (36,18–37,18° N, 122,37–121,37° O) | Elevación **con batimetría** (el cañón de Monterey llega a −2.804 m). Coincide con las *Terrain Tiles* de Mapzen/AWS en formato *terrarium*, que combinan SRTM/NED en tierra con ETOPO1 y modelos costeros de NOAA en el mar | Correlación 0,999 contra el zoom 9; diferencia mediana 9 m (los píxeles del zoom 9 son de ≈200 m y no caen alineados con las celdas) | Media: no se pudo reproducir celda por celda, así que la fuente exacta de la batimetría y el método de remuestreo siguen sin confirmar |
+
+Atribución de las Terrain Tiles: <https://github.com/tilezen/joerd/blob/master/docs/attribution.md>. Los relieves que carga el jugador son tiles SRTM `.hgt` (NASA, dominio público).
 
 **Kiev** se genera con `scripts/gen-terrain.mjs` a partir del tile SRTM N50E030 (NASA, dominio público), bajado de las *Terrain Tiles* de Mapzen/AWS (formato skadi; atribución en <https://github.com/tilezen/joerd/blob/master/docs/attribution.md>). Cada celda de 200 m es el promedio de las muestras de 1" que contiene. Trae una **máscara de ríos y lagos** detectada en el propio SRTM (los espejos de agua están aplanados): solo sirve para el dibujo y la lectura del terreno, la física usa la elevación real. Las posiciones de los objetivos del escenario salen de Global Energy Monitor (centrales CHP-5 y CHP-6) y Wikipedia (represa de Kiev); las de las defensas son ilustrativas.
 

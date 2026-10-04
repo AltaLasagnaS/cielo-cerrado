@@ -7,9 +7,7 @@ Son ideas ordenadas por prioridad, no promesas. Cada ítem que cambie resultados
 ## Próximo (0.4)
 
 - **Arnés de calibración reproducible** (`npm run calibrar`): reconstruir los casos de `CAL` con geometría guardada. El Monte Carlo de escenarios en Node ya está (`npm run mc`).
-- **`remotePk` con rango en `UNC`** (ver `docs/investigacion/valores-estimados.md`).
 - **Verificar las fuentes de la investigación de EW ucraniana** (ver `docs/investigacion/`) y subir la confianza de lo confirmado.
-- **Documentar el origen de los relieves** incluidos.
 
 ## Física (cada ítem es **[sim]**)
 

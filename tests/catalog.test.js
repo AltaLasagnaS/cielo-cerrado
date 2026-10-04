@@ -1,7 +1,7 @@
 // Integridad del catálogo: atrapa errores de tipeo al agregar armas, fuentes o escenarios.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { THREATS, DEFENSES, JAMMERS, BANDS, CLS_NAME, UNC, OBS, SRC, SCENARIOS, TERRAIN, PL, TARGET_TYPES } from '../src/data/index.js';
+import { THREATS, DEFENSES, JAMMERS, BANDS, CLS_NAME, UNC, OBS, SRC, SCENARIOS, TERRAIN, PL, TARGET_TYPES, C2_LEVELS, applySample, applyProbable } from '../src/data/index.js';
 
 const PROFILES = ['drone', 'cruise', 'bunt', 'ballistic', 'highdive', 'hilo', 'glide'];
 
@@ -29,7 +29,7 @@ test('jammers: bandas existentes', () => {
 });
 
 test('incertidumbre: rangos ordenados, confianza válida, etiquetas y fuentes existentes', () => {
-  const CAT = { thr: THREATS, def: DEFENSES, jam: JAMMERS };
+  const CAT = { thr: THREATS, def: DEFENSES, jam: JAMMERS, c2: C2_LEVELS };
   for (const [kind, set] of Object.entries(UNC)) for (const [k, params] of Object.entries(set)) {
     assert.ok(CAT[kind][k], `UNC.${kind}.${k} no existe en el catálogo`);
     for (const [path, u] of Object.entries(params)) {
@@ -108,12 +108,21 @@ test('los valores escritos en el catálogo coinciden con el probable de UNC (lec
   // Se importan los módulos crudos en un proceso aparte para ver los literales antes de applyProbable().
   const { execFileSync } = await import('node:child_process');
   const out = execFileSync(process.execPath, ['--input-type=module', '-e', `
-    const { THREATS } = await import('./src/data/threats.js'); const { DEFENSES } = await import('./src/data/defenses.js'); const { JAMMERS } = await import('./src/data/jammers.js');
-    console.log(JSON.stringify({ thr: THREATS, def: DEFENSES, jam: JAMMERS }));`], { encoding: 'utf8' });
+    const { THREATS } = await import('./src/data/threats.js'); const { DEFENSES } = await import('./src/data/defenses.js'); const { JAMMERS } = await import('./src/data/jammers.js'); const { C2_LEVELS } = await import('./src/data/c2.js');
+    console.log(JSON.stringify({ thr: THREATS, def: DEFENSES, jam: JAMMERS, c2: C2_LEVELS }));`], { encoding: 'utf8' });
   const raw = JSON.parse(out), get = (o, p) => p.split('.').reduce((a, k) => a?.[k], o);
   for (const [kind, set] of Object.entries(UNC)) for (const [k, params] of Object.entries(set)) for (const [path, u] of Object.entries(params)) {
     if (path.startsWith('info.')) continue;
     const v = get(raw[kind][k], path);
     if (v !== undefined) assert.equal(v, u.p, `${kind}.${k}.${path}: literal ${v} ≠ probable ${u.p}`);
   }
+});
+
+test('remotePk de la C2 coordinada tiene rango en UNC y el sorteo lo mueve', () => {
+  const u = UNC.c2.coordinada.remotePk;
+  assert.equal(C2_LEVELS.coordinada.remotePk, u.p);
+  const seen = new Set(); let x = 0.1;
+  try { for (let k = 0; k < 20; k++) { applySample(() => (x = (x * 9301 + 0.49297) % 1)); seen.add(C2_LEVELS.coordinada.remotePk); assert.ok(C2_LEVELS.coordinada.remotePk >= u.min && C2_LEVELS.coordinada.remotePk <= u.max); } } finally { applyProbable(); }
+  assert.ok(seen.size > 5, 'varía entre corridas');
+  assert.equal(C2_LEVELS.coordinada.remotePk, u.p, 'applyProbable lo repone');
 });

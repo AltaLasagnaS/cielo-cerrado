@@ -18,7 +18,7 @@ export const PL = {
   'sam.ch': ['Canales simultáneos', ''], 'sam.mag': ['Munición de la unidad', ''], 'sam.reloadS': ['Tiempo de recarga de la batería', 's'], 'sam.reserve': ['Reserva para recargar', ''], 'sam.cost': ['Costo por disparo', 'M US$'],
   'sam.pk.dron': ['Pk por disparo vs drones', ''], 'sam.pk.crucero': ['Pk por disparo vs crucero', ''], 'sam.pk.supersonico': ['Pk por disparo vs supersónicos', ''],
   'sam.pk.balistico': ['Pk por disparo vs balísticos', ''], 'sam.pk.hiper': ['Pk por disparo vs hipersónicos', ''],
-  alt: ['Altitud de patrulla', 'm'], radius: ['Radio de efecto', 'km'], spoofKm: ['Desvío típico por engaño GNSS', 'km'], P: ['Potencia relativa (juego)', '']
+  alt: ['Altitud de patrulla', 'm'], remotePk: ['Pk de un disparo con pista de red (factor)', '×'], radius: ['Radio de efecto', 'km'], spoofKm: ['Desvío típico por engaño GNSS', 'km'], P: ['Potencia relativa (juego)', '']
 };
 export const RCS_NOTE = 'est: sin medición pública; analogía con la tabla de GlobalSecurity (Tomahawk 0,5 m², ALCM furtivo <0,05, Harpoon/Exocet 0,1) y tamaño/forma';
 export const VHF_NOTE = 'est: con λ≈1,5–2 m el cuerpo entra en zona de resonancia y el conformado furtivo pierde efecto';
@@ -456,5 +456,9 @@ export const UNC = {
       P: U(1e4, 3e4, 1e5, 'baja', S_('ng_alq131', 'fas_alq131'), 'parámetro de juego: potencia y bandas del pod no son públicas. Un orden de magnitud menos que el Il-22PP (3e5): un pod de caza tiene menos potencia y antenas mucho más chicas; est'),
       alt: U(300, 4000, 8000, 'baja', [], 'est: los F-16 ucranianos vuelan bajo para sobrevivir y suben para lanzar; altura de patrulla de juego')
     }
+  },
+  // niveles de C2 (data/c2.js); ver docs/investigacion/valores-estimados.md §1
+  c2: {
+    coordinada: { remotePk: U(0.9, 0.97, 1, 'baja', [], 'est de juego: la imagen común entrega la posición con error y demora de segundos y el buscador tiene una canasta de adquisición limitada; no hay dato público de cuánto baja la Pk. Muy sensible: 0,9 → Kiev ≈48%, 1,0 → ≈75% (medido antes de la confirmación 2 de 3)') }
   }
 };

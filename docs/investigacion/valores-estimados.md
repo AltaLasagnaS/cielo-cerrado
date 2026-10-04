@@ -20,6 +20,8 @@ Tres valores del motor no tienen una fuente firme y pesan en los resultados. Ac�
 
 **Qué haría falta.** Una fuente sobre la calidad de pista de Link 16 (error de posición típico) y el tamaño de la canasta del AIM-120 o del IRIS-T SL; con eso, `remotePk` se podría calcular en vez de estimar. Mientras tanto conviene **sumarlo a `UNC`** con un rango 0,9–1,0, para que el Monte Carlo con sorteo lo tenga en cuenta.
 
+**Estado:** hecho. `UNC.c2.coordinada.remotePk` = 0,9 / 0,97 / 1,0 (confianza baja). El valor probable no cambia, así que las golden tampoco; el Monte Carlo con sorteo (`SAMPLE=1` o el botón de la interfaz) ahora lo varía.
+
 ## 2. Recarga del NASAMS: 30 min
 
 **Qué es.** El tiempo para recargar la batería entera desde su reserva (`sam.reloadS` = 1.800 s; rango en `UNC` 15–60 min).

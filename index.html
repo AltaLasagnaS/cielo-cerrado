@@ -1356,6 +1356,7 @@ table.t.mc td.pc{white-space:nowrap}
     "sam.pk.balistico": ["Pk por disparo vs balísticos", ""],
     "sam.pk.hiper": ["Pk por disparo vs hipersónicos", ""],
     alt: ["Altitud de patrulla", "m"],
+    remotePk: ["Pk de un disparo con pista de red (factor)", "×"],
     radius: ["Radio de efecto", "km"],
     spoofKm: ["Desvío típico por engaño GNSS", "km"],
     P: ["Potencia relativa (juego)", ""]
@@ -1795,8 +1796,59 @@ table.t.mc td.pc{white-space:nowrap}
         P: U(1e4, 3e4, 1e5, "baja", S_("ng_alq131", "fas_alq131"), "parámetro de juego: potencia y bandas del pod no son públicas. Un orden de magnitud menos que el Il-22PP (3e5): un pod de caza tiene menos potencia y antenas mucho más chicas; est"),
         alt: U(300, 4e3, 8e3, "baja", [], "est: los F-16 ucranianos vuelan bajo para sobrevivir y suben para lanzar; altura de patrulla de juego")
       }
+    },
+    // niveles de C2 (data/c2.js); ver docs/investigacion/valores-estimados.md §1
+    c2: {
+      coordinada: { remotePk: U(0.9, 0.97, 1, "baja", [], "est de juego: la imagen común entrega la posición con error y demora de segundos y el buscador tiene una canasta de adquisición limitada; no hay dato público de cuánto baja la Pk. Muy sensible: 0,9 → Kiev ≈48%, 1,0 → ≈75% (medido antes de la confirmación 2 de 3)") }
     }
   };
+
+  // src/data/c2.js
+  var C2_LEVELS = {
+    desconectada: {
+      name: "Desconectada",
+      share: "none",
+      lag: 0,
+      window: 0,
+      deconf: false,
+      remotePk: 1,
+      best: false,
+      desc: "Cada batería pelea sola con su radar. Nadie avisa ni reparte blancos: dos baterías pueden gastar misiles en el mismo blanco."
+    },
+    descoordinada: {
+      name: "Descoordinada (solo alerta)",
+      share: "cue",
+      lag: 45,
+      window: 12,
+      deconf: false,
+      remotePk: 1,
+      best: false,
+      desc: "Llegan alertas por voz o tableta con ~45 s de demora: la batería se prepara antes (arranca su tiempo de reacción), pero necesita su propia pista para disparar y no hay reparto de blancos."
+    },
+    coordinada: {
+      name: "Coordinada (imagen común)",
+      share: "track",
+      lag: 0,
+      window: 12,
+      deconf: true,
+      remotePk: 0.97,
+      best: false,
+      desc: "Imagen aérea común: los misiles activos o IR y los drones interceptores pueden disparar con la pista de otro sensor, y una batería no repite un blanco que otra ya está enfrentando."
+    },
+    integrada: {
+      name: "Integrada (calidad de tiro)",
+      share: "fire",
+      lag: 2,
+      window: 12,
+      deconf: true,
+      remotePk: 1,
+      best: true,
+      desc: "Pista compuesta de calidad de tiro (tipo IBCS o CEC): además, los sistemas guiados por radar pueden lanzar con la pista de otro sensor si su radar ve el punto de encuentro, la alerta llega casi sin demora y cada blanco se asigna al mejor tirador disponible."
+    }
+  };
+  var C2_ORDER = ["desconectada", "descoordinada", "coordinada", "integrada"];
+  var C2_NODES = { command: "all", comms: 1 };
+  var c2FromNet = (net) => net ? "coordinada" : "desconectada";
 
   // src/data/bands.js
   var BANDS = {
@@ -2334,53 +2386,6 @@ table.t.mc td.pc{white-space:nowrap}
     gb_vacio: { map: "goteborg", name: "Gotemburgo · vacío", player: "defensa", description: "Mapa libre para armar tu propio escenario: ubicá objetivos, defensas, ataques y guerra electrónica.", objectives: [], defs: [], salvos: [], jams: [], goals: [] }
   };
 
-  // src/data/c2.js
-  var C2_LEVELS = {
-    desconectada: {
-      name: "Desconectada",
-      share: "none",
-      lag: 0,
-      window: 0,
-      deconf: false,
-      remotePk: 1,
-      best: false,
-      desc: "Cada batería pelea sola con su radar. Nadie avisa ni reparte blancos: dos baterías pueden gastar misiles en el mismo blanco."
-    },
-    descoordinada: {
-      name: "Descoordinada (solo alerta)",
-      share: "cue",
-      lag: 45,
-      window: 12,
-      deconf: false,
-      remotePk: 1,
-      best: false,
-      desc: "Llegan alertas por voz o tableta con ~45 s de demora: la batería se prepara antes (arranca su tiempo de reacción), pero necesita su propia pista para disparar y no hay reparto de blancos."
-    },
-    coordinada: {
-      name: "Coordinada (imagen común)",
-      share: "track",
-      lag: 0,
-      window: 12,
-      deconf: true,
-      remotePk: 0.97,
-      best: false,
-      desc: "Imagen aérea común: los misiles activos o IR y los drones interceptores pueden disparar con la pista de otro sensor, y una batería no repite un blanco que otra ya está enfrentando."
-    },
-    integrada: {
-      name: "Integrada (calidad de tiro)",
-      share: "fire",
-      lag: 2,
-      window: 12,
-      deconf: true,
-      remotePk: 1,
-      best: true,
-      desc: "Pista compuesta de calidad de tiro (tipo IBCS o CEC): además, los sistemas guiados por radar pueden lanzar con la pista de otro sensor si su radar ve el punto de encuentro, la alerta llega casi sin demora y cada blanco se asigna al mejor tirador disponible."
-    }
-  };
-  var C2_ORDER = ["desconectada", "descoordinada", "coordinada", "integrada"];
-  var C2_NODES = { command: "all", comms: 1 };
-  var c2FromNet = (net) => net ? "coordinada" : "desconectada";
-
   // src/data/datalinks.js
   var DATALINKS = {
     l16: {
@@ -2598,7 +2603,7 @@ table.t.mc td.pc{white-space:nowrap}
     }
     a[ks[ks.length - 1]] = v;
   }
-  var CAT_OF = { thr: THREATS, def: DEFENSES, jam: JAMMERS };
+  var CAT_OF = { thr: THREATS, def: DEFENSES, jam: JAMMERS, c2: C2_LEVELS };
   function applyProbable() {
     for (const [kind, set] of Object.entries(UNC)) for (const [k, params] of Object.entries(set)) {
       const obj = CAT_OF[kind][k];
