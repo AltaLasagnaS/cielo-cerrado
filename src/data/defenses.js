@@ -97,7 +97,7 @@ export const DEFENSES = {
     name: 'MANPADS (Stinger / Igla)', short: 'MANPADS', side: 'both', kind: 'sam', color: '#62b6ff',
     datalinks: [],
     radar: { name: 'Visual / IR', band: 'OPT', R1: 7, mast: 2, mastRange: [2, 2], mastNote: 'Fija: el tirador.', sector: 360, eccm: 99, scan: 1 },
-    sam: { maxR: 4.8, maxRtbm: 0, minR: 0.2, altMin: 10, altMax: 3800, vInt: 550, vmax: 750, tb: 2, vmaxT: 400, react: 6, ch: 1, mag: 4, reserve: 4, reloadS: 60, salvo: 1, guid: 'IR', shot: 'FIM-92 Stinger', cost: 0.45, pk: { dron: 0.5, crucero: 0.4, supersonico: 0.05, balistico: 0, hiper: 0 } },
+    sam: { maxR: 4.8, maxRtbm: 0, minR: 0.2, altMin: 10, altMax: 3800, vInt: 550, vmaxT: 400, react: 6, ch: 1, mag: 4, reserve: 4, reloadS: 60, salvo: 1, guid: 'IR', shot: 'FIM-92 Stinger', cost: 0.45, pk: { dron: 0.5, crucero: 0.4, supersonico: 0.05, balistico: 0, hiper: 0 } },
     range: '≈4,8 km, techo ≈3,8 km', interceptor: 'Misil portátil con buscador infrarrojo (Stinger Mach 2,2; Igla ≈570 m/s)',
     notes: ['Stinger: más de US$400k; Igla: ~US$60–80k (dato viejo).', 'Se usan en grupos móviles y contra helicópteros. Las bengalas los degradan.'],
     sources: [WP('FIM-92_Stinger'), WP('9K38_Igla')]

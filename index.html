@@ -1047,7 +1047,7 @@ table.t.mc td.pc{white-space:nowrap}
       color: "#62b6ff",
       datalinks: [],
       radar: { name: "Visual / IR", band: "OPT", R1: 7, mast: 2, mastRange: [2, 2], mastNote: "Fija: el tirador.", sector: 360, eccm: 99, scan: 1 },
-      sam: { maxR: 4.8, maxRtbm: 0, minR: 0.2, altMin: 10, altMax: 3800, vInt: 550, vmax: 750, tb: 2, vmaxT: 400, react: 6, ch: 1, mag: 4, reserve: 4, reloadS: 60, salvo: 1, guid: "IR", shot: "FIM-92 Stinger", cost: 0.45, pk: { dron: 0.5, crucero: 0.4, supersonico: 0.05, balistico: 0, hiper: 0 } },
+      sam: { maxR: 4.8, maxRtbm: 0, minR: 0.2, altMin: 10, altMax: 3800, vInt: 550, vmaxT: 400, react: 6, ch: 1, mag: 4, reserve: 4, reloadS: 60, salvo: 1, guid: "IR", shot: "FIM-92 Stinger", cost: 0.45, pk: { dron: 0.5, crucero: 0.4, supersonico: 0.05, balistico: 0, hiper: 0 } },
       range: "≈4,8 km, techo ≈3,8 km",
       interceptor: "Misil portátil con buscador infrarrojo (Stinger Mach 2,2; Igla ≈570 m/s)",
       notes: ["Stinger: más de US$400k; Igla: ~US$60–80k (dato viejo).", "Se usan en grupos móviles y contra helicópteros. Las bengalas los degradan."],
@@ -1713,8 +1713,6 @@ table.t.mc td.pc{white-space:nowrap}
       manpads: {
         "sam.maxR": U(4.5, 4.8, 6, "alta", S_("wp:FIM-92_Stinger", "wp:9K38_Igla"), ""),
         "sam.vInt": U(450, 550, 650, "baja", [], "est"),
-        "sam.vmax": U(700, 750, 860, "media", S_("wp:FIM-92_Stinger"), "745 m/s; Mach 2,54 máx. según la misma página"),
-        "sam.tb": U(1.5, 2, 3, "baja", [], "est: motor de eyección y motor de vuelo de dos etapas, corto"),
         "sam.cost": U(0.06, 0.45, 0.5, "media", S_("wp:FIM-92_Stinger", "wp:9K38_Igla"), "Igla 60–80k; Stinger >400k"),
         "sam.pk.dron": U(0.3, 0.5, 0.7, "baja", [], "est")
       },
@@ -2031,9 +2029,9 @@ table.t.mc td.pc{white-space:nowrap}
       "caso": "20 Kalibr (cada 3 s) contra S-300PS + Buk-M1 + radar 3D",
       "real": "67% para crucero a nivel nacional (feb-22 → ago-24), con defensa mayormente soviética.",
       "obj": "60–85%",
-      "sim": 0.766,
-      "lo": 0.624,
-      "hi": 0.965,
+      "sim": 0.736,
+      "lo": 0.608,
+      "hi": 0.963,
       "ok": true
     },
     {
@@ -2051,9 +2049,9 @@ table.t.mc td.pc{white-space:nowrap}
       "caso": "8 Iskander-M con maniobra 2025 y señuelos contra una batería Patriot de 3 lanzadores (36 PAC-3 MSE)",
       "real": "37% nacional en jun–sep 25 (IC95% 31–45%), cota inferior de lo que pasa dentro de cobertura; 6–17% en otoño 2025.",
       "obj": "35–65%",
-      "sim": 0.425,
-      "lo": 0.35,
-      "hi": 0.478,
+      "sim": 0.525,
+      "lo": 0.344,
+      "hi": 0.559,
       "ok": true
     },
     {
@@ -2061,8 +2059,8 @@ table.t.mc td.pc{white-space:nowrap}
       "caso": "6 Kinzhal contra 1 Patriot MSE",
       "real": "6 de 6 sobre Kyiv el 16/5/2023 (IC95% 61–100%); 25% a nivel nacional.",
       "obj": "61–100%",
-      "sim": 0.992,
-      "lo": 0.842,
+      "sim": 0.983,
+      "lo": 0.796,
       "hi": 1,
       "ok": true
     },
@@ -2071,9 +2069,9 @@ table.t.mc td.pc{white-space:nowrap}
       "caso": "12 Kh-22 (cada 5 s) contra 1 Patriot MSE (16 misiles)",
       "real": "9 de 12 sobre Kyiv el 2/2/2026 (IC95% 47–91%).",
       "obj": "47–91%",
-      "sim": 0.617,
-      "lo": 0.477,
-      "hi": 0.669,
+      "sim": 0.615,
+      "lo": 0.481,
+      "hi": 0.667,
       "ok": true
     },
     {
@@ -2091,9 +2089,9 @@ table.t.mc td.pc{white-space:nowrap}
       "caso": "6 Oniks (perfil hi-lo) contra IRIS-T + NASAMS ubicados en el blanco",
       "real": "5,7% a nivel nacional (12 de 211). No hay datos dentro de cobertura: caso de control, sin objetivo.",
       "obj": "—",
-      "sim": 0.671,
-      "lo": 0.346,
-      "hi": 0.875,
+      "sim": 0.575,
+      "lo": 0.375,
+      "hi": 0.858,
       "ok": null
     },
     {
@@ -2101,8 +2099,8 @@ table.t.mc td.pc{white-space:nowrap}
       "caso": "4 Zircon contra Patriot + SAMP/T",
       "real": "2 de 2 sobre Kyiv el 25/3/2024 (IC95% 34–100%); 33% nacional hasta ago-24.",
       "obj": "34–100%",
-      "sim": 0.994,
-      "lo": 0.9,
+      "sim": 0.988,
+      "lo": 0.788,
       "hi": 1,
       "ok": true
     }
@@ -2318,7 +2316,7 @@ table.t.mc td.pc{white-space:nowrap}
       description: "Una noche típica de la campaña rusa contra la energía ucraniana: oleadas de Shahed desde el norte y el este, señuelos Gerbera para gastar munición, misiles de crucero Kh-101 y Kalibr, y balísticos Iskander-M y Kinzhal al final, todo para llegar casi junto. Los blancos son las centrales de cogeneración que dan luz y calefacción a la ciudad y la represa de Kiev. Las posiciones de la defensa son ilustrativas, no las reales.",
       forces: {
         defensa: "Defensa por capas de la capital: radar 3D y radar VHF de alerta, Patriot (sector hacia el noreste), NASAMS, IRIS-T, dos Gepard junto a las centrales, tres grupos móviles, red acústica, drones interceptores y la red anti-GNSS Pokrova sobre la ciudad. Red de mando integrada.",
-        ataque: "24 Shahed en dos oleadas, 10 Gerbera, 7 Kh-101, 6 Kalibr, 3 Iskander-M con señuelos y 2 Kinzhal."
+        ataque: "24 Shahed en dos oleadas, 10 Gerbera, 9 Kh-101, 6 Kalibr, 3 Iskander-M con señuelos y 2 Kinzhal."
       },
       conditions: "Noche de invierno, despejada. El motor no modela la luz: la noche solo explica por qué los grupos móviles dependen de la alerta acústica y del radar. Probá un techo de nubes bajo (pestaña Defensa): los grupos móviles dejan de ver a los Shahed que vuelan arriba.",
       rules: { c2: "coordinada", doctrine: "salva", weather: "despejado" },
@@ -2348,7 +2346,7 @@ table.t.mc td.pc{white-space:nowrap}
         { type: "shahed", count: 18, interval: 20, tStart: 0, agl: 1500, pts: [[40, 0], [42, 30], [46.9, 52]], targetObj: "Central CHP-6" },
         { type: "gerbera", count: 10, interval: 25, tStart: 60, agl: 900, pts: [[70, 5], [50, 30], [44, 55]] },
         { type: "shahed", count: 6, interval: 30, tStart: 120, agl: 2e3, pts: [[70, 40], [55, 55], [40.3, 67.4]], targetObj: "Central CHP-5" },
-        { type: "kh101", count: 7, interval: 10, sync: true, tArrive: 1500, agl: 40, pts: [[0, 30], [20, 50], [40.3, 67.4]], targetObj: "Central CHP-5" },
+        { type: "kh101", count: 9, interval: 10, sync: true, tArrive: 1500, agl: 40, pts: [[0, 30], [20, 50], [40.3, 67.4]], targetObj: "Central CHP-5" },
         { type: "kalibr", count: 6, interval: 8, sync: true, tArrive: 1490, agl: 50, pts: [[45, 111], [42, 90], [40.3, 67.4]], targetObj: "Central CHP-5" },
         { type: "isk_m", count: 3, interval: 15, sync: true, tArrive: 1520, launchDist: 400, maneuver: true, decoys: true, pts: [[70, 0], [46.9, 52]], targetObj: "Central CHP-6" },
         { type: "kinzhal", count: 2, interval: 15, sync: true, tArrive: 1530, launchDist: 450, pts: [[70, 20], [36.3, 45.7]], targetObj: "Represa de Kiev" }

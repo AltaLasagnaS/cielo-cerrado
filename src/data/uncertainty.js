@@ -370,8 +370,6 @@ export const UNC = {
     manpads: {
       'sam.maxR': U(4.5, 4.8, 6, 'alta', S_('wp:FIM-92_Stinger', 'wp:9K38_Igla'), ''),
       'sam.vInt': U(450, 550, 650, 'baja', [], 'est'),
-      'sam.vmax': U(700, 750, 860, 'media', S_('wp:FIM-92_Stinger'), '745 m/s; Mach 2,54 máx. según la misma página'),
-      'sam.tb': U(1.5, 2, 3, 'baja', [], 'est: motor de eyección y motor de vuelo de dos etapas, corto'),
       'sam.cost': U(0.06, 0.45, 0.5, 'media', S_('wp:FIM-92_Stinger', 'wp:9K38_Igla'), 'Igla 60–80k; Stinger >400k'),
       'sam.pk.dron': U(0.3, 0.5, 0.7, 'baja', [], 'est')
     },
