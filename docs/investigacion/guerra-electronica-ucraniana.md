@@ -166,6 +166,12 @@ Cambio sugerido para la entrada existente, conservando la clave:
 - En el bloque GNSS de engine.js: `if (J.side !== 'both' && J.side === th.T.side) continue;`
 - Opcional, "fratricidio": si `J.side === th.T.side`, aplicar un 20–30 % del efecto. Pokrova también degradaba el GNSS propio y civil.
 
+**Estado en el motor (PR de ECM/ECCM segunda parte).** El filtro normal ya está aplicado: un jammer con
+`side: 'RU'` no degrada radares ni GNSS rusos, y uno con `side: 'UA'` no degrada los ucranianos. Los
+equipos marcados `both` quedan exceptuados. El fratricidio parcial sigue fuera del modelo porque no hay
+datos públicos suficientes para elegir una tasa y no queremos convertir una capacidad civil o propia en
+un número inventado.
+
 **D2. Separar interferencia de engaño (`mode: 'jam' | 'spoof'`).**
 - `jam` (ruido): el arma pasa a navegación inercial. Error = `deriva × distancia que le queda hasta el blanco al entrar al radio`, con `deriva = U(0.02, 0.03, 0.05)`. Fuentes: Politico/NV, "≈2 km cada 100 km"; Defense Post, "≈5 % de la distancia". Reemplaza el `300 + rnd·1500` actual, que es demasiado chico para un Shahed y demasiado grande para una UMPK que entra a 20 km del blanco.
 - `spoof` (engaño): desvío **dirigido**. El arma se corre un vector de módulo `U(2, 5, 10)` km (Pokrova, primeros reportes de 5–10 km). Dirección: hacia afuera del centro de la estación, o la que elija el jugador (`spoofAz`). Más una probabilidad `pLost` de que el arma quede "perdida localmente" (no impacta: se agota el combustible o se va a Bielorrusia).

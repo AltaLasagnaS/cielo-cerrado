@@ -157,7 +157,7 @@ G ×= 0,1     si el jammer está fuera del sector del radar
 
 **Distancia de quemado:** con la interferencia J, el radar ve hasta `R' = R1·(1/(1+J))^¼` contra 1 m². Más cerca, el eco del blanco le gana al ruido. La ficha de cada jammer de radar muestra esa distancia para cada radar de sus bandas, con el jammer a 100 km de frente o de costado, en barrera o puntual (`physics/radar.js#singleJam`, `burnThrough`).
 
-Solo suman los jammers activos de la **misma banda** con **línea de vista** radar–jammer. `d` es la distancia 3D en km (+1 para evitar la división por cero). `P` es una **potencia relativa de juego**: las potencias reales no son públicas.
+Solo suman los jammers activos de la **misma banda**, de un **bando distinto**, con **línea de vista** radar–jammer. Un equipo con `side: 'both'` es la excepción. `d` es la distancia 3D en km (+1 para evitar la división por cero). `P` es una **potencia relativa de juego**: las potencias reales no son públicas.
 
 El alcance queda en `R' = R·(1/(1+J))^¼`. La Pk de los guiados que dependen del radar se multiplica por `1/(1 + 0,08·J)`, con un piso de 0,5 (§7).
 

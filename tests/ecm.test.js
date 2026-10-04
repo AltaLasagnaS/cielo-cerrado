@@ -23,6 +23,12 @@ test('barrera: con un radar sin ECCM nuevas da lo mismo que la fórmula de siemp
   assert.ok(Math.abs(jamJ(u, 0, [j]) / old - 1) < 1e-3);
 });
 
+test('ECM: un jammer no degrada un radar del mismo bando', () => {
+  const ua = unit('patriot'), ru = { ...unit('s400'), type: 's400' }, j = soj(ua, 0, 50);
+  assert.ok(jamJ(ua, 0, [j]) > 0, 'un jammer ruso sí afecta al radar ucraniano');
+  assert.equal(jamJ(ru, 0, [j]), 0, 'el mismo jammer no afecta al radar ruso');
+});
+
 test('ruido puntual: ×10 contra el radar elegido sin agilidad, nada contra los demás, ×0,1 contra uno ágil', () => {
   const s125 = unit('s125'), pat = unit('patriot'), ewr = unit('ewr');
   for (const [u, want] of [[s125, JAM_MODES.spot.gain], [pat, JAM_MODES.spot.agileGain], [ewr, JAM_MODES.spot.gain]]) {
