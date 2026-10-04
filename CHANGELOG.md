@@ -12,6 +12,7 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 
 ### Cambiado
 - **[sim]** **Kiev vuelve a 7 Kh-101** (se revierte el aumento a 9). Se prioriza el realismo: el escenario de referencia no se ajusta para recuperar la tasa anterior. Con la física nueva (perfil del interceptor) la defensa gana 95% de las noches (40 noches, valores probables; parcial 5%, fracaso 0%), contra 78% antes del perfil. Con 9 Kh-101 volvía a 78%; si se quiere una versión más difícil, va como escenario aparte. CONTRIBUIR cambia la regla de "balancear" por la de medir y documentar: un escenario de referencia puede ser asimétrico.
+- La Academia (Mando y control) decía que no se modelaban los enlaces por sistema; ahora explica las familias de enlace que ya existen y qué falta (pasarelas, pertenencia a la red por unidad). Lo señaló Codex.
 - El MANPADS conserva el modelo legado de velocidad constante **por falta de datos**: no valida que Stinger, Igla y RBS 70 sean equivalentes (docs/FISICA.md §6 y nota en `UNC`).
 
 ### Corregido
