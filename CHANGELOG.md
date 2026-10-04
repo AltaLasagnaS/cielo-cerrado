@@ -14,6 +14,9 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 - Pruebas de regresión de tiempo fijo, ataques tardíos y bloqueo de series, más `tests/ui.browser.mjs` para validar entradas y controles en Chromium.
 
 ### Agregado
+- **[sim]** La doctrina de alcance ahora retiene el lanzamiento hasta que el blanco entra en el porcentaje elegido. Esperar reduce la ventana de tiro y puede dejar pasar la solución; `fireRange = 1` mantiene el comportamiento anterior.
+
+### Agregado
 - **[sim]** Segunda parte de ECM/ECCM: los jammers de radar y anti-GNSS respetan el bando (`side`) del equipo afectado. Un interferidor ruso no degrada sus propios radares ni sus propias armas; el fratricidio parcial queda documentado como pendiente por falta de datos.
 
 ### Agregado
