@@ -9,6 +9,10 @@ import { setMode, toast } from '../modes.js';
 import { openFicha } from '../fichas.js';
 import { infoBtn } from '../academy.js';
 
+/** Direcciones de donde sopla el viento (rosa de 8). */
+const WIND_DIRS = [['Norte', 0], ['Noreste', 45], ['Este', 90], ['Sudeste', 135], ['Sur', 180], ['Sudoeste', 225], ['Oeste', 270], ['Noroeste', 315]];
+const windTxt = () => S.wind.v ? `${S.wind.v} m/s (${Math.round(S.wind.v * 3.6)} km/h) desde ${(WIND_DIRS.find(([, a]) => a === S.wind.from) || [S.wind.from + '°'])[0].toLowerCase()}` : 'calma';
+
 /** Botón de unidad con su "i" para abrir la ficha. */
 export function unitBtn(key, def, act, cls) { return `<button class="ub ${cls} ${act ? 'act' : ''}" data-k="${key}" title="${esc(def.name)}"><span>${esc(def.short)}</span><i data-info="${key}" role="button" aria-label="Ficha">i</i></button>`; }
 export function renderDef() {
@@ -28,6 +32,8 @@ export function renderDef() {
     <div class="grp"><h3>Clima ${infoBtn('clima')}</h3>
       <div class="field"><label for="optWx">Tiempo</label><select id="optWx" class="sel">${Object.entries(WEATHER).map(([k, W]) => `<option value="${k}" ${S.weather === k ? 'selected' : ''}>${esc(W.name)}</option>`).join('')}</select></div>
       <p class="hint" id="wxInfo">${esc(WEATHER[S.weather].desc)}</p>
+      <div class="field" title="Viento a la altura de vuelo, igual en todo el mapa. Los drones y misiles de crucero vuelan a su velocidad respecto del aire: con viento de frente tardan más y con viento de cola llegan antes. A un Shahed (≈185 km/h) le pesa mucho; a un misil de crucero, poco. No afecta a balísticos ni planeadoras."><label for="optWind">Viento ${infoBtn('clima')}</label><span class="val" id="windVal">${windTxt()}</span><input type="range" id="optWind" min="0" max="30" step="1" value="${S.wind.v}"></div>
+      <div class="field"><label for="optWindFrom">Sopla desde</label><select id="optWindFrom" class="sel">${WIND_DIRS.map(([n, a]) => `<option value="${a}" ${S.wind.from === a ? 'selected' : ''}>${n} (${a}°)</option>`).join('')}</select></div>
     </div>
     <div class="grp"><h3>Cobertura de radar ${infoBtn('horizon')} ${infoBtn('los')}</h3>
       <label class="check"><input type="checkbox" id="optCov" ${S.showCov ? 'checked' : ''}> Mostrar cobertura sobre el mapa</label>
@@ -45,6 +51,9 @@ export function renderDef() {
   $('#optDecoy').onchange = e => { S.ignoreDecoys = e.target.checked; };
   $('#optFR').oninput = e => { S.fireRange = +e.target.value / 100; $('#frVal').textContent = e.target.value + '%'; };
   $('#optWx').onchange = e => { if (S.started) { toast('Reiniciá para cambiar el clima.'); e.target.value = S.weather; return; } S.weather = e.target.value; $('#wxInfo').textContent = WEATHER[S.weather].desc; schedCov(); };
+  const windLock = (e, v) => { if (!S.started) return false; toast('Reiniciá para cambiar el viento.'); e.target.value = v; return true; };
+  $('#optWind').oninput = e => { if (windLock(e, S.wind.v)) return; S.wind = { ...S.wind, v: +e.target.value }; $('#windVal').textContent = windTxt(); };
+  $('#optWindFrom').onchange = e => { if (windLock(e, S.wind.from)) return; S.wind = { ...S.wind, from: +e.target.value }; $('#windVal').textContent = windTxt(); };
   $('#optCov').onchange = e => { S.showCov = e.target.checked; draw(); };
   $('#optRef').onchange = e => { S.covRef = e.target.value; const T = THREATS[S.covRef]; S.covAgl = T.agl ?? (T.prof === 'ballistic' ? 10000 : (T.prof === 'hilo' ? 15 : 5000)); $('#optAgl').value = S.covAgl; $('#aglVal').textContent = S.covAgl + ' m'; schedCov(); };
   $('#optAgl').oninput = e => { S.covAgl = +e.target.value; $('#aglVal').textContent = S.covAgl + ' m'; schedCov(); };

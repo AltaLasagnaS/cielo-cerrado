@@ -2783,6 +2783,7 @@ table.t.mc td.pc{white-space:nowrap}
     doctrine: "salva",
     fireRange: 1,
     weather: "despejado",
+    wind: { v: 0, from: 0 },
     ignoreDecoys: false,
     showCov: true,
     covRef: "kh101",
@@ -3372,7 +3373,14 @@ table.t.mc td.pc{white-space:nowrap}
   // src/physics/kinematics.js
   var OFFMAP_PROFILES = ["ballistic", "highdive", "hilo", "glide"];
   var isOffmap = (T) => OFFMAP_PROFILES.includes(T.prof);
-  function buildThreat(sv, k, tLaunch) {
+  function groundSpeed(v, ux, uy, wind) {
+    if (!wind || !(wind.v > 0)) return v;
+    const a = wind.from * Math.PI / 180, wx = -wind.v * Math.sin(a), wy = wind.v * Math.cos(a);
+    const along = wx * ux + wy * uy, cross = wx * uy - wy * ux;
+    if (cross * cross >= v * v) return 0.1 * v;
+    return Math.max(0.1 * v, along + Math.sqrt(v * v - cross * cross));
+  }
+  function buildThreat(sv, k, tLaunch, wind = null) {
     const T = THREATS[sv.type];
     let pts = sv.pts.map((p) => [p[0], p[1]]);
     const offmap = isOffmap(T);
@@ -3396,6 +3404,16 @@ table.t.mc td.pc{white-space:nowrap}
     if (T.prof === "highdive") ph = [[0, Math.max(0, L - T.diveDist), T.v], [Math.max(0, L - T.diveDist), L, T.vDive]];
     else if (T.prof === "hilo") ph = [[0, Math.max(0, L - 60), T.v], [Math.max(0, L - 60), L, T.vLow]];
     else ph = [[0, L, T.v]];
+    if (wind?.v > 0 && !offmap) {
+      const out = [];
+      for (const [s0, s1, v] of ph) for (let i = 1; i < pts.length; i++) {
+        const a0 = Math.max(s0, cum[i - 1]), a1 = Math.min(s1, cum[i]);
+        if (a1 <= a0) continue;
+        const seg = cum[i] - cum[i - 1] || 1e-6;
+        out.push([a0, a1, groundSpeed(v, (pts[i][0] - pts[i - 1][0]) / seg, (pts[i][1] - pts[i - 1][1]) / seg, wind)]);
+      }
+      ph = out;
+    }
     let acc = 0;
     ph = ph.map((p) => {
       const o = { s0: p[0], s1: p[1], v: p[2], t0: acc };
@@ -3760,10 +3778,10 @@ table.t.mc td.pc{white-space:nowrap}
     for (const sv of S.setup.salvos) {
       let t0 = sv.tStart || 0;
       if (sv.sync) {
-        const probe = buildThreat(sv, 0, 0);
+        const probe = buildThreat(sv, 0, 0, S.wind);
         t0 = Math.max(0, (sv.tArrive || 0) - probe.ft);
       }
-      for (let k = 0; k < sv.count; k++) S.pending.push(buildThreat(sv, k, t0 + k * (sv.interval || 0)));
+      for (let k = 0; k < sv.count; k++) S.pending.push(buildThreat(sv, k, t0 + k * (sv.interval || 0), S.wind));
     }
     S.pending.sort((a, b) => a.tLaunch - b.tLaunch);
     S.t = 0;
@@ -4263,6 +4281,7 @@ table.t.mc td.pc{white-space:nowrap}
       if (sc2.rules.doctrine) S.doctrine = sc2.rules.doctrine;
     }
     S.weather = WEATHER[sc2.rules?.weather] ? sc2.rules.weather : WEATHER_DEFAULT;
+    S.wind = { v: sc2.rules?.wind?.v ?? 0, from: sc2.rules?.wind?.from ?? 0 };
     S.ignoreDecoys = !!sc2.rules?.ignoreDecoys;
     S.fireRange = sc2.rules?.fireRange ?? 1;
     S.scen = sc2;
@@ -5566,7 +5585,7 @@ table.t.mc td.pc{white-space:nowrap}
       body: () => `<p>El tiempo no afecta igual a todos los sensores. La <b>lluvia</b> absorbe y dispersa las microondas, tanto más cuanto más alta es la frecuencia: un radar en banda S o L casi no la nota, uno en X la siente y uno en Ku pierde mucho alcance en una tormenta. Por eso los radares de alerta usan bandas bajas y los de guiado (X, Ku) sufren más.</p><p>Los sensores <b>ópticos e infrarrojos</b> (los grupos móviles con ametralladoras y cámaras térmicas, los MANPADS) son los más castigados: la lluvia o la niebla les achican el alcance a una fracción y las <b>nubes</b> les tapan todo lo que vuela por encima, aunque se escuche el motor. La red <b>acústica</b> oye menos con lluvia y viento.</p>`,
       engine: () => `<p>El clima se elige en la pestaña Defensa (${code("S.weather")}) y queda fijo todo el escenario. La atenuación del radar sale de la Rec. ITU-R P.838-3: ${code("γ = k · R^α")} dB/km, con k y α según la frecuencia de cada banda (${code("BANDS[b].ghz")}), sobre un camino de lluvia de hasta ${code("rainKm")}. El alcance resuelve ${code("R = R0 · 10^(−γ·min(R, L)/20)")}. Con lluvia de 4 mm/h, γ por banda: ${["S", "C", "X", "Ku"].map((b) => b + " " + rainGamma(b, 4).toFixed(3)).join(" · ")} dB/km.</p>
       <div class="tblwrap"><table class="t"><thead><tr><th>Clima</th><th>Lluvia</th><th>Óptico/IR</th><th>Techo para ópticos</th><th>Acústico</th></tr></thead><tbody>${Object.values(WEATHER).map((W) => `<tr><td>${esc(W.name)}</td><td>${W.rain ? W.rain + " mm/h en " + W.rainKm + " km" : "—"}</td><td>×${W.opt}</td><td>${W.ceiling != null ? W.ceiling + " m" : "—"}</td><td>×${W.acu}</td></tr>`).join("")}</tbody></table></div>
-      <p>Los factores ópticos y acústicos son estimaciones de juego (el manual de CMO dice que la lluvia deja lo visual en 1–5% y degrada mucho el IR). No se modelan el día y la noche, el viento sobre los drones, ni el clutter de lluvia.</p>`
+      <p>Los factores ópticos y acústicos son estimaciones de juego (el manual de CMO dice que la lluvia deja lo visual en 1–5% y degrada mucho el IR). El <b>viento</b> (${code("S.wind")}) cambia la velocidad sobre el suelo de drones y misiles de crucero en cada tramo de su ruta: ${code("Vg = W·u + √(v² − (W×u)²)")} (corrigen la deriva). Con 10 m/s de frente, un Shahed tarda un 24% más y un Kalibr un 4%. No se modelan el día y la noche ni el clutter de lluvia.</p>`
     },
     {
       id: "saturation",
@@ -5997,7 +6016,7 @@ table.t.mc td.pc{white-space:nowrap}
         return renderSel();
       }
       const T = THREATS[sv.type];
-      const probe = buildThreat(sv, 0, 0);
+      const probe = buildThreat(sv, 0, 0, S.wind);
       releaseId();
       el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${sv.count}× ${esc(T.name)}</b><dl class="kv"><dt>Blanco</dt><dd>${esc(targetName(sv) || "punto del mapa")}</dd><dt>Ojiva</dt><dd>${warheadKg(T) ? warheadKg(T) + " kg · " + Math.round(directDamage(T)) + " HP por impacto directo" : "sin ojiva"}</dd><dt>Recorrido</dt><dd>${probe.L.toFixed(0)} km</dd><dt>Tiempo de vuelo</dt><dd>${fmtT(probe.ft).slice(2)}</dd><dt>${sv.sync ? "Llegada" : "Lanzamiento"}</dt><dd>T+${sv.sync ? sv.tArrive : sv.tStart} s</dd>${T.aglRange ? "<dt>Altura</dt><dd>" + sv.agl + " m AGL</dd>" : ""}<dt>Maniobra</dt><dd>${sv.maneuver ? "sí" : "no"}</dd><dt>Costo salva</dt><dd>${money(T.cost * sv.count)}</dd>${sv.crpa ? `<dt>Antena GNSS</dt><dd>CRPA de ${sv.crpa} elementos: anula hasta ${sv.crpa - 1} interferidores</dd>` : ""}</dl>
       <div class="row"><button class="btn sm" id="vInfo">Ficha</button>${!S.started ? '<button class="btn sm danger" id="vDel">Eliminar</button>' : ""}</div>`;
@@ -6648,6 +6667,8 @@ table.t.mc td.pc{white-space:nowrap}
   }
 
   // src/ui/panels/defense.js
+  var WIND_DIRS = [["Norte", 0], ["Noreste", 45], ["Este", 90], ["Sudeste", 135], ["Sur", 180], ["Sudoeste", 225], ["Oeste", 270], ["Noroeste", 315]];
+  var windTxt = () => S.wind.v ? `${S.wind.v} m/s (${Math.round(S.wind.v * 3.6)} km/h) desde ${(WIND_DIRS.find(([, a]) => a === S.wind.from) || [S.wind.from + "°"])[0].toLowerCase()}` : "calma";
   function unitBtn(key, def, act, cls) {
     return `<button class="ub ${cls} ${act ? "act" : ""}" data-k="${key}" title="${esc(def.name)}"><span>${esc(def.short)}</span><i data-info="${key}" role="button" aria-label="Ficha">i</i></button>`;
   }
@@ -6671,6 +6692,8 @@ table.t.mc td.pc{white-space:nowrap}
     <div class="grp"><h3>Clima ${infoBtn("clima")}</h3>
       <div class="field"><label for="optWx">Tiempo</label><select id="optWx" class="sel">${Object.entries(WEATHER).map(([k, W]) => `<option value="${k}" ${S.weather === k ? "selected" : ""}>${esc(W.name)}</option>`).join("")}</select></div>
       <p class="hint" id="wxInfo">${esc(WEATHER[S.weather].desc)}</p>
+      <div class="field" title="Viento a la altura de vuelo, igual en todo el mapa. Los drones y misiles de crucero vuelan a su velocidad respecto del aire: con viento de frente tardan más y con viento de cola llegan antes. A un Shahed (≈185 km/h) le pesa mucho; a un misil de crucero, poco. No afecta a balísticos ni planeadoras."><label for="optWind">Viento ${infoBtn("clima")}</label><span class="val" id="windVal">${windTxt()}</span><input type="range" id="optWind" min="0" max="30" step="1" value="${S.wind.v}"></div>
+      <div class="field"><label for="optWindFrom">Sopla desde</label><select id="optWindFrom" class="sel">${WIND_DIRS.map(([n2, a]) => `<option value="${a}" ${S.wind.from === a ? "selected" : ""}>${n2} (${a}°)</option>`).join("")}</select></div>
     </div>
     <div class="grp"><h3>Cobertura de radar ${infoBtn("horizon")} ${infoBtn("los")}</h3>
       <label class="check"><input type="checkbox" id="optCov" ${S.showCov ? "checked" : ""}> Mostrar cobertura sobre el mapa</label>
@@ -6722,6 +6745,22 @@ table.t.mc td.pc{white-space:nowrap}
       S.weather = e.target.value;
       $("#wxInfo").textContent = WEATHER[S.weather].desc;
       schedCov();
+    };
+    const windLock = (e, v) => {
+      if (!S.started) return false;
+      toast("Reiniciá para cambiar el viento.");
+      e.target.value = v;
+      return true;
+    };
+    $("#optWind").oninput = (e) => {
+      if (windLock(e, S.wind.v)) return;
+      S.wind = { ...S.wind, v: +e.target.value };
+      $("#windVal").textContent = windTxt();
+    };
+    $("#optWindFrom").onchange = (e) => {
+      if (windLock(e, S.wind.from)) return;
+      S.wind = { ...S.wind, from: +e.target.value };
+      $("#windVal").textContent = windTxt();
     };
     $("#optCov").onchange = (e) => {
       S.showCov = e.target.checked;
@@ -7093,7 +7132,7 @@ table.t.mc td.pc{white-space:nowrap}
       version: VERSION,
       saved: now.toISOString(),
       map: mapRef(),
-      rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather, ignoreDecoys: S.ignoreDecoys, fireRange: S.fireRange },
+      rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather, wind: { ...S.wind }, ignoreDecoys: S.ignoreDecoys, fireRange: S.fireRange },
       scenario: S.scen ? { base: baseKey(S.scen), ...pick(S.scen, META_KEYS) } : null,
       setup: {
         objs: s.objs.map((g) => pick(g, OBJ_KEYS)),
@@ -7283,6 +7322,10 @@ table.t.mc td.pc{white-space:nowrap}
     const r = raw.rules || {};
     const net = bool("rules.net", r.net);
     const rules = { c2: r.c2 ?? (net === void 0 ? void 0 : c2FromNet(net)), doctrine: r.doctrine, weather: r.weather, ignoreDecoys: bool("rules.ignoreDecoys", r.ignoreDecoys), fireRange: num2("rules.fireRange", r.fireRange, 0.3, 1, { opt: true }) };
+    if (r.wind !== void 0) {
+      if (r.wind === null || typeof r.wind !== "object") err("rules.wind: tiene que ser { v, from } (m/s y grados de donde sopla).");
+      else rules.wind = { v: num2("rules.wind.v", r.wind.v, 0, 40), from: num2("rules.wind.from", r.wind.from, 0, 360) };
+    }
     if (r.weather !== void 0 && !WEATHER[r.weather]) err(`rules.weather: "${String(r.weather)}" no es un clima válido (${Object.keys(WEATHER).join(", ")}).`);
     if (r.c2 !== void 0 && !C2_LEVELS[r.c2]) err(`rules.c2: "${String(r.c2)}" no es un nivel de mando y control válido (${Object.keys(C2_LEVELS).join(", ")}).`);
     if (r.doctrine !== void 0 && !DOCTRINES.includes(r.doctrine)) err(`rules.doctrine: "${String(r.doctrine)}" no es ${DOCTRINES.join(" ni ")}.`);
@@ -7350,6 +7393,7 @@ table.t.mc td.pc{white-space:nowrap}
     }
     if (data.rules.c2) S.c2 = data.rules.c2;
     S.weather = data.rules.weather || "despejado";
+    S.wind = { v: data.rules.wind?.v ?? 0, from: data.rules.wind?.from ?? 0 };
     S.ignoreDecoys = !!data.rules.ignoreDecoys;
     S.fireRange = data.rules.fireRange ?? 1;
     if (data.rules.doctrine) S.doctrine = data.rules.doctrine;

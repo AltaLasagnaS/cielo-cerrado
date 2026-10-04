@@ -23,11 +23,29 @@ export const OFFMAP_PROFILES = ['ballistic', 'highdive', 'hilo', 'glide'];
 export const isOffmap = T => OFFMAP_PROFILES.includes(T.prof);
 
 /**
+ * Velocidad sobre el suelo (m/s) de un arma que vuela a v m/s respecto del aire por un tramo de
+ * dirección unitaria (ux, uy) en el mapa (x al este, y al sur), con viento wind = { v (m/s), from (°,
+ * de dónde sopla, 0 = norte) }. El arma corrige la deriva (vuela con ángulo de cangrejo para no salirse
+ * del tramo): Vg = W·u + √(v² − (W×u)²). Si el viento cruzado iguala o supera su velocidad no puede
+ * avanzar; se acota a 0,1·v para no detener el modelo. Ver docs/FISICA.md §1.
+ */
+export function groundSpeed(v, ux, uy, wind) {
+  if (!wind || !(wind.v > 0)) return v;
+  const a = wind.from * Math.PI / 180, wx = -wind.v * Math.sin(a), wy = wind.v * Math.cos(a);   // hacia dónde sopla
+  const along = wx * ux + wy * uy, cross = wx * uy - wy * ux;
+  if (cross * cross >= v * v) return 0.1 * v;
+  return Math.max(0.1 * v, along + Math.sqrt(v * v - cross * cross));
+}
+
+/**
  * Crea la amenaza número k de la salva sv, lanzada en el instante tLaunch (s).
  * Precalcula la ruta (pts), las distancias acumuladas (cum, km), el largo total (L, km) y las
  * fases de velocidad (ph: tramos [s0, s1] km a v m/s que empiezan en t0 s). ft = tiempo de vuelo.
+ * wind (opcional, { v, from }): las armas con ruta en el mapa (drones y crucero) vuelan a su velocidad
+ * respecto del aire y el viento cambia su velocidad sobre el suelo en cada tramo (groundSpeed). Las que
+ * se lanzan desde fuera del mapa (balísticos, picada, planeadoras) no se modifican.
  */
-export function buildThreat(sv, k, tLaunch) {
+export function buildThreat(sv, k, tLaunch, wind = null) {
   const T = THREATS[sv.type];
   let pts = sv.pts.map(p => [p[0], p[1]]);
   const offmap = isOffmap(T);
@@ -40,6 +58,16 @@ export function buildThreat(sv, k, tLaunch) {
   if (T.prof === 'highdive') ph = [[0, Math.max(0, L - T.diveDist), T.v], [Math.max(0, L - T.diveDist), L, T.vDive]];
   else if (T.prof === 'hilo') ph = [[0, Math.max(0, L - 60), T.v], [Math.max(0, L - 60), L, T.vLow]];
   else ph = [[0, L, T.v]];
+  if (wind?.v > 0 && !offmap) {
+    // partir cada fase en los tramos de la ruta: cada tramo tiene su propio rumbo y su velocidad sobre el suelo
+    const out = [];
+    for (const [s0, s1, v] of ph) for (let i = 1; i < pts.length; i++) {
+      const a0 = Math.max(s0, cum[i - 1]), a1 = Math.min(s1, cum[i]); if (a1 <= a0) continue;
+      const seg = cum[i] - cum[i - 1] || 1e-6;
+      out.push([a0, a1, groundSpeed(v, (pts[i][0] - pts[i - 1][0]) / seg, (pts[i][1] - pts[i - 1][1]) / seg, wind)]);
+    }
+    ph = out;
+  }
   let acc = 0; ph = ph.map(p => { const o = { s0: p[0], s1: p[1], v: p[2], t0: acc }; acc += (p[1] - p[0]) * 1000 / p[2]; return o; });
   const tg = pts[pts.length - 1];
   return {

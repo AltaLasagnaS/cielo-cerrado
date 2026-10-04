@@ -28,8 +28,8 @@ export function startSim() {
   S.pending = [];
   for (const sv of S.setup.salvos) {
     let t0 = sv.tStart || 0;
-    if (sv.sync) { const probe = buildThreat(sv, 0, 0); t0 = Math.max(0, (sv.tArrive || 0) - probe.ft); }
-    for (let k = 0; k < sv.count; k++) S.pending.push(buildThreat(sv, k, t0 + k * (sv.interval || 0)));
+    if (sv.sync) { const probe = buildThreat(sv, 0, 0, S.wind); t0 = Math.max(0, (sv.tArrive || 0) - probe.ft); }
+    for (let k = 0; k < sv.count; k++) S.pending.push(buildThreat(sv, k, t0 + k * (sv.interval || 0), S.wind));
   }
   S.pending.sort((a, b) => a.tLaunch - b.tLaunch);
   S.t = 0; S.started = true;
