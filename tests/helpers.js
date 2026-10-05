@@ -1,6 +1,7 @@
 // Utilidades para correr el motor sin navegador.
 import { SCENARIOS } from '../src/data/index.js';
 import { setMap, builtinMap, flatMap } from '../src/physics/terrain.js';
+import { posAt } from '../src/physics/kinematics.js';
 import { setRandom, seeded } from '../src/util/rng.js';
 import { S } from '../src/sim/state.js';
 import { startSim, resetState, step } from '../src/sim/engine.js';
@@ -10,6 +11,14 @@ import { applyScenario } from '../src/sim/setup.js';
 export function useMap(key, { flat = false } = {}) {
   const m = builtinMap(key);
   setMap(flat ? flatMap(m.W, m.H, m.cell) : m);
+}
+
+/** Pista perfecta de th en t: detecciones en t − 1 y t (lo que anota el motor con un radar que lo ve cada segundo). */
+export function seeTrack(th, t) {
+  const a = t - 1 >= th.tLaunch ? posAt(th, t - 1) : null, b = posAt(th, t);
+  th.seenPrev = a ? { x: a.x, y: a.y, z: a.z, t: t - 1 } : null;
+  th.seen = b ? { x: b.x, y: b.y, z: b.z, t } : null;
+  return th;
 }
 
 /** Deja el estado limpio con un setup vacío. */

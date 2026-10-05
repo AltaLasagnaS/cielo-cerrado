@@ -133,7 +133,9 @@ Con la casilla **Vista del defensor**, el mapa, la ayuda emergente y la ficha de
 
 Cada unidad tiene un **dueño explícito** (`u.owner`, `data/index.js#sideOf`): quién la opera, separado del país del equipo (un 36D6 o un Buk puede ser de cualquiera de los dos bandos).
 
-Lo que falta de las **perspectivas por bando** (etapa 1 del plan de Codex): vista del atacante y **tiro sin omnisciencia** (hoy la solución de tiro predice el punto de encuentro con la ruta real del arma; pasar a predecir con la pista observada cambia resultados y calibración, así que queda para decidir con el usuario).
+**Tiro sin omnisciencia**: la solución de tiro (`physics/engagement.js#solve`) predice el punto de encuentro con la pista observada (`physics/track.js`: última detección y velocidad medida), no con la ruta real; solo los balísticos usan la trayectoria verdadera, que la física fija. Al llegar, `arrivalReach` decide con la posición real si al misil le alcanza la energía (docs/FISICA.md §6).
+
+Lo que falta de las **perspectivas por bando** (etapa 1 del plan de Codex): vista del atacante.
 
 ## Modo Monte Carlo (`sim/montecarlo.js`)
 

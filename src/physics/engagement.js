@@ -8,6 +8,7 @@ import { jamJ } from './radar.js';
 import { posAt, speedAt, termZone } from './kinematics.js';
 import { profileOf, hasProfile, timeTo, energyAt } from './interceptor.js';
 import { isaSigma } from './atmosphere.js';
+import { trackVel, predictAt } from './track.js';
 
 /** Guiados que necesitan que el radar PROPIO de la batería vea el blanco hasta el final. */
 export const RADAR_GUID = ['TVM', 'SARH', 'mando', 'cañón'];
@@ -173,47 +174,78 @@ function closingCos(th, tt, p, x, y, z) {
 }
 
 /**
- * Busca el primer punto de intercepción posible: recorre la trayectoria futura del blanco
- * (pasos de 0,5 s hasta 30 s y luego de 2 s, hasta 400 s) y devuelve el primer instante tau en que
+ * Busca el primer punto de intercepción posible: recorre la trayectoria futura del blanco tal como
+ * la defensa la puede prever (balísticos: la verdadera, la fija la física; el resto: línea recta con la
+ * velocidad medida por la pista, physics/track.js; sin dos detecciones no hay solución) (pasos de 0,5 s hasta 30 s y luego de 2 s, hasta 400 s) y devuelve el primer instante tau en que
  * el blanco está dentro de la envolvente (alcance, alcance mínimo, piso y techo) y el interceptor,
  * volando en línea recta con su perfil de motor y planeo (physics/interceptor.js; a sam.vInt constante
  * si no tiene perfil), llega a tiempo (con ≤ 3 s de holgura).
  * El alcance es el efectivo: maxR × rangeFactor(aspecto) × pct, con pct la doctrina "disparar dentro
  * del X% del alcance" (S.fireRange, 1 = todo el alcance).
- * → { tau (s desde t), p (posición del blanco), r (km), f (r / alcance cinemático, para energyPk) } o null.
+ * → { tau (s desde t), p (posición prevista del blanco), r (km), f (r / alcance cinemático, para energyPk),
+ *     v (m/s medida por la pista; null en balísticos) } o null. La llegada se verifica con arrivalReach.
  */
 export function solve(u, th, t, pct = 1) {
   const sm = D(u).sam, tbm = isTBM(th);
   const maxR = tbm ? sm.maxRtbm : sm.maxR; const lz = surf(u.x, u.y) + 2;
   const P = profileOf(sm);
+  // Dónde va a estar el blanco: un balístico sigue una trayectoria que la física fija desde el
+  // lanzamiento (la ruta es la verdadera); el resto se extrapola en línea recta desde la pista (track.js)
+  const vel = tbm ? null : trackVel(th); if (!tbm && !vel) return null;
+  const at = tt => tbm ? posAt(th, tt) : predictAt(vel, tt);
+  const cosAt = (tt, p) => tbm ? closingCos(th, tt, p, u.x, u.y, lz) : velCos(vel, p, u.x, u.y, lz);
   // Una doctrina menor que el 100% retiene el lanzamiento hasta que el blanco entra en su
   // envolvente de disparo. Antes solo se comprobaba el alcance en el punto futuro de encuentro:
   // el misil podía salir mientras el blanco todavía estaba fuera del porcentaje elegido, de modo
   // que "esperar" no tenía costo temporal. El 100% conserva el comportamiento histórico.
   if (pct < 1) {
-    const p0 = posAt(th, t);
+    const p0 = at(t);
     if (!p0) return null;
     const r0 = Math.hypot(p0.x - u.x, p0.y - u.y, (p0.z - lz) / 1000);
-    const ca0 = closingCos(th, t, p0, u.x, u.y, lz);
+    const ca0 = cosAt(t, p0);
     if (r0 > maxR * rangeFactor(ca0) * pct) return null;
   }
-  const tEnd = th.tLaunch + th.ft - 0.5;
+  // el fin del vuelo solo se conoce para el balístico; al resto se lo persigue hasta 400 s
+  const tEnd = tbm ? th.tLaunch + th.ft - 0.5 : Infinity;
   let tau = 0.5;
   while (t + tau < tEnd && tau < 400) {
-    const p = posAt(th, t + tau); if (!p) break;
+    const p = at(t + tau); if (!p) break;
     const dh = Math.hypot(p.x - u.x, p.y - u.y), r = Math.hypot(dh, (p.z - lz) / 1000);
     const agl = p.z - surf(p.x, p.y);
     // altMin: sobre el terreno bajo el blanco (el piso del radar); altMax: sobre el lanzador (techo del arma)
     if (r <= maxR * pct && r >= sm.minR && agl >= sm.altMin && p.z - lz <= sm.altMax) {
-      const kin = maxR * rangeFactor(closingCos(th, t + tau, p, u.x, u.y, lz));
+      const kin = maxR * rangeFactor(cosAt(t + tau, p));
       if (r <= kin * pct) {
         const tf = timeTo(P, r * 1000);
-        if (tf <= tau) return (tau - tf <= 3) ? { tau, p, r, f: r / kin } : null;
+        if (tf <= tau) return (tau - tf <= 3) ? { tau, p, r, f: r / kin, v: vel ? vel.v : null } : null;
       }
     }
     tau += tau < 30 ? 0.5 : 2;
   }
   return null;
+}
+
+/** Coseno de acercamiento con la velocidad medida de la pista (vel = track.js#trackVel), en p. */
+function velCos(vel, p, x, y, z) {
+  const vx = vel.vx, vy = vel.vy, vz = vel.vAgl / 1000, lx = x - p.x, ly = y - p.y, lzk = (z - p.z) / 1000;
+  const nv = Math.hypot(vx, vy, vz), nl = Math.hypot(lx, ly, lzk);
+  return nv && nl ? (vx * lx + vy * ly + vz * lzk) / (nv * nl) : 1;
+}
+
+/**
+ * Llegada del interceptor de u al blanco th en t, que salió hacia el punto predicho por solve(): el
+ * buscador o la guía corrigen hacia la posición real, pero solo si le alcanza la energía. Mismo
+ * criterio que solve y engage con la posición verdadera: r ≤ alcance cinemático (maxR × rangeFactor),
+ * alcance mínimo, piso, techo y velocidad del blanco ≤ vmaxT (uno que aceleró en la picada se escapa). Si el blanco giró o cambió de altura más de lo que el misil cubre,
+ * no lo alcanza. → { ok, f } (f = r / alcance, para la Pk como en solve).
+ */
+export function arrivalReach(u, th, t) {
+  const sm = D(u).sam, p = th.p; if (!p) return { ok: false, f: 1 };
+  const maxR = isTBM(th) ? sm.maxRtbm : sm.maxR, lz = surf(u.x, u.y) + 2;
+  const r = Math.hypot(p.x - u.x, p.y - u.y, (p.z - lz) / 1000);
+  const kin = maxR * rangeFactor(closingCos(th, t, p, u.x, u.y, lz));
+  const ok = r <= kin && r >= sm.minR && p.z - surf(p.x, p.y) >= sm.altMin && p.z - lz <= sm.altMax && speedAt(th, t) <= sm.vmaxT;
+  return { ok, f: r / kin };
 }
 
 /**

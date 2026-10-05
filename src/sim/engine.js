@@ -13,7 +13,7 @@ import { antZ, aspectCos, belowCeiling, detR, inSector, jamJ, pdScan, PD_CUTOFF,
 import { buildThreat, posAt, speedAt } from '../physics/kinematics.js';
 import { gnssNavError, crpaOverwhelmed } from '../physics/navigation.js';
 import { profileOf, timeTo } from '../physics/interceptor.js';
-import { RADAR_GUID, isTBM, trackOK, reactionStart, solve, calcPk, effectiveC2, unitC2, netPk, cpOf, netKey } from '../physics/engagement.js';
+import { RADAR_GUID, isTBM, trackOK, reactionStart, solve, arrivalReach, calcPk, effectiveC2, unitC2, netPk, cpOf, netKey } from '../physics/engagement.js';
 import { C2_LEVELS } from '../data/index.js';
 import { damageAt, targetStatus } from '../physics/damage.js';
 import { azOf } from '../util/math.js';
@@ -180,7 +180,10 @@ export function step(dt) {
     if (!th.alive) { log('d', it.shot + ' de ' + uLabel(u) + ': blanco ya destruido, autodestrucción.'); continue; }
     // guiado por el radar de la batería (SARH, TVM, mando): si la batería cayó, el misil queda sin guía
     if (!u.alive && RADAR_GUID.includes(D(u).sam.guid)) { log('x', it.shot + ' de ' + uLabel(u) + ' pierde la guía: su batería fue destruida.'); continue; }
-    const pk = calcPk(u, th, t, S.jamsLive, it.f ?? null) * (it.remote ? C2_LEVELS[it.c2].remotePk * (it.gw ?? 1) : 1);   // error de posición de la pista de red (y de la pasarela)
+    // salió hacia el punto previsto: si el blanco cambió de rumbo o de altura más de lo que cubre su energía, no llega
+    const reach = arrivalReach(u, th, t);
+    if (!reach.ok) { log('x', it.shot + ' de ' + uLabel(u) + ' no alcanza a ' + label(th) + ': el blanco no estaba donde se lo esperaba.'); S.fx.push({ x: it.px, y: it.py, rt: performance.now(), c: '#8a9aac' }); continue; }
+    const pk = calcPk(u, th, t, S.jamsLive, it.f == null ? null : reach.f) * (it.remote ? C2_LEVELS[it.c2].remotePk * (it.gw ?? 1) : 1);   // error de posición de la pista de red (y de la pasarela)
     if (rnd() < pk) {
       th.alive = false; th.killed = true; th.tEnd = t; S.stats.killed++; if (th.isDecoy) S.stats.decoysKilled++;
       const p = th.p || it; S.fx.push({ x: p.x, y: p.y, rt: performance.now(), c: '#6fd08c' });
@@ -229,7 +232,7 @@ function canEngage(u, th, t, c2, probe) {
 function solveFor(u, th, t) {
   const sm = D(u).sam, r = D(u).radar;
   const sol = solve(u, th, t, S.fireRange ?? 1); if (!sol) return null;
-  if (speedAt(th, t + sol.tau) > sm.vmaxT) return null;
+  if ((sol.v ?? speedAt(th, t + sol.tau)) > sm.vmaxT) return null;   // velocidad medida (la verdadera solo en balísticos)
   const remote = !(r && t - (th.det[u.id] ?? -1e9) <= r.scan * 2 + 0.6);
   if (RADAR_GUID.includes(sm.guid) && sm.guid !== 'cañón') {
     if (!los(u.x, u.y, antZ(u), sol.p.x, sol.p.y, sol.p.z)) return null;

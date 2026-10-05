@@ -299,7 +299,11 @@ Es un modelo **cinemático guiado por datos**: la amenaza recorre una ruta polig
 
 **Tiempo de reacción:** desde que hay pista hasta el primer disparo pasan `sam.react` segundos.
 
-**Solución** (`solve`): recorre la trayectoria futura del blanco con pasos de 0,5 s hasta 30 s y de 2 s hasta 400 s. Toma el primer instante τ en que:
+**Qué trayectoria predice la defensa** (`physics/track.js`): la defensa no conoce la ruta del arma, solo su pista. Para drones, crucero y supersónicos extrapola en **línea recta** con la velocidad medida entre las dos últimas detecciones de la red (`th.seen`, `th.seenPrev`; separadas a lo sumo `VEL_GAP` = 12 s, la misma ventana de la pista de red). La altura se extrapola **sobre el terreno** (un crucero que sigue el relieve mantiene su AGL; uno en picada la pierde), nunca por debajo de 5 m. Con una sola detección no hay velocidad y no hay disparo. Los **balísticos e hipersónicos** siguen con la trayectoria verdadera: después del motor la fija la física y un radar de tiro la predice bien; su fin de vuelo también. La velocidad que se compara con `vmaxT` es la medida (la verdadera solo en balísticos).
+
+**Llegada** (`arrivalReach`): el interceptor sale hacia el punto previsto y al llegar el buscador o la guía corrigen hacia la posición real, pero solo si le alcanza: se aplica el mismo criterio de la solución con la posición verdadera (r ≤ `maxR × rangeFactor`, alcance mínimo, piso, techo y velocidad ≤ `vmaxT`). Si el blanco giró, bajó a su picada final o aceleró más de lo que cubre el misil, no lo alcanza (el registro dice "el blanco no estaba donde se lo esperaba"); si llega, la Pk usa la fracción del alcance real en ese momento. Simplificación: no se modela el tiempo extra de la corrección ni el ángulo que el buscador puede cubrir (no es público por misil); cuenta solo la energía.
+
+**Solución** (`solve`): recorre la trayectoria prevista del blanco con pasos de 0,5 s hasta 30 s y de 2 s hasta 400 s. Toma el primer instante τ en que:
 
 ```
 minR ≤ r ≤ R_ef = maxR × rangeFactor(ca) × fireRange   (maxRtbm si es balístico/hipersónico)

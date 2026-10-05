@@ -6,7 +6,7 @@ Son ideas ordenadas por prioridad, no promesas. Cada ítem que cambie resultados
 
 ## Próximo
 
-- **Perspectivas por bando, segunda parte** (etapa 1 del plan de Codex, [`PLAN-MAESTRO.md`](experimentos/catalogo-presupuesto/docs/PLAN-MAESTRO.md)). Ya están el dueño explícito de cada unidad (`u.owner`) y la vista del defensor con contactos (posición estimada, edad, último reporte; ficha de pista sin la verdad). Falta: **vista del atacante** (qué sabe el atacante de la defensa; hay que filtrar también el registro, los tooltips y el debrief para no filtrar información) y **tiro sin trampa** (hoy la solución de tiro predice el punto de encuentro con la ruta real del arma). *(Para decidir con el usuario: pasar a predecir con la pista observada cambia resultados y calibración, y para modelarlo bien hace falta saber cuánto corrige cada misil en vuelo, que no es público.)*
+- **Perspectivas por bando, segunda parte** (etapa 1 del plan de Codex, [`PLAN-MAESTRO.md`](experimentos/catalogo-presupuesto/docs/PLAN-MAESTRO.md)). Ya están el dueño explícito de cada unidad (`u.owner`) y la vista del defensor con contactos (posición estimada, edad, último reporte; ficha de pista sin la verdad). Ya está también el **tiro sin omnisciencia** (la defensa apunta con su pista; CHANGELOG). Falta: **vista del atacante** (qué sabe el atacante de la defensa; hay que filtrar también el registro, los tooltips y el debrief para no filtrar información).
 
 ## Física (cada ítem es **[sim]**)
 

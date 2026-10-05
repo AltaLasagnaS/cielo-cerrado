@@ -4451,6 +4451,25 @@ table.t.mc td.pc{white-space:nowrap}
     return S20 * Math.pow(1 + (h - 2e4) / 216650, -35.1632);
   }
 
+  // src/physics/track.js
+  var VEL_GAP = 12;
+  var PRED_FLOOR = 5;
+  function trackVel(th) {
+    const s = th.seen, q = th.seenPrev;
+    if (!s || !q) return null;
+    const dt = s.t - q.t;
+    if (!(dt > 0) || dt > VEL_GAP) return null;
+    const vx = (s.x - q.x) / dt, vy = (s.y - q.y) / dt;
+    const vAgl = (s.z - surf(s.x, s.y) - (q.z - surf(q.x, q.y))) / dt;
+    return { s, vx, vy, vAgl, v: Math.hypot(vx * 1e3, vy * 1e3, (s.z - q.z) / dt) };
+  }
+  function predictAt(vel, tt) {
+    if (!vel) return null;
+    const { s } = vel, k = tt - s.t, x = s.x + vel.vx * k, y = s.y + vel.vy * k;
+    const g = surf(x, y), agl = Math.max(PRED_FLOOR, s.z - surf(s.x, s.y) + vel.vAgl * k);
+    return { x, y, z: g + agl, agl };
+  }
+
   // src/physics/engagement.js
   var RADAR_GUID = ["TVM", "SARH", "mando", "cañón"];
   var isTBM = (th) => th.cls === "balistico" || th.cls === "hiper";
@@ -4530,30 +4549,48 @@ table.t.mc td.pc{white-space:nowrap}
     const maxR = tbm ? sm.maxRtbm : sm.maxR;
     const lz = surf(u.x, u.y) + 2;
     const P = profileOf(sm);
+    const vel = tbm ? null : trackVel(th);
+    if (!tbm && !vel) return null;
+    const at = (tt) => tbm ? posAt(th, tt) : predictAt(vel, tt);
+    const cosAt = (tt, p) => tbm ? closingCos(th, tt, p, u.x, u.y, lz) : velCos(vel, p, u.x, u.y, lz);
     if (pct3 < 1) {
-      const p0 = posAt(th, t);
+      const p0 = at(t);
       if (!p0) return null;
       const r0 = Math.hypot(p0.x - u.x, p0.y - u.y, (p0.z - lz) / 1e3);
-      const ca0 = closingCos(th, t, p0, u.x, u.y, lz);
+      const ca0 = cosAt(t, p0);
       if (r0 > maxR * rangeFactor(ca0) * pct3) return null;
     }
-    const tEnd = th.tLaunch + th.ft - 0.5;
+    const tEnd = tbm ? th.tLaunch + th.ft - 0.5 : Infinity;
     let tau = 0.5;
     while (t + tau < tEnd && tau < 400) {
-      const p = posAt(th, t + tau);
+      const p = at(t + tau);
       if (!p) break;
       const dh = Math.hypot(p.x - u.x, p.y - u.y), r = Math.hypot(dh, (p.z - lz) / 1e3);
       const agl = p.z - surf(p.x, p.y);
       if (r <= maxR * pct3 && r >= sm.minR && agl >= sm.altMin && p.z - lz <= sm.altMax) {
-        const kin = maxR * rangeFactor(closingCos(th, t + tau, p, u.x, u.y, lz));
+        const kin = maxR * rangeFactor(cosAt(t + tau, p));
         if (r <= kin * pct3) {
           const tf = timeTo(P, r * 1e3);
-          if (tf <= tau) return tau - tf <= 3 ? { tau, p, r, f: r / kin } : null;
+          if (tf <= tau) return tau - tf <= 3 ? { tau, p, r, f: r / kin, v: vel ? vel.v : null } : null;
         }
       }
       tau += tau < 30 ? 0.5 : 2;
     }
     return null;
+  }
+  function velCos(vel, p, x, y, z) {
+    const vx = vel.vx, vy = vel.vy, vz = vel.vAgl / 1e3, lx = x - p.x, ly = y - p.y, lzk = (z - p.z) / 1e3;
+    const nv = Math.hypot(vx, vy, vz), nl = Math.hypot(lx, ly, lzk);
+    return nv && nl ? (vx * lx + vy * ly + vz * lzk) / (nv * nl) : 1;
+  }
+  function arrivalReach(u, th, t) {
+    const sm = D(u).sam, p = th.p;
+    if (!p) return { ok: false, f: 1 };
+    const maxR = isTBM(th) ? sm.maxRtbm : sm.maxR, lz = surf(u.x, u.y) + 2;
+    const r = Math.hypot(p.x - u.x, p.y - u.y, (p.z - lz) / 1e3);
+    const kin = maxR * rangeFactor(closingCos(th, t, p, u.x, u.y, lz));
+    const ok = r <= kin && r >= sm.minR && p.z - surf(p.x, p.y) >= sm.altMin && p.z - lz <= sm.altMax && speedAt(th, t) <= sm.vmaxT;
+    return { ok, f: r / kin };
   }
   function calcPk(u, th, t, jams, f = null) {
     const sm = D(u).sam;
@@ -5026,7 +5063,13 @@ table.t.mc td.pc{white-space:nowrap}
         log("x", it.shot + " de " + uLabel(u) + " pierde la guía: su batería fue destruida.");
         continue;
       }
-      const pk = calcPk(u, th, t, S.jamsLive, it.f ?? null) * (it.remote ? C2_LEVELS[it.c2].remotePk * (it.gw ?? 1) : 1);
+      const reach = arrivalReach(u, th, t);
+      if (!reach.ok) {
+        log("x", it.shot + " de " + uLabel(u) + " no alcanza a " + label(th) + ": el blanco no estaba donde se lo esperaba.");
+        S.fx.push({ x: it.px, y: it.py, rt: performance.now(), c: "#8a9aac" });
+        continue;
+      }
+      const pk = calcPk(u, th, t, S.jamsLive, it.f == null ? null : reach.f) * (it.remote ? C2_LEVELS[it.c2].remotePk * (it.gw ?? 1) : 1);
       if (rnd() < pk) {
         th.alive = false;
         th.killed = true;
@@ -5081,7 +5124,7 @@ table.t.mc td.pc{white-space:nowrap}
     const sm = D(u).sam, r = D(u).radar;
     const sol = solve(u, th, t, S.fireRange ?? 1);
     if (!sol) return null;
-    if (speedAt(th, t + sol.tau) > sm.vmaxT) return null;
+    if ((sol.v ?? speedAt(th, t + sol.tau)) > sm.vmaxT) return null;
     const remote = !(r && t - (th.det[u.id] ?? -1e9) <= r.scan * 2 + 0.6);
     if (RADAR_GUID.includes(sm.guid) && sm.guid !== "cañón") {
       if (!los(u.x, u.y, antZ(u), sol.p.x, sol.p.y, sol.p.z)) return null;
@@ -6753,7 +6796,7 @@ table.t.mc td.pc{white-space:nowrap}
       group: "Enfrentamiento",
       title: "Detección, seguimiento e intercepción",
       body: () => `<p>Son tres pasos distintos. <b>Detectar</b> es que un sensor vea el blanco en un barrido. <b>Seguir</b> es mantener actualizaciones seguidas para conocer su trayectoria. <b>Interceptar</b> exige una solución de tiro, un canal libre, superar el tiempo de reacción y que el interceptor llegue al punto de encuentro antes que el blanco.</p><p>Muchos sistemas detectan lejos pero solo pueden guiar misiles con su radar propio.</p>`,
-      engine: () => `<ul><li>Barridos cada ${code("radar.scan")} s; probabilidad de detección según la distancia.</li><li>Pista propia válida si el radar de la batería vio el blanco en los últimos 2 barridos; pista de red válida 12 s (${code("trackOK()")}).</li><li>Los guiados TVM, semiactivo, por mando y los cañones necesitan pista propia; los misiles activos e IR pueden usar la de la red; los drones interceptores, solo la de la red.</li><li>${code("sam.react")}: segundos desde que hay pista hasta el primer disparo.</li><li>${code("solve()")}: busca el primer punto de la trayectoria dentro de la envolvente al que el interceptor llega a tiempo.</li></ul>`
+      engine: () => `<ul><li>Barridos cada ${code("radar.scan")} s; probabilidad de detección según la distancia.</li><li>Pista propia válida si el radar de la batería vio el blanco en los últimos 2 barridos; pista de red válida 12 s (${code("trackOK()")}).</li><li>Los guiados TVM, semiactivo, por mando y los cañones necesitan pista propia; los misiles activos e IR pueden usar la de la red; los drones interceptores, solo la de la red.</li><li>${code("sam.react")}: segundos desde que hay pista hasta el primer disparo.</li><li>${code("solve()")}: busca el primer punto de la trayectoria prevista (línea recta con la velocidad medida por la pista; la verdadera solo en balísticos) dentro de la envolvente al que el interceptor llega a tiempo. Al llegar, ${code("arrivalReach()")} revisa con la posición real si le alcanza la energía.</li></ul>`
     },
     {
       id: "pk",
@@ -6798,7 +6841,7 @@ table.t.mc td.pc{white-space:nowrap}
         return `<p>El alcance del catálogo es el máximo contra un blanco ideal. La <b>ventana práctica</b> es el tiempo en que, a la vez, el blanco está dentro de la envolvente (alcances mínimo y máximo, piso y techo), está siendo seguido, ya pasó el tiempo de reacción y el interceptor puede llegar antes que él.</p>
       <p>Ejemplo con los datos del motor: un ${esc(T.short)} vuela a ${n(T.cruiseAlt / 1e3)} km de altura y pica en los últimos ${dd} km a ${kmh(T.vDive)}. El IRIS-T tiene ${s.maxR} km de alcance, pero su techo es de ${n(s.altMax / 1e3)} km y el blanco recién baja de esa altura en los últimos ~${n(remAlt, 1)} km: quedan <b>~${n(tw)} s</b>. Menos ${s.react} s de reacción, y con un interceptor que promedia ${kmh(s.vInt)} contra un blanco a ${kmh(T.vDive)}, en el mejor caso el encuentro sería a ~${n(x, 1)} km. Ahí la Pk contra supersónicos es ${Math.round(s.pk.supersonico * 100)}% y baja otro ×0,8 porque el blanco va cerca del máximo enfrentable (${kmh(s.vmaxT)}). Es una ventana de pocos segundos con poca probabilidad, aunque "el alcance alcance". Coincide con los 3 derribos en más de 400 lanzamientos fuera de la cobertura Patriot.</p>`;
       },
-      engine: () => `<p>${code("solve()")} recorre la trayectoria futura del blanco y verifica ${code("minR ≤ r ≤ maxR × rangeFactor × fireRange")} (o ${code("maxRtbm")} para balísticos; ver "Energía del interceptor"), ${code("altMin ≤ altura ≤ altMax")} y el tiempo de vuelo del interceptor (perfil de motor y planeo, o ${code("vInt")} constante sin perfil). ${code("engage()")} descarta además blancos más rápidos que ${code("vmaxT")} y sin línea de vista al punto de encuentro.</p>`
+      engine: () => `<p>${code("solve()")} recorre la trayectoria prevista del blanco (la que la defensa puede deducir de su pista) y verifica ${code("minR ≤ r ≤ maxR × rangeFactor × fireRange")} (o ${code("maxRtbm")} para balísticos; ver "Energía del interceptor"), ${code("altMin ≤ altura ≤ altMax")} y el tiempo de vuelo del interceptor (perfil de motor y planeo, o ${code("vInt")} constante sin perfil). ${code("engage()")} descarta además blancos más rápidos que ${code("vmaxT")} y sin línea de vista al punto de encuentro.</p>`
     },
     {
       id: "energia",
