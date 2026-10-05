@@ -27,3 +27,15 @@ export function safeProduct(a, b) {
 export function safeSum(a, b) {
   return integer(a + b, 'suma');
 }
+
+// Combat uses quarter-second steps. Time is continuous; ammunition and
+// monetary minor units remain integers. Bound the supported campaign clock
+// to 1e9 seconds (about 31 years), without rounding or quantization.
+export function seconds(value, name = 'tiempo', signed = false) {
+  if (typeof value !== 'number' || !Number.isFinite(value) || Math.abs(value) > 1e9 || (!signed && value < 0)) {
+    throw Error(`${name}: segundos finitos dentro del intervalo admitido requeridos`);
+  }
+  return value;
+}
+
+export function addSeconds(a, b) { return seconds(a + b, 'suma de tiempo'); }

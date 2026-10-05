@@ -1,0 +1,60 @@
+import assert from 'node:assert/strict';
+
+const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
+const url = process.env.TEST_LOGISTICS_URL || 'http://127.0.0.1:8766/demo/logistics.html';
+const origin = new URL(url).origin;
+const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined,
+  headless: true, args: ['--no-sandbox'] });
+try {
+  const page = await browser.newPage({ viewport: { width: 1200, height: 1000 } });
+  const errors = [], external = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.route('**/*', route => {
+    if (route.request().url().startsWith(origin + '/')) return route.continue();
+    external.push(route.request().url()); return route.abort();
+  });
+  await page.goto(url); await page.waitForFunction(() => window.__logisticsDemo);
+  const snapshot = () => page.evaluate(() => window.__logisticsDemo.getState());
+  assert.equal(await page.locator('#balance').textContent(), '1200');
+  await page.locator('#briefing').click();
+  assert.equal(JSON.parse(await page.locator('#briefing-output').textContent()).intelligence[0].ageSeconds, 600);
+  await page.locator('#quantity').fill('1.5'); await page.locator('#order').click();
+  assert.match(await page.locator('#status').textContent(), /entero/);
+  assert.equal((await snapshot()).jobs.length, 0);
+  await page.locator('#quantity').fill('4'); await page.locator('#order').click();
+  assert.equal(await page.locator('#balance').textContent(), '1100');
+  await page.locator('#reload').click();
+  assert.equal((await snapshot()).inventory.stock.find(row => row.locationId === 'cargo').quantity, 4);
+  await page.locator('#advance').click();
+  assert.equal((await snapshot()).inventory.stock.find(row => row.locationId === 'launcher-stock').quantity, 4);
+  await page.locator('#activate').click();
+  assert.equal(await page.locator('#briefing-output').textContent(), '');
+  assert.equal(await page.locator('#briefing').isDisabled(), true);
+  await page.locator('#quantity').fill('1'); await page.locator('#fire').click();
+  assert.equal((await snapshot()).inventory.totals[0].expended, 1);
+  await page.locator('#disable').click(); await page.locator('#repair').click();
+  await page.locator('#fire').click(); assert.match(await page.locator('#status').textContent(), /no operativa/);
+  assert.equal((await snapshot()).inventory.totals[0].expended, 1);
+  assert.equal(await page.locator('#spares').textContent(), '2');
+  await page.locator('#finish').click(); await page.locator('#next').click();
+  assert.equal((await snapshot()).inventory.components.find(row => row.id === 'radar').condition, 'disabled');
+  assert.equal((await snapshot()).missions.length, 2);
+  await page.locator('#seconds').fill('240'); await page.locator('#advance').click();
+  assert.equal((await snapshot()).inventory.components.find(row => row.id === 'radar').condition, 'operational');
+  assert.equal((await snapshot()).inventory.totals[0].acquired, 4);
+  await page.locator('#briefing').click();
+  assert.equal(JSON.parse(await page.locator('#briefing-output').textContent()).intelligence[0].ageSeconds, 900);
+  await page.locator('#save').click();
+  const saved = await page.locator('#saved').inputValue(), before = await snapshot();
+  await page.locator('#reset').click(); await page.locator('#saved').fill(saved); await page.locator('#restore').click();
+  assert.deepEqual(await snapshot(), before);
+  const beforeInvalid = await snapshot();
+  await page.locator('#saved').fill(saved.slice(0, -4)); await page.locator('#restore').click();
+  assert.deepEqual(await snapshot(), beforeInvalid, 'guardado inválido no destruye la partida actual');
+  await page.locator('#seconds').fill(''); await page.locator('#advance').click();
+  assert.match(await page.locator('#status').textContent(), /entero/);
+  await page.setViewportSize({ width: 390, height: 844 });
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true);
+  assert.deepEqual(errors, []); assert.deepEqual(external, []);
+  console.log('Logística: compras, tránsito, reparación, daño, continuidad, replay, enteros y móvil verificados, sin red externa.');
+} finally { await browser.close(); }
