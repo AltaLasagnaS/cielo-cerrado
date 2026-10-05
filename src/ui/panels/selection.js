@@ -67,7 +67,7 @@ function renderMulti(el) {
   bind('#mDec', (u, v) => { if (v) u.decoyDoc = v; else delete u.decoyDoc; });
   bind('#mNoD', (u, v) => { u.noDrones = v === 'no'; });
   $('#mDel').onclick = () => {
-    if (!confirm(`¿Eliminar las ${us.length} unidades seleccionadas?`)) return;
+    if (!window.confirm(`¿Eliminar las ${us.length} unidades seleccionadas?`)) return;
     const ids = new Set(us.map(u => u.id));
     S.setup.defs = S.setup.defs.filter(v => !ids.has(v.id));
     for (const sv of S.setup.salvos) if (ids.has(sv.targetUnit)) sv.targetUnit = null;
