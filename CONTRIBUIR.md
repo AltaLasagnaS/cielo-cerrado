@@ -17,10 +17,10 @@ Editá siempre en `src/`. **No edites `index.html` a mano**: se genera con `npm 
 npm test          # todas las pruebas
 npm run build     # regenera index.html
 npm run docs      # regenera docs/CATALOGO.md (si tocaste datos)
-npm run typecheck # revisa los tipos de util, data, physics y sim (archivos con // @ts-check)
+npm run typecheck # revisa los tipos de todas las capas (archivos con // @ts-check, strictNullChecks)
 ```
 
-Los archivos de `util/`, `data/`, `physics/` y `sim/` empiezan con `// @ts-check`: documentá los tipos nuevos en JSDoc (`src/types.js`) y mantené `npm run typecheck` sin errores. O todo junto: `npm run check`. La CI de GitHub hace lo mismo y además verifica que `index.html` y `docs/CATALOGO.md` estén al día.
+Todos los archivos de `src/` empiezan con `// @ts-check` (y `strictNullChecks` está activado): documentá los tipos nuevos en JSDoc (`src/types.js`) y mantené `npm run typecheck` sin errores. O todo junto: `npm run check`. La CI de GitHub hace lo mismo y además verifica que `index.html` y `docs/CATALOGO.md` estén al día.
 
 Para verificar los campos numéricos y los controles de Monte Carlo en el navegador, dejá `npm run dev` en marcha y ejecutá `node tests/ui.browser.mjs` con Playwright y Chromium disponibles. Si están fuera del proyecto, indicá `PLAYWRIGHT_MODULE=/ruta/a/playwright/index.mjs` y `CHROMIUM_PATH=/ruta/a/chromium`; `TEST_URL` permite usar otro puerto. Esta prueba es adicional a `npm test` y bloquea pedidos externos de tipografías.
 

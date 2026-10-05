@@ -3,6 +3,9 @@
 // El motor anota la última detección (th.seen) y la anterior (th.seenPrev); de ahí sale la posición
 // estimada por estima (posición + velocidad · edad) mientras la pista sigue viva, y el último reporte
 // fechado cuando se pierde. Nunca mira la posición real ni la ruta futura. Anotar no consume azar.
+// Del lado del atacante, attackerKnows dice qué unidades de la defensa conoce.
+import { D } from '../data/index.js';
+import { S } from './state.js';
 
 /** Edad máxima (s) de una pista que se sigue dibujando como viva (la misma ventana de la red). */
 export const TRACK_AGE = 12;
@@ -14,6 +17,14 @@ export function noteSeen(th, t, by) {
   const p = th.p; if (!p) return;
   if (th.seen && t - th.seen.t > 0.5) th.seenPrev = th.seen;
   th.seen = { x: p.x, y: p.y, z: p.z, t, by };
+}
+
+/** Anota una detección en la pista key de th (th.obs: 'u' + id del radar, o la clave de una red; physics/track.js). */
+export function noteObs(th, key, t) {
+  const p = th.p; if (!p) return;
+  const m = th.obs || (th.obs = {}), o = m[key] || (m[key] = { s: null, q: null });
+  if (o.s && t - o.s.t > 0.5) o.q = o.s;
+  o.s = { x: p.x, y: p.y, z: p.z, t };
 }
 
 /**
@@ -29,4 +40,37 @@ export function contactOf(th, t) {
   const lost = age > TRACK_AGE || !th.alive;
   const k = lost ? 0 : age;   // pista viva: estima; perdida: queda donde se la vio por última vez
   return { x: s.x + vx * k, y: s.y + vy * k, z: s.z + vz * k, vx, vy, v: Math.hypot(vx, vy) * 1000, age, lost, by: s.by };
+}
+
+/**
+ * ¿Sabe el atacante dónde está la unidad u en t? (vista del atacante, docs/ARQUITECTURA.md)
+ *   - desde que su radar emitió por primera vez (u.emitFrom, lo anota el motor; también el AEW): lo
+ *     ubica la inteligencia de señales (ELINT); con control de emisiones (u.emcon) puede no emitir nunca;
+ *   - si no emitió (sin radar, sensor pasivo o radar en silencio): solo desde su primer disparo
+ *     (u.revealed), por el destello y la estela del lanzamiento.
+ * No dice si está viva, dañada ni cuánta munición le queda.
+ */
+export function attackerKnows(u, t) {
+  if (u.emitFrom != null && u.emitFrom <= t) return true;
+  return u.revealed != null && u.revealed <= t;
+}
+
+/** ¿El sensor r emite? (los acústicos y ópticos escuchan o miran: son pasivos). */
+export const isEmitter = r => !!r && r.band !== 'ACU' && r.band !== 'OPT';
+
+/** Modos de control de emisiones de un radar (u.emcon): sin dato, emite siempre. */
+export const EMCON = { siempre: 'Emite siempre', alerta: 'Se enciende con la primera alerta de la red', silencio: 'En silencio (solo pistas de la red)' };
+
+/**
+ * ¿Está emitiendo el radar de u en t? (control de emisiones, docs/FISICA.md §6). 'siempre' (o sin dato): sí.
+ * 'silencio': nunca; la unidad depende de las pistas de la red. 'alerta': desde la primera alerta que
+ * recibe su puesto de mando (la de un sensor de la red; si ninguno avisa, no se enciende). Los sensores
+ * pasivos (acústicos, ópticos) no emiten y no se apagan.
+ */
+export function emitting(u, t) {
+  const m = u.emcon; if (!m || m === 'siempre' || !isEmitter(D(u).radar)) return true;
+  if (m === 'silencio') return false;
+  if (u.c2 === 'desconectada') return false;   // aislada: no le llegan alertas
+  const cp = u.cp || '';
+  return S.threats.some(th => { const c = cp ? th.cueCp?.[cp] : th.cueFirst; return c != null && c <= t; });
 }

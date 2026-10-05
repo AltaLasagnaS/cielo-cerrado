@@ -102,3 +102,18 @@ test('una batería destruida deja sin guía a sus misiles guiados por radar (TVM
   // un buscador activo (NASAMS) sigue solo después del lanzamiento
   assert.ok(shootThenDie('nasams').stats.killed > 0, 'el AMRAAM no depende de la batería');
 });
+
+test('un jammer terrestre alcanzado por una explosión deja de interferir; uno aéreo no se daña así', async () => {
+  const { addJam, addSalvo } = await import('../src/sim/setup.js');
+  useMap('monterey', { flat: true }); clearSetup();
+  addJam('krasukha4', 40, 40, { on: true });
+  addSalvo({ type: 'kalibr', count: 3, interval: 5, pts: [[40, 0], [40, 40]] });
+  const S2 = runCurrent(4);
+  const j = S2.jamsLive[0];
+  assert.equal(j.dead, true, 'tres Kalibr sobre el Krasukha lo destruyen: ' + j.hp);
+  assert.ok(S2.log.some(e => /Krasukha-4 queda destruido/.test(e.msg) && e.who === 'def'));
+  const { damageJammers } = await import('../src/sim/engine.js');
+  const air = { id: 99, type: 'soj', x: 10, y: 10, on: true, hp: 300 }; S2.jamsLive.push(air);
+  damageJammers(S2.threats[0].T, 10, 10);
+  assert.ok(!air.dead && air.hp === 300, 'el aéreo no');
+});

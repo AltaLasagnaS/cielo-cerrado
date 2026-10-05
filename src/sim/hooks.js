@@ -9,5 +9,7 @@ export const hooks = {
   /** Una unidad fue destruida (cambia la cobertura). */
   onUnitLost() {},
   /** ¿El jugador está en "vista del defensor"? (solo cambia el texto del registro). */
-  defenderView: () => false
+  defenderView: () => false,
+  /** ¿El jugador está en "vista del atacante"? (solo cambia el dibujo y lo que se puede tocar). */
+  attackerView: () => false
 };

@@ -10,7 +10,7 @@ import { surf } from '../physics/terrain.js';
 import { isOffmap, posAt } from '../physics/kinematics.js';
 import { profileOf, distAt } from '../physics/interceptor.js';
 import { S } from '../sim/state.js';
-import { contactOf } from '../sim/contacts.js';
+import { contactOf, attackerKnows } from '../sim/contacts.js';
 import { hooks } from '../sim/hooks.js';
 import { frameAt } from '../sim/replay.js';
 import { cv, ctx, dpr, V, toS } from './view.js';
@@ -26,8 +26,10 @@ export function draw() {
   ctx.fillStyle = '#0a1520'; ctx.fillRect(0, 0, w, h);
   // relieve (raster suavizado + vectores) y cobertura (interpolada, sin bloques)
   const [ox, oy] = toS(0, 0), mw = MAP.wKm * V.s, mh = MAP.hKm * V.s;
+  // vista del atacante (no en la repetición, que muestra la verdad): solo las defensas que conoce, sin su estado
+  const av = S.started && !R && hooks.attackerView();
   drawTerrain({ ctx, dpr, s: V.s, ox, oy }, S.relief);
-  if (S.showCov && covCanvas.width) { ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high'; ctx.drawImage(covCanvas, ox, oy, mw, mh); }
+  if (S.showCov && covCanvas.width && !av) { ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high'; ctx.drawImage(covCanvas, ox, oy, mw, mh); }
   ctx.strokeStyle = 'rgba(230,165,60,.5)'; ctx.lineWidth = 1; ctx.strokeRect(ox, oy, mw, mh);
   // grilla km
   ctx.font = '10px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(200,215,230,.55)'; ctx.strokeStyle = 'rgba(200,215,230,.08)';
@@ -41,11 +43,11 @@ export function draw() {
   // lugares
   ctx.font = '600 12px "IBM Plex Sans", sans-serif';
   for (const p of MAP.places || []) { const [sx, sy] = toS(p[1], p[2]); ctx.fillStyle = 'rgba(10,15,22,.75)'; ctx.fillRect(sx - 2, sy - 2, 4, 4); ctx.fillStyle = 'rgba(235,240,245,.85)'; ctx.fillText(p[0], sx + 5, sy + 4); }
-  const units = R ? R.units : S.started ? S.units : S.setup.defs;
+  const units = (R ? R.units : S.started ? S.units : S.setup.defs).filter(u => !av || attackerKnows(u, tNow));
   const jams = S.started ? S.jamsLive : S.setup.jams;
   // anillos de alcance y sectores
   for (const u of units) {
-    const d = D(u); const [sx, sy] = toS(u.x, u.y); const dead = S.started && !u.alive;
+    const d = D(u); const [sx, sy] = toS(u.x, u.y); const dead = S.started && !u.alive && !av;
     if (dead) continue;
     const isSel = S.sel && S.sel.kind === 'def' && S.sel.id === u.id;
     if (d.sam) {
@@ -71,7 +73,7 @@ export function draw() {
   if (!R && (!S.started || !S.running)) for (const sv of S.setup.salvos) drawRoute(sv, S.sel && S.sel.kind === 'salvo' && S.sel.id === sv.id);
   if (S.route) drawRoute({ type: S.atk.type, pts: S.route.pts, preview: true }, true);
   // objetivos (debajo de las unidades)
-  for (const g of R ? R.objs : S.started ? S.objs : S.setup.objs) drawObjective(g, S.sel && S.sel.kind === 'obj' && S.sel.id === g.id);
+  for (const g of R ? R.objs : S.started ? S.objs : S.setup.objs) drawObjective(g, S.sel && S.sel.kind === 'obj' && S.sel.id === g.id, av);
   // jammers
   for (const j of jams) {
     const J = JAMMERS[j.type], [sx, sy] = toS(j.x, j.y); const isSel = S.sel && S.sel.kind === 'jam' && S.sel.id === j.id;
@@ -79,13 +81,13 @@ export function draw() {
     ctx.fillStyle = j.on && !j.dead ? '#c58cff' : '#5d4a75'; ctx.strokeStyle = isSel ? '#e6a53c' : '#1a1024'; ctx.lineWidth = isSel ? 2 : 1;
     ctx.beginPath(); for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4, rr = k % 2 ? 4 : 9; ctx.lineTo(sx + Math.cos(a) * rr, sy + Math.sin(a) * rr); } ctx.closePath(); ctx.fill(); ctx.stroke();
     // ubicado por triangulación (sim/ew.js): círculo del error; derribado (home-on-jam): cruz
-    if (S.started && j.fix && !j.dead) { ctx.strokeStyle = 'rgba(230,165,60,.8)'; ctx.setLineDash([2, 3]); ctx.beginPath(); ctx.arc(sx, sy, Math.max(6, j.fix.err * V.s), 0, 7); ctx.stroke(); ctx.setLineDash([]); }
+    if (S.started && j.fix && !j.dead && !av) { ctx.strokeStyle = 'rgba(230,165,60,.8)'; ctx.setLineDash([2, 3]); ctx.beginPath(); ctx.arc(sx, sy, Math.max(6, j.fix.err * V.s), 0, 7); ctx.stroke(); ctx.setLineDash([]); }
     if (S.started && j.dead) { ctx.strokeStyle = '#ff5b4d'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(sx - 7, sy - 7); ctx.lineTo(sx + 7, sy + 7); ctx.moveTo(sx + 7, sy - 7); ctx.lineTo(sx - 7, sy + 7); ctx.stroke(); }
     labelAt(sx, sy, J.short, '#d8b8ff');
   }
   // unidades
   for (const u of units) {
-    const d = D(u), [sx, sy] = toS(u.x, u.y), dead = S.started && !u.alive;
+    const d = D(u), [sx, sy] = toS(u.x, u.y), dead = S.started && !u.alive && !av;
     const isSel = (S.sel && S.sel.kind === 'def' && S.sel.id === u.id) || S.multi.includes(u.id);
     const c = sideOf(u) === 'RU' ? '#ff9f5a' : '#62b6ff';
     ctx.lineWidth = isSel ? 2.2 : 1.2; ctx.strokeStyle = isSel ? '#e6a53c' : '#08101a'; ctx.fillStyle = dead ? '#3a4452' : c;
@@ -96,9 +98,9 @@ export function draw() {
     else { ctx.moveTo(sx, sy - 9); ctx.lineTo(sx + 8, sy + 6); ctx.lineTo(sx - 8, sy + 6); ctx.closePath(); }
     ctx.fill(); ctx.stroke();
     if (d.kind === 'aew') { ctx.strokeStyle = c; ctx.beginPath(); ctx.arc(sx, sy, 12, 0, 7); ctx.stroke(); }
-    if (S.started && !dead && (u.dmgRadar || u.dmgLauncher)) { ctx.strokeStyle = '#e6a53c'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(sx, sy, 12, 0, 7); ctx.stroke(); }   // dañada
+    if (S.started && !dead && !av && (u.dmgRadar || u.dmgLauncher)) { ctx.strokeStyle = '#e6a53c'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(sx, sy, 12, 0, 7); ctx.stroke(); }   // dañada
     if (dead) { ctx.strokeStyle = '#ff5b4d'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(sx - 7, sy - 7); ctx.lineTo(sx + 7, sy + 7); ctx.moveTo(sx + 7, sy - 7); ctx.lineTo(sx - 7, sy + 7); ctx.stroke(); }
-    const ammo = S.started && d.sam && u.alive ? ' ' + u.magLeft : '';
+    const ammo = S.started && d.sam && u.alive && !av ? ' ' + u.magLeft : '';
     labelAt(sx, sy, (u.name || d.short) + ammo, dead ? '#6b7888' : '#e6eef6');
   }
   // posición propuesta, pendiente de confirmar
@@ -128,8 +130,8 @@ export function draw() {
     ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
     if (V.s > 9) { ctx.font = '10px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(255,190,180,.9)'; ctx.fillText(dv ? '#' + th.id : th.T.short, sx + 7, sy - 6); }
   }
-  // interceptores
-  for (const it of R ? R.ints : S.ints) {
+  // interceptores (el atacante no los ve)
+  if (!av) for (const it of R ? R.ints : S.ints) {
     if (it.done || tNow < it.tL) continue;
     // fracción del camino recorrida según el perfil de motor y planeo (acelera al salir, frena al final)
     const P = profileOf(D(it.u).sam), fl = Math.max(0.1, it.tH - it.tL);
@@ -142,6 +144,8 @@ export function draw() {
   const now = performance.now();
   S.fx = S.fx.filter(f => now - f.rt < 1400);
   for (const f of S.fx) { const k = (now - f.rt) / 1400, [sx, sy] = toS(f.x, f.y); ctx.strokeStyle = f.c; ctx.globalAlpha = 1 - k; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(sx, sy, (f.big ? 6 : 3) + k * (f.big ? 26 : 14), 0, 7); ctx.stroke(); ctx.globalAlpha = 1; }
+  // rectángulo de selección múltiple (Shift + arrastrar, ui/input.js#boxSelect)
+  if (S.box) { const [x1, y1] = toS(...S.box.a), [x2, y2] = toS(...S.box.b); ctx.strokeStyle = '#e6a53c'; ctx.lineWidth = 1.2; ctx.setLineDash([4, 3]); ctx.strokeRect(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1)); ctx.setLineDash([]); ctx.fillStyle = 'rgba(230,165,60,.08)'; ctx.fillRect(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1)); }
   // regla de medición (modo 'measure', ui/input.js): solo puntos que tocó el usuario, nada oculto
   if (S.mode === 'measure' && S.measure?.a) drawMeasure(S.measure);
 }
@@ -215,9 +219,9 @@ export function drawRoute(sv, hi) {
 
 const STATUS_COLOR = { operational: '#6fd08c', damaged: '#e6a53c', destroyed: '#ff5b4d' };
 
-/** Objetivo: ícono cuadrado con la letra del tipo, nombre y barra de vida. */
-function drawObjective(g, isSel) {
-  const tt = TARGET_TYPES[g.type], [sx, sy] = toS(g.x, g.y), hp = g.hp ?? g.maxHp, st = g.status || 'operational', col = STATUS_COLOR[st];
+/** Objetivo: ícono cuadrado con la letra del tipo, nombre y barra de vida. hide: el estado no se conoce (vista del atacante). */
+function drawObjective(g, isSel, hide = false) {
+  const tt = TARGET_TYPES[g.type], [sx, sy] = toS(g.x, g.y), hp = hide ? g.maxHp : g.hp ?? g.maxHp, st = hide ? 'operational' : g.status || 'operational', col = hide ? '#8a9aac' : STATUS_COLOR[st];
   // huella real del objetivo cuando el zoom la hace visible
   const rpx = tt.radius / 1000 * V.s; if (rpx > 4) { ctx.strokeStyle = 'rgba(242,212,138,.35)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(sx, sy, rpx, 0, 7); ctx.stroke(); }
   ctx.fillStyle = st === 'destroyed' ? '#3a2422' : '#1f2630'; ctx.strokeStyle = isSel ? '#e6a53c' : col; ctx.lineWidth = isSel ? 2.2 : 1.6;

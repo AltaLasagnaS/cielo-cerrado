@@ -11,6 +11,8 @@ import { resetSim } from './app.js';
 import { schedCov } from './coverage.js';
 import { setMode, toast } from './modes.js';
 import { renderAll } from './panels/index.js';
+import { renderStats, renderLog } from './panels/results.js';
+import { renderScenario } from './panels/scenario.js';
 import { AUTO_PHASES } from '../sim/pace.js';
 
 /** Multiplicadores de tiempo (1× = tiempo real; un Shahed tarda ~20 min en cruzar 60 km). */
@@ -21,7 +23,7 @@ export function initControls() {
   $('#speeds').onclick = e => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.s === 'auto') S.auto = true; else { S.auto = false; S.speed = +b.dataset.s; } updatePlay(); };
   $('#play').onclick = togglePlay;
   $('#reset').onclick = () => { resetSim(); renderAll(); };
-  $('#defView').onchange = draw;
+  $('#view').onchange = () => { renderAll(); renderStats(); renderLog(); renderScenario(); draw(); };
 }
 
 /** Iniciar → pausar → seguir; al terminar, "nueva corrida" vuelve al modo edición. */

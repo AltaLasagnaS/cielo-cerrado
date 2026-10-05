@@ -1,6 +1,7 @@
 // Pruebas de los modelos físicos: cada una verifica una propiedad que el modelo debe cumplir
 // (no un número mágico), así sirven de documentación ejecutable de docs/FISICA.md.
 import { test } from 'node:test';
+import { seeTrack } from './helpers.js';
 import assert from 'node:assert/strict';
 import { THREATS, DEFENSES, UNC, sampleU } from '../src/data/index.js';
 import { KR, HORIZON_K } from '../src/physics/constants.js';
@@ -103,7 +104,7 @@ test('intercepción: el interceptor llega al punto de encuentro a tiempo y dentr
   const u = unit('nasams', 40, 40);
   const sv = { id: 2, type: 'kalibr', count: 1, pts: [[0, 40], [40, 40]], agl: 50 };
   const th = buildThreat(sv, 0, 0);
-  const sol = solve(u, th, 0);
+  const sol = solve(u, seeTrack(th, 1), 1);
   assert.ok(sol, 'tiene que haber solución');
   assert.ok(sol.r <= DEFENSES.nasams.sam.maxR && sol.r >= DEFENSES.nasams.sam.minR);
   assert.ok(sol.r * 1000 / DEFENSES.nasams.sam.vInt <= sol.tau);
