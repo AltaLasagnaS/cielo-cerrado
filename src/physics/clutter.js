@@ -47,7 +47,7 @@ function landSeen(ux, uy, uz, x, y, zs) {
   return v;
 }
 
-/** Coeficientes del modelo NRL (polarización H y V). */
+/** Coeficientes del modelo NRL (polarización H y V): los del listado del apéndice B del informe (fig. 22). */
 const NRL = { H: [-73.0, 20.781, 7.351, 25.65, 0.0054], V: [-50.796, 25.93, 0.7093, 21.588, 0.00211] };
 
 /**
@@ -101,7 +101,7 @@ export function clutterRcs(r, ux, uy, uz, rr, agl, x, y, wx) {
       const g2 = Math.exp(-8 * Math.LN2 * (delta / thEl) ** 2);
       const A = AZ_INT * dR * R * thAz / Math.cos(Math.min(Math.abs(psi), 1.2));
       let s0;
-      if (sea) s0 = Math.pow(10, seaSigma0Db(B.ghz, Math.max(psi, 1e-4) / DEG, wx?.sea ?? 2, r.pol || 'H') / 10);
+      if (sea) s0 = Math.pow(10, seaSigma0Db(Math.min(35, Math.max(0.5, B.ghz)), Math.max(psi, 1e-4) / DEG, wx?.sea ?? 2, r.pol || 'H') / 10);   // fuera de 0,5–35 GHz (VHF) se usa el borde del ajuste
       else {
         const rough = clamp(0.5 + slopeAt(x, y) / 10, 0.5, 1.5);   // 0,5 llano … 1,5 quebrado (como el modelo anterior)
         s0 = Math.pow(10, (M.landDb + 2 * M.reliefDb * (rough - 1)) / 10);

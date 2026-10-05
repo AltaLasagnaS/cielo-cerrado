@@ -207,7 +207,7 @@ function canEngage(u, th, t, c2, probe) {
   const maxR = isTBM(th) ? sm.maxRtbm : sm.maxR; if (!maxR) return null;
   if (u.noDrones && th.cls === 'dron') return null;
   if (Math.hypot(th.p.x - u.x, th.p.y - u.y) > maxR + 120) return null;
-  if (!trackOK(u, th, t, c2)) { if (!probe) delete u.avail[th.id]; return null; }
+  if (!trackOK(u, th, t, c2, S.gateways)) { if (!probe) delete u.avail[th.id]; return null; }
   let av = u.avail[th.id];
   if (av === undefined) { av = reactionStart(th, t, c2, u); if (!probe) u.avail[th.id] = av; }
   if (t - av < sm.react * (u.dmgRadar ? UNIT_DAMAGE.react : 1)) return null;   // radar de tiro dañado: reacción más lenta
@@ -304,7 +304,7 @@ export function engage(u, t) {
     const { sol, remote } = f;
     const n = Math.min(S.doctrine === 'salva' ? (u.salvo || sm.salvo) : 1, u.magLeft, ch - u.active);
     for (let k = 0; k < n; k++) {
-      const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f, gw: remote ? (netPk(u, th, t, c2) || 1) : 1 };
+      const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f, gw: remote ? (netPk(u, th, t, c2, S.gateways) || 1) : 1 };
       S.ints.push(it); (th.fly = th.fly || []).push(it);
       S.rec?.ints.push(it); u.magLeft--; u.active++; S.stats.shots++; S.stats.defCost += sm.cost; recUnit(u);
       S.stats.byUnit[uLabel(u)] = (S.stats.byUnit[uLabel(u)] || 0) + 1;

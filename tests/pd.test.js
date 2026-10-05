@@ -33,6 +33,10 @@ test('clutter de mar NRL: coincide con la tabla de Barton (±4 dB) y crece con e
   assert.ok(seaSigma0Db(9.5, 3, 3) > seaSigma0Db(9.5, 0.3, 3));
 });
 
+test('clutter de mar NRL: el punto publicado por MathWorks (H, estado 2, 30 GHz, 10°) da −36,6645 dB', () => {
+  assert.ok(Math.abs(seaSigma0Db(30, 10, 2, 'H') - -36.6644895) < 1e-6, String(seaSigma0Db(30, 10, 2, 'H')));
+});
+
 test('lluvia: η de Barton a 4 mm/h coincide con su tabla (banda X ≈ 5·10⁻⁷ m⁻¹)', () => {
   const e = rainEta(4, 0.032); assert.ok(e > 4e-7 && e < 6.5e-7, String(e));
   assert.equal(rainEta(0, 0.032), 0);

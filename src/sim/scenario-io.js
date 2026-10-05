@@ -8,7 +8,7 @@
 // objetivos que existan en el catálogo, mapa conocido, posiciones dentro del mapa, números
 // finitos y en rango, y blancos de las salvas que existan. Solo se copian los campos conocidos.
 // Formato: ver docs/ARQUITECTURA.md § "Archivo de escenario".
-import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES, TERRAIN, SCENARIOS, C2_LEVELS, c2FromNet, WEATHER, CRPA_SIZES, JAM_MODES, TIMES_OF_DAY } from '../data/index.js';
+import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES, TERRAIN, SCENARIOS, C2_LEVELS, c2FromNet, WEATHER, CRPA_SIZES, JAM_MODES, TIMES_OF_DAY, GATEWAYS } from '../data/index.js';
 import { MAP } from '../physics/terrain.js';
 import { S } from './state.js';
 import { addObj, addDef, addSalvo, addJam } from './setup.js';
@@ -45,7 +45,7 @@ export function exportScenario(now = new Date()) {
   return {
     format: FORMAT, version: VERSION, saved: now.toISOString(),
     map: mapRef(),
-    rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather, tod: S.tod, wxPlan: S.wxPlan.map(c => ({ ...c })), wind: { ...S.wind }, ignoreDecoys: S.ignoreDecoys, fireRange: S.fireRange },
+    rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather, tod: S.tod, wxPlan: S.wxPlan.map(c => ({ ...c })), gateways: [...S.gateways], wind: { ...S.wind }, ignoreDecoys: S.ignoreDecoys, fireRange: S.fireRange },
     scenario: S.scen ? { base: baseKey(S.scen), ...pick(S.scen, META_KEYS) } : null,
     setup: {
       objs: s.objs.map(g => pick(g, OBJ_KEYS)),
@@ -180,6 +180,10 @@ export function validateScenario(raw) {
     if (r.wind === null || typeof r.wind !== 'object') err('rules.wind: tiene que ser { v, from } (m/s y grados de donde sopla).');
     else rules.wind = { v: num('rules.wind.v', r.wind.v, 0, 40), from: num('rules.wind.from', r.wind.from, 0, 360) };
   }
+  if (r.gateways !== undefined) {
+    if (!Array.isArray(r.gateways)) err('rules.gateways: tiene que ser una lista de pasarelas (' + Object.keys(GATEWAYS).join(', ') + ').');
+    else { for (const k of r.gateways) if (!GATEWAYS[k]) err(`rules.gateways: "${String(k)}" no es una pasarela conocida (${Object.keys(GATEWAYS).join(', ')}).`); rules.gateways = r.gateways.filter(k => GATEWAYS[k]); }
+  }
   if (r.tod !== undefined) { if (!TIMES_OF_DAY[r.tod]) err(`rules.tod: "${String(r.tod)}" no es un momento del día válido (${Object.keys(TIMES_OF_DAY).join(', ')}).`); else rules.tod = r.tod; }
   if (r.wxPlan !== undefined) {
     if (!Array.isArray(r.wxPlan) || r.wxPlan.length > 10) err('rules.wxPlan: tiene que ser una lista de hasta 10 cambios { t, weather } (segundos y clima).');
@@ -255,6 +259,7 @@ export function loadScenarioData(data) {
   S.weather = data.rules.weather || 'despejado';
   S.wind = { v: data.rules.wind?.v ?? 0, from: data.rules.wind?.from ?? 0 };
   S.tod = data.rules.tod || 'noche';
+  S.gateways = data.rules.gateways || [];
   S.wxPlan = data.rules.wxPlan || [];
   S.ignoreDecoys = !!data.rules.ignoreDecoys;
   S.fireRange = data.rules.fireRange ?? 1;

@@ -1,5 +1,5 @@
 // Pestaña "Defensa": catálogo de sistemas para ubicar, mando y control, y opciones de cobertura.
-import { DEFENSES, THREATS, C2_LEVELS, WEATHER, TIMES_OF_DAY } from '../../data/index.js';
+import { DEFENSES, THREATS, C2_LEVELS, WEATHER, TIMES_OF_DAY, GATEWAYS } from '../../data/index.js';
 import { esc } from '../../util/format.js';
 import { S } from '../../sim/state.js';
 import { draw } from '../../render/draw.js';
@@ -27,6 +27,8 @@ export function renderDef() {
       <div class="field"><label for="optC2">Coordinación C2 (general) ${infoBtn('c2')}</label><select id="optC2" class="sel">${Object.entries(C2_LEVELS).map(([k, L]) => `<option value="${k}" ${S.c2 === k ? 'selected' : ''}>${esc(L.name)}</option>`).join('')}</select></div>
       <p class="hint" id="c2Info">${esc(C2_LEVELS[S.c2].desc)}</p>
       <p class="hint">Desconectada desactiva alertas, pistas de red y reparto de blancos. El enlace técnico de cada unidad se configura aparte en Selección y solo intercambia pistas con sistemas compatibles.</p>
+      ${Object.entries(GATEWAYS).map(([k, G]) => `<label class="check" title="${esc(G.note)}"><input type="checkbox" class="optGw" data-gw="${k}" ${S.gateways.includes(k) ? 'checked' : ''}> ${esc(G.name)}: pistas de tiro entre las dos redes (+${G.gwLag} s, Pk ×${G.gwPk})</label>`).join('')}
+      <p class="hint">Apagada por defecto: no hay fuente de que esas pistas sirvan para disparar (sí hay imagen común y alertas, que se comparten igual).</p>
       <div class="field"><label for="optDoc">Doctrina de tiro</label><select id="optDoc" class="sel"><option value="salva" ${S.doctrine === 'salva' ? 'selected' : ''}>Salva (según unidad)</option><option value="sls" ${S.doctrine === 'sls' ? 'selected' : ''}>Disparar-observar-disparar</option></select></div>
       <label class="check" title="Los radares de tiro (S, C, X, Ku) aprenden a distinguir señuelos con el tiempo de seguimiento. Con esta opción no se dispara a pistas clasificadas como señuelo: ahorra munición, pero a veces un arma real se clasifica mal."><input type="checkbox" id="optDecoy" ${S.ignoreDecoys ? 'checked' : ''}> No tirarle a pistas clasificadas como señuelo</label>
       <div class="field" title="Alcance efectivo = alcance máximo × geometría (menos contra un blanco que se aleja). Esperar a que el blanco se acerque deja menos tiempo para un segundo tiro, pero el misil llega con más energía y la Pk sube."><label for="optFR">Disparar dentro del ${'<span id="frVal">' + Math.round(S.fireRange * 100) + '%</span>'} del alcance ${infoBtn('energia')}</label><input type="range" id="optFR" min="50" max="100" step="5" value="${Math.round(S.fireRange * 100)}"></div>
@@ -53,6 +55,7 @@ export function renderDef() {
     if (S.mode === 'placeDef' && S.placeType === b.dataset.k) setMode('select'); else setMode('placeDef', b.dataset.k);
   };
   $('#optC2').onchange = e => { if (S.started) { toast('Reiniciá para cambiar el mando y control.'); e.target.value = S.c2; return; } S.c2 = e.target.value; $('#c2Info').textContent = C2_LEVELS[S.c2].desc; renderSel(); };
+  for (const c of el.querySelectorAll('.optGw')) c.onchange = e => { if (S.started) { toast('Reiniciá para cambiar las pasarelas.'); e.target.checked = !e.target.checked; return; } const k = e.target.dataset.gw; S.gateways = e.target.checked ? [...new Set([...S.gateways, k])] : S.gateways.filter(x => x !== k); };
   $('#optDoc').onchange = e => { S.doctrine = e.target.value; };
   $('#optDecoy').onchange = e => { S.ignoreDecoys = e.target.checked; };
   $('#optFR').oninput = e => { S.fireRange = +e.target.value / 100; $('#frVal').textContent = e.target.value + '%'; };

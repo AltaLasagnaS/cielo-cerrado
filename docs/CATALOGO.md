@@ -975,27 +975,25 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
 | Altura hasta la que maniobra con toda su aceleración a velocidad máxima (m) | 10.000 | **15.000** | 20.000 | baja | — | est: misil de gran altura (techo 24 km); sin dato publicado de g por altura |
-| Pk de un disparo home-on-jam contra un jammer aéreo | 0,2 | **0,5** | 0,7 | baja | [1] | la variante MIM-104B (ASOJ) se diseñó contra jammers stand-off con home-on-jam; Pk est: guiado solo angular, sin distancia |
-| Radar: blancos que puede seguir a la vez | 50 | **100** | 150 | media | [2] | mismo radar AN/MPQ-65 |
-| Radar: detección contra 1 m² (km) | 90 | **100** | 120 | baja | [3] | mismo radar que el MSE |
+| Radar: blancos que puede seguir a la vez | 50 | **100** | 150 | media | [1] | mismo radar AN/MPQ-65 |
+| Radar: detección contra 1 m² (km) | 90 | **100** | 120 | baja | [2] | mismo radar que el MSE |
 | Radar: discriminación de señuelos (×, divide el τ de su banda) (×) | 1 | **4** | 8 | baja | — | est: mismo radar que el MSE |
-| Radar: sector de búsqueda (°) | 90 | **90** | 120 | media | [3] | — |
-| Alcance vs aeronaves/crucero (km) | 120 | **160** | 160 | baja | [2] | — |
+| Radar: sector de búsqueda (°) | 90 | **90** | 120 | media | [2] | — |
+| Alcance vs aeronaves/crucero (km) | 120 | **160** | 160 | baja | [1] | — |
 | Alcance vs balísticos (km) | 15 | **20** | 30 | baja | — | — |
-| Techo (m) | 24.000 | **24.000** | 32.000 | baja | [2] | — |
+| Techo (m) | 24.000 | **24.000** | 32.000 | baja | [1] | — |
 | Velocidad media del interceptor hasta el alcance máximo (m/s) | 800 | **900** | 1.100 | baja | — | est: Mach 3,5 máx. |
-| Velocidad máxima del interceptor (m/s) | 1.200 | **1.500** | 1.600 | baja | [2] | Wikipedia: PAC-2 GEM+ 5.630 km/h ≈ 1.560 m/s; otras fuentes dan Mach 3,5 |
+| Velocidad máxima del interceptor (m/s) | 1.200 | **1.500** | 1.600 | baja | [1] | Wikipedia: PAC-2 GEM+ 5.630 km/h ≈ 1.560 m/s; otras fuentes dan Mach 3,5 |
 | Duración del motor del interceptor (s) | 9 | **12** | 15 | baja | — | est: motor de una etapa |
-| Costo por disparo | US$2 M | **US$3 M** | US$4 M | baja | [4] | precio oficial no público |
+| Costo por disparo | US$2 M | **US$3 M** | US$4 M | baja | [3] | precio oficial no público |
 | Pk por disparo vs crucero | 0,7 | **0,85** | 0,9 | baja | — | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
 | Pk por disparo vs supersónicos | 0,4 | **0,55** | 0,7 | baja | — | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
 | Pk por disparo vs balísticos | 0,2 | **0,4** | 0,6 | baja | — | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
 | Pk por disparo vs hipersónicos | 0,1 | **0,25** | 0,4 | baja | — | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
 
-1. [Wikipedia: Active radar homing](https://en.wikipedia.org/wiki/Active_radar_homing)
-2. [Wikipedia: MIM-104 Patriot](https://en.wikipedia.org/wiki/MIM-104_Patriot)
-3. [Radartutorial: AN/MPQ-53](https://www.radartutorial.eu/19.kartei/06.missile/karte003.en.html)
-4. [Army Recognition: pedido de GEM-T 2026](https://www.armyrecognition.com/news/army-news/2026/us-army-pac-2-gem-t-patriot-interceptor-order)
+1. [Wikipedia: MIM-104 Patriot](https://en.wikipedia.org/wiki/MIM-104_Patriot)
+2. [Radartutorial: AN/MPQ-53](https://www.radartutorial.eu/19.kartei/06.missile/karte003.en.html)
+3. [Army Recognition: pedido de GEM-T 2026](https://www.armyrecognition.com/news/army-news/2026/us-army-pac-2-gem-t-patriot-interceptor-order)
 
 #### Fuentes generales
 
@@ -1118,7 +1116,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
 | Altura hasta la que maniobra con toda su aceleración a velocidad máxima (m) | 6.000 | **10.000** | 14.000 | baja | — | est: AIM-120 lanzado desde tierra |
-| Pk de un disparo home-on-jam contra un jammer aéreo | 0,2 | **0,5** | 0,7 | baja | [1] [2] | el AIM-120 tiene modo home-on-jam; Pk est: guiado solo angular, sin distancia |
+| Pk de un disparo home-on-jam contra un jammer aéreo | 0,2 | **0,5** | 0,7 | baja | [1] [2] | el AIM-120 tiene modo home-on-jam; Pk est: guiado solo angular, sin distancia. El PAC-2 GEM-T y el I-Hawk quedan sin HOJ: lo documentado es del MIM-104B/SOJC y no se generaliza (docs/investigacion/datos-fisica-guerra-electronica.md) |
 | Radar: blancos que puede seguir a la vez | 50 | **60** | 100 | media | [3] | Sentinel: más de 50 blancos simultáneos |
 | Tiempo de recarga de la batería (s) | 900 | **1.800** | 3.600 | baja | — | est: lanzador de 6 AMRAAM recargado con grúa; sin dato público firme |
 | Radar: detección contra 1 m² (km) | 40 | **60** | 90 | media | [3] | 40 km el básico, 120 km el F1/A3 |
@@ -1378,20 +1376,18 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
 | Altura hasta la que maniobra con toda su aceleración a velocidad máxima (m) | 5.000 | **8.000** | 12.000 | baja | — | est |
-| Pk de un disparo home-on-jam contra un jammer aéreo | 0,1 | **0,3** | 0,5 | baja | [1] | el I-Hawk tenía un modo home-on-jam "potencial"; Pk est, menor que en misiles modernos |
 | Radar: blancos que puede seguir a la vez | 10 | **25** | 50 | baja | — | est: radares de búsqueda PAR y CWAR con seguimiento automático; sin cifra pública |
-| Radar: detección contra 1 m² (km) | 50 | **70** | 100 | baja | [2] | CMO: HPIR 45 nmi (83 km) y PAR 54 nmi (100 km) de alcance instrumentado; est contra 1 m² |
-| Alcance vs aeronaves/crucero (km) | 35 | **40** | 50 | media | [2] [3] | CMO 22 nmi ≈ 40 km; OSINT 35–50 km |
-| Velocidad media del interceptor hasta el alcance máximo (m/s) | 600 | **700** | 850 | baja | [3] | Mach 2,5 máx.; est media |
-| Blanco más rápido enfrentable (m/s) | 700 | **820** | 900 | baja | [2] | CMO: blancos hasta 1.600 nudos |
+| Radar: detección contra 1 m² (km) | 50 | **70** | 100 | baja | [1] | CMO: HPIR 45 nmi (83 km) y PAR 54 nmi (100 km) de alcance instrumentado; est contra 1 m² |
+| Alcance vs aeronaves/crucero (km) | 35 | **40** | 50 | media | [1] [2] | CMO 22 nmi ≈ 40 km; OSINT 35–50 km |
+| Velocidad media del interceptor hasta el alcance máximo (m/s) | 600 | **700** | 850 | baja | [2] | Mach 2,5 máx.; est media |
+| Blanco más rápido enfrentable (m/s) | 700 | **820** | 900 | baja | [1] | CMO: blancos hasta 1.600 nudos |
 | Tiempo de reacción (s) | 10 | **15** | 30 | baja | — | est |
 | Costo por disparo | US$200k | **US$300k** | US$500k | baja | — | est: misil viejo de stock reacondicionado |
-| Pk por disparo vs crucero | 0,5 | **0,7** | 0,85 | baja | [3] | analistas occidentales hablan de ~85%; est más conservadora. calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
-| Pk por disparo vs drones | 0,4 | **0,6** | 0,8 | baja | [3] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
+| Pk por disparo vs crucero | 0,5 | **0,7** | 0,85 | baja | [2] | analistas occidentales hablan de ~85%; est más conservadora. calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
+| Pk por disparo vs drones | 0,4 | **0,6** | 0,8 | baja | [2] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
 
-1. [Wikipedia: MIM-23 Hawk](https://en.wikipedia.org/wiki/MIM-23_Hawk)
-2. [Base de datos de Command: Modern Operations (DB3000 515): alcances, techos y velocidades de MIM-23, 5V28 y 5V27 (estimaciones de juego, en millas náuticas)](https://www.matrixgames.com/game/command-modern-operations)
-3. [Defence Blog: el veterano Hawk resulta eficaz contra misiles rusos (una unidad: 14 crucero y 40 Shahed)](https://defence-blog.com/vintage-hawk-system-proves-effective-against-russian-missiles/)
+1. [Base de datos de Command: Modern Operations (DB3000 515): alcances, techos y velocidades de MIM-23, 5V28 y 5V27 (estimaciones de juego, en millas náuticas)](https://www.matrixgames.com/game/command-modern-operations)
+2. [Defence Blog: el veterano Hawk resulta eficaz contra misiles rusos (una unidad: 14 crucero y 40 Shahed)](https://defence-blog.com/vintage-hawk-system-proves-effective-against-russian-missiles/)
 
 #### Fuentes generales
 

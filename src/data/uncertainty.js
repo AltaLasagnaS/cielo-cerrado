@@ -276,7 +276,6 @@ export const UNC = {
     },
     patriot2: {
       'sam.hFull': U(10000, 15000, 20000, 'baja', [], 'est: misil de gran altura (techo 24 km); sin dato publicado de g por altura'),
-      'sam.pkHoj': U(0.2, 0.5, 0.7, 'baja', S_('wp:Active_radar_homing'), 'la variante MIM-104B (ASOJ) se diseñó contra jammers stand-off con home-on-jam; Pk est: guiado solo angular, sin distancia'),
       'radar.tracks': U(50, 100, 150, 'media', S_('wp:MIM-104_Patriot'), 'mismo radar AN/MPQ-65'),
       'radar.R1': U(90, 100, 120, 'baja', S_('rt_mpq53'), 'mismo radar que el MSE'),
       'radar.discrim': U(1, 4, 8, 'baja', [], 'est: mismo radar que el MSE'),
@@ -331,7 +330,7 @@ export const UNC = {
     },
     nasams: {
       'sam.hFull': U(6000, 10000, 14000, 'baja', [], 'est: AIM-120 lanzado desde tierra'),
-      'sam.pkHoj': U(0.2, 0.5, 0.7, 'baja', S_('wp:Active_radar_homing', 'wp:AIM-120_AMRAAM'), 'el AIM-120 tiene modo home-on-jam; Pk est: guiado solo angular, sin distancia'),
+      'sam.pkHoj': U(0.2, 0.5, 0.7, 'baja', S_('wp:Active_radar_homing', 'wp:AIM-120_AMRAAM'), 'el AIM-120 tiene modo home-on-jam; Pk est: guiado solo angular, sin distancia. El PAC-2 GEM-T y el I-Hawk quedan sin HOJ: lo documentado es del MIM-104B/SOJC y no se generaliza (docs/investigacion/datos-fisica-guerra-electronica.md)'),
       'radar.tracks': U(50, 60, 100, 'media', S_('wp:AN/MPQ-64_Sentinel'), 'Sentinel: más de 50 blancos simultáneos'),
       'sam.reloadS': U(900, 1800, 3600, 'baja', [], 'est: lanzador de 6 AMRAAM recargado con grúa; sin dato público firme'),
       'radar.R1': U(40, 60, 90, 'media', S_('wp:AN/MPQ-64_Sentinel'), '40 km el básico, 120 km el F1/A3'),
@@ -405,7 +404,6 @@ export const UNC = {
     },
     hawk: {
       'sam.hFull': U(5000, 8000, 12000, 'baja', [], 'est'),
-      'sam.pkHoj': U(0.1, 0.3, 0.5, 'baja', S_('wp:MIM-23_Hawk'), 'el I-Hawk tenía un modo home-on-jam "potencial"; Pk est, menor que en misiles modernos'),
       'radar.tracks': U(10, 25, 50, 'baja', [], 'est: radares de búsqueda PAR y CWAR con seguimiento automático; sin cifra pública'),
       'radar.R1': U(50, 70, 100, 'baja', S_('cmo_db3k_sam'), 'CMO: HPIR 45 nmi (83 km) y PAR 54 nmi (100 km) de alcance instrumentado; est contra 1 m²'),
       'sam.maxR': U(35, 40, 50, 'media', S_('cmo_db3k_sam', 'db_hawk'), 'CMO 22 nmi ≈ 40 km; OSINT 35–50 km'),

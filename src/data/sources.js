@@ -152,6 +152,7 @@ export const SRC = {
   rt_arabel: ['Radartutorial: Arabel (SAMP/T)', 'https://www.radartutorial.eu/19.kartei/04.battle/karte035.en.html'],
   ms_lessons: ['MissileStrikes: Lessons from Ukraine air defense (integración de radares soviéticos con la imagen común; fuente secundaria)', 'https://missilestrikes.com/guide/lessons-from-ukraine-air-defense/'],
   nv_l16: ['NV: Ucrania se integra al sistema de aviación de la OTAN (licencia Link 16, 2025)', 'https://english.nv.ua/nation/ukraine-integrates-into-nato-s-aviation-system-defense-ministry-says-50518462.html'],
+  fm30185: ['US Army, FM 3-01.85, Patriot Battalion and Battery Operations (2002): §5-31 triangulación de jammers, glosario SOJC (MIM-104B)', 'https://archive.org/download/Fm301.85PatriotBattalionAndBatteryOperations/fm%203-01.85%20Patriot%20Battalion%20and%20Battery%20Operations.pdf'],
   // clutter (physics/clutter.js)
   skolnik_mti: ['Shrader y Gregers-Hansen, "MTI Radar", cap. 15 del Radar Handbook (Skolnik, 2.ª ed., 1990): tabla 15.1 (espectro del clutter), tabla 15.2 (reflectividad, de Barton) y ec. 15.9–15.11 (factor de mejora)', 'https://helitavia.com/skolnik/Skolnik_chapter_15.pdf'],
   nrl_sea: ['Gregers-Hansen y Mital, "An Improved Empirical Model for Radar Sea Clutter Reflectivity", NRL/MR/5310--12-9346 (2012); coeficientes en la implementación pública de scivision', 'https://github.com/scivision/nrl-radar-sea-clutter/blob/main/NRL_SigmaSea.m'],

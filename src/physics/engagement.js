@@ -26,9 +26,9 @@ export const isTBM = th => th.cls === 'balistico' || th.cls === 'hiper';
  * siempre con su propio sensor; drones interceptores (operador) usan la de red; misiles activos/IR
  * aceptan cualquiera.
  */
-export function trackOK(u, th, t, c2) {
+export function trackOK(u, th, t, c2, gws = []) {
   const d = D(u), L = C2_LEVELS[c2], own = d.radar ? (t - (th.det[u.id] ?? -1e9)) <= d.radar.scan * 2 + 0.6 : false;
-  const compatible = netPk(u, th, t, c2) > 0;
+  const compatible = netPk(u, th, t, c2, gws) > 0;
   // Fallback para pistas creadas por escenarios/archivos de la versión anterior al desglose por red.
   const legacy = !th.net && th.netFirst != null && t - th.netFirst >= L.lag && t - th.lastNet <= L.window;
   const netT = u.link !== false && (L.share === 'track' || L.share === 'fire') && (compatible || legacy);
@@ -41,15 +41,15 @@ export function trackOK(u, th, t, c2) {
 /**
  * Pista de red utilizable por u contra th (docs/FISICA.md §6, "Enlaces"): 1 si llega por una red propia
  * (después de la demora del nivel de C2 y mientras siga fresca), gwPk si solo llega a través de una
- * pasarela (data/datalinks.js#GATEWAYS, con gwLag de demora extra), 0 si no hay. No mira u.link ni el
- * nivel de C2 (lo hace trackOK).
+ * pasarela habilitada en el escenario (gws: ids de data/datalinks.js#GATEWAYS, con gwLag de demora extra),
+ * 0 si no hay. No mira u.link ni el nivel de C2 (lo hace trackOK).
  */
-export function netPk(u, th, t, c2) {
+export function netPk(u, th, t, c2, gws = []) {
   const L = C2_LEVELS[c2]; let best = 0;
   const fresh = (n, lag) => n && n.first != null && t - n.first >= L.lag + lag && t - n.last <= L.window;
   for (const key of datalinksOf(D(u))) {
     if (fresh(th.net?.[key], 0)) return 1;
-    for (const { from, G } of gatewaysInto(key)) if (fresh(th.net?.[from], G.gwLag)) best = Math.max(best, G.gwPk);
+    for (const { from, G, id } of gatewaysInto(key)) if (gws.includes(id) && fresh(th.net?.[from], G.gwLag)) best = Math.max(best, G.gwPk);
   }
   return best;
 }

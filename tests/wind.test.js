@@ -47,11 +47,11 @@ test('buildThreat: cada tramo de la ruta tiene su propio efecto', () => {
   assert.ok(th.ft > 60000 / v, 'ida y vuelta con viento siempre tarda más que en calma');
 });
 
-test('viento con la altura: ley de potencia 1/7 hasta el tope de la capa límite', () => {
+test('viento con la altura: ley de potencia 1/7 en la capa límite', () => {
   close(windAt(10, 10), 10, 1e-12, 'a 10 m, el de superficie');
   close(windAt(10, 2), 10, 1e-12, 'debajo de 10 m no baja más');
   close(windAt(10, 1000), 10 * Math.pow(100, ENV.modelo.windAlpha), 1e-9, 'a 1.000 m');
-  assert.equal(windAt(10, 5000), windAt(10, ENV.modelo.windTop), 'arriba de la capa límite, constante');
+  assert.ok(windAt(10, 5000) > windAt(10, ENV.modelo.windTop), 'arriba de la capa límite sigue creciendo (perfil de Kiev)');
   assert.ok(windAt(10, 1000) / 10 > 1.8 && windAt(10, 1000) / 10 < 2.0, 'con 1/7, ≈1,9 veces');
 });
 

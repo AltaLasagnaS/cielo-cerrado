@@ -8,6 +8,9 @@
 //   ceiling  techo de nubes o niebla (m sobre el terreno): un sensor OPT en tierra no ve blancos
 //            más arriba. null = sin techo que moleste
 //   acu      factor de alcance de la red acústica (la lluvia y el viento tapan el ruido del motor)
+//   lwc      agua líquida de la niebla (g/m³) y fogKm su extensión (km): atenuación ITU-R P.840
+//            (physics/weather.js#fogGamma); 0,05 g/m³ es el valor orientativo de la Recomendación para
+//            niebla de unos 300 m de visibilidad. A microondas atenúa muy poco (≈0,005 dB/km en X)
 //   snow     nieve en mm/h de agua equivalente: eco de volumen en el radar (physics/weather.js#snowEta);
 //            la nieve seca casi no atenúa microondas, así que no suma atenuación
 //   sea      estado del mar (escala Douglas, 0–6) para el clutter de mar (physics/clutter.js, modelo NRL).
@@ -38,8 +41,8 @@ export const WEATHER = {
     desc: 'Nieve que tapa la vista a cerca de un kilómetro: lo óptico y el infrarrojo caen mucho y las nubes cortan arriba de 600 m. Los radares casi no pierden alcance, pero el eco de los copos se suma al clutter (más en banda X y Ku). La red acústica oye algo menos.'
   },
   niebla: {
-    name: 'Niebla', rain: 0, rainKm: 0, opt: 0.1, ceiling: 200, acu: 1, sea: 1,
-    desc: 'Visibilidad de unos cientos de metros: los sensores ópticos casi no sirven y no ven nada por encima de 200 m. Los radares no se enteran (la niebla casi no atenúa microondas) y el sonido viaja bien.'
+    name: 'Niebla', rain: 0, rainKm: 0, lwc: 0.05, fogKm: 10, opt: 0.1, ceiling: 200, acu: 1, sea: 1,
+    desc: 'Visibilidad de unos cientos de metros: los sensores ópticos casi no sirven y no ven nada por encima de 200 m. Los radares casi no se enteran (la niebla atenúa las microondas centésimas de dB por km) y el sonido viaja bien.'
   }
 };
 

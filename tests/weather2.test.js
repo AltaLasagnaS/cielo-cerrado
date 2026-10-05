@@ -55,3 +55,16 @@ test('archivo: el momento del día y el plan de clima se guardan, se validan y s
   const bad = validateScenario({ ...JSON.parse(JSON.stringify(data)), rules: { tod: 'tarde', wxPlan: [{ t: 10, weather: 'granizo' }] } });
   assert.ok(bad.errors.length >= 2, bad.errors.join('; '));
 });
+
+test('niebla: ITU-R P.840 reproduce la tabla calculada (0 °C) y atenúa casi nada', async () => {
+  const { cloudKl, fogGamma } = await import('../src/physics/weather.js');
+  for (const [f, kl] of [[3, 0.00840753], [6, 0.0335369], [10, 0.0925504], [15, 0.205626]]) assert.ok(Math.abs(cloudKl(f) / kl - 1) < 1e-5, `${f} GHz: ${cloudKl(f)}`);
+  assert.ok(fogGamma('X', 0.05) < 0.01);
+  assert.equal(fogGamma('VHF', 0.05), 0, 'fuera del dominio de P.840');
+});
+
+test('viento por encima de la capa límite: sigue creciendo con la forma del perfil de Kiev', async () => {
+  const { windAt } = await import('../src/physics/weather.js');
+  assert.ok(windAt(10, 3000) / windAt(10, 1000) > 1.85 && windAt(10, 3000) / windAt(10, 1000) < 1.92);
+  assert.equal(windAt(10, 15000), windAt(10, 10000), 'arriba de 10 km, constante');
+});

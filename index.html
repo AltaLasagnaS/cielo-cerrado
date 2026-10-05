@@ -716,6 +716,7 @@ table.t.mc td.pc{white-space:nowrap}
     rt_arabel: ["Radartutorial: Arabel (SAMP/T)", "https://www.radartutorial.eu/19.kartei/04.battle/karte035.en.html"],
     ms_lessons: ["MissileStrikes: Lessons from Ukraine air defense (integración de radares soviéticos con la imagen común; fuente secundaria)", "https://missilestrikes.com/guide/lessons-from-ukraine-air-defense/"],
     nv_l16: ["NV: Ucrania se integra al sistema de aviación de la OTAN (licencia Link 16, 2025)", "https://english.nv.ua/nation/ukraine-integrates-into-nato-s-aviation-system-defense-ministry-says-50518462.html"],
+    fm30185: ["US Army, FM 3-01.85, Patriot Battalion and Battery Operations (2002): §5-31 triangulación de jammers, glosario SOJC (MIM-104B)", "https://archive.org/download/Fm301.85PatriotBattalionAndBatteryOperations/fm%203-01.85%20Patriot%20Battalion%20and%20Battery%20Operations.pdf"],
     // clutter (physics/clutter.js)
     skolnik_mti: ['Shrader y Gregers-Hansen, "MTI Radar", cap. 15 del Radar Handbook (Skolnik, 2.ª ed., 1990): tabla 15.1 (espectro del clutter), tabla 15.2 (reflectividad, de Barton) y ec. 15.9–15.11 (factor de mejora)', "https://helitavia.com/skolnik/Skolnik_chapter_15.pdf"],
     nrl_sea: ['Gregers-Hansen y Mital, "An Improved Empirical Model for Radar Sea Clutter Reflectivity", NRL/MR/5310--12-9346 (2012); coeficientes en la implementación pública de scivision', "https://github.com/scivision/nrl-radar-sea-clutter/blob/main/NRL_SigmaSea.m"],
@@ -1244,7 +1245,7 @@ table.t.mc td.pc{white-space:nowrap}
       color: "#62b6ff",
       datalinks: ["l16"],
       radar: { name: "AN/MPQ-65", agile: true, slb: true, slc: 1, discrim: 4, band: "C", mti: "pd", R1: 100, mast: 4, mastRange: [4, 4], mastNote: "Fija: la antena va sobre el semirremolque M860. El mástil de ≈30 m (AMG) es de comunicaciones, no del radar.", sector: 90, eccm: 10, tracks: 100, scan: 2 },
-      sam: { hFull: 15e3, hoj: true, pkHoj: 0.5, maxR: 160, maxRtbm: 20, minR: 3, altMin: 60, altMax: 24e3, vInt: 900, vmax: 1500, tb: 12, vmaxT: 2500, react: 9, ch: 8, mag: 16, reserve: 16, reloadS: 2400, salvo: 2, guid: "TVM", shot: "PAC-2 GEM-T", noDrones: true, cost: 3, pk: { dron: 0.8, crucero: 0.85, supersonico: 0.55, balistico: 0.4, hiper: 0.25 } },
+      sam: { hFull: 15e3, maxR: 160, maxRtbm: 20, minR: 3, altMin: 60, altMax: 24e3, vInt: 900, vmax: 1500, tb: 12, vmaxT: 2500, react: 9, ch: 8, mag: 16, reserve: 16, reloadS: 2400, salvo: 2, guid: "TVM", shot: "PAC-2 GEM-T", noDrones: true, cost: 3, pk: { dron: 0.8, crucero: 0.85, supersonico: 0.55, balistico: 0.4, hiper: 0.25 } },
       range: "≈160 km vs aeronaves, ≈20 km vs balísticos",
       interceptor: "GEM-T: fragmentación, guiado TVM (necesita que el radar propio vea el blanco), Mach ≈3,5",
       notes: ["Mayor alcance contra aviones y misiles de crucero que el MSE, pero peor contra balísticos.", "4 misiles por lanzador M901/M903.", "Precio unitario no publicado: US$2–4 M según estimaciones de prensa."],
@@ -1313,7 +1314,7 @@ table.t.mc td.pc{white-space:nowrap}
       kind: "sam",
       color: "#62b6ff",
       datalinks: ["ua_c2", "ru_c2"],
-      radar: { name: "9S35 Fire Dome (+9S18M1 Snow Drift)", band: "X", mti: "mti", R1: 50, mast: 4, mastRange: [4, 4], mastNote: "Fija: radar sobre el vehículo de orugas (altura estimada).", sector: 360, eccm: 3, tracks: 50, scan: 2 },
+      radar: { name: "9S35 Fire Dome (+9S18M1 Snow Drift)", band: "X", mti: "mti", bwEl: 1.3, R1: 50, mast: 4, mastRange: [4, 4], mastNote: "Fija: radar sobre el vehículo de orugas (altura estimada).", sector: 360, eccm: 3, tracks: 50, scan: 2 },
       sam: { hFull: 1e4, maxR: 35, maxRtbm: 10, minR: 3.3, altMin: 15, altMax: 22e3, vInt: 650, vmax: 850, tb: 15, vmaxT: 830, react: 22, ch: 3, mag: 12, reserve: 12, reloadS: 780, salvo: 2, guid: "SARH", shot: "9M38", cost: 0.5, pk: { dron: 0.55, crucero: 0.5, supersonico: 0.35, balistico: 0.05, hiper: 0 } },
       range: "3,3–35 km, techo 22 km",
       interceptor: "9M38: ≈Mach 3, semiactivo: el radar del lanzador tiene que iluminar el blanco hasta el impacto",
@@ -1384,7 +1385,7 @@ table.t.mc td.pc{white-space:nowrap}
       color: "#62b6ff",
       datalinks: [],
       radar: { name: "AN/MPQ-61 HPIR (+ AN/MPQ-50 PAR, AN/MPQ-62 CWAR)", band: "X", mti: "pd", R1: 70, mast: 4, mastRange: [4, 4], mastNote: "Fija: radares sobre remolques (altura estimada).", sector: 360, eccm: 5, tracks: 25, scan: 2 },
-      sam: { hFull: 8e3, hoj: true, pkHoj: 0.3, maxR: 40, maxRtbm: 0, minR: 1.5, altMin: 60, altMax: 17700, vInt: 700, vmaxT: 820, react: 15, ch: 2, mag: 9, reserve: 9, reloadS: 1200, salvo: 2, guid: "SARH", shot: "MIM-23B", cost: 0.3, pk: { dron: 0.6, crucero: 0.7, supersonico: 0.4, balistico: 0, hiper: 0 } },
+      sam: { hFull: 8e3, maxR: 40, maxRtbm: 0, minR: 1.5, altMin: 60, altMax: 17700, vInt: 700, vmaxT: 820, react: 15, ch: 2, mag: 9, reserve: 9, reloadS: 1200, salvo: 2, guid: "SARH", shot: "MIM-23B", cost: 0.3, pk: { dron: 0.6, crucero: 0.7, supersonico: 0.4, balistico: 0, hiper: 0 } },
       range: "1,5–40 km, techo ≈17 km",
       interceptor: "MIM-23B: ≈Mach 2,5, semiactivo: el HPIR ilumina el blanco hasta el impacto",
       notes: ["España entregó baterías Fase III desde fines de 2022 (21 lanzadores, radares MPQ-61 y MPQ-62) y más lanzadores en 2023–24; EE. UU. aportó misiles.", "Una sola unidad ucraniana reclamó 14 misiles de crucero y 40 Shahed derribados.", "Cada HPIR guía contra un blanco a la vez: dos secciones de fuego = dos canales."],
@@ -1397,7 +1398,7 @@ table.t.mc td.pc{white-space:nowrap}
       kind: "sam",
       color: "#62b6ff",
       datalinks: ["ua_c2"],
-      radar: { name: 'SNR-125 "Low Blow" (+ P-18/P-19 de búsqueda)', band: "X", mti: "none", R1: 40, mast: 4, mastRange: [4, 6], mastNote: "Cabina de radar sobre remolque; la versión polaca Newa-SC va sobre chasis MAZ-543 (≈4–6 m, estimado).", sector: 360, eccm: 3, tracks: 10, scan: 2 },
+      radar: { name: 'SNR-125 "Low Blow" (+ P-18/P-19 de búsqueda)', band: "X", mti: "mti", prf: 2600, R1: 40, mast: 4, mastRange: [4, 6], mastNote: "Cabina de radar sobre remolque; la versión polaca Newa-SC va sobre chasis MAZ-543 (≈4–6 m, estimado).", sector: 360, eccm: 3, tracks: 10, scan: 2 },
       sam: { hFull: 1e4, maxR: 25, maxRtbm: 0, minR: 2.5, altMin: 25, altMax: 18e3, vInt: 600, vmax: 1e3, tb: 3, vmaxT: 700, react: 25, ch: 1, mag: 8, reserve: 8, reloadS: 1500, salvo: 2, guid: "mando", shot: "5V27", cost: 0.15, pk: { dron: 0.45, crucero: 0.55, supersonico: 0.3, balistico: 0, hiper: 0 } },
       range: "2,5–25 km, techo 18 km",
       interceptor: "5V27: guiado por radiocomando desde el SNR-125 (un blanco a la vez)",
@@ -1941,7 +1942,6 @@ table.t.mc td.pc{white-space:nowrap}
       },
       patriot2: {
         "sam.hFull": U(1e4, 15e3, 2e4, "baja", [], "est: misil de gran altura (techo 24 km); sin dato publicado de g por altura"),
-        "sam.pkHoj": U(0.2, 0.5, 0.7, "baja", S_("wp:Active_radar_homing"), "la variante MIM-104B (ASOJ) se diseñó contra jammers stand-off con home-on-jam; Pk est: guiado solo angular, sin distancia"),
         "radar.tracks": U(50, 100, 150, "media", S_("wp:MIM-104_Patriot"), "mismo radar AN/MPQ-65"),
         "radar.R1": U(90, 100, 120, "baja", S_("rt_mpq53"), "mismo radar que el MSE"),
         "radar.discrim": U(1, 4, 8, "baja", [], "est: mismo radar que el MSE"),
@@ -1996,7 +1996,7 @@ table.t.mc td.pc{white-space:nowrap}
       },
       nasams: {
         "sam.hFull": U(6e3, 1e4, 14e3, "baja", [], "est: AIM-120 lanzado desde tierra"),
-        "sam.pkHoj": U(0.2, 0.5, 0.7, "baja", S_("wp:Active_radar_homing", "wp:AIM-120_AMRAAM"), "el AIM-120 tiene modo home-on-jam; Pk est: guiado solo angular, sin distancia"),
+        "sam.pkHoj": U(0.2, 0.5, 0.7, "baja", S_("wp:Active_radar_homing", "wp:AIM-120_AMRAAM"), "el AIM-120 tiene modo home-on-jam; Pk est: guiado solo angular, sin distancia. El PAC-2 GEM-T y el I-Hawk quedan sin HOJ: lo documentado es del MIM-104B/SOJC y no se generaliza (docs/investigacion/datos-fisica-guerra-electronica.md)"),
         "radar.tracks": U(50, 60, 100, "media", S_("wp:AN/MPQ-64_Sentinel"), "Sentinel: más de 50 blancos simultáneos"),
         "sam.reloadS": U(900, 1800, 3600, "baja", [], "est: lanzador de 6 AMRAAM recargado con grúa; sin dato público firme"),
         "radar.R1": U(40, 60, 90, "media", S_("wp:AN/MPQ-64_Sentinel"), "40 km el básico, 120 km el F1/A3"),
@@ -2070,7 +2070,6 @@ table.t.mc td.pc{white-space:nowrap}
       },
       hawk: {
         "sam.hFull": U(5e3, 8e3, 12e3, "baja", [], "est"),
-        "sam.pkHoj": U(0.1, 0.3, 0.5, "baja", S_("wp:MIM-23_Hawk"), 'el I-Hawk tenía un modo home-on-jam "potencial"; Pk est, menor que en misiles modernos'),
         "radar.tracks": U(10, 25, 50, "baja", [], "est: radares de búsqueda PAR y CWAR con seguimiento automático; sin cifra pública"),
         "radar.R1": U(50, 70, 100, "baja", S_("cmo_db3k_sam"), "CMO: HPIR 45 nmi (83 km) y PAR 54 nmi (100 km) de alcance instrumentado; est contra 1 m²"),
         "sam.maxR": U(35, 40, 50, "media", S_("cmo_db3k_sam", "db_hawk"), "CMO 22 nmi ≈ 40 km; OSINT 35–50 km"),
@@ -2313,15 +2312,15 @@ table.t.mc td.pc{white-space:nowrap}
       b: "ua_c2",
       gwLag: 10,
       gwPk: 0.95,
-      note: 'Ucrania convirtió la salida de sus radares soviéticos a su imagen aérea común con los sistemas occidentales ("cajas negras" de conversión, 2022–24) y firmó la licencia de Link 16 en 2025. Demora y pérdida: estimación.',
+      note: 'Ucrania convirtió la salida de sus radares soviéticos a su imagen aérea común con los sistemas occidentales ("cajas negras" de conversión, 2022–24) y firmó la licencia de Link 16 en 2025. Demora y pérdida: estimación. Sin fuente primaria de que la pista sirva para disparar: apagada por defecto.',
       sources: ["ms_lessons", "nv_l16"]
     }
   };
   function gatewaysInto(key) {
     const out = [];
-    for (const G of Object.values(GATEWAYS)) {
-      if (G.a === key) out.push({ from: G.b, G });
-      else if (G.b === key) out.push({ from: G.a, G });
+    for (const [id, G] of Object.entries(GATEWAYS)) {
+      if (G.a === key) out.push({ from: G.b, G, id });
+      else if (G.b === key) out.push({ from: G.a, G, id });
     }
     return out;
   }
@@ -3008,11 +3007,13 @@ table.t.mc td.pc{white-space:nowrap}
       name: "Niebla",
       rain: 0,
       rainKm: 0,
+      lwc: 0.05,
+      fogKm: 10,
       opt: 0.1,
       ceiling: 200,
       acu: 1,
       sea: 1,
-      desc: "Visibilidad de unos cientos de metros: los sensores ópticos casi no sirven y no ven nada por encima de 200 m. Los radares no se enteran (la niebla casi no atenúa microondas) y el sonido viaja bien."
+      desc: "Visibilidad de unos cientos de metros: los sensores ópticos casi no sirven y no ven nada por encima de 200 m. Los radares casi no se enteran (la niebla atenúa las microondas centésimas de dB por km) y el sonido viaja bien."
     }
   };
   var WEATHER_DEFAULT = "despejado";
@@ -3327,6 +3328,7 @@ table.t.mc td.pc{white-space:nowrap}
     weather: "despejado",
     tod: "noche",
     wxPlan: [],
+    gateways: [],
     wind: { v: 0, from: 0 },
     ignoreDecoys: false,
     showCov: true,
@@ -3488,9 +3490,32 @@ table.t.mc td.pc{white-space:nowrap}
     for (let i = 0; i < 8; i++) R -= (Math.log(R) + c * R - l0) / (1 / R + c);
     return R;
   }
+  var ALOFT = [[1e3, 1], [3e3, 4.753 / 2.519], [5e3, 6.669 / 2.519], [1e4, 10.9 / 2.519]];
+  var aloft = (h) => {
+    if (h <= ALOFT[0][0]) return 1;
+    for (let i = 1; i < ALOFT.length; i++) if (h <= ALOFT[i][0]) {
+      const [h0, r0] = ALOFT[i - 1], [h1, r1] = ALOFT[i];
+      return r0 + (r1 - r0) * (h - h0) / (h1 - h0);
+    }
+    return ALOFT[ALOFT.length - 1][1];
+  };
   function windAt(v10, h) {
-    const M = ENV.modelo;
-    return v10 * Math.pow(Math.min(Math.max(h, 10), M.windTop) / 10, M.windAlpha);
+    const M = ENV.modelo, top = M.windTop;
+    const bl = v10 * Math.pow(Math.min(Math.max(h, 10), top) / 10, M.windAlpha);
+    return h <= top ? bl : bl * aloft(h) / aloft(top);
+  }
+  function cloudKl(f, T = 273.15) {
+    const th = 300 / T - 1, e0 = 77.66 + 103.3 * th, e1 = 0.0671 * e0, e2 = 3.52;
+    const fp = 20.2 - 146 * th + 316 * th * th, fs = 39.8 * fp;
+    const re = (e0 - e1) / (1 + (f / fp) ** 2) + (e1 - e2) / (1 + (f / fs) ** 2) + e2;
+    const im = f * (e0 - e1) / (fp * (1 + (f / fp) ** 2)) + f * (e1 - e2) / (fs * (1 + (f / fs) ** 2));
+    const eta = (2 + re) / im;
+    return 0.819 * f / (im * (1 + eta * eta));
+  }
+  function fogGamma(band, lwc) {
+    const f = BANDS[band]?.ghz;
+    if (!lwc || !f || f < 1) return 0;
+    return cloudKl(f) * lwc;
   }
   var snowEta = (s, lambda) => s > 0 ? Math.pow(Math.PI, 5) * 0.93 * 1780 * Math.pow(s, 2.23) * Math.pow(10, -0.65) * 1e-18 / Math.pow(lambda, 4) : 0;
 
@@ -3816,7 +3841,7 @@ table.t.mc td.pc{white-space:nowrap}
         const g2 = Math.exp(-8 * Math.LN2 * (delta / thEl) ** 2);
         const A = AZ_INT * dR * R * thAz / Math.cos(Math.min(Math.abs(psi), 1.2));
         let s0;
-        if (sea) s0 = Math.pow(10, seaSigma0Db(B.ghz, Math.max(psi, 1e-4) / DEG, wx?.sea ?? 2, r.pol || "H") / 10);
+        if (sea) s0 = Math.pow(10, seaSigma0Db(Math.min(35, Math.max(0.5, B.ghz)), Math.max(psi, 1e-4) / DEG, wx?.sea ?? 2, r.pol || "H") / 10);
         else {
           const rough = clamp(0.5 + slopeAt(x, y) / 10, 0.5, 1.5);
           s0 = Math.pow(10, (M.landDb + 2 * M.reliefDb * (rough - 1)) / 10);
@@ -3949,7 +3974,8 @@ table.t.mc td.pc{white-space:nowrap}
     if (r.band === "ACU") return r.R1 * (wx ? wx.acu : 1) * dmg;
     if (r.band === "OPT") return r.R1 * (wx ? wx.opt : 1) * dmg;
     const R = r.R1 * Math.pow(rcsAt(th.T || th, r.band, ca), 0.25) * Math.pow(1 / (1 + J), 0.25) * dmg;
-    return wx && wx.rain ? rainRange(R, rainGamma(r.band, wx.rain), wx.rainKm) : R;
+    const Rr = wx && wx.rain ? rainRange(R, rainGamma(r.band, wx.rain), wx.rainKm) : R;
+    return wx && wx.lwc ? rainRange(Rr, fogGamma(r.band, wx.lwc), wx.fogKm) : Rr;
   }
   var belowCeiling = (r, wx, agl) => !(r.band === "OPT" && wx && wx.ceiling != null && agl > wx.ceiling);
   var SNR50 = Math.log(PFA) / Math.log(0.5) - 1;
@@ -4277,9 +4303,9 @@ table.t.mc td.pc{white-space:nowrap}
   // src/physics/engagement.js
   var RADAR_GUID = ["TVM", "SARH", "mando", "cañón"];
   var isTBM = (th) => th.cls === "balistico" || th.cls === "hiper";
-  function trackOK(u, th, t, c2) {
+  function trackOK(u, th, t, c2, gws = []) {
     const d = D(u), L = C2_LEVELS[c2], own = d.radar ? t - (th.det[u.id] ?? -1e9) <= d.radar.scan * 2 + 0.6 : false;
-    const compatible = netPk(u, th, t, c2) > 0;
+    const compatible = netPk(u, th, t, c2, gws) > 0;
     const legacy = !th.net && th.netFirst != null && t - th.netFirst >= L.lag && t - th.lastNet <= L.window;
     const netT = u.link !== false && (L.share === "track" || L.share === "fire") && (compatible || legacy);
     if (d.sam.guid === "cañón") return own;
@@ -4287,13 +4313,13 @@ table.t.mc td.pc{white-space:nowrap}
     if (d.sam.guid === "operador") return netT;
     return own || netT;
   }
-  function netPk(u, th, t, c2) {
+  function netPk(u, th, t, c2, gws = []) {
     const L = C2_LEVELS[c2];
     let best = 0;
     const fresh = (n2, lag) => n2 && n2.first != null && t - n2.first >= L.lag + lag && t - n2.last <= L.window;
     for (const key of datalinksOf(D(u))) {
       if (fresh(th.net?.[key], 0)) return 1;
-      for (const { from, G } of gatewaysInto(key)) if (fresh(th.net?.[from], G.gwLag)) best = Math.max(best, G.gwPk);
+      for (const { from, G, id } of gatewaysInto(key)) if (gws.includes(id) && fresh(th.net?.[from], G.gwLag)) best = Math.max(best, G.gwPk);
     }
     return best;
   }
@@ -4842,7 +4868,7 @@ table.t.mc td.pc{white-space:nowrap}
     if (!maxR) return null;
     if (u.noDrones && th.cls === "dron") return null;
     if (Math.hypot(th.p.x - u.x, th.p.y - u.y) > maxR + 120) return null;
-    if (!trackOK(u, th, t, c2)) {
+    if (!trackOK(u, th, t, c2, S.gateways)) {
       if (!probe) delete u.avail[th.id];
       return null;
     }
@@ -4925,7 +4951,7 @@ table.t.mc td.pc{white-space:nowrap}
       const { sol, remote } = f;
       const n2 = Math.min(S.doctrine === "salva" ? u.salvo || sm.salvo : 1, u.magLeft, ch - u.active);
       for (let k = 0; k < n2; k++) {
-        const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f, gw: remote ? netPk(u, th, t, c2) || 1 : 1 };
+        const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f, gw: remote ? netPk(u, th, t, c2, S.gateways) || 1 : 1 };
         S.ints.push(it);
         (th.fly = th.fly || []).push(it);
         S.rec?.ints.push(it);
@@ -5136,6 +5162,7 @@ table.t.mc td.pc{white-space:nowrap}
     }
     S.weather = WEATHER[sc2.rules?.weather] ? sc2.rules.weather : WEATHER_DEFAULT;
     S.wind = { v: sc2.rules?.wind?.v ?? 0, from: sc2.rules?.wind?.from ?? 0 };
+    S.gateways = (sc2.rules?.gateways || []).filter((k) => GATEWAYS[k]);
     S.tod = TIMES_OF_DAY[sc2.rules?.tod] ? sc2.rules.tod : TOD_DEFAULT;
     S.wxPlan = (sc2.rules?.wxPlan || []).filter((c) => WEATHER[c.weather]).map((c) => ({ t: c.t, weather: c.weather }));
     S.ignoreDecoys = !!sc2.rules?.ignoreDecoys;
@@ -7777,6 +7804,8 @@ table.t.mc td.pc{white-space:nowrap}
       <div class="field"><label for="optC2">Coordinación C2 (general) ${infoBtn("c2")}</label><select id="optC2" class="sel">${Object.entries(C2_LEVELS).map(([k, L]) => `<option value="${k}" ${S.c2 === k ? "selected" : ""}>${esc(L.name)}</option>`).join("")}</select></div>
       <p class="hint" id="c2Info">${esc(C2_LEVELS[S.c2].desc)}</p>
       <p class="hint">Desconectada desactiva alertas, pistas de red y reparto de blancos. El enlace técnico de cada unidad se configura aparte en Selección y solo intercambia pistas con sistemas compatibles.</p>
+      ${Object.entries(GATEWAYS).map(([k, G]) => `<label class="check" title="${esc(G.note)}"><input type="checkbox" class="optGw" data-gw="${k}" ${S.gateways.includes(k) ? "checked" : ""}> ${esc(G.name)}: pistas de tiro entre las dos redes (+${G.gwLag} s, Pk ×${G.gwPk})</label>`).join("")}
+      <p class="hint">Apagada por defecto: no hay fuente de que esas pistas sirvan para disparar (sí hay imagen común y alertas, que se comparten igual).</p>
       <div class="field"><label for="optDoc">Doctrina de tiro</label><select id="optDoc" class="sel"><option value="salva" ${S.doctrine === "salva" ? "selected" : ""}>Salva (según unidad)</option><option value="sls" ${S.doctrine === "sls" ? "selected" : ""}>Disparar-observar-disparar</option></select></div>
       <label class="check" title="Los radares de tiro (S, C, X, Ku) aprenden a distinguir señuelos con el tiempo de seguimiento. Con esta opción no se dispara a pistas clasificadas como señuelo: ahorra munición, pero a veces un arma real se clasifica mal."><input type="checkbox" id="optDecoy" ${S.ignoreDecoys ? "checked" : ""}> No tirarle a pistas clasificadas como señuelo</label>
       <div class="field" title="Alcance efectivo = alcance máximo × geometría (menos contra un blanco que se aleja). Esperar a que el blanco se acerque deja menos tiempo para un segundo tiro, pero el misil llega con más energía y la Pk sube."><label for="optFR">Disparar dentro del ${'<span id="frVal">' + Math.round(S.fireRange * 100) + "%</span>"} del alcance ${infoBtn("energia")}</label><input type="range" id="optFR" min="50" max="100" step="5" value="${Math.round(S.fireRange * 100)}"></div>
@@ -7822,6 +7851,15 @@ table.t.mc td.pc{white-space:nowrap}
       S.c2 = e.target.value;
       $("#c2Info").textContent = C2_LEVELS[S.c2].desc;
       renderSel();
+    };
+    for (const c of el.querySelectorAll(".optGw")) c.onchange = (e) => {
+      if (S.started) {
+        toast("Reiniciá para cambiar las pasarelas.");
+        e.target.checked = !e.target.checked;
+        return;
+      }
+      const k = e.target.dataset.gw;
+      S.gateways = e.target.checked ? [.../* @__PURE__ */ new Set([...S.gateways, k])] : S.gateways.filter((x) => x !== k);
     };
     $("#optDoc").onchange = (e) => {
       S.doctrine = e.target.value;
@@ -8263,7 +8301,7 @@ table.t.mc td.pc{white-space:nowrap}
       version: VERSION,
       saved: now.toISOString(),
       map: mapRef(),
-      rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather, tod: S.tod, wxPlan: S.wxPlan.map((c) => ({ ...c })), wind: { ...S.wind }, ignoreDecoys: S.ignoreDecoys, fireRange: S.fireRange },
+      rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather, tod: S.tod, wxPlan: S.wxPlan.map((c) => ({ ...c })), gateways: [...S.gateways], wind: { ...S.wind }, ignoreDecoys: S.ignoreDecoys, fireRange: S.fireRange },
       scenario: S.scen ? { base: baseKey(S.scen), ...pick(S.scen, META_KEYS) } : null,
       setup: {
         objs: s.objs.map((g) => pick(g, OBJ_KEYS)),
@@ -8458,6 +8496,13 @@ table.t.mc td.pc{white-space:nowrap}
       if (r.wind === null || typeof r.wind !== "object") err("rules.wind: tiene que ser { v, from } (m/s y grados de donde sopla).");
       else rules.wind = { v: num2("rules.wind.v", r.wind.v, 0, 40), from: num2("rules.wind.from", r.wind.from, 0, 360) };
     }
+    if (r.gateways !== void 0) {
+      if (!Array.isArray(r.gateways)) err("rules.gateways: tiene que ser una lista de pasarelas (" + Object.keys(GATEWAYS).join(", ") + ").");
+      else {
+        for (const k of r.gateways) if (!GATEWAYS[k]) err(`rules.gateways: "${String(k)}" no es una pasarela conocida (${Object.keys(GATEWAYS).join(", ")}).`);
+        rules.gateways = r.gateways.filter((k) => GATEWAYS[k]);
+      }
+    }
     if (r.tod !== void 0) {
       if (!TIMES_OF_DAY[r.tod]) err(`rules.tod: "${String(r.tod)}" no es un momento del día válido (${Object.keys(TIMES_OF_DAY).join(", ")}).`);
       else rules.tod = r.tod;
@@ -8544,6 +8589,7 @@ table.t.mc td.pc{white-space:nowrap}
     S.weather = data.rules.weather || "despejado";
     S.wind = { v: data.rules.wind?.v ?? 0, from: data.rules.wind?.from ?? 0 };
     S.tod = data.rules.tod || "noche";
+    S.gateways = data.rules.gateways || [];
     S.wxPlan = data.rules.wxPlan || [];
     S.ignoreDecoys = !!data.rules.ignoreDecoys;
     S.fireRange = data.rules.fireRange ?? 1;

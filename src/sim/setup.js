@@ -1,7 +1,7 @@
 // @ts-check
 // ---------------- ARMADO DEL ESCENARIO ----------------
 // Funciones para agregar defensas, salvas y jammers a S.setup (antes de iniciar la corrida).
-import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES, C2_LEVELS, c2FromNet, WEATHER, WEATHER_DEFAULT, TIMES_OF_DAY, TOD_DEFAULT } from '../data/index.js';
+import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES, C2_LEVELS, c2FromNet, WEATHER, WEATHER_DEFAULT, TIMES_OF_DAY, TOD_DEFAULT, GATEWAYS } from '../data/index.js';
 import { azOf } from '../util/math.js';
 import { nextId } from '../util/ids.js';
 import { S } from './state.js';
@@ -74,6 +74,7 @@ export function applyScenario(sc) {
   }
   S.weather = WEATHER[sc.rules?.weather] ? sc.rules.weather : WEATHER_DEFAULT;
   S.wind = { v: sc.rules?.wind?.v ?? 0, from: sc.rules?.wind?.from ?? 0 };   // viento del escenario: sin dato, calma
+  S.gateways = (sc.rules?.gateways || []).filter(k => GATEWAYS[k]);   // pasarelas entre redes: sin dato, ninguna
   S.tod = TIMES_OF_DAY[sc.rules?.tod] ? sc.rules.tod : TOD_DEFAULT;   // momento del día: sin dato, noche
   S.wxPlan = (sc.rules?.wxPlan || []).filter(c => WEATHER[c.weather]).map(c => ({ t: c.t, weather: c.weather }));   // cambios de tiempo
   S.ignoreDecoys = !!sc.rules?.ignoreDecoys;   // el clima es del escenario: sin dato, despejado

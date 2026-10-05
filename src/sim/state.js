@@ -11,7 +11,7 @@ export const S = {
   scen: null,
   // opciones de mando (c2 = nivel de integración, ver data/c2.js; fireRange = disparar dentro de esa
   // fracción del alcance efectivo), clima (data/weather.js) y de visualización
-  c2: 'coordinada', doctrine: 'salva', fireRange: 1, weather: 'despejado', tod: 'noche', wxPlan: [], wind: { v: 0, from: 0 }, ignoreDecoys: false, showCov: true, covRef: 'kh101', covAgl: 50, strobes: true, relief: 'normal',
+  c2: 'coordinada', doctrine: 'salva', fireRange: 1, weather: 'despejado', tod: 'noche', wxPlan: [], gateways: [], wind: { v: 0, from: 0 }, ignoreDecoys: false, showCov: true, covRef: 'kh101', covAgl: 50, strobes: true, relief: 'normal',
   // reloj y control de la corrida
   t: 0, running: false, started: false, speed: 15, auto: true, autoPhase: 'calm',
   // corrida en curso

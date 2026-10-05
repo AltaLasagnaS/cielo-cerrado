@@ -3,7 +3,9 @@
 import { WP, SRC } from './sources.js';
 
 // kind: sam | gun | sensor | aew | acoustic
-// radar: band, mti ('none' | 'mti' | 'pd': procesamiento contra clutter, ver physics/radar.js), R1 (km para 1 m²: Pd 50%), mast (m), mastRange [mín, máx] (m; iguales = fija), mastNote, sector (°), eccm (dB), scan (s)
+// radar: band, mti ('none' | 'mti' | 'pd': procesamiento contra clutter, ver physics/radar.js; S-125: MTI según
+//        dos fuentes técnicas, APA y Missilery, con PRF de búsqueda 1.750–3.500 Hz de la tabla de APA → 2.600; Buk:
+//        haz de seguimiento del 9S35 de 1,3° en elevación, APA; docs/investigacion/datos-fisica-clutter.md), R1 (km para 1 m²: Pd 50%), mast (m), mastRange [mín, máx] (m; iguales = fija), mastNote, sector (°), eccm (dB), scan (s)
 //        ECCM (physics/radar.js#jamJ, docs/FISICA.md §4): slb (blanqueo de lóbulos laterales contra falsos blancos DRFM;
 //        est: se asigna a los radares con cancelador, porque ambos usan los mismos canales auxiliares), agile (agilidad de frecuencia: anula el ruido puntual), lowSL (lóbulos
 //        laterales bajos), slc (cantidad de canceladores de lóbulos laterales). Patriot: agilidad y al menos un SLC (Radartutorial,
@@ -27,7 +29,7 @@ export const DEFENSES = {
     name: 'Patriot (PAC-2 GEM-T)', short: 'Patriot GEM-T', side: 'UA', kind: 'sam', color: '#62b6ff',
     datalinks: ['l16'],
     radar: { name: 'AN/MPQ-65', agile: true, slb: true, slc: 1, discrim: 4, band: 'C', mti: 'pd', R1: 100, mast: 4, mastRange: [4, 4], mastNote: 'Fija: la antena va sobre el semirremolque M860. El mástil de ≈30 m (AMG) es de comunicaciones, no del radar.', sector: 90, eccm: 10, tracks: 100, scan: 2 },
-    sam: { hFull: 15000, hoj: true, pkHoj: 0.5, maxR: 160, maxRtbm: 20, minR: 3, altMin: 60, altMax: 24000, vInt: 900, vmax: 1500, tb: 12, vmaxT: 2500, react: 9, ch: 8, mag: 16, reserve: 16, reloadS: 2400, salvo: 2, guid: 'TVM', shot: 'PAC-2 GEM-T', noDrones: true, cost: 3, pk: { dron: 0.8, crucero: 0.85, supersonico: 0.55, balistico: 0.4, hiper: 0.25 } },
+    sam: { hFull: 15000, maxR: 160, maxRtbm: 20, minR: 3, altMin: 60, altMax: 24000, vInt: 900, vmax: 1500, tb: 12, vmaxT: 2500, react: 9, ch: 8, mag: 16, reserve: 16, reloadS: 2400, salvo: 2, guid: 'TVM', shot: 'PAC-2 GEM-T', noDrones: true, cost: 3, pk: { dron: 0.8, crucero: 0.85, supersonico: 0.55, balistico: 0.4, hiper: 0.25 } },
     range: '≈160 km vs aeronaves, ≈20 km vs balísticos', interceptor: 'GEM-T: fragmentación, guiado TVM (necesita que el radar propio vea el blanco), Mach ≈3,5',
     notes: ['Mayor alcance contra aviones y misiles de crucero que el MSE, pero peor contra balísticos.', '4 misiles por lanzador M901/M903.', 'Precio unitario no publicado: US$2–4 M según estimaciones de prensa.'],
     sources: [WP('MIM-104_Patriot'), SRC.csis_patriot, SRC.ar_gemt]
@@ -71,7 +73,7 @@ export const DEFENSES = {
   buk: {
     name: 'Buk-M1 (9M38)', short: 'Buk-M1', side: 'both', kind: 'sam', color: '#62b6ff',
     datalinks: ['ua_c2', 'ru_c2'],
-    radar: { name: '9S35 Fire Dome (+9S18M1 Snow Drift)', band: 'X', mti: 'mti', R1: 50, mast: 4, mastRange: [4, 4], mastNote: 'Fija: radar sobre el vehículo de orugas (altura estimada).', sector: 360, eccm: 3, tracks: 50, scan: 2 },
+    radar: { name: '9S35 Fire Dome (+9S18M1 Snow Drift)', band: 'X', mti: 'mti', bwEl: 1.3, R1: 50, mast: 4, mastRange: [4, 4], mastNote: 'Fija: radar sobre el vehículo de orugas (altura estimada).', sector: 360, eccm: 3, tracks: 50, scan: 2 },
     sam: { hFull: 10000, maxR: 35, maxRtbm: 10, minR: 3.3, altMin: 15, altMax: 22000, vInt: 650, vmax: 850, tb: 15, vmaxT: 830, react: 22, ch: 3, mag: 12, reserve: 12, reloadS: 780, salvo: 2, guid: 'SARH', shot: '9M38', cost: 0.5, pk: { dron: 0.55, crucero: 0.5, supersonico: 0.35, balistico: 0.05, hiper: 0 } },
     range: '3,3–35 km, techo 22 km', interceptor: '9M38: ≈Mach 3, semiactivo: el radar del lanzador tiene que iluminar el blanco hasta el impacto',
     notes: ['Lo usan ambos bandos (Rusia con versiones M2/M3). Ucrania tenía 15 divisiones en 2022.', 'El 9S18M1 (banda centimétrica) detecta a ~85 km a altura; a 100 m de altura solo ~35 km.', 'Ucrania adaptó lanzadores Buk para disparar RIM-7 Sea Sparrow ("FrankenSAM").'],
@@ -117,7 +119,7 @@ export const DEFENSES = {
     name: 'MIM-23B I-Hawk (Fase III)', short: 'Hawk', side: 'UA', kind: 'sam', color: '#62b6ff',
     datalinks: [],
     radar: { name: 'AN/MPQ-61 HPIR (+ AN/MPQ-50 PAR, AN/MPQ-62 CWAR)', band: 'X', mti: 'pd', R1: 70, mast: 4, mastRange: [4, 4], mastNote: 'Fija: radares sobre remolques (altura estimada).', sector: 360, eccm: 5, tracks: 25, scan: 2 },
-    sam: { hFull: 8000, hoj: true, pkHoj: 0.3, maxR: 40, maxRtbm: 0, minR: 1.5, altMin: 60, altMax: 17700, vInt: 700, vmaxT: 820, react: 15, ch: 2, mag: 9, reserve: 9, reloadS: 1200, salvo: 2, guid: 'SARH', shot: 'MIM-23B', cost: 0.3, pk: { dron: 0.6, crucero: 0.7, supersonico: 0.4, balistico: 0, hiper: 0 } },
+    sam: { hFull: 8000, maxR: 40, maxRtbm: 0, minR: 1.5, altMin: 60, altMax: 17700, vInt: 700, vmaxT: 820, react: 15, ch: 2, mag: 9, reserve: 9, reloadS: 1200, salvo: 2, guid: 'SARH', shot: 'MIM-23B', cost: 0.3, pk: { dron: 0.6, crucero: 0.7, supersonico: 0.4, balistico: 0, hiper: 0 } },
     range: '1,5–40 km, techo ≈17 km', interceptor: 'MIM-23B: ≈Mach 2,5, semiactivo: el HPIR ilumina el blanco hasta el impacto',
     notes: ['España entregó baterías Fase III desde fines de 2022 (21 lanzadores, radares MPQ-61 y MPQ-62) y más lanzadores en 2023–24; EE. UU. aportó misiles.', 'Una sola unidad ucraniana reclamó 14 misiles de crucero y 40 Shahed derribados.', 'Cada HPIR guía contra un blanco a la vez: dos secciones de fuego = dos canales.'],
     sources: [WP('MIM-23_Hawk'), SRC.mil_hawk, SRC.db_hawk, SRC.cmo_db3k_sam]
@@ -125,7 +127,7 @@ export const DEFENSES = {
   s125: {
     name: 'S-125 Pechora / Newa-SC (modernizado)', short: 'S-125', side: 'UA', kind: 'sam', color: '#62b6ff',
     datalinks: ['ua_c2'],
-    radar: { name: 'SNR-125 "Low Blow" (+ P-18/P-19 de búsqueda)', band: 'X', mti: 'none', R1: 40, mast: 4, mastRange: [4, 6], mastNote: 'Cabina de radar sobre remolque; la versión polaca Newa-SC va sobre chasis MAZ-543 (≈4–6 m, estimado).', sector: 360, eccm: 3, tracks: 10, scan: 2 },
+    radar: { name: 'SNR-125 "Low Blow" (+ P-18/P-19 de búsqueda)', band: 'X', mti: 'mti', prf: 2600, R1: 40, mast: 4, mastRange: [4, 6], mastNote: 'Cabina de radar sobre remolque; la versión polaca Newa-SC va sobre chasis MAZ-543 (≈4–6 m, estimado).', sector: 360, eccm: 3, tracks: 10, scan: 2 },
     sam: { hFull: 10000, maxR: 25, maxRtbm: 0, minR: 2.5, altMin: 25, altMax: 18000, vInt: 600, vmax: 1000, tb: 3, vmaxT: 700, react: 25, ch: 1, mag: 8, reserve: 8, reloadS: 1500, salvo: 2, guid: 'mando', shot: '5V27', cost: 0.15, pk: { dron: 0.45, crucero: 0.55, supersonico: 0.3, balistico: 0, hiper: 0 } },
     range: '2,5–25 km, techo 18 km', interceptor: '5V27: guiado por radiocomando desde el SNR-125 (un blanco a la vez)',
     notes: ['Sistema de los años 60, modernizado en Ucrania y en Polonia (Newa-SC, digital y sobre chasis con orugas o ruedas).', 'En su primer combate un S-125 ucraniano derribó un Kalibr; muy bueno a baja altura para su edad.', 'Un solo canal: se satura enseguida con oleadas.'],

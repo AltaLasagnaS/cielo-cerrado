@@ -72,19 +72,20 @@ test('datalink: una detección sin transporte no alimenta la red compatible', ()
   assert.ok(th2.netFirst === null || th2.netFirst > th2.firstDet);   // el S-300 no recibe la pista del EWR si el sensor no publica
 });
 
-test('datalink: Link 16 une NASAMS y Patriot; al S-300 ucraniano le llega por la pasarela, más tarde y con menos Pk', () => {
+test('datalink: Link 16 une NASAMS y Patriot; al S-300 ucraniano le llega solo con la pasarela habilitada, más tarde y con menos Pk', () => {
   const G = GATEWAYS.ua_l16;
   const remote = { det: {}, net: { l16: { first: 100, last: 150 } }, netFirst: 100, lastNet: 150 };
   assert.equal(trackOK({ id: 1, type: 'patriot', link: true }, remote, 155, 'coordinada'), true);
   assert.equal(trackOK({ id: 2, type: 'nasams', link: true }, remote, 155, 'coordinada'), true);
   assert.equal(netPk({ id: 2, type: 'nasams', link: true }, remote, 155, 'coordinada'), 1, 'red propia');
-  assert.equal(trackOK({ id: 3, type: 's300', link: true }, remote, 155, 'integrada'), true, 'por la pasarela');
-  assert.equal(netPk({ id: 3, type: 's300', link: true }, remote, 155, 'integrada'), G.gwPk);
+  assert.equal(trackOK({ id: 3, type: 's300', link: true }, remote, 155, 'integrada'), false, 'pasarela apagada por defecto');
+  assert.equal(trackOK({ id: 3, type: 's300', link: true }, remote, 155, 'integrada', ['ua_l16']), true, 'por la pasarela');
+  assert.equal(netPk({ id: 3, type: 's300', link: true }, remote, 155, 'integrada', ['ua_l16']), G.gwPk);
   const fresh = { det: {}, net: { l16: { first: 150, last: 152 } } };
-  assert.equal(trackOK({ id: 3, type: 's300', link: true }, fresh, 150 + C2_LEVELS.integrada.lag + G.gwLag - 1, 'integrada'), false, 'todavía no cruzó la pasarela');
-  assert.equal(trackOK({ id: 3, type: 's300', link: true }, fresh, 150 + C2_LEVELS.integrada.lag + G.gwLag, 'integrada'), true);
+  assert.equal(trackOK({ id: 3, type: 's300', link: true }, fresh, 150 + C2_LEVELS.integrada.lag + G.gwLag - 1, 'integrada', ['ua_l16']), false, 'todavía no cruzó la pasarela');
+  assert.equal(trackOK({ id: 3, type: 's300', link: true }, fresh, 150 + C2_LEVELS.integrada.lag + G.gwLag, 'integrada', ['ua_l16']), true);
   const russian = { det: {}, net: { ru_c2: { first: 100, last: 150 } } };
-  assert.equal(trackOK({ id: 4, type: 'patriot', link: true }, russian, 155, 'coordinada'), false, 'no hay pasarela con la red rusa');
+  assert.equal(trackOK({ id: 4, type: 'patriot', link: true }, russian, 155, 'coordinada', ['ua_l16']), false, 'no hay pasarela con la red rusa');
 });
 
 test('C2 por unidad: una unidad puede quedar con menos coordinación que la red, nunca más', () => {

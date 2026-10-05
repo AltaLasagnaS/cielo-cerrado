@@ -6,7 +6,7 @@ import { BANDS, JAMMERS, JAM_MODES, D, UNIT_DAMAGE } from '../data/index.js';
 import { angDiff, azOf } from '../util/math.js';
 import { HORIZON_K } from './constants.js';
 import { surf, los } from './terrain.js';
-import { rainGamma, rainRange } from './weather.js';
+import { rainGamma, rainRange, fogGamma } from './weather.js';
 import { PFA, noncoherentPd, integratedSnr50 } from './pulse-integration.js';
 import { clutterRcs } from './clutter.js';
 
@@ -168,7 +168,7 @@ export function falseTracks(u, list) {
  * con aspecto ca (1 = de frente, el peor caso, que usan la cobertura y las fichas):
  *   R = R1 · σ(banda, aspecto)^¼ · (1 / (1 + J))^¼
  * R1 es el alcance contra 1 m². Sensores acústicos y ópticos usan R1 fijo (no dependen del RCS).
- * wx (data/weather.js, opcional): la lluvia atenúa el radar (physics/weather.js#rainRange) y el
+ * wx (data/weather.js, opcional): la lluvia y la niebla atenúan el radar (physics/weather.js#rainRange) y el
  * clima achica los alcances ópticos (wx.opt) y acústicos (wx.acu). El techo de nubes (wx.ceiling)
  * lo aplican quienes conocen la altura del blanco (sim/engine.js, physics/coverage.js).
  * Un sensor dañado durante la corrida (u.dmgRadar, daño funcional) ve ×UNIT_DAMAGE.radarR.
@@ -178,7 +178,8 @@ export function detR(u, th, J, ca = 1, wx = null) {
   if (r.band === 'ACU') return r.R1 * (wx ? wx.acu : 1) * dmg;
   if (r.band === 'OPT') return r.R1 * (wx ? wx.opt : 1) * dmg;
   const R = r.R1 * Math.pow(rcsAt(th.T || th, r.band, ca), 0.25) * Math.pow(1 / (1 + J), 0.25) * dmg;
-  return wx && wx.rain ? rainRange(R, rainGamma(r.band, wx.rain), wx.rainKm) : R;
+  const Rr = wx && wx.rain ? rainRange(R, rainGamma(r.band, wx.rain), wx.rainKm) : R;
+  return wx && wx.lwc ? rainRange(Rr, fogGamma(r.band, wx.lwc), wx.fogKm) : Rr;   // niebla (ITU-R P.840): casi nada
 }
 
 /** ¿El techo de nubes o niebla de wx le tapa a un sensor óptico en tierra un blanco a agl m? */
