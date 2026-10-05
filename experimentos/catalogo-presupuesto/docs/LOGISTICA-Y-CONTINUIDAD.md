@@ -10,7 +10,7 @@
 |---|---|
 | `order` | Paga una sola vez, limita la disponibilidad del proveedor, agenda entrega. El inventario sólo aumenta al vencer el plazo |
 | `transfer` | Saca munición del origen y la coloca en tránsito reservado a esa ruta. Un servicio sólo atiende un trabajo; al vencer el plazo valida equipo y carga admitida |
-| `repair` | Sólo equipo averiado; consume repuestos y fondos al comenzar. Recupera al vencer el plazo; la destrucción durante el trabajo lo hace fallar |
+| `repair` | Equipo degradado o inutilizado; consume repuestos y fondos al comenzar. Recupera al vencer el plazo; la destrucción durante el trabajo lo hace fallar |
 | `cancel` | Pedidos sólo si su cotización declara cancelación con devolución. Servicios iniciados no devuelven gasto/repuestos. Retornar carga conserva lo sobreviviente en tránsito y requiere otro plazo y costo |
 | `outcome` | Registra disparo, pérdida o daño decidido por el motor. No admite adquisición libre ni recuperación sin reparación |
 | `advance` | Procesa trabajos vencidos cronológicamente. El motor suministra este tiempo; no debe usarse para saltarse el combate |
@@ -25,6 +25,8 @@ Se conserva por munición: existencias + disparadas + perdidas = iniciales + ent
 Los eventos se reproducen al cargar. Un comando fallido deja intactos fondos, existencias, disponibilidad, reloj y trabajos. Un reintento idéntico no repite efectos. No se aceptan snapshots de saldo/inventario como autoridad, ni eventos de otro bando. Esto no protege criptográficamente una partida local.
 
 `buildCampaignBriefing` proyecta recursos propios en preparación y valida objetivos/reportes autorizados con la misma normalización del briefing anterior. Exige bando, misión y reloj actuales; conserva edad desde la observación, no desde recepción ni cambio de misión. Rechaza campos del plan enemigo. No es la vista de combate: al conectarse con perspectivas debe recibir también el conocimiento autorizado de bajas propias, que puede diferir del inventario físico si una unidad está incomunicada. La demo limpia un briefing que ya no corresponde al estado o fase actual.
+
+El [adaptador de misión](ADAPTADOR-MISION.md) acepta el reloj fraccionario del motor sin truncarlo. Cantidades y fondos siguen siendo enteros. El tiempo se acota a segundos finitos dentro de 1e9 s desde el origen; no se infiere una precisión de radar a partir de ese reloj.
 
 ## Verificación y revisión
 

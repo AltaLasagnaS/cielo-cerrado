@@ -5,6 +5,7 @@ import { buildCampaignBriefing } from '../lib/campaign-briefing.mjs';
 const $ = id => document.getElementById(id);
 const labels = { planning: 'Preparación', active: 'En curso', completed: 'Finalizada',
   operational: 'Operativo', disabled: 'Averiado', destroyed: 'Destruido', pending: 'En curso',
+  degraded: 'Degradado',
   interrupted: 'Interrumpido', lost: 'Perdido', returned: 'Devuelto', failed: 'Falló', cancelled: 'Cancelado' };
 let state = createCampaign(demoCampaign());
 let serial = 0;

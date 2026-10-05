@@ -1,4 +1,4 @@
-import { deepFreeze, id, integer } from './common.mjs';
+import { deepFreeze, id, integer, seconds } from './common.mjs';
 import { savePlan } from './budget.mjs';
 
 // Preparation-only projection, not a sensor fusion engine or a security boundary.
@@ -46,29 +46,31 @@ export function buildPreparationBriefing(plan, input) {
 
 // Shared report/objective validation. Resource owners verify their own state
 // and phase before calling; this function never reads world truth.
-export function normalizePreparationBriefing(input, context) {
+export function normalizePreparationBriefing(input, context, { fractionalTime = false } = {}) {
+  const time = fractionalTime ? seconds : integer;
+  const signed = fractionalTime ? (value, name) => seconds(value, name, true) : signedTime;
   record(input, ['sideId', 'missionId', 'role', 'title', 'issuedAtSeconds', 'objectives', 'intelligence'], 'briefing');
   const sideId = id(input.sideId, 'sideId');
   const missionId = id(input.missionId, 'missionId');
   if (sideId !== context.sideId || missionId !== context.missionId) throw new Error('Briefing de otro bando o misión');
   if (!['attack', 'defence'].includes(input.role)) throw new Error('Rol de misión inválido');
-  const issuedAtSeconds = integer(input.issuedAtSeconds, 'issuedAtSeconds');
+  const issuedAtSeconds = time(input.issuedAtSeconds, 'issuedAtSeconds');
   const objectives = uniqueList(input.objectives, 'objetivos', row => {
     record(row, ['id', 'text', 'deadlineSeconds'], 'objetivo');
     return { id: id(row.id), text: text(row.text, 'objetivo'),
-      deadlineSeconds: row.deadlineSeconds === null ? null : integer(row.deadlineSeconds, 'deadlineSeconds') };
+      deadlineSeconds: row.deadlineSeconds === null ? null : time(row.deadlineSeconds, 'deadlineSeconds') };
   });
   if (!objectives.length) throw new Error('El briefing necesita al menos un objetivo');
   const intelligence = uniqueList(input.intelligence, 'inteligencia', row => {
     record(row, ['id', 'text', 'confidence', 'sourceLabel', 'observedAtSeconds', 'receivedAtSeconds'], 'reporte');
     if (!['confirmed', 'probable', 'unconfirmed'].includes(row.confidence)) throw new Error('Confianza de reporte inválida');
-    const observedAtSeconds = signedTime(row.observedAtSeconds, 'observedAtSeconds');
-    const receivedAtSeconds = signedTime(row.receivedAtSeconds, 'receivedAtSeconds');
+    const observedAtSeconds = signed(row.observedAtSeconds, 'observedAtSeconds');
+    const receivedAtSeconds = signed(row.receivedAtSeconds, 'receivedAtSeconds');
     if (observedAtSeconds > receivedAtSeconds || receivedAtSeconds > issuedAtSeconds) throw new Error('Cronología de reporte inválida');
     return { id: id(row.id), text: text(row.text, 'reporte'), confidence: row.confidence,
       sourceLabel: text(row.sourceLabel, 'sourceLabel'), observedAtSeconds, receivedAtSeconds,
-      ageSeconds: integer(issuedAtSeconds - observedAtSeconds, 'antigüedad'),
-      deliveryDelaySeconds: integer(receivedAtSeconds - observedAtSeconds, 'demora') };
+      ageSeconds: time(issuedAtSeconds - observedAtSeconds, 'antigüedad'),
+      deliveryDelaySeconds: time(receivedAtSeconds - observedAtSeconds, 'demora') };
   });
   return deepFreeze({
     sideId, missionId, role: input.role, title: text(input.title, 'title'), issuedAtSeconds,

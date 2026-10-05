@@ -14,6 +14,7 @@ Trabajo original en una carpeta experimental independiente. No cambia `src/`, es
 - Inventario físico por componente, munición tipada y cargas completas explícitas: conserva existencias, disparos y pérdidas, y exige componentes de lanzamiento operativos. Ver [el contrato](docs/COMPONENTES-E-INVENTARIO.md).
 - Evidencia separada para GEM-T, PAC-3 CRI/MSE y S-300PT/PT-1KD/PS: capacidades desconocidas siguen como `null`. Ver [el relevo de variantes](docs/RELEVO-DATOS-2026-10-05.md).
 - Contrato de [logística y continuidad](docs/LOGISTICA-Y-CONTINUIDAD.md), con fondos, pedidos, traslado en tránsito, reparación con repuestos y plazos, y conservación entre misiones. La [demo de navegador](demo/logistics.html) usa exclusivamente datos ficticios.
+- [Adaptador ejecutable de misión](docs/ADAPTADOR-MISION.md): asignaciones explícitas, consultas/disparos/recargas tipados y reloj de 0,25 s sin truncarlo. Conexión al motor aún pendiente de Claude.
 - Pruebas sin dependencias y demostración ejecutable en Node.
 
 ## Ejecutar

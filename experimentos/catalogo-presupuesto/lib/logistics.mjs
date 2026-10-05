@@ -1,4 +1,4 @@
-import { deepFreeze, id, integer, safeProduct, safeSum } from './common.mjs';
+import { deepFreeze, id, integer, safeProduct, safeSum, seconds, addSeconds } from './common.mjs';
 import { createInventory, applyInventoryEvent } from './components.mjs';
 
 // Campaign resource authority: ONE physical ammunition inventory. Quotes,
@@ -27,6 +27,11 @@ function list(value, label, limit = 200) {
 function unique(rows, label) {
   if (new Set(rows.map(row => row.id)).size !== rows.length) throw Error(`${label}: duplicado`);
 }
+function positiveSeconds(value, label) {
+  seconds(value, label);
+  if (value <= 0) throw Error(`${label}: duración positiva requerida`);
+  return value;
+}
 function keep(state) { deepFreeze(state); states.add(state); return state; }
 function basis(raw, unit, label) {
   exact(raw, ['kind', 'note', 'sourceIds'], label);
@@ -50,7 +55,7 @@ function normalize(raw) {
     if (!inventory.ammunitionIds.includes(ammunitionId) || !depot(toId)) throw Error('Entrega sin depósito o munición conocidos');
     if (typeof row.cancellable !== 'boolean') throw Error('Cotización requiere condición de cancelación explícita');
     return { id: id(row.id), ammunitionId, toId, cancellable: row.cancellable, price: integer(row.price, 'precio'),
-      quantityLimit: integer(row.quantityLimit, 'disponibilidad'), leadSeconds: integer(row.leadSeconds, 'plazo', 1),
+      quantityLimit: integer(row.quantityLimit, 'disponibilidad'), leadSeconds: positiveSeconds(row.leadSeconds, 'plazo'),
       basis: basis(row.basis, unit, 'Evidencia de entrega') };
   });
   unique(quotes, 'cotizaciones');
@@ -65,7 +70,7 @@ function normalize(raw) {
       : ['componentIds', 'spareId', 'spareQuantity'];
     exact(row, [...common, ...extra], 'Servicio');
     const service = { id: id(row.id), kind: row.kind, fee: integer(row.fee, 'costo de servicio'),
-      durationSeconds: integer(row.durationSeconds, 'duración', 1), basis: basis(row.basis, unit, 'Evidencia de servicio') };
+      durationSeconds: positiveSeconds(row.durationSeconds, 'duración'), basis: basis(row.basis, unit, 'Evidencia de servicio') };
     if (row.kind === 'transfer') {
       for (const key of ['fromId', 'toId', 'transitId', 'recoveryId']) service[key] = id(row[key], key);
       if (!depot(service.transitId) || !depot(service.recoveryId)
@@ -139,7 +144,7 @@ function complete(state, job) {
   } else {
     const available = stock(state, job.transitId, job.ammunitionId);
     const destination = state.inventory.initial.locations.find(row => row.id === job.toId);
-    const destinationReady = destination.kind === 'depot' || condition(state, destination.componentId) === 'operational';
+    const destinationReady = destination.kind === 'depot' || ['operational', 'degraded'].includes(condition(state, destination.componentId));
     if (available < job.quantity || !destinationReady) {
       job.status = available === 0 ? 'lost' : 'interrupted'; return;
     }
@@ -158,7 +163,7 @@ function complete(state, job) {
 function normalizeCommand(raw) {
   if (!Object.hasOwn(keys, raw?.kind)) throw Error('Comando desconocido');
   exact(raw, ['commandId', 'sideId', 'atSeconds', 'kind', ...keys[raw.kind]], 'Comando');
-  const command = { commandId: id(raw.commandId), sideId: id(raw.sideId), atSeconds: integer(raw.atSeconds, 'tiempo'), kind: raw.kind };
+  const command = { commandId: id(raw.commandId), sideId: id(raw.sideId), atSeconds: seconds(raw.atSeconds, 'tiempo'), kind: raw.kind };
   for (const key of keys[raw.kind]) command[key] = key === 'quantity' ? integer(raw[key], 'cantidad', 1)
     : key === 'outcome' ? structuredClone(raw[key]) : id(raw[key], key);
   if (command.kind === 'outcome') {
@@ -167,7 +172,7 @@ function normalizeCommand(raw) {
     exact(command.outcome, ['kind', ...fields], 'Resultado');
     command.outcome = { kind: command.outcome.kind, ...Object.fromEntries(fields.map(key => [key, command.outcome[key]])) };
     // Damage may disable/destroy. Recovery must go through a paid timed job.
-    if (command.outcome.kind === 'condition' && !['disabled', 'destroyed'].includes(command.outcome.condition)) throw Error('Recuperación requiere reparación');
+    if (command.outcome.kind === 'condition' && !['degraded', 'disabled', 'destroyed'].includes(command.outcome.condition)) throw Error('Recuperación requiere reparación');
   }
   return command;
 }
@@ -198,7 +203,7 @@ export function applyCampaignCommand(state, raw) {
         lifetime = safeSum(lifetime, job.quantity);
       }
       safeSum(lifetime, command.quantity); // Reject an impossible future receipt before payment.
-      const dueAtSeconds = safeSum(next.clockSeconds, quote.leadSeconds);
+      const dueAtSeconds = addSeconds(next.clockSeconds, quote.leadSeconds);
       const paid = safeProduct(quote.price, command.quantity);
       pay(next, paid); availability.remaining -= command.quantity;
       next.jobs.push({ id: command.jobId, kind: 'delivery', quoteId: quote.id, toId: quote.toId,
@@ -209,7 +214,7 @@ export function applyCampaignCommand(state, raw) {
       newJob(next, command); const service = serviceFor(next, command, 'transfer');
       eventRoom(next, 2);
       if (!service.ammunitionIds.includes(command.ammunitionId)) throw Error('Munición no admitida por el servicio');
-      const dueAtSeconds = safeSum(next.clockSeconds, service.durationSeconds);
+      const dueAtSeconds = addSeconds(next.clockSeconds, service.durationSeconds);
       pay(next, service.fee);
       record(next, next.clockSeconds, 'transfer', { fromId: service.fromId, toId: service.transitId,
         ammunitionId: command.ammunitionId, quantity: command.quantity });
@@ -221,11 +226,11 @@ export function applyCampaignCommand(state, raw) {
     case 'repair': {
       newJob(next, command); const service = serviceFor(next, command, 'repair');
       eventRoom(next, 1);
-      if (!service.componentIds.includes(command.componentId) || condition(next, command.componentId) !== 'disabled') throw Error('Componente no reparable');
+      if (!service.componentIds.includes(command.componentId) || !['disabled', 'degraded'].includes(condition(next, command.componentId))) throw Error('Componente no reparable');
       if (next.jobs.some(job => job.kind === 'repair' && job.componentId === command.componentId && job.status === 'pending')) throw Error('Componente ya en reparación');
       const spare = next.spares.find(row => row.id === service.spareId);
       if (spare.quantity < service.spareQuantity) throw Error('Repuestos insuficientes');
-      const dueAtSeconds = safeSum(next.clockSeconds, service.durationSeconds);
+      const dueAtSeconds = addSeconds(next.clockSeconds, service.durationSeconds);
       pay(next, service.fee); spare.quantity -= service.spareQuantity;
       next.jobs.push({ id: command.jobId, kind: 'repair', serviceId: service.id, componentId: command.componentId,
         paid: service.fee, dueAtSeconds, status: 'pending' });
@@ -244,7 +249,7 @@ export function applyCampaignCommand(state, raw) {
         if (remaining) {
           if (job.status === 'interrupted') eventRoom(next, 1);
           const service = next.initial.services.find(row => row.id === job.serviceId);
-          const dueAtSeconds = safeSum(next.clockSeconds, service.durationSeconds);
+          const dueAtSeconds = addSeconds(next.clockSeconds, service.durationSeconds);
           pay(next, service.fee);
           job.returning = true; job.toId = job.recoveryId; job.quantity = remaining;
           job.paid = safeSum(job.paid, service.fee); job.dueAtSeconds = dueAtSeconds; job.status = 'pending';

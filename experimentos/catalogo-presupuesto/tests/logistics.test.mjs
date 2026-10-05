@@ -133,7 +133,7 @@ test('failed orders, services, invalid clocks and foreign commands are atomic', 
   let raw = demoCampaign(); raw.unit = 'USD-2026-minor';
   assert.throws(() => createCampaign(raw), /fuentes/);
   raw = demoCampaign(); raw.services[0].durationSeconds = 0;
-  assert.throws(() => createCampaign(raw), /entero/);
+  assert.throws(() => createCampaign(raw), /positiva/);
   raw = demoCampaign(); raw.spares[0].quantity = 0;
   let noSpares = createCampaign(raw);
   noSpares = apply(noSpares, 'outcome', { outcome: { kind: 'condition', componentId: 'radar', condition: 'disabled' } });

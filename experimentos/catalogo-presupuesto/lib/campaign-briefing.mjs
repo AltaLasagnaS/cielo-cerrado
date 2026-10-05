@@ -7,7 +7,7 @@ import { saveCampaign } from './logistics.mjs';
 export function buildCampaignBriefing(campaign, input) {
   saveCampaign(campaign);
   if (campaign.phase !== 'planning') throw Error('Briefing requiere preparación');
-  const briefing = normalizePreparationBriefing(input, { sideId: campaign.sideId, missionId: campaign.missions.at(-1).id });
+  const briefing = normalizePreparationBriefing(input, { sideId: campaign.sideId, missionId: campaign.missions.at(-1).id }, { fractionalTime: true });
   if (briefing.issuedAtSeconds !== campaign.clockSeconds) throw Error('Briefing debe usar el reloj actual');
   return deepFreeze({ format: 'cielo-cerrado/campaign-preparation-briefing', version: 1, ...briefing,
     resources: { unit: campaign.unit, balance: campaign.balance,
