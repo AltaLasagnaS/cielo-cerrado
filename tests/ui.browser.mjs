@@ -149,12 +149,27 @@ try {
   assert.equal(await page.locator('#view').inputValue(), 'def', 'la vista completa queda bloqueada en la guardia');
   await page.click('#mcBtn');
   assert.equal(await page.locator('#modal').isHidden(), true, 'Monte Carlo no se abre en la guardia');
-  const scenName = await page.evaluate(() => window.__S.scen?.name);
-  await page.setInputFiles('#loadScen', { name: 'otro.json', mimeType: 'application/json', buffer: Buffer.from('{}') });
-  assert.equal(await page.evaluate(() => window.__S.scen?.name), scenName, 'no se carga otro escenario');
+  const world = () => page.evaluate(() => JSON.stringify([window.__S.scen?.name, window.__S.started, window.__S.t, window.__S.setup]));
+  await page.evaluate(() => { window.__S.running = false; });   // en pausa, para que el reloj no se mueva
+  const w0 = await world();
+  // un escenario válido (el mismo exportado) tampoco entra: lo que importa es que no resetee el mundo
+  const scenJson = await page.evaluate(async () => JSON.stringify((await import('/sim/scenario-io.js')).exportScenario()));
+  await page.setInputFiles('#loadScen', { name: 'otro.json', mimeType: 'application/json', buffer: Buffer.from(scenJson) });
+  await page.waitForTimeout(100);
+  assert.equal(await world(), w0, 'no se carga otro escenario');
+  assert.equal(await page.evaluate(() => window.__dbg.loadFromObject({}).ok), false, 'ni por código');
   assert.equal(await page.locator('#modal').isHidden(), true, 'ni se abre la ventana de errores');
   await page.setInputFiles('#hgt', { name: 'N46E030.hgt', mimeType: 'application/octet-stream', buffer: Buffer.alloc(8) });
-  assert.equal(await page.evaluate(() => window.__S.scen?.name), scenName, 'no se carga otro relieve');
+  assert.equal(await world(), w0, 'no se carga otro relieve');
+  // borde (prueba de Codex en #69): sin amenazas vivas ni por llegar, en guardia el botón dice "Seguir"
+  // y no arma una corrida nueva
+  const edge = await page.evaluate(async () => {
+    const { togglePlay, updatePlay } = await import('/ui/controls.js'), S = window.__S, keep = [S.pending, S.threats, S.running];
+    S.running = false; S.pending = []; S.threats = []; updatePlay();
+    const label = document.querySelector('#play')?.textContent; togglePlay(); const out = [label, S.running, S.started];
+    [S.pending, S.threats, S.running] = keep; updatePlay(); return out;
+  });
+  assert.deepEqual(edge, ['▶ Seguir', true, true], 'en guardia el botón nunca es "Nueva corrida"');
   const run0 = await page.evaluate(() => window.__S.running);
   await page.click('#play');
   assert.deepEqual(await page.evaluate(() => [window.__S.running, window.__S.started]), [!run0, true], 'el botón pausa sin reiniciar');

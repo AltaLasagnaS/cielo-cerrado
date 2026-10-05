@@ -43,7 +43,7 @@ export function togglePlay() {
 
 /** Refresca el botón principal, la velocidad marcada y el reloj. */
 export function updatePlay() {
-  $('#play').textContent = S.running ? '❚❚ Pausa' : (S.started ? (S.pending.length || S.threats.some(t => t.alive) ? '▶ Seguir' : '↺ Nueva corrida') : '▶ Iniciar');
+  $('#play').textContent = S.running ? '❚❚ Pausa' : (S.started ? (campaignBattle() || S.pending.length || S.threats.some(t => t.alive) ? '▶ Seguir' : '↺ Nueva corrida') : '▶ Iniciar');
   for (const b of $('#speeds').children) b.classList.toggle('act', S.auto ? b.dataset.s === 'auto' : +b.dataset.s === S.speed);
   $('#clock').textContent = fmtT(S.t);
   renderTimeScale();

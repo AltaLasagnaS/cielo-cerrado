@@ -31,7 +31,6 @@ export function openMonteCarlo() {
     <div class="row"><button class="btn pri" id="mcGo">Correr</button></div>
   </div>`, openMonteCarlo);
   $('#mcGo').onclick = () => {
-    if (campaignBlocks('Monte Carlo')) return;
     if (!$('#mcSeed').reportValidity() || !Number.isFinite($('#mcSeed').valueAsNumber)) return;
     last = { runs: +$('#mcRuns').value, sample: $('#mcSample').checked, seed: $('#mcSeed').valueAsNumber };
     run(last);
@@ -40,6 +39,7 @@ export function openMonteCarlo() {
 
 /** Corre la serie con barra de progreso y al final abre el debrief Monte Carlo. */
 function run(opts) {
+  if (campaignBlocks('Monte Carlo')) return;
   resetSim();
   const mc = createMonteCarlo(opts), t0 = performance.now();
   openModal(`<header><h2>Monte Carlo en curso</h2></header><div class="bd">

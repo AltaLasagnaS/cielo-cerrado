@@ -23,7 +23,6 @@ export function initScenarioFile() {
   $('#saveScen').onclick = saveScenario;
   $('#loadScen').onchange = async e => {
     const f = e.target.files[0]; if (!f) return; e.target.value = '';
-    if (campaignBlocks('cargar un escenario')) return;
     if (f.size > MAX_BYTES) { showErrors(f.name, ['El archivo pesa más de 2 MB: no parece un escenario.']); return; }
     let raw;
     try { raw = JSON.parse(await f.text()); } catch (x) { showErrors(f.name, ['No es un JSON válido: ' + x.message]); return; }
@@ -44,6 +43,7 @@ export function saveScenario() {
 
 /** Valida y despliega un escenario leído de un archivo. Devuelve el resultado de la validación. */
 export function loadFromObject(raw, fileName = 'archivo') {
+  if (campaignBlocks('cargar un escenario')) return { ok: false, errors: ['Hay una guardia de campaña en curso.'], warnings: [], data: null };
   const res = validateScenario(raw);
   if (!res.ok) { showErrors(fileName, res.errors); return res; }
   const { data } = res; if (!data || !data.map) return res;

@@ -8918,13 +8918,13 @@ table.t.mc td.pc{white-space:nowrap}
     <div class="row"><button class="btn pri" id="mcGo">Correr</button></div>
   </div>`, openMonteCarlo);
     $("#mcGo").onclick = () => {
-      if (campaignBlocks("Monte Carlo")) return;
       if (!$("#mcSeed").reportValidity() || !Number.isFinite($("#mcSeed").valueAsNumber)) return;
       last = { runs: +$("#mcRuns").value, sample: $("#mcSample").checked, seed: $("#mcSeed").valueAsNumber };
       run(last);
     };
   }
   function run(opts) {
+    if (campaignBlocks("Monte Carlo")) return;
     resetSim();
     const mc = createMonteCarlo(opts), t0 = performance.now();
     openModal(`<header><h2>Monte Carlo en curso</h2></header><div class="bd">
@@ -10129,7 +10129,7 @@ table.t.mc td.pc{white-space:nowrap}
     updatePlay();
   }
   function updatePlay() {
-    $("#play").textContent = S.running ? "❚❚ Pausa" : S.started ? S.pending.length || S.threats.some((t) => t.alive) ? "▶ Seguir" : "↺ Nueva corrida" : "▶ Iniciar";
+    $("#play").textContent = S.running ? "❚❚ Pausa" : S.started ? campaignBattle() || S.pending.length || S.threats.some((t) => t.alive) ? "▶ Seguir" : "↺ Nueva corrida" : "▶ Iniciar";
     for (const b of $("#speeds").children) b.classList.toggle("act", S.auto ? b.dataset.s === "auto" : +b.dataset.s === S.speed);
     $("#clock").textContent = fmtT(S.t);
     renderTimeScale();
@@ -11202,7 +11202,6 @@ table.t.mc td.pc{white-space:nowrap}
       const f = e.target.files[0];
       if (!f) return;
       e.target.value = "";
-      if (campaignBlocks("cargar un escenario")) return;
       if (f.size > MAX_BYTES) {
         showErrors(f.name, ["El archivo pesa más de 2 MB: no parece un escenario."]);
         return;
@@ -11229,6 +11228,7 @@ table.t.mc td.pc{white-space:nowrap}
     toast("Escenario guardado: " + a.download);
   }
   function loadFromObject(raw, fileName = "archivo") {
+    if (campaignBlocks("cargar un escenario")) return { ok: false, errors: ["Hay una guardia de campaña en curso."], warnings: [], data: null };
     const res = validateScenario(raw);
     if (!res.ok) {
       showErrors(fileName, res.errors);
