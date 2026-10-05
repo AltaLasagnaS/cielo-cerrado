@@ -1,0 +1,19 @@
+{
+  "format": "cielo-cerrado/dbinfo-envelope-review",
+  "version": 1,
+  "sourceFile": "DBInfo.dat",
+  "sha256": "6d29f1bee13b4f4f6cca3447524a79e8fc80c733397d2bce9ce1b080f96f64c5",
+  "sourceBytes": 59592,
+  "encoding": "base64",
+  "decodedBytes": 44692,
+  "prefixLengthLittleEndian": 16,
+  "payloadBytes": 44672,
+  "payloadModulo16": 0,
+  "payloadEntropyBitsPerByte": 7.996198653609418,
+  "cipher": null,
+  "mode": null,
+  "keyDerivation": null,
+  "plaintextRecovered": false,
+  "databaseVersionsVerified": null,
+  "note": "Compatible con contenedor .NET de IV y cifrado en bloques; no confirma AES ni descifra. Hace falta el lector/clave del archivo para verificar el esquema."
+}

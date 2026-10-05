@@ -31,6 +31,17 @@ export function validateDatabaseReview(review) {
       }
       if (record.table === 'DataWeapon' && (record.seekerGimbalDegrees !== null
           || record.terminalLateralAccelerationMps2 !== null)) fail('Haz del radar no acredita gimbal ni aceleración terminal');
+      if (record.sensorCodes !== undefined) {
+        if (record.table !== 'DataSensor' || !Array.isArray(record.sensorCodes)) fail('Códigos de sensor inválidos');
+        else {
+          const codes = new Set();
+          for (const code of record.sensorCodes) {
+            if (!integer(code.CodeID) || code.CodeID === 0 || codes.has(code.CodeID)
+                || !(typeof code.Description === 'string' || code.Description === null)) fail('Código de sensor inválido/repetido');
+            codes.add(code.CodeID);
+          }
+        }
+      }
       if (record.table === 'DataMount') {
         if (record.realLauncherCompatibility !== null || !Array.isArray(record.weaponRecords)) fail('Carga del juego no certifica hardware');
         for (const load of record.weaponRecords ?? []) {
