@@ -88,3 +88,5 @@ blanco. `noReach`, `kill` y `pkMiss` vienen del evento de llegada; `other` conse
 las otras terminaciones sin atribuirles una causa no registrada. No sumar episodios
 o muestras como tiros/victorias recuperables. El resumen exige resultados completos
 por semilla idénticos al control anterior.
+
+La investigación adicional [coordinación de blancos](../../docs/investigacion/coordinacion-blancos.md) contrasta la propuesta de deconflicción por enlace del #64 con J-series, C2 de equipos MANPADS y cueing de drones interceptores. Distingue capacidades documentadas de políticas no encontradas y conserva el [registro de accesos](data/accesos-coordinacion.json); no cambia reglas ni resultados.
