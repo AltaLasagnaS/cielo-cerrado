@@ -1,6 +1,6 @@
 # Pendientes identificados y criterios de cierre
 
-Registro original: 4 de octubre de 2026, `9cafba0`. Estado reconciliado el 5 de octubre contra `main` `0a77102` (merge #59), el contrato experimental #61 y el PR abierto #64. **Pendiente** no significa fallo reproducido; las mejoras de comportamiento se separan de bugs. El roadmap físico activo sigue siendo `ROADMAP.md`, no esta lista.
+Registro original: 4 de octubre de 2026, `9cafba0`. Estado reconciliado el 5 de octubre contra `main` `f0428e4` (merge #68, que incluye #61 y la campaña nativa; #64 ya mergeado). **Pendiente** no significa fallo reproducido; las mejoras de comportamiento se separan de bugs. El roadmap físico activo sigue siendo `ROADMAP.md`, no esta lista.
 
 | ID | Pedido / estado | Criterio de cierre y dependencia |
 |---|---|---|
@@ -13,13 +13,13 @@ Registro original: 4 de octubre de 2026, `9cafba0`. Estado reconciliado el 5 de 
 | UX07 | Fijar una pista aérea y consultar su información — implementado en main (#59) | Contactos y ficha conocida; la auditoría de pérdida y antigüedad continúa con perspectivas. No equivale a lock de tiro |
 | F01 | Pertenencia al C2 por unidad — implementada en main (#59) | Independiente de `u.link`; revisar conocimiento y aislamiento en las perspectivas restringidas |
 | F02 | Doctrina de señuelos por unidad — implementada en main (#59) | Heredar/ignorar/permitir; clasificación conocida, no identidad real oculta |
-| F03 | Selección múltiple y edición grupal — Shift+clic implementado en main (#59) | Edición común y borrado con confirmación. Selección por rectángulo sigue como ampliación |
-| F04 | Dos perspectivas restringidas — parcial en main; continuación en #64 | #64 agrega tiro sobre observaciones y vista del atacante. Registro/resultados/debrief siguen pendientes de restricción; ubicación SIGINT automática y balísticos verdaderos requieren revisión. No se cierra por ocultar iconos |
-| F05 | Briefing + recursos — campaña experimental jugable #61 | Dos guardias conectadas al motor, libro único y vista propia probados en Chromium; contrato `missionReport` v1 para Claude. Falta enganche al menú/controller nativo |
+| F03 | Selección múltiple y edición grupal — implementada en main (#59/#64) | Shift+clic, Shift+rectángulo, edición común y borrado con confirmación; prueba de navegador nativa |
+| F04 | Dos perspectivas y tiro observado — implementados en main (#64) | Registro, resultados y objetivos por bando; el debrief de laboratorio explica la verdad. El parte atacante de campaña requiere decidir conocimiento/BDA; los controles de campaña tienen Q05 pendiente |
+| F05 | Briefing + recursos — campaña nativa en main (#68, incluye #61) | Dos guardias, preparación/compra/carga/reparación, libro único y contrato missionReport v1; Chromium de punta a punta. Créditos y plazos hipotéticos, no precios reales; falta cerrar Q05 |
 | F06 | Variantes y componentes — seis fichas y contrato experimental #61 | Inventario tipado, dependencias, cargas completas admitidas y pérdidas localizadas probados. Falta primera configuración activa con versión/operador/fecha/evidencia y rangos UNC completos; adaptador legado explícito; ninguna habilitación masiva |
-| F07 | Movilidad, despliegue y EMCON/ESM — diseño | Estados/tiempos/capacidades documentados; marcación pasiva no es pista de tiro; no inventar red vial a partir de SRTM |
-| F08 | Logística — puente de combate experimental #61, nativo pendiente | Libro único, recargas temporizadas y pérdidas conectado al motor sin editar `src/`; faltan trayectos geográficos, severidad de averías y enganche al controller nativo |
-| F09 | Campaña persistente — dos guardias jugables en #61 | Conserva recursos, daños, trabajos, posiciones y reportes fechados, con guardado entre misiones. Falta integrar pantalla nativa, campaña atacante/BDA y restauración del mundo durante combate. No se cierra por tener este experimento |
+| F07 | Movilidad/despliegue — diseño; control de emisiones en main (#64) | Radares siempre/alerta/apagados ya disponibles. Falta tiempo de encendido por radar y doctrina con evidencia, trayectos y estados de movimiento/despliegue; no inventar red vial a partir de SRTM |
+| F08 | Logística — integrada en campaña nativa (#68) | Libro único, recargas temporizadas y pérdidas conectado al controlador; faltan trayectos geográficos y severidad de averías documentada |
+| F09 | Campaña persistente — dos guardias nativas en main (#68) | Conserva recursos, daños, trabajos, posiciones y reportes fechados, guardado entre misiones. Tercera guardia opcional preparada en esta entrega, sin migrar partidas existentes; faltan selección nativa, atacante/BDA y restauración durante combate |
 | F10 | Aviación con misiones — diferido | Después de movilidad/campaña: combustible/cargas/bases y funciones, no sólo iconos de cazas |
 | R01 | Parámetros/precios/configuraciones verificadas — investigación parcial | Fuente por campo/condición; `unknown/null` cuando falte evidencia; ver cola de investigación |
 | R02 | Referencias CMO/Fleet — revisión de fichas en #63; bases modernas recibidas | El usuario autoriza datos secundarios de confianza media-baja. Conservar versión, campo, unidad e incertidumbre; no importar Pk genéricas, adivinar unidades ni redistribuir bases completas |
@@ -27,6 +27,7 @@ Registro original: 4 de octubre de 2026, `9cafba0`. Estado reconciliado el 5 de 
 | Q02 | Límite inferior del perfil — cerrado en main (#47) | `solveTd` corrige el caso; `tests/interceptor.test.js` prueba R menor/igual a distancia acelerando. La nota preservada conserva el diagnóstico histórico |
 | Q03 | MANPADS legado no implica equivalencia — aclaración en main (#47) | `docs/FISICA.md` §6 y UNC explican ausencia de datos y diferencias Stinger/Igla/RBS 70. Variantes separadas siguen pendientes |
 | Q04 | Técnica/replay/idioma/CI — roadmap de Claude | Consultar estado actual antes de tomar tareas; replay/debrief de campaña respetan vista por bando |
+| Q05 | Controles que alteran una guardia de campaña — bugs reproducidos, entregados a Claude | En f31738a/main f0428e4: vista completa aceptada, cargar escenario y Monte Carlo resetean el mundo mientras sigue activo el libro. Reproducción y reparto en [#62](https://github.com/AltaLasagnaS/cielo-cerrado/issues/62#issuecomment-6002465534). No cerrado por la prueba del camino feliz |
 
 ## Orden seguro, no fecha de entrega
 
