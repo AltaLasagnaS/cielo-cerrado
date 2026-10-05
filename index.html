@@ -3504,6 +3504,10 @@ table.t.mc td.pc{white-space:nowrap}
       /** @type {any} */
       null
     ),
+    box: (
+      /** @type {any} */
+      null
+    ),
     // última cobertura calculada (grilla y % del mapa cubierto)
     _cov: (
       /** @type {any} */
@@ -6033,6 +6037,16 @@ table.t.mc td.pc{white-space:nowrap}
       ctx.arc(sx, sy, (f.big ? 6 : 3) + k * (f.big ? 26 : 14), 0, 7);
       ctx.stroke();
       ctx.globalAlpha = 1;
+    }
+    if (S.box) {
+      const [x1, y1] = toS(...S.box.a), [x2, y2] = toS(...S.box.b);
+      ctx.strokeStyle = "#e6a53c";
+      ctx.lineWidth = 1.2;
+      ctx.setLineDash([4, 3]);
+      ctx.strokeRect(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1));
+      ctx.setLineDash([]);
+      ctx.fillStyle = "rgba(230,165,60,.08)";
+      ctx.fillRect(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1));
     }
     if (S.mode === "measure" && S.measure?.a) drawMeasure(S.measure);
   }
@@ -8696,6 +8710,18 @@ table.t.mc td.pc{white-space:nowrap}
       renderSel();
     }
   }
+  function boxSelect() {
+    const b = S.box;
+    S.box = null;
+    if (!b) return;
+    const [x0, x1] = [Math.min(b.a[0], b.b[0]), Math.max(b.a[0], b.b[0])], [y0, y1] = [Math.min(b.a[1], b.b[1]), Math.max(b.a[1], b.b[1])];
+    const ins = S.setup.defs.filter((u) => u.x >= x0 && u.x <= x1 && u.y >= y0 && u.y <= y1).map((u) => u.id);
+    if (!S.multi.length && S.sel?.kind === "def") S.multi = [S.sel.id];
+    S.multi = [.../* @__PURE__ */ new Set([...S.multi, ...ins])];
+    S.sel = S.multi.length === 1 ? { kind: "def", id: S.multi[0] } : null;
+    if (S.multi.length === 1) S.multi = [];
+    renderSel();
+  }
   function initInput() {
     cv.addEventListener("pointerdown", (e) => {
       cv.setPointerCapture(e.pointerId);
@@ -8723,7 +8749,9 @@ table.t.mc td.pc{white-space:nowrap}
         if (!g.kind) {
           if (Math.hypot(sx - g.sx, sy - g.sy) < DRAG_PX) return;
           const movable = S.mode === "select" && !S.started && g.hit && SETUP_LIST[g.hit.kind];
-          g.kind = movable ? "move" : "pan";
+          const box = S.mode === "select" && !S.started && g.shift && !g.hit;
+          g.kind = movable ? "move" : box ? "box" : "pan";
+          if (box) S.box = { a: toW(g.sx, g.sy), b: toW(sx, sy) };
           if (movable) {
             S.sel = g.hit;
             renderSel();
@@ -8732,6 +8760,10 @@ table.t.mc td.pc{white-space:nowrap}
         if (g.kind === "pan") {
           V.cx = g.cx - (sx - g.sx) / V.s;
           V.cy = g.cy - (sy - g.sy) / V.s;
+          return;
+        }
+        if (g.kind === "box") {
+          if (S.box) S.box.b = toW(sx, sy);
           return;
         }
         const [wx, wy] = toW(sx, sy), o = SETUP_LIST[g.hit.kind]().find((v) => v.id === g.hit.id);
@@ -8755,7 +8787,7 @@ table.t.mc td.pc{white-space:nowrap}
       else if (g.kind === "move") {
         schedCov();
         renderSel();
-      }
+      } else if (g.kind === "box") boxSelect();
     };
     cv.addEventListener("pointerup", endPtr);
     cv.addEventListener("pointercancel", endPtr);
@@ -8872,7 +8904,7 @@ table.t.mc td.pc{white-space:nowrap}
   function initHelp() {
     $("#helpBtn").onclick = () => openModal(`<header><h2>Cómo se usa</h2><button class="btn x">Cerrar</button></header><div class="bd">
   <ul>
-    <li><b>Defensa:</b> elegí un sistema y tocá el mapa. Seleccionalo para cambiar mástil, orientación del sector (Patriot, S-400), rumbo del AEW, munición e interceptores por blanco. Arrastrá para mover.</li>
+    <li><b>Defensa:</b> elegí un sistema y tocá el mapa. Seleccionalo para cambiar mástil, orientación del sector (Patriot, S-400), rumbo del AEW, munición e interceptores por blanco. Arrastrá para mover. Shift + click suma o saca defensas de un grupo, y Shift + arrastrar sobre el mapa vacío las selecciona con un rectángulo, para cambiarles algo a todas juntas. En cada radar podés elegir cuándo emite (siempre, con la primera alerta o nunca): uno que emite ve, pero el enemigo lo ubica.</li>
     <li><b>Ataque:</b> elegí el arma, cantidad, horario (o "sincronizar llegada" para saturar), altura y maniobra; después "Trazar ruta". Los balísticos y supersónicos se lanzan desde fuera del mapa en la dirección que marques.</li>
     <li><b>Guerra electrónica:</b> jammers de ruido (aéreo o Krasukha) y supresor GNSS. Las líneas violeta muestran qué radar está siendo interferido.</li>
     <li><b>Cobertura:</b> el mapa sombrea en turquesa dónde tus sensores ven un blanco de referencia a cierta altura sobre el terreno, considerando relieve real, curvatura terrestre, RCS en la banda de cada radar e interferencia. Bajá la altura y vas a ver aparecer los huecos de los valles.</li>

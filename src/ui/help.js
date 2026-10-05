@@ -6,7 +6,7 @@ import { openModal } from './fichas.js';
 export function initHelp() {
 $('#helpBtn').onclick = () => openModal(`<header><h2>Cómo se usa</h2><button class="btn x">Cerrar</button></header><div class="bd">
   <ul>
-    <li><b>Defensa:</b> elegí un sistema y tocá el mapa. Seleccionalo para cambiar mástil, orientación del sector (Patriot, S-400), rumbo del AEW, munición e interceptores por blanco. Arrastrá para mover.</li>
+    <li><b>Defensa:</b> elegí un sistema y tocá el mapa. Seleccionalo para cambiar mástil, orientación del sector (Patriot, S-400), rumbo del AEW, munición e interceptores por blanco. Arrastrá para mover. Shift + click suma o saca defensas de un grupo, y Shift + arrastrar sobre el mapa vacío las selecciona con un rectángulo, para cambiarles algo a todas juntas. En cada radar podés elegir cuándo emite (siempre, con la primera alerta o nunca): uno que emite ve, pero el enemigo lo ubica.</li>
     <li><b>Ataque:</b> elegí el arma, cantidad, horario (o "sincronizar llegada" para saturar), altura y maniobra; después "Trazar ruta". Los balísticos y supersónicos se lanzan desde fuera del mapa en la dirección que marques.</li>
     <li><b>Guerra electrónica:</b> jammers de ruido (aéreo o Krasukha) y supresor GNSS. Las líneas violeta muestran qué radar está siendo interferido.</li>
     <li><b>Cobertura:</b> el mapa sombrea en turquesa dónde tus sensores ven un blanco de referencia a cierta altura sobre el terreno, considerando relieve real, curvatura terrestre, RCS en la banda de cada radar e interferencia. Bajá la altura y vas a ver aparecer los huecos de los valles.</li>

@@ -144,6 +144,8 @@ export function draw() {
   const now = performance.now();
   S.fx = S.fx.filter(f => now - f.rt < 1400);
   for (const f of S.fx) { const k = (now - f.rt) / 1400, [sx, sy] = toS(f.x, f.y); ctx.strokeStyle = f.c; ctx.globalAlpha = 1 - k; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(sx, sy, (f.big ? 6 : 3) + k * (f.big ? 26 : 14), 0, 7); ctx.stroke(); ctx.globalAlpha = 1; }
+  // rectángulo de selección múltiple (Shift + arrastrar, ui/input.js#boxSelect)
+  if (S.box) { const [x1, y1] = toS(...S.box.a), [x2, y2] = toS(...S.box.b); ctx.strokeStyle = '#e6a53c'; ctx.lineWidth = 1.2; ctx.setLineDash([4, 3]); ctx.strokeRect(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1)); ctx.setLineDash([]); ctx.fillStyle = 'rgba(230,165,60,.08)'; ctx.fillRect(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1)); }
   // regla de medición (modo 'measure', ui/input.js): solo puntos que tocó el usuario, nada oculto
   if (S.mode === 'measure' && S.measure?.a) drawMeasure(S.measure);
 }

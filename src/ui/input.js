@@ -80,6 +80,20 @@ function click(g) {
   if (g.hit) { S.sel = g.hit; renderSel(); }
 }
 
+/**
+ * Termina el rectángulo de selección (S.box, en km): suma al grupo las defensas que quedaron adentro.
+ * Solo las del armado (antes de iniciar), así que no consulta nada oculto.
+ */
+export function boxSelect() {
+  const b = S.box; S.box = null; if (!b) return;
+  const [x0, x1] = [Math.min(b.a[0], b.b[0]), Math.max(b.a[0], b.b[0])], [y0, y1] = [Math.min(b.a[1], b.b[1]), Math.max(b.a[1], b.b[1])];
+  const ins = S.setup.defs.filter(u => u.x >= x0 && u.x <= x1 && u.y >= y0 && u.y <= y1).map(u => u.id);
+  if (!S.multi.length && S.sel?.kind === 'def') S.multi = [S.sel.id];
+  S.multi = [...new Set([...S.multi, ...ins])];
+  S.sel = S.multi.length === 1 ? { kind: 'def', id: S.multi[0] } : null; if (S.multi.length === 1) S.multi = [];
+  renderSel();
+}
+
 export function initInput() {
 cv.addEventListener('pointerdown', e => {
   cv.setPointerCapture(e.pointerId); pointers.set(e.pointerId, evPos(e));
@@ -97,10 +111,14 @@ cv.addEventListener('pointermove', e => {
       if (Math.hypot(sx - g.sx, sy - g.sy) < DRAG_PX) return;
       // arrastrar algo ya ubicado solo en modo selección y antes de iniciar; si no, se mueve el mapa
       const movable = S.mode === 'select' && !S.started && g.hit && SETUP_LIST[g.hit.kind];
-      g.kind = movable ? 'move' : 'pan';
+      // Shift + arrastrar sobre el mapa vacío (antes de iniciar): rectángulo de selección múltiple (F03)
+      const box = S.mode === 'select' && !S.started && g.shift && !g.hit;
+      g.kind = movable ? 'move' : box ? 'box' : 'pan';
+      if (box) S.box = { a: toW(g.sx, g.sy), b: toW(sx, sy) };
       if (movable) { S.sel = g.hit; renderSel(); }
     }
     if (g.kind === 'pan') { V.cx = g.cx - (sx - g.sx) / V.s; V.cy = g.cy - (sy - g.sy) / V.s; return; }
+    if (g.kind === 'box') { if (S.box) S.box.b = toW(sx, sy); return; }
     const [wx, wy] = toW(sx, sy), o = SETUP_LIST[g.hit.kind]().find(v => v.id === g.hit.id);
     if (o) {
       o.x = +wx.toFixed(2); o.y = +wy.toFixed(2);
@@ -117,6 +135,7 @@ const endPtr = e => {
   if (!g || e.type === 'pointercancel') return;
   if (!g.kind) click(g);
   else if (g.kind === 'move') { schedCov(); renderSel(); }
+  else if (g.kind === 'box') boxSelect();
 };
 cv.addEventListener('pointerup', endPtr); cv.addEventListener('pointercancel', endPtr);
 cv.addEventListener('pointerleave', () => { $('#tip').hidden = true; });
