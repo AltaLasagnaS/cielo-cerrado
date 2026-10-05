@@ -1,6 +1,6 @@
 # Paquete paralelo: catálogo y asignación de recursos
 
-Contratos de componentes, recursos y campaña, conservados en una carpeta independiente. El juego nativo los importa desde #68 para ejecutar dos guardias de Odesa con el motor actual y un libro único de recursos; también sigue disponible la demo independiente. Las variantes de referencia no se habilitan automáticamente ni cambian las golden. Esta entrega agrega una definición opcional de tres guardias, sin modificar la campaña que crea el menú.
+Contratos de componentes, recursos y campaña, conservados en una carpeta independiente. El juego nativo los importa desde #68 para ejecutar dos guardias de Odesa con el motor actual y un libro único de recursos; también sigue disponible la demo independiente. Las variantes de referencia no se habilitan automáticamente ni cambian las golden. Desde #69 el menú ofrece elegir dos o tres guardias (la tercera es la definición opcional de esta carpeta).
 
 ## Qué está implementado
 
@@ -43,7 +43,7 @@ Ninguna configuración nueva está habilitada en el simulador. Los parámetros f
 
 Las configuraciones son candidatos de investigación; la compatibilidad familiar no prueba la composición, disponibilidad nacional, fecha, carga mixta ni empleo remoto de una batería concreta.
 
-El prototipo contable y la demo independiente conservan sus pantallas. El juego tiene su propia pantalla Campaña, que usa el mismo libro logístico, sin duplicar existencias. El contrato de componentes registra consecuencias autorizadas por el motor; no calcula daño. La extensión logística agenda traslados, entregas y reparación con plazos explícitos, sin simular trayectos, personal ni severidad de averías. La integración nativa funciona para dos guardias; faltan selección explícita de tres, campaña atacante y restauración del mundo a mitad del combate. Los controles de campaña tienen la auditoría Q05 pendiente.
+El prototipo contable y la demo independiente conservan sus pantallas. El juego tiene su propia pantalla Campaña, que usa el mismo libro logístico, sin duplicar existencias. El contrato de componentes registra consecuencias autorizadas por el motor; no calcula daño. La extensión logística agenda traslados, entregas y reparación con plazos explícitos, sin simular trayectos, personal ni severidad de averías. La integración nativa funciona para dos o tres guardias (selección en el menú desde #69); faltan campaña atacante y restauración del mundo a mitad del combate. Los controles que alteraban una guardia (Q05) quedan bloqueados desde #69, con prueba de regresión.
 
 Las cotizaciones se congelan al crear el plan. Los montos son enteros: `credits` identifica créditos ficticios; `USD-2025-minor`, por ejemplo, indica unidades monetarias menores con moneda/año, no permite mezclar ni convertir monedas. La exigencia de referencias es una comprobación de metadatos, no una auditoría automática de veracidad de precios.
 

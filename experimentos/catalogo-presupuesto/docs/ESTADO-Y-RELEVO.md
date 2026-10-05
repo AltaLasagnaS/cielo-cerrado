@@ -30,11 +30,11 @@ Conservar todo lo conversado y el trabajo previo, mantener la estructura del pro
 | Área | Qué hay | Qué NO hay todavía |
 |---|---|---|
 | Catálogo | Referencias, fuentes y validadores; diez candidatos deshabilitados | Nuevas configuraciones activas o prestaciones/precios certificados |
-| Presupuesto | Pantalla de campaña nativa con asignación, compras/plazos/cancelación; libro único conectado al combate (#68) | Precios reales certificados; protección completa de los controles de campaña (Q05) |
+| Presupuesto | Pantalla de campaña nativa con asignación, compras/plazos/cancelación; libro único conectado al combate (#68) | Precios reales certificados (controles de campaña Q05 cerrados en #69) |
 | Componentes/logística | Inventario tipado por depósito/lanzador, cargas explícitas, daño autorizado, tránsito, entregas, reparación con fondos/repuestos; puente conectado al controlador nativo | Variantes nuevas activas, trayectos geográficos y severidad de averías documentada |
-| Continuidad | Dos guardias nativas con daño/munición/ofertas/fondos/repuestos/trabajos, posiciones, reloj e informes persistentes; guardado estratégico con replay | Tercera guardia seleccionable en menú (definición opcional preparada aquí), campaña atacante y restauración del mundo durante combate |
+| Continuidad | Dos guardias nativas con daño/munición/ofertas/fondos/repuestos/trabajos, posiciones, reloj e informes persistentes; guardado estratégico con replay | Campaña atacante (la tercera guardia ya se elige en el menú desde #69) y restauración del mundo durante combate |
 | Briefing propio | Preparación, recursos y reportes fechados; contactos en combate y parte propio, perspectivas/tiro observado (#64/#68) | BDA incierto y política de revelación del resultado para la campaña atacante; auditoría de aislamiento completa |
-| Pedidos de interfaz | Delete/enteros/explicación C2, regla, track, doctrina, selección múltiple/rectángulo, rótulos y C2 individual en main | Menú/tutorial experimental #66 pendiente de integración; controles de campaña Q05 |
+| Pedidos de interfaz | Delete/enteros/explicación C2, regla, track, doctrina, selección múltiple/rectángulo, rótulos y C2 individual en main | Menú/tutorial experimental #66 pendiente de integración (controles de campaña Q05 cerrados en #69) |
 | Física | `solveTd` corregido en main; investigación independiente #54–58. No se modifica desde esta entrega | Validación completa de todos los supuestos; los datos desconocidos no se completan artificialmente |
 
 La lógica de recursos sigue en `experimentos/catalogo-presupuesto/`; desde #68 `src/ui/campaign.js` importa sus módulos directamente, sin copiarlos. La extensión de tres guardias agrega una definición opcional y pruebas; no modifica los ataques del catálogo ni las golden. Su documentación está en `docs/investigacion/tercera-guardia-odesa.md` desde la raíz del repositorio.
@@ -49,9 +49,9 @@ Cada ampliación exige designar un único responsable para los archivos comparti
 
 ## Siguiente entrega segura
 
-1. Cerrar los controles de campaña Q05 con pruebas de regresión y revisar conocimiento por bando.
+1. Revisar conocimiento por bando (los controles de campaña Q05 quedaron cerrados en #69 con prueba de regresión).
 2. Completar una configuración del catálogo por vez, sin tocar consumidores hasta tener evidencia suficiente.
-3. Mantener el reparto confirmado: Claude integra selección explícita de dos/tres guardias en `src/`; Codex entrega definición/pruebas aparte y actualiza #63/#65/#66/#67 contra main.
+3. Mantener el reparto confirmado: Claude integró la selección de dos/tres guardias en `src/` (#69); Codex entrega definición/pruebas aparte y actualiza #63/#65/#66/#67 contra main.
 4. Continuar variantes verificadas, movilidad y campaña atacante; presupuesto/logística/persistencia de dos guardias ya funcionan en la pantalla nativa.
 
 ## Cómo retomar sin perder contexto

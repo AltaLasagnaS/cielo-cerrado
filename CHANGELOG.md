@@ -67,6 +67,7 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 - El MANPADS conserva el modelo legado de velocidad constante **por falta de datos**: no valida que Stinger, Igla y RBS 70 sean equivalentes (docs/FISICA.md §6 y nota en `UNC`).
 
 ### Corregido
+- **Campaña: controles que alteraban una guardia en curso** (auditoría Q05 de Codex, #62): durante la guardia ya no se puede pasar a la vista completa o del atacante, cargar un escenario o un relieve, ni abrir o correr Monte Carlo (antes reseteaban el mundo con el libro de recursos activo); el botón principal y la barra espaciadora solo pausan y siguen. Prueba de navegador. No cambia la simulación.
 - **El modo DRFM del jammer se perdía al cargar** un escenario o un archivo (`addJam` solo aceptaba puntual o barrera). Prueba nueva.
 - `solveTd` devolvía un frenado de 0,001 s, sin solución real, cuando el misil ya pasaba el alcance acelerando (`R ≤ vmax·tb/2`); ahora vuela sin frenar, como en los otros casos sin solución, y se verifica que la bisección encierre la solución. No pasa con los valores probables del catálogo (las golden no cambian por esto). Lo encontró la revisión de Codex (`experimentos/catalogo-presupuesto/docs/NOTA-INTERCEPTOR.md`).
 

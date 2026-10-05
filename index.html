@@ -8903,6 +8903,7 @@ table.t.mc td.pc{white-space:nowrap}
   var SIDE = { ataque: "Ataque", defensa: "Defensa" };
   var last = { runs: 20, sample: true, seed: 1 };
   function openMonteCarlo() {
+    if (campaignBlocks("Monte Carlo")) return;
     if (!S.setup.salvos.length) {
       toast("Agregá al menos un ataque en la pestaña Ataque.");
       return;
@@ -8917,6 +8918,7 @@ table.t.mc td.pc{white-space:nowrap}
     <div class="row"><button class="btn pri" id="mcGo">Correr</button></div>
   </div>`, openMonteCarlo);
     $("#mcGo").onclick = () => {
+      if (campaignBlocks("Monte Carlo")) return;
       if (!$("#mcSeed").reportValidity() || !Number.isFinite($("#mcSeed").valueAsNumber)) return;
       last = { runs: +$("#mcRuns").value, sample: $("#mcSample").checked, seed: $("#mcSeed").valueAsNumber };
       run(last);
@@ -9166,6 +9168,11 @@ table.t.mc td.pc{white-space:nowrap}
   var ES = { operational: "operativo", degraded: "degradado", disabled: "fuera de servicio", destroyed: "destruido", pending: "en curso", interrupted: "interrumpido", completed: "terminado", cancelled: "cancelado", delivery: "Entrega", transfer: "Carga", repair: "Reparación", return: "Devolución", sensor: "sensor", launcher: "lanzador", control: "control" };
   var es = (k) => ES[k] || k;
   var campaignBattle = () => !!combat && operation?.phase === "active";
+  function campaignBlocks(what = "eso") {
+    if (!campaignBattle()) return false;
+    toast(`Hay una guardia de campaña en curso: ${what} queda bloqueado hasta terminarla.`);
+    return true;
+  }
   function campaignStep() {
     if (!combat) return false;
     let more = false;
@@ -10083,14 +10090,15 @@ table.t.mc td.pc{white-space:nowrap}
     };
     $("#play").onclick = togglePlay;
     $("#reset").onclick = () => {
-      if (campaignBattle()) {
-        toast("Hay una guardia de campaña en curso: terminala primero.");
-        return;
-      }
+      if (campaignBlocks("reiniciar")) return;
       resetSim();
       renderAll();
     };
-    $("#view").onchange = () => {
+    $("#view").onchange = (e) => {
+      if (campaignBattle() && e.target.value !== "def") {
+        e.target.value = "def";
+        campaignBlocks("cambiar de vista");
+      }
       renderAll();
       renderStats();
       renderLog();
@@ -10100,6 +10108,11 @@ table.t.mc td.pc{white-space:nowrap}
   }
   function togglePlay() {
     if (isMonteCarloRunning()) return;
+    if (campaignBattle()) {
+      S.running = !S.running;
+      updatePlay();
+      return;
+    }
     if (!S.started) {
       if (!S.setup.salvos.length) {
         toast("Agregá al menos un ataque en la pestaña Ataque.");
@@ -10813,6 +10826,7 @@ table.t.mc td.pc{white-space:nowrap}
       const f = e.target.files[0];
       if (!f) return;
       e.target.value = "";
+      if (campaignBlocks("cargar relieve")) return;
       const tile = parseHgtName(f.name);
       if (!tile) {
         toast("El nombre del archivo tiene que ser tipo N50E030.hgt");
@@ -11188,6 +11202,7 @@ table.t.mc td.pc{white-space:nowrap}
       const f = e.target.files[0];
       if (!f) return;
       e.target.value = "";
+      if (campaignBlocks("cargar un escenario")) return;
       if (f.size > MAX_BYTES) {
         showErrors(f.name, ["El archivo pesa más de 2 MB: no parece un escenario."]);
         return;
