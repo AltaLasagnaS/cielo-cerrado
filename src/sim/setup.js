@@ -1,7 +1,7 @@
 // @ts-check
 // ---------------- ARMADO DEL ESCENARIO ----------------
 // Funciones para agregar defensas, salvas y jammers a S.setup (antes de iniciar la corrida).
-import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES, C2_LEVELS, c2FromNet, WEATHER, WEATHER_DEFAULT, TIMES_OF_DAY, TOD_DEFAULT, GATEWAYS, JAM_MODES } from '../data/index.js';
+import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES, C2_LEVELS, c2FromNet, WEATHER, WEATHER_DEFAULT, TIMES_OF_DAY, TOD_DEFAULT, GATEWAYS, JAM_MODES, UNIT_TARGET } from '../data/index.js';
 import { azOf } from '../util/math.js';
 import { nextId } from '../util/ids.js';
 import { S } from './state.js';
@@ -13,8 +13,13 @@ export function addDef(type, x, y, o = {}) {
   if (o.c2) u.c2 = o.c2;
   if (o.cp) u.cp = o.cp;
   if (o.owner === 'UA' || o.owner === 'RU') u.owner = o.owner;   // quién la opera (data/index.js#sideOf)
-  if (o.decoyDoc === 'ignorar' || o.decoyDoc === 'tirar') u.decoyDoc = o.decoyDoc;
-  if (o.emcon === 'alerta' || o.emcon === 'silencio') u.emcon = o.emcon;   // control de emisiones (sim/contacts.js#emitting); sin dato, emite siempre   // doctrina de señuelos propia; sin dato, la general   // puesto de mando (physics/engagement.js#cpOf); sin dato, el principal
+  if (o.decoyDoc === 'ignorar' || o.decoyDoc === 'tirar') u.decoyDoc = o.decoyDoc;   // doctrina de señuelos propia; sin dato, la general
+  if (o.emcon === 'alerta' || o.emcon === 'silencio') u.emcon = o.emcon;   // control de emisiones (sim/contacts.js#emitting); sin dato, emite siempre
+  // estado heredado de una misión anterior (campaña, sim/mission.js): vida y componentes dañados
+  if (Number.isFinite(o.hp) && o.hp > 0 && o.hp < UNIT_TARGET.hp) u.hp = Math.round(o.hp);
+  if (o.dmgRadar === true) u.dmgRadar = true;
+  if (o.dmgLauncher === true) u.dmgLauncher = true;
+  if (Number.isInteger(o.mag) && o.mag >= 0 && d.sam) u.mag = o.mag;
   S.setup.defs.push(u); return u;
 }
 
@@ -46,6 +51,7 @@ export function addObj(type, x, y, o = {}) {
   const n = S.setup.objs.filter(g => g.type === type).length + 1;
   const g = { id: nextId(), type, x, y, name: o.name || tt.name + ' ' + n, short: o.short || '', maxHp: o.hp || tt.hp, desc: o.desc || '' };
   if (o.cp) g.cp = o.cp;   // nodo de C2 de un puesto de mando (solo afecta a sus unidades)
+  if (Number.isFinite(o.hpNow) && o.hpNow >= 0 && o.hpNow < g.maxHp) g.hpNow = Math.round(o.hpNow);   // vida al empezar (campaña); sin dato, entera
   S.setup.objs.push(g); return g;
 }
 

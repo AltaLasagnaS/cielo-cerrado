@@ -55,6 +55,7 @@ El juego es una página web estática hecha con **JavaScript moderno (módulos E
 - `contacts.js`: lo que sabe cada bando: la defensa de cada amenaza (última detección, posición estimada, edad; pistas por radar y por red en `th.obs`) y el atacante de cada defensa (`attackerKnows`). Lo usan las vistas y la solución de tiro.
 - `ew.js`: guerra electrónica de la defensa (triangulación de jammers, home-on-jam). `weather-now.js`: clima vigente (plan de cambios, día y noche).
 - `goals.js`, `debrief.js`: evaluación de metas y análisis final.
+- `mission.js`: informe de fin de misión para la campaña (`missionReport(bando)`): metas de ese bando, sus medios (vida, componentes, munición, si el enemigo los ubicó), el registro como lo conoce y lo gastado. La continuidad entra por el armado: `defs[].hp`, `dmgRadar`, `dmgLauncher`, `mag`, `reserve` y `objectives[].hpNow`.
 - `pace.js`: fases del modo de velocidad Auto.
 - `hooks.js`: enganches hacia la interfaz.
 

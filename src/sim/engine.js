@@ -28,9 +28,9 @@ import { noteSeen, noteObs, emitting, isEmitter } from './contacts.js';
 
 /** Arma la corrida a partir de S.setup: copia unidades y jammers y programa todos los lanzamientos. */
 export function startSim() {
-  S.units = S.setup.defs.map(d => ({ ...d, alive: true, hp: UNIT_TARGET.hp, dmgRadar: false, dmgLauncher: false, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
+  S.units = S.setup.defs.map(d => ({ ...d, alive: true, hp: d.hp ?? UNIT_TARGET.hp, dmgRadar: !!d.dmgRadar, dmgLauncher: !!d.dmgLauncher, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
   S.jamsLive = S.setup.jams.map(j => ({ ...j, _losMap: {}, hp: UNIT_TARGET.hp })); S.hoj = []; S.ewNext = 0; wxReset();
-  S.objs = S.setup.objs.map(g => ({ ...g, hp: g.maxHp, status: 'operational', hits: 0, dmgBy: {} }));
+  S.objs = S.setup.objs.map(g => { const hp = g.hpNow ?? g.maxHp; return { ...g, hp, status: targetStatus(hp, g.maxHp), hits: 0, dmgBy: {} }; });
   S.threats = []; S.ints = []; S.fx = []; S.impacts = []; S.stats = newStats(); S.log = []; S.events = []; S.arrivals = [];
   S.pending = []; recReset();
   for (const sv of S.setup.salvos) {

@@ -4885,12 +4885,15 @@ table.t.mc td.pc{white-space:nowrap}
 
   // src/sim/engine.js
   function startSim() {
-    S.units = S.setup.defs.map((d) => ({ ...d, alive: true, hp: UNIT_TARGET.hp, dmgRadar: false, dmgLauncher: false, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
+    S.units = S.setup.defs.map((d) => ({ ...d, alive: true, hp: d.hp ?? UNIT_TARGET.hp, dmgRadar: !!d.dmgRadar, dmgLauncher: !!d.dmgLauncher, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
     S.jamsLive = S.setup.jams.map((j) => ({ ...j, _losMap: {}, hp: UNIT_TARGET.hp }));
     S.hoj = [];
     S.ewNext = 0;
     wxReset();
-    S.objs = S.setup.objs.map((g) => ({ ...g, hp: g.maxHp, status: "operational", hits: 0, dmgBy: {} }));
+    S.objs = S.setup.objs.map((g) => {
+      const hp = g.hpNow ?? g.maxHp;
+      return { ...g, hp, status: targetStatus(hp, g.maxHp), hits: 0, dmgBy: {} };
+    });
     S.threats = [];
     S.ints = [];
     S.fx = [];
@@ -5452,6 +5455,10 @@ table.t.mc td.pc{white-space:nowrap}
     if (o.owner === "UA" || o.owner === "RU") u.owner = o.owner;
     if (o.decoyDoc === "ignorar" || o.decoyDoc === "tirar") u.decoyDoc = o.decoyDoc;
     if (o.emcon === "alerta" || o.emcon === "silencio") u.emcon = o.emcon;
+    if (Number.isFinite(o.hp) && o.hp > 0 && o.hp < UNIT_TARGET.hp) u.hp = Math.round(o.hp);
+    if (o.dmgRadar === true) u.dmgRadar = true;
+    if (o.dmgLauncher === true) u.dmgLauncher = true;
+    if (Number.isInteger(o.mag) && o.mag >= 0 && d.sam) u.mag = o.mag;
     S.setup.defs.push(u);
     return u;
   }
@@ -5492,6 +5499,7 @@ table.t.mc td.pc{white-space:nowrap}
     const n2 = S.setup.objs.filter((g2) => g2.type === type).length + 1;
     const g = { id: nextId(), type, x, y, name: o.name || tt.name + " " + n2, short: o.short || "", maxHp: o.hp || tt.hp, desc: o.desc || "" };
     if (o.cp) g.cp = o.cp;
+    if (Number.isFinite(o.hpNow) && o.hpNow >= 0 && o.hpNow < g.maxHp) g.hpNow = Math.round(o.hpNow);
     S.setup.objs.push(g);
     return g;
   }
@@ -8965,8 +8973,8 @@ table.t.mc td.pc{white-space:nowrap}
     for (const k of keys) if (o[k] !== void 0) r[k] = structuredClone(o[k]);
     return r;
   };
-  var OBJ_KEYS = ["id", "type", "x", "y", "name", "short", "maxHp", "desc", "cp"];
-  var DEF_KEYS = ["id", "type", "x", "y", "name", "az", "mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2", "cp", "decoyDoc", "owner", "emcon"];
+  var OBJ_KEYS = ["id", "type", "x", "y", "name", "short", "maxHp", "desc", "cp", "hpNow"];
+  var DEF_KEYS = ["id", "type", "x", "y", "name", "az", "mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2", "cp", "decoyDoc", "owner", "emcon", "hp", "dmgRadar", "dmgLauncher"];
   var SALVO_KEYS = ["id", "type", "count", "interval", "tStart", "sync", "tArrive", "agl", "launchDist", "maneuver", "decoys", "link", "crpa", "pts", "targetUnit", "targetObj"];
   var JAM_KEYS = ["id", "type", "x", "y", "alt", "on", "mode", "target"];
   var META_KEYS = ["name", "player", "time", "description", "forces", "conditions", "rulesText", "goals", "success", "failure"];
@@ -9099,7 +9107,7 @@ table.t.mc td.pc{white-space:nowrap}
         return { id: id(w, g.id) };
       }
       pos(w, g.x, g.y);
-      return { id: id(w, g.id), type: g.type, x: g.x, y: g.y, name: str(w + " · name", g.name, 120, false), short: str(w + " · short", g.short, 60), maxHp: num2(w + " · maxHp", g.maxHp, 1, 1e5, { opt: true }), desc: str(w + " · desc", g.desc, 1e3), cp: str(w + " · cp", g.cp, 20) || void 0 };
+      return { id: id(w, g.id), type: g.type, x: g.x, y: g.y, name: str(w + " · name", g.name, 120, false), short: str(w + " · short", g.short, 60), maxHp: num2(w + " · maxHp", g.maxHp, 1, 1e5, { opt: true }), desc: str(w + " · desc", g.desc, 1e3), cp: str(w + " · cp", g.cp, 20) || void 0, hpNow: num2(w + " · hpNow", g.hpNow, 0, 1e5, { opt: true }) };
     });
     const defs = list("defs", setup.defs).map((u, i) => {
       const w = `Defensa ${i + 1}${typeof u.name === "string" ? " (" + u.name + ")" : ""}`;
@@ -9125,6 +9133,9 @@ table.t.mc td.pc{white-space:nowrap}
         cp: str(w + " · cp", u.cp, 20) || void 0,
         owner: u.owner === void 0 ? void 0 : ["UA", "RU"].includes(u.owner) ? u.owner : (err(`${w} · owner: "${String(u.owner)}" no es "UA" ni "RU".`), void 0),
         decoyDoc: u.decoyDoc === void 0 ? void 0 : ["ignorar", "tirar"].includes(u.decoyDoc) ? u.decoyDoc : (err(`${w} · decoyDoc: "${String(u.decoyDoc)}" no es "ignorar" ni "tirar".`), void 0),
+        hp: num2(w + " · hp", u.hp, 1, UNIT_TARGET.hp, { int: true, opt: true }),
+        dmgRadar: bool(w + " · dmgRadar", u.dmgRadar),
+        dmgLauncher: bool(w + " · dmgLauncher", u.dmgLauncher),
         emcon: u.emcon === void 0 ? void 0 : ["siempre", "alerta", "silencio"].includes(u.emcon) ? u.emcon : (err(`${w} · emcon: "${String(u.emcon)}" no es "siempre", "alerta" ni "silencio".`), void 0),
         c2: u.c2 === void 0 ? void 0 : C2_LEVELS[u.c2] ? u.c2 : (err(`${w} · c2: "${String(u.c2)}" no es un nivel de C2 válido (${Object.keys(C2_LEVELS).join(", ")}).`), void 0)
       };
@@ -9255,10 +9266,10 @@ table.t.mc td.pc{white-space:nowrap}
     S.sel = null;
     S.mode = "select";
     const objId = /* @__PURE__ */ new Map(), defId = /* @__PURE__ */ new Map();
-    for (const g of data.setup.objs) objId.set(g.id, addObj(g.type, g.x, g.y, { name: g.name, short: g.short, hp: g.maxHp, desc: g.desc, cp: g.cp }).id);
+    for (const g of data.setup.objs) objId.set(g.id, addObj(g.type, g.x, g.y, { name: g.name, short: g.short, hp: g.maxHp, desc: g.desc, cp: g.cp, hpNow: g.hpNow }).id);
     for (const d of data.setup.defs) {
       const u = addDef(d.type, d.x, d.y, { name: d.name, az: d.az });
-      for (const k of ["mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2", "cp", "decoyDoc", "owner", "emcon"]) if (d[k] !== void 0) u[k] = d[k];
+      for (const k of ["mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2", "cp", "decoyDoc", "owner", "emcon", "hp", "dmgRadar", "dmgLauncher"]) if (d[k] !== void 0) u[k] = d[k];
       defId.set(d.id, u.id);
     }
     for (const sv of data.setup.salvos) {
