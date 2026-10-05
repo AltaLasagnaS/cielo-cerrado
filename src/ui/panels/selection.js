@@ -12,6 +12,7 @@ import { label, uLabel } from '../../sim/log.js';
 import { targetName } from '../../sim/setup.js';
 import { warheadKg, directDamage } from '../../physics/damage.js';
 import { $, isDefenderView } from '../dom.js';
+import { draw } from '../../render/draw.js';
 import { contactOf } from '../../sim/contacts.js';
 import { schedCov } from '../coverage.js';
 import { openFicha } from '../fichas.js';
@@ -62,6 +63,7 @@ export function renderSel(live) {
       }
       if (d.kind === 'aew') html += `<div class="field"><label for="sAlt">Altitud de vuelo</label><span class="val">${u.alt} m</span><input id="sAlt" type="range" min="2000" max="11000" step="250" value="${u.alt}"></div>`;
       if (r && (r.sector < 360)) html += `<div class="field"><label for="sAz">${r.side ? 'Rumbo de vuelo' : 'Orientación del sector'}</label><span class="val">${u.az}°</span><input id="sAz" type="range" min="0" max="359" value="${u.az}"></div>`;
+      html += `<div class="field" title="Quién opera la unidad. El país que fabricó el equipo no decide de qué lado pelea: un Buk o un radar 36D6 puede ser ucraniano o ruso. Decide qué interferidores la afectan y su color en el mapa."><label for="sOwn">Operada por</label><select id="sOwn" class="sel"><option value="" ${!u.owner ? 'selected' : ''}>Según el equipo (${d.side === 'both' ? 'ambos bandos' : d.side === 'RU' ? 'Rusia' : 'Ucrania / OTAN'})</option><option value="UA" ${u.owner === 'UA' ? 'selected' : ''}>Ucrania / OTAN</option><option value="RU" ${u.owner === 'RU' ? 'selected' : ''}>Rusia</option></select></div>`;
       if (d.sam || r) html += `<h3>Enlace técnico de pistas</h3>`;
       if (datalinksOf(d).length) html += `<label class="check"><input type="checkbox" id="sLink" ${u.link !== false ? 'checked' : ''}> Datalink activo (${esc(links)})</label><p class="hint">Al apagarlo, esta unidad deja de publicar y recibir pistas de tiro por enlaces compatibles. Conserva su sensor propio y puede recibir alertas C2 si la coordinación general lo permite.</p>`;
       else if (d.sam || r) html += `<p class="hint">Sin enlace técnico compatible: las alertas C2 no son una pista de tiro ni permiten guiar un misil con un sensor ajeno.</p>`;
@@ -78,6 +80,7 @@ export function renderSel(live) {
       if ($('#sNoD')) $('#sNoD').onchange = e => { u.noDrones = e.target.checked; };
       if ($('#sLink')) $('#sLink').onchange = e => { u.link = e.target.checked; };
       if ($('#sC2')) $('#sC2').onchange = e => { if (e.target.value) u.c2 = e.target.value; else delete u.c2; };
+      if ($('#sOwn')) $('#sOwn').onchange = e => { if (e.target.value) u.owner = e.target.value; else delete u.owner; draw(); };
       if ($('#sDec')) $('#sDec').onchange = e => { if (e.target.value) u.decoyDoc = e.target.value; else delete u.decoyDoc; };
       if ($('#sCp')) $('#sCp').onchange = e => { if (e.target.value) u.cp = e.target.value; else delete u.cp; };
       $('#sDel').onclick = () => { S.setup.defs = S.setup.defs.filter(v => v.id !== u.id); S.sel = null; renderSel(); schedCov(); };

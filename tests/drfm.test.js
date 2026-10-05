@@ -82,3 +82,15 @@ test('DRFM: el modo se conserva al cargar un escenario o un archivo', async () =
   clearSetup(); loadScenarioData(v.data);
   assert.equal(S.setup.jams[0].mode, 'drfm');
 });
+
+test('dueño explícito: un equipo de "ambos bandos" operado por Rusia no sufre el jammer ruso', async () => {
+  const { sideOf } = await import('../src/data/index.js');
+  const { jamJ } = await import('../src/physics/radar.js');
+  useMap('monterey', { flat: true });
+  const u = { id: 1, type: 'ewr', x: 10, y: 10, az: 0 };   // 36D6: catálogo 'both'
+  assert.equal(sideOf(u), 'both');
+  const j = { type: 'soj', x: 10, y: 60, alt: 8000, on: true, mode: 'barrage' };
+  assert.ok(jamJ(u, 180, [j]) > 0, 'sin dueño: lo interfiere cualquiera');
+  assert.equal(jamJ({ ...u, owner: 'RU' }, 180, [j]), 0, 'operado por Rusia: su propio jammer no lo toca');
+  assert.ok(jamJ({ ...u, owner: 'UA' }, 180, [j]) > 0);
+});

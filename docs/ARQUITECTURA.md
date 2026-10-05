@@ -131,7 +131,9 @@ El debrief tiene un botón **Ver repetición**: el mapa vuelve a mostrar la corr
 
 Con la casilla **Vista del defensor**, el mapa, la ayuda emergente y la ficha de una pista muestran **contactos**, no la verdad. Cada detección de la defensa anota la posición vista (`th.seen`, y la anterior en `th.seenPrev`); `contactOf(th, t)` da la posición estimada por estima (última posición + velocidad de las dos últimas detecciones × edad) mientras la pista vive (12 s, la ventana de la red), y el último reporte fechado cuando se pierde (hasta 90 s). No muestra el tipo de arma, su blanco, su ruta ni la distancia que le falta; tocar el mapa selecciona el contacto donde se lo ve. Anotar no consume azar (las golden no cambian; `tests/contacts.test.js`). La repetición sigue mostrando la verdad.
 
-Lo que falta de las **perspectivas por bando** (etapa 1 del plan de Codex): vista del atacante, dueño explícito de cada unidad separado del país del equipo y **tiro sin omnisciencia** (hoy la solución de tiro predice el punto de encuentro con la ruta real del arma; pasar a predecir con la pista observada cambia resultados y calibración, así que queda para decidir con el usuario).
+Cada unidad tiene un **dueño explícito** (`u.owner`, `data/index.js#sideOf`): quién la opera, separado del país del equipo (un 36D6 o un Buk puede ser de cualquiera de los dos bandos).
+
+Lo que falta de las **perspectivas por bando** (etapa 1 del plan de Codex): vista del atacante y **tiro sin omnisciencia** (hoy la solución de tiro predice el punto de encuentro con la ruta real del arma; pasar a predecir con la pista observada cambia resultados y calibración, así que queda para decidir con el usuario).
 
 ## Modo Monte Carlo (`sim/montecarlo.js`)
 

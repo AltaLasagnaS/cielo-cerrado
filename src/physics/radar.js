@@ -2,7 +2,7 @@
 // ---------------- RADAR / DETECCIÓN ----------------
 // Ecuación del radar simplificada (R ∝ σ^¼), sectores de antena, horizonte e interferencia de ruido.
 // Ver docs/FISICA.md §2–§4.
-import { BANDS, JAMMERS, JAM_MODES, D, UNIT_DAMAGE } from '../data/index.js';
+import { BANDS, JAMMERS, JAM_MODES, D, UNIT_DAMAGE, sideOf } from '../data/index.js';
 import { angDiff, azOf } from '../util/math.js';
 import { HORIZON_K } from './constants.js';
 import { surf, los } from './terrain.js';
@@ -122,7 +122,7 @@ export function jamJ(u, az, list) {
     const JJ = JAMMERS[j.type]; if (!j.on || j.dead || JJ.gnssJam || !JJ.bands.includes(r.band) || JAM_MODES[j.mode]?.coherent) continue;
     // Un interferidor de un bando no degrada sus propios radares. `both` queda reservado para
     // equipos cuyo rol puede cambiar; no asumimos fratricidio como efecto normal.
-    if (JJ.side !== 'both' && D(u).side !== 'both' && JJ.side === D(u).side) continue;
+    if (JJ.side !== 'both' && sideOf(u) !== 'both' && JJ.side === sideOf(u)) continue;
     const key = u.id + '|' + u.x.toFixed(2) + '|' + u.y.toFixed(2) + '|' + j.x.toFixed(2) + '|' + j.y.toFixed(2) + '|' + (u.mast || 0) + '|' + (u.alt || 0) + '|' + (j.alt || 0);
     j._losMap = j._losMap || {};
     if (j._losMap[key] === undefined) { const p = jamPos(j); j._losMap[key] = los(p[0], p[1], p[2], u.x, u.y, uz); }
@@ -164,7 +164,7 @@ export function falseTracks(u, list) {
   const M = JAM_MODES.drfm, uz = antZ(u), sl = r.lowSL ? LOW_SIDELOBES : SIDELOBES; let n = 0;
   for (const j of list) {
     const JJ = JAMMERS[j.type]; if (j.mode !== 'drfm' || !j.on || j.dead || JJ.gnssJam || !JJ.bands.includes(r.band)) continue;
-    if (JJ.side !== 'both' && D(u).side !== 'both' && JJ.side === D(u).side) continue;
+    if (JJ.side !== 'both' && sideOf(u) !== 'both' && JJ.side === sideOf(u)) continue;
     const base = drfmJ(u, j, uz); if (base === null) continue;
     const main = base > 0 && base >= SNR50;
     const side = !r.slb && Math.abs(base) * sl.near >= SNR50;

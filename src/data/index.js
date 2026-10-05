@@ -35,6 +35,12 @@ export { TERRAIN } from './terrain/index.js';
 
 /** Ficha de catálogo de una unidad desplegada (u.type → DEFENSES[u.type]). */
 export const D = u => DEFENSES[u.type];
+/**
+ * Bando que OPERA una unidad: el dueño explícito del escenario (u.owner: 'UA' | 'RU') o, si no lo tiene,
+ * el del catálogo (que puede ser 'both' para equipos que usan los dos bandos). El país que fabricó el
+ * equipo no decide de qué lado pelea.
+ */
+export const sideOf = u => u?.owner || DEFENSES[u.type]?.side;
 
 /** Lee una propiedad anidada por ruta con puntos ('sam.pk.dron'). */
 export function getPath(o, path) { return path.split('.').reduce((a, k) => (a == null ? undefined : a[k]), o); }

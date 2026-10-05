@@ -1,7 +1,7 @@
 // @ts-check
 // Guerra electrónica de la defensa durante la corrida: ubicar interferidores por triangulación y
 // dispararles con misiles que se guían a su ruido (home-on-jam). Ver docs/FISICA.md §4.
-import { D, JAMMERS, BANDS, C2_LEVELS } from '../data/index.js';
+import { D, JAMMERS, BANDS, C2_LEVELS, sideOf } from '../data/index.js';
 import { rnd } from '../util/rng.js';
 import { azOf } from '../util/math.js';
 import { jamJ, jamPos, antZ, drfmJ } from '../physics/radar.js';
@@ -20,7 +20,7 @@ function strobes(j) {
   const JJ = JAMMERS[j.type], out = [];
   for (const u of S.units) {
     const r = D(u).radar; if (!u.alive || !r || r.band === 'ACU' || r.band === 'OPT') continue;
-    if (JJ.side !== 'both' && D(u).side === JJ.side) continue;
+    if (JJ.side !== 'both' && sideOf(u) === JJ.side) continue;
     // un DRFM no mete ruido, pero emite cuando el haz lo ilumina: se lo marca por su copia (lóbulo principal)
     const p = jamPos(j), J = j.mode === 'drfm' ? (JJ.bands.includes(r.band) ? Math.max(0, drfmJ(u, j) ?? 0) : 0) : jamJ(u, azOf(p[0] - u.x, p[1] - u.y), [j]);
     if (J >= STROBE_J) out.push({ u, x: u.x, y: u.y, sigma: bearingSigma(BANDS[r.band].bw, J), J });

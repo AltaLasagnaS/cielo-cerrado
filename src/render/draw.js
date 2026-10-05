@@ -2,7 +2,7 @@
 // ---------------- DIBUJO ----------------
 // Redibuja todo el mapa en cada cuadro: relieve, cobertura, grilla, anillos de alcance, sectores,
 // "strobes" de interferencia, rutas, jammers, unidades, impactos, amenazas, interceptores y explosiones.
-import { THREATS, JAMMERS, DEFENSES, TARGET_TYPES, D } from '../data/index.js';
+import { THREATS, JAMMERS, DEFENSES, TARGET_TYPES, D, sideOf } from '../data/index.js';
 import { azOf, clamp } from '../util/math.js';
 import { MAP } from '../physics/terrain.js';
 import { jamJ, horizon } from '../physics/radar.js';
@@ -49,7 +49,7 @@ export function draw() {
     if (dead) continue;
     const isSel = S.sel && S.sel.kind === 'def' && S.sel.id === u.id;
     if (d.sam) {
-      ctx.setLineDash([5, 5]); ctx.strokeStyle = isSel ? 'rgba(230,165,60,.9)' : (d.side === 'RU' ? 'rgba(255,159,90,.45)' : 'rgba(98,182,255,.45)'); ctx.lineWidth = isSel ? 1.6 : 1;
+      ctx.setLineDash([5, 5]); ctx.strokeStyle = isSel ? 'rgba(230,165,60,.9)' : (sideOf(u) === 'RU' ? 'rgba(255,159,90,.45)' : 'rgba(98,182,255,.45)'); ctx.lineWidth = isSel ? 1.6 : 1;
       ctx.beginPath(); ctx.arc(sx, sy, d.sam.maxR * V.s, 0, 7); ctx.stroke();
       if (d.sam.maxRtbm && d.sam.maxRtbm !== d.sam.maxR) { ctx.setLineDash([2, 4]); ctx.beginPath(); ctx.arc(sx, sy, d.sam.maxRtbm * V.s, 0, 7); ctx.stroke(); }
       ctx.setLineDash([]);
@@ -87,7 +87,7 @@ export function draw() {
   for (const u of units) {
     const d = D(u), [sx, sy] = toS(u.x, u.y), dead = S.started && !u.alive;
     const isSel = S.sel && S.sel.kind === 'def' && S.sel.id === u.id;
-    const c = d.side === 'RU' ? '#ff9f5a' : '#62b6ff';
+    const c = sideOf(u) === 'RU' ? '#ff9f5a' : '#62b6ff';
     ctx.lineWidth = isSel ? 2.2 : 1.2; ctx.strokeStyle = isSel ? '#e6a53c' : '#08101a'; ctx.fillStyle = dead ? '#3a4452' : c;
     ctx.beginPath();
     if (d.kind === 'sensor' || d.kind === 'aew') { ctx.moveTo(sx, sy - 8); ctx.lineTo(sx + 8, sy); ctx.lineTo(sx, sy + 8); ctx.lineTo(sx - 8, sy); ctx.closePath(); }

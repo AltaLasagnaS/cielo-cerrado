@@ -36,8 +36,8 @@ export const SCENARIOS = {
       { type: 'airbase', name: 'Aeródromo de Marina', short: 'Aeródromo Marina', x: 51.5, y: 55.5, desc: 'Base de la aviación de defensa. No está atacada al comienzo: protegela si agregás ataques.' }
     ],
     defs: [
-      { type: 'ewr', x: 85.4, y: 53.2, name: 'Radar 3D (cerro Gabilan)' },
-      { type: 'p18', x: 70, y: 40, name: 'Radar VHF' },
+      { type: 'ewr', owner: 'UA', x: 85.4, y: 53.2, name: 'Radar 3D (cerro Gabilan)' },
+      { type: 'p18', owner: 'UA', x: 70, y: 40, name: 'Radar VHF' },
       { type: 'patriot', x: 58, y: 58, az: 320, name: 'Patriot-1' },
       { type: 'irist', x: 44, y: 67, name: 'IRIS-T-1' },
       { type: 'nasams', x: 56, y: 62, name: 'NASAMS-1' },
@@ -94,8 +94,8 @@ export const SCENARIOS = {
       { type: 'pantsir', x: 54, y: 30, name: 'Pantsir-1' },
       { type: 'pantsir', x: 55, y: 22, name: 'Pantsir-2' },
       { type: 'tor', x: 56, y: 38, name: 'Tor-M2' },
-      { type: 'buk', x: 48, y: 20, name: 'Buk-M1' },
-      { type: 'p18', x: 58, y: 14, name: 'Radar VHF' }
+      { type: 'buk', owner: 'RU', x: 48, y: 20, name: 'Buk-M1' },
+      { type: 'p18', owner: 'RU', x: 58, y: 14, name: 'Radar VHF' }
     ],
     salvos: [
       { type: 'storm', count: 16, interval: 6, sync: true, tArrive: 1480, agl: 35, pts: [[0, 60], [30, 46], [44, 38], [57.8, 32.5]], targetObj: 'Depósito de munición' },
@@ -134,13 +134,13 @@ export const SCENARIOS = {
       { type: 'infra', name: 'Puerto de Gotemburgo', short: 'Puerto', x: 55.6, y: 33.9, desc: 'Terminales de contenedores: blanco de los Kinzhal.' }
     ],
     defs: [
-      { type: 'ewr', x: 53, y: 29.5, name: 'Radar 3D (Hisingen)' },
+      { type: 'ewr', owner: 'UA', x: 53, y: 29.5, name: 'Radar 3D (Hisingen)' },
       { type: 'aew_s340', x: 30, y: 50, az: 0, name: 'Saab AEW' },
       { type: 'patriot', x: 55, y: 32, az: 260, name: 'Patriot-1' },
       { type: 'irist', x: 49.5, y: 33, name: 'IRIS-T-1' },
       { type: 'nasams', x: 48, y: 32.5, name: 'NASAMS-1' },
-      { type: 'manpads', x: 50.6, y: 34, name: 'RBS 70-1' },
-      { type: 'manpads', x: 54.4, y: 33.6, name: 'RBS 70-2' },
+      { type: 'manpads', owner: 'UA', x: 50.6, y: 34, name: 'RBS 70-1' },
+      { type: 'manpads', owner: 'UA', x: 54.4, y: 33.6, name: 'RBS 70-2' },
       { type: 'mfg', x: 47, y: 31, name: 'Grupo móvil 1' },
       { type: 'mfg', x: 52.5, y: 35.2, name: 'Grupo móvil 2' },
       { type: 'acoustic', x: 46, y: 33, name: 'Acústico 1' },
@@ -191,9 +191,9 @@ export const SCENARIOS = {
       { type: 'pantsir', x: 52.8, y: 41.3, name: 'Pantsir-1' },
       { type: 'pantsir', x: 51, y: 39.5, name: 'Pantsir-2' },
       { type: 'tor', x: 53.5, y: 40, name: 'Tor-M2' },
-      { type: 'buk', x: 56, y: 44, name: 'Buk-M1' },
-      { type: 'ewr', x: 61, y: 40, name: 'Radar 3D' },
-      { type: 'p18', x: 58, y: 40, name: 'Radar VHF' }
+      { type: 'buk', owner: 'RU', x: 56, y: 44, name: 'Buk-M1' },
+      { type: 'ewr', owner: 'RU', x: 61, y: 40, name: 'Radar 3D' },
+      { type: 'p18', owner: 'RU', x: 58, y: 40, name: 'Radar VHF' }
     ],
     salvos: [
       { type: 'storm', count: 10, interval: 5, sync: true, tArrive: 1500, agl: 35, pts: [[0, 58], [30, 52], [44, 45], [51.8, 40.9]], targetObj: 'Puente de la autopista 1' },
@@ -232,8 +232,8 @@ export const SCENARIOS = {
       { type: 'infra', name: 'Represa de Kiev', short: 'Represa', x: 36.3, y: 45.7, hp: 2500, desc: 'Central hidroeléctrica de Vyshhorod, al pie del embalse de Kiev.' }
     ],
     defs: [
-      { type: 'ewr', x: 30, y: 72, name: 'Radar 3D' },
-      { type: 'p18', x: 52, y: 60, name: 'Radar VHF' },
+      { type: 'ewr', owner: 'UA', x: 30, y: 72, name: 'Radar 3D' },
+      { type: 'p18', owner: 'UA', x: 52, y: 60, name: 'Radar VHF' },
       { type: 'patriot', x: 33, y: 60, az: 40, name: 'Patriot-1' },
       { type: 'nasams', x: 44, y: 58, name: 'NASAMS-1' },
       { type: 'irist', x: 34, y: 67, name: 'IRIS-T-1' },
@@ -289,8 +289,8 @@ export const SCENARIOS = {
       { type: 'infra', name: 'Central de Zmiiv', short: 'Zmiiv', x: 38, y: 101.3, hp: 2000, desc: 'Central térmica de Zmiiv (Slobozhanske), al sur. Destruida en marzo de 2024; acá está en pie y no la atacan esta mañana.' }
     ],
     defs: [
-      { type: 'ewr', x: 22, y: 66, name: 'Radar 3D' },
-      { type: 'p18', x: 30, y: 60, name: 'Radar VHF' },
+      { type: 'ewr', owner: 'UA', x: 22, y: 66, name: 'Radar 3D' },
+      { type: 'p18', owner: 'UA', x: 30, y: 60, name: 'Radar VHF' },
       { type: 'patriot', x: 14, y: 68, az: 0, name: 'Patriot-1' },
       { type: 'irist', x: 9, y: 61, name: 'IRIS-T-1' },
       { type: 'nasams', x: 19, y: 59, name: 'NASAMS-1' },
@@ -338,8 +338,8 @@ export const SCENARIOS = {
       { type: 'infra', name: 'Centro de Odesa', short: 'Centro', x: 56.1, y: 58, hp: 2500, desc: 'Centro histórico y administrativo de la ciudad.' }
     ],
     defs: [
-      { type: 'ewr', x: 49, y: 81, name: 'Radar 3D' },
-      { type: 'p18', x: 40, y: 60, name: 'Radar VHF' },
+      { type: 'ewr', owner: 'UA', x: 49, y: 81, name: 'Radar 3D' },
+      { type: 'p18', owner: 'UA', x: 40, y: 60, name: 'Radar VHF' },
       { type: 's300', x: 49.5, y: 78, az: 135, name: 'S-300-1' },
       { type: 'irist', x: 48.5, y: 82, name: 'IRIS-T-1' },
       { type: 'gepard', x: 55, y: 56.5, name: 'Gepard-1' },
