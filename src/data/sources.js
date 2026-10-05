@@ -147,7 +147,12 @@ export const SRC = {
   dx_f16nl: ['Defense Express: qué traen distinto los F-16 holandeses (ALQ-131, ECIPS)', 'https://en.defence-ua.com/news/ukraines_new_f_16s_from_the_netherlands_whats_different_from_danish_version-12107.html'],
   afm_f16ew: ['Air & Space Forces Magazine: la USAF reprogramó la GE de los F-16 ucranianos (ago-2024)', 'https://www.airandspaceforces.com/ukraine-f-16-electronic-warfare-us-air-force/'],
   twz_f16pods: ['TWZ: los F-16 ucranianos, en servicio con pods de autoprotección (ALQ-162(V)6)', 'https://www.twz.com/air/f-16-officially-in-ukrainian-service-self-protection-pods-included'],
-  rusi_storm: ['RUSI: Stormbreak (2023)', 'https://static.rusi.org/Stormbreak-Special-Report-web-final_0.pdf']
+  rusi_storm: ['RUSI: Stormbreak (2023)', 'https://static.rusi.org/Stormbreak-Special-Report-web-final_0.pdf'],
+  // clutter (physics/clutter.js)
+  skolnik_mti: ['Shrader y Gregers-Hansen, "MTI Radar", cap. 15 del Radar Handbook (Skolnik, 2.ª ed., 1990): tabla 15.1 (espectro del clutter), tabla 15.2 (reflectividad, de Barton) y ec. 15.9–15.11 (factor de mejora)', 'https://helitavia.com/skolnik/Skolnik_chapter_15.pdf'],
+  nrl_sea: ['Gregers-Hansen y Mital, "An Improved Empirical Model for Radar Sea Clutter Reflectivity", NRL/MR/5310--12-9346 (2012); coeficientes en la implementación pública de scivision', 'https://github.com/scivision/nrl-radar-sea-clutter/blob/main/NRL_SigmaSea.m'],
+  mw_sea: ['MathWorks, seareflectivity: validez del modelo NRL (0,5–35 GHz, 0,1–60°, estado del mar 0–6; desvío ≈2,2–2,6 dB contra mediciones)', 'https://www.mathworks.com/help/radar/ref/seareflectivity.html'],
+  billingsley: ['Billingsley, Low-Angle Radar Land Clutter (2002), resumido en Greco, "Radar Clutter Modeling" (Univ. de Pisa): σ°F⁴ espacial mediano ≈ −30 dB en 37 sitios rurales, VHF a banda X', 'https://docenti.ing.unipi.it/m.greco/esami_lab/Radar/Clutter_modeling.pdf']
 };
 /** Azúcar para listas de claves de fuentes. */
 export const S_ = (...ids) => ids;

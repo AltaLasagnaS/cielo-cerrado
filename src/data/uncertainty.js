@@ -19,6 +19,8 @@ export const PL = {
   'sam.ch': ['Canales simultáneos', ''], 'sam.mag': ['Munición de la unidad', ''], 'sam.reloadS': ['Tiempo de recarga de la batería', 's'], 'sam.reserve': ['Reserva para recargar', ''], 'sam.cost': ['Costo por disparo', 'M US$'],
   'sam.pk.dron': ['Pk por disparo vs drones', ''], 'sam.pk.crucero': ['Pk por disparo vs crucero', ''], 'sam.pk.supersonico': ['Pk por disparo vs supersónicos', ''],
   'sam.pk.balistico': ['Pk por disparo vs balísticos', ''], 'sam.pk.hiper': ['Pk por disparo vs hipersónicos', ''],
+  landDb: ['Clutter de suelo rasante (σ°F⁴ mediano)', 'dB'], reliefDb: ['Variación del clutter de suelo con el relieve', '± dB'], res: ['Resolución en distancia típica', 'm'], ruK: ['Alcance sin ambigüedad del MTI (× R1)', '×'],
+  mtiCap: ['Techo del factor de mejora MTI', 'dB'], pdCap: ['Factor de mejora pulso-Doppler', 'dB'], landSv: ['Dispersión de velocidad del clutter de suelo', 'm/s'], seaSv: ['Dispersión de velocidad del clutter de mar', 'm/s'], rainSv: ['Dispersión de velocidad del clutter de lluvia', 'm/s'],
   alt: ['Altitud de patrulla', 'm'], remotePk: ['Pk de un disparo con pista de red (factor)', '×'], radius: ['Radio de efecto', 'km'], spoofKm: ['Desvío típico por engaño GNSS', 'km'], P: ['Potencia relativa (juego)', '']
 };
 export const RCS_NOTE = 'est: sin medición pública; analogía con la tabla de GlobalSecurity (Tomahawk 0,5 m², ALCM furtivo <0,05, Harpoon/Exocet 0,1) y tamaño/forma';
@@ -481,6 +483,20 @@ export const UNC = {
     f16ecm: {
       P: U(1e4, 3e4, 1e5, 'baja', S_('ng_alq131', 'fas_alq131'), 'parámetro de juego: potencia y bandas del pod no son públicas. Un orden de magnitud menos que el Il-22PP (3e5): un pod de caza tiene menos potencia y antenas mucho más chicas; est'),
       alt: U(300, 4000, 8000, 'baja', [], 'est: los F-16 ucranianos vuelan bajo para sobrevivir y suben para lanzar; altura de patrulla de juego')
+    }
+  },
+  // modelo de clutter (data/clutter.js, physics/clutter.js); valores por clase de radar, no por sistema
+  clu: {
+    modelo: {
+      landDb: U(-40, -30, -20, 'media', S_('billingsley'), 'mediana de los promedios espaciales de σ°F⁴ en 37 sitios rurales a menos de 8° (Billingsley); la dispersión entre sitios es de unos ±10 dB'),
+      reliefDb: U(2, 5, 8, 'baja', S_('billingsley'), 'est: Billingsley mide más clutter en relieve alto que en llanuras; el valor de cada tipo de terreno no está en las fuentes leídas'),
+      res: U(30, 150, 300, 'baja', S_('billingsley'), 'est: 150 m es la resolución de las mediciones de Billingsley y la de un pulso comprimido de 1 µs; los radares de tiro suelen resolver menos de 50 m. Sin dato por radar'),
+      ruK: U(1.2, 2, 3, 'baja', [], 'est: un MTI de PRF baja no tiene ambigüedad en distancia; su alcance instrumentado suele superar el de detección contra 1 m²'),
+      mtiCap: U(25, 35, 45, 'baja', S_('skolnik_mti'), 'est: un cancelador de 2 pulsos da del orden de 20–30 dB y uno de 3 pulsos 30–40 dB; las inestabilidades y el barrido ponen el techo'),
+      pdCap: U(45, 55, 65, 'baja', S_('skolnik_mti'), 'est: banco de filtros Doppler con lóbulos de −50 a −70 dB (el manual muestra un banco de Chebyshev de 68 dB); sin dato por radar'),
+      landSv: U(0.017, 0.1, 0.32, 'media', S_('skolnik_mti'), 'tabla 15.1: bosque ralo en calma 0,017; colinas arboladas con viento de 10–40 nudos 0,04–0,32 m/s'),
+      seaSv: U(0.46, 0.9, 1.1, 'media', S_('skolnik_mti'), 'tabla 15.1: eco de mar 0,46–1,1 m/s'),
+      rainSv: U(1.8, 2, 4, 'media', S_('skolnik_mti'), 'tabla 15.1: nubes de lluvia 1,8–4,0 m/s (sube con la cizalladura del viento)')
     }
   },
   // niveles de C2 (data/c2.js); ver docs/investigacion/valores-estimados.md §1

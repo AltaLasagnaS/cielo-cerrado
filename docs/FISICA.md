@@ -39,7 +39,7 @@ Cada radar barre cada `radar.scan` segundos. Si el blanco está dentro del secto
 
 ```
 R   = detR(...)                    alcance del catálogo = el de Pd 50% con PFA = 10⁻⁶
-SNR = SNR50 · (R/r)⁴ / 10^(clutter/10)        SNR50 = ln(PFA)/ln(0,5) − 1 ≈ 18,9 (12,8 dB)
+SNR = SNR50 · (R/r)⁴  (y el clutter se suma al ruido, ver abajo)        SNR50 = ln(PFA)/ln(0,5) − 1 ≈ 18,9 (12,8 dB)
 Pd  = PFA^(1/(1+SNR))                          (Swerling 1, un pulso)
 Pd  = (1 + 2·SNR·T/(2+SNR)²) · exp(−2T/(2+SNR))   (Swerling 3, un pulso; T = −ln PFA ≈ 13,8, SNR50 ≈ 15,7)
 ```
@@ -67,7 +67,22 @@ N debe ser entero entre 1 y 128 (dominio numérico verificado, no límite de un 
 
 Más allá de **2,5·R** no se calcula nada: es un corte de **rendimiento**, no físico (la Pd ya es menor que 10⁻⁴). Antes había un corte a 1,2·R que compensaba a lo bruto que se abría pista con un solo eco; la regla 2 de 3 lo reemplaza (ver `docs/investigacion/valores-estimados.md`).
 
-**Clutter** (eco del suelo): si el blanco vuela a menos de 300 m sobre el terreno, la SNR pierde hasta `CLUTTER_DB[radar.mti]` dB: 20 sin filtro de blancos móviles (`'none'`, S-125), 10 con MTI clásico (`'mti'`: Buk, 36D6, P-18) y 3 con pulso-Doppler (`'pd'`: Patriot, IRIS-T, NASAMS, S-300/400, Pantsir, Tor, Gepard, Hawk, AEW). La pérdida escala con lo rasante (0 a 300 m, máxima a 0 m) y con la rugosidad del suelo (pendiente local: ×0,5 en el llano a ×1,5 en zonas quebradas; ×0,7 sobre el mar). Valores estimados. No hay todavía clutter de mar según el estado del mar ni clutter de lluvia: faltan los datos que lista [la investigación de clutter](investigacion/clutter-y-pulsos-datos.md) (mejora sub-clutter por radar, reflectividad verificada, celda de cada radar), y no se inventan. El S-125 figura `'none'`, aunque Air Power Australia le atribuye MTI al SNR-125; sin una segunda fuente no se cambia (ROADMAP).
+**Clutter** (`physics/clutter.js`, parámetros en `data/clutter.js` con rango y fuentes en `UNC.clu`): el eco del suelo, del mar y de la lluvia que cae en la misma celda de resolución que el blanco. Como blanco y clutter salen de la misma ecuación del radar, el cociente no depende de la potencia:
+
+```
+SINR = 1 / (1/SNR + C/σ)        C = clutter que sobrevive al filtro (m²), σ = RCS del blanco
+superficie  C = σ° · A · g²(Δ) / I      A = 0,75 · ΔR · R · θaz / cos ψ
+lluvia      C = η · V / I               V = 0,567 · ΔR · R² · θaz · θel   (π/(8·ln2), haz gaussiano)
+```
+
+- **Cuándo hay clutter de superficie.** El haz apunta al blanco; el suelo que está debajo queda Δ = agl/R radianes más abajo y entra con la ganancia de ida y vuelta g²(Δ) = exp(−8·ln2·(Δ/θel)²). Más allá de 1,5 anchos de haz entra por lóbulos laterales a −50 dB o menos y se desprecia. Además el radar tiene que ver la superficie: en tierra, línea de vista a ese punto (cacheada por celda); en el mar, ángulo rasante positivo sobre la Tierra 4/3 (más allá del horizonte de la superficie no hay eco de mar). Por eso el clutter pesa cerca y con antenas altas; un blanco rasante lejos de un mástil bajo queda fuera del horizonte del suelo y compite solo con el ruido.
+- **Suelo:** σ°F⁴ = −30 dB (mediana de Billingsley en 37 sitios rurales a menos de 8°, de VHF a X; ya incluye la propagación), ±5 dB según la rugosidad local (pendiente). 
+- **Mar:** modelo NRL 2012 (Gregers-Hansen y Mital) según banda, ángulo rasante y estado del mar (polarización H por defecto; `radar.pol`). Ajustado de 0,1° a 60° y de 0,5 a 35 GHz (desvío ≈2,2–2,6 dB); por debajo de 0,1° se extrapola. Coincide con la tabla de Barton (estado 4, X, 1°: −42,5 dB) dentro de 4 dB (prueba). El estado del mar sale del clima (`WEATHER[].sea`: despejado 2, nublado y lluvia 3, tormenta 5, niebla 1; estimado).
+- **Lluvia:** η = 6·10⁻¹⁴·r^1,6/λ⁴ m⁻¹ (Barton; Rayleigh con Z = 200·r^1,6 de Marshall–Palmer). Llena el haz hasta 3.000 m (`RAIN_TOP`, la nieve de arriba casi no refleja) y solo cuenta si el blanco vuela debajo. Se supone que el blanco está dentro de la lluvia (mismo supuesto que la atenuación).
+- **Factor de mejora I** (`radar.mti`): sin filtro 1. MTI: cancelador doble contra un espectro gaussiano, I = 2·(PRF/(2π·σf))⁴ con σf = 2σv/λ (Radar Handbook, ec. 15.10), con techo de 35 dB; la dispersión σv es 0,1 m/s en tierra, 0,9 en el mar y 2 en la lluvia (tabla 15.1). La PRF, sin dato, es la de alcance sin ambigüedad hasta 2·R1. Pulso-Doppler: 55 dB. Con eso un MTI rinde 35 dB contra el suelo pero solo 26–28 dB contra el mar y 12–14 dB contra la lluvia en S y X (el 36D6 y el Buk); un pulso-Doppler mantiene 55 dB.
+- **Resolución ΔR:** 150 m por defecto (`radar.res` la pisa); ancho de haz en elevación = el de la banda (`radar.bwEl`).
+
+Todos son valores **por clase**, con rango en `UNC.clu` (Monte Carlo los sortea) y confianza baja o media: faltan la mejora sub-clutter, la PRF y la resolución publicadas de cada radar ([handoff de datos](investigacion/clutter-y-pulsos-datos.md)). El S-125 sigue `'none'` (ver ROADMAP).
 
 **Notch Doppler:** los radares con filtro Doppler (`'mti'`, `'pd'`) borran lo que no se acerca ni se aleja: si la velocidad radial del blanco (|v|·cos del aspecto) es menor que 15 m/s (MTI) u 8 m/s (pulso-Doppler), ese barrido no lo ve. Choca de lleno con el aspecto (§3): de costado la RCS es máxima, pero un radar Doppler lo puede perder. Los sensores ópticos y acústicos no tienen clutter ni notch.
 
@@ -90,7 +105,7 @@ L (`rainKm`) es el largo máximo del camino dentro de la lluvia: las celdas de l
 
 **Ópticos, IR y acústicos.** Los sensores `OPT` multiplican su alcance por `wx.opt` y no ven blancos por encima del techo de nubes o niebla (`wx.ceiling`, m sobre el terreno). Los acústicos multiplican por `wx.acu`. Son estimaciones de juego apoyadas en el manual de CMO (la lluvia deja lo visual en 1–5% y degrada mucho el IR; las nubes cortan la línea de vista).
 
-**No se modela:** día y noche, el clutter de lluvia (eco de las gotas), el viento sobre los drones, ni el efecto del clima sobre los buscadores IR de los misiles.
+**No se modela:** día y noche, el viento sobre los drones, ni el efecto del clima sobre los buscadores IR de los misiles.
 
 ### Sensores no radar
 
@@ -437,8 +452,8 @@ Es un modelo de juego: no representa estructuras, incendios, penetración ni sub
 | Simplificación | Efecto | Mejora posible |
 |---|---|---|
 | RCS con tres aspectos | Sin aspecto arriba/abajo ni detalle angular fino | Tabla por ángulo (como el "3D radar splat" de CMO PE) |
-| Clutter y Doppler simples | Pérdida de SNR por clutter según el procesamiento del radar y la rugosidad, y notch por velocidad radial | Clutter de lluvia y de mar por estado del mar; visibilidad sub-clutter por radar con datos |
-| Clima simple | Lluvia (ITU-R P.838-3), techo de nubes y factores ópticos/acústicos fijos por escenario | Día y noche, clutter de lluvia, viento, clima que cambia durante el escenario |
+| Clutter de suelo, mar y lluvia | Celda de resolución, Billingsley (suelo), NRL 2012 (mar por estado), Barton/Marshall–Palmer (lluvia), factor de mejora MTI/PD por clase, notch por velocidad radial | Mejora sub-clutter, PRF y resolución publicadas por radar; velocidad media de la lluvia con el viento; clutter discreto |
+| Clima simple | Lluvia (ITU-R P.838-3) y su clutter, estado del mar, techo de nubes y factores ópticos/acústicos fijos por escenario | Día y noche, clima que cambia durante el escenario |
 | Recarga de batería completa | Recarga toda la batería de una vez (`sam.reloadS`) desde su reserva; los tiempos son estimaciones | Recarga por lanzador; vehículos de recarga como unidades |
 | Swerling lento 1/3, integración no coherente opcional | Catálogo aún usa la aproximación de un pulso: faltan datos de integración por modo/radar; sin casos 2 y 4 | Datos de N con fuente/UNC; integración coherente y ruido correlacionado; Swerling 2/4 cuando haya evidencia de fluctuación pulso a pulso |
 | Interceptor en línea recta a velocidad media | Energía resumida en dos factores (alcance según el aspecto y Pk según la fracción del alcance); el tiempo de vuelo sigue siendo r / vInt | Perfil de velocidad (motor y planeo) y límite de g (paso B de la propuesta) |

@@ -102,8 +102,8 @@ export function step(dt) {
         const ca = aspectCos(th, u.x, u.y, uz), agl = p.z - surf(p.x, p.y);
         if (rr > PD_CUTOFF * detR(u, th, 0, ca, wx) || !belowCeiling(r, wx, agl)) continue;
         const J = jamJ(u, az, S.jamsLive); const R = detR(u, th, J, ca, wx);
-        // probabilidad de detección del barrido: SNR con fluctuación Swerling 1, clutter y notch Doppler
-        const pd = pdScan(u, th, rr, R, agl, p.x, p.y, ca);
+        // probabilidad de detección del barrido: SNR con fluctuación Swerling, clutter (suelo, mar, lluvia) y notch Doppler
+        const pd = pdScan(u, th, rr, R, agl, p.x, p.y, ca, wx);
         const hit = pd > 0 && rnd() <= pd && los(u.x, u.y, uz, p.x, p.y, p.z);
         if (r.band === 'OPT') ok = hit;
         else {

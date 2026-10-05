@@ -98,7 +98,7 @@ test('pdScan usa N del radar, conserva detR y excluye sensores ópticos/acústic
     assert.equal(pdScan(u, th, R * 1.2, R, 5000, 10, 10, 1), pdRel(3, (R / (R * 1.2)) ** 4, 8));
     assert.equal(pdScan(u, th, R * 3, R, 5000, 10, 10, 1), 0, 'corte de rendimiento');
     assert.equal(pdScan(u, th, R / 2, R, 5000, 10, 10, 0), 0, 'notch');
-    assert.ok(pdScan(u, th, R, R, 20, 10, 10, 1) < 0.5, 'clutter sigue aplicado');
+    assert.ok(pdScan(u, th, R, R, 20, 3, 3, 1) < 0.5, 'clutter sigue aplicado');
     for (const band of ['OPT', 'ACU']) {
       radar.band = band;
       assert.equal(pdScan(u, th, R * 1.2, R, 5000, 10, 10, 0), pdRel(3, (R / (R * 1.2)) ** 4), band);
