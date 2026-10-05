@@ -493,6 +493,8 @@ Por debajo de un factor de 0,02 no hay daño. Ejemplos de impacto directo con vu
 
 **Daño funcional de las unidades** (`sim/engine.js#damageUnits`, parámetros en `data/targets.js`): cada caída también daña a las unidades de defensa en tierra que estén cerca (no a los aviones AEW), con la misma fórmula y un blanco `UNIT_TARGET` = 300 HP, huella de 30 m y vulnerabilidad 1,2 (una batería con radar, lanzadores y vehículos, sensible a esquirlas como un sitio de radar).
 
+**Jammers terrestres** (`sim/engine.js#damageJammers`): una caída cerca de un jammer en tierra le quita vida con el mismo blanco `UNIT_TARGET`; a 0 queda destruido y deja de interferir (ruido, DRFM, GNSS y antidrón). Sin daño parcial: con vida sigue entero. Para atacarlo se apunta una salva a su posición. Los aéreos no se dañan así: los derriba el home-on-jam (§4). Falta un misil antirradiación que se guíe a su emisión.
+
 | Vida perdida | Efecto |
 |---|---|
 | ≥ 20% | pierde un componente |

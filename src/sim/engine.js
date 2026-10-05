@@ -29,7 +29,7 @@ import { noteSeen, noteObs, emitting, isEmitter } from './contacts.js';
 /** Arma la corrida a partir de S.setup: copia unidades y jammers y programa todos los lanzamientos. */
 export function startSim() {
   S.units = S.setup.defs.map(d => ({ ...d, alive: true, hp: UNIT_TARGET.hp, dmgRadar: false, dmgLauncher: false, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
-  S.jamsLive = S.setup.jams.map(j => ({ ...j, _losMap: {} })); S.hoj = []; S.ewNext = 0; wxReset();
+  S.jamsLive = S.setup.jams.map(j => ({ ...j, _losMap: {}, hp: UNIT_TARGET.hp })); S.hoj = []; S.ewNext = 0; wxReset();
   S.objs = S.setup.objs.map(g => ({ ...g, hp: g.maxHp, status: 'operational', hits: 0, dmgBy: {} }));
   S.threats = []; S.ints = []; S.fx = []; S.impacts = []; S.stats = newStats(); S.log = []; S.events = []; S.arrivals = [];
   S.pending = []; recReset();
@@ -77,13 +77,13 @@ export function step(dt) {
     }
     if (!th.gnssHit && th.T.gnss < 1) {
       // fuentes anti-GNSS que cubren el punto; una antena CRPA de N elementos anula hasta N − 1 (por dirección)
-      const srcs = S.jamsLive.filter(j => JAMMERS[j.type].gnssJam && j.on && Math.hypot(p.x - j.x, p.y - j.y) <= JAMMERS[j.type].radius);
+      const srcs = S.jamsLive.filter(j => JAMMERS[j.type].gnssJam && j.on && !j.dead && Math.hypot(p.x - j.x, p.y - j.y) <= JAMMERS[j.type].radius);
       const held = th.crpa > 0 && srcs.length > 0 && !crpaOverwhelmed(th.crpa, p.x, p.y, srcs);
       if (held && !th.crpaHeld) { th.crpaHeld = true; log('d', label(th) + ': su antena CRPA de ' + th.crpa + ' elementos anula la interferencia GNSS (' + srcs.length + ' fuente' + (srcs.length > 1 ? 's' : '') + ').', 'atk'); }
       for (const j of held ? [] : srcs) {
         const J = JAMMERS[j.type];
         if (J.side !== 'both' && th.T.side !== 'both' && J.side === th.T.side) continue;
-        const link = th.link && !S.jamsLive.some(k => JAMMERS[k.type].linkJam && k.on && Math.hypot(p.x - k.x, p.y - k.y) <= JAMMERS[k.type].radius);   // un antidrón le corta el enlace
+        const link = th.link && !S.jamsLive.some(k => JAMMERS[k.type].linkJam && k.on && !k.dead && Math.hypot(p.x - k.x, p.y - k.y) <= JAMMERS[k.type].radius);   // un antidrón le corta el enlace
         const n = gnssNavError(th.T, J, link); th.gnssHit = true; th.navErr = n.err;
         if (n.corrected) log('w', label(th) + ' pierde el GNSS en la zona de ' + J.short + (n.rejected ? ' y descarta el engaño' : '') + ', pero su buscador terminal encuentra el blanco.', 'atk');
         else if (th.navErr > 150) { log('w', label(th) + (n.spoofed ? ' es engañada por ' + J.short + ' (spoofing GNSS): desvío ≈' + (th.navErr / 1000).toFixed(1) + ' km.' : (n.rejected ? ' descarta el engaño de ' + J.short + (link && !th.T.navFix ? ' gracias a su enlace de datos' : ' con su corrección de terreno') + '; sigue con inercial: error ≈' : ' entra en zona anti-GNSS: error de navegación ≈') + Math.round(th.navErr) + ' m.'), 'atk'); event('Primera arma desviada por interferencia GNSS', 'gnss'); }
@@ -387,7 +387,7 @@ export function impact(th) {
     S.stats.misses++; S.impacts.push({ x, y, k: 'miss', t: S.t });
     log('w', label(th) + ' cae a ' + Math.round(r) + ' m del blanco' + (th.navErr > 150 ? ' (desviado por interferencia GNSS)' : '') + dtxt + '.', 'def', 'Cae ' + (th.firstDet === null ? 'un arma no detectada' : 'la ' + pista(th)) + ' sin dar en un objetivo' + dtxt + '.');
   }
-  damageUnits(th.T, x, y);
+  damageUnits(th.T, x, y); damageJammers(th.T, x, y);
   for (const d of dmg) {
     event('Primer impacto con daño: ' + label(th) + ' sobre ' + d.g.name, 'firstDmg');
     if (d.g.status !== d.before) {
@@ -412,6 +412,25 @@ function applyDamage(th, x, y) {
     out.push({ g, dmg, dist, before });
   }
   return out;
+}
+
+/**
+ * Jammers terrestres alcanzados por una caída en (x, y) km (docs/FISICA.md §10): pierden vida como una
+ * unidad (UNIT_TARGET) y a 0 dejan de interferir. Los aéreos no (los derriba el home-on-jam, sim/ew.js).
+ * Sin daño parcial: un jammer con vida sigue funcionando entero. Se puede apuntar una salva a un jammer.
+ */
+export function damageJammers(T, x, y) {
+  for (const j of S.jamsLive) {
+    if (j.dead || JAMMERS[j.type].air) continue;
+    const res = damageAt(T, UNIT_TARGET, Math.hypot(x - j.x, y - j.y) * 1000); if (!res.dmg) continue;
+    j.hp = (j.hp ?? UNIT_TARGET.hp) - Math.round(res.dmg);
+    if (j.hp <= 0) {
+      j.dead = true; S.stats.jamsLost = (S.stats.jamsLost || 0) + 1;
+      // lo sabe quien lo opera; un jammer terrestre suele ser de la defensa (el atacante interfiere desde el aire)
+      log('x', JAMMERS[j.type].short + ' queda destruido por la explosión de ' + T.short + ' a ' + Math.round(res.edge + UNIT_TARGET.radius) + ' m: deja de interferir.', 'def');
+      event(JAMMERS[j.type].short + ' destruido por ' + T.short, 'jamLost:' + j.id);
+    }
+  }
 }
 
 /**

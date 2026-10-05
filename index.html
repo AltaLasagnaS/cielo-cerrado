@@ -4881,7 +4881,7 @@ table.t.mc td.pc{white-space:nowrap}
   // src/sim/engine.js
   function startSim() {
     S.units = S.setup.defs.map((d) => ({ ...d, alive: true, hp: UNIT_TARGET.hp, dmgRadar: false, dmgLauncher: false, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
-    S.jamsLive = S.setup.jams.map((j) => ({ ...j, _losMap: {} }));
+    S.jamsLive = S.setup.jams.map((j) => ({ ...j, _losMap: {}, hp: UNIT_TARGET.hp }));
     S.hoj = [];
     S.ewNext = 0;
     wxReset();
@@ -4972,7 +4972,7 @@ table.t.mc td.pc{white-space:nowrap}
         event(label(th) + " libera señuelos", "decoys");
       }
       if (!th.gnssHit && th.T.gnss < 1) {
-        const srcs2 = S.jamsLive.filter((j) => JAMMERS[j.type].gnssJam && j.on && Math.hypot(p.x - j.x, p.y - j.y) <= JAMMERS[j.type].radius);
+        const srcs2 = S.jamsLive.filter((j) => JAMMERS[j.type].gnssJam && j.on && !j.dead && Math.hypot(p.x - j.x, p.y - j.y) <= JAMMERS[j.type].radius);
         const held = th.crpa > 0 && srcs2.length > 0 && !crpaOverwhelmed(th.crpa, p.x, p.y, srcs2);
         if (held && !th.crpaHeld) {
           th.crpaHeld = true;
@@ -4981,7 +4981,7 @@ table.t.mc td.pc{white-space:nowrap}
         for (const j of held ? [] : srcs2) {
           const J = JAMMERS[j.type];
           if (J.side !== "both" && th.T.side !== "both" && J.side === th.T.side) continue;
-          const link = th.link && !S.jamsLive.some((k) => JAMMERS[k.type].linkJam && k.on && Math.hypot(p.x - k.x, p.y - k.y) <= JAMMERS[k.type].radius);
+          const link = th.link && !S.jamsLive.some((k) => JAMMERS[k.type].linkJam && k.on && !k.dead && Math.hypot(p.x - k.x, p.y - k.y) <= JAMMERS[k.type].radius);
           const n2 = gnssNavError(th.T, J, link);
           th.gnssHit = true;
           th.navErr = n2.err;
@@ -5357,6 +5357,7 @@ table.t.mc td.pc{white-space:nowrap}
       log("w", label(th) + " cae a " + Math.round(r) + " m del blanco" + (th.navErr > 150 ? " (desviado por interferencia GNSS)" : "") + dtxt + ".", "def", "Cae " + (th.firstDet === null ? "un arma no detectada" : "la " + pista(th)) + " sin dar en un objetivo" + dtxt + ".");
     }
     damageUnits(th.T, x, y);
+    damageJammers(th.T, x, y);
     for (const d of dmg) {
       event("Primer impacto con daño: " + label(th) + " sobre " + d.g.name, "firstDmg");
       if (d.g.status !== d.before) {
@@ -5385,6 +5386,20 @@ table.t.mc td.pc{white-space:nowrap}
       out.push({ g, dmg, dist, before });
     }
     return out;
+  }
+  function damageJammers(T, x, y) {
+    for (const j of S.jamsLive) {
+      if (j.dead || JAMMERS[j.type].air) continue;
+      const res = damageAt(T, UNIT_TARGET, Math.hypot(x - j.x, y - j.y) * 1e3);
+      if (!res.dmg) continue;
+      j.hp = (j.hp ?? UNIT_TARGET.hp) - Math.round(res.dmg);
+      if (j.hp <= 0) {
+        j.dead = true;
+        S.stats.jamsLost = (S.stats.jamsLost || 0) + 1;
+        log("x", JAMMERS[j.type].short + " queda destruido por la explosión de " + T.short + " a " + Math.round(res.edge + UNIT_TARGET.radius) + " m: deja de interferir.", "def");
+        event(JAMMERS[j.type].short + " destruido por " + T.short, "jamLost:" + j.id);
+      }
+    }
   }
   function damageUnits(T, x, y) {
     for (const u of S.units) {
