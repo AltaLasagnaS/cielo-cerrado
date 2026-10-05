@@ -4,7 +4,7 @@
 import { D, JAMMERS, BANDS, C2_LEVELS } from '../data/index.js';
 import { rnd } from '../util/rng.js';
 import { azOf } from '../util/math.js';
-import { jamJ, jamPos, antZ } from '../physics/radar.js';
+import { jamJ, jamPos, antZ, drfmJ } from '../physics/radar.js';
 import { STROBE_J, FIX_MAX_KM, bearingSigma, fixError } from '../physics/jamloc.js';
 import { effectiveC2, unitC2 } from '../physics/engagement.js';
 import { profileOf, timeTo } from '../physics/interceptor.js';
@@ -21,7 +21,8 @@ function strobes(j) {
   for (const u of S.units) {
     const r = D(u).radar; if (!u.alive || !r || r.band === 'ACU' || r.band === 'OPT') continue;
     if (JJ.side !== 'both' && D(u).side === JJ.side) continue;
-    const p = jamPos(j), J = jamJ(u, azOf(p[0] - u.x, p[1] - u.y), [j]);
+    // un DRFM no mete ruido, pero emite cuando el haz lo ilumina: se lo marca por su copia (lóbulo principal)
+    const p = jamPos(j), J = j.mode === 'drfm' ? (JJ.bands.includes(r.band) ? Math.max(0, drfmJ(u, j) ?? 0) : 0) : jamJ(u, azOf(p[0] - u.x, p[1] - u.y), [j]);
     if (J >= STROBE_J) out.push({ u, x: u.x, y: u.y, sigma: bearingSigma(BANDS[r.band].bw, J), J });
   }
   return out;

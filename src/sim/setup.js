@@ -1,7 +1,7 @@
 // @ts-check
 // ---------------- ARMADO DEL ESCENARIO ----------------
 // Funciones para agregar defensas, salvas y jammers a S.setup (antes de iniciar la corrida).
-import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES, C2_LEVELS, c2FromNet, WEATHER, WEATHER_DEFAULT, TIMES_OF_DAY, TOD_DEFAULT, GATEWAYS } from '../data/index.js';
+import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES, C2_LEVELS, c2FromNet, WEATHER, WEATHER_DEFAULT, TIMES_OF_DAY, TOD_DEFAULT, GATEWAYS, JAM_MODES } from '../data/index.js';
 import { azOf } from '../util/math.js';
 import { nextId } from '../util/ids.js';
 import { S } from './state.js';
@@ -48,13 +48,13 @@ export function addObj(type, x, y, o = {}) {
 export const targetName = sv => sv.targetUnit ? S.setup.defs.find(u => u.id === sv.targetUnit)?.name : sv.targetObj ? S.setup.objs.find(g => g.id === sv.targetObj)?.name : null;
 
 /**
- * Despliega un interferidor. o = { alt? (aéreos), mode? ('barrage' | 'spot', data/jammers.js#JAM_MODES),
+ * Despliega un interferidor. o = { alt? (aéreos), mode? ('barrage' | 'spot' | 'drfm', data/jammers.js#JAM_MODES),
  * target? (ruido puntual: nombre o id de la defensa cuyo radar interfiere) }.
  */
 export function addJam(type, x, y, o = {}) {
   const J = JAMMERS[type], u = o.target != null ? S.setup.defs.find(v => v.name === o.target || v.id === o.target) : null;
   const j = { id: nextId(), type, x, y, alt: o.alt ?? J.alt, on: true };
-  if (J.bands) { j.mode = o.mode === 'spot' ? 'spot' : 'barrage'; j.target = u ? u.id : null; }
+  if (J.bands) { j.mode = JAM_MODES[o.mode] ? o.mode : 'barrage'; j.target = u ? u.id : null; }
   S.setup.jams.push(j); return j;
 }
 

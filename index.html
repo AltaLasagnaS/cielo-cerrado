@@ -1621,7 +1621,7 @@ table.t.mc td.pc{white-space:nowrap}
   var JAM_MODES = {
     barrage: { name: "Barrera (toda la banda)", gain: 1 },
     spot: { name: "Puntual (contra un radar)", gain: 10, agileGain: 0.1 },
-    drfm: { name: "Engaño DRFM (falsos blancos)", gain: 0, coherent: true, falseTargets: 20 }
+    drfm: { name: "Engaño DRFM (falsos blancos)", gain: 0, coherent: true, falseTargets: 20, fooled: 0.3 }
   };
 
   // src/data/uncertainty.js
@@ -3951,6 +3951,12 @@ table.t.mc td.pc{white-space:nowrap}
     }
     return J * Math.pow(10, -(r.eccm || 0) / 10);
   }
+  function drfmJ(u, j, uz = antZ(u)) {
+    const p = jamPos(j);
+    if (!los(p[0], p[1], p[2], u.x, u.y, uz)) return null;
+    const d = Math.hypot(p[0] - u.x, p[1] - u.y, (p[2] - uz) / 1e3) + 1, J = JAMMERS[j.type].P / (d * d);
+    return inSector(u, azOf(p[0] - u.x, p[1] - u.y)) ? J : -J;
+  }
   function falseTracks(u, list) {
     const r = D(u).radar;
     if (!r || r.band === "ACU" || r.band === "OPT") return 0;
@@ -3960,11 +3966,10 @@ table.t.mc td.pc{white-space:nowrap}
       const JJ = JAMMERS[j.type];
       if (j.mode !== "drfm" || !j.on || j.dead || JJ.gnssJam || !JJ.bands.includes(r.band)) continue;
       if (JJ.side !== "both" && D(u).side !== "both" && JJ.side === D(u).side) continue;
-      const p = jamPos(j);
-      if (!los(p[0], p[1], p[2], u.x, u.y, uz)) continue;
-      const d = Math.hypot(p[0] - u.x, p[1] - u.y, (p[2] - uz) / 1e3) + 1, base = JJ.P / (d * d);
-      const main = inSector(u, azOf(p[0] - u.x, p[1] - u.y)) && base >= SNR50;
-      const side = !r.slb && base * sl.near >= SNR50;
+      const base = drfmJ(u, j, uz);
+      if (base === null) continue;
+      const main = base > 0 && base >= SNR50;
+      const side = !r.slb && Math.abs(base) * sl.near >= SNR50;
       if (main || side) n2 += M.falseTargets;
     }
     return n2;
@@ -4524,7 +4529,7 @@ table.t.mc td.pc{white-space:nowrap}
       const r = D(u).radar;
       if (!u.alive || !r || r.band === "ACU" || r.band === "OPT") continue;
       if (JJ.side !== "both" && D(u).side === JJ.side) continue;
-      const p = jamPos(j), J = jamJ(u, azOf(p[0] - u.x, p[1] - u.y), [j]);
+      const p = jamPos(j), J = j.mode === "drfm" ? JJ.bands.includes(r.band) ? Math.max(0, drfmJ(u, j) ?? 0) : 0 : jamJ(u, azOf(p[0] - u.x, p[1] - u.y), [j]);
       if (J >= STROBE_J) out.push({ u, x: u.x, y: u.y, sigma: bearingSigma(BANDS[r.band].bw, J), J });
     }
     return out;
@@ -4726,7 +4731,8 @@ table.t.mc td.pc{white-space:nowrap}
       if (t < u.nextScan) continue;
       u.nextScan = t + d.radar.scan;
       const r = d.radar, uz = antZ(u), wx = wxNow();
-      const keep = r.scan * 2 + 0.6, cap = r.tracks ?? Infinity, fake = cap < Infinity ? falseTracks(u, S.jamsLive) : 0;
+      const keep = r.scan * 2 + 0.6, cap = r.tracks ?? Infinity, fake = falseTracks(u, S.jamsLive);
+      u.fake = fake;
       let held = 0;
       if (cap < Infinity) {
         for (const th of S.threats) if (th.alive && t - (th.det[u.id] ?? -1e9) <= keep) held++;
@@ -4824,6 +4830,10 @@ table.t.mc td.pc{white-space:nowrap}
       it.done = true;
       const u = it.u;
       u.active = Math.max(0, u.active - 1);
+      if (it.phantom) {
+        log("x", it.shot + " de " + uLabel(u) + " no encuentra nada: era un falso blanco.");
+        continue;
+      }
       const th = it.th;
       if (!th.alive) {
         log("d", it.shot + " de " + uLabel(u) + ": blanco ya destruido, autodestrucción.");
@@ -4926,6 +4936,8 @@ table.t.mc td.pc{white-space:nowrap}
     const cand = [];
     for (const th of S.threats) if (canEngage(u, th, t, c2, false)) cand.push([th, th.p.rem / Math.max(1, th.T.v)]);
     cand.sort((a, b) => a[1] - b[1]);
+    const ph = Math.round((u.fake || 0) * JAM_MODES.drfm.fooled);
+    if (ph > 0 && u.active < ch && u.magLeft > 0 && rnd() < ph / (ph + cand.length)) phantomShot(u, t);
     for (const [th] of cand) {
       if (u.active >= ch || u.magLeft <= 0) {
         const k = uLabel(u), sat = u.magLeft <= 0 ? S.stats.satMag : S.stats.satChannels;
@@ -4969,6 +4981,22 @@ table.t.mc td.pc{white-space:nowrap}
       }
       log("l", uLabel(u) + " dispara " + n2 + "× " + sm.shot + " contra " + (th.isDecoy && hooks.defenderView() ? "pista #" + th.id : label(th)) + " — intercepción a " + sol.r.toFixed(1) + " km en " + sol.tau.toFixed(0) + " s" + (remote ? " (con pista de la red)" : "") + ".");
     }
+  }
+  function phantomShot(u, t) {
+    const sm = D(u).sam, n2 = Math.min(S.doctrine === "salva" ? u.salvo || sm.salvo : 1, u.magLeft, sm.ch - u.active);
+    const a = (u.az || 0) * Math.PI / 180, r = sm.maxR * 0.6, tau = timeTo(profileOf(sm), r * 1e3);
+    for (let k = 0; k < n2; k++) {
+      const it = { u, th: null, phantom: true, x0: u.x, y0: u.y, px: u.x + Math.sin(a) * r, py: u.y - Math.cos(a) * r, tL: t + k * 0.6, tH: t + tau + k * 0.6, shot: sm.shot, done: false };
+      S.ints.push(it);
+      S.rec?.ints.push(it);
+      u.magLeft--;
+      u.active++;
+      S.stats.shots++;
+      S.stats.defCost += sm.cost;
+      recUnit(u);
+    }
+    log("w", uLabel(u) + " dispara " + n2 + "× " + sm.shot + " contra un falso blanco (engaño DRFM).");
+    if (u.magLeft === 0) log("w", uLabel(u) + " se queda sin munición.");
   }
   function impact(th) {
     th.alive = false;
@@ -5143,7 +5171,7 @@ table.t.mc td.pc{white-space:nowrap}
     const J = JAMMERS[type], u = o.target != null ? S.setup.defs.find((v) => v.name === o.target || v.id === o.target) : null;
     const j = { id: nextId(), type, x, y, alt: o.alt ?? J.alt, on: true };
     if (J.bands) {
-      j.mode = o.mode === "spot" ? "spot" : "barrage";
+      j.mode = JAM_MODES[o.mode] ? o.mode : "barrage";
       j.target = u ? u.id : null;
     }
     S.setup.jams.push(j);

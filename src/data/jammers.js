@@ -56,12 +56,14 @@ export const CRPA_SIZES = [0, 4, 8, 12, 16];
  *            achica) y el radar las ve como blancos. Crea falseTargets falsos blancos por barrido
  *            (valor de juego) que ocupan la capacidad de seguimiento (radar.tracks). Entran por el
  *            lóbulo principal cuando el haz pasa por el jammer, y por los laterales si son fuertes,
- *            salvo que el radar tenga blanqueo de lóbulos laterales (radar.slb). Ver docs/FISICA.md §4.
+ *            salvo que el radar tenga blanqueo de lóbulos laterales (radar.slb). Una fracción fooled (valor
+ *            de juego, sin dato público) pasa la clasificación y la batería le dispara: misiles perdidos.
+ *            Ver docs/FISICA.md §4.
  * gain 10 (10 dB) es un valor de juego: la ganancia real es el cociente entre el ancho de la banda
  * barrida y el del radar, y puede ser mucho mayor.
  */
 export const JAM_MODES = {
   barrage: { name: 'Barrera (toda la banda)', gain: 1 },
   spot: { name: 'Puntual (contra un radar)', gain: 10, agileGain: 0.1 },
-  drfm: { name: 'Engaño DRFM (falsos blancos)', gain: 0, coherent: true, falseTargets: 20 }
+  drfm: { name: 'Engaño DRFM (falsos blancos)', gain: 0, coherent: true, falseTargets: 20, fooled: 0.3 }
 };

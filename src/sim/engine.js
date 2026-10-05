@@ -3,7 +3,7 @@
 // Bucle de paso fijo: la interfaz llama a step(dt) con dt ≤ 0,25 s de tiempo simulado.
 // Cada paso: lanzamientos → movimiento/señuelos/GNSS → barridos de sensores → decisiones de tiro
 // → resolución de interceptores → fin de corrida. Ver docs/ARQUITECTURA.md.
-import { D, JAMMERS, TARGET_STATUS, UNIT_TARGET, UNIT_DAMAGE, UNIT_COMP_AT, datalinksOf } from '../data/index.js';
+import { D, JAMMERS, JAM_MODES, TARGET_STATUS, UNIT_TARGET, UNIT_DAMAGE, UNIT_COMP_AT, datalinksOf } from '../data/index.js';
 import { classify, classifyGain, classifyTau } from '../physics/decoys.js';
 import { money } from '../util/format.js';
 import { nextId } from '../util/ids.js';
@@ -12,6 +12,7 @@ import { surf, los } from '../physics/terrain.js';
 import { antZ, aspectCos, belowCeiling, detR, inSector, jamJ, pdScan, PD_CUTOFF, confirms, scanHistory, falseTracks } from '../physics/radar.js';
 import { buildThreat, posAt, speedAt } from '../physics/kinematics.js';
 import { gnssNavError, crpaOverwhelmed } from '../physics/navigation.js';
+import { profileOf, timeTo } from '../physics/interceptor.js';
 import { RADAR_GUID, isTBM, trackOK, reactionStart, solve, calcPk, effectiveC2, unitC2, netPk } from '../physics/engagement.js';
 import { C2_LEVELS } from '../data/index.js';
 import { damageAt, targetStatus } from '../physics/damage.js';
@@ -95,7 +96,8 @@ export function step(dt) {
     const r = d.radar, uz = antZ(u), wx = wxNow();
     // capacidad de seguimiento (radar.tracks): pistas abiertas + falsos blancos DRFM; una pista nueva no
     // entra si está lleno (las abiertas se mantienen)
-    const keep = r.scan * 2 + 0.6, cap = r.tracks ?? Infinity, fake = cap < Infinity ? falseTracks(u, S.jamsLive) : 0;
+    const keep = r.scan * 2 + 0.6, cap = r.tracks ?? Infinity, fake = falseTracks(u, S.jamsLive);
+    u.fake = fake;   // falsos blancos DRFM de este barrido: ocupan capacidad y pueden atraer disparos (engage)
     let held = 0;
     if (cap < Infinity) for (const th of S.threats) if (th.alive && t - (th.det[u.id] ?? -1e9) <= keep) held++;
     for (const th of S.threats) {
@@ -171,6 +173,7 @@ export function step(dt) {
   for (const it of S.ints) {
     if (it.done || t < it.tH) continue;
     it.done = true; const u = it.u; u.active = Math.max(0, u.active - 1);
+    if (it.phantom) { log('x', it.shot + ' de ' + uLabel(u) + ' no encuentra nada: era un falso blanco.'); continue; }
     const th = it.th;
     if (!th.alive) { log('d', it.shot + ' de ' + uLabel(u) + ': blanco ya destruido, autodestrucción.'); continue; }
     // guiado por el radar de la batería (SARH, TVM, mando): si la batería cayó, el misil queda sin guía
@@ -285,6 +288,10 @@ export function engage(u, t) {
   const cand = [];
   for (const th of S.threats) if (canEngage(u, th, t, c2, false)) cand.push([th, th.p.rem / Math.max(1, th.T.v)]);
   cand.sort((a, b) => a[1] - b[1]);
+  // falsos blancos DRFM que pasan la clasificación (JAM_MODES.drfm.fooled): compiten con las pistas reales
+  // por los disparos de esta evaluación; si sale uno, la batería gasta una salva en la nada
+  const ph = Math.round((u.fake || 0) * JAM_MODES.drfm.fooled);
+  if (ph > 0 && u.active < ch && u.magLeft > 0 && rnd() < ph / (ph + cand.length)) phantomShot(u, t);
   for (const [th] of cand) {
     if (u.active >= ch || u.magLeft <= 0) { const k = uLabel(u), sat = u.magLeft <= 0 ? S.stats.satMag : S.stats.satChannels; sat[k] = (sat[k] || 0) + 1; break; }
     const f = solveFor(u, th, t); if (!f) continue;
@@ -313,6 +320,18 @@ export function engage(u, t) {
     if (u.magLeft === 0) { log('w', uLabel(u) + ' se queda sin munición.'); event(uLabel(u) + ' se queda sin munición', 'empty:' + u.id); }
     log('l', uLabel(u) + ' dispara ' + n + '× ' + sm.shot + ' contra ' + (th.isDecoy && hooks.defenderView() ? 'pista #' + th.id : label(th)) + ' — intercepción a ' + sol.r.toFixed(1) + ' km en ' + sol.tau.toFixed(0) + ' s' + (remote ? ' (con pista de la red)' : '') + '.');
   }
+}
+
+/** Salva contra un falso blanco DRFM: el misil vuela hacia el sector del radar y no encuentra nada. */
+function phantomShot(u, t) {
+  const sm = D(u).sam, n = Math.min(S.doctrine === 'salva' ? (u.salvo || sm.salvo) : 1, u.magLeft, sm.ch - u.active);
+  const a = (u.az || 0) * Math.PI / 180, r = sm.maxR * 0.6, tau = timeTo(profileOf(sm), r * 1000);
+  for (let k = 0; k < n; k++) {
+    const it = { u, th: null, phantom: true, x0: u.x, y0: u.y, px: u.x + Math.sin(a) * r, py: u.y - Math.cos(a) * r, tL: t + k * 0.6, tH: t + tau + k * 0.6, shot: sm.shot, done: false };
+    S.ints.push(it); S.rec?.ints.push(it); u.magLeft--; u.active++; S.stats.shots++; S.stats.defCost += sm.cost; recUnit(u);
+  }
+  log('w', uLabel(u) + ' dispara ' + n + '× ' + sm.shot + ' contra un falso blanco (engaño DRFM).');
+  if (u.magLeft === 0) log('w', uLabel(u) + ' se queda sin munición.');
 }
 
 /**

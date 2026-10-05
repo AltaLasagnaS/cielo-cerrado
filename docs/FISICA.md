@@ -210,7 +210,9 @@ El **blanqueo de lóbulos laterales** (SLB) compara cada pulso con una antena au
 
 **Capacidad de seguimiento** (`radar.tracks`, con rango y fuente en `UNC.def`): blancos que el radar puede seguir a la vez. Patriot 100, Arabel 100, TRML-4D 1.500, Sentinel más de 50, 30N6 24, 9S18M 50, Tor 48, 92N6 100; el resto es estimación. En cada barrido, las pistas abiertas más los falsos blancos ocupan esa capacidad. Si está llena, el radar **no abre pistas nuevas** (las abiertas se mantienen) y el registro lo avisa. También pasa sin engaño: en el puente de Monterey, un Pantsir con capacidad 20 se llena con el enjambre.
 
-No se modela todavía: arrastre de la ventana de distancia o velocidad contra un seguimiento (RGPO/VGPO, hace falta un jammer a bordo del blanco), disparos desperdiciados contra falsos blancos ni chequeos de coherencia distancia-Doppler de cada radar.
+**Disparos contra falsos blancos:** una fracción `JAM_MODES.drfm.fooled` = 0,3 de los falsos blancos (valor de juego: no hay dato público de cuántos pasan la clasificación) compite con las pistas reales por los disparos de cada evaluación de la batería: con probabilidad `falsos / (falsos + pistas reales)` dispara una salva hacia su sector, que no encuentra nada y ocupa canales y munición. Un DRFM no mete ruido, pero emite cuando el haz lo ilumina: también se lo puede **ubicar por triangulación** (abajo) por su copia en el lóbulo principal.
+
+No se modela todavía: arrastre de la ventana de distancia o velocidad contra un seguimiento (RGPO/VGPO, hace falta un jammer a bordo del blanco) ni chequeos de coherencia distancia-Doppler de cada radar.
 
 ### Triangulación y home-on-jam
 

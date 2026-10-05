@@ -140,6 +140,17 @@ export function jamJ(u, az, list) {
 }
 
 /**
+ * Relación de una copia DRFM del jammer j con el ruido del radar de u (sin eccm): P / d². Positiva si el
+ * jammer está en el sector del radar (le entra por el lóbulo principal al barrer), negativa si está fuera
+ * (solo podría entrar por los laterales), null sin línea de vista. uz: altura de la antena.
+ */
+export function drfmJ(u, j, uz = antZ(u)) {
+  const p = jamPos(j); if (!los(p[0], p[1], p[2], u.x, u.y, uz)) return null;
+  const d = Math.hypot(p[0] - u.x, p[1] - u.y, (p[2] - uz) / 1000) + 1, J = JAMMERS[j.type].P / (d * d);
+  return inSector(u, azOf(p[0] - u.x, p[1] - u.y)) ? J : -J;
+}
+
+/**
  * Falsos blancos que los interferidores DRFM (modo 'drfm', data/jammers.js#JAM_MODES) le meten por barrido
  * al radar de u. Una copia coherente recibe toda la ganancia de procesamiento, así que su relación con el
  * ruido es J = P · G / d² sin el descuento de eccm, y el radar la toma por un blanco si J ≥ SNR50:
@@ -154,10 +165,9 @@ export function falseTracks(u, list) {
   for (const j of list) {
     const JJ = JAMMERS[j.type]; if (j.mode !== 'drfm' || !j.on || j.dead || JJ.gnssJam || !JJ.bands.includes(r.band)) continue;
     if (JJ.side !== 'both' && D(u).side !== 'both' && JJ.side === D(u).side) continue;
-    const p = jamPos(j); if (!los(p[0], p[1], p[2], u.x, u.y, uz)) continue;
-    const d = Math.hypot(p[0] - u.x, p[1] - u.y, (p[2] - uz) / 1000) + 1, base = JJ.P / (d * d);
-    const main = inSector(u, azOf(p[0] - u.x, p[1] - u.y)) && base >= SNR50;
-    const side = !r.slb && base * sl.near >= SNR50;
+    const base = drfmJ(u, j, uz); if (base === null) continue;
+    const main = base > 0 && base >= SNR50;
+    const side = !r.slb && Math.abs(base) * sl.near >= SNR50;
     if (main || side) n += M.falseTargets;
   }
   return n;
