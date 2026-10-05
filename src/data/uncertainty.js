@@ -21,6 +21,7 @@ export const PL = {
   'sam.pk.balistico': ['Pk por disparo vs balísticos', ''], 'sam.pk.hiper': ['Pk por disparo vs hipersónicos', ''],
   landDb: ['Clutter de suelo rasante (σ°F⁴ mediano)', 'dB'], reliefDb: ['Variación del clutter de suelo con el relieve', '± dB'], res: ['Resolución en distancia típica', 'm'], ruK: ['Alcance sin ambigüedad del MTI (× R1)', '×'],
   mtiCap: ['Techo del factor de mejora MTI', 'dB'], pdCap: ['Factor de mejora pulso-Doppler', 'dB'], landSv: ['Dispersión de velocidad del clutter de suelo', 'm/s'], seaSv: ['Dispersión de velocidad del clutter de mar', 'm/s'], rainSv: ['Dispersión de velocidad del clutter de lluvia', 'm/s'],
+  windAlpha: ['Exponente del viento con la altura (ley de potencia)', ''], windTop: ['Altura hasta la que crece el viento', 'm'], optDay: ['Alcance óptico de día respecto de la noche', '×'],
   gwLag: ['Demora agregada por la pasarela', 's'], gwPk: ['Pk de un disparo con pista que pasó por la pasarela (factor)', '×'],
   alt: ['Altitud de patrulla', 'm'], remotePk: ['Pk de un disparo con pista de red (factor)', '×'], radius: ['Radio de efecto', 'km'], spoofKm: ['Desvío típico por engaño GNSS', 'km'], P: ['Potencia relativa (juego)', '']
 };
@@ -517,6 +518,14 @@ export const UNC = {
     f16ecm: {
       P: U(1e4, 3e4, 1e5, 'baja', S_('ng_alq131', 'fas_alq131'), 'parámetro de juego: potencia y bandas del pod no son públicas. Un orden de magnitud menos que el Il-22PP (3e5): un pod de caza tiene menos potencia y antenas mucho más chicas; est'),
       alt: U(300, 4000, 8000, 'baja', [], 'est: los F-16 ucranianos vuelan bajo para sobrevivir y suben para lanzar; altura de patrulla de juego')
+    }
+  },
+  // ambiente (data/environment.js)
+  env: {
+    modelo: {
+      windAlpha: U(0.1, 0.143, 0.4, 'media', S_('wp:Wind_profile_power_law'), '1/7 con atmósfera neutra; de noche, con inversión estable, el exponente sube a 0,3–0,4'),
+      windTop: U(500, 1000, 2000, 'media', S_('wp:Planetary_boundary_layer'), 'tope típico de la capa límite: cientos de metros de noche, 1–2 km de día'),
+      optDay: U(1, 1.3, 2, 'baja', [], 'est: de día se suma la vista al visor térmico; sin dato público de alcances por hora')
     }
   },
   // pasarelas entre familias de enlaces (data/datalinks.js#GATEWAYS)

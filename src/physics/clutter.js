@@ -15,12 +15,14 @@
 //   σ° suelo: σ°F⁴ de Billingsley a ángulos rasantes (≈ −30 dB, ya incluye la propagación), ± relieve.
 //   σ° mar:   modelo NRL 2012 (Gregers-Hansen y Mital) según banda, ángulo rasante y estado del mar.
 //   η lluvia: 6·10⁻¹⁴ · r^1,6 / λ⁴ (m⁻¹; Barton): Rayleigh con Z = 200·r^1,6 (Marshall–Palmer).
+//   η nieve: physics/weather.js#snowEta (Sekhon y Srivastava). La nieve seca casi no atenúa microondas.
 // I (factor de mejora): sin filtro 1; MTI con cancelador doble contra un espectro gaussiano
 // I = 2·(PRF / (2π·σf))⁴, σf = 2·σv/λ, con techo mtiCap; pulso-Doppler pdCap.
 import { BANDS, CLUTTER } from '../data/index.js';
 import { surf, los, MAP } from './terrain.js';
 import { slopeAt } from './terrain-analysis.js';
 import { LOS_MARGIN } from './constants.js';
+import { snowEta } from './weather.js';
 import { clamp } from '../util/math.js';
 
 const DEG = Math.PI / 180;
@@ -107,11 +109,11 @@ export function clutterRcs(r, ux, uy, uz, rr, agl, x, y, wx) {
       out.surface = s0 * A * g2 / improvement(r, sea ? M.seaSv : M.landSv);
     }
   }
-  // lluvia: llena el haz hasta RAIN_TOP; el blanco está dentro de la lluvia si vuela debajo
-  const rain = wx?.rain || 0, zt = Math.max(0, surf(x, y)) + Math.max(0, agl);
-  if (rain > 0 && zt < RAIN_TOP) {
+  // lluvia o nieve: llenan el haz hasta RAIN_TOP; el blanco está dentro si vuela debajo
+  const rain = wx?.rain || 0, snow = wx?.snow || 0, zt = Math.max(0, surf(x, y)) + Math.max(0, agl);
+  if ((rain > 0 || snow > 0) && zt < RAIN_TOP) {
     const fill = Math.min(1, RAIN_TOP / Math.max(1, R * thEl));
-    out.rain = rainEta(rain, lambda) * VOL_INT * dR * R * R * thAz * thEl * fill / improvement(r, M.rainSv);
+    out.rain = (rainEta(rain, lambda) + snowEta(snow, lambda)) * VOL_INT * dR * R * R * thAz * thEl * fill / improvement(r, M.rainSv);
   }
   return out;
 }

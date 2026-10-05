@@ -2,7 +2,7 @@
 // ---------------- CLIMA ----------------
 // Atenuación del radar por lluvia (Rec. ITU-R P.838-3) y su efecto en el alcance de detección.
 // Ver docs/FISICA.md §2 ("Clima") y data/weather.js.
-import { BANDS } from '../data/index.js';
+import { BANDS, ENV } from '../data/index.js';
 
 // Constantes de la Rec. ITU-R P.838-3 (2005) para polarización horizontal: k y α en función de la
 // frecuencia f (GHz), válidas de 1 a 1.000 GHz. γ = k · R^α  (dB/km, R en mm/h).
@@ -37,3 +37,20 @@ export function rainRange(R0, gamma, L) {
   for (let i = 0; i < 8; i++) R -= (Math.log(R) + c * R - l0) / (1 / R + c);
   return R;
 }
+
+/**
+ * Viento a h metros sobre el suelo a partir del de superficie v10 (a 10 m, el que dan los partes):
+ * ley de potencia v(h) = v10 · (h/10)^α hasta el tope de la capa límite (ENV.modelo.windTop) y constante
+ * más arriba. Con α = 1/7, a 1.000 m sopla ≈1,9 veces más que en superficie. Ver docs/FISICA.md §5.
+ */
+export function windAt(v10, h) {
+  const M = ENV.modelo; return v10 * Math.pow(Math.min(Math.max(h, 10), M.windTop) / 10, M.windAlpha);
+}
+
+/**
+ * Reflectividad de volumen de la nieve η (m²/m³) con s mm/h de agua equivalente y longitud de onda λ (m):
+ * Rayleigh como la lluvia, con la reflectividad equivalente de Sekhon y Srivastava (1970), la que usa el
+ * servicio meteorológico de Canadá: Zes = 1780·s^2,23 con el factor dieléctrico del hielo; con el del
+ * agua (convención del radar) Ze = Zes − 6,5 dB. η = π⁵·0,93·Ze·10⁻¹⁸ / λ⁴.
+ */
+export const snowEta = (s, lambda) => (s > 0 ? Math.pow(Math.PI, 5) * 0.93 * 1780 * Math.pow(s, 2.23) * Math.pow(10, -0.65) * 1e-18 / Math.pow(lambda, 4) : 0);

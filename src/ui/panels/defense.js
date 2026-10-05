@@ -1,5 +1,5 @@
 // Pestaña "Defensa": catálogo de sistemas para ubicar, mando y control, y opciones de cobertura.
-import { DEFENSES, THREATS, C2_LEVELS, WEATHER } from '../../data/index.js';
+import { DEFENSES, THREATS, C2_LEVELS, WEATHER, TIMES_OF_DAY } from '../../data/index.js';
 import { esc } from '../../util/format.js';
 import { S } from '../../sim/state.js';
 import { draw } from '../../render/draw.js';
@@ -34,7 +34,11 @@ export function renderDef() {
     <div class="grp"><h3>Clima ${infoBtn('clima')}</h3>
       <div class="field"><label for="optWx">Tiempo</label><select id="optWx" class="sel">${Object.entries(WEATHER).map(([k, W]) => `<option value="${k}" ${S.weather === k ? 'selected' : ''}>${esc(W.name)}</option>`).join('')}</select></div>
       <p class="hint" id="wxInfo">${esc(WEATHER[S.weather].desc)}</p>
-      <div class="field" title="Viento a la altura de vuelo, igual en todo el mapa. Los drones y misiles de crucero vuelan a su velocidad respecto del aire: con viento de frente tardan más y con viento de cola llegan antes. A un Shahed (≈185 km/h) le pesa mucho; a un misil de crucero, poco. No afecta a balísticos ni planeadoras."><label for="optWind">Viento ${infoBtn('clima')}</label><span class="val" id="windVal">${windTxt()}</span><input type="range" id="optWind" min="0" max="30" step="1" value="${S.wind.v}"></div>
+      <div class="field"><label for="optTod">Momento</label><select id="optTod" class="sel">${Object.entries(TIMES_OF_DAY).map(([k, D]) => `<option value="${k}" ${S.tod === k ? 'selected' : ''}>${esc(D.name)}</option>`).join('')}</select></div>
+      <p class="hint" id="todInfo">${esc(TIMES_OF_DAY[S.tod].desc)}</p>
+      <div class="field" title="El tiempo puede cambiar durante la noche: a los minutos indicados pasa al estado elegido (por ejemplo, entra una tormenta)."><label for="optWx2">Después cambia a</label><select id="optWx2" class="sel"><option value="">(no cambia)</option>${Object.entries(WEATHER).map(([k, W]) => `<option value="${k}" ${S.wxPlan[0]?.weather === k ? 'selected' : ''}>${esc(W.name)}</option>`).join('')}</select></div>
+      <div class="field"><label for="optWxT">A los (minutos)</label><input id="optWxT" class="inp" type="number" min="1" max="600" value="${Math.round((S.wxPlan[0]?.t ?? 1800) / 60)}"></div>
+      <div class="field" title="Viento en superficie (a 10 m), igual en todo el mapa; arriba sopla más (≈1,9 veces a 1.000 m). Los drones y misiles de crucero vuelan a su velocidad respecto del aire: con viento de frente tardan más y con viento de cola llegan antes. A un Shahed (≈185 km/h) le pesa mucho; a un misil de crucero, poco. No afecta a balísticos ni planeadoras."><label for="optWind">Viento ${infoBtn('clima')}</label><span class="val" id="windVal">${windTxt()}</span><input type="range" id="optWind" min="0" max="30" step="1" value="${S.wind.v}"></div>
       <div class="field"><label for="optWindFrom">Sopla desde</label><select id="optWindFrom" class="sel">${WIND_DIRS.map(([n, a]) => `<option value="${a}" ${S.wind.from === a ? 'selected' : ''}>${n} (${a}°)</option>`).join('')}</select></div>
     </div>
     <div class="grp"><h3>Cobertura de radar ${infoBtn('horizon')} ${infoBtn('los')}</h3>
@@ -53,6 +57,10 @@ export function renderDef() {
   $('#optDecoy').onchange = e => { S.ignoreDecoys = e.target.checked; };
   $('#optFR').oninput = e => { S.fireRange = +e.target.value / 100; $('#frVal').textContent = e.target.value + '%'; };
   $('#optWx').onchange = e => { if (S.started) { toast('Reiniciá para cambiar el clima.'); e.target.value = S.weather; return; } S.weather = e.target.value; $('#wxInfo').textContent = WEATHER[S.weather].desc; schedCov(); };
+  $('#optTod').onchange = e => { if (S.started) { toast('Reiniciá para cambiar el momento del día.'); e.target.value = S.tod; return; } S.tod = e.target.value; $('#todInfo').textContent = TIMES_OF_DAY[S.tod].desc; schedCov(); };
+  const setPlan = () => { const w = $('#optWx2').value, m = +$('#optWxT').value; S.wxPlan = w && Number.isFinite(m) && m >= 1 && m <= 600 ? [{ t: Math.round(m * 60), weather: w }] : []; };
+  $('#optWx2').onchange = e => { if (S.started) { toast('Reiniciá para cambiar el clima.'); e.target.value = S.wxPlan[0]?.weather ?? ''; return; } setPlan(); };
+  $('#optWxT').onchange = e => { if (S.started) { toast('Reiniciá para cambiar el clima.'); return; } setPlan(); };
   const windLock = (e, v) => { if (!S.started) return false; toast('Reiniciá para cambiar el viento.'); e.target.value = v; return true; };
   $('#optWind').oninput = e => { if (windLock(e, S.wind.v)) return; S.wind = { ...S.wind, v: +e.target.value }; $('#windVal').textContent = windTxt(); };
   $('#optWindFrom').onchange = e => { if (windLock(e, S.wind.from)) return; S.wind = { ...S.wind, from: +e.target.value }; $('#windVal').textContent = windTxt(); };

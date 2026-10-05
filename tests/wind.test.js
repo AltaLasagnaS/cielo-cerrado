@@ -1,7 +1,8 @@
 // Viento sobre drones y misiles de crucero (physics/kinematics.js#groundSpeed, docs/FISICA.md §1).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { SCENARIOS, THREATS } from '../src/data/index.js';
+import { SCENARIOS, THREATS, ENV } from '../src/data/index.js';
+import { windAt } from '../src/physics/weather.js';
 import { groundSpeed, buildThreat } from '../src/physics/kinematics.js';
 import { S } from '../src/sim/state.js';
 import { applyScenario } from '../src/sim/setup.js';
@@ -28,10 +29,12 @@ test('buildThreat: el viento alarga o acorta el vuelo de un Shahed y casi no toc
   const ft = (type, wind) => buildThreat(sv(type), 0, 0, wind).ft;
   const calm = ft('shahed'), head = ft('shahed', { v: 10, from: 90 }), tail = ft('shahed', { v: 10, from: 270 });
   close(calm, 60000 / THREATS.shahed.v, 1e-6, 'sin viento, como antes');
-  close(head, 60000 / (THREATS.shahed.v - 10), 1e-6, 'de frente');
-  close(tail, 60000 / (THREATS.shahed.v + 10), 1e-6, 'de cola');
+  const w = windAt(10, THREATS.shahed.agl);   // el viento a la altura de vuelo del Shahed
+  assert.ok(w > 10, 'arriba sopla más que en superficie');
+  close(head, 60000 / (THREATS.shahed.v - w), 1e-6, 'de frente');
+  close(tail, 60000 / (THREATS.shahed.v + w), 1e-6, 'de cola');
   const k = ft('kalibr', { v: 10, from: 90 }) / ft('kalibr');
-  assert.ok(k > 1 && k < 1.05, `Kalibr con 10 m/s de frente: ×${k.toFixed(3)}`);
+  assert.ok(k > 1 && k < 1.08, `Kalibr con 10 m/s de frente en superficie (≈12 m/s a su altura): ×${k.toFixed(3)}`);
   assert.ok(head / calm > 1.2, 'al Shahed le pesa mucho más');
 });
 
@@ -39,9 +42,17 @@ test('buildThreat: cada tramo de la ruta tiene su propio efecto', () => {
   useMap('monterey', { flat: true }); clearSetup();
   // ida al este 30 km y vuelta al oeste 30 km con viento del este: tarda más que en calma
   const th = buildThreat({ id: 1, type: 'shahed', count: 1, pts: [[10, 50], [40, 50], [10, 50.001]] }, 0, 0, { v: 10, from: 90 });
-  const v = THREATS.shahed.v;
-  close(th.ft, 30000 / (v - 10) + 30000 / (v + 10), 1e-3, 'ida de frente, vuelta de cola');
+  const v = THREATS.shahed.v, w = windAt(10, THREATS.shahed.agl);
+  close(th.ft, 30000 / (v - w) + 30000 / (v + w), 1e-3, 'ida de frente, vuelta de cola');
   assert.ok(th.ft > 60000 / v, 'ida y vuelta con viento siempre tarda más que en calma');
+});
+
+test('viento con la altura: ley de potencia 1/7 hasta el tope de la capa límite', () => {
+  close(windAt(10, 10), 10, 1e-12, 'a 10 m, el de superficie');
+  close(windAt(10, 2), 10, 1e-12, 'debajo de 10 m no baja más');
+  close(windAt(10, 1000), 10 * Math.pow(100, ENV.modelo.windAlpha), 1e-9, 'a 1.000 m');
+  assert.equal(windAt(10, 5000), windAt(10, ENV.modelo.windTop), 'arriba de la capa límite, constante');
+  assert.ok(windAt(10, 1000) / 10 > 1.8 && windAt(10, 1000) / 10 < 2.0, 'con 1/7, ≈1,9 veces');
 });
 
 test('buildThreat: los balísticos y los lanzados desde fuera del mapa no cambian con el viento', () => {

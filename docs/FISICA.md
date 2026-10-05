@@ -105,7 +105,13 @@ L (`rainKm`) es el largo máximo del camino dentro de la lluvia: las celdas de l
 
 **Ópticos, IR y acústicos.** Los sensores `OPT` multiplican su alcance por `wx.opt` y no ven blancos por encima del techo de nubes o niebla (`wx.ceiling`, m sobre el terreno). Los acústicos multiplican por `wx.acu`. Son estimaciones de juego apoyadas en el manual de CMO (la lluvia deja lo visual en 1–5% y degrada mucho el IR; las nubes cortan la línea de vista).
 
-**No se modela:** día y noche, el viento sobre los drones, ni el efecto del clima sobre los buscadores IR de los misiles.
+**Día y noche** (`S.tod`, pestaña Defensa → Clima, `rules.tod`; por defecto noche): los alcances del catálogo de los sensores ópticos (grupos móviles, MANPADS) están estimados para la noche, con visor térmico y reflectores. De día se suma la vista y llegan ×`ENV.modelo.optDay` = 1,3 más lejos (estimado, rango 1–2 en UNC: no hay alcances públicos por hora). Los radares no cambian.
+
+**Nieve** (estado "Nevada moderada", `snow` = 2 mm/h de agua equivalente): la nieve seca casi no atenúa microondas, así que no suma atenuación; sí devuelve eco de volumen, que se suma al clutter de lluvia (§2, "Clutter") con la reflectividad de Sekhon y Srivastava (1970), la que usa el servicio meteorológico de Canadá: `Zes = 1780·s^2,23` (hielo), `Ze = Zes − 6,5 dB` (convención del agua), `η = π⁵·0,93·Ze·10⁻¹⁸/λ⁴`. Lo óptico cae a 0,2 y las nubes cortan arriba de 600 m (estimados).
+
+**Cambios de tiempo durante la noche** (`S.wxPlan`, "Después cambia a…" en Defensa → Clima, `rules.wxPlan` = hasta 10 cambios `{ t (s), weather }`): a la hora indicada el clima vigente pasa al nuevo estado y el registro lo anota (`sim/weather-now.js`). El clima elegido del escenario no se pisa.
+
+**No se modela:** el efecto del clima sobre los buscadores IR de los misiles, ni nieve húmeda (que sí atenúa).
 
 ### Sensores no radar
 
@@ -267,7 +273,7 @@ Es un modelo **cinemático guiado por datos**: la amenaza recorre una ruta polig
 - **Salvas:** dispersión lateral de 0,25 km entre misiles, para que no se apilen.
 - **Señuelos:** se liberan a 40 km del blanco; se abren hasta 1–3,5 km del misil padre y suben hasta 300 m.
 - **Velocidad instantánea:** diferencia centrada de ±0,5 s (`speedAt`).
-- **Viento** (`S.wind = { v, from }`, pestaña Defensa → Clima, `rules.wind` en los archivos; por defecto calma): uniforme en todo el mapa y en altura, fijo toda la noche. Las armas con ruta en el mapa (drones y crucero) vuelan a su velocidad del catálogo **respecto del aire**: en cada tramo de la ruta, con rumbo `u` y viento `W` (hacia dónde sopla), corrigen la deriva y avanzan sobre el suelo a
+- **Viento** (`S.wind = { v, from }`, pestaña Defensa → Clima, `rules.wind` en los archivos; por defecto calma): uniforme en todo el mapa y fijo toda la noche. Es el viento **en superficie** (a 10 m, el de los partes) y crece con la altura según la ley de potencia `v(h) = v10·(h/10)^α` con α = 1/7 (atmósfera neutra) hasta el tope de la capa límite (1.000 m) y constante arriba: a 1.000 m sopla ≈1,9 veces más (`physics/weather.js#windAt`, parámetros con rango en `UNC.env`). Cada arma usa el viento de su altura de vuelo. Las armas con ruta en el mapa (drones y crucero) vuelan a su velocidad del catálogo **respecto del aire**: en cada tramo de la ruta, con rumbo `u` y viento `W` (hacia dónde sopla), corrigen la deriva y avanzan sobre el suelo a
   ```
   Vg = W·u + √(v² − (W×u)²)          (triángulo de velocidades; si el viento cruzado supera v, se acota a 0,1·v)
   ```

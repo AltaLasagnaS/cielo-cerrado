@@ -3,7 +3,7 @@
 // Bucle de paso fijo: la interfaz llama a step(dt) con dt ≤ 0,25 s de tiempo simulado.
 // Cada paso: lanzamientos → movimiento/señuelos/GNSS → barridos de sensores → decisiones de tiro
 // → resolución de interceptores → fin de corrida. Ver docs/ARQUITECTURA.md.
-import { D, JAMMERS, TARGET_STATUS, WEATHER, UNIT_TARGET, UNIT_DAMAGE, UNIT_COMP_AT, datalinksOf } from '../data/index.js';
+import { D, JAMMERS, TARGET_STATUS, UNIT_TARGET, UNIT_DAMAGE, UNIT_COMP_AT, datalinksOf } from '../data/index.js';
 import { classify, classifyGain, classifyTau } from '../physics/decoys.js';
 import { money } from '../util/format.js';
 import { nextId } from '../util/ids.js';
@@ -21,11 +21,12 @@ import { hooks } from './hooks.js';
 import { log, event, label, uLabel } from './log.js';
 import { recReset, recUnit, recObj } from './replay.js';
 import { ewStep } from './ew.js';
+import { wxNow, wxReset, wxStep } from './weather-now.js';
 
 /** Arma la corrida a partir de S.setup: copia unidades y jammers y programa todos los lanzamientos. */
 export function startSim() {
   S.units = S.setup.defs.map(d => ({ ...d, alive: true, hp: UNIT_TARGET.hp, dmgRadar: false, dmgLauncher: false, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
-  S.jamsLive = S.setup.jams.map(j => ({ ...j, _losMap: {} })); S.hoj = []; S.ewNext = 0;
+  S.jamsLive = S.setup.jams.map(j => ({ ...j, _losMap: {} })); S.hoj = []; S.ewNext = 0; wxReset();
   S.objs = S.setup.objs.map(g => ({ ...g, hp: g.maxHp, status: 'operational', hits: 0, dmgBy: {} }));
   S.threats = []; S.ints = []; S.fx = []; S.impacts = []; S.stats = newStats(); S.log = []; S.events = []; S.arrivals = [];
   S.pending = []; recReset();
@@ -40,11 +41,12 @@ export function startSim() {
 }
 
 /** Vuelve al modo edición: descarta la corrida (el setup queda intacto). */
-export function resetState() { S.rec = null; S.replay = null; S.autoPhase = 'calm'; S.running = false; S.started = false; S.t = 0; S.units = []; S.jamsLive = []; S.hoj = []; S.ewNext = 0; S.objs = []; S.events = []; S.arrivals = []; S.pending = []; S.threats = []; S.ints = []; S.fx = []; S.impacts = []; S.stats = newStats(); S.log = []; }
+export function resetState() { S.rec = null; S.replay = null; S.autoPhase = 'calm'; S.running = false; S.started = false; S.t = 0; S.units = []; S.jamsLive = []; S.hoj = []; S.ewNext = 0; S.wxLive = null; S.wxIdx = 0; S.objs = []; S.events = []; S.arrivals = []; S.pending = []; S.threats = []; S.ints = []; S.fx = []; S.impacts = []; S.stats = newStats(); S.log = []; }
 
 /** Avanza la simulación dt segundos. */
 export function step(dt) {
   const t = S.t + dt; S.t = t;
+  wxStep(t);
   // lanzamientos
   while (S.pending.length && S.pending[0].tLaunch <= t) {
     const th = S.pending.shift(); th.alive = true; S.threats.push(th);
@@ -90,7 +92,7 @@ export function step(dt) {
   for (const u of S.units) {
     if (!u.alive) continue; const d = D(u); if (!d.radar) continue;
     if (t < u.nextScan) continue; u.nextScan = t + d.radar.scan;
-    const r = d.radar, uz = antZ(u), wx = WEATHER[S.weather];
+    const r = d.radar, uz = antZ(u), wx = wxNow();
     // capacidad de seguimiento (radar.tracks): pistas abiertas + falsos blancos DRFM; una pista nueva no
     // entra si está lleno (las abiertas se mantienen)
     const keep = r.scan * 2 + 0.6, cap = r.tracks ?? Infinity, fake = cap < Infinity ? falseTracks(u, S.jamsLive) : 0;
@@ -226,7 +228,7 @@ function solveFor(u, th, t) {
     // con pista ajena (C2 integrada), su radar tiene que cubrir el punto de encuentro: sector y alcance
     if (remote) {
       const az = azOf(sol.p.x - u.x, sol.p.y - u.y), dk = Math.hypot(sol.p.x - u.x, sol.p.y - u.y, (sol.p.z - antZ(u)) / 1000);
-      if (!inSector(u, az) || dk > detR(u, th, jamJ(u, az, S.jamsLive), 1, WEATHER[S.weather])) return null;
+      if (!inSector(u, az) || dk > detR(u, th, jamJ(u, az, S.jamsLive), 1, wxNow())) return null;
     }
   }
   return { sol, remote };

@@ -1680,6 +1680,9 @@ table.t.mc td.pc{white-space:nowrap}
     landSv: ["Dispersión de velocidad del clutter de suelo", "m/s"],
     seaSv: ["Dispersión de velocidad del clutter de mar", "m/s"],
     rainSv: ["Dispersión de velocidad del clutter de lluvia", "m/s"],
+    windAlpha: ["Exponente del viento con la altura (ley de potencia)", ""],
+    windTop: ["Altura hasta la que crece el viento", "m"],
+    optDay: ["Alcance óptico de día respecto de la noche", "×"],
     gwLag: ["Demora agregada por la pasarela", "s"],
     gwPk: ["Pk de un disparo con pista que pasó por la pasarela (factor)", "×"],
     alt: ["Altitud de patrulla", "m"],
@@ -2182,6 +2185,14 @@ table.t.mc td.pc{white-space:nowrap}
         alt: U(300, 4e3, 8e3, "baja", [], "est: los F-16 ucranianos vuelan bajo para sobrevivir y suben para lanzar; altura de patrulla de juego")
       }
     },
+    // ambiente (data/environment.js)
+    env: {
+      modelo: {
+        windAlpha: U(0.1, 0.143, 0.4, "media", S_("wp:Wind_profile_power_law"), "1/7 con atmósfera neutra; de noche, con inversión estable, el exponente sube a 0,3–0,4"),
+        windTop: U(500, 1e3, 2e3, "media", S_("wp:Planetary_boundary_layer"), "tope típico de la capa límite: cientos de metros de noche, 1–2 km de día"),
+        optDay: U(1, 1.3, 2, "baja", [], "est: de día se suma la vista al visor térmico; sin dato público de alcances por hora")
+      }
+    },
     // pasarelas entre familias de enlaces (data/datalinks.js#GATEWAYS)
     gw: {
       ua_l16: {
@@ -2318,6 +2329,20 @@ table.t.mc td.pc{white-space:nowrap}
     const links = u?.datalinks ?? u?.links ?? [];
     return Array.isArray(links) ? links.filter((k) => DATALINKS[k]) : [];
   };
+
+  // src/data/environment.js
+  var ENV = {
+    modelo: {
+      windAlpha: 0.143,
+      windTop: 1e3,
+      optDay: 1.3
+    }
+  };
+  var TIMES_OF_DAY = {
+    noche: { name: "Noche", desc: "Los grupos móviles y los MANPADS buscan con visor térmico y reflectores: los alcances del catálogo." },
+    dia: { name: "Día", desc: "Se suma la vista: los sensores ópticos llegan algo más lejos (estimado). Los radares no cambian." }
+  };
+  var TOD_DEFAULT = "noche";
 
   // src/data/bands.js
   var BANDS = {
@@ -2968,6 +2993,17 @@ table.t.mc td.pc{white-space:nowrap}
       sea: 5,
       desc: "Lluvia fuerte en celdas de unos 15 km: los radares de banda X y Ku pierden bastante alcance, la óptica casi no sirve y la red acústica oye poco."
     },
+    nieve: {
+      name: "Nevada moderada (≈2 mm/h de agua)",
+      rain: 0,
+      snow: 2,
+      rainKm: 0,
+      opt: 0.2,
+      ceiling: 600,
+      acu: 0.8,
+      sea: 3,
+      desc: "Nieve que tapa la vista a cerca de un kilómetro: lo óptico y el infrarrojo caen mucho y las nubes cortan arriba de 600 m. Los radares casi no pierden alcance, pero el eco de los copos se suma al clutter (más en banda X y Ku). La red acústica oye algo menos."
+    },
     niebla: {
       name: "Niebla",
       rain: 0,
@@ -3146,7 +3182,7 @@ table.t.mc td.pc{white-space:nowrap}
     }
     a[ks[ks.length - 1]] = v;
   }
-  var CAT_OF = { thr: THREATS, def: DEFENSES, jam: JAMMERS, c2: C2_LEVELS, clu: CLUTTER, gw: GATEWAYS };
+  var CAT_OF = { thr: THREATS, def: DEFENSES, jam: JAMMERS, c2: C2_LEVELS, clu: CLUTTER, gw: GATEWAYS, env: ENV };
   function applyProbable() {
     for (const [kind, set] of Object.entries(UNC)) for (const [k, params] of Object.entries(set)) {
       const obj = CAT_OF[kind][k];
@@ -3289,6 +3325,8 @@ table.t.mc td.pc{white-space:nowrap}
     doctrine: "salva",
     fireRange: 1,
     weather: "despejado",
+    tod: "noche",
+    wxPlan: [],
     wind: { v: 0, from: 0 },
     ignoreDecoys: false,
     showCov: true,
@@ -3308,6 +3346,8 @@ table.t.mc td.pc{white-space:nowrap}
     jamsLive: [],
     hoj: [],
     ewNext: 0,
+    wxLive: null,
+    wxIdx: 0,
     objs: [],
     pending: [],
     threats: [],
@@ -3448,6 +3488,11 @@ table.t.mc td.pc{white-space:nowrap}
     for (let i = 0; i < 8; i++) R -= (Math.log(R) + c * R - l0) / (1 / R + c);
     return R;
   }
+  function windAt(v10, h) {
+    const M = ENV.modelo;
+    return v10 * Math.pow(Math.min(Math.max(h, 10), M.windTop) / 10, M.windAlpha);
+  }
+  var snowEta = (s, lambda) => s > 0 ? Math.pow(Math.PI, 5) * 0.93 * 1780 * Math.pow(s, 2.23) * Math.pow(10, -0.65) * 1e-18 / Math.pow(lambda, 4) : 0;
 
   // src/physics/pulse-integration.js
   var PFA = 1e-6;
@@ -3779,10 +3824,10 @@ table.t.mc td.pc{white-space:nowrap}
         out.surface = s0 * A * g2 / improvement(r, sea ? M.seaSv : M.landSv);
       }
     }
-    const rain = wx?.rain || 0, zt = Math.max(0, surf(x, y)) + Math.max(0, agl);
-    if (rain > 0 && zt < RAIN_TOP) {
+    const rain = wx?.rain || 0, snow = wx?.snow || 0, zt = Math.max(0, surf(x, y)) + Math.max(0, agl);
+    if ((rain > 0 || snow > 0) && zt < RAIN_TOP) {
       const fill = Math.min(1, RAIN_TOP / Math.max(1, R * thEl));
-      out.rain = rainEta(rain, lambda) * VOL_INT * dR * R * R * thAz * thEl * fill / improvement(r, M.rainSv);
+      out.rain = (rainEta(rain, lambda) + snowEta(snow, lambda)) * VOL_INT * dR * R * R * thAz * thEl * fill / improvement(r, M.rainSv);
     }
     return out;
   }
@@ -3998,6 +4043,7 @@ table.t.mc td.pc{white-space:nowrap}
     else if (T.prof === "hilo") ph = [[0, Math.max(0, L - 60), T.v], [Math.max(0, L - 60), L, T.vLow]];
     else ph = [[0, L, T.v]];
     if (wind?.v > 0 && !offmap) {
+      wind = { ...wind, v: windAt(wind.v, sv.agl ?? T.agl ?? T.cruiseAlt ?? 100) };
       const out = [];
       for (const [s0, s1, v] of ph) for (let i = 1; i < pts.length; i++) {
         const a0 = Math.max(s0, cum[i - 1]), a1 = Math.min(s1, cum[i]);
@@ -4512,12 +4558,32 @@ table.t.mc td.pc{white-space:nowrap}
     }
   }
 
+  // src/sim/weather-now.js
+  function wxNow() {
+    const W = WEATHER[S.wxLive ?? S.weather] || WEATHER.despejado;
+    return S.tod === "dia" ? { ...W, opt: W.opt * ENV.modelo.optDay } : W;
+  }
+  function wxReset() {
+    S.wxLive = S.weather;
+    S.wxIdx = 0;
+  }
+  function wxStep(t) {
+    const plan = S.wxPlan || [];
+    while (S.wxIdx < plan.length && t >= plan[S.wxIdx].t) {
+      const c = plan[S.wxIdx++];
+      if (!WEATHER[c.weather] || c.weather === S.wxLive) continue;
+      S.wxLive = c.weather;
+      log("w", "Cambia el tiempo: " + WEATHER[c.weather].name + ".");
+    }
+  }
+
   // src/sim/engine.js
   function startSim() {
     S.units = S.setup.defs.map((d) => ({ ...d, alive: true, hp: UNIT_TARGET.hp, dmgRadar: false, dmgLauncher: false, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
     S.jamsLive = S.setup.jams.map((j) => ({ ...j, _losMap: {} }));
     S.hoj = [];
     S.ewNext = 0;
+    wxReset();
     S.objs = S.setup.objs.map((g) => ({ ...g, hp: g.maxHp, status: "operational", hits: 0, dmgBy: {} }));
     S.threats = [];
     S.ints = [];
@@ -4553,6 +4619,8 @@ table.t.mc td.pc{white-space:nowrap}
     S.jamsLive = [];
     S.hoj = [];
     S.ewNext = 0;
+    S.wxLive = null;
+    S.wxIdx = 0;
     S.objs = [];
     S.events = [];
     S.arrivals = [];
@@ -4567,6 +4635,7 @@ table.t.mc td.pc{white-space:nowrap}
   function step(dt) {
     const t = S.t + dt;
     S.t = t;
+    wxStep(t);
     while (S.pending.length && S.pending[0].tLaunch <= t) {
       const th = S.pending.shift();
       th.alive = true;
@@ -4630,7 +4699,7 @@ table.t.mc td.pc{white-space:nowrap}
       if (!d.radar) continue;
       if (t < u.nextScan) continue;
       u.nextScan = t + d.radar.scan;
-      const r = d.radar, uz = antZ(u), wx = WEATHER[S.weather];
+      const r = d.radar, uz = antZ(u), wx = wxNow();
       const keep = r.scan * 2 + 0.6, cap = r.tracks ?? Infinity, fake = cap < Infinity ? falseTracks(u, S.jamsLive) : 0;
       let held = 0;
       if (cap < Infinity) {
@@ -4798,7 +4867,7 @@ table.t.mc td.pc{white-space:nowrap}
       if (!los(u.x, u.y, antZ(u), sol.p.x, sol.p.y, sol.p.z)) return null;
       if (remote) {
         const az = azOf(sol.p.x - u.x, sol.p.y - u.y), dk = Math.hypot(sol.p.x - u.x, sol.p.y - u.y, (sol.p.z - antZ(u)) / 1e3);
-        if (!inSector(u, az) || dk > detR(u, th, jamJ(u, az, S.jamsLive), 1, WEATHER[S.weather])) return null;
+        if (!inSector(u, az) || dk > detR(u, th, jamJ(u, az, S.jamsLive), 1, wxNow())) return null;
       }
     }
     return { sol, remote };
@@ -5067,6 +5136,8 @@ table.t.mc td.pc{white-space:nowrap}
     }
     S.weather = WEATHER[sc2.rules?.weather] ? sc2.rules.weather : WEATHER_DEFAULT;
     S.wind = { v: sc2.rules?.wind?.v ?? 0, from: sc2.rules?.wind?.from ?? 0 };
+    S.tod = TIMES_OF_DAY[sc2.rules?.tod] ? sc2.rules.tod : TOD_DEFAULT;
+    S.wxPlan = (sc2.rules?.wxPlan || []).filter((c) => WEATHER[c.weather]).map((c) => ({ t: c.t, weather: c.weather }));
     S.ignoreDecoys = !!sc2.rules?.ignoreDecoys;
     S.fireRange = sc2.rules?.fireRange ?? 1;
     S.scen = sc2;
@@ -7713,7 +7784,11 @@ table.t.mc td.pc{white-space:nowrap}
     <div class="grp"><h3>Clima ${infoBtn("clima")}</h3>
       <div class="field"><label for="optWx">Tiempo</label><select id="optWx" class="sel">${Object.entries(WEATHER).map(([k, W]) => `<option value="${k}" ${S.weather === k ? "selected" : ""}>${esc(W.name)}</option>`).join("")}</select></div>
       <p class="hint" id="wxInfo">${esc(WEATHER[S.weather].desc)}</p>
-      <div class="field" title="Viento a la altura de vuelo, igual en todo el mapa. Los drones y misiles de crucero vuelan a su velocidad respecto del aire: con viento de frente tardan más y con viento de cola llegan antes. A un Shahed (≈185 km/h) le pesa mucho; a un misil de crucero, poco. No afecta a balísticos ni planeadoras."><label for="optWind">Viento ${infoBtn("clima")}</label><span class="val" id="windVal">${windTxt()}</span><input type="range" id="optWind" min="0" max="30" step="1" value="${S.wind.v}"></div>
+      <div class="field"><label for="optTod">Momento</label><select id="optTod" class="sel">${Object.entries(TIMES_OF_DAY).map(([k, D2]) => `<option value="${k}" ${S.tod === k ? "selected" : ""}>${esc(D2.name)}</option>`).join("")}</select></div>
+      <p class="hint" id="todInfo">${esc(TIMES_OF_DAY[S.tod].desc)}</p>
+      <div class="field" title="El tiempo puede cambiar durante la noche: a los minutos indicados pasa al estado elegido (por ejemplo, entra una tormenta)."><label for="optWx2">Después cambia a</label><select id="optWx2" class="sel"><option value="">(no cambia)</option>${Object.entries(WEATHER).map(([k, W]) => `<option value="${k}" ${S.wxPlan[0]?.weather === k ? "selected" : ""}>${esc(W.name)}</option>`).join("")}</select></div>
+      <div class="field"><label for="optWxT">A los (minutos)</label><input id="optWxT" class="inp" type="number" min="1" max="600" value="${Math.round((S.wxPlan[0]?.t ?? 1800) / 60)}"></div>
+      <div class="field" title="Viento en superficie (a 10 m), igual en todo el mapa; arriba sopla más (≈1,9 veces a 1.000 m). Los drones y misiles de crucero vuelan a su velocidad respecto del aire: con viento de frente tardan más y con viento de cola llegan antes. A un Shahed (≈185 km/h) le pesa mucho; a un misil de crucero, poco. No afecta a balísticos ni planeadoras."><label for="optWind">Viento ${infoBtn("clima")}</label><span class="val" id="windVal">${windTxt()}</span><input type="range" id="optWind" min="0" max="30" step="1" value="${S.wind.v}"></div>
       <div class="field"><label for="optWindFrom">Sopla desde</label><select id="optWindFrom" class="sel">${WIND_DIRS.map(([n2, a]) => `<option value="${a}" ${S.wind.from === a ? "selected" : ""}>${n2} (${a}°)</option>`).join("")}</select></div>
     </div>
     <div class="grp"><h3>Cobertura de radar ${infoBtn("horizon")} ${infoBtn("los")}</h3>
@@ -7768,6 +7843,35 @@ table.t.mc td.pc{white-space:nowrap}
       $("#wxInfo").textContent = WEATHER[S.weather].desc;
       schedCov();
     };
+    $("#optTod").onchange = (e) => {
+      if (S.started) {
+        toast("Reiniciá para cambiar el momento del día.");
+        e.target.value = S.tod;
+        return;
+      }
+      S.tod = e.target.value;
+      $("#todInfo").textContent = TIMES_OF_DAY[S.tod].desc;
+      schedCov();
+    };
+    const setPlan = () => {
+      const w = $("#optWx2").value, m = +$("#optWxT").value;
+      S.wxPlan = w && Number.isFinite(m) && m >= 1 && m <= 600 ? [{ t: Math.round(m * 60), weather: w }] : [];
+    };
+    $("#optWx2").onchange = (e) => {
+      if (S.started) {
+        toast("Reiniciá para cambiar el clima.");
+        e.target.value = S.wxPlan[0]?.weather ?? "";
+        return;
+      }
+      setPlan();
+    };
+    $("#optWxT").onchange = (e) => {
+      if (S.started) {
+        toast("Reiniciá para cambiar el clima.");
+        return;
+      }
+      setPlan();
+    };
     const windLock = (e, v) => {
       if (!S.started) return false;
       toast("Reiniciá para cambiar el viento.");
@@ -7820,7 +7924,7 @@ table.t.mc td.pc{white-space:nowrap}
     if (!MAP) return;
     const units = S.started ? S.units.filter((u) => u.alive) : S.setup.defs;
     const jams = S.started ? S.jamsLive : S.setup.jams;
-    const cov = coverageGrid(units, jams, THREATS[S.covRef], S.covAgl, WEATHER[S.weather]);
+    const cov = coverageGrid(units, jams, THREATS[S.covRef], S.covAgl, wxNow());
     paintCoverage(cov, MAP.W, MAP.H);
     S._cov = cov;
     S.covStat = { pct: Math.round(100 * cov.reduce((a, v) => a + (v > 0), 0) / (MAP.W * MAP.H)) };
@@ -8159,7 +8263,7 @@ table.t.mc td.pc{white-space:nowrap}
       version: VERSION,
       saved: now.toISOString(),
       map: mapRef(),
-      rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather, wind: { ...S.wind }, ignoreDecoys: S.ignoreDecoys, fireRange: S.fireRange },
+      rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather, tod: S.tod, wxPlan: S.wxPlan.map((c) => ({ ...c })), wind: { ...S.wind }, ignoreDecoys: S.ignoreDecoys, fireRange: S.fireRange },
       scenario: S.scen ? { base: baseKey(S.scen), ...pick(S.scen, META_KEYS) } : null,
       setup: {
         objs: s.objs.map((g) => pick(g, OBJ_KEYS)),
@@ -8354,6 +8458,22 @@ table.t.mc td.pc{white-space:nowrap}
       if (r.wind === null || typeof r.wind !== "object") err("rules.wind: tiene que ser { v, from } (m/s y grados de donde sopla).");
       else rules.wind = { v: num2("rules.wind.v", r.wind.v, 0, 40), from: num2("rules.wind.from", r.wind.from, 0, 360) };
     }
+    if (r.tod !== void 0) {
+      if (!TIMES_OF_DAY[r.tod]) err(`rules.tod: "${String(r.tod)}" no es un momento del día válido (${Object.keys(TIMES_OF_DAY).join(", ")}).`);
+      else rules.tod = r.tod;
+    }
+    if (r.wxPlan !== void 0) {
+      if (!Array.isArray(r.wxPlan) || r.wxPlan.length > 10) err("rules.wxPlan: tiene que ser una lista de hasta 10 cambios { t, weather } (segundos y clima).");
+      else rules.wxPlan = r.wxPlan.map((c, i) => {
+        const w = `rules.wxPlan[${i}]`;
+        if (!c || typeof c !== "object") {
+          err(w + ": tiene que ser { t, weather }.");
+          return null;
+        }
+        if (!WEATHER[c.weather]) err(`${w}.weather: "${String(c.weather)}" no es un clima válido (${Object.keys(WEATHER).join(", ")}).`);
+        return { t: num2(w + ".t", c.t, 0, 86400), weather: c.weather };
+      }).filter(Boolean).sort((a, b) => a.t - b.t);
+    }
     if (r.weather !== void 0 && !WEATHER[r.weather]) err(`rules.weather: "${String(r.weather)}" no es un clima válido (${Object.keys(WEATHER).join(", ")}).`);
     if (r.c2 !== void 0 && !C2_LEVELS[r.c2]) err(`rules.c2: "${String(r.c2)}" no es un nivel de mando y control válido (${Object.keys(C2_LEVELS).join(", ")}).`);
     if (r.doctrine !== void 0 && !DOCTRINES.includes(r.doctrine)) err(`rules.doctrine: "${String(r.doctrine)}" no es ${DOCTRINES.join(" ni ")}.`);
@@ -8423,6 +8543,8 @@ table.t.mc td.pc{white-space:nowrap}
     if (data.rules.c2) S.c2 = data.rules.c2;
     S.weather = data.rules.weather || "despejado";
     S.wind = { v: data.rules.wind?.v ?? 0, from: data.rules.wind?.from ?? 0 };
+    S.tod = data.rules.tod || "noche";
+    S.wxPlan = data.rules.wxPlan || [];
     S.ignoreDecoys = !!data.rules.ignoreDecoys;
     S.fireRange = data.rules.fireRange ?? 1;
     if (data.rules.doctrine) S.doctrine = data.rules.doctrine;

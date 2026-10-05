@@ -8,7 +8,7 @@
 // objetivos que existan en el catálogo, mapa conocido, posiciones dentro del mapa, números
 // finitos y en rango, y blancos de las salvas que existan. Solo se copian los campos conocidos.
 // Formato: ver docs/ARQUITECTURA.md § "Archivo de escenario".
-import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES, TERRAIN, SCENARIOS, C2_LEVELS, c2FromNet, WEATHER, CRPA_SIZES, JAM_MODES } from '../data/index.js';
+import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES, TERRAIN, SCENARIOS, C2_LEVELS, c2FromNet, WEATHER, CRPA_SIZES, JAM_MODES, TIMES_OF_DAY } from '../data/index.js';
 import { MAP } from '../physics/terrain.js';
 import { S } from './state.js';
 import { addObj, addDef, addSalvo, addJam } from './setup.js';
@@ -45,7 +45,7 @@ export function exportScenario(now = new Date()) {
   return {
     format: FORMAT, version: VERSION, saved: now.toISOString(),
     map: mapRef(),
-    rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather, wind: { ...S.wind }, ignoreDecoys: S.ignoreDecoys, fireRange: S.fireRange },
+    rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather, tod: S.tod, wxPlan: S.wxPlan.map(c => ({ ...c })), wind: { ...S.wind }, ignoreDecoys: S.ignoreDecoys, fireRange: S.fireRange },
     scenario: S.scen ? { base: baseKey(S.scen), ...pick(S.scen, META_KEYS) } : null,
     setup: {
       objs: s.objs.map(g => pick(g, OBJ_KEYS)),
@@ -180,6 +180,16 @@ export function validateScenario(raw) {
     if (r.wind === null || typeof r.wind !== 'object') err('rules.wind: tiene que ser { v, from } (m/s y grados de donde sopla).');
     else rules.wind = { v: num('rules.wind.v', r.wind.v, 0, 40), from: num('rules.wind.from', r.wind.from, 0, 360) };
   }
+  if (r.tod !== undefined) { if (!TIMES_OF_DAY[r.tod]) err(`rules.tod: "${String(r.tod)}" no es un momento del día válido (${Object.keys(TIMES_OF_DAY).join(', ')}).`); else rules.tod = r.tod; }
+  if (r.wxPlan !== undefined) {
+    if (!Array.isArray(r.wxPlan) || r.wxPlan.length > 10) err('rules.wxPlan: tiene que ser una lista de hasta 10 cambios { t, weather } (segundos y clima).');
+    else rules.wxPlan = r.wxPlan.map((c, i) => {
+      const w = `rules.wxPlan[${i}]`;
+      if (!c || typeof c !== 'object') { err(w + ': tiene que ser { t, weather }.'); return null; }
+      if (!WEATHER[c.weather]) err(`${w}.weather: "${String(c.weather)}" no es un clima válido (${Object.keys(WEATHER).join(', ')}).`);
+      return { t: num(w + '.t', c.t, 0, 86400), weather: c.weather };
+    }).filter(Boolean).sort((a, b) => a.t - b.t);
+  }
   if (r.weather !== undefined && !WEATHER[r.weather]) err(`rules.weather: "${String(r.weather)}" no es un clima válido (${Object.keys(WEATHER).join(', ')}).`);
   if (r.c2 !== undefined && !C2_LEVELS[r.c2]) err(`rules.c2: "${String(r.c2)}" no es un nivel de mando y control válido (${Object.keys(C2_LEVELS).join(', ')}).`);
   if (r.doctrine !== undefined && !DOCTRINES.includes(r.doctrine)) err(`rules.doctrine: "${String(r.doctrine)}" no es ${DOCTRINES.join(' ni ')}.`);
@@ -244,6 +254,8 @@ export function loadScenarioData(data) {
   if (data.rules.c2) S.c2 = data.rules.c2;
   S.weather = data.rules.weather || 'despejado';
   S.wind = { v: data.rules.wind?.v ?? 0, from: data.rules.wind?.from ?? 0 };
+  S.tod = data.rules.tod || 'noche';
+  S.wxPlan = data.rules.wxPlan || [];
   S.ignoreDecoys = !!data.rules.ignoreDecoys;
   S.fireRange = data.rules.fireRange ?? 1;
   if (data.rules.doctrine) S.doctrine = data.rules.doctrine;
