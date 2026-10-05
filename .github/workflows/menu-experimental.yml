@@ -1,6 +1,11 @@
 name: Menú y tutorial experimental
 
 on:
+  push:
+    paths:
+      - 'experimentos/catalogo-presupuesto/**'
+      - '.github/workflows/menu-experimental.yml'
+      - 'tests/browser/package*.json'
   pull_request:
     paths:
       - 'experimentos/catalogo-presupuesto/**'
