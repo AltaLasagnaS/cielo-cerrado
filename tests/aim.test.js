@@ -80,3 +80,21 @@ test('trackKeys: la velocidad sale solo de pistas que le llegan a la batería (p
   th.det[7] = 10; th.obs.u7 = pair(30, 10);
   assert.deepEqual(trackKeys({ ...nasams, link: false }, th, 10, 'coordinada'), ['u7'], 'su propio radar');
 });
+
+test('arrivalReach: conserva el alcance efectivo con que se planeó el tiro (el aspecto no se recalcula al llegar)', () => {
+  setMap(flatMap(400, 400, 200));
+  const u = unit('nasams', 40, 40), th = kal([[0, 40], [80, 40]]), maxR = DEFENSES.nasams.sam.maxR;
+  // el blanco ya pasó y se aleja: con el aspecto real (de cola) el alcance efectivo es ≈60% de maxR
+  const tt = th.ft * 0.5 + (0.75 * maxR) / (th.T.v / 1000); th.p = posAt(th, tt);
+  assert.equal(arrivalReach(u, th, tt).ok, false, 'recalculado de cola: fuera');
+  assert.ok(arrivalReach(u, th, tt, maxR).ok, 'con el alcance del plan (de frente): adentro');
+});
+
+test('arrivalReach: un cañón no tiene cuenta de energía al llegar (su ráfaga no corrige; el acierto está en la Pk)', () => {
+  setMap(flatMap(400, 400, 200));
+  const g = unit('gepard', 40, 40), maxR = DEFENSES.gepard.sam.maxR, th = kal([[0, 40], [40, 40]]);
+  const tt = th.ft - (maxR * 1.0001) / (th.T.v / 1000); th.p = posAt(th, tt);   // apenas afuera del alcance
+  assert.ok(arrivalReach(g, th, tt, maxR).ok, 'la ráfaga ya salida llega');
+  const m = unit('nasams', 40, 40);
+  th.p = posAt(th, 1); assert.equal(arrivalReach(m, th, 1, DEFENSES.nasams.sam.maxR).ok, false, 'un misil fuera de alcance, no');
+});

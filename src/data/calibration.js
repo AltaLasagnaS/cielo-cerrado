@@ -90,8 +90,8 @@ export const CAL = [
   "real": "5,7% a nivel nacional (12 de 211). No hay datos dentro de cobertura: caso de control, sin objetivo.",
   "obj": "—",
   "sim": 0.488,
-  "lo": 0.288,
-  "hi": 0.717,
+  "lo": 0.283,
+  "hi": 0.708,
   "ok": null
  },
  {

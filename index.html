@@ -2567,8 +2567,8 @@ table.t.mc td.pc{white-space:nowrap}
       "real": "5,7% a nivel nacional (12 de 211). No hay datos dentro de cobertura: caso de control, sin objetivo.",
       "obj": "—",
       "sim": 0.488,
-      "lo": 0.288,
-      "hi": 0.717,
+      "lo": 0.283,
+      "hi": 0.708,
       "ok": null
     },
     {
@@ -4614,13 +4614,14 @@ table.t.mc td.pc{white-space:nowrap}
     const nv = Math.hypot(vx, vy, vz), nl = Math.hypot(lx, ly, lzk);
     return nv && nl ? (vx * lx + vy * ly + vz * lzk) / (nv * nl) : 1;
   }
-  function arrivalReach(u, th, t) {
+  function arrivalReach(u, th, t, kinPlan = null) {
     const sm = D(u).sam, p = th.p;
     if (!p) return { ok: false, f: 1 };
     const maxR = isTBM(th) ? sm.maxRtbm : sm.maxR, lz = surf(u.x, u.y) + 2;
     const r = Math.hypot(p.x - u.x, p.y - u.y, (p.z - lz) / 1e3);
-    const kin = maxR * rangeFactor(closingCos(th, t, p, u.x, u.y, lz));
-    const ok = r <= kin && r >= sm.minR && p.z - surf(p.x, p.y) >= sm.altMin && p.z - lz <= sm.altMax && speedAt(th, t) <= sm.vmaxT;
+    const kin = kinPlan ?? maxR * rangeFactor(closingCos(th, t, p, u.x, u.y, lz));
+    const inRange = sm.guid === "cañón" || r <= kin && r >= sm.minR;
+    const ok = inRange && p.z - surf(p.x, p.y) >= sm.altMin && p.z - lz <= sm.altMax && speedAt(th, t) <= sm.vmaxT;
     return { ok, f: r / kin };
   }
   function calcPk(u, th, t, jams, f = null, est = false) {
@@ -5133,7 +5134,7 @@ table.t.mc td.pc{white-space:nowrap}
         log("x", it.shot + " de " + uLabel(u) + " pierde la guía: su batería fue destruida.", "def");
         continue;
       }
-      const reach = arrivalReach(u, th, t);
+      const reach = arrivalReach(u, th, t, it.kin ?? null);
       if (!reach.ok) {
         log("x", it.shot + " de " + uLabel(u) + " no alcanza a " + label(th) + ": el blanco no estaba donde se lo esperaba.", "def", it.shot + " de " + uLabel(u) + " no alcanza a la " + pista(th) + ": no estaba donde se la esperaba.");
         S.fx.push({ x: it.px, y: it.py, rt: performance.now(), c: "#8a9aac" });
@@ -5267,7 +5268,7 @@ table.t.mc td.pc{white-space:nowrap}
       const { sol, remote } = f;
       const n2 = Math.min(S.doctrine === "salva" ? u.salvo || sm.salvo : 1, u.magLeft, ch - u.active);
       for (let k = 0; k < n2; k++) {
-        const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f, gw: remote ? netPk(u, th, t, c2, S.gateways) || 1 : 1 };
+        const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f, kin: sol.f > 0 ? sol.r / sol.f : null, gw: remote ? netPk(u, th, t, c2, S.gateways) || 1 : 1 };
         S.ints.push(it);
         (th.fly = th.fly || []).push(it);
         S.rec?.ints.push(it);

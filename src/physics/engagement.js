@@ -263,12 +263,18 @@ function velCos(vel, p, x, y, z) {
  * alcance mínimo, piso, techo y velocidad del blanco ≤ vmaxT (uno que aceleró en la picada se escapa). Si el blanco giró o cambió de altura más de lo que el misil cubre,
  * no lo alcanza. → { ok, f } (f = r / alcance, para la Pk como en solve).
  */
-export function arrivalReach(u, th, t) {
+/** @param {number | null} [kinPlan] alcance efectivo (km) con el que se planeó el tiro (solve: r / f) */
+export function arrivalReach(u, th, t, kinPlan = null) {
   const sm = D(u).sam, p = th.p; if (!p) return { ok: false, f: 1 };
   const maxR = isTBM(th) ? sm.maxRtbm : sm.maxR, lz = surf(u.x, u.y) + 2;
   const r = Math.hypot(p.x - u.x, p.y - u.y, (p.z - lz) / 1000);
-  const kin = maxR * rangeFactor(closingCos(th, t, p, u.x, u.y, lz));
-  const ok = r <= kin && r >= sm.minR && p.z - surf(p.x, p.y) >= sm.altMin && p.z - lz <= sm.altMax && speedAt(th, t) <= sm.vmaxT;
+  // el aspecto ya se usó al planear el vuelo (el misil voló esa trayectoria): se conserva su alcance
+  // efectivo y solo cambia la distancia al blanco real; sin plan (pruebas, viejos), se recalcula
+  const kin = kinPlan ?? maxR * rangeFactor(closingCos(th, t, p, u.x, u.y, lz));
+  // un cañón no corrige en vuelo: su ráfaga llega en un par de segundos al punto apuntado y el acierto
+  // ya está en su Pk; la cuenta de energía de un misil guiado no le corresponde (piso, techo y velocidad sí)
+  const inRange = sm.guid === 'cañón' || (r <= kin && r >= sm.minR);
+  const ok = inRange && p.z - surf(p.x, p.y) >= sm.altMin && p.z - lz <= sm.altMax && speedAt(th, t) <= sm.vmaxT;
   return { ok, f: r / kin };
 }
 

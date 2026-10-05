@@ -184,7 +184,7 @@ export function step(dt) {
     // guiado por el radar de la batería (SARH, TVM, mando): si la batería cayó, el misil queda sin guía
     if (!u.alive && RADAR_GUID.includes(D(u).sam.guid)) { log('x', it.shot + ' de ' + uLabel(u) + ' pierde la guía: su batería fue destruida.', 'def'); continue; }
     // salió hacia el punto previsto: si el blanco cambió de rumbo o de altura más de lo que cubre su energía, no llega
-    const reach = arrivalReach(u, th, t);
+    const reach = arrivalReach(u, th, t, it.kin ?? null);
     if (!reach.ok) { log('x', it.shot + ' de ' + uLabel(u) + ' no alcanza a ' + label(th) + ': el blanco no estaba donde se lo esperaba.', 'def', it.shot + ' de ' + uLabel(u) + ' no alcanza a la ' + pista(th) + ': no estaba donde se la esperaba.'); S.fx.push({ x: it.px, y: it.py, rt: performance.now(), c: '#8a9aac' }); continue; }
     const pk = calcPk(u, th, t, S.jamsLive, it.f == null ? null : reach.f) * (it.remote ? C2_LEVELS[it.c2].remotePk * (it.gw ?? 1) : 1);   // error de posición de la pista de red (y de la pasarela)
     if (rnd() < pk) {
@@ -330,7 +330,7 @@ export function engage(u, t) {
     const { sol, remote } = f;
     const n = Math.min(S.doctrine === 'salva' ? (u.salvo || sm.salvo) : 1, u.magLeft, ch - u.active);
     for (let k = 0; k < n; k++) {
-      const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f, gw: remote ? (netPk(u, th, t, c2, S.gateways) || 1) : 1 };
+      const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f, kin: sol.f > 0 ? sol.r / sol.f : null, gw: remote ? (netPk(u, th, t, c2, S.gateways) || 1) : 1 };
       S.ints.push(it); (th.fly = th.fly || []).push(it);
       S.rec?.ints.push(it); u.magLeft--; u.active++; S.stats.shots++; S.stats.defCost += sm.cost; recUnit(u); u.revealed ??= t;   // el lanzamiento la delata (vista del atacante)
       S.stats.byUnit[uLabel(u)] = (S.stats.byUnit[uLabel(u)] || 0) + 1;

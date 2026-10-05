@@ -1960,5 +1960,5 @@ Casos corridos con el motor (Monte Carlo) para ajustar las Pk contra episodios r
 | 12 Kh-22 (cada 5 s) contra 1 Patriot MSE (16 misiles) | 9 de 12 sobre Kyiv el 2/2/2026 (IC95% 47–91%). | 47–91% | 62% | 49–67% |
 | 6 Kh-22 contra IRIS-T + NASAMS, sin Patriot | 3 de más de 400 derribados antes de feb-2026 (IC95% 0–2%). | 0–10% | 0% | 0–0% |
 | 6 Kh-22 contra S-300PS + radar 3D, sin Patriot | 3 de más de 400 derribados antes de feb-2026 por la defensa sin Patriot, que incluía S-300 sobre las ciudades atacadas (IC95% 0–2%). | 0–10% | 1% | 0–2% |
-| 6 Oniks (perfil hi-lo) contra IRIS-T + NASAMS ubicados en el blanco | 5,7% a nivel nacional (12 de 211). No hay datos dentro de cobertura: caso de control, sin objetivo. | — | 49% | 29–72% |
+| 6 Oniks (perfil hi-lo) contra IRIS-T + NASAMS ubicados en el blanco | 5,7% a nivel nacional (12 de 211). No hay datos dentro de cobertura: caso de control, sin objetivo. | — | 49% | 28–71% |
 | 4 Zircon contra Patriot + SAMP/T | 2 de 2 sobre Kyiv el 25/3/2024 (IC95% 34–100%); 33% nacional hasta ago-24. | 34–100% | 99% | 79–100% |
