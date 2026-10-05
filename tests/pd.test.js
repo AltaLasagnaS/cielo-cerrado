@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import { pdSwerling1, pdScan, inNotch, SNR50, PFA, PD_CUTOFF } from '../src/physics/radar.js';
 import { clutterRcs, seaSigma0Db, improvement, rainEta } from '../src/physics/clutter.js';
 import { DEFENSES, WEATHER } from '../src/data/index.js';
+import { surf } from '../src/physics/terrain.js';
 import { setRandom, seeded, rnd } from '../src/util/rng.js';
 import { useMap } from './helpers.js';
 
@@ -54,6 +55,18 @@ test('clutter de superficie: solo rasante, solo si el radar ve el suelo, y menos
   assert.ok(clutterRcs(pd, 0, 0, 10, 4, 20, 4, 0, WEATHER.despejado).surface < low / 1e4);
   assert.ok(clutterRcs(none, 0, 0, 10, 4, 1500, 4, 0, WEATHER.tormenta).rain > 0, 'la lluvia rodea al blanco aunque vuele fuera del clutter de suelo');
   assert.equal(clutterRcs(none, 0, 0, 10, 4, 5000, 4, 0, WEATHER.tormenta).rain, 0, 'arriba de la lluvia');
+});
+
+test('clutter de suelo: con un mástil de 10 m el radar ve buena parte del suelo cercano (la línea de vista llega a árboles y edificios)', () => {
+  // Con el rayo apuntado a 2 m del suelo, el margen de la línea de vista (LOS_MARGIN = 4 m) lo tapaba casi
+  // siempre: 37 de 624 celdas en vez de 114. La prueba fija el criterio correcto.
+  useMap('kyiv');
+  const uz = surf(40, 60) + 10; let seen = 0;
+  for (let x = 34; x <= 46; x += 0.5) for (let y = 54; y <= 66; y += 0.5) {
+    const rr = Math.hypot(x - 40, y - 60); if (rr < 0.3 || surf(x, y) <= 0) continue;
+    if (clutterRcs({ band: 'X', mti: 'none' }, 40, 60, uz, rr, 5, x, y, WEATHER.despejado).surface > 0) seen++;
+  }
+  assert.ok(seen >= 90, 'celdas con clutter de suelo: ' + seen);
 });
 
 test('notch Doppler: de costado lo pierde un radar pulso-Doppler, no uno sin filtro', () => {

@@ -20,6 +20,7 @@
 import { BANDS, CLUTTER } from '../data/index.js';
 import { surf, los, MAP } from './terrain.js';
 import { slopeAt } from './terrain-analysis.js';
+import { LOS_MARGIN } from './constants.js';
 import { clamp } from '../util/math.js';
 
 const DEG = Math.PI / 180;
@@ -32,13 +33,15 @@ export const RAIN_TOP = 3000;
 /** Más allá de este múltiplo del ancho de haz en elevación el suelo ya no está en el lóbulo principal. */
 const BEAM_EDGE = 1.5;
 
-/** Visibilidad del suelo desde una antena, cacheada por celda de 200 m y por mapa (el relieve no cambia en la corrida). */
+/**
+ * Visibilidad del suelo desde una antena: el rayo tiene que llegar a lo que devuelve el eco (árboles,
+ * edificios), apenas por encima del margen de la línea de vista (LOS_MARGIN). Cacheada por celda de 200 m y por mapa (el relieve no cambia en la corrida). */
 let SEEN = new Map(), SEEN_MAP = null;
 function landSeen(ux, uy, uz, x, y, zs) {
   if (SEEN_MAP !== MAP) { SEEN = new Map(); SEEN_MAP = MAP; }
   const key = ux.toFixed(2) + ',' + uy.toFixed(2) + ',' + uz.toFixed(0) + ',' + Math.round(x * 5) + ',' + Math.round(y * 5);
   let v = SEEN.get(key);
-  if (v === undefined) { if (SEEN.size > 200000) SEEN.clear(); v = los(ux, uy, uz, x, y, zs + 2); SEEN.set(key, v); }
+  if (v === undefined) { if (SEEN.size > 200000) SEEN.clear(); v = los(ux, uy, uz, x, y, zs + LOS_MARGIN + 1); SEEN.set(key, v); }
   return v;
 }
 

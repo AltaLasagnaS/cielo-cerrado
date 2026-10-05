@@ -3666,7 +3666,7 @@ table.t.mc td.pc{white-space:nowrap}
     let v = SEEN.get(key);
     if (v === void 0) {
       if (SEEN.size > 2e5) SEEN.clear();
-      v = los(ux, uy, uz, x, y, zs + 2);
+      v = los(ux, uy, uz, x, y, zs + LOS_MARGIN + 1);
       SEEN.set(key, v);
     }
     return v;
