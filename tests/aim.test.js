@@ -98,3 +98,15 @@ test('arrivalReach: un cañón no tiene cuenta de energía al llegar (su ráfaga
   const m = unit('nasams', 40, 40);
   th.p = posAt(th, 1); assert.equal(arrivalReach(m, th, 1, DEFENSES.nasams.sam.maxR).ok, false, 'un misil fuera de alcance, no');
 });
+
+test('una batería aborta su tiro cuando su pista muestra al blanco bajo su piso, y libera el blanco', async () => {
+  const { runScenario } = await import('./helpers.js');
+  const S = runScenario('gb_refineria', { seed: 1 });
+  const ab = S.ints.filter(i => i.aborted != null);
+  assert.ok(ab.length > 0, 'en la refinería hay Kalibr que bajan del piso de NASAMS o Patriot');
+  for (const i of ab) {
+    assert.ok(i.done && i.tH === i.aborted, 'termina en el instante del aborto');
+    const s = i.th.obs && Object.values(i.th.obs).some(o => o.s && o.s.t <= i.aborted);
+    assert.ok(s, 'lo decidió con una detección, no con la verdad');
+  }
+});

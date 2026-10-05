@@ -4392,6 +4392,14 @@ table.t.mc td.pc{white-space:nowrap}
     }
     return pairVel(th.seen, th.seenPrev);
   }
+  function lastSeen(th, keys) {
+    let best = null;
+    for (const k of keys) {
+      const s = th.obs?.[k]?.s;
+      if (s && (!best || s.t > best.t)) best = s;
+    }
+    return best;
+  }
   function pairVel(s, q) {
     if (!s || !q) return null;
     const dt = s.t - q.t;
@@ -5113,6 +5121,19 @@ table.t.mc td.pc{white-space:nowrap}
       }
     }
     ewStep(t);
+    for (const it of S.ints) {
+      if (it.done || it.phantom || t < it.tL || !it.th.alive || !it.u.alive) continue;
+      const sm = D(it.u).sam;
+      if (sm.guid === "cañón" || !sm.altMin) continue;
+      const s = lastSeen(it.th, trackKeys(it.u, it.th, t, it.c2, S.gateways));
+      if (!s || s.t <= it.tL) continue;
+      if (s.z - surf(s.x, s.y) >= sm.altMin) continue;
+      it.done = true;
+      it.u.active = Math.max(0, it.u.active - 1);
+      it.aborted = t;
+      it.tH = t;
+      log("x", it.shot + " de " + uLabel(it.u) + " aborta: " + label(it.th) + " bajó de su piso de enfrentamiento.", "def", it.shot + " de " + uLabel(it.u) + " aborta: la " + pista(it.th) + " bajó de su piso de enfrentamiento.");
+    }
     for (const u of S.units) {
       if (!u.alive || !D(u).sam || u.dmgLauncher || u.magLeft <= 0) continue;
       if (t < u.nextEval) continue;

@@ -30,6 +30,13 @@ export function trackVel(th, keys = null) {
   return pairVel(th.seen, th.seenPrev);
 }
 
+/** Última detección (la más reciente) de las pistas keys de th, o null. */
+export function lastSeen(th, keys) {
+  let best = null;
+  for (const k of keys) { const s = th.obs?.[k]?.s; if (s && (!best || s.t > best.t)) best = s; }
+  return best;
+}
+
 /** Velocidad entre dos detecciones q → s (ver trackVel). */
 function pairVel(s, q) {
   if (!s || !q) return null;

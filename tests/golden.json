@@ -864,32 +864,31 @@
   "t": 1528,
   "stats": {
    "launched": 36,
-   "killed": 33,
-   "hits": 3,
+   "killed": 35,
+   "hits": 1,
    "misses": 0,
    "decoys": 8,
    "decoysKilled": 8,
-   "shots": 51,
-   "defCost": 65.31000000000003,
+   "shots": 54,
+   "defCost": 66.66000000000004,
    "atkCost": 22.32,
    "lost": 0,
    "byUnit": {
     "IRIS-T-1": 24,
     "NASAMS-1": 18,
     "Patriot-1": 8,
-    "RBS 70-1": 1
+    "RBS 70-1": 4
    },
-   "damage": 1600,
+   "damage": 610,
    "dmgByWeapon": {
-    "Kalibr": 1600
+    "Kalibr": 610
    },
-   "missSum": 31.118309388450292,
-   "missN": 3,
-   "objsDestroyed": 1,
+   "missSum": 19.410661331685954,
+   "missN": 1,
+   "objsDestroyed": 0,
    "satChannels": {
     "IRIS-T-1": 8,
-    "NASAMS-1": 3,
-    "Patriot-1": 1
+    "NASAMS-1": 3
    },
    "satMag": {
     "IRIS-T-1": 1,
@@ -900,18 +899,8 @@
   },
   "impacts": [
    [
-    51.1101,
-    34.4087,
-    "hit"
-   ],
-   [
-    51.0923,
-    34.4008,
-    "hit"
-   ],
-   [
-    51.1081,
-    34.4059,
+    51.095,
+    34.3813,
     "hit"
    ]
   ],
@@ -944,7 +933,7 @@
    [
     "RBS 70-1",
     true,
-    3
+    0
    ],
    [
     "RBS 70-2",
@@ -977,7 +966,7 @@
     20
    ]
   ],
-  "log": 145
+  "log": 150
  },
  "mb_puente_s1": {
   "t": 1537.5,

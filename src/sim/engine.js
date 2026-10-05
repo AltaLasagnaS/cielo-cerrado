@@ -11,7 +11,7 @@ import { rnd } from '../util/rng.js';
 import { surf, los, MAP } from '../physics/terrain.js';
 import { antZ, aspectCos, belowCeiling, detR, inSector, jamJ, pdScan, PD_CUTOFF, confirms, scanHistory, falseTracks } from '../physics/radar.js';
 import { buildThreat, posAt, speedAt } from '../physics/kinematics.js';
-import { trackVel, predictAt } from '../physics/track.js';
+import { trackVel, predictAt, lastSeen } from '../physics/track.js';
 import { gnssNavError, crpaOverwhelmed } from '../physics/navigation.js';
 import { profileOf, timeTo } from '../physics/interceptor.js';
 import { RADAR_GUID, isTBM, trackOK, reactionStart, solve, arrivalReach, trackKeys, ownKey, calcPk, effectiveC2, unitC2, netPk, cpOf, netKey } from '../physics/engagement.js';
@@ -168,6 +168,16 @@ export function step(dt) {
   }
   // guerra electrónica de la defensa: triangulación de jammers y disparos home-on-jam
   ewStep(t);
+  // la batería sigue al blanco mientras su misil vuela: si su pista lo muestra por debajo de su piso de
+  // enfrentamiento (sam.altMin), sabe que no va a llegar, aborta y libera el blanco para otra unidad
+  for (const it of S.ints) {
+    if (it.done || it.phantom || t < it.tL || !it.th.alive || !it.u.alive) continue;
+    const sm = D(it.u).sam; if (sm.guid === 'cañón' || !sm.altMin) continue;
+    const s = lastSeen(it.th, trackKeys(it.u, it.th, t, it.c2, S.gateways)); if (!s || s.t <= it.tL) continue;
+    if (s.z - surf(s.x, s.y) >= sm.altMin) continue;
+    it.done = true; it.u.active = Math.max(0, it.u.active - 1); it.aborted = t; it.tH = t;   // la repetición lo deja de dibujar acá
+    log('x', it.shot + ' de ' + uLabel(it.u) + ' aborta: ' + label(it.th) + ' bajó de su piso de enfrentamiento.', 'def', it.shot + ' de ' + uLabel(it.u) + ' aborta: la ' + pista(it.th) + ' bajó de su piso de enfrentamiento.');
+  }
   // enfrentamientos (cada 1 s simulado por unidad)
   for (const u of S.units) {
     if (!u.alive || !D(u).sam || u.dmgLauncher || u.magLeft <= 0) continue;
