@@ -544,7 +544,7 @@ table.t.mc td.pc{white-space:nowrap}
         <span class="clock" id="clock">T+00:00</span>
         <span class="tscale" id="tscale"></span>
         <div class="speeds" id="speeds"></div>
-        <label class="check" style="font-size:12px"><input type="checkbox" id="defView"> Vista del defensor</label>
+        <select id="view" class="sel" style="font-size:12px;width:auto" aria-label="Qué se muestra en el mapa" title="Completa: la verdad. Defensor: solo sus pistas. Atacante: sus armas y las defensas que conoce."><option value="all">Vista completa</option><option value="def">Vista del defensor</option><option value="atk">Vista del atacante</option></select>
       </div>
       <div class="replaybar" id="replayBar" role="group" aria-label="Repetición de la corrida" hidden></div>
       <div class="relief" id="relief" role="group" aria-label="Lectura del relieve"><span>Relieve</span></div>
@@ -2496,9 +2496,9 @@ table.t.mc td.pc{white-space:nowrap}
       "caso": "20 Kalibr (cada 3 s) contra S-300PS + Buk-M1 + radar 3D",
       "real": "67% para crucero a nivel nacional (feb-22 → ago-24), con defensa mayormente soviética.",
       "obj": "60–85%",
-      "sim": 0.751,
-      "lo": 0.605,
-      "hi": 0.984,
+      "sim": 0.741,
+      "lo": 0.621,
+      "hi": 0.978,
       "ok": true
     },
     {
@@ -2506,9 +2506,9 @@ table.t.mc td.pc{white-space:nowrap}
       "caso": "60 Shahed + 30 Gerbera contra 2 Gepard, 3 grupos móviles, 2 equipos de interceptores, red acústica",
       "real": "Derribo cinético 52% (mar–may 25) a 63% (2022–24); el resto de la neutralización es guerra electrónica, que el juego no modela como pérdida.",
       "obj": "50–70%",
-      "sim": 0.642,
-      "lo": 0.448,
-      "hi": 0.781,
+      "sim": 0.627,
+      "lo": 0.464,
+      "hi": 0.758,
       "ok": true
     },
     {
@@ -2516,9 +2516,9 @@ table.t.mc td.pc{white-space:nowrap}
       "caso": "8 Iskander-M con maniobra 2025 y señuelos contra una batería Patriot de 3 lanzadores (36 PAC-3 MSE)",
       "real": "37% nacional en jun–sep 25 (IC95% 31–45%), cota inferior de lo que pasa dentro de cobertura; 6–17% en otoño 2025.",
       "obj": "35–65%",
-      "sim": 0.525,
-      "lo": 0.344,
-      "hi": 0.559,
+      "sim": 0.509,
+      "lo": 0.375,
+      "hi": 0.575,
       "ok": true
     },
     {
@@ -2536,9 +2536,9 @@ table.t.mc td.pc{white-space:nowrap}
       "caso": "12 Kh-22 (cada 5 s) contra 1 Patriot MSE (16 misiles)",
       "real": "9 de 12 sobre Kyiv el 2/2/2026 (IC95% 47–91%).",
       "obj": "47–91%",
-      "sim": 0.615,
-      "lo": 0.481,
-      "hi": 0.667,
+      "sim": 0.621,
+      "lo": 0.492,
+      "hi": 0.665,
       "ok": true
     },
     {
@@ -2556,9 +2556,9 @@ table.t.mc td.pc{white-space:nowrap}
       "caso": "6 Kh-22 contra S-300PS + radar 3D, sin Patriot",
       "real": "3 de más de 400 derribados antes de feb-2026 por la defensa sin Patriot, que incluía S-300 sobre las ciudades atacadas (IC95% 0–2%).",
       "obj": "0–10%",
-      "sim": 0.017,
+      "sim": 8e-3,
       "lo": 0,
-      "hi": 0.021,
+      "hi": 0.017,
       "ok": true
     },
     {
@@ -2566,9 +2566,9 @@ table.t.mc td.pc{white-space:nowrap}
       "caso": "6 Oniks (perfil hi-lo) contra IRIS-T + NASAMS ubicados en el blanco",
       "real": "5,7% a nivel nacional (12 de 211). No hay datos dentro de cobertura: caso de control, sin objetivo.",
       "obj": "—",
-      "sim": 0.575,
-      "lo": 0.375,
-      "hi": 0.858,
+      "sim": 0.488,
+      "lo": 0.283,
+      "hi": 0.708,
       "ok": null
     },
     {
@@ -3504,6 +3504,10 @@ table.t.mc td.pc{white-space:nowrap}
       /** @type {any} */
       null
     ),
+    box: (
+      /** @type {any} */
+      null
+    ),
     // última cobertura calculada (grilla y % del mapa cubierto)
     _cov: (
       /** @type {any} */
@@ -3555,7 +3559,9 @@ table.t.mc td.pc{white-space:nowrap}
     onUnitLost() {
     },
     /** ¿El jugador está en "vista del defensor"? (solo cambia el texto del registro). */
-    defenderView: () => false
+    defenderView: () => false,
+    /** ¿El jugador está en "vista del atacante"? (solo cambia el dibujo y lo que se puede tocar). */
+    attackerView: () => false
   };
 
   // src/physics/decoys.js
@@ -4372,6 +4378,43 @@ table.t.mc td.pc{white-space:nowrap}
     return Math.hypot((b.x - a.x) * 1e3, (b.y - a.y) * 1e3, b.z - a.z);
   }
 
+  // src/physics/track.js
+  var VEL_GAP = 12;
+  var PRED_FLOOR = 5;
+  function trackVel(th, keys = null) {
+    if (keys) {
+      let best = null;
+      for (const k of keys) {
+        const o = th.obs?.[k], v = o && pairVel(o.s, o.q);
+        if (v && (!best || v.s.t > best.s.t)) best = v;
+      }
+      return best;
+    }
+    return pairVel(th.seen, th.seenPrev);
+  }
+  function lastSeen(th, keys) {
+    let best = null;
+    for (const k of keys) {
+      const s = th.obs?.[k]?.s;
+      if (s && (!best || s.t > best.t)) best = s;
+    }
+    return best;
+  }
+  function pairVel(s, q) {
+    if (!s || !q) return null;
+    const dt = s.t - q.t;
+    if (!(dt > 0) || dt > VEL_GAP) return null;
+    const vx = (s.x - q.x) / dt, vy = (s.y - q.y) / dt;
+    const vAgl = (s.z - surf(s.x, s.y) - (q.z - surf(q.x, q.y))) / dt;
+    return { s, vx, vy, vAgl, v: Math.hypot(vx * 1e3, vy * 1e3, (s.z - q.z) / dt) };
+  }
+  function predictAt(vel, tt) {
+    if (!vel) return null;
+    const { s } = vel, k = tt - s.t, x = s.x + vel.vx * k, y = s.y + vel.vy * k;
+    const g = surf(x, y), agl = Math.max(PRED_FLOOR, s.z - surf(s.x, s.y) + vel.vAgl * k);
+    return { x, y, z: g + agl, agl };
+  }
+
   // src/physics/navigation.js
   var SEEKER_ACQ = 0.9;
   function gnssNavError(T, J, link = false) {
@@ -4464,6 +4507,21 @@ table.t.mc td.pc{white-space:nowrap}
     if (d.sam.guid === "operador") return netT;
     return own || netT;
   }
+  var ownKey = (u) => "u" + u.id;
+  function trackKeys(u, th, t, c2, gws = []) {
+    const d = D(u), L = C2_LEVELS[c2], g = d.sam.guid, keys = [];
+    const own = d.radar ? t - (th.det[u.id] ?? -1e9) <= d.radar.scan * 2 + 0.6 : false;
+    if (own && g !== "operador") keys.push(ownKey(u));
+    const netOK = u.link !== false && g !== "cañón" && (L.share === "fire" || L.share === "track" && !RADAR_GUID.includes(g));
+    if (!netOK) return keys;
+    const fresh = (n2, lag) => n2 && n2.first != null && t - n2.first >= L.lag + lag && t - n2.last <= L.window;
+    const cp = cpOf(u);
+    for (const key of datalinksOf(d)) {
+      if (fresh(th.net?.[netKey(key, cp)], 0)) keys.push(netKey(key, cp));
+      for (const { from, G, id } of gatewaysInto(key)) if (gws.includes(id) && fresh(th.net?.[netKey(from, cp)], G.gwLag)) keys.push(netKey(from, cp));
+    }
+    return keys;
+  }
   function netPk(u, th, t, c2, gws = []) {
     const L = C2_LEVELS[c2];
     let best = 0;
@@ -4525,42 +4583,61 @@ table.t.mc td.pc{white-space:nowrap}
     const nv = Math.hypot(vx, vy, vz), nl = Math.hypot(lx, ly, lzk);
     return nv && nl ? (vx * lx + vy * ly + vz * lzk) / (nv * nl) : 1;
   }
-  function solve(u, th, t, pct3 = 1) {
+  function solve(u, th, t, pct3 = 1, keys = null) {
     const sm = D(u).sam, tbm = isTBM(th);
     const maxR = tbm ? sm.maxRtbm : sm.maxR;
     const lz = surf(u.x, u.y) + 2;
     const P = profileOf(sm);
+    const vel = tbm ? null : trackVel(th, keys);
+    if (!tbm && !vel) return null;
+    const at = (tt) => tbm ? posAt(th, tt) : predictAt(vel, tt);
+    const cosAt = (tt, p) => tbm ? closingCos(th, tt, p, u.x, u.y, lz) : velCos(vel, p, u.x, u.y, lz);
     if (pct3 < 1) {
-      const p0 = posAt(th, t);
+      const p0 = at(t);
       if (!p0) return null;
       const r0 = Math.hypot(p0.x - u.x, p0.y - u.y, (p0.z - lz) / 1e3);
-      const ca0 = closingCos(th, t, p0, u.x, u.y, lz);
+      const ca0 = cosAt(t, p0);
       if (r0 > maxR * rangeFactor(ca0) * pct3) return null;
     }
-    const tEnd = th.tLaunch + th.ft - 0.5;
+    const tEnd = tbm ? th.tLaunch + th.ft - 0.5 : Infinity;
     let tau = 0.5;
     while (t + tau < tEnd && tau < 400) {
-      const p = posAt(th, t + tau);
+      const p = at(t + tau);
       if (!p) break;
       const dh = Math.hypot(p.x - u.x, p.y - u.y), r = Math.hypot(dh, (p.z - lz) / 1e3);
       const agl = p.z - surf(p.x, p.y);
       if (r <= maxR * pct3 && r >= sm.minR && agl >= sm.altMin && p.z - lz <= sm.altMax) {
-        const kin = maxR * rangeFactor(closingCos(th, t + tau, p, u.x, u.y, lz));
+        const kin = maxR * rangeFactor(cosAt(t + tau, p));
         if (r <= kin * pct3) {
           const tf = timeTo(P, r * 1e3);
-          if (tf <= tau) return tau - tf <= 3 ? { tau, p, r, f: r / kin } : null;
+          if (tf <= tau) return tau - tf <= 3 ? { tau, p, r, f: r / kin, v: vel ? vel.v : null } : null;
         }
       }
       tau += tau < 30 ? 0.5 : 2;
     }
     return null;
   }
-  function calcPk(u, th, t, jams, f = null) {
+  function velCos(vel, p, x, y, z) {
+    const vx = vel.vx, vy = vel.vy, vz = vel.vAgl / 1e3, lx = x - p.x, ly = y - p.y, lzk = (z - p.z) / 1e3;
+    const nv = Math.hypot(vx, vy, vz), nl = Math.hypot(lx, ly, lzk);
+    return nv && nl ? (vx * lx + vy * ly + vz * lzk) / (nv * nl) : 1;
+  }
+  function arrivalReach(u, th, t, kinPlan = null) {
+    const sm = D(u).sam, p = th.p;
+    if (!p) return { ok: false, f: 1 };
+    const maxR = isTBM(th) ? sm.maxRtbm : sm.maxR, lz = surf(u.x, u.y) + 2;
+    const r = Math.hypot(p.x - u.x, p.y - u.y, (p.z - lz) / 1e3);
+    const kin = kinPlan ?? maxR * rangeFactor(closingCos(th, t, p, u.x, u.y, lz));
+    const inRange = sm.guid === "cañón" || r <= kin && r >= sm.minR;
+    const ok = inRange && p.z - surf(p.x, p.y) >= sm.altMin && p.z - lz <= sm.altMax && speedAt(th, t) <= sm.vmaxT;
+    return { ok, f: r / kin };
+  }
+  function calcPk(u, th, t, jams, f = null, est = false) {
     const sm = D(u).sam;
     let pk = sm.pk[th.cls] || 0;
-    const p = th.p;
+    const p = est ? th.seen ?? th.p : th.p;
     if (!p) return 0;
-    const man = !!th.maneuver && p.rem < termZone(th);
+    const man = !est && !!th.maneuver && th.p.rem < termZone(th);
     if (man) pk *= sm.guid === "cañón" ? 0.85 : th.T.manPk ?? 0.7;
     if (th.T.ir && sm.guid === "IR") pk *= 0.85;
     if (th.T.cold && sm.guid === "IR") pk *= 0.3;
@@ -4569,7 +4646,7 @@ table.t.mc td.pc{white-space:nowrap}
       const J = jamJ(u, azOf(p.x - u.x, p.y - u.y), jams);
       if (J > 1) pk *= Math.max(0.5, 1 / (1 + 0.08 * J));
     }
-    const v = speedAt(th, t);
+    const v = est ? trackVel(th)?.v ?? speedAt(th, t) : speedAt(th, t);
     if (v > 0.8 * sm.vmaxT) pk *= 0.8;
     if (f !== null && usesEnergy(sm.guid)) pk *= energyPk(sm, f, isTBM(th)) * altitudePk(sm, f, isTBM(th), p.z, man);
     return clamp(pk, 0, 0.98);
@@ -4593,12 +4670,19 @@ table.t.mc td.pc{white-space:nowrap}
   }
 
   // src/sim/log.js
-  function log(cls, msg) {
-    const e = { t: S.t, cls, msg };
+  function log(cls, msg, who = "all", alt = null) {
+    const e = { t: S.t, cls, msg, who, alt };
     S.log.unshift(e);
     if (S.log.length > 300) S.log.pop();
     S.rec?.log.push(e);
     hooks.onLog();
+  }
+  function logFor(entries, view) {
+    if (view === "all") return entries.map((e) => ({ ...e, text: e.msg }));
+    return entries.filter((e) => (e.who || "all") === "all" || e.who === view).map((e) => ({ ...e, text: view === "def" && e.alt ? e.alt : e.msg }));
+  }
+  function pista(th) {
+    return "pista #" + th.id + (th.clsAs ? " (" + th.clsAs + ")" : "");
   }
   function label(th) {
     return (th.isDecoyChild ? "Señuelo de " : "") + th.T.short + " #" + th.id;
@@ -4696,8 +4780,8 @@ table.t.mc td.pc{white-space:nowrap}
       if (h.j.dead) continue;
       if (rnd() < sm.pkHoj) {
         h.j.dead = true;
-        log("k", uLabel(h.u) + " derriba al " + JJ.short + " guiándose a su ruido (home-on-jam) — Pk " + Math.round(sm.pkHoj * 100) + "%.");
-      } else log("x", "El misil home-on-jam de " + uLabel(h.u) + " falla contra el " + JJ.short + ".");
+        log("k", uLabel(h.u) + " derriba al " + JJ.short + " guiándose a su ruido (home-on-jam) — Pk " + Math.round(sm.pkHoj * 100) + "%.", "def");
+      } else log("x", "El misil home-on-jam de " + uLabel(h.u) + " falla contra el " + JJ.short + ".", "def");
     }
     if (t < S.ewNext) return;
     S.ewNext = t + EW_DT;
@@ -4719,7 +4803,7 @@ table.t.mc td.pc{white-space:nowrap}
           }
         }
         if (pair && best <= FIX_MAX_KM && (!j.fix || best < j.fix.err)) {
-          if (!j.fix) log("l", JJ.short + " ubicado por triangulación entre " + uLabel(pair[0]) + " y " + uLabel(pair[1]) + ": error ≈ " + best.toFixed(1) + " km.");
+          if (!j.fix) log("l", JJ.short + " ubicado por triangulación entre " + uLabel(pair[0]) + " y " + uLabel(pair[1]) + ": error ≈ " + best.toFixed(1) + " km.", "def");
           j.fix = { t, err: best };
         }
       }
@@ -4734,9 +4818,10 @@ table.t.mc td.pc{white-space:nowrap}
         recUnit(u);
         S.stats.shots++;
         S.stats.defCost += sm.cost;
+        u.revealed ?? (u.revealed = t);
         S.hoj.push({ u, j, tH: t + timeTo(profileOf(sm), d * 1e3) });
         j.hojBusy = true;
-        log("l", uLabel(u) + " dispara un misil home-on-jam contra el " + JJ.short + " a " + d.toFixed(0) + " km.");
+        log("l", uLabel(u) + " dispara un misil home-on-jam contra el " + JJ.short + " a " + d.toFixed(0) + " km.", "def");
         break;
       }
     }
@@ -4770,6 +4855,13 @@ table.t.mc td.pc{white-space:nowrap}
     if (th.seen && t - th.seen.t > 0.5) th.seenPrev = th.seen;
     th.seen = { x: p.x, y: p.y, z: p.z, t, by };
   }
+  function noteObs(th, key, t) {
+    const p = th.p;
+    if (!p) return;
+    const m = th.obs || (th.obs = {}), o = m[key] || (m[key] = { s: null, q: null });
+    if (o.s && t - o.s.t > 0.5) o.q = o.s;
+    o.s = { x: p.x, y: p.y, z: p.z, t };
+  }
   function contactOf(th, t) {
     const s = th.seen;
     if (!s) return null;
@@ -4781,15 +4873,35 @@ table.t.mc td.pc{white-space:nowrap}
     const k = lost ? 0 : age;
     return { x: s.x + vx * k, y: s.y + vy * k, z: s.z + vz * k, vx, vy, v: Math.hypot(vx, vy) * 1e3, age, lost, by: s.by };
   }
+  function attackerKnows(u, t) {
+    if (u.emitFrom != null && u.emitFrom <= t) return true;
+    return u.revealed != null && u.revealed <= t;
+  }
+  var isEmitter = (r) => !!r && r.band !== "ACU" && r.band !== "OPT";
+  var EMCON = { siempre: "Emite siempre", alerta: "Se enciende con la primera alerta de la red", silencio: "En silencio (solo pistas de la red)" };
+  function emitting(u, t) {
+    const m = u.emcon;
+    if (!m || m === "siempre" || !isEmitter(D(u).radar)) return true;
+    if (m === "silencio") return false;
+    if (u.c2 === "desconectada") return false;
+    const cp = u.cp || "";
+    return S.threats.some((th) => {
+      const c = cp ? th.cueCp?.[cp] : th.cueFirst;
+      return c != null && c <= t;
+    });
+  }
 
   // src/sim/engine.js
   function startSim() {
-    S.units = S.setup.defs.map((d) => ({ ...d, alive: true, hp: UNIT_TARGET.hp, dmgRadar: false, dmgLauncher: false, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
-    S.jamsLive = S.setup.jams.map((j) => ({ ...j, _losMap: {} }));
+    S.units = S.setup.defs.map((d) => ({ ...d, alive: true, hp: d.hp ?? UNIT_TARGET.hp, dmgRadar: !!d.dmgRadar, dmgLauncher: !!d.dmgLauncher, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
+    S.jamsLive = S.setup.jams.map((j) => ({ ...j, _losMap: {}, hp: UNIT_TARGET.hp }));
     S.hoj = [];
     S.ewNext = 0;
     wxReset();
-    S.objs = S.setup.objs.map((g) => ({ ...g, hp: g.maxHp, status: "operational", hits: 0, dmgBy: {} }));
+    S.objs = S.setup.objs.map((g) => {
+      const hp = g.hpNow ?? g.maxHp;
+      return { ...g, hp, status: targetStatus(hp, g.maxHp), hits: 0, dmgBy: {} };
+    });
     S.threats = [];
     S.ints = [];
     S.fx = [];
@@ -4867,31 +4979,31 @@ table.t.mc td.pc{white-space:nowrap}
         th.released = true;
         for (let k = 0; k < th.decoyRel; k++) {
           const ang = rnd() * 6.28, dist = 1 + rnd() * 2.5;
-          const dc = { ...th, fly: [], id: nextId(), parent: th, tBorn: t, isDecoy: true, isDecoyChild: true, decoyRel: 0, sRel: p.s, off: [Math.cos(ang) * dist, Math.sin(ang) * dist], det: {}, mn: {}, mnT: {}, net: {}, trail: [], lastNet: -1e9, firstDet: null, cueFirst: null, netFirst: null, clsT: 0, clsTau: null, clsAs: null, phase: th.phase + (k + 1) * 1.6180339, alive: true, targetUnit: null };
+          const dc = { ...th, fly: [], id: nextId(), parent: th, tBorn: t, isDecoy: true, isDecoyChild: true, decoyRel: 0, sRel: p.s, off: [Math.cos(ang) * dist, Math.sin(ang) * dist], det: {}, mn: {}, mnT: {}, net: {}, obs: {}, seen: null, seenPrev: null, trail: [], lastNet: -1e9, firstDet: null, cueFirst: null, netFirst: null, clsT: 0, clsTau: null, clsAs: null, phase: th.phase + (k + 1) * 1.6180339, alive: true, targetUnit: null };
           S.threats.push(dc);
           S.stats.decoys++;
           S.stats.launched++;
         }
-        log("w", label(th) + " libera " + th.decoyRel + " señuelos a " + p.rem.toFixed(0) + " km del blanco.");
+        log("w", label(th) + " libera " + th.decoyRel + " señuelos a " + p.rem.toFixed(0) + " km del blanco.", "atk");
         event(label(th) + " libera señuelos", "decoys");
       }
       if (!th.gnssHit && th.T.gnss < 1) {
-        const srcs2 = S.jamsLive.filter((j) => JAMMERS[j.type].gnssJam && j.on && Math.hypot(p.x - j.x, p.y - j.y) <= JAMMERS[j.type].radius);
+        const srcs2 = S.jamsLive.filter((j) => JAMMERS[j.type].gnssJam && j.on && !j.dead && Math.hypot(p.x - j.x, p.y - j.y) <= JAMMERS[j.type].radius);
         const held = th.crpa > 0 && srcs2.length > 0 && !crpaOverwhelmed(th.crpa, p.x, p.y, srcs2);
         if (held && !th.crpaHeld) {
           th.crpaHeld = true;
-          log("d", label(th) + ": su antena CRPA de " + th.crpa + " elementos anula la interferencia GNSS (" + srcs2.length + " fuente" + (srcs2.length > 1 ? "s" : "") + ").");
+          log("d", label(th) + ": su antena CRPA de " + th.crpa + " elementos anula la interferencia GNSS (" + srcs2.length + " fuente" + (srcs2.length > 1 ? "s" : "") + ").", "atk");
         }
         for (const j of held ? [] : srcs2) {
           const J = JAMMERS[j.type];
           if (J.side !== "both" && th.T.side !== "both" && J.side === th.T.side) continue;
-          const link = th.link && !S.jamsLive.some((k) => JAMMERS[k.type].linkJam && k.on && Math.hypot(p.x - k.x, p.y - k.y) <= JAMMERS[k.type].radius);
+          const link = th.link && !S.jamsLive.some((k) => JAMMERS[k.type].linkJam && k.on && !k.dead && Math.hypot(p.x - k.x, p.y - k.y) <= JAMMERS[k.type].radius);
           const n2 = gnssNavError(th.T, J, link);
           th.gnssHit = true;
           th.navErr = n2.err;
-          if (n2.corrected) log("w", label(th) + " pierde el GNSS en la zona de " + J.short + (n2.rejected ? " y descarta el engaño" : "") + ", pero su buscador terminal encuentra el blanco.");
+          if (n2.corrected) log("w", label(th) + " pierde el GNSS en la zona de " + J.short + (n2.rejected ? " y descarta el engaño" : "") + ", pero su buscador terminal encuentra el blanco.", "atk");
           else if (th.navErr > 150) {
-            log("w", label(th) + (n2.spoofed ? " es engañada por " + J.short + " (spoofing GNSS): desvío ≈" + (th.navErr / 1e3).toFixed(1) + " km." : (n2.rejected ? " descarta el engaño de " + J.short + (link && !th.T.navFix ? " gracias a su enlace de datos" : " con su corrección de terreno") + "; sigue con inercial: error ≈" : " entra en zona anti-GNSS: error de navegación ≈") + Math.round(th.navErr) + " m."));
+            log("w", label(th) + (n2.spoofed ? " es engañada por " + J.short + " (spoofing GNSS): desvío ≈" + (th.navErr / 1e3).toFixed(1) + " km." : (n2.rejected ? " descarta el engaño de " + J.short + (link && !th.T.navFix ? " gracias a su enlace de datos" : " con su corrección de terreno") + "; sigue con inercial: error ≈" : " entra en zona anti-GNSS: error de navegación ≈") + Math.round(th.navErr) + " m."), "atk");
             event("Primera arma desviada por interferencia GNSS", "gnss");
           }
           break;
@@ -4902,8 +5014,10 @@ table.t.mc td.pc{white-space:nowrap}
       if (!u.alive) continue;
       const d = D(u);
       if (!d.radar) continue;
+      if (!emitting(u, t)) continue;
       if (t < u.nextScan) continue;
       u.nextScan = t + d.radar.scan;
+      if (isEmitter(d.radar)) u.emitFrom ?? (u.emitFrom = t);
       const r = d.radar, uz = antZ(u), wx = wxNow();
       const keep = r.scan * 2 + 0.6, cap = r.tracks ?? Infinity, fake = falseTracks(u, S.jamsLive);
       u.fake = fake;
@@ -4941,7 +5055,7 @@ table.t.mc td.pc{white-space:nowrap}
                 ok = false;
                 if (!u.satLog) {
                   u.satLog = true;
-                  log("w", uLabel(u) + " no puede abrir más pistas: " + held + " reales" + (fake ? " y " + fake + " falsas (engaño DRFM)" : "") + " llenan su capacidad de " + cap + ".");
+                  log("w", uLabel(u) + " no puede abrir más pistas: " + held + " reales" + (fake ? " y " + fake + " falsas (engaño DRFM)" : "") + " llenan su capacidad de " + cap + ".", "def", uLabel(u) + " no puede abrir más pistas: " + (held + fake) + " llenan su capacidad de " + cap + ".");
                 }
               } else held++;
             }
@@ -4950,6 +5064,7 @@ table.t.mc td.pc{white-space:nowrap}
         if (ok) {
           th.det[u.id] = t;
           noteSeen(th, t, u.id);
+          noteObs(th, ownKey(u), t);
           const g = classifyGain(r);
           if (g) {
             th.clsT = (th.clsT || 0) + g;
@@ -4957,7 +5072,7 @@ table.t.mc td.pc{white-space:nowrap}
             const c = classify(th);
             if (c && !th.clsAs) {
               th.clsAs = c;
-              if (c === "señuelo" && S.ignoreDecoys) log("d", "Pista #" + th.id + " clasificada como señuelo por " + uLabel(u) + (th.isDecoy ? "." : " (¡error: era " + th.T.short + "!)."));
+              if (c === "señuelo" && S.ignoreDecoys) log("d", "Pista #" + th.id + " clasificada como señuelo por " + uLabel(u) + (th.isDecoy ? "." : " (¡error: era " + th.T.short + "!)."), "def", "Pista #" + th.id + " clasificada como señuelo por " + uLabel(u) + ".");
             }
           }
           const inNet = u.c2 !== "desconectada";
@@ -4974,13 +5089,17 @@ table.t.mc td.pc{white-space:nowrap}
             const nk = netKey(key, cp), n2 = th.net[nk] || (th.net[nk] = { first: null, last: -1e9 });
             if (n2.first === null) n2.first = t;
             n2.last = t;
+            noteObs(th, nk, t);
             th.lastNet = t;
             if (th.netFirst === null) th.netFirst = t;
           }
           if (th.firstDet === null) {
             th.firstDet = t;
             th.detKm = p.rem;
-            log("l", "Primera detección: " + label(th) + " por " + uLabel(u) + " a " + Math.hypot(p.x - u.x, p.y - u.y).toFixed(1) + " km, " + Math.round(p.z - surf(p.x, p.y)) + " m AGL.");
+            {
+              const where = " por " + uLabel(u) + " a " + Math.hypot(p.x - u.x, p.y - u.y).toFixed(1) + " km, " + Math.round(p.z - surf(p.x, p.y)) + " m AGL.";
+              log("l", "Primera detección: " + label(th) + where, "def", "Primera detección: pista #" + th.id + where);
+            }
             event("Primera detección: " + label(th) + " por " + uLabel(u), "firstDet");
           }
         }
@@ -4995,13 +5114,26 @@ table.t.mc td.pc{white-space:nowrap}
         u.reloadUntil = null;
         S.stats.reloads++;
         recUnit(u);
-        log("l", uLabel(u) + " termina de recargar: " + n2 + " listos, quedan " + u.reserveLeft + " en reserva.");
+        log("l", uLabel(u) + " termina de recargar: " + n2 + " listos, quedan " + u.reserveLeft + " en reserva.", "def");
       } else if (u.reloadUntil === null && u.magLeft === 0 && u.active === 0 && u.reserveLeft > 0 && canResupply(u)) {
         u.reloadUntil = t + D(u).sam.reloadS;
-        log("w", uLabel(u) + " empieza a recargar (" + Math.round(D(u).sam.reloadS / 60) + " min).");
+        log("w", uLabel(u) + " empieza a recargar (" + Math.round(D(u).sam.reloadS / 60) + " min).", "def");
       }
     }
     ewStep(t);
+    for (const it of S.ints) {
+      if (it.done || it.phantom || t < it.tL || !it.th.alive || !it.u.alive) continue;
+      const sm = D(it.u).sam;
+      if (sm.guid === "cañón" || !sm.altMin) continue;
+      const s = lastSeen(it.th, trackKeys(it.u, it.th, t, it.c2, S.gateways));
+      if (!s || s.t <= it.tL) continue;
+      if (s.z - surf(s.x, s.y) >= sm.altMin) continue;
+      it.done = true;
+      it.u.active = Math.max(0, it.u.active - 1);
+      it.aborted = t;
+      it.tH = t;
+      log("x", it.shot + " de " + uLabel(it.u) + " aborta: " + label(it.th) + " bajó de su piso de enfrentamiento.", "def", it.shot + " de " + uLabel(it.u) + " aborta: la " + pista(it.th) + " bajó de su piso de enfrentamiento.");
+    }
     for (const u of S.units) {
       if (!u.alive || !D(u).sam || u.dmgLauncher || u.magLeft <= 0) continue;
       if (t < u.nextEval) continue;
@@ -5014,19 +5146,25 @@ table.t.mc td.pc{white-space:nowrap}
       const u = it.u;
       u.active = Math.max(0, u.active - 1);
       if (it.phantom) {
-        log("x", it.shot + " de " + uLabel(u) + " no encuentra nada: era un falso blanco.");
+        log("x", it.shot + " de " + uLabel(u) + " no encuentra nada: era un falso blanco.", "def");
         continue;
       }
       const th = it.th;
       if (!th.alive) {
-        log("d", it.shot + " de " + uLabel(u) + ": blanco ya destruido, autodestrucción.");
+        log("d", it.shot + " de " + uLabel(u) + ": blanco ya destruido, autodestrucción.", "def");
         continue;
       }
       if (!u.alive && RADAR_GUID.includes(D(u).sam.guid)) {
-        log("x", it.shot + " de " + uLabel(u) + " pierde la guía: su batería fue destruida.");
+        log("x", it.shot + " de " + uLabel(u) + " pierde la guía: su batería fue destruida.", "def");
         continue;
       }
-      const pk = calcPk(u, th, t, S.jamsLive, it.f ?? null) * (it.remote ? C2_LEVELS[it.c2].remotePk * (it.gw ?? 1) : 1);
+      const reach = arrivalReach(u, th, t, it.kin ?? null);
+      if (!reach.ok) {
+        log("x", it.shot + " de " + uLabel(u) + " no alcanza a " + label(th) + ": el blanco no estaba donde se lo esperaba.", "def", it.shot + " de " + uLabel(u) + " no alcanza a la " + pista(th) + ": no estaba donde se la esperaba.");
+        S.fx.push({ x: it.px, y: it.py, rt: performance.now(), c: "#8a9aac" });
+        continue;
+      }
+      const pk = calcPk(u, th, t, S.jamsLive, it.f == null ? null : reach.f) * (it.remote ? C2_LEVELS[it.c2].remotePk * (it.gw ?? 1) : 1);
       if (rnd() < pk) {
         th.alive = false;
         th.killed = true;
@@ -5035,10 +5173,10 @@ table.t.mc td.pc{white-space:nowrap}
         if (th.isDecoy) S.stats.decoysKilled++;
         const p = th.p || it;
         S.fx.push({ x: p.x, y: p.y, rt: performance.now(), c: "#6fd08c" });
-        log("k", uLabel(u) + " derriba " + label(th) + (th.isDecoy ? " (era señuelo)" : "") + " — Pk " + Math.round(pk * 100) + "%.");
+        log("k", uLabel(u) + " derriba " + label(th) + (th.isDecoy ? " (era señuelo)" : "") + " — Pk " + Math.round(pk * 100) + "%.", "def", uLabel(u) + " derriba la " + pista(th) + " — Pk " + Math.round(pk * 100) + "%.");
         event("Primer derribo: " + uLabel(u) + " derriba " + label(th), "firstKill");
       } else {
-        log("x", it.shot + " de " + uLabel(u) + " falla contra " + label(th) + " (Pk " + Math.round(pk * 100) + "%).");
+        log("x", it.shot + " de " + uLabel(u) + " falla contra " + label(th) + " (Pk " + Math.round(pk * 100) + "%).", "def", it.shot + " de " + uLabel(u) + " falla contra la " + pista(th) + " (Pk " + Math.round(pk * 100) + "%).");
         S.fx.push({ x: it.px, y: it.py, rt: performance.now(), c: "#8a9aac" });
       }
     }
@@ -5060,7 +5198,8 @@ table.t.mc td.pc{white-space:nowrap}
     const maxR = isTBM(th) ? sm.maxRtbm : sm.maxR;
     if (!maxR) return null;
     if (u.noDrones && th.cls === "dron") return null;
-    if (Math.hypot(th.p.x - u.x, th.p.y - u.y) > maxR + 120) return null;
+    const sn = th.seen ?? th.p;
+    if (Math.hypot(sn.x - u.x, sn.y - u.y) > maxR + 120) return null;
     if (!trackOK(u, th, t, c2, S.gateways)) {
       if (!probe) delete u.avail[th.id];
       return null;
@@ -5077,11 +5216,11 @@ table.t.mc td.pc{white-space:nowrap}
     if (ign && th.clsAs === "señuelo") return null;
     return { pre: true };
   }
-  function solveFor(u, th, t) {
+  function solveFor(u, th, t, c2) {
     const sm = D(u).sam, r = D(u).radar;
-    const sol = solve(u, th, t, S.fireRange ?? 1);
+    const sol = solve(u, th, t, S.fireRange ?? 1, trackKeys(u, th, t, c2, S.gateways));
     if (!sol) return null;
-    if (speedAt(th, t + sol.tau) > sm.vmaxT) return null;
+    if ((sol.v ?? speedAt(th, t + sol.tau)) > sm.vmaxT) return null;
     const remote = !(r && t - (th.det[u.id] ?? -1e9) <= r.scan * 2 + 0.6);
     if (RADAR_GUID.includes(sm.guid) && sm.guid !== "cañón") {
       if (!los(u.x, u.y, antZ(u), sol.p.x, sol.p.y, sol.p.z)) return null;
@@ -5093,7 +5232,7 @@ table.t.mc td.pc{white-space:nowrap}
     return { sol, remote };
   }
   function shooterScore(u, th, t, f = null) {
-    const pk = Math.max(0.01, calcPk(u, th, t, S.jamsLive, f));
+    const pk = Math.max(0.01, calcPk(u, th, t, S.jamsLive, f, true));
     return th.cls === "dron" ? -D(u).sam.cost / pk : pk;
   }
   var RESUPPLY_KM = 30;
@@ -5102,12 +5241,14 @@ table.t.mc td.pc{white-space:nowrap}
     if (!dumps.length) return true;
     return dumps.some((g) => g.status !== "destroyed" && Math.hypot(g.x - u.x, g.y - u.y) <= RESUPPLY_KM);
   }
-  var costPerKill = (u, th, t) => D(u).sam.cost / Math.max(0.01, calcPk(u, th, t, S.jamsLive));
-  function reaches(v, th, t) {
-    const sm = D(v).sam, lz = surf(v.x, v.y) + 2, tEnd = th.tLaunch + th.ft - 1;
+  var costPerKill = (u, th, t) => D(u).sam.cost / Math.max(0.01, calcPk(u, th, t, S.jamsLive, null, true));
+  function reaches(v, th, t, keys) {
+    const sm = D(v).sam, lz = surf(v.x, v.y) + 2, tbm = isTBM(th), vel = tbm ? null : trackVel(th, keys);
+    if (!tbm && !vel) return false;
+    const tEnd = tbm ? th.tLaunch + th.ft - 1 : t + 3600;
     for (let tt = t + 2; tt < tEnd; tt += 2) {
-      const p = posAt(th, tt);
-      if (!p) break;
+      const p = tbm ? posAt(th, tt) : predictAt(vel, tt);
+      if (!p || p.x < 0 || p.y < 0 || p.x > MAP.wKm || p.y > MAP.hKm) break;
       if (Math.hypot(p.x - v.x, p.y - v.y) <= sm.maxR * 0.9 && p.z - lz <= sm.altMax && p.z - surf(p.x, p.y) >= sm.altMin) return true;
     }
     return false;
@@ -5118,7 +5259,11 @@ table.t.mc td.pc{white-space:nowrap}
     if (u.active >= ch) return;
     const cp = cpOf(u), c2net = effectiveC2(S.c2, S.objs, cp), c2 = unitC2(u, c2net), L = C2_LEVELS[c2];
     const cand = [];
-    for (const th of S.threats) if (canEngage(u, th, t, c2, false)) cand.push([th, th.p.rem / Math.max(1, th.T.v)]);
+    const eta = (th) => {
+      const s = th.seen, v = trackVel(th);
+      return s ? Math.hypot(s.x - u.x, s.y - u.y) * 1e3 / Math.max(1, v ? v.v : 1) : Infinity;
+    };
+    for (const th of S.threats) if (canEngage(u, th, t, c2, false)) cand.push([th, eta(th)]);
     cand.sort((a, b) => a[1] - b[1]);
     const ph = Math.round((u.fake || 0) * JAM_MODES.drfm.fooled);
     if (ph > 0 && u.active < ch && u.magLeft > 0 && rnd() < ph / (ph + cand.length)) phantomShot(u, t);
@@ -5128,26 +5273,26 @@ table.t.mc td.pc{white-space:nowrap}
         sat[k] = (sat[k] || 0) + 1;
         break;
       }
-      const f = solveFor(u, th, t);
+      const f = solveFor(u, th, t, c2);
       if (!f) continue;
       if (L.best && u.link !== false) {
         const mine = shooterScore(u, th, t, f.sol.f);
         const better = S.units.some((v) => {
           if (v === u || v.link === false || cpOf(v) !== cp || !canEngage(v, th, t, unitC2(v, c2net), true)) return false;
-          const fv = solveFor(v, th, t);
+          const fv = solveFor(v, th, t, unitC2(v, c2net));
           return !!fv && shooterScore(v, th, t, fv.sol.f) > mine * (th.cls === "dron" ? 0.999 : 1.001);
         });
         if (better) continue;
         if (th.cls === "dron") {
-          const cpk = costPerKill(u, th, t);
-          const layer = S.units.some((v) => v !== u && v.alive && v.link !== false && cpOf(v) === cp && D(v).sam && v.magLeft > 0 && !v.noDrones && D(v).sam.maxR > 0 && costPerKill(v, th, t) * 2 <= cpk && reaches(v, th, t));
+          const cpk = costPerKill(u, th, t), keys = trackKeys(u, th, t, c2, S.gateways);
+          const layer = S.units.some((v) => v !== u && v.alive && v.link !== false && cpOf(v) === cp && D(v).sam && v.magLeft > 0 && !v.noDrones && D(v).sam.maxR > 0 && costPerKill(v, th, t) * 2 <= cpk && reaches(v, th, t, keys));
           if (layer) continue;
         }
       }
       const { sol, remote } = f;
       const n2 = Math.min(S.doctrine === "salva" ? u.salvo || sm.salvo : 1, u.magLeft, ch - u.active);
       for (let k = 0; k < n2; k++) {
-        const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f, gw: remote ? netPk(u, th, t, c2, S.gateways) || 1 : 1 };
+        const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f, kin: sol.f > 0 ? sol.r / sol.f : null, gw: remote ? netPk(u, th, t, c2, S.gateways) || 1 : 1 };
         S.ints.push(it);
         (th.fly = th.fly || []).push(it);
         S.rec?.ints.push(it);
@@ -5156,14 +5301,16 @@ table.t.mc td.pc{white-space:nowrap}
         S.stats.shots++;
         S.stats.defCost += sm.cost;
         recUnit(u);
+        u.revealed ?? (u.revealed = t);
         S.stats.byUnit[uLabel(u)] = (S.stats.byUnit[uLabel(u)] || 0) + 1;
       }
       event("Primer interceptor lanzado: " + uLabel(u) + " contra " + label(th), "firstShot");
       if (u.magLeft === 0) {
-        log("w", uLabel(u) + " se queda sin munición.");
+        log("w", uLabel(u) + " se queda sin munición.", "def");
         event(uLabel(u) + " se queda sin munición", "empty:" + u.id);
       }
-      log("l", uLabel(u) + " dispara " + n2 + "× " + sm.shot + " contra " + (th.isDecoy && hooks.defenderView() ? "pista #" + th.id : label(th)) + " — intercepción a " + sol.r.toFixed(1) + " km en " + sol.tau.toFixed(0) + " s" + (remote ? " (con pista de la red)" : "") + ".");
+      const how = " — intercepción a " + sol.r.toFixed(1) + " km en " + sol.tau.toFixed(0) + " s" + (remote ? " (con pista de la red)" : "") + ".";
+      log("l", uLabel(u) + " dispara " + n2 + "× " + sm.shot + " contra " + label(th) + how, "def", uLabel(u) + " dispara " + n2 + "× " + sm.shot + " contra la " + pista(th) + how);
     }
   }
   function phantomShot(u, t) {
@@ -5178,9 +5325,10 @@ table.t.mc td.pc{white-space:nowrap}
       S.stats.shots++;
       S.stats.defCost += sm.cost;
       recUnit(u);
+      u.revealed ?? (u.revealed = t);
     }
-    log("w", uLabel(u) + " dispara " + n2 + "× " + sm.shot + " contra un falso blanco (engaño DRFM).");
-    if (u.magLeft === 0) log("w", uLabel(u) + " se queda sin munición.");
+    log("w", uLabel(u) + " dispara " + n2 + "× " + sm.shot + " contra un falso blanco (engaño DRFM).", "def", uLabel(u) + " dispara " + n2 + "× " + sm.shot + " contra una pista.");
+    if (u.magLeft === 0) log("w", uLabel(u) + " se queda sin munición.", "def");
   }
   function impact(th) {
     th.alive = false;
@@ -5199,7 +5347,7 @@ table.t.mc td.pc{white-space:nowrap}
     y += Math.sin(ang) * r / 1e3;
     if (th.isDecoy) {
       S.impacts.push({ x, y, k: "decoy", t: S.t });
-      log("d", label(th) + " cae sin efecto.");
+      log("d", label(th) + " cae sin efecto.", "def", "La " + pista(th) + " cae sin efecto.");
       return;
     }
     const hit = r <= (th.T.hitR || (th.cls === "dron" ? 20 : 50));
@@ -5207,7 +5355,7 @@ table.t.mc td.pc{white-space:nowrap}
     const dmg = applyDamage(th, x, y), total = dmg.reduce((a, d) => a + d.dmg, 0);
     const c2After = effectiveC2(S.c2, S.objs);
     if (c2After !== c2Before) {
-      log("x", `La defensa pierde un nodo de mando y control: el C2 cae a "${C2_LEVELS[c2After].name}".`);
+      log("x", `La defensa pierde un nodo de mando y control: el C2 cae a "${C2_LEVELS[c2After].name}".`, "def");
       event("C2 degradado a " + C2_LEVELS[c2After].name, "c2:" + c2After);
     }
     S.stats.missSum += r;
@@ -5218,7 +5366,7 @@ table.t.mc td.pc{white-space:nowrap}
       S.stats.hits++;
       S.impacts.push({ x, y, k: "hit", t: S.t });
       S.fx.push({ x, y, rt: performance.now(), c: "#ff5b4d", big: true });
-      let msg = label(th) + " impacta en el blanco";
+      let msg = label(th) + " impacta en el blanco", alt = "Impacto" + (th.firstDet === null ? " de un arma no detectada" : " de la " + pista(th));
       if (th.targetUnit) {
         const u = S.units.find((v) => v.id === th.targetUnit && v.alive);
         if (u) {
@@ -5226,17 +5374,19 @@ table.t.mc td.pc{white-space:nowrap}
           recUnit(u);
           S.stats.lost++;
           msg += " y destruye " + uLabel(u);
+          alt += ": " + uLabel(u) + " destruida";
           hooks.onUnitLost();
           event(uLabel(u) + " destruida por " + label(th), "lost:" + u.id);
         }
       }
-      log("x", msg + dtxt + ".");
+      log("x", msg + dtxt + ".", "def", alt + dtxt + ".");
     } else {
       S.stats.misses++;
       S.impacts.push({ x, y, k: "miss", t: S.t });
-      log("w", label(th) + " cae a " + Math.round(r) + " m del blanco" + (th.navErr > 150 ? " (desviado por interferencia GNSS)" : "") + dtxt + ".");
+      log("w", label(th) + " cae a " + Math.round(r) + " m del blanco" + (th.navErr > 150 ? " (desviado por interferencia GNSS)" : "") + dtxt + ".", "def", "Cae " + (th.firstDet === null ? "un arma no detectada" : "la " + pista(th)) + " sin dar en un objetivo" + dtxt + ".");
     }
     damageUnits(th.T, x, y);
+    damageJammers(th.T, x, y);
     for (const d of dmg) {
       event("Primer impacto con daño: " + label(th) + " sobre " + d.g.name, "firstDmg");
       if (d.g.status !== d.before) {
@@ -5266,6 +5416,20 @@ table.t.mc td.pc{white-space:nowrap}
     }
     return out;
   }
+  function damageJammers(T, x, y) {
+    for (const j of S.jamsLive) {
+      if (j.dead || JAMMERS[j.type].air) continue;
+      const res = damageAt(T, UNIT_TARGET, Math.hypot(x - j.x, y - j.y) * 1e3);
+      if (!res.dmg) continue;
+      j.hp = (j.hp ?? UNIT_TARGET.hp) - Math.round(res.dmg);
+      if (j.hp <= 0) {
+        j.dead = true;
+        S.stats.jamsLost = (S.stats.jamsLost || 0) + 1;
+        log("x", JAMMERS[j.type].short + " queda destruido por la explosión de " + T.short + " a " + Math.round(res.edge + UNIT_TARGET.radius) + " m: deja de interferir.", "def");
+        event(JAMMERS[j.type].short + " destruido por " + T.short, "jamLost:" + j.id);
+      }
+    }
+  }
   function damageUnits(T, x, y) {
     for (const u of S.units) {
       const d = D(u);
@@ -5278,7 +5442,7 @@ table.t.mc td.pc{white-space:nowrap}
         recUnit(u);
         S.stats.lost++;
         hooks.onUnitLost();
-        log("x", uLabel(u) + " queda destruida por la explosión de " + T.short + " a " + Math.round(res.edge + UNIT_TARGET.radius) + " m.");
+        log("x", uLabel(u) + " queda destruida por la explosión de " + T.short + " a " + Math.round(res.edge + UNIT_TARGET.radius) + " m.", "def");
         event(uLabel(u) + " destruida por " + T.short, "lost:" + u.id);
         continue;
       }
@@ -5291,10 +5455,10 @@ table.t.mc td.pc{white-space:nowrap}
         const c = comps.length > 1 ? comps[rnd() < 0.5 ? 0 : 1] : comps[0];
         if (c === "radar") {
           u.dmgRadar = true;
-          log("w", uLabel(u) + " dañada: el radar pierde alcance (×" + UNIT_DAMAGE.radarR + ") y reacciona más lento.");
+          log("w", uLabel(u) + " dañada: el radar pierde alcance (×" + UNIT_DAMAGE.radarR + ") y reacciona más lento.", "def");
         } else {
           u.dmgLauncher = true;
-          log("w", uLabel(u) + " dañada: el lanzador queda fuera de servicio.");
+          log("w", uLabel(u) + " dañada: el lanzador queda fuera de servicio.", "def");
         }
         S.stats.unitsDamaged++;
         event(uLabel(u) + " dañada por " + T.short, "dmgUnit:" + u.id + ":" + c);
@@ -5311,6 +5475,11 @@ table.t.mc td.pc{white-space:nowrap}
     if (o.cp) u.cp = o.cp;
     if (o.owner === "UA" || o.owner === "RU") u.owner = o.owner;
     if (o.decoyDoc === "ignorar" || o.decoyDoc === "tirar") u.decoyDoc = o.decoyDoc;
+    if (o.emcon === "alerta" || o.emcon === "silencio") u.emcon = o.emcon;
+    if (Number.isFinite(o.hp) && o.hp > 0 && o.hp < UNIT_TARGET.hp) u.hp = Math.round(o.hp);
+    if (o.dmgRadar === true) u.dmgRadar = true;
+    if (o.dmgLauncher === true) u.dmgLauncher = true;
+    if (Number.isInteger(o.mag) && o.mag >= 0 && d.sam) u.mag = o.mag;
     S.setup.defs.push(u);
     return u;
   }
@@ -5351,6 +5520,7 @@ table.t.mc td.pc{white-space:nowrap}
     const n2 = S.setup.objs.filter((g2) => g2.type === type).length + 1;
     const g = { id: nextId(), type, x, y, name: o.name || tt.name + " " + n2, short: o.short || "", maxHp: o.hp || tt.hp, desc: o.desc || "" };
     if (o.cp) g.cp = o.cp;
+    if (Number.isFinite(o.hpNow) && o.hpNow >= 0 && o.hpNow < g.maxHp) g.hpNow = Math.round(o.hpNow);
     S.setup.objs.push(g);
     return g;
   }
@@ -5602,8 +5772,9 @@ table.t.mc td.pc{white-space:nowrap}
     ctx.fillStyle = "#0a1520";
     ctx.fillRect(0, 0, w, h);
     const [ox, oy] = toS(0, 0), mw = MAP.wKm * V.s, mh = MAP.hKm * V.s;
+    const av = S.started && !R && hooks.attackerView();
     drawTerrain({ ctx, dpr, s: V.s, ox, oy }, S.relief);
-    if (S.showCov && covCanvas.width) {
+    if (S.showCov && covCanvas.width && !av) {
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = "high";
       ctx.drawImage(covCanvas, ox, oy, mw, mh);
@@ -5641,12 +5812,12 @@ table.t.mc td.pc{white-space:nowrap}
       ctx.fillStyle = "rgba(235,240,245,.85)";
       ctx.fillText(p[0], sx + 5, sy + 4);
     }
-    const units = R ? R.units : S.started ? S.units : S.setup.defs;
+    const units = (R ? R.units : S.started ? S.units : S.setup.defs).filter((u) => !av || attackerKnows(u, tNow));
     const jams = S.started ? S.jamsLive : S.setup.jams;
     for (const u of units) {
       const d = D(u);
       const [sx, sy] = toS(u.x, u.y);
-      const dead = S.started && !u.alive;
+      const dead = S.started && !u.alive && !av;
       if (dead) continue;
       const isSel = S.sel && S.sel.kind === "def" && S.sel.id === u.id;
       if (d.sam) {
@@ -5705,7 +5876,7 @@ table.t.mc td.pc{white-space:nowrap}
     }
     if (!R && (!S.started || !S.running)) for (const sv of S.setup.salvos) drawRoute(sv, S.sel && S.sel.kind === "salvo" && S.sel.id === sv.id);
     if (S.route) drawRoute({ type: S.atk.type, pts: S.route.pts, preview: true }, true);
-    for (const g of R ? R.objs : S.started ? S.objs : S.setup.objs) drawObjective(g, S.sel && S.sel.kind === "obj" && S.sel.id === g.id);
+    for (const g of R ? R.objs : S.started ? S.objs : S.setup.objs) drawObjective(g, S.sel && S.sel.kind === "obj" && S.sel.id === g.id, av);
     for (const j of jams) {
       const J = JAMMERS[j.type], [sx, sy] = toS(j.x, j.y);
       const isSel = S.sel && S.sel.kind === "jam" && S.sel.id === j.id;
@@ -5728,7 +5899,7 @@ table.t.mc td.pc{white-space:nowrap}
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
-      if (S.started && j.fix && !j.dead) {
+      if (S.started && j.fix && !j.dead && !av) {
         ctx.strokeStyle = "rgba(230,165,60,.8)";
         ctx.setLineDash([2, 3]);
         ctx.beginPath();
@@ -5749,7 +5920,7 @@ table.t.mc td.pc{white-space:nowrap}
       labelAt(sx, sy, J.short, "#d8b8ff");
     }
     for (const u of units) {
-      const d = D(u), [sx, sy] = toS(u.x, u.y), dead = S.started && !u.alive;
+      const d = D(u), [sx, sy] = toS(u.x, u.y), dead = S.started && !u.alive && !av;
       const isSel = S.sel && S.sel.kind === "def" && S.sel.id === u.id || S.multi.includes(u.id);
       const c = sideOf(u) === "RU" ? "#ff9f5a" : "#62b6ff";
       ctx.lineWidth = isSel ? 2.2 : 1.2;
@@ -5780,7 +5951,7 @@ table.t.mc td.pc{white-space:nowrap}
         ctx.arc(sx, sy, 12, 0, 7);
         ctx.stroke();
       }
-      if (S.started && !dead && (u.dmgRadar || u.dmgLauncher)) {
+      if (S.started && !dead && !av && (u.dmgRadar || u.dmgLauncher)) {
         ctx.strokeStyle = "#e6a53c";
         ctx.lineWidth = 2;
         ctx.beginPath();
@@ -5797,7 +5968,7 @@ table.t.mc td.pc{white-space:nowrap}
         ctx.lineTo(sx - 7, sy + 7);
         ctx.stroke();
       }
-      const ammo = S.started && d.sam && u.alive ? " " + u.magLeft : "";
+      const ammo = S.started && d.sam && u.alive && !av ? " " + u.magLeft : "";
       labelAt(sx, sy, (u.name || d.short) + ammo, dead ? "#6b7888" : "#e6eef6");
     }
     if (S.preview) drawPreview(S.preview);
@@ -5869,7 +6040,7 @@ table.t.mc td.pc{white-space:nowrap}
           ctx.fillText(dv ? "#" + th.id : th.T.short, sx + 7, sy - 6);
         }
       }
-    for (const it of R ? R.ints : S.ints) {
+    if (!av) for (const it of R ? R.ints : S.ints) {
       if (it.done || tNow < it.tL) continue;
       const P = profileOf(D(it.u).sam), fl = Math.max(0.1, it.tH - it.tL);
       const f = clamp(distAt(P, tNow - it.tL) / Math.max(1, distAt(P, fl)), 0, 1);
@@ -5896,6 +6067,16 @@ table.t.mc td.pc{white-space:nowrap}
       ctx.arc(sx, sy, (f.big ? 6 : 3) + k * (f.big ? 26 : 14), 0, 7);
       ctx.stroke();
       ctx.globalAlpha = 1;
+    }
+    if (S.box) {
+      const [x1, y1] = toS(...S.box.a), [x2, y2] = toS(...S.box.b);
+      ctx.strokeStyle = "#e6a53c";
+      ctx.lineWidth = 1.2;
+      ctx.setLineDash([4, 3]);
+      ctx.strokeRect(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1));
+      ctx.setLineDash([]);
+      ctx.fillStyle = "rgba(230,165,60,.08)";
+      ctx.fillRect(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1));
     }
     if (S.mode === "measure" && S.measure?.a) drawMeasure(S.measure);
   }
@@ -6038,8 +6219,8 @@ table.t.mc td.pc{white-space:nowrap}
     }
   }
   var STATUS_COLOR = { operational: "#6fd08c", damaged: "#e6a53c", destroyed: "#ff5b4d" };
-  function drawObjective(g, isSel) {
-    const tt = TARGET_TYPES[g.type], [sx, sy] = toS(g.x, g.y), hp = g.hp ?? g.maxHp, st = g.status || "operational", col = STATUS_COLOR[st];
+  function drawObjective(g, isSel, hide = false) {
+    const tt = TARGET_TYPES[g.type], [sx, sy] = toS(g.x, g.y), hp = hide ? g.maxHp : g.hp ?? g.maxHp, st = hide ? "operational" : g.status || "operational", col = hide ? "#8a9aac" : STATUS_COLOR[st];
     const rpx = tt.radius / 1e3 * V.s;
     if (rpx > 4) {
       ctx.strokeStyle = "rgba(242,212,138,.35)";
@@ -6157,7 +6338,9 @@ table.t.mc td.pc{white-space:nowrap}
 
   // src/ui/dom.js
   var $ = (s) => document.querySelector(s);
-  var isDefenderView = () => $("#defView").checked;
+  var isDefenderView = () => $("#view")?.value === "def";
+  var isAttackerView = () => $("#view")?.value === "atk";
+  var viewNow = () => S.replay ? "all" : isDefenderView() ? "def" : isAttackerView() ? "atk" : "all";
 
   // src/physics/coverage.js
   function coverageGrid(units, jams, ref, agl, wx = null) {
@@ -6319,7 +6502,7 @@ table.t.mc td.pc{white-space:nowrap}
     const saved = { ...hooks }, quiet = { onLog() {
     }, onEnd() {
     }, onUnitLost() {
-    }, defenderView: () => false };
+    }, defenderView: () => false, attackerView: () => false };
     mc.tick = (budgetMs = 40) => {
       if (mc.done) return true;
       const t0 = Date.now();
@@ -6441,6 +6624,94 @@ table.t.mc td.pc{white-space:nowrap}
     return { n: n2, sample, seed, scen, player: scen?.player || null, outcome, goals, objectives, unitsLost, metrics, interceptHist: histogram(rate, 0, 1, 10) };
   }
 
+  // src/sim/debrief.js
+  var sum = (a, f) => a.reduce((s, x) => s + f(x), 0);
+  var LOST_M = 2e3;
+  function buildDebrief(S2) {
+    const st = S2.stats, real = S2.threats.filter((t) => !t.isDecoy), decoys = S2.threats.filter((t) => t.isDecoy);
+    const arrivals = S2.arrivals;
+    const { goals, outcome } = evaluateGoals(S2.scen, S2);
+    const byType = {};
+    for (const t of S2.threats) {
+      const k = t.isDecoyChild ? t.T.short + " (señuelo)" : t.T.short;
+      const b = byType[k] || (byType[k] = { launched: 0, killed: 0, arrived: 0, shotsAt: 0 });
+      b.launched++;
+      if (t.killed) b.killed++;
+      else if (t.done) b.arrived++;
+      b.shotsAt += (t.fly || []).length;
+    }
+    const objectives = S2.objs.map((o) => ({ name: o.name, type: o.type, status: o.status, dmg: o.maxHp - o.hp, maxHp: o.maxHp, hits: o.hits, dmgBy: o.dmgBy }));
+    const dmgSorted = Object.entries(st.dmgByWeapon).sort((a, b) => b[1] - a[1]);
+    const magTotal = sum(S2.units, (u) => u.mag || 0), magLeft = sum(S2.units, (u) => DEFENSES[u.type].sam ? u.magLeft : 0);
+    const lost = S2.units.filter((u) => !u.alive).map((u) => u.name);
+    const detected = real.filter((t) => t.firstDet !== null && t.detKm != null);
+    const attack = {
+      launched: st.launched,
+      real: real.length,
+      decoys: st.decoys,
+      intercepted: st.killed - st.decoysKilled,
+      decoysKilled: st.decoysKilled,
+      impacts: st.hits,
+      misses: st.misses,
+      lostLocally: arrivals.filter((a) => a.nav > LOST_M).length,
+      byType
+    };
+    const damage = {
+      total: st.damage,
+      byWeapon: dmgSorted,
+      top: dmgSorted[0] || null,
+      avgMiss: st.missN ? st.missSum / st.missN : null,
+      objsDestroyed: st.objsDestroyed,
+      objsSurviving: S2.objs.filter((o) => o.status !== "destroyed").length
+    };
+    const defense = {
+      shots: st.shots,
+      magLeft,
+      magTotal,
+      defCost: st.defCost,
+      atkCost: st.atkCost,
+      lost,
+      byUnit: st.byUnit,
+      perKill: st.killed ? st.shots / st.killed : null,
+      avgDetKm: detected.length ? sum(detected, (t) => t.detKm) / detected.length : null
+    };
+    const timeline = [...S2.events].sort((a, b) => a.t - b.t);
+    return { scen: S2.scen, t: S2.t, goals, outcome, objectives, attack, damage, defense, timeline, why: explain(S2, arrivals, decoys) };
+  }
+  function explain(S2, arrivals, decoys) {
+    const out = [], st = S2.stats, list = (a) => [...new Set(a.map((x) => THREATS[x.type].short))].join(", ");
+    const real = arrivals;
+    if (!S2.threats.length) return ["No hubo ataques: agregá salvas en la pestaña Ataque."];
+    if (!real.length) out.push("Ninguna arma real llegó a su blanco: todas fueron derribadas o eran señuelos. La defensa por capas cubrió las rutas de ataque.");
+    const never = real.filter((a) => a.det === null);
+    if (never.length) out.push(`${never.length} arma(s) llegaron sin haber sido detectadas nunca (${list(never)}). Típico de blancos rasantes: el horizonte de radar y el relieve los ocultan. Probá subir mástiles, sumar un AEW o ubicar sensores sobre cotas altas (capa "Puntos altos").`);
+    const unengaged = real.filter((a) => a.det !== null && a.shots === 0);
+    if (unengaged.length) {
+      const lead = unengaged.reduce((s, a) => s + (a.t - a.det), 0) / unengaged.length;
+      out.push(`${unengaged.length} arma(s) fueron detectadas pero nadie les disparó (${list(unengaged)}), en promedio ${Math.round(lead)} s antes de llegar. Causas posibles: fuera del alcance o de la envolvente de altura, tiempo de reacción mayor que la ventana, clase no enfrentable (p. ej. IRIS-T o NASAMS contra balísticos), canales ocupados o sin munición.`);
+    }
+    const survived = real.filter((a) => a.shots > 0);
+    if (survived.length) out.push(`${survived.length} arma(s) sobrevivieron a ${survived.reduce((s, a) => s + a.shots, 0)} interceptor(es) disparados contra ellas (${list(survived)}): la Pk por disparo nunca es 100% y baja con maniobra terminal, baja firma, bengalas o interferencia.`);
+    const decoyShots = decoys.reduce((s, t) => s + (t.fly || []).length, 0);
+    const clsDecoys = decoys.filter((t) => t.clsAs === "señuelo").length, wrong = S2.threats.filter((t) => !t.isDecoy && t.clsAs === "señuelo");
+    if (clsDecoys) out.push(`Los radares de tiro reconocieron ${clsDecoys} de ${decoys.length} señuelo(s)${S2.ignoreDecoys ? " y dejaron de tirarles" : '; con la doctrina "no tirarle a pistas clasificadas como señuelo" se habrían ahorrado interceptores'}.`);
+    if (wrong.length) out.push(`${wrong.length} arma(s) real(es) se clasificaron por error como señuelo (${wrong.map((t) => t.T.short).join(", ")})${S2.ignoreDecoys ? " y no se les tiró" : ""}.`);
+    if (S2.stats.reloads) out.push(`Hubo ${S2.stats.reloads} recarga(s) de baterías durante el ataque.`);
+    if (decoyShots) out.push(`Los señuelos consumieron ${decoyShots} interceptor(es) que no se usaron contra armas reales. La "vista del defensor" muestra cómo los ve el operador: iguales a las armas.`);
+    const empty = S2.events.filter((e) => e.key && e.key.startsWith("empty:"));
+    if (empty.length) out.push(`Se quedaron sin munición: ${empty.map((e) => e.text.replace(" se queda sin munición", "")).join(", ")}. Mientras recargan (o sin reserva), la saturación agota los cargadores antes de que llegue lo más peligroso.`);
+    const sat = Object.entries(st.satChannels).sort((a, b) => b[1] - a[1]);
+    if (sat.length) out.push(`Saturación de canales de tiro: ${sat.slice(0, 3).map(([k, v]) => `${k} (${v} s)`).join(", ")} tuvo más blancos que canales simultáneos.`);
+    const gnss = real.filter((a) => a.nav > 150 && a.nav <= LOST_M), lostL = real.filter((a) => a.nav > LOST_M);
+    if (gnss.length) out.push(`${gnss.length} arma(s) fueron desviadas por interferencia GNSS (${list(gnss)}).`);
+    if (lostL.length) out.push(`${lostL.length} arma(s) quedaron "perdidas localmente": el engaño GNSS las desvió más de ${LOST_M / 1e3} km (${list(lostL)}). Ojo al comparar con las cifras oficiales ucranianas: esa categoría real también incluye señuelos y fallas.`);
+    const hurt = S2.units.filter((u) => u.alive && (u.dmgRadar || u.dmgLauncher));
+    if (hurt.length) out.push(`Unidades dañadas por explosiones cercanas: ${hurt.map((u) => u.name + " (" + [u.dmgRadar ? "radar" : "", u.dmgLauncher ? "lanzador" : ""].filter(Boolean).join(" y ") + ")").join(", ")}. Un radar dañado ve menos y reacciona más lento; un lanzador dañado no dispara aunque le queden misiles.`);
+    if (S2.units.some((u) => !u.alive)) out.push(`Unidades perdidas: ${S2.units.filter((u) => !u.alive).map((u) => u.name).join(", ")}. Una batería destruida deja un hueco de cobertura para lo que viene después.`);
+    if (st.killed) out.push(`Economía: la defensa gastó US$${st.defCost.toFixed(1)} M y el ataque US$${st.atkCost.toFixed(1)} M. ${st.defCost > st.atkCost ? "Defender costó más que atacar: es la lógica de los drones baratos y los señuelos." : "Defender costó menos que atacar."}`);
+    return out;
+  }
+
   // src/sim/pace.js
   var AUTO_PHASES = {
     calm: { speed: 60, text: "calma" },
@@ -6457,57 +6728,6 @@ table.t.mc td.pc{white-space:nowrap}
     if (alive.some((t) => eta(t) < (t.firstDet !== null ? ACTION_WINDOW : ACTION_WINDOW / 2))) return "action";
     if (alive.some((t) => t.firstDet !== null)) return "tracked";
     return alive.length ? "approach" : "calm";
-  }
-
-  // src/ui/controls.js
-  var SPEEDS = [1, 5, 15, 30, 60];
-  function initControls() {
-    $("#speeds").innerHTML = `<button data-s="auto" title="Rápido cuando no pasa nada, lento cuando hay combate">Auto</button>` + SPEEDS.map((s) => `<button data-s="${s}">${s}×</button>`).join("");
-    $("#speeds").onclick = (e) => {
-      const b = e.target.closest("button");
-      if (!b) return;
-      if (b.dataset.s === "auto") S.auto = true;
-      else {
-        S.auto = false;
-        S.speed = +b.dataset.s;
-      }
-      updatePlay();
-    };
-    $("#play").onclick = togglePlay;
-    $("#reset").onclick = () => {
-      resetSim();
-      renderAll();
-    };
-    $("#defView").onchange = draw;
-  }
-  function togglePlay() {
-    if (isMonteCarloRunning()) return;
-    if (!S.started) {
-      if (!S.setup.salvos.length) {
-        toast("Agregá al menos un ataque en la pestaña Ataque.");
-        return;
-      }
-      setMode("select");
-      startSim();
-      S.running = true;
-      schedCov();
-    } else if (!S.pending.length && S.threats.every((t) => !t.alive)) {
-      resetSim();
-      return;
-    } else S.running = !S.running;
-    updatePlay();
-  }
-  function updatePlay() {
-    $("#play").textContent = S.running ? "❚❚ Pausa" : S.started ? S.pending.length || S.threats.some((t) => t.alive) ? "▶ Seguir" : "↺ Nueva corrida" : "▶ Iniciar";
-    for (const b of $("#speeds").children) b.classList.toggle("act", S.auto ? b.dataset.s === "auto" : +b.dataset.s === S.speed);
-    $("#clock").textContent = fmtT(S.t);
-    renderTimeScale();
-  }
-  var currentSpeed = () => S.auto ? AUTO_PHASES[S.autoPhase].speed : S.speed;
-  var span = (s) => s < 60 ? s + " s" : s / 60 + " min";
-  function renderTimeScale() {
-    const sp = currentSpeed();
-    $("#tscale").textContent = (S.auto ? "Auto " + sp + "× (" + AUTO_PHASES[S.autoPhase].text + ")" : sp + "×") + " · 1 s real = " + span(sp) + (sp === 1 ? " (tiempo real)" : " simulados");
   }
 
   // src/edu/concepts.js
@@ -6753,7 +6973,7 @@ table.t.mc td.pc{white-space:nowrap}
       group: "Enfrentamiento",
       title: "Detección, seguimiento e intercepción",
       body: () => `<p>Son tres pasos distintos. <b>Detectar</b> es que un sensor vea el blanco en un barrido. <b>Seguir</b> es mantener actualizaciones seguidas para conocer su trayectoria. <b>Interceptar</b> exige una solución de tiro, un canal libre, superar el tiempo de reacción y que el interceptor llegue al punto de encuentro antes que el blanco.</p><p>Muchos sistemas detectan lejos pero solo pueden guiar misiles con su radar propio.</p>`,
-      engine: () => `<ul><li>Barridos cada ${code("radar.scan")} s; probabilidad de detección según la distancia.</li><li>Pista propia válida si el radar de la batería vio el blanco en los últimos 2 barridos; pista de red válida 12 s (${code("trackOK()")}).</li><li>Los guiados TVM, semiactivo, por mando y los cañones necesitan pista propia; los misiles activos e IR pueden usar la de la red; los drones interceptores, solo la de la red.</li><li>${code("sam.react")}: segundos desde que hay pista hasta el primer disparo.</li><li>${code("solve()")}: busca el primer punto de la trayectoria dentro de la envolvente al que el interceptor llega a tiempo.</li></ul>`
+      engine: () => `<ul><li>Barridos cada ${code("radar.scan")} s; probabilidad de detección según la distancia.</li><li>Pista propia válida si el radar de la batería vio el blanco en los últimos 2 barridos; pista de red válida 12 s (${code("trackOK()")}).</li><li>Los guiados TVM, semiactivo, por mando y los cañones necesitan pista propia; los misiles activos e IR pueden usar la de la red; los drones interceptores, solo la de la red.</li><li>${code("sam.react")}: segundos desde que hay pista hasta el primer disparo.</li><li>${code("solve()")}: busca el primer punto de la trayectoria prevista (línea recta con la velocidad medida por la pista; la verdadera solo en balísticos) dentro de la envolvente al que el interceptor llega a tiempo. Al llegar, ${code("arrivalReach()")} revisa con la posición real si le alcanza la energía.</li></ul>`
     },
     {
       id: "pk",
@@ -6798,7 +7018,7 @@ table.t.mc td.pc{white-space:nowrap}
         return `<p>El alcance del catálogo es el máximo contra un blanco ideal. La <b>ventana práctica</b> es el tiempo en que, a la vez, el blanco está dentro de la envolvente (alcances mínimo y máximo, piso y techo), está siendo seguido, ya pasó el tiempo de reacción y el interceptor puede llegar antes que él.</p>
       <p>Ejemplo con los datos del motor: un ${esc(T.short)} vuela a ${n(T.cruiseAlt / 1e3)} km de altura y pica en los últimos ${dd} km a ${kmh(T.vDive)}. El IRIS-T tiene ${s.maxR} km de alcance, pero su techo es de ${n(s.altMax / 1e3)} km y el blanco recién baja de esa altura en los últimos ~${n(remAlt, 1)} km: quedan <b>~${n(tw)} s</b>. Menos ${s.react} s de reacción, y con un interceptor que promedia ${kmh(s.vInt)} contra un blanco a ${kmh(T.vDive)}, en el mejor caso el encuentro sería a ~${n(x, 1)} km. Ahí la Pk contra supersónicos es ${Math.round(s.pk.supersonico * 100)}% y baja otro ×0,8 porque el blanco va cerca del máximo enfrentable (${kmh(s.vmaxT)}). Es una ventana de pocos segundos con poca probabilidad, aunque "el alcance alcance". Coincide con los 3 derribos en más de 400 lanzamientos fuera de la cobertura Patriot.</p>`;
       },
-      engine: () => `<p>${code("solve()")} recorre la trayectoria futura del blanco y verifica ${code("minR ≤ r ≤ maxR × rangeFactor × fireRange")} (o ${code("maxRtbm")} para balísticos; ver "Energía del interceptor"), ${code("altMin ≤ altura ≤ altMax")} y el tiempo de vuelo del interceptor (perfil de motor y planeo, o ${code("vInt")} constante sin perfil). ${code("engage()")} descarta además blancos más rápidos que ${code("vmaxT")} y sin línea de vista al punto de encuentro.</p>`
+      engine: () => `<p>${code("solve()")} recorre la trayectoria prevista del blanco (la que la defensa puede deducir de su pista) y verifica ${code("minR ≤ r ≤ maxR × rangeFactor × fireRange")} (o ${code("maxRtbm")} para balísticos; ver "Energía del interceptor"), ${code("altMin ≤ altura ≤ altMax")} y el tiempo de vuelo del interceptor (perfil de motor y planeo, o ${code("vInt")} constante sin perfil). ${code("engage()")} descarta además blancos más rápidos que ${code("vmaxT")} y sin línea de vista al punto de encuentro.</p>`
     },
     {
       id: "energia",
@@ -7041,62 +7261,260 @@ table.t.mc td.pc{white-space:nowrap}
     <div class="tblwrap"><table class="t"><thead><tr><th>Radar</th><th>ECCM</th><th>Sin jammer</th><th>Barrera, de frente</th><th>Barrera, de costado</th><th>Puntual, de frente</th></tr></thead><tbody>${rows.join("")}</tbody></table></div></div>`;
   }
 
-  // src/ui/panels/ew.js
-  function roleTag(J) {
-    const who = J.side === "RU" ? "ruso" : J.side === "UA" ? "ucraniano" : "ambos bandos";
-    const role = J.gnssJam ? "anti-GNSS: desvía armas del atacante" : "contra radares de la defensa";
-    return `${J.gnssJam ? "Defensor" : "Atacante"} · ${who} · ${role}`;
+  // src/ui/montecarlo.js
+  var RUNS = [10, 20, 50, 100];
+  var SIDE = { ataque: "Ataque", defensa: "Defensa" };
+  var last = { runs: 20, sample: true, seed: 1 };
+  function openMonteCarlo() {
+    if (!S.setup.salvos.length) {
+      toast("Agregá al menos un ataque en la pestaña Ataque.");
+      return;
+    }
+    openModal(`<header><div><span class="chip">${esc(S.scen?.name || "Escenario libre")}</span><h2>Monte Carlo</h2></div><button class="btn x">Cerrar</button></header><div class="bd">
+    <p>Corre <b>la misma situación</b> muchas veces con semillas distintas y muestra qué tan probable es cada resultado. Una sola corrida puede ser suerte; cien corridas muestran la tendencia.</p>
+    <div class="field"><label for="mcRuns">Cantidad de corridas</label><select id="mcRuns" class="sel">${RUNS.map((n2) => `<option value="${n2}" ${n2 === last.runs ? "selected" : ""}>${n2}</option>`).join("")}</select></div>
+    <label class="check"><input type="checkbox" id="mcSample" ${last.sample ? "checked" : ""}> Sortear los parámetros dentro de su rango de incertidumbre (RCS, Pk, velocidades, alcances, CEP…)</label>
+    <p class="hint">Sin sorteo, solo cambia el azar de cada corrida (detección, Pk, dispersión) con los valores probables del catálogo. Con sorteo, además, cada corrida usa un catálogo distinto tomado de los rangos mín–probable–máx de cada ficha. Lo que elegiste vos (posiciones, munición, mástiles, rutas, alturas) no se sortea.</p>
+    <div class="field"><label for="mcSeed">Primera semilla</label><input id="mcSeed" class="inp" type="number" min="1" max="1000000" value="${last.seed}"></div>
+    <p class="hint">La corrida <i>i</i> usa la semilla <i>primera + i</i>: con los mismos datos, la serie se puede repetir exacta. Una corrida del escenario de Monterey tarda 1–2 s, así que 50 corridas llevan alrededor de un minuto.</p>
+    <div class="row"><button class="btn pri" id="mcGo">Correr</button></div>
+  </div>`, openMonteCarlo);
+    $("#mcGo").onclick = () => {
+      if (!$("#mcSeed").reportValidity() || !Number.isFinite($("#mcSeed").valueAsNumber)) return;
+      last = { runs: +$("#mcRuns").value, sample: $("#mcSample").checked, seed: $("#mcSeed").valueAsNumber };
+      run(last);
+    };
   }
-  var roleShort = (J) => (J.gnssJam ? "Def." : "Atac.") + " " + (J.side === "both" ? "ambos" : J.side);
-  function renderEW() {
-    const el = $("#tab-ew");
-    el.innerHTML = `
-    <p class="hint">El efecto depende del <b>rol</b>, no de la bandera: los interferidores de radar degradan los radares de la defensa (herramienta del atacante) y los anti-GNSS desvían las armas del atacante (herramienta del defensor).</p><div class="grp"><h3>Interferidores y contramedidas</h3><div class="unitgrid">${Object.entries(JAMMERS).map(([k, j]) => `<button class="ub ew ${S.mode === "placeJam" && S.placeType === k ? "act" : ""}" data-k="${k}" title="${esc(j.name)} — ${roleTag(j)}"><span>${esc(j.short)}</span><small class="side">${roleShort(j)}</small><i data-info="${k}" role="button" aria-label="Ficha">i</i></button>`).join("")}</div></div>
-    <label class="check"><input type="checkbox" id="optStr" ${S.strobes ? "checked" : ""}> Mostrar "strobes" de interferencia (líneas violeta radar → jammer)</label>
-    <div class="grp"><h3>Desplegados</h3><div class="list" id="jList">${S.setup.jams.map((j) => `<div class="item vio"><span class="t">${esc(JAMMERS[j.type].name)} <small class="side">${roleTag(JAMMERS[j.type])}</small></span><span class="s">${j.x.toFixed(1)}, ${j.y.toFixed(1)} km${JAMMERS[j.type].air ? " · " + j.alt + " m" : ""}</span><span class="a"><button class="btn sm ${j.on ? "on" : ""}" data-tog="${j.id}">${j.on ? "Activo" : "Apagado"}</button><button class="btn sm danger" data-del="${j.id}" aria-label="Borrar">✕</button></span></div>`).join("") || '<p class="hint">Ninguno.</p>'}</div></div>
-    <div class="grp"><h3>Modelo ${infoBtn("noise")} ${infoBtn("lobes")} ${infoBtn("eccm")} ${infoBtn("gnss")}</h3><p class="hint">Jammer de ruido: reduce el alcance de detección como <b>R' = R·(1/(1+J/N))<sup>¼</sup></b>. J/N cae con la distancia al cuadrado, solo afecta radares de la misma banda, necesita línea de vista y es ~25 dB más débil fuera del lóbulo principal. Elegí barrera o ruido puntual (contra un radar) en el panel de selección del jammer. Cada radar tiene sus ECCM: agilidad de frecuencia (anula el puntual), lóbulos bajos y canceladores de los lóbulos laterales (no pueden con un jammer alineado con los blancos). La ficha del jammer muestra la distancia de quemado de cada radar. El anti-GNSS no toca radares: desvía armas que navegan por satélite.</p></div>`;
-    el.onclick = (e) => {
-      const inf = e.target.closest("[data-info]");
-      if (inf) {
-        e.stopPropagation();
-        openFicha("jam", inf.dataset.info);
+  function run(opts) {
+    resetSim();
+    const mc = createMonteCarlo(opts), t0 = performance.now();
+    openModal(`<header><h2>Monte Carlo en curso</h2></header><div class="bd">
+    <p id="mcTxt">Preparando…</p><div class="mcprog"><i id="mcBar" style="width:0%"></i></div>
+    <p class="hint" id="mcEta">&nbsp;</p><div class="row"><button class="btn" id="mcStop">Cancelar</button></div></div>`);
+    $("#mcStop").onclick = () => mc.cancel();
+    const frame = () => {
+      if ($("#modal").hidden && !mc.done) mc.cancel();
+      try {
+        mc.tick(40);
+      } catch (error) {
+        resetSim();
+        renderAll();
+        openModal(`<header><h2>Monte Carlo detenido</h2><button class="btn x">Cerrar</button></header><div class="bd"><p>${esc(error.message)}</p><p>La serie quedó incompleta. Revisá las rutas y los horarios antes de volver a correrla.</p></div>`);
         return;
       }
-      const t = e.target.closest("[data-tog]");
-      if (t) {
-        const j = S.setup.jams.find((v) => v.id == t.dataset.tog);
-        j.on = !j.on;
-        if (S.started) {
-          const jl = S.jamsLive.find((v) => v.id == j.id);
-          if (jl) jl.on = j.on;
-        }
-        renderEW();
-        schedCov();
+      const k = mc.results.length, el = (performance.now() - t0) / 1e3;
+      if (!mc.done) {
+        $("#mcTxt").textContent = `Corrida ${Math.min(k + 1, opts.runs)} de ${opts.runs}`;
+        $("#mcBar").style.width = (100 * k / opts.runs).toFixed(1) + "%";
+        if (k) $("#mcEta").textContent = `Faltan unos ${Math.ceil(el / k * (opts.runs - k))} s`;
+        setTimeout(frame, 0);
         return;
       }
-      const d = e.target.closest("[data-del]");
-      if (d) {
-        if (S.started) {
-          toast("Reiniciá para editar.");
-          return;
-        }
-        S.setup.jams = S.setup.jams.filter((v) => v.id != d.dataset.del);
-        renderEW();
-        schedCov();
+      resetSim();
+      renderAll();
+      if (!k) {
+        closeModal();
+        toast("Monte Carlo cancelado.");
         return;
       }
-      const b = e.target.closest(".ub");
+      openMcDebrief(aggregate(mc.results, S.scen, opts), mc.cancelled);
+    };
+    setTimeout(frame, 0);
+  }
+  var pct = (v) => v == null ? "—" : Math.round(v * 100) + "%";
+  var ci = (p) => `${pct(p.lo)}–${pct(p.hi)}`;
+  var num = (v, d = 0) => v == null ? "—" : v.toLocaleString("es-AR", { maximumFractionDigits: d, minimumFractionDigits: d });
+  var pbar = (p) => `<div class="pbar" title="${pct(p.p)} (${p.k} de ${p.n}); IC 95%: ${ci(p)}"><span class="ci" style="left:${(100 * p.lo).toFixed(1)}%;width:${(100 * (p.hi - p.lo)).toFixed(1)}%"></span><i style="width:${(100 * p.p).toFixed(1)}%"></i></div>`;
+  var pcell = (p) => `<td class="pc">${pbar(p)}<b>${pct(p.p)}</b> <span class="dim">${ci(p)}</span></td>`;
+  function openMcDebrief(a, cancelled = false) {
+    const o = a.outcome, side = a.player;
+    const resTxt = o.none.k === a.n ? "Sin metas definidas" : `Éxito ${pct(o.exito.p)} · parcial ${pct(o.parcial.p)} · fracaso ${pct(o.fracaso.p)}`;
+    const objRows = a.objectives.map((x) => `<tr><td>${esc(x.name)}</td>${pcell(x.survive)}${pcell(x.operational)}<td>${pct(x.dmgFrac.mean)}</td><td>${pct(x.dmgFrac.p10)}–${pct(x.dmgFrac.p90)}</td></tr>`).join("");
+    const goalRows = a.goals.map((g) => `<tr><td class="nt">${g.primary ? "<b>Principal:</b> " : ""}${esc(g.text)}</td><td>${SIDE[g.side]}${g.side === side ? " (vos)" : ""}</td>${pcell(g.met)}</tr>`).join("");
+    const unitRows = a.unitsLost.map((u) => `<tr><td>${esc(u.name)}</td>${pcell(u.lost)}</tr>`).join("");
+    const m = a.metrics;
+    const mrow = (lab, d, f = (v) => num(v)) => `<tr><td>${lab}</td><td>${f(d.mean)}</td><td>${f(d.p10)}</td><td>${f(d.p50)}</td><td>${f(d.p90)}</td><td>${f(d.min)}–${f(d.max)}</td></tr>`;
+    const hmax = Math.max(1, ...a.interceptHist.map((h) => h.n));
+    const hist = a.interceptHist.map((h) => `<div class="hb" title="${pct(h.from)}–${pct(h.to)} interceptadas: ${h.n} corrida(s)"><i style="height:${(100 * h.n / hmax).toFixed(1)}%"></i>${h.n ? `<span>${h.n}</span>` : ""}</div>`).join("");
+    openModal(`<header><div><span class="chip">${esc(a.scen?.name || "Escenario libre")}</span><h2>Debrief Monte Carlo</h2></div><button class="btn x">Cerrar</button></header><div class="bd debrief">
+    <div class="dbres"><b>${side ? esc(SIDE[side]) + ": " : ""}${resTxt}</b><span>${a.n} corridas${cancelled ? " (cancelado antes de terminar)" : ""} · ${a.sample ? "parámetros sorteados en su rango" : "valores probables del catálogo"} · semillas ${a.seed}–${a.seed + a.n - 1}</span></div>
+    ${a.objectives.length ? `<div><h3>Objetivos: probabilidad de que sobrevivan</h3><div class="tblwrap"><table class="t mc"><thead><tr><th>Objetivo</th><th>No destruido</th><th>Operativo</th><th>Daño medio</th><th>Daño p10–p90</th></tr></thead><tbody>${objRows}</tbody></table></div></div>` : ""}
+    ${goalRows ? `<div><h3>Metas: probabilidad de cumplirlas</h3><div class="tblwrap"><table class="t mc"><thead><tr><th>Meta</th><th>Bando</th><th>Se cumple</th></tr></thead><tbody>${goalRows}</tbody></table></div></div>` : ""}
+    ${unitRows ? `<div><h3>Unidades de defensa perdidas</h3><div class="tblwrap"><table class="t mc"><thead><tr><th>Unidad</th><th>Probabilidad de perderla</th></tr></thead><tbody>${unitRows}</tbody></table></div></div>` : ""}
+    <div><h3>Armas reales interceptadas (% por corrida)</h3><div class="hist" role="img" aria-label="Histograma del porcentaje de armas reales interceptadas en cada corrida">${hist}</div><div class="histx"><span>0%</span><span>50%</span><span>100%</span></div><p class="hint">Cada barra cuenta cuántas corridas terminaron con ese porcentaje de interceptación (pasá el mouse para ver el detalle).</p></div>
+    <div><h3>Dispersión de resultados</h3><div class="tblwrap"><table class="t"><thead><tr><th>Medida</th><th>Media</th><th>p10</th><th>Mediana</th><th>p90</th><th>Mín–máx</th></tr></thead><tbody>
+      ${mrow("Armas reales interceptadas", m.interceptRate, pct)}${mrow("Interceptadas (cantidad)", m.intercepted)}${mrow("Impactos en el blanco", m.impacts)}${mrow("Daño total (HP)", m.damage)}${mrow("Interceptores lanzados", m.shots)}${mrow("Gasto de la defensa", m.defCost, (v) => v == null ? "—" : money(v))}${mrow("Costo del ataque", m.atkCost, (v) => v == null ? "—" : money(v))}
+    </tbody></table></div></div>
+    <div><h3>Cómo leerlo</h3><ul class="why">
+      <li><b>Probabilidad</b> = corridas en las que pasó ÷ corridas totales. La franja clara de cada barra es el <b>intervalo de confianza del 95%</b> (Wilson): con pocas corridas es ancho; para afinarlo hacen falta más corridas (el ancho baja con √N).</li>
+      <li><b>p10 / p90</b>: el 10% de las corridas dio menos que p10 y el 10% dio más que p90. Es el rango "típico" sin los extremos.</li>
+      <li>${a.sample ? 'Cada corrida sorteó RCS, Pk, velocidades, alcances, CEP y costos dentro de los rangos del catálogo (fichas → "Confianza de los datos"): la dispersión mezcla el azar del combate con lo que no sabemos de cada sistema.' : "Todas las corridas usaron los valores probables del catálogo: la dispersión es solo el azar del combate (detección, Pk, dispersión de impactos)."}</li>
+      <li>Es un modelo con datos públicos aproximados: compará disposiciones entre sí más que leer los porcentajes como predicción.</li></ul></div>
+    <div class="row"><button class="btn" id="mcAgain">Otra serie</button></div>
+  </div>`, () => openMcDebrief(a, cancelled));
+    $("#mcAgain").onclick = openMonteCarlo;
+  }
+
+  // src/ui/replay.js
+  var SPEEDS = [5, 30, 120];
+  function openReplay(t = 0) {
+    if (!canReplay()) {
+      toast("Primero corré el escenario hasta el final.");
+      return;
+    }
+    closeModal();
+    S.running = false;
+    S.replay = { t, playing: true, speed: 30 };
+    renderReplayBar();
+  }
+  function closeReplay() {
+    S.replay = null;
+    renderReplayBar();
+  }
+  function renderReplayBar() {
+    const el = $("#replayBar");
+    if (!el) return;
+    if (!S.replay) {
+      el.hidden = true;
+      el.innerHTML = "";
+      return;
+    }
+    const end = Math.ceil(replayEnd());
+    el.hidden = false;
+    el.innerHTML = `<button class="btn pri sm" id="rpPlay"></button>
+    <input type="range" id="rpT" min="0" max="${end}" step="1" value="${Math.round(S.replay.t)}" aria-label="Instante de la repetición">
+    <span class="clock" id="rpClock"></span>
+    <div class="speeds">${SPEEDS.map((s) => `<button data-s="${s}" class="${s === S.replay.speed ? "act" : ""}">${s}×</button>`).join("")}</div>
+    <button class="btn sm" id="rpExit">Salir</button>
+    <ol class="rplog" id="rpLog" aria-live="polite"></ol>`;
+    $("#rpPlay").onclick = () => {
+      const R = S.replay;
+      if (R.t >= end) R.t = 0;
+      R.playing = !R.playing;
+      updateReplayBar();
+    };
+    $("#rpT").oninput = (e) => {
+      S.replay.t = +e.target.value;
+      S.replay.playing = false;
+      updateReplayBar();
+    };
+    el.querySelector(".speeds").onclick = (e) => {
+      const b = e.target.closest("button");
       if (!b) return;
-      if (S.started) {
-        toast("Reiniciá para editar el escenario.");
-        return;
-      }
-      if (S.mode === "placeJam" && S.placeType === b.dataset.k) setMode("select");
-      else setMode("placeJam", b.dataset.k);
+      S.replay.speed = +b.dataset.s;
+      for (const c of b.parentNode.children) c.classList.toggle("act", c === b);
     };
-    $("#optStr").onchange = (e) => {
-      S.strobes = e.target.checked;
-    };
+    $("#rpExit").onclick = closeReplay;
+    updateReplayBar();
+  }
+  function updateReplayBar() {
+    const R = S.replay;
+    if (!R || !$("#rpPlay")) return;
+    $("#rpPlay").textContent = R.playing ? "❚❚" : "▶";
+    $("#rpT").value = Math.round(R.t);
+    $("#rpClock").textContent = "Repetición " + fmtT(R.t);
+    const log2 = frameAt(R.t).log.slice(-4).reverse();
+    $("#rpLog").innerHTML = log2.map((l) => `<li class="${esc(l.cls)}"><time>${fmtT(l.t)}</time> ${esc(l.msg)}</li>`).join("");
+  }
+  function tickReplay(dtr) {
+    const R = S.replay;
+    if (!R?.playing) return;
+    const end = replayEnd();
+    R.t = Math.min(end, R.t + dtr * R.speed);
+    if (R.t >= end) R.playing = false;
+    updateReplayBar();
+  }
+
+  // src/ui/debrief.js
+  var pct2 = (a, b) => b ? Math.round(100 * a / b) + "%" : "—";
+  var SIDE2 = { ataque: "Ataque", defensa: "Defensa" };
+  function openDebrief() {
+    const d = buildDebrief(S), a = d.attack, g = d.damage, f = d.defense;
+    const res = d.outcome.result, resCls = { exito: "st-operational", parcial: "st-damaged", fracaso: "st-destroyed" }[res] || "";
+    const objRows = d.objectives.map((o) => `<div class="dbobj"><span class="t">${esc(TARGET_TYPES[o.type].icon)} · ${esc(o.name)}</span><span class="chip st-${o.status}">${TARGET_STATUS[o.status].toUpperCase()}</span><span class="n">${o.dmg} / ${o.maxHp} de daño</span><div class="hpbar"><i class="st-${o.status}" style="width:${(100 * (o.maxHp - o.dmg) / o.maxHp).toFixed(1)}%"></i></div></div>`).join("") || '<p class="hint">El escenario no tiene objetivos: las armas caen sobre puntos del mapa.</p>';
+    const goalRows = ["ataque", "defensa"].map((side) => {
+      const gs = d.goals.filter((x) => x.side === side);
+      if (!gs.length) return "";
+      return `<div><b>${SIDE2[side]}${d.outcome.side === side ? " (vos)" : ""}</b><ul class="goals">${gs.map((x) => `<li class="${x.met ? "ok" : "no"}">${x.met ? "✔" : "✘"} ${x.primary ? "<b>Principal:</b> " : "Secundaria: "}${esc(x.text)}</li>`).join("")}</ul></div>`;
+    }).join("");
+    const typeRows = Object.entries(a.byType).map(([k, b]) => `<tr><td>${esc(k)}</td><td>${b.launched}</td><td>${b.killed}</td><td>${b.arrived}</td><td>${b.shotsAt}</td></tr>`).join("");
+    const tl = d.timeline.map((e) => `<li><time>${fmtT(e.t)}</time> — ${esc(e.text)}</li>`).join("") || "<li>Sin eventos.</li>";
+    openModal(`<header><div><span class="chip">${esc(d.scen?.name || "Escenario libre")}</span><h2>Debrief</h2></div><button class="btn x">Cerrar</button></header><div class="bd debrief">
+    <div class="dbres ${resCls}"><b>${esc(d.outcome.side ? SIDE2[d.outcome.side] + ": " : "")}${esc(d.outcome.text)}</b><span>Duración ${fmtT(d.t).slice(2)} de tiempo simulado</span></div>
+    ${goalRows ? `<div><h3>Metas del escenario</h3><div class="dbgoals">${goalRows}</div></div>` : ""}
+    <div><h3>Objetivos</h3>${objRows}</div>
+    <div class="dbcols">
+      <div><h3>Ataque</h3><ul class="dblist">
+        <li><b>${a.real}</b> armas lanzadas${a.decoys ? ` + <b>${a.decoys}</b> señuelos` : ""}</li>
+        <li><b>${a.intercepted}</b> interceptadas (${pct2(a.intercepted, a.real)})</li>
+        <li><b>${a.impacts}</b> impactos en el blanco · <b>${a.misses}</b> fuera${a.lostLocally ? ` (<b>${a.lostLocally}</b> perdidas localmente por engaño GNSS)` : ""}</li>
+        <li><b>${a.decoysKilled}</b> señuelos derribados</li></ul></div>
+      <div><h3>Daño</h3><ul class="dblist">
+        <li>Daño total: <b>${g.total}</b> HP</li>
+        <li>Mayor fuente de daño: <b>${g.top ? esc(g.top[0]) + " (" + g.top[1] + " HP)" : "—"}</b></li>
+        <li>Distancia media de caída al punto apuntado: <b>${g.avgMiss == null ? "—" : Math.round(g.avgMiss) + " m"}</b></li>
+        <li>Objetivos destruidos: <b>${g.objsDestroyed}</b> · en pie: <b>${g.objsSurviving}</b></li></ul></div>
+      <div><h3>Defensa</h3><ul class="dblist">
+        <li>Interceptores lanzados: <b>${f.shots}</b>${f.perKill ? ` (${f.perKill.toFixed(1)} por derribo)` : ""}</li>
+        <li>Munición restante: <b>${f.magLeft}</b> de ${f.magTotal}</li>
+        <li>Gasto en munición: <b>${money(f.defCost)}</b> (ataque: ${money(f.atkCost)})</li>
+        <li>Unidades perdidas: <b>${f.lost.length ? esc(f.lost.join(", ")) : "ninguna"}</b></li>
+        ${f.avgDetKm != null ? `<li>Primera detección, en promedio: <b>${f.avgDetKm.toFixed(0)} km</b> antes del blanco</li>` : ""}</ul></div>
+    </div>
+    <div><h3>¿Por qué pasó lo que pasó?</h3><ul class="why">${d.why.map((w) => `<li>${esc(w)}</li>`).join("")}</ul></div>
+    <div><h3>Línea de tiempo</h3><ol class="timeline">${tl}</ol></div>
+    <div><h3>Por tipo de arma</h3><div class="tblwrap"><table class="t"><thead><tr><th>Arma</th><th>Lanzadas</th><th>Derribadas</th><th>Llegaron</th><th>Interceptores recibidos</th></tr></thead><tbody>${typeRows}</tbody></table></div></div>
+    <p class="hint">Todo lo de arriba sale de lo que registró el motor durante la corrida. Corré de nuevo con otra disposición: el azar (detección, Pk, dispersión) cambia el resultado de una corrida a otra.</p>
+    <div class="row"><button class="btn pri" id="dbReplay" title="Volver a ver la corrida sobre el mapa, con una línea de tiempo">Ver repetición</button><button class="btn" id="dbMc">¿Fue suerte? Repetir muchas veces (Monte Carlo)</button></div>
+  </div>`, openDebrief);
+    $("#dbMc").onclick = openMonteCarlo;
+    $("#dbReplay").onclick = () => openReplay(0);
+  }
+
+  // src/ui/panels/results.js
+  var logDirty = true;
+  function markLogDirty() {
+    logDirty = true;
+  }
+  function renderLogIfDirty() {
+    if (logDirty) renderLog();
+  }
+  function renderStats() {
+    const s = S.stats, v = S.started ? viewNow() : "all";
+    const rate = s.launched ? Math.round(100 * s.killed / s.launched) : 0;
+    const done = S.started && !S.running && !S.pending.length && S.threats.length && S.threats.every((t) => !t.alive);
+    if (v !== "all" && !done) {
+      $("#stats").innerHTML = v === "def" ? `
+    <div class="stat g"><b>${s.killed}</b><small>Derribos propios</small></div>
+    <div class="stat"><b>${s.shots}</b><small>Interceptores usados</small></div>
+    <div class="stat r"><b>${s.hits}</b><small>Impactos en objetivos</small></div>
+    <div class="stat"><b>${money(s.defCost)}</b><small>Gasto defensa</small></div>
+    ${s.lost ? `<div class="stat r"><b>${s.lost}</b><small>Unidades perdidas</small></div>` : ""}
+    ${S.objs.length ? `<div class="stat ${s.damage ? "r" : ""}"><b>${s.damage}</b><small>Daño a objetivos (HP)</small></div>` : ""}
+    <p class="hint" style="grid-column:1/-1">Vista del defensor: no sabe cuántas armas se lanzaron, cuáles eran señuelos ni cuánto gastó el ataque.</p>` : `
+    <div class="stat"><b>${s.launched}</b><small>Lanzadas (${s.decoys} señuelos)</small></div>
+    <div class="stat"><b>${money(s.atkCost)}</b><small>Gasto ataque</small></div>
+    <p class="hint" style="grid-column:1/-1">Vista del atacante: cuántas llegan y qué daño hacen se sabe en el debrief.</p>`;
+      return;
+    }
+    $("#stats").innerHTML = `
+    <div class="stat"><b>${s.launched}</b><small>Lanzadas (${s.decoys} señuelos)</small></div>
+    <div class="stat g"><b>${s.killed}</b><small>Derribadas · ${rate}%</small></div>
+    <div class="stat r"><b>${s.hits}</b><small>Impactos en blanco</small></div>
+    <div class="stat a"><b>${s.misses}</b><small>Cayeron fuera</small></div>
+    <div class="stat"><b>${s.shots}</b><small>Interceptores usados</small></div>
+    <div class="stat"><b>${s.decoysKilled}</b><small>Señuelos derribados</small></div>
+    <div class="stat"><b>${money(s.defCost)}</b><small>Gasto defensa</small></div>
+    <div class="stat"><b>${money(s.atkCost)}</b><small>Gasto ataque</small></div>
+    ${s.lost ? `<div class="stat r"><b>${s.lost}</b><small>Unidades perdidas</small></div>` : ""}
+    ${S.objs.length ? `<div class="stat ${s.damage ? "r" : ""}"><b>${s.damage}</b><small>Daño a objetivos (HP)</small></div><div class="stat"><b>${s.objsDestroyed}/${S.objs.length}</b><small>Objetivos destruidos</small></div>` : ""}
+    ${done ? '<button class="btn pri" id="dbBtn" style="grid-column:1/-1">Ver debrief</button>' : ""}`;
+    const b = $("#dbBtn");
+    if (b) b.onclick = openDebrief;
+  }
+  function renderLog() {
+    logDirty = false;
+    $("#log").innerHTML = logFor(S.log, viewNow()).slice(0, 150).map((l) => `<div class="${l.cls}"><time>${fmtT(l.t)}</time>${esc(l.text)}</div>`).join("") || "<div>Sin eventos todavía. Apretá ▶ Iniciar.</div>";
   }
 
   // src/ui/number-input.js
@@ -7141,305 +7559,6 @@ table.t.mc td.pc{white-space:nowrap}
         input.value = get();
       }
     });
-  }
-
-  // src/ui/panels/selection.js
-  var CPS = [["", "Principal"], ["A", "Puesto A"], ["B", "Puesto B"], ["C", "Puesto C"]];
-  function deleteSelected() {
-    if (S.started || isMonteCarloRunning()) return false;
-    if (S.multi.length > 1) {
-      renderSel();
-      const b = $("#mDel");
-      if (b) {
-        b.click();
-        return true;
-      }
-    }
-    if (!S.sel) return false;
-    renderSel();
-    const id = { def: "#sDel", jam: "#jDel", salvo: "#vDel", obj: "#oDel" }[S.sel?.kind];
-    const button = id && $(id);
-    if (!button || button.disabled) return false;
-    button.click();
-    return true;
-  }
-  function renderMulti(el) {
-    const us = S.multi.map((id) => S.setup.defs.find((v) => v.id === id)).filter(Boolean);
-    if (us.length < 2) {
-      S.multi = [];
-      return false;
-    }
-    const same = (f) => {
-      const v = us.map(f);
-      return v.every((x) => x === v[0]) ? v[0] : void 0;
-    };
-    const sams = us.filter((u) => D(u).sam);
-    const opt = (id, label2, cur, opts) => `<div class="field"><label for="${id}">${label2}</label><select id="${id}" class="sel">${cur === void 0 ? '<option value="__mix" selected>(mezcla)</option>' : ""}${opts.map(([k, n2]) => `<option value="${k}" ${cur === k ? "selected" : ""}>${n2}</option>`).join("")}</select></div>`;
-    let h = `<h3>Selección</h3><b style="font-size:15px">${us.length} defensas</b><p class="hint">${us.map((u) => esc(u.name)).join(", ")}</p><p class="hint">Shift + click suma o saca una unidad; Esc limpia el grupo. Solo se cambian los valores que elijas.</p>`;
-    h += opt("mOwn", "Operada por", same((u) => u.owner || ""), [["", "Según el equipo"], ["UA", "Ucrania / OTAN"], ["RU", "Rusia"]]);
-    h += opt("mC2", "Coordinación C2", same((u) => u.c2 || ""), [["", "Igual que la red"], ...C2_ORDER.slice(0, C2_ORDER.indexOf(S.c2)).map((k) => [k, C2_LEVELS[k].name])]);
-    h += opt("mCp", "Puesto de mando", same((u) => u.cp || ""), CPS);
-    h += opt("mLink", "Datalink", same((u) => u.link !== false ? "on" : "off"), [["on", "Activo"], ["off", "Apagado"]]);
-    if (sams.length === us.length) {
-      h += opt("mDec", "Pistas clasificadas como señuelo", same((u) => u.decoyDoc || ""), [["", "Como la regla general"], ["ignorar", "No tirarles"], ["tirar", "Tirarles igual"]]);
-      h += opt("mNoD", "Drones", same((u) => u.noDrones ? "no" : "si"), [["si", "Les tira"], ["no", "No gastar en drones"]]);
-    }
-    h += `<div class="row"><button class="btn sm danger" id="mDel">Eliminar las ${us.length} unidades</button></div>`;
-    el.innerHTML = h;
-    const bind = (id, apply) => {
-      const s = $(id);
-      if (s) s.onchange = (e) => {
-        const v = e.target.value;
-        if (v === "__mix") return;
-        for (const u of us) apply(u, v);
-        draw();
-        renderMulti(el);
-      };
-    };
-    bind("#mOwn", (u, v) => {
-      if (v) u.owner = v;
-      else delete u.owner;
-    });
-    bind("#mC2", (u, v) => {
-      if (v) u.c2 = v;
-      else delete u.c2;
-    });
-    bind("#mCp", (u, v) => {
-      if (v) u.cp = v;
-      else delete u.cp;
-    });
-    bind("#mLink", (u, v) => {
-      u.link = v === "on";
-    });
-    bind("#mDec", (u, v) => {
-      if (v) u.decoyDoc = v;
-      else delete u.decoyDoc;
-    });
-    bind("#mNoD", (u, v) => {
-      u.noDrones = v === "no";
-    });
-    $("#mDel").onclick = () => {
-      if (!window.confirm(`¿Eliminar las ${us.length} unidades seleccionadas?`)) return;
-      const ids = new Set(us.map((u) => u.id));
-      S.setup.defs = S.setup.defs.filter((v) => !ids.has(v.id));
-      for (const sv of S.setup.salvos) if (ids.has(sv.targetUnit)) sv.targetUnit = null;
-      S.multi = [];
-      S.sel = null;
-      renderSel();
-      schedCov();
-      draw();
-    };
-    return true;
-  }
-  function renderSel(live) {
-    const el = $("#selCard");
-    const sel = S.sel;
-    if (S.multi.length && !S.started && renderMulti(el)) return;
-    if (!sel) {
-      el.innerHTML = '<h3>Selección</h3><p class="hint">Tocá una unidad, jammer o ruta en el mapa para ver y ajustar sus parámetros. Arrastrá unidades para moverlas (antes de iniciar).</p>';
-      return;
-    }
-    if (live && document.activeElement && el.contains(document.activeElement) && document.activeElement.tagName === "INPUT") return;
-    if (sel.kind === "def") {
-      const u = (S.started ? S.units : S.setup.defs).find((v) => v.id === sel.id);
-      if (!u) {
-        S.sel = null;
-        return renderSel();
-      }
-      const d = D(u), r = d.radar;
-      const ll = latlon(u.x, u.y);
-      const ed = !S.started;
-      const ground = Math.round(surf(u.x, u.y));
-      let html = `<h3>Selección</h3><div class="row" style="justify-content:space-between"><b style="font-size:15px">${esc(u.name)}</b><span class="chip ${d.side === "RU" ? "ru" : "ua"}">${esc(d.short)}</span></div>
-      <dl class="kv"><dt>Posición</dt><dd>${u.x.toFixed(1)}, ${u.y.toFixed(1)} km</dd><dt>Lat/Lon</dt><dd>${ll[0].toFixed(3)}°, ${ll[1].toFixed(3)}°</dd><dt>Terreno</dt><dd>${ground} m</dd>`;
-      if (r && r.band !== "ACU") {
-        const hor = horizon(antZ(u) - (d.kind === "aew" ? 0 : ground), 50);
-        html += `<dt>Radar</dt><dd>${esc(r.name)} · ${r.band}</dd><dt>Horizonte vs blanco a 50 m</dt><dd>${hor.toFixed(0)} km</dd>`;
-      }
-      if (d.sam) html += `<dt>Alcance</dt><dd>${d.sam.maxR} km${d.sam.maxRtbm ? " (TBM " + d.sam.maxRtbm + ")" : ""}</dd><dt>Guiado</dt><dd>${d.sam.guid}</dd>`;
-      const links = datalinksOf(d).map((k) => DATALINKS[k].name).join(", ");
-      if (d.sam || r) html += `<dt>Enlace técnico de pistas</dt><dd>${esc(links || "Sin enlace compatible")}</dd><dt>Coordinación C2 (general)</dt><dd>${esc(C2_LEVELS[S.c2].name)}</dd>`;
-      if (S.started && d.sam) html += `<dt>Munición</dt><dd>${u.magLeft}/${u.mag} · reserva ${u.reserveLeft}</dd><dt>En vuelo</dt><dd>${u.active}/${d.sam.ch}</dd>${u.reloadUntil !== null ? `<dt>Recargando</dt><dd>faltan ${Math.ceil((u.reloadUntil - S.t) / 60)} min</dd>` : ""}`;
-      if (S.started) {
-        const hurt = u.alive && (u.dmgRadar || u.dmgLauncher), what = [u.dmgRadar ? "radar: menos alcance y reacción más lenta" : "", u.dmgLauncher ? "lanzador fuera de servicio" : ""].filter(Boolean).join("; ");
-        html += `<dt>Estado</dt><dd style="color:${!u.alive ? "var(--red)" : hurt ? "var(--warn, #e6a53c)" : "var(--ok)"}">${!u.alive ? "Destruida" : hurt ? "Dañada (" + what + ")" : "Operativa"}${u.alive && u.hp < UNIT_TARGET.hp ? " · " + Math.max(0, u.hp) + "/" + UNIT_TARGET.hp + " HP" : ""}</dd>`;
-      }
-      html += "</dl>";
-      if (ed) {
-        if (r && d.kind !== "aew" && r.band !== "ACU" && r.band !== "OPT") {
-          const [lo, hi] = r.mastRange || [r.mast, r.mast];
-          html += lo === hi ? `<div class="field"><label>Altura de antena</label><span class="val">${u.mast} m · fija</span></div>` : `<div class="field"><label for="sMast">Altura de antena / mástil</label><span class="val">${u.mast} m</span><input id="sMast" type="range" min="${lo}" max="${hi}" value="${u.mast}"></div>`;
-          if (r.mastNote) html += `<p class="hint">${esc(r.mastNote)}</p>`;
-        }
-        if (d.kind === "aew") html += `<div class="field"><label for="sAlt">Altitud de vuelo</label><span class="val">${u.alt} m</span><input id="sAlt" type="range" min="2000" max="11000" step="250" value="${u.alt}"></div>`;
-        if (r && r.sector < 360) html += `<div class="field"><label for="sAz">${r.side ? "Rumbo de vuelo" : "Orientación del sector"}</label><span class="val">${u.az}°</span><input id="sAz" type="range" min="0" max="359" value="${u.az}"></div>`;
-        html += `<div class="field" title="Quién opera la unidad. El país que fabricó el equipo no decide de qué lado pelea: un Buk o un radar 36D6 puede ser ucraniano o ruso. Decide qué interferidores la afectan y su color en el mapa."><label for="sOwn">Operada por</label><select id="sOwn" class="sel"><option value="" ${!u.owner ? "selected" : ""}>Según el equipo (${d.side === "both" ? "ambos bandos" : d.side === "RU" ? "Rusia" : "Ucrania / OTAN"})</option><option value="UA" ${u.owner === "UA" ? "selected" : ""}>Ucrania / OTAN</option><option value="RU" ${u.owner === "RU" ? "selected" : ""}>Rusia</option></select></div>`;
-        if (d.sam || r) html += `<h3>Enlace técnico de pistas</h3>`;
-        if (datalinksOf(d).length) html += `<label class="check"><input type="checkbox" id="sLink" ${u.link !== false ? "checked" : ""}> Datalink activo (${esc(links)})</label><p class="hint">Al apagarlo, esta unidad deja de publicar y recibir pistas de tiro por enlaces compatibles. Conserva su sensor propio y puede recibir alertas C2 si la coordinación general lo permite.</p>`;
-        else if (d.sam || r) html += `<p class="hint">Sin enlace técnico compatible: las alertas C2 no son una pista de tiro ni permiten guiar un misil con un sensor ajeno.</p>`;
-        if (d.sam || r) html += `<h3>Coordinación C2</h3><p class="hint">Red: ${esc(C2_LEVELS[S.c2].name)} (se cambia en Defensa). En Desconectada no hay alertas compartidas, pistas de red ni reparto de blancos; las unidades conservan sus sensores y disparos propios.</p><div class="field"><label for="sC2">Esta unidad</label><select id="sC2" class="sel">${["", ...C2_ORDER.slice(0, C2_ORDER.indexOf(S.c2))].map((k) => `<option value="${k}" ${(u.c2 || "") === k ? "selected" : ""}>${k ? esc(C2_LEVELS[k].name) : "Igual que la red"}</option>`).join("")}</select></div><p class="hint">Una unidad puede quedar con menos coordinación que la red (por ejemplo, una batería aislada). Desconectada: ni avisa ni recibe.</p><div class="field"><label for="sCp">Puesto de mando</label><select id="sCp" class="sel">${CPS.map(([k, n2]) => `<option value="${k}" ${(u.cp || "") === k ? "selected" : ""}>${n2}</option>`).join("")}</select></div><p class="hint">Las pistas, alertas, el reparto de blancos y la triangulación de jammers solo circulan entre unidades del mismo puesto.</p>`;
-        if (d.sam) html += `<div class="field" title="Los radares de tiro aprenden a distinguir señuelos con el tiempo de seguimiento; la decisión usa esa clasificación, que a veces se equivoca."><label for="sDec">Pistas clasificadas como señuelo</label><select id="sDec" class="sel"><option value="" ${!u.decoyDoc ? "selected" : ""}>Como la regla general (${S.ignoreDecoys ? "no tirarles" : "tirarles"})</option><option value="ignorar" ${u.decoyDoc === "ignorar" ? "selected" : ""}>No tirarles</option><option value="tirar" ${u.decoyDoc === "tirar" ? "selected" : ""}>Tirarles igual</option></select></div>`;
-        if (d.sam) html += `<label class="check"><input type="checkbox" id="sNoD" ${u.noDrones ? "checked" : ""}> No gastar en drones (reservar para misiles)</label><div class="field"><label for="sMag">Munición disponible</label><input id="sMag" class="inp" type="number" min="1" max="200" value="${u.mag}"></div><div class="field"><label for="sRes">Reserva para recargar (${Math.round(d.sam.reloadS / 60)} min por recarga)</label><input id="sRes" class="inp" type="number" min="0" max="500" value="${u.reserve ?? 0}"></div><div class="field"><label for="sSal">Interceptores por blanco</label><input id="sSal" class="inp" type="number" min="1" max="4" value="${u.salvo}"></div>`;
-      }
-      html += `<div class="row"><button class="btn sm" id="sInfo">Ficha</button>${ed ? '<button class="btn sm danger" id="sDel">Eliminar</button>' : ""}</div>`;
-      el.innerHTML = html;
-      $("#sInfo").onclick = () => openFicha("def", u.type);
-      if (ed) {
-        const bind = (id, k, cov) => {
-          const i = $(id);
-          bindNumber(i, () => u[k], (value) => {
-            u[k] = value;
-            const v = i.parentElement.querySelector(".val");
-            if (v) v.textContent = u[k] + (k === "az" ? "°" : " m");
-            if (cov) schedCov();
-          }, { integer: ["mag", "reserve", "salvo"].includes(k) });
-        };
-        bind("#sMast", "mast", 1);
-        bind("#sAlt", "alt", 1);
-        bind("#sAz", "az", 1);
-        bind("#sMag", "mag");
-        bind("#sRes", "reserve");
-        bind("#sSal", "salvo");
-        if ($("#sNoD")) $("#sNoD").onchange = (e) => {
-          u.noDrones = e.target.checked;
-        };
-        if ($("#sLink")) $("#sLink").onchange = (e) => {
-          u.link = e.target.checked;
-        };
-        if ($("#sC2")) $("#sC2").onchange = (e) => {
-          if (e.target.value) u.c2 = e.target.value;
-          else delete u.c2;
-        };
-        if ($("#sOwn")) $("#sOwn").onchange = (e) => {
-          if (e.target.value) u.owner = e.target.value;
-          else delete u.owner;
-          draw();
-        };
-        if ($("#sDec")) $("#sDec").onchange = (e) => {
-          if (e.target.value) u.decoyDoc = e.target.value;
-          else delete u.decoyDoc;
-        };
-        if ($("#sCp")) $("#sCp").onchange = (e) => {
-          if (e.target.value) u.cp = e.target.value;
-          else delete u.cp;
-        };
-        $("#sDel").onclick = () => {
-          S.setup.defs = S.setup.defs.filter((v) => v.id !== u.id);
-          S.sel = null;
-          renderSel();
-          schedCov();
-        };
-      }
-    } else if (sel.kind === "jam") {
-      const j = (S.started ? S.jamsLive : S.setup.jams).find((v) => v.id === sel.id);
-      if (!j) {
-        S.sel = null;
-        return renderSel();
-      }
-      const J = JAMMERS[j.type];
-      el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(J.name)}</b><dl class="kv"><dt>Posición</dt><dd>${j.x.toFixed(1)}, ${j.y.toFixed(1)} km</dd>${J.bands ? "<dt>Bandas</dt><dd>" + J.bands.join(", ") + "</dd>" : "<dt>Radio</dt><dd>" + J.radius + " km</dd>"}</dl>
-      ${J.air && !S.started ? `<div class="field"><label for="jAlt">Altitud</label><span class="val">${j.alt} m</span><input id="jAlt" type="range" min="1000" max="12000" step="250" value="${j.alt}"></div>` : ""}
-      ${J.bands ? jamModeHtml(j, J) : ""}
-      <div class="row"><button class="btn sm" id="jInfo">Ficha</button>${!S.started ? '<button class="btn sm danger" id="jDel">Eliminar</button>' : ""}</div>`;
-      $("#jInfo").onclick = () => openFicha("jam", j.type);
-      if ($("#jAlt")) $("#jAlt").oninput = (e) => {
-        j.alt = +e.target.value;
-        j._losMap = {};
-        e.target.parentElement.querySelector(".val").textContent = j.alt + " m";
-        schedCov();
-      };
-      if ($("#jDel")) $("#jDel").onclick = () => {
-        S.setup.jams = S.setup.jams.filter((v) => v.id !== j.id);
-        S.sel = null;
-        renderSel();
-        renderEW();
-        schedCov();
-      };
-      if ($("#jMode")) $("#jMode").onchange = (e) => {
-        j.mode = e.target.value;
-        if (j.mode === "spot" && j.target == null) j.target = jamTargets(J)[0]?.id ?? null;
-        renderSel();
-        schedCov();
-      };
-      if ($("#jTgt")) $("#jTgt").onchange = (e) => {
-        j.target = +e.target.value;
-        renderSel();
-        schedCov();
-      };
-    } else if (sel.kind === "salvo") {
-      const sv = S.setup.salvos.find((v) => v.id === sel.id);
-      if (!sv) {
-        S.sel = null;
-        return renderSel();
-      }
-      const T = THREATS[sv.type];
-      const probe = buildThreat(sv, 0, 0, S.wind);
-      releaseId();
-      el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${sv.count}× ${esc(T.name)}</b><dl class="kv"><dt>Blanco</dt><dd>${esc(targetName(sv) || "punto del mapa")}</dd><dt>Ojiva</dt><dd>${warheadKg(T) ? warheadKg(T) + " kg · " + Math.round(directDamage(T)) + " HP por impacto directo" : "sin ojiva"}</dd><dt>Recorrido</dt><dd>${probe.L.toFixed(0)} km</dd><dt>Tiempo de vuelo</dt><dd>${fmtT(probe.ft).slice(2)}</dd><dt>${sv.sync ? "Llegada" : "Lanzamiento"}</dt><dd>T+${sv.sync ? sv.tArrive : sv.tStart} s</dd>${T.aglRange ? "<dt>Altura</dt><dd>" + sv.agl + " m AGL</dd>" : ""}<dt>Maniobra</dt><dd>${sv.maneuver ? "sí" : "no"}</dd><dt>Costo salva</dt><dd>${money(T.cost * sv.count)}</dd>${sv.crpa ? `<dt>Antena GNSS</dt><dd>CRPA de ${sv.crpa} elementos: anula hasta ${sv.crpa - 1} interferidores</dd>` : ""}</dl>
-      <div class="row"><button class="btn sm" id="vInfo">Ficha</button>${!S.started ? '<button class="btn sm danger" id="vDel">Eliminar</button>' : ""}</div>`;
-      $("#vInfo").onclick = () => openFicha("thr", sv.type);
-      if ($("#vDel")) $("#vDel").onclick = () => {
-        S.setup.salvos = S.setup.salvos.filter((v) => v.id !== sv.id);
-        S.sel = null;
-        renderSel();
-        renderAtk();
-      };
-    } else if (sel.kind === "obj") {
-      const g = (S.started ? S.objs : S.setup.objs).find((v) => v.id === sel.id);
-      if (!g) {
-        S.sel = null;
-        return renderSel();
-      }
-      const tt = TARGET_TYPES[g.type], hp = g.hp ?? g.maxHp, st = g.status || "operational", ll = latlon(g.x, g.y);
-      const dmgBy = Object.entries(g.dmgBy || {}).sort((a, b) => b[1] - a[1]).map(([k, v]) => esc(k) + " " + v).join(", ");
-      el.innerHTML = `<h3>Selección</h3><div class="row" style="justify-content:space-between"><b style="font-size:15px">OBJETIVO: ${esc(g.name)}</b><span class="chip st-${st}">${TARGET_STATUS[st]}</span></div>
-      <div class="hpbar"><i class="st-${st}" style="width:${Math.max(0, 100 * hp / g.maxHp).toFixed(1)}%"></i></div>
-      <dl class="kv"><dt>HP</dt><dd>${hp} / ${g.maxHp}</dd><dt>Tipo</dt><dd>${esc(tt.name)}</dd><dt>Posición</dt><dd>${g.x.toFixed(1)}, ${g.y.toFixed(1)} km</dd><dt>Lat/Lon</dt><dd>${ll[0].toFixed(3)}°, ${ll[1].toFixed(3)}°</dd><dt>Huella</dt><dd>${tt.radius} m de radio</dd><dt>Vulnerabilidad</dt><dd>×${tt.vuln}</dd>${S.started ? `<dt>Impactos con daño</dt><dd>${g.hits}</dd>${dmgBy ? `<dt>Daño por arma</dt><dd>${dmgBy}</dd>` : ""}` : ""}</dl>
-      <p class="hint">${esc(g.desc || tt.desc)}</p>
-      ${!S.started ? `<div class="field"><label for="oHp">Vida máxima</label><input id="oHp" class="inp" type="number" min="50" max="20000" step="50" value="${g.maxHp}"></div><div class="row"><button class="btn sm danger" id="oDel">Eliminar</button></div>` : ""}`;
-      if (!S.started && C2_NODES[g.type]) {
-        $("#oHp").parentElement.insertAdjacentHTML("afterend", `<div class="field"><label for="oCp">Nodo de mando de</label><select id="oCp" class="sel">${CPS.map(([k, n2]) => `<option value="${k}" ${(g.cp || "") === k ? "selected" : ""}>${k ? n2 : "Todos los puestos"}</option>`).join("")}</select></div>`);
-        $("#oCp").onchange = (e) => {
-          if (e.target.value) g.cp = e.target.value;
-          else delete g.cp;
-        };
-      }
-      bindNumber($("#oHp"), () => g.maxHp, (value) => {
-        g.maxHp = value;
-      });
-      if ($("#oDel")) $("#oDel").onclick = () => removeObj(g.id);
-    } else if (sel.kind === "thr") {
-      const th = S.threats.find((t) => t.id === sel.id);
-      if (th && isDefenderView() && !S.replay) {
-        const c = contactOf(th, S.t);
-        if (!c) {
-          el.innerHTML = `<h3>Selección</h3><p class="hint">Pista #${th.id}: sin reportes recientes.</p>`;
-          return;
-        }
-        const by = c.by != null ? uLabel(S.units.find((u) => u.id == c.by)) : "—";
-        el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">Pista #${th.id}</b> <span class="chip">${c.lost ? "perdida" : "en seguimiento"}</span><dl class="kv"><dt>Último reporte</dt><dd>hace ${Math.round(c.age)} s, de ${esc(by)}</dd><dt>Posición${c.lost ? "" : " estimada"}</dt><dd>${c.x.toFixed(1)}, ${c.y.toFixed(1)} km</dd><dt>Altitud</dt><dd>${Math.round(c.z)} m (${Math.round(c.z - surf(c.x, c.y))} AGL)</dd><dt>Velocidad estimada</dt><dd>${kmh(c.v)}</dd><dt>Clasificación</dt><dd>${esc(th.clsAs || "sin clasificar")}</dd><dt>Primera detección</dt><dd>${th.firstDet === null ? "—" : fmtT(th.firstDet)}</dd></dl><p class="hint">Vista del defensor: no se muestra el tipo de arma, su blanco ni su posición real.</p>`;
-        return;
-      }
-      if (!th || !th.p) {
-        el.innerHTML = '<h3>Selección</h3><p class="hint">La amenaza ya no está en vuelo.</p>';
-        return;
-      }
-      const p = th.p, v = speedAt(th, S.t);
-      el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(label(th))}</b><dl class="kv"><dt>Altitud</dt><dd>${Math.round(p.z)} m (${Math.round(p.z - surf(p.x, p.y))} AGL)</dd><dt>Velocidad</dt><dd>${kmh(v)}</dd><dt>Al blanco</dt><dd>${p.rem.toFixed(1)} km</dd><dt>Primera detección</dt><dd>${th.firstDet === null ? "—" : fmtT(th.firstDet)}</dd></dl><div class="row"><button class="btn sm" id="tInfo">Ficha</button></div>`;
-      $("#tInfo").onclick = () => openFicha("thr", th.type);
-    }
-  }
-  var jamTargets = (J) => S.setup.defs.filter((u) => D(u).radar && J.bands.includes(D(u).radar.band));
-  function jamModeHtml(j, J) {
-    const ed = !S.started, tg = S.setup.defs.find((u) => u.id === j.target), r = tg && D(tg).radar;
-    const opts = Object.entries(JAM_MODES).map(([k, M]) => `<option value="${k}" ${(j.mode || "barrage") === k ? "selected" : ""}>${esc(M.name)}</option>`).join("");
-    let h = `<div class="field" title="Barrera: reparte la potencia en toda la banda. Puntual: la concentra en la frecuencia de un radar (×${JAM_MODES.spot.gain}), pero un radar con agilidad de frecuencia salta y la deja en ×${JAM_MODES.spot.agileGain}. DRFM: no mete ruido; devuelve copias del pulso que el radar toma por blancos (${JAM_MODES.drfm.falseTargets} falsos blancos)."><label for="jMode">Modo</label><select id="jMode" class="sel" ${ed ? "" : "disabled"}>${opts}</select></div>`;
-    if (j.mode === "spot") {
-      h += `<div class="field"><label for="jTgt">Contra el radar de</label><select id="jTgt" class="sel" ${ed ? "" : "disabled"}>${jamTargets(J).map((u) => `<option value="${u.id}" ${u.id === j.target ? "selected" : ""}>${esc(u.name)} (${D(u).radar.band})</option>`).join("") || "<option>No hay radares en sus bandas</option>"}</select></div>`;
-      if (r) h += `<p class="hint">${r.agile ? `${esc(tg.name)} tiene agilidad de frecuencia: salta de frecuencia y el ruido puntual casi no le hace nada (×${JAM_MODES.spot.agileGain}). Contra él conviene la barrera.` : `${esc(tg.name)} no tiene agilidad de frecuencia: el ruido puntual le pega ×${JAM_MODES.spot.gain} más que la barrera. A los demás radares no los toca.`}</p>`;
-    }
-    if (j.mode === "drfm") h += `<p class="hint">Engaño DRFM: no tapa con ruido. Crea ${JAM_MODES.drfm.falseTargets} falsos blancos en cada radar que lo recibe fuerte; ocupan su capacidad de seguimiento y, si está llena, el radar no abre pistas nuevas. Entran por el haz principal y, si el jammer está cerca, por los costados, salvo en radares con blanqueo de lóbulos laterales.</p>`;
-    return h;
   }
 
   // src/ui/panels/attack.js
@@ -7584,37 +7703,387 @@ table.t.mc td.pc{white-space:nowrap}
     schedCov();
   }
 
-  // src/ui/panels/catalog.js
-  function renderCat() {
-    const el = $("#tab-cat");
-    const row = (kind, k, o, extra) => `<div class="item ${kind === "thr" ? "red" : kind === "jam" ? "vio" : ""}" style="cursor:pointer" data-f="${kind}:${k}"><span class="t">${esc(o.name)}</span><span class="s">${extra}</span><span class="a"><span class="chip ${o.side === "RU" ? "ru" : o.side === "UA" ? "ua" : ""}">${o.side === "RU" ? "RU" : o.side === "UA" ? "UA" : "ambos"}</span></span></div>`;
+  // src/ui/panels/ew.js
+  function roleTag(J) {
+    const who = J.side === "RU" ? "ruso" : J.side === "UA" ? "ucraniano" : "ambos bandos";
+    const role = J.gnssJam ? "anti-GNSS: desvía armas del atacante" : "contra radares de la defensa";
+    return `${J.gnssJam ? "Defensor" : "Atacante"} · ${who} · ${role}`;
+  }
+  var roleShort = (J) => (J.gnssJam ? "Def." : "Atac.") + " " + (J.side === "both" ? "ambos" : J.side);
+  function renderEW() {
+    const el = $("#tab-ew");
     el.innerHTML = `
-    <div class="row"><button class="btn" id="cmpT">Comparar amenazas</button><button class="btn" id="cmpD">Comparar defensas</button><button class="btn" id="calB">Calibración de Pk</button></div>
-    <p class="hint">Cada ficha tiene una sección <b>Confianza de los datos</b> con rangos mín/probable/máx y fuentes. Revisión OSINT: octubre 2026.</p>
-    <div class="grp"><h3>Amenazas</h3><div class="list">${Object.entries(THREATS).map(([k, t]) => row("thr", k, t, kmh(t.v) + " · RCS " + t.rcs + " m²")).join("")}</div></div>
-    <div class="grp"><h3>Defensas y sensores</h3><div class="list">${Object.entries(DEFENSES).map(([k, d]) => row("def", k, d, d.sam ? d.sam.maxR + " km · " + d.sam.guid : d.radar ? "banda " + d.radar.band : "")).join("")}</div></div>
-    <div class="grp"><h3>Guerra electrónica</h3><div class="list">${Object.entries(JAMMERS).map(([k, j]) => row("jam", k, j, j.gnssJam ? "GNSS · " + j.radius + " km" : "bandas " + j.bands.join("/"))).join("")}</div></div>`;
+    <p class="hint">El efecto depende del <b>rol</b>, no de la bandera: los interferidores de radar degradan los radares de la defensa (herramienta del atacante) y los anti-GNSS desvían las armas del atacante (herramienta del defensor).</p><div class="grp"><h3>Interferidores y contramedidas</h3><div class="unitgrid">${Object.entries(JAMMERS).map(([k, j]) => `<button class="ub ew ${S.mode === "placeJam" && S.placeType === k ? "act" : ""}" data-k="${k}" title="${esc(j.name)} — ${roleTag(j)}"><span>${esc(j.short)}</span><small class="side">${roleShort(j)}</small><i data-info="${k}" role="button" aria-label="Ficha">i</i></button>`).join("")}</div></div>
+    <label class="check"><input type="checkbox" id="optStr" ${S.strobes ? "checked" : ""}> Mostrar "strobes" de interferencia (líneas violeta radar → jammer)</label>
+    <div class="grp"><h3>Desplegados</h3><div class="list" id="jList">${S.setup.jams.map((j) => `<div class="item vio"><span class="t">${esc(JAMMERS[j.type].name)} <small class="side">${roleTag(JAMMERS[j.type])}</small></span><span class="s">${j.x.toFixed(1)}, ${j.y.toFixed(1)} km${JAMMERS[j.type].air ? " · " + j.alt + " m" : ""}</span><span class="a"><button class="btn sm ${j.on ? "on" : ""}" data-tog="${j.id}">${j.on ? "Activo" : "Apagado"}</button><button class="btn sm danger" data-del="${j.id}" aria-label="Borrar">✕</button></span></div>`).join("") || '<p class="hint">Ninguno.</p>'}</div></div>
+    <div class="grp"><h3>Modelo ${infoBtn("noise")} ${infoBtn("lobes")} ${infoBtn("eccm")} ${infoBtn("gnss")}</h3><p class="hint">Jammer de ruido: reduce el alcance de detección como <b>R' = R·(1/(1+J/N))<sup>¼</sup></b>. J/N cae con la distancia al cuadrado, solo afecta radares de la misma banda, necesita línea de vista y es ~25 dB más débil fuera del lóbulo principal. Elegí barrera o ruido puntual (contra un radar) en el panel de selección del jammer. Cada radar tiene sus ECCM: agilidad de frecuencia (anula el puntual), lóbulos bajos y canceladores de los lóbulos laterales (no pueden con un jammer alineado con los blancos). La ficha del jammer muestra la distancia de quemado de cada radar. El anti-GNSS no toca radares: desvía armas que navegan por satélite.</p></div>`;
     el.onclick = (e) => {
-      const f = e.target.closest("[data-f]");
-      if (f) {
-        const [kind, k] = f.dataset.f.split(":");
-        openFicha(kind, k);
+      const inf = e.target.closest("[data-info]");
+      if (inf) {
+        e.stopPropagation();
+        openFicha("jam", inf.dataset.info);
+        return;
       }
+      const t = e.target.closest("[data-tog]");
+      if (t) {
+        const j = S.setup.jams.find((v) => v.id == t.dataset.tog);
+        j.on = !j.on;
+        if (S.started) {
+          const jl = S.jamsLive.find((v) => v.id == j.id);
+          if (jl) jl.on = j.on;
+        }
+        renderEW();
+        schedCov();
+        return;
+      }
+      const d = e.target.closest("[data-del]");
+      if (d) {
+        if (S.started) {
+          toast("Reiniciá para editar.");
+          return;
+        }
+        S.setup.jams = S.setup.jams.filter((v) => v.id != d.dataset.del);
+        renderEW();
+        schedCov();
+        return;
+      }
+      const b = e.target.closest(".ub");
+      if (!b) return;
+      if (S.started) {
+        toast("Reiniciá para editar el escenario.");
+        return;
+      }
+      if (S.mode === "placeJam" && S.placeType === b.dataset.k) setMode("select");
+      else setMode("placeJam", b.dataset.k);
     };
-    $("#cmpT").onclick = cmpThreats;
-    $("#cmpD").onclick = cmpDefs;
-    $("#calB").onclick = openCal;
+    $("#optStr").onchange = (e) => {
+      S.strobes = e.target.checked;
+    };
   }
 
-  // src/ui/panels/academy.js
-  function renderAcademy() {
-    const item = (c) => `<button class="item concept-item" data-concept="${c.id}"><span class="t">${esc(c.title)}</span></button>`;
-    $("#tab-edu").innerHTML = `<p class="hint">Explicaciones cortas de los conceptos que usa la simulación. Cada una muestra <b>cómo lo calcula el motor</b>, con las variables reales y números del catálogo. También podés abrirlas desde los botones ⓘ de las fichas y los paneles.</p>
-    ${CONCEPT_GROUPS.map((g) => `<div class="grp"><h3>${esc(g)}</h3>${g === "Radar y bandas" ? `<div class="row">${Object.keys(BANDS).map((b) => `<button class="chip" data-concept="band:${b}" title="${esc(BANDS[b].name + " · " + BANDS[b].freq)}">${esc(b)}</button>`).join("")}</div>` : ""}<div class="list">${CONCEPTS.filter((c) => c.group === g && !c.id.startsWith("band:")).map(item).join("")}</div></div>`).join("")}`;
+  // src/ui/panels/selection.js
+  var CPS = [["", "Principal"], ["A", "Puesto A"], ["B", "Puesto B"], ["C", "Puesto C"]];
+  function deleteSelected() {
+    if (S.started || isMonteCarloRunning()) return false;
+    if (S.multi.length > 1) {
+      renderSel();
+      const b = $("#mDel");
+      if (b) {
+        b.click();
+        return true;
+      }
+    }
+    if (!S.sel) return false;
+    renderSel();
+    const id = { def: "#sDel", jam: "#jDel", salvo: "#vDel", obj: "#oDel" }[S.sel?.kind];
+    const button = id && $(id);
+    if (!button || button.disabled) return false;
+    button.click();
+    return true;
+  }
+  function renderMulti(el) {
+    const us = S.multi.map((id) => S.setup.defs.find((v) => v.id === id)).filter(Boolean);
+    if (us.length < 2) {
+      S.multi = [];
+      return false;
+    }
+    const same = (f) => {
+      const v = us.map(f);
+      return v.every((x) => x === v[0]) ? v[0] : void 0;
+    };
+    const sams = us.filter((u) => D(u).sam);
+    const opt = (id, label2, cur, opts) => `<div class="field"><label for="${id}">${label2}</label><select id="${id}" class="sel">${cur === void 0 ? '<option value="__mix" selected>(mezcla)</option>' : ""}${opts.map(([k, n2]) => `<option value="${k}" ${cur === k ? "selected" : ""}>${n2}</option>`).join("")}</select></div>`;
+    let h = `<h3>Selección</h3><b style="font-size:15px">${us.length} defensas</b><p class="hint">${us.map((u) => esc(u.name)).join(", ")}</p><p class="hint">Shift + click suma o saca una unidad; Esc limpia el grupo. Solo se cambian los valores que elijas.</p>`;
+    h += opt("mOwn", "Operada por", same((u) => u.owner || ""), [["", "Según el equipo"], ["UA", "Ucrania / OTAN"], ["RU", "Rusia"]]);
+    h += opt("mC2", "Coordinación C2", same((u) => u.c2 || ""), [["", "Igual que la red"], ...C2_ORDER.slice(0, C2_ORDER.indexOf(S.c2)).map((k) => [k, C2_LEVELS[k].name])]);
+    h += opt("mCp", "Puesto de mando", same((u) => u.cp || ""), CPS);
+    h += opt("mLink", "Datalink", same((u) => u.link !== false ? "on" : "off"), [["on", "Activo"], ["off", "Apagado"]]);
+    if (us.every((u) => isEmitter(D(u).radar))) h += opt("mEm", "Emisión del radar", same((u) => u.emcon || "siempre"), Object.entries(EMCON));
+    if (sams.length === us.length) {
+      h += opt("mDec", "Pistas clasificadas como señuelo", same((u) => u.decoyDoc || ""), [["", "Como la regla general"], ["ignorar", "No tirarles"], ["tirar", "Tirarles igual"]]);
+      h += opt("mNoD", "Drones", same((u) => u.noDrones ? "no" : "si"), [["si", "Les tira"], ["no", "No gastar en drones"]]);
+    }
+    h += `<div class="row"><button class="btn sm danger" id="mDel">Eliminar las ${us.length} unidades</button></div>`;
+    el.innerHTML = h;
+    const bind = (id, apply) => {
+      const s = $(id);
+      if (s) s.onchange = (e) => {
+        const v = e.target.value;
+        if (v === "__mix") return;
+        for (const u of us) apply(u, v);
+        draw();
+        renderMulti(el);
+      };
+    };
+    bind("#mOwn", (u, v) => {
+      if (v) u.owner = v;
+      else delete u.owner;
+    });
+    bind("#mC2", (u, v) => {
+      if (v) u.c2 = v;
+      else delete u.c2;
+    });
+    bind("#mCp", (u, v) => {
+      if (v) u.cp = v;
+      else delete u.cp;
+    });
+    bind("#mLink", (u, v) => {
+      u.link = v === "on";
+    });
+    bind("#mEm", (u, v) => {
+      if (v !== "siempre") u.emcon = v;
+      else delete u.emcon;
+    });
+    bind("#mDec", (u, v) => {
+      if (v) u.decoyDoc = v;
+      else delete u.decoyDoc;
+    });
+    bind("#mNoD", (u, v) => {
+      u.noDrones = v === "no";
+    });
+    $("#mDel").onclick = () => {
+      if (!window.confirm(`¿Eliminar las ${us.length} unidades seleccionadas?`)) return;
+      const ids = new Set(us.map((u) => u.id));
+      S.setup.defs = S.setup.defs.filter((v) => !ids.has(v.id));
+      for (const sv of S.setup.salvos) if (ids.has(sv.targetUnit)) sv.targetUnit = null;
+      S.multi = [];
+      S.sel = null;
+      renderSel();
+      schedCov();
+      draw();
+    };
+    return true;
+  }
+  function renderSel(live) {
+    const el = $("#selCard");
+    const sel = S.sel;
+    if (S.multi.length && !S.started && renderMulti(el)) return;
+    if (!sel) {
+      el.innerHTML = '<h3>Selección</h3><p class="hint">Tocá una unidad, jammer o ruta en el mapa para ver y ajustar sus parámetros. Arrastrá unidades para moverlas (antes de iniciar).</p>';
+      return;
+    }
+    if (live && document.activeElement && el.contains(document.activeElement) && document.activeElement.tagName === "INPUT") return;
+    if (sel.kind === "def") {
+      const u = (S.started ? S.units : S.setup.defs).find((v) => v.id === sel.id);
+      if (!u) {
+        S.sel = null;
+        return renderSel();
+      }
+      const d = D(u), r = d.radar;
+      const ll = latlon(u.x, u.y);
+      const ed = !S.started;
+      const ground = Math.round(surf(u.x, u.y));
+      if (S.started && !S.replay && isAttackerView()) {
+        if (!attackerKnows(u, S.t)) {
+          S.sel = null;
+          return renderSel();
+        }
+        el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(d.short)}</b><dl class="kv"><dt>Posición</dt><dd>${u.x.toFixed(1)}, ${u.y.toFixed(1)} km</dd>${r && r.band !== "ACU" && r.band !== "OPT" ? `<dt>Radar</dt><dd>${esc(r.name)} · ${r.band}</dd>` : ""}${d.sam ? `<dt>Alcance (catálogo)</dt><dd>${d.sam.maxR} km</dd>` : ""}<dt>Estado</dt><dd>desconocido</dd></dl><p class="hint">Vista del atacante: ${u.emitFrom != null && u.emitFrom <= S.t ? "ubicada por su emisión de radar" : "ubicada al disparar"}. No se sabe si está dañada ni cuánta munición le queda.</p>`;
+        return;
+      }
+      let html = `<h3>Selección</h3><div class="row" style="justify-content:space-between"><b style="font-size:15px">${esc(u.name)}</b><span class="chip ${d.side === "RU" ? "ru" : "ua"}">${esc(d.short)}</span></div>
+      <dl class="kv"><dt>Posición</dt><dd>${u.x.toFixed(1)}, ${u.y.toFixed(1)} km</dd><dt>Lat/Lon</dt><dd>${ll[0].toFixed(3)}°, ${ll[1].toFixed(3)}°</dd><dt>Terreno</dt><dd>${ground} m</dd>`;
+      if (r && r.band !== "ACU") {
+        const hor = horizon(antZ(u) - (d.kind === "aew" ? 0 : ground), 50);
+        html += `<dt>Radar</dt><dd>${esc(r.name)} · ${r.band}</dd><dt>Horizonte vs blanco a 50 m</dt><dd>${hor.toFixed(0)} km</dd>`;
+      }
+      if (d.sam) html += `<dt>Alcance</dt><dd>${d.sam.maxR} km${d.sam.maxRtbm ? " (TBM " + d.sam.maxRtbm + ")" : ""}</dd><dt>Guiado</dt><dd>${d.sam.guid}</dd>`;
+      const links = datalinksOf(d).map((k) => DATALINKS[k].name).join(", ");
+      if (d.sam || r) html += `<dt>Enlace técnico de pistas</dt><dd>${esc(links || "Sin enlace compatible")}</dd><dt>Coordinación C2 (general)</dt><dd>${esc(C2_LEVELS[S.c2].name)}</dd>`;
+      if (S.started && d.sam) html += `<dt>Munición</dt><dd>${u.magLeft}/${u.mag} · reserva ${u.reserveLeft}</dd><dt>En vuelo</dt><dd>${u.active}/${d.sam.ch}</dd>${u.reloadUntil !== null ? `<dt>Recargando</dt><dd>faltan ${Math.ceil((u.reloadUntil - S.t) / 60)} min</dd>` : ""}`;
+      if (S.started) {
+        const hurt = u.alive && (u.dmgRadar || u.dmgLauncher), what = [u.dmgRadar ? "radar: menos alcance y reacción más lenta" : "", u.dmgLauncher ? "lanzador fuera de servicio" : ""].filter(Boolean).join("; ");
+        html += `<dt>Estado</dt><dd style="color:${!u.alive ? "var(--red)" : hurt ? "var(--warn, #e6a53c)" : "var(--ok)"}">${!u.alive ? "Destruida" : hurt ? "Dañada (" + what + ")" : "Operativa"}${u.alive && u.hp < UNIT_TARGET.hp ? " · " + Math.max(0, u.hp) + "/" + UNIT_TARGET.hp + " HP" : ""}</dd>`;
+      }
+      html += "</dl>";
+      if (ed) {
+        if (r && d.kind !== "aew" && r.band !== "ACU" && r.band !== "OPT") {
+          const [lo, hi] = r.mastRange || [r.mast, r.mast];
+          html += lo === hi ? `<div class="field"><label>Altura de antena</label><span class="val">${u.mast} m · fija</span></div>` : `<div class="field"><label for="sMast">Altura de antena / mástil</label><span class="val">${u.mast} m</span><input id="sMast" type="range" min="${lo}" max="${hi}" value="${u.mast}"></div>`;
+          if (r.mastNote) html += `<p class="hint">${esc(r.mastNote)}</p>`;
+        }
+        if (d.kind === "aew") html += `<div class="field"><label for="sAlt">Altitud de vuelo</label><span class="val">${u.alt} m</span><input id="sAlt" type="range" min="2000" max="11000" step="250" value="${u.alt}"></div>`;
+        if (r && r.sector < 360) html += `<div class="field"><label for="sAz">${r.side ? "Rumbo de vuelo" : "Orientación del sector"}</label><span class="val">${u.az}°</span><input id="sAz" type="range" min="0" max="359" value="${u.az}"></div>`;
+        html += `<div class="field" title="Quién opera la unidad. El país que fabricó el equipo no decide de qué lado pelea: un Buk o un radar 36D6 puede ser ucraniano o ruso. Decide qué interferidores la afectan y su color en el mapa."><label for="sOwn">Operada por</label><select id="sOwn" class="sel"><option value="" ${!u.owner ? "selected" : ""}>Según el equipo (${d.side === "both" ? "ambos bandos" : d.side === "RU" ? "Rusia" : "Ucrania / OTAN"})</option><option value="UA" ${u.owner === "UA" ? "selected" : ""}>Ucrania / OTAN</option><option value="RU" ${u.owner === "RU" ? "selected" : ""}>Rusia</option></select></div>`;
+        if (isEmitter(r)) html += `<div class="field" title="Un radar que emite puede ser ubicado por el enemigo (inteligencia de señales) y atacado. Apagarlo lo esconde, pero deja de ver: depende de las pistas de la red."><label for="sEm">Emisión del radar</label><select id="sEm" class="sel">${Object.entries(EMCON).map(([k, n2]) => `<option value="${k}" ${(u.emcon || "siempre") === k ? "selected" : ""}>${n2}</option>`).join("")}</select></div>`;
+        if (d.sam || r) html += `<h3>Enlace técnico de pistas</h3>`;
+        if (datalinksOf(d).length) html += `<label class="check"><input type="checkbox" id="sLink" ${u.link !== false ? "checked" : ""}> Datalink activo (${esc(links)})</label><p class="hint">Al apagarlo, esta unidad deja de publicar y recibir pistas de tiro por enlaces compatibles. Conserva su sensor propio y puede recibir alertas C2 si la coordinación general lo permite.</p>`;
+        else if (d.sam || r) html += `<p class="hint">Sin enlace técnico compatible: las alertas C2 no son una pista de tiro ni permiten guiar un misil con un sensor ajeno.</p>`;
+        if (d.sam || r) html += `<h3>Coordinación C2</h3><p class="hint">Red: ${esc(C2_LEVELS[S.c2].name)} (se cambia en Defensa). En Desconectada no hay alertas compartidas, pistas de red ni reparto de blancos; las unidades conservan sus sensores y disparos propios.</p><div class="field"><label for="sC2">Esta unidad</label><select id="sC2" class="sel">${["", ...C2_ORDER.slice(0, C2_ORDER.indexOf(S.c2))].map((k) => `<option value="${k}" ${(u.c2 || "") === k ? "selected" : ""}>${k ? esc(C2_LEVELS[k].name) : "Igual que la red"}</option>`).join("")}</select></div><p class="hint">Una unidad puede quedar con menos coordinación que la red (por ejemplo, una batería aislada). Desconectada: ni avisa ni recibe.</p><div class="field"><label for="sCp">Puesto de mando</label><select id="sCp" class="sel">${CPS.map(([k, n2]) => `<option value="${k}" ${(u.cp || "") === k ? "selected" : ""}>${n2}</option>`).join("")}</select></div><p class="hint">Las pistas, alertas, el reparto de blancos y la triangulación de jammers solo circulan entre unidades del mismo puesto.</p>`;
+        if (d.sam) html += `<div class="field" title="Los radares de tiro aprenden a distinguir señuelos con el tiempo de seguimiento; la decisión usa esa clasificación, que a veces se equivoca."><label for="sDec">Pistas clasificadas como señuelo</label><select id="sDec" class="sel"><option value="" ${!u.decoyDoc ? "selected" : ""}>Como la regla general (${S.ignoreDecoys ? "no tirarles" : "tirarles"})</option><option value="ignorar" ${u.decoyDoc === "ignorar" ? "selected" : ""}>No tirarles</option><option value="tirar" ${u.decoyDoc === "tirar" ? "selected" : ""}>Tirarles igual</option></select></div>`;
+        if (d.sam) html += `<label class="check"><input type="checkbox" id="sNoD" ${u.noDrones ? "checked" : ""}> No gastar en drones (reservar para misiles)</label><div class="field"><label for="sMag">Munición disponible</label><input id="sMag" class="inp" type="number" min="1" max="200" value="${u.mag}"></div><div class="field"><label for="sRes">Reserva para recargar (${Math.round(d.sam.reloadS / 60)} min por recarga)</label><input id="sRes" class="inp" type="number" min="0" max="500" value="${u.reserve ?? 0}"></div><div class="field"><label for="sSal">Interceptores por blanco</label><input id="sSal" class="inp" type="number" min="1" max="4" value="${u.salvo}"></div>`;
+      }
+      html += `<div class="row"><button class="btn sm" id="sInfo">Ficha</button>${ed ? '<button class="btn sm danger" id="sDel">Eliminar</button>' : ""}</div>`;
+      el.innerHTML = html;
+      $("#sInfo").onclick = () => openFicha("def", u.type);
+      if (ed) {
+        const bind = (id, k, cov) => {
+          const i = $(id);
+          bindNumber(i, () => u[k], (value) => {
+            u[k] = value;
+            const v = i.parentElement.querySelector(".val");
+            if (v) v.textContent = u[k] + (k === "az" ? "°" : " m");
+            if (cov) schedCov();
+          }, { integer: ["mag", "reserve", "salvo"].includes(k) });
+        };
+        bind("#sMast", "mast", 1);
+        bind("#sAlt", "alt", 1);
+        bind("#sAz", "az", 1);
+        bind("#sMag", "mag");
+        bind("#sRes", "reserve");
+        bind("#sSal", "salvo");
+        if ($("#sNoD")) $("#sNoD").onchange = (e) => {
+          u.noDrones = e.target.checked;
+        };
+        if ($("#sLink")) $("#sLink").onchange = (e) => {
+          u.link = e.target.checked;
+        };
+        if ($("#sC2")) $("#sC2").onchange = (e) => {
+          if (e.target.value) u.c2 = e.target.value;
+          else delete u.c2;
+        };
+        if ($("#sOwn")) $("#sOwn").onchange = (e) => {
+          if (e.target.value) u.owner = e.target.value;
+          else delete u.owner;
+          draw();
+        };
+        if ($("#sDec")) $("#sDec").onchange = (e) => {
+          if (e.target.value) u.decoyDoc = e.target.value;
+          else delete u.decoyDoc;
+        };
+        if ($("#sEm")) $("#sEm").onchange = (e) => {
+          if (e.target.value !== "siempre") u.emcon = e.target.value;
+          else delete u.emcon;
+        };
+        if ($("#sCp")) $("#sCp").onchange = (e) => {
+          if (e.target.value) u.cp = e.target.value;
+          else delete u.cp;
+        };
+        $("#sDel").onclick = () => {
+          S.setup.defs = S.setup.defs.filter((v) => v.id !== u.id);
+          S.sel = null;
+          renderSel();
+          schedCov();
+        };
+      }
+    } else if (sel.kind === "jam") {
+      const j = (S.started ? S.jamsLive : S.setup.jams).find((v) => v.id === sel.id);
+      if (!j) {
+        S.sel = null;
+        return renderSel();
+      }
+      const J = JAMMERS[j.type];
+      el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(J.name)}</b><dl class="kv"><dt>Posición</dt><dd>${j.x.toFixed(1)}, ${j.y.toFixed(1)} km</dd>${J.bands ? "<dt>Bandas</dt><dd>" + J.bands.join(", ") + "</dd>" : "<dt>Radio</dt><dd>" + J.radius + " km</dd>"}</dl>
+      ${J.air && !S.started ? `<div class="field"><label for="jAlt">Altitud</label><span class="val">${j.alt} m</span><input id="jAlt" type="range" min="1000" max="12000" step="250" value="${j.alt}"></div>` : ""}
+      ${J.bands ? jamModeHtml(j, J) : ""}
+      <div class="row"><button class="btn sm" id="jInfo">Ficha</button>${!S.started ? '<button class="btn sm danger" id="jDel">Eliminar</button>' : ""}</div>`;
+      $("#jInfo").onclick = () => openFicha("jam", j.type);
+      if ($("#jAlt")) $("#jAlt").oninput = (e) => {
+        j.alt = +e.target.value;
+        j._losMap = {};
+        e.target.parentElement.querySelector(".val").textContent = j.alt + " m";
+        schedCov();
+      };
+      if ($("#jDel")) $("#jDel").onclick = () => {
+        S.setup.jams = S.setup.jams.filter((v) => v.id !== j.id);
+        S.sel = null;
+        renderSel();
+        renderEW();
+        schedCov();
+      };
+      if ($("#jMode")) $("#jMode").onchange = (e) => {
+        j.mode = e.target.value;
+        if (j.mode === "spot" && j.target == null) j.target = jamTargets(J)[0]?.id ?? null;
+        renderSel();
+        schedCov();
+      };
+      if ($("#jTgt")) $("#jTgt").onchange = (e) => {
+        j.target = +e.target.value;
+        renderSel();
+        schedCov();
+      };
+    } else if (sel.kind === "salvo") {
+      const sv = S.setup.salvos.find((v) => v.id === sel.id);
+      if (!sv) {
+        S.sel = null;
+        return renderSel();
+      }
+      const T = THREATS[sv.type];
+      const probe = buildThreat(sv, 0, 0, S.wind);
+      releaseId();
+      el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${sv.count}× ${esc(T.name)}</b><dl class="kv"><dt>Blanco</dt><dd>${esc(targetName(sv) || "punto del mapa")}</dd><dt>Ojiva</dt><dd>${warheadKg(T) ? warheadKg(T) + " kg · " + Math.round(directDamage(T)) + " HP por impacto directo" : "sin ojiva"}</dd><dt>Recorrido</dt><dd>${probe.L.toFixed(0)} km</dd><dt>Tiempo de vuelo</dt><dd>${fmtT(probe.ft).slice(2)}</dd><dt>${sv.sync ? "Llegada" : "Lanzamiento"}</dt><dd>T+${sv.sync ? sv.tArrive : sv.tStart} s</dd>${T.aglRange ? "<dt>Altura</dt><dd>" + sv.agl + " m AGL</dd>" : ""}<dt>Maniobra</dt><dd>${sv.maneuver ? "sí" : "no"}</dd><dt>Costo salva</dt><dd>${money(T.cost * sv.count)}</dd>${sv.crpa ? `<dt>Antena GNSS</dt><dd>CRPA de ${sv.crpa} elementos: anula hasta ${sv.crpa - 1} interferidores</dd>` : ""}</dl>
+      <div class="row"><button class="btn sm" id="vInfo">Ficha</button>${!S.started ? '<button class="btn sm danger" id="vDel">Eliminar</button>' : ""}</div>`;
+      $("#vInfo").onclick = () => openFicha("thr", sv.type);
+      if ($("#vDel")) $("#vDel").onclick = () => {
+        S.setup.salvos = S.setup.salvos.filter((v) => v.id !== sv.id);
+        S.sel = null;
+        renderSel();
+        renderAtk();
+      };
+    } else if (sel.kind === "obj") {
+      const g = (S.started ? S.objs : S.setup.objs).find((v) => v.id === sel.id);
+      if (!g) {
+        S.sel = null;
+        return renderSel();
+      }
+      if (S.started && !S.replay && isAttackerView()) {
+        el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">OBJETIVO: ${esc(g.name)}</b><dl class="kv"><dt>Tipo</dt><dd>${esc(TARGET_TYPES[g.type].name)}</dd><dt>Posición</dt><dd>${g.x.toFixed(1)}, ${g.y.toFixed(1)} km</dd><dt>Daño</dt><dd>sin evaluar</dd></dl><p class="hint">Vista del atacante: el daño se conoce en el debrief.</p>`;
+        return;
+      }
+      const tt = TARGET_TYPES[g.type], hp = g.hp ?? g.maxHp, st = g.status || "operational", ll = latlon(g.x, g.y);
+      const dmgBy = Object.entries(g.dmgBy || {}).sort((a, b) => b[1] - a[1]).map(([k, v]) => esc(k) + " " + v).join(", ");
+      el.innerHTML = `<h3>Selección</h3><div class="row" style="justify-content:space-between"><b style="font-size:15px">OBJETIVO: ${esc(g.name)}</b><span class="chip st-${st}">${TARGET_STATUS[st]}</span></div>
+      <div class="hpbar"><i class="st-${st}" style="width:${Math.max(0, 100 * hp / g.maxHp).toFixed(1)}%"></i></div>
+      <dl class="kv"><dt>HP</dt><dd>${hp} / ${g.maxHp}</dd><dt>Tipo</dt><dd>${esc(tt.name)}</dd><dt>Posición</dt><dd>${g.x.toFixed(1)}, ${g.y.toFixed(1)} km</dd><dt>Lat/Lon</dt><dd>${ll[0].toFixed(3)}°, ${ll[1].toFixed(3)}°</dd><dt>Huella</dt><dd>${tt.radius} m de radio</dd><dt>Vulnerabilidad</dt><dd>×${tt.vuln}</dd>${S.started ? `<dt>Impactos con daño</dt><dd>${g.hits}</dd>${dmgBy ? `<dt>Daño por arma</dt><dd>${dmgBy}</dd>` : ""}` : ""}</dl>
+      <p class="hint">${esc(g.desc || tt.desc)}</p>
+      ${!S.started ? `<div class="field"><label for="oHp">Vida máxima</label><input id="oHp" class="inp" type="number" min="50" max="20000" step="50" value="${g.maxHp}"></div><div class="row"><button class="btn sm danger" id="oDel">Eliminar</button></div>` : ""}`;
+      if (!S.started && C2_NODES[g.type]) {
+        $("#oHp").parentElement.insertAdjacentHTML("afterend", `<div class="field"><label for="oCp">Nodo de mando de</label><select id="oCp" class="sel">${CPS.map(([k, n2]) => `<option value="${k}" ${(g.cp || "") === k ? "selected" : ""}>${k ? n2 : "Todos los puestos"}</option>`).join("")}</select></div>`);
+        $("#oCp").onchange = (e) => {
+          if (e.target.value) g.cp = e.target.value;
+          else delete g.cp;
+        };
+      }
+      bindNumber($("#oHp"), () => g.maxHp, (value) => {
+        g.maxHp = value;
+      });
+      if ($("#oDel")) $("#oDel").onclick = () => removeObj(g.id);
+    } else if (sel.kind === "thr") {
+      const th = S.threats.find((t) => t.id === sel.id);
+      if (th && isDefenderView() && !S.replay) {
+        const c = contactOf(th, S.t);
+        if (!c) {
+          el.innerHTML = `<h3>Selección</h3><p class="hint">Pista #${th.id}: sin reportes recientes.</p>`;
+          return;
+        }
+        const by = c.by != null ? uLabel(S.units.find((u) => u.id == c.by)) : "—";
+        el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">Pista #${th.id}</b> <span class="chip">${c.lost ? "perdida" : "en seguimiento"}</span><dl class="kv"><dt>Último reporte</dt><dd>hace ${Math.round(c.age)} s, de ${esc(by)}</dd><dt>Posición${c.lost ? "" : " estimada"}</dt><dd>${c.x.toFixed(1)}, ${c.y.toFixed(1)} km</dd><dt>Altitud</dt><dd>${Math.round(c.z)} m (${Math.round(c.z - surf(c.x, c.y))} AGL)</dd><dt>Velocidad estimada</dt><dd>${kmh(c.v)}</dd><dt>Clasificación</dt><dd>${esc(th.clsAs || "sin clasificar")}</dd><dt>Primera detección</dt><dd>${th.firstDet === null ? "—" : fmtT(th.firstDet)}</dd></dl><p class="hint">Vista del defensor: no se muestra el tipo de arma, su blanco ni su posición real.</p>`;
+        return;
+      }
+      if (!th || !th.p) {
+        el.innerHTML = '<h3>Selección</h3><p class="hint">La amenaza ya no está en vuelo.</p>';
+        return;
+      }
+      const p = th.p, v = speedAt(th, S.t);
+      el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(label(th))}</b><dl class="kv"><dt>Altitud</dt><dd>${Math.round(p.z)} m (${Math.round(p.z - surf(p.x, p.y))} AGL)</dd><dt>Velocidad</dt><dd>${kmh(v)}</dd><dt>Al blanco</dt><dd>${p.rem.toFixed(1)} km</dd>${S.started && !S.replay && isAttackerView() ? "" : `<dt>Primera detección</dt><dd>${th.firstDet === null ? "—" : fmtT(th.firstDet)}</dd>`}</dl><div class="row"><button class="btn sm" id="tInfo">Ficha</button></div>`;
+      $("#tInfo").onclick = () => openFicha("thr", th.type);
+    }
+  }
+  var jamTargets = (J) => S.setup.defs.filter((u) => D(u).radar && J.bands.includes(D(u).radar.band));
+  function jamModeHtml(j, J) {
+    const ed = !S.started, tg = S.setup.defs.find((u) => u.id === j.target), r = tg && D(tg).radar;
+    const opts = Object.entries(JAM_MODES).map(([k, M]) => `<option value="${k}" ${(j.mode || "barrage") === k ? "selected" : ""}>${esc(M.name)}</option>`).join("");
+    let h = `<div class="field" title="Barrera: reparte la potencia en toda la banda. Puntual: la concentra en la frecuencia de un radar (×${JAM_MODES.spot.gain}), pero un radar con agilidad de frecuencia salta y la deja en ×${JAM_MODES.spot.agileGain}. DRFM: no mete ruido; devuelve copias del pulso que el radar toma por blancos (${JAM_MODES.drfm.falseTargets} falsos blancos)."><label for="jMode">Modo</label><select id="jMode" class="sel" ${ed ? "" : "disabled"}>${opts}</select></div>`;
+    if (j.mode === "spot") {
+      h += `<div class="field"><label for="jTgt">Contra el radar de</label><select id="jTgt" class="sel" ${ed ? "" : "disabled"}>${jamTargets(J).map((u) => `<option value="${u.id}" ${u.id === j.target ? "selected" : ""}>${esc(u.name)} (${D(u).radar.band})</option>`).join("") || "<option>No hay radares en sus bandas</option>"}</select></div>`;
+      if (r) h += `<p class="hint">${r.agile ? `${esc(tg.name)} tiene agilidad de frecuencia: salta de frecuencia y el ruido puntual casi no le hace nada (×${JAM_MODES.spot.agileGain}). Contra él conviene la barrera.` : `${esc(tg.name)} no tiene agilidad de frecuencia: el ruido puntual le pega ×${JAM_MODES.spot.gain} más que la barrera. A los demás radares no los toca.`}</p>`;
+    }
+    if (j.mode === "drfm") h += `<p class="hint">Engaño DRFM: no tapa con ruido. Crea ${JAM_MODES.drfm.falseTargets} falsos blancos en cada radar que lo recibe fuerte; ocupan su capacidad de seguimiento y, si está llena, el radar no abre pistas nuevas. Entran por el haz principal y, si el jammer está cerca, por los costados, salvo en radares con blanqueo de lóbulos laterales.</p>`;
+    return h;
   }
 
   // src/ui/goals-editor.js
-  var SIDE = { defensa: "Defensa", ataque: "Ataque" };
+  var SIDE3 = { defensa: "Defensa", ataque: "Ataque" };
   var GOAL_TYPES = {
     destroy: { on: "obj", name: "Destruir objetivo", text: (t) => `Destruir ${t}` },
     damage: { on: "obj", name: "Dañar objetivo (≥ %)", text: (t, g) => `Dañar ${t} (≥ ${Math.round((g.min ?? DAMAGED_AT) * 100)}%)` },
@@ -7638,7 +8107,7 @@ table.t.mc td.pc{white-space:nowrap}
     const row = (g, i) => {
       const names = targetsFor(g.kind), missing = g.target && !names.includes(g.target);
       return `<tr data-i="${i}">
-      <td><select class="sel" data-f="side" aria-label="Bando">${Object.entries(SIDE).map(([k, v]) => `<option value="${k}" ${g.side === k ? "selected" : ""}>${v}</option>`).join("")}</select></td>
+      <td><select class="sel" data-f="side" aria-label="Bando">${Object.entries(SIDE3).map(([k, v]) => `<option value="${k}" ${g.side === k ? "selected" : ""}>${v}</option>`).join("")}</select></td>
       <td><label class="check"><input type="checkbox" data-f="primary" ${g.primary ? "checked" : ""}> Principal</label></td>
       <td><select class="sel" data-f="kind" aria-label="Tipo de meta">${Object.entries(GOAL_TYPES).map(([k, v]) => `<option value="${k}" ${g.kind === k ? "selected" : ""}>${v.name}</option>`).join("")}</select></td>
       <td><select class="sel" data-f="target" aria-label="Blanco">${missing ? `<option value="${esc(g.target)}" selected>⚠ ${esc(g.target)} (ya no existe)</option>` : ""}${names.map((n2) => `<option value="${esc(n2)}" ${g.target === n2 ? "selected" : ""}>${esc(n2)}</option>`).join("") || '<option value="">(no hay)</option>'}</select></td>
@@ -7647,10 +8116,10 @@ table.t.mc td.pc{white-space:nowrap}
     };
     const render = () => {
       openModal(`<header><div><span class="chip">${esc(d.name || "Escenario")}</span><h2>Metas del escenario</h2></div><button class="btn x">Cerrar</button></header><div class="bd">
-      <div class="field"><label for="gPlayer">Jugás</label><select id="gPlayer" class="sel">${Object.entries(SIDE).map(([k, v]) => `<option value="${k}" ${d.player === k ? "selected" : ""}>${v}</option>`).join("")}</select></div>
+      <div class="field"><label for="gPlayer">Jugás</label><select id="gPlayer" class="sel">${Object.entries(SIDE3).map(([k, v]) => `<option value="${k}" ${d.player === k ? "selected" : ""}>${v}</option>`).join("")}</select></div>
       <p class="hint">El resultado se juzga con tus metas <b>principales</b>: todas cumplidas es éxito, algunas es éxito parcial, ninguna es fracaso. Las secundarias se cuentan aparte. Las metas apuntan a objetivos o unidades por su nombre: si renombrás o borrás uno, la meta queda marcada con ⚠.</p>
       <div class="tblwrap"><table class="t"><thead><tr><th>Bando</th><th></th><th>Meta</th><th>Sobre</th><th>Mínimo</th><th></th></tr></thead><tbody>${d.goals.map(row).join("") || '<tr><td colspan="6" class="hint">Sin metas.</td></tr>'}</tbody></table></div>
-      <ul class="goals">${d.goals.map((g) => `<li>${SIDE[g.side]} · ${g.primary ? "<b>Principal:</b> " : "Secundaria: "}${esc(goalText(g))}</li>`).join("")}</ul>
+      <ul class="goals">${d.goals.map((g) => `<li>${SIDE3[g.side]} · ${g.primary ? "<b>Principal:</b> " : "Secundaria: "}${esc(goalText(g))}</li>`).join("")}</ul>
       <div class="row"><button class="btn" id="gAdd">+ Agregar meta</button><button class="btn pri" id="gSave">Guardar metas</button></div>
     </div>`, null);
       $("#gPlayer").onchange = (e) => {
@@ -7695,9 +8164,10 @@ table.t.mc td.pc{white-space:nowrap}
   }
 
   // src/ui/panels/scenario.js
-  var SIDE2 = { ataque: "Ataque", defensa: "Defensa" };
+  var SIDE4 = { ataque: "Ataque", defensa: "Defensa" };
   var KIND = { destroy: "destruir", damage: "dañar", protect: "proteger", survive: "que sobreviva", killUnit: "destruir unidad", keepUnit: "conservar unidad" };
   var objRow = (g) => {
+    if (S.started && !S.replay && isAttackerView()) return `<div class="sobj" data-oid="${g.id}"><span class="t">${esc(TARGET_TYPES[g.type].icon)} · ${esc(g.name)}</span><span class="chip">sin evaluar</span></div>`;
     const hp = g.hp ?? g.maxHp, st = g.status || "operational";
     return `<div class="sobj" data-oid="${g.id}"><span class="t">${esc(TARGET_TYPES[g.type].icon)} · ${esc(g.name)}</span><span class="chip st-${st}">${TARGET_STATUS[st]}</span><div class="hpbar"><i class="st-${st}" style="width:${(100 * Math.max(0, hp) / g.maxHp).toFixed(1)}%"></i></div><span class="n">HP ${Math.max(0, hp)} / ${g.maxHp}</span></div>`;
   };
@@ -7713,7 +8183,7 @@ table.t.mc td.pc{white-space:nowrap}
     const objs = S.replay ? frameAt(S.replay.t).objs : S.started ? S.objs : S.setup.objs;
     const mine = (sc2.goals || []).filter((g) => g.side === sc2.player);
     el.innerHTML = `<div class="row" style="justify-content:space-between"><h3>Escenario</h3><span class="row">${goalsBtn}<button class="btn sm" id="briefBtn">Briefing</button></span></div>
-    <p class="hint">${sc2.time ? esc(sc2.time) + " · " : ""}Jugás: <b>${SIDE2[sc2.player] || "—"}</b></p>
+    <p class="hint">${sc2.time ? esc(sc2.time) + " · " : ""}Jugás: <b>${SIDE4[sc2.player] || "—"}</b></p>
     ${objs.length ? `<div class="sobjs">${objs.map(objRow).join("")}</div>` : '<p class="hint">Sin objetivos: agregalos en la pestaña Ataque.</p>'}
     ${mine.length ? `<ul class="sgoals">${mine.map((g) => `<li>${g.primary ? "<b>Principal:</b> " : ""}${esc(g.text)}</li>`).join("")}</ul>` : ""}`;
     $("#briefBtn").onclick = openBriefing;
@@ -7730,9 +8200,9 @@ table.t.mc td.pc{white-space:nowrap}
     const sc2 = S.scen;
     if (!sc2) return;
     const goals = (side) => (sc2.goals || []).filter((g) => g.side === side);
-    const goalList = (side) => goals(side).length ? `<div><b>${SIDE2[side]}${sc2.player === side ? " (vos)" : ""}</b><ul class="goals">${goals(side).map((g) => `<li>${g.primary ? "<b>Principal:</b> " : "Secundaria: "}${esc(g.text)} <span class="dim">(${KIND[g.kind]})</span></li>`).join("")}</ul></div>` : "";
+    const goalList = (side) => goals(side).length ? `<div><b>${SIDE4[side]}${sc2.player === side ? " (vos)" : ""}</b><ul class="goals">${goals(side).map((g) => `<li>${g.primary ? "<b>Principal:</b> " : "Secundaria: "}${esc(g.text)} <span class="dim">(${KIND[g.kind]})</span></li>`).join("")}</ul></div>` : "";
     openModal(`<header><div><span class="chip">Briefing · ${esc(TERRAIN[sc2.map]?.name || MAP?.name || "")}</span><h2>${esc(sc2.name)}</h2></div><button class="btn x">Cerrar</button></header><div class="bd">
-    <div class="specs">${[["Hora", sc2.time || "—"], ["Jugás", SIDE2[sc2.player] || "—"], ["Mapa", TERRAIN[sc2.map]?.name || "—"]].map(([a, b]) => `<div class="spec"><small>${a}</small><b>${esc(b)}</b></div>`).join("")}</div>
+    <div class="specs">${[["Hora", sc2.time || "—"], ["Jugás", SIDE4[sc2.player] || "—"], ["Mapa", TERRAIN[sc2.map]?.name || "—"]].map(([a, b]) => `<div class="spec"><small>${a}</small><b>${esc(b)}</b></div>`).join("")}</div>
     <p>${esc(sc2.description || "")}</p>
     ${sc2.forces ? `<div class="dbcols"><div><h3>Defensa</h3><p>${esc(sc2.forces.defensa)}</p></div><div><h3>Ataque</h3><p>${esc(sc2.forces.ataque)}</p></div></div>` : ""}
     ${sc2.conditions ? `<div><h3>Condiciones iniciales</h3><p>${esc(sc2.conditions)}</p></div>` : ""}
@@ -7744,333 +8214,90 @@ table.t.mc td.pc{white-space:nowrap}
   </div>`, openBriefing);
   }
 
-  // src/sim/debrief.js
-  var sum = (a, f) => a.reduce((s, x) => s + f(x), 0);
-  var LOST_M = 2e3;
-  function buildDebrief(S2) {
-    const st = S2.stats, real = S2.threats.filter((t) => !t.isDecoy), decoys = S2.threats.filter((t) => t.isDecoy);
-    const arrivals = S2.arrivals;
-    const { goals, outcome } = evaluateGoals(S2.scen, S2);
-    const byType = {};
-    for (const t of S2.threats) {
-      const k = t.isDecoyChild ? t.T.short + " (señuelo)" : t.T.short;
-      const b = byType[k] || (byType[k] = { launched: 0, killed: 0, arrived: 0, shotsAt: 0 });
-      b.launched++;
-      if (t.killed) b.killed++;
-      else if (t.done) b.arrived++;
-      b.shotsAt += (t.fly || []).length;
-    }
-    const objectives = S2.objs.map((o) => ({ name: o.name, type: o.type, status: o.status, dmg: o.maxHp - o.hp, maxHp: o.maxHp, hits: o.hits, dmgBy: o.dmgBy }));
-    const dmgSorted = Object.entries(st.dmgByWeapon).sort((a, b) => b[1] - a[1]);
-    const magTotal = sum(S2.units, (u) => u.mag || 0), magLeft = sum(S2.units, (u) => DEFENSES[u.type].sam ? u.magLeft : 0);
-    const lost = S2.units.filter((u) => !u.alive).map((u) => u.name);
-    const detected = real.filter((t) => t.firstDet !== null && t.detKm != null);
-    const attack = {
-      launched: st.launched,
-      real: real.length,
-      decoys: st.decoys,
-      intercepted: st.killed - st.decoysKilled,
-      decoysKilled: st.decoysKilled,
-      impacts: st.hits,
-      misses: st.misses,
-      lostLocally: arrivals.filter((a) => a.nav > LOST_M).length,
-      byType
-    };
-    const damage = {
-      total: st.damage,
-      byWeapon: dmgSorted,
-      top: dmgSorted[0] || null,
-      avgMiss: st.missN ? st.missSum / st.missN : null,
-      objsDestroyed: st.objsDestroyed,
-      objsSurviving: S2.objs.filter((o) => o.status !== "destroyed").length
-    };
-    const defense = {
-      shots: st.shots,
-      magLeft,
-      magTotal,
-      defCost: st.defCost,
-      atkCost: st.atkCost,
-      lost,
-      byUnit: st.byUnit,
-      perKill: st.killed ? st.shots / st.killed : null,
-      avgDetKm: detected.length ? sum(detected, (t) => t.detKm) / detected.length : null
-    };
-    const timeline = [...S2.events].sort((a, b) => a.t - b.t);
-    return { scen: S2.scen, t: S2.t, goals, outcome, objectives, attack, damage, defense, timeline, why: explain(S2, arrivals, decoys) };
-  }
-  function explain(S2, arrivals, decoys) {
-    const out = [], st = S2.stats, list = (a) => [...new Set(a.map((x) => THREATS[x.type].short))].join(", ");
-    const real = arrivals;
-    if (!S2.threats.length) return ["No hubo ataques: agregá salvas en la pestaña Ataque."];
-    if (!real.length) out.push("Ninguna arma real llegó a su blanco: todas fueron derribadas o eran señuelos. La defensa por capas cubrió las rutas de ataque.");
-    const never = real.filter((a) => a.det === null);
-    if (never.length) out.push(`${never.length} arma(s) llegaron sin haber sido detectadas nunca (${list(never)}). Típico de blancos rasantes: el horizonte de radar y el relieve los ocultan. Probá subir mástiles, sumar un AEW o ubicar sensores sobre cotas altas (capa "Puntos altos").`);
-    const unengaged = real.filter((a) => a.det !== null && a.shots === 0);
-    if (unengaged.length) {
-      const lead = unengaged.reduce((s, a) => s + (a.t - a.det), 0) / unengaged.length;
-      out.push(`${unengaged.length} arma(s) fueron detectadas pero nadie les disparó (${list(unengaged)}), en promedio ${Math.round(lead)} s antes de llegar. Causas posibles: fuera del alcance o de la envolvente de altura, tiempo de reacción mayor que la ventana, clase no enfrentable (p. ej. IRIS-T o NASAMS contra balísticos), canales ocupados o sin munición.`);
-    }
-    const survived = real.filter((a) => a.shots > 0);
-    if (survived.length) out.push(`${survived.length} arma(s) sobrevivieron a ${survived.reduce((s, a) => s + a.shots, 0)} interceptor(es) disparados contra ellas (${list(survived)}): la Pk por disparo nunca es 100% y baja con maniobra terminal, baja firma, bengalas o interferencia.`);
-    const decoyShots = decoys.reduce((s, t) => s + (t.fly || []).length, 0);
-    const clsDecoys = decoys.filter((t) => t.clsAs === "señuelo").length, wrong = S2.threats.filter((t) => !t.isDecoy && t.clsAs === "señuelo");
-    if (clsDecoys) out.push(`Los radares de tiro reconocieron ${clsDecoys} de ${decoys.length} señuelo(s)${S2.ignoreDecoys ? " y dejaron de tirarles" : '; con la doctrina "no tirarle a pistas clasificadas como señuelo" se habrían ahorrado interceptores'}.`);
-    if (wrong.length) out.push(`${wrong.length} arma(s) real(es) se clasificaron por error como señuelo (${wrong.map((t) => t.T.short).join(", ")})${S2.ignoreDecoys ? " y no se les tiró" : ""}.`);
-    if (S2.stats.reloads) out.push(`Hubo ${S2.stats.reloads} recarga(s) de baterías durante el ataque.`);
-    if (decoyShots) out.push(`Los señuelos consumieron ${decoyShots} interceptor(es) que no se usaron contra armas reales. La "vista del defensor" muestra cómo los ve el operador: iguales a las armas.`);
-    const empty = S2.events.filter((e) => e.key && e.key.startsWith("empty:"));
-    if (empty.length) out.push(`Se quedaron sin munición: ${empty.map((e) => e.text.replace(" se queda sin munición", "")).join(", ")}. Mientras recargan (o sin reserva), la saturación agota los cargadores antes de que llegue lo más peligroso.`);
-    const sat = Object.entries(st.satChannels).sort((a, b) => b[1] - a[1]);
-    if (sat.length) out.push(`Saturación de canales de tiro: ${sat.slice(0, 3).map(([k, v]) => `${k} (${v} s)`).join(", ")} tuvo más blancos que canales simultáneos.`);
-    const gnss = real.filter((a) => a.nav > 150 && a.nav <= LOST_M), lostL = real.filter((a) => a.nav > LOST_M);
-    if (gnss.length) out.push(`${gnss.length} arma(s) fueron desviadas por interferencia GNSS (${list(gnss)}).`);
-    if (lostL.length) out.push(`${lostL.length} arma(s) quedaron "perdidas localmente": el engaño GNSS las desvió más de ${LOST_M / 1e3} km (${list(lostL)}). Ojo al comparar con las cifras oficiales ucranianas: esa categoría real también incluye señuelos y fallas.`);
-    const hurt = S2.units.filter((u) => u.alive && (u.dmgRadar || u.dmgLauncher));
-    if (hurt.length) out.push(`Unidades dañadas por explosiones cercanas: ${hurt.map((u) => u.name + " (" + [u.dmgRadar ? "radar" : "", u.dmgLauncher ? "lanzador" : ""].filter(Boolean).join(" y ") + ")").join(", ")}. Un radar dañado ve menos y reacciona más lento; un lanzador dañado no dispara aunque le queden misiles.`);
-    if (S2.units.some((u) => !u.alive)) out.push(`Unidades perdidas: ${S2.units.filter((u) => !u.alive).map((u) => u.name).join(", ")}. Una batería destruida deja un hueco de cobertura para lo que viene después.`);
-    if (st.killed) out.push(`Economía: la defensa gastó US$${st.defCost.toFixed(1)} M y el ataque US$${st.atkCost.toFixed(1)} M. ${st.defCost > st.atkCost ? "Defender costó más que atacar: es la lógica de los drones baratos y los señuelos." : "Defender costó menos que atacar."}`);
-    return out;
-  }
-
-  // src/ui/montecarlo.js
-  var RUNS = [10, 20, 50, 100];
-  var SIDE3 = { ataque: "Ataque", defensa: "Defensa" };
-  var last = { runs: 20, sample: true, seed: 1 };
-  function openMonteCarlo() {
-    if (!S.setup.salvos.length) {
-      toast("Agregá al menos un ataque en la pestaña Ataque.");
-      return;
-    }
-    openModal(`<header><div><span class="chip">${esc(S.scen?.name || "Escenario libre")}</span><h2>Monte Carlo</h2></div><button class="btn x">Cerrar</button></header><div class="bd">
-    <p>Corre <b>la misma situación</b> muchas veces con semillas distintas y muestra qué tan probable es cada resultado. Una sola corrida puede ser suerte; cien corridas muestran la tendencia.</p>
-    <div class="field"><label for="mcRuns">Cantidad de corridas</label><select id="mcRuns" class="sel">${RUNS.map((n2) => `<option value="${n2}" ${n2 === last.runs ? "selected" : ""}>${n2}</option>`).join("")}</select></div>
-    <label class="check"><input type="checkbox" id="mcSample" ${last.sample ? "checked" : ""}> Sortear los parámetros dentro de su rango de incertidumbre (RCS, Pk, velocidades, alcances, CEP…)</label>
-    <p class="hint">Sin sorteo, solo cambia el azar de cada corrida (detección, Pk, dispersión) con los valores probables del catálogo. Con sorteo, además, cada corrida usa un catálogo distinto tomado de los rangos mín–probable–máx de cada ficha. Lo que elegiste vos (posiciones, munición, mástiles, rutas, alturas) no se sortea.</p>
-    <div class="field"><label for="mcSeed">Primera semilla</label><input id="mcSeed" class="inp" type="number" min="1" max="1000000" value="${last.seed}"></div>
-    <p class="hint">La corrida <i>i</i> usa la semilla <i>primera + i</i>: con los mismos datos, la serie se puede repetir exacta. Una corrida del escenario de Monterey tarda 1–2 s, así que 50 corridas llevan alrededor de un minuto.</p>
-    <div class="row"><button class="btn pri" id="mcGo">Correr</button></div>
-  </div>`, openMonteCarlo);
-    $("#mcGo").onclick = () => {
-      if (!$("#mcSeed").reportValidity() || !Number.isFinite($("#mcSeed").valueAsNumber)) return;
-      last = { runs: +$("#mcRuns").value, sample: $("#mcSample").checked, seed: $("#mcSeed").valueAsNumber };
-      run(last);
-    };
-  }
-  function run(opts) {
-    resetSim();
-    const mc = createMonteCarlo(opts), t0 = performance.now();
-    openModal(`<header><h2>Monte Carlo en curso</h2></header><div class="bd">
-    <p id="mcTxt">Preparando…</p><div class="mcprog"><i id="mcBar" style="width:0%"></i></div>
-    <p class="hint" id="mcEta">&nbsp;</p><div class="row"><button class="btn" id="mcStop">Cancelar</button></div></div>`);
-    $("#mcStop").onclick = () => mc.cancel();
-    const frame = () => {
-      if ($("#modal").hidden && !mc.done) mc.cancel();
-      try {
-        mc.tick(40);
-      } catch (error) {
-        resetSim();
-        renderAll();
-        openModal(`<header><h2>Monte Carlo detenido</h2><button class="btn x">Cerrar</button></header><div class="bd"><p>${esc(error.message)}</p><p>La serie quedó incompleta. Revisá las rutas y los horarios antes de volver a correrla.</p></div>`);
-        return;
-      }
-      const k = mc.results.length, el = (performance.now() - t0) / 1e3;
-      if (!mc.done) {
-        $("#mcTxt").textContent = `Corrida ${Math.min(k + 1, opts.runs)} de ${opts.runs}`;
-        $("#mcBar").style.width = (100 * k / opts.runs).toFixed(1) + "%";
-        if (k) $("#mcEta").textContent = `Faltan unos ${Math.ceil(el / k * (opts.runs - k))} s`;
-        setTimeout(frame, 0);
-        return;
-      }
-      resetSim();
-      renderAll();
-      if (!k) {
-        closeModal();
-        toast("Monte Carlo cancelado.");
-        return;
-      }
-      openMcDebrief(aggregate(mc.results, S.scen, opts), mc.cancelled);
-    };
-    setTimeout(frame, 0);
-  }
-  var pct = (v) => v == null ? "—" : Math.round(v * 100) + "%";
-  var ci = (p) => `${pct(p.lo)}–${pct(p.hi)}`;
-  var num = (v, d = 0) => v == null ? "—" : v.toLocaleString("es-AR", { maximumFractionDigits: d, minimumFractionDigits: d });
-  var pbar = (p) => `<div class="pbar" title="${pct(p.p)} (${p.k} de ${p.n}); IC 95%: ${ci(p)}"><span class="ci" style="left:${(100 * p.lo).toFixed(1)}%;width:${(100 * (p.hi - p.lo)).toFixed(1)}%"></span><i style="width:${(100 * p.p).toFixed(1)}%"></i></div>`;
-  var pcell = (p) => `<td class="pc">${pbar(p)}<b>${pct(p.p)}</b> <span class="dim">${ci(p)}</span></td>`;
-  function openMcDebrief(a, cancelled = false) {
-    const o = a.outcome, side = a.player;
-    const resTxt = o.none.k === a.n ? "Sin metas definidas" : `Éxito ${pct(o.exito.p)} · parcial ${pct(o.parcial.p)} · fracaso ${pct(o.fracaso.p)}`;
-    const objRows = a.objectives.map((x) => `<tr><td>${esc(x.name)}</td>${pcell(x.survive)}${pcell(x.operational)}<td>${pct(x.dmgFrac.mean)}</td><td>${pct(x.dmgFrac.p10)}–${pct(x.dmgFrac.p90)}</td></tr>`).join("");
-    const goalRows = a.goals.map((g) => `<tr><td class="nt">${g.primary ? "<b>Principal:</b> " : ""}${esc(g.text)}</td><td>${SIDE3[g.side]}${g.side === side ? " (vos)" : ""}</td>${pcell(g.met)}</tr>`).join("");
-    const unitRows = a.unitsLost.map((u) => `<tr><td>${esc(u.name)}</td>${pcell(u.lost)}</tr>`).join("");
-    const m = a.metrics;
-    const mrow = (lab, d, f = (v) => num(v)) => `<tr><td>${lab}</td><td>${f(d.mean)}</td><td>${f(d.p10)}</td><td>${f(d.p50)}</td><td>${f(d.p90)}</td><td>${f(d.min)}–${f(d.max)}</td></tr>`;
-    const hmax = Math.max(1, ...a.interceptHist.map((h) => h.n));
-    const hist = a.interceptHist.map((h) => `<div class="hb" title="${pct(h.from)}–${pct(h.to)} interceptadas: ${h.n} corrida(s)"><i style="height:${(100 * h.n / hmax).toFixed(1)}%"></i>${h.n ? `<span>${h.n}</span>` : ""}</div>`).join("");
-    openModal(`<header><div><span class="chip">${esc(a.scen?.name || "Escenario libre")}</span><h2>Debrief Monte Carlo</h2></div><button class="btn x">Cerrar</button></header><div class="bd debrief">
-    <div class="dbres"><b>${side ? esc(SIDE3[side]) + ": " : ""}${resTxt}</b><span>${a.n} corridas${cancelled ? " (cancelado antes de terminar)" : ""} · ${a.sample ? "parámetros sorteados en su rango" : "valores probables del catálogo"} · semillas ${a.seed}–${a.seed + a.n - 1}</span></div>
-    ${a.objectives.length ? `<div><h3>Objetivos: probabilidad de que sobrevivan</h3><div class="tblwrap"><table class="t mc"><thead><tr><th>Objetivo</th><th>No destruido</th><th>Operativo</th><th>Daño medio</th><th>Daño p10–p90</th></tr></thead><tbody>${objRows}</tbody></table></div></div>` : ""}
-    ${goalRows ? `<div><h3>Metas: probabilidad de cumplirlas</h3><div class="tblwrap"><table class="t mc"><thead><tr><th>Meta</th><th>Bando</th><th>Se cumple</th></tr></thead><tbody>${goalRows}</tbody></table></div></div>` : ""}
-    ${unitRows ? `<div><h3>Unidades de defensa perdidas</h3><div class="tblwrap"><table class="t mc"><thead><tr><th>Unidad</th><th>Probabilidad de perderla</th></tr></thead><tbody>${unitRows}</tbody></table></div></div>` : ""}
-    <div><h3>Armas reales interceptadas (% por corrida)</h3><div class="hist" role="img" aria-label="Histograma del porcentaje de armas reales interceptadas en cada corrida">${hist}</div><div class="histx"><span>0%</span><span>50%</span><span>100%</span></div><p class="hint">Cada barra cuenta cuántas corridas terminaron con ese porcentaje de interceptación (pasá el mouse para ver el detalle).</p></div>
-    <div><h3>Dispersión de resultados</h3><div class="tblwrap"><table class="t"><thead><tr><th>Medida</th><th>Media</th><th>p10</th><th>Mediana</th><th>p90</th><th>Mín–máx</th></tr></thead><tbody>
-      ${mrow("Armas reales interceptadas", m.interceptRate, pct)}${mrow("Interceptadas (cantidad)", m.intercepted)}${mrow("Impactos en el blanco", m.impacts)}${mrow("Daño total (HP)", m.damage)}${mrow("Interceptores lanzados", m.shots)}${mrow("Gasto de la defensa", m.defCost, (v) => v == null ? "—" : money(v))}${mrow("Costo del ataque", m.atkCost, (v) => v == null ? "—" : money(v))}
-    </tbody></table></div></div>
-    <div><h3>Cómo leerlo</h3><ul class="why">
-      <li><b>Probabilidad</b> = corridas en las que pasó ÷ corridas totales. La franja clara de cada barra es el <b>intervalo de confianza del 95%</b> (Wilson): con pocas corridas es ancho; para afinarlo hacen falta más corridas (el ancho baja con √N).</li>
-      <li><b>p10 / p90</b>: el 10% de las corridas dio menos que p10 y el 10% dio más que p90. Es el rango "típico" sin los extremos.</li>
-      <li>${a.sample ? 'Cada corrida sorteó RCS, Pk, velocidades, alcances, CEP y costos dentro de los rangos del catálogo (fichas → "Confianza de los datos"): la dispersión mezcla el azar del combate con lo que no sabemos de cada sistema.' : "Todas las corridas usaron los valores probables del catálogo: la dispersión es solo el azar del combate (detección, Pk, dispersión de impactos)."}</li>
-      <li>Es un modelo con datos públicos aproximados: compará disposiciones entre sí más que leer los porcentajes como predicción.</li></ul></div>
-    <div class="row"><button class="btn" id="mcAgain">Otra serie</button></div>
-  </div>`, () => openMcDebrief(a, cancelled));
-    $("#mcAgain").onclick = openMonteCarlo;
-  }
-
-  // src/ui/replay.js
-  var SPEEDS2 = [5, 30, 120];
-  function openReplay(t = 0) {
-    if (!canReplay()) {
-      toast("Primero corré el escenario hasta el final.");
-      return;
-    }
-    closeModal();
-    S.running = false;
-    S.replay = { t, playing: true, speed: 30 };
-    renderReplayBar();
-  }
-  function closeReplay() {
-    S.replay = null;
-    renderReplayBar();
-  }
-  function renderReplayBar() {
-    const el = $("#replayBar");
-    if (!el) return;
-    if (!S.replay) {
-      el.hidden = true;
-      el.innerHTML = "";
-      return;
-    }
-    const end = Math.ceil(replayEnd());
-    el.hidden = false;
-    el.innerHTML = `<button class="btn pri sm" id="rpPlay"></button>
-    <input type="range" id="rpT" min="0" max="${end}" step="1" value="${Math.round(S.replay.t)}" aria-label="Instante de la repetición">
-    <span class="clock" id="rpClock"></span>
-    <div class="speeds">${SPEEDS2.map((s) => `<button data-s="${s}" class="${s === S.replay.speed ? "act" : ""}">${s}×</button>`).join("")}</div>
-    <button class="btn sm" id="rpExit">Salir</button>
-    <ol class="rplog" id="rpLog" aria-live="polite"></ol>`;
-    $("#rpPlay").onclick = () => {
-      const R = S.replay;
-      if (R.t >= end) R.t = 0;
-      R.playing = !R.playing;
-      updateReplayBar();
-    };
-    $("#rpT").oninput = (e) => {
-      S.replay.t = +e.target.value;
-      S.replay.playing = false;
-      updateReplayBar();
-    };
-    el.querySelector(".speeds").onclick = (e) => {
+  // src/ui/controls.js
+  var SPEEDS2 = [1, 5, 15, 30, 60];
+  function initControls() {
+    $("#speeds").innerHTML = `<button data-s="auto" title="Rápido cuando no pasa nada, lento cuando hay combate">Auto</button>` + SPEEDS2.map((s) => `<button data-s="${s}">${s}×</button>`).join("");
+    $("#speeds").onclick = (e) => {
       const b = e.target.closest("button");
       if (!b) return;
-      S.replay.speed = +b.dataset.s;
-      for (const c of b.parentNode.children) c.classList.toggle("act", c === b);
+      if (b.dataset.s === "auto") S.auto = true;
+      else {
+        S.auto = false;
+        S.speed = +b.dataset.s;
+      }
+      updatePlay();
     };
-    $("#rpExit").onclick = closeReplay;
-    updateReplayBar();
+    $("#play").onclick = togglePlay;
+    $("#reset").onclick = () => {
+      resetSim();
+      renderAll();
+    };
+    $("#view").onchange = () => {
+      renderAll();
+      renderStats();
+      renderLog();
+      renderScenario();
+      draw();
+    };
   }
-  function updateReplayBar() {
-    const R = S.replay;
-    if (!R || !$("#rpPlay")) return;
-    $("#rpPlay").textContent = R.playing ? "❚❚" : "▶";
-    $("#rpT").value = Math.round(R.t);
-    $("#rpClock").textContent = "Repetición " + fmtT(R.t);
-    const log2 = frameAt(R.t).log.slice(-4).reverse();
-    $("#rpLog").innerHTML = log2.map((l) => `<li class="${esc(l.cls)}"><time>${fmtT(l.t)}</time> ${esc(l.msg)}</li>`).join("");
+  function togglePlay() {
+    if (isMonteCarloRunning()) return;
+    if (!S.started) {
+      if (!S.setup.salvos.length) {
+        toast("Agregá al menos un ataque en la pestaña Ataque.");
+        return;
+      }
+      setMode("select");
+      startSim();
+      S.running = true;
+      schedCov();
+    } else if (!S.pending.length && S.threats.every((t) => !t.alive)) {
+      resetSim();
+      return;
+    } else S.running = !S.running;
+    updatePlay();
   }
-  function tickReplay(dtr) {
-    const R = S.replay;
-    if (!R?.playing) return;
-    const end = replayEnd();
-    R.t = Math.min(end, R.t + dtr * R.speed);
-    if (R.t >= end) R.playing = false;
-    updateReplayBar();
+  function updatePlay() {
+    $("#play").textContent = S.running ? "❚❚ Pausa" : S.started ? S.pending.length || S.threats.some((t) => t.alive) ? "▶ Seguir" : "↺ Nueva corrida" : "▶ Iniciar";
+    for (const b of $("#speeds").children) b.classList.toggle("act", S.auto ? b.dataset.s === "auto" : +b.dataset.s === S.speed);
+    $("#clock").textContent = fmtT(S.t);
+    renderTimeScale();
   }
-
-  // src/ui/debrief.js
-  var pct2 = (a, b) => b ? Math.round(100 * a / b) + "%" : "—";
-  var SIDE4 = { ataque: "Ataque", defensa: "Defensa" };
-  function openDebrief() {
-    const d = buildDebrief(S), a = d.attack, g = d.damage, f = d.defense;
-    const res = d.outcome.result, resCls = { exito: "st-operational", parcial: "st-damaged", fracaso: "st-destroyed" }[res] || "";
-    const objRows = d.objectives.map((o) => `<div class="dbobj"><span class="t">${esc(TARGET_TYPES[o.type].icon)} · ${esc(o.name)}</span><span class="chip st-${o.status}">${TARGET_STATUS[o.status].toUpperCase()}</span><span class="n">${o.dmg} / ${o.maxHp} de daño</span><div class="hpbar"><i class="st-${o.status}" style="width:${(100 * (o.maxHp - o.dmg) / o.maxHp).toFixed(1)}%"></i></div></div>`).join("") || '<p class="hint">El escenario no tiene objetivos: las armas caen sobre puntos del mapa.</p>';
-    const goalRows = ["ataque", "defensa"].map((side) => {
-      const gs = d.goals.filter((x) => x.side === side);
-      if (!gs.length) return "";
-      return `<div><b>${SIDE4[side]}${d.outcome.side === side ? " (vos)" : ""}</b><ul class="goals">${gs.map((x) => `<li class="${x.met ? "ok" : "no"}">${x.met ? "✔" : "✘"} ${x.primary ? "<b>Principal:</b> " : "Secundaria: "}${esc(x.text)}</li>`).join("")}</ul></div>`;
-    }).join("");
-    const typeRows = Object.entries(a.byType).map(([k, b]) => `<tr><td>${esc(k)}</td><td>${b.launched}</td><td>${b.killed}</td><td>${b.arrived}</td><td>${b.shotsAt}</td></tr>`).join("");
-    const tl = d.timeline.map((e) => `<li><time>${fmtT(e.t)}</time> — ${esc(e.text)}</li>`).join("") || "<li>Sin eventos.</li>";
-    openModal(`<header><div><span class="chip">${esc(d.scen?.name || "Escenario libre")}</span><h2>Debrief</h2></div><button class="btn x">Cerrar</button></header><div class="bd debrief">
-    <div class="dbres ${resCls}"><b>${esc(d.outcome.side ? SIDE4[d.outcome.side] + ": " : "")}${esc(d.outcome.text)}</b><span>Duración ${fmtT(d.t).slice(2)} de tiempo simulado</span></div>
-    ${goalRows ? `<div><h3>Metas del escenario</h3><div class="dbgoals">${goalRows}</div></div>` : ""}
-    <div><h3>Objetivos</h3>${objRows}</div>
-    <div class="dbcols">
-      <div><h3>Ataque</h3><ul class="dblist">
-        <li><b>${a.real}</b> armas lanzadas${a.decoys ? ` + <b>${a.decoys}</b> señuelos` : ""}</li>
-        <li><b>${a.intercepted}</b> interceptadas (${pct2(a.intercepted, a.real)})</li>
-        <li><b>${a.impacts}</b> impactos en el blanco · <b>${a.misses}</b> fuera${a.lostLocally ? ` (<b>${a.lostLocally}</b> perdidas localmente por engaño GNSS)` : ""}</li>
-        <li><b>${a.decoysKilled}</b> señuelos derribados</li></ul></div>
-      <div><h3>Daño</h3><ul class="dblist">
-        <li>Daño total: <b>${g.total}</b> HP</li>
-        <li>Mayor fuente de daño: <b>${g.top ? esc(g.top[0]) + " (" + g.top[1] + " HP)" : "—"}</b></li>
-        <li>Distancia media de caída al punto apuntado: <b>${g.avgMiss == null ? "—" : Math.round(g.avgMiss) + " m"}</b></li>
-        <li>Objetivos destruidos: <b>${g.objsDestroyed}</b> · en pie: <b>${g.objsSurviving}</b></li></ul></div>
-      <div><h3>Defensa</h3><ul class="dblist">
-        <li>Interceptores lanzados: <b>${f.shots}</b>${f.perKill ? ` (${f.perKill.toFixed(1)} por derribo)` : ""}</li>
-        <li>Munición restante: <b>${f.magLeft}</b> de ${f.magTotal}</li>
-        <li>Gasto en munición: <b>${money(f.defCost)}</b> (ataque: ${money(f.atkCost)})</li>
-        <li>Unidades perdidas: <b>${f.lost.length ? esc(f.lost.join(", ")) : "ninguna"}</b></li>
-        ${f.avgDetKm != null ? `<li>Primera detección, en promedio: <b>${f.avgDetKm.toFixed(0)} km</b> antes del blanco</li>` : ""}</ul></div>
-    </div>
-    <div><h3>¿Por qué pasó lo que pasó?</h3><ul class="why">${d.why.map((w) => `<li>${esc(w)}</li>`).join("")}</ul></div>
-    <div><h3>Línea de tiempo</h3><ol class="timeline">${tl}</ol></div>
-    <div><h3>Por tipo de arma</h3><div class="tblwrap"><table class="t"><thead><tr><th>Arma</th><th>Lanzadas</th><th>Derribadas</th><th>Llegaron</th><th>Interceptores recibidos</th></tr></thead><tbody>${typeRows}</tbody></table></div></div>
-    <p class="hint">Todo lo de arriba sale de lo que registró el motor durante la corrida. Corré de nuevo con otra disposición: el azar (detección, Pk, dispersión) cambia el resultado de una corrida a otra.</p>
-    <div class="row"><button class="btn pri" id="dbReplay" title="Volver a ver la corrida sobre el mapa, con una línea de tiempo">Ver repetición</button><button class="btn" id="dbMc">¿Fue suerte? Repetir muchas veces (Monte Carlo)</button></div>
-  </div>`, openDebrief);
-    $("#dbMc").onclick = openMonteCarlo;
-    $("#dbReplay").onclick = () => openReplay(0);
+  var currentSpeed = () => S.auto ? AUTO_PHASES[S.autoPhase].speed : S.speed;
+  var span = (s) => s < 60 ? s + " s" : s / 60 + " min";
+  function renderTimeScale() {
+    const sp = currentSpeed();
+    $("#tscale").textContent = (S.auto ? "Auto " + sp + "× (" + AUTO_PHASES[S.autoPhase].text + ")" : sp + "×") + " · 1 s real = " + span(sp) + (sp === 1 ? " (tiempo real)" : " simulados");
   }
 
-  // src/ui/panels/results.js
-  var logDirty = true;
-  function markLogDirty() {
-    logDirty = true;
+  // src/ui/panels/catalog.js
+  function renderCat() {
+    const el = $("#tab-cat");
+    const row = (kind, k, o, extra) => `<div class="item ${kind === "thr" ? "red" : kind === "jam" ? "vio" : ""}" style="cursor:pointer" data-f="${kind}:${k}"><span class="t">${esc(o.name)}</span><span class="s">${extra}</span><span class="a"><span class="chip ${o.side === "RU" ? "ru" : o.side === "UA" ? "ua" : ""}">${o.side === "RU" ? "RU" : o.side === "UA" ? "UA" : "ambos"}</span></span></div>`;
+    el.innerHTML = `
+    <div class="row"><button class="btn" id="cmpT">Comparar amenazas</button><button class="btn" id="cmpD">Comparar defensas</button><button class="btn" id="calB">Calibración de Pk</button></div>
+    <p class="hint">Cada ficha tiene una sección <b>Confianza de los datos</b> con rangos mín/probable/máx y fuentes. Revisión OSINT: octubre 2026.</p>
+    <div class="grp"><h3>Amenazas</h3><div class="list">${Object.entries(THREATS).map(([k, t]) => row("thr", k, t, kmh(t.v) + " · RCS " + t.rcs + " m²")).join("")}</div></div>
+    <div class="grp"><h3>Defensas y sensores</h3><div class="list">${Object.entries(DEFENSES).map(([k, d]) => row("def", k, d, d.sam ? d.sam.maxR + " km · " + d.sam.guid : d.radar ? "banda " + d.radar.band : "")).join("")}</div></div>
+    <div class="grp"><h3>Guerra electrónica</h3><div class="list">${Object.entries(JAMMERS).map(([k, j]) => row("jam", k, j, j.gnssJam ? "GNSS · " + j.radius + " km" : "bandas " + j.bands.join("/"))).join("")}</div></div>`;
+    el.onclick = (e) => {
+      const f = e.target.closest("[data-f]");
+      if (f) {
+        const [kind, k] = f.dataset.f.split(":");
+        openFicha(kind, k);
+      }
+    };
+    $("#cmpT").onclick = cmpThreats;
+    $("#cmpD").onclick = cmpDefs;
+    $("#calB").onclick = openCal;
   }
-  function renderLogIfDirty() {
-    if (logDirty) renderLog();
-  }
-  function renderStats() {
-    const s = S.stats;
-    const rate = s.launched ? Math.round(100 * s.killed / s.launched) : 0;
-    $("#stats").innerHTML = `
-    <div class="stat"><b>${s.launched}</b><small>Lanzadas (${s.decoys} señuelos)</small></div>
-    <div class="stat g"><b>${s.killed}</b><small>Derribadas · ${rate}%</small></div>
-    <div class="stat r"><b>${s.hits}</b><small>Impactos en blanco</small></div>
-    <div class="stat a"><b>${s.misses}</b><small>Cayeron fuera</small></div>
-    <div class="stat"><b>${s.shots}</b><small>Interceptores usados</small></div>
-    <div class="stat"><b>${s.decoysKilled}</b><small>Señuelos derribados</small></div>
-    <div class="stat"><b>${money(s.defCost)}</b><small>Gasto defensa</small></div>
-    <div class="stat"><b>${money(s.atkCost)}</b><small>Gasto ataque</small></div>
-    ${s.lost ? `<div class="stat r"><b>${s.lost}</b><small>Unidades perdidas</small></div>` : ""}
-    ${S.objs.length ? `<div class="stat ${s.damage ? "r" : ""}"><b>${s.damage}</b><small>Daño a objetivos (HP)</small></div><div class="stat"><b>${s.objsDestroyed}/${S.objs.length}</b><small>Objetivos destruidos</small></div>` : ""}
-    ${S.started && !S.running && !S.pending.length && S.threats.length && S.threats.every((t) => !t.alive) ? '<button class="btn pri" id="dbBtn" style="grid-column:1/-1">Ver debrief</button>' : ""}`;
-    const b = $("#dbBtn");
-    if (b) b.onclick = openDebrief;
-  }
-  function renderLog() {
-    logDirty = false;
-    $("#log").innerHTML = S.log.slice(0, 150).map((l) => `<div class="${l.cls}"><time>${fmtT(l.t)}</time>${esc(l.msg)}</div>`).join("") || "<div>Sin eventos todavía. Apretá ▶ Iniciar.</div>";
+
+  // src/ui/panels/academy.js
+  function renderAcademy() {
+    const item = (c) => `<button class="item concept-item" data-concept="${c.id}"><span class="t">${esc(c.title)}</span></button>`;
+    $("#tab-edu").innerHTML = `<p class="hint">Explicaciones cortas de los conceptos que usa la simulación. Cada una muestra <b>cómo lo calcula el motor</b>, con las variables reales y números del catálogo. También podés abrirlas desde los botones ⓘ de las fichas y los paneles.</p>
+    ${CONCEPT_GROUPS.map((g) => `<div class="grp"><h3>${esc(g)}</h3>${g === "Radar y bandas" ? `<div class="row">${Object.keys(BANDS).map((b) => `<button class="chip" data-concept="band:${b}" title="${esc(BANDS[b].name + " · " + BANDS[b].freq)}">${esc(b)}</button>`).join("")}</div>` : ""}<div class="list">${CONCEPTS.filter((c) => c.group === g && !c.id.startsWith("band:")).map(item).join("")}</div></div>`).join("")}`;
   }
 
   // src/ui/panels/index.js
@@ -8432,7 +8659,9 @@ table.t.mc td.pc{white-space:nowrap}
         if (Math.hypot(a - sx, b - sy) < 9) return { kind: "thr", id: th.id };
       }
     }
+    const av = S.started && !S.replay && isAttackerView();
     for (const u of units) {
+      if (av && !attackerKnows(u, S.t)) continue;
       const [a, b] = toS(u.x, u.y);
       if (Math.hypot(a - sx, b - sy) < 11) return { kind: "def", id: u.id };
     }
@@ -8511,6 +8740,18 @@ table.t.mc td.pc{white-space:nowrap}
       renderSel();
     }
   }
+  function boxSelect() {
+    const b = S.box;
+    S.box = null;
+    if (!b) return;
+    const [x0, x1] = [Math.min(b.a[0], b.b[0]), Math.max(b.a[0], b.b[0])], [y0, y1] = [Math.min(b.a[1], b.b[1]), Math.max(b.a[1], b.b[1])];
+    const ins = S.setup.defs.filter((u) => u.x >= x0 && u.x <= x1 && u.y >= y0 && u.y <= y1).map((u) => u.id);
+    if (!S.multi.length && S.sel?.kind === "def") S.multi = [S.sel.id];
+    S.multi = [.../* @__PURE__ */ new Set([...S.multi, ...ins])];
+    S.sel = S.multi.length === 1 ? { kind: "def", id: S.multi[0] } : null;
+    if (S.multi.length === 1) S.multi = [];
+    renderSel();
+  }
   function initInput() {
     cv.addEventListener("pointerdown", (e) => {
       cv.setPointerCapture(e.pointerId);
@@ -8538,7 +8779,9 @@ table.t.mc td.pc{white-space:nowrap}
         if (!g.kind) {
           if (Math.hypot(sx - g.sx, sy - g.sy) < DRAG_PX) return;
           const movable = S.mode === "select" && !S.started && g.hit && SETUP_LIST[g.hit.kind];
-          g.kind = movable ? "move" : "pan";
+          const box = S.mode === "select" && !S.started && g.shift && !g.hit;
+          g.kind = movable ? "move" : box ? "box" : "pan";
+          if (box) S.box = { a: toW(g.sx, g.sy), b: toW(sx, sy) };
           if (movable) {
             S.sel = g.hit;
             renderSel();
@@ -8547,6 +8790,10 @@ table.t.mc td.pc{white-space:nowrap}
         if (g.kind === "pan") {
           V.cx = g.cx - (sx - g.sx) / V.s;
           V.cy = g.cy - (sy - g.sy) / V.s;
+          return;
+        }
+        if (g.kind === "box") {
+          if (S.box) S.box.b = toW(sx, sy);
           return;
         }
         const [wx, wy] = toW(sx, sy), o = SETUP_LIST[g.hit.kind]().find((v) => v.id === g.hit.id);
@@ -8570,7 +8817,7 @@ table.t.mc td.pc{white-space:nowrap}
       else if (g.kind === "move") {
         schedCov();
         renderSel();
-      }
+      } else if (g.kind === "box") boxSelect();
     };
     cv.addEventListener("pointerup", endPtr);
     cv.addEventListener("pointercancel", endPtr);
@@ -8652,14 +8899,14 @@ table.t.mc td.pc{white-space:nowrap}
         txt = "Pista #" + th.id + (c.lost ? " · perdida hace " + Math.round(c.age) + " s" : "") + "\nAlt: " + Math.round(c.z) + " m (" + Math.round(c.z - surf(c.x, c.y)) + " AGL)\nVel: " + kmh(c.v) + " · " + mach(c.v) + " (estimada)\nDetectada por: " + by;
       } else {
         const p = th.p, v = speedAt(th, S.t);
-        txt = label(th) + "\nAlt: " + Math.round(p.z) + " m (" + Math.round(p.z - surf(p.x, p.y)) + " AGL)\nVel: " + kmh(v) + " · " + mach(v) + "\nA " + p.rem.toFixed(1) + " km del blanco\nDetectada por: " + by;
+        txt = label(th) + "\nAlt: " + Math.round(p.z) + " m (" + Math.round(p.z - surf(p.x, p.y)) + " AGL)\nVel: " + kmh(v) + " · " + mach(v) + "\nA " + p.rem.toFixed(1) + " km del blanco" + (S.started && !S.replay && isAttackerView() ? "" : "\nDetectada por: " + by);
       }
     } else if (h && h.kind === "def") {
       const u = (S.started ? S.units : S.setup.defs).find((u2) => u2.id === h.id);
       txt = (u.name || D(u).short) + "\n" + D(u).name;
     } else if (h && h.kind === "obj") {
       const g = (S.started ? S.objs : S.setup.objs).find((v) => v.id === h.id), hp = g.hp ?? g.maxHp;
-      txt = "OBJETIVO: " + g.name + "\n" + TARGET_TYPES[g.type].name + "\nHP " + hp + " / " + g.maxHp + " · " + TARGET_STATUS[g.status || "operational"];
+      txt = "OBJETIVO: " + g.name + "\n" + TARGET_TYPES[g.type].name + (S.started && !S.replay && isAttackerView() ? "\nDaño: sin evaluar (vista del atacante)" : "\nHP " + hp + " / " + g.maxHp + " · " + TARGET_STATUS[g.status || "operational"]);
     } else if (MAP && wx >= 0 && wy >= 0 && wx <= MAP.wKm && wy <= MAP.hKm) {
       const e = elev(wx, wy), ll = latlon(wx, wy);
       txt = wx.toFixed(1) + " / " + wy.toFixed(1) + " km · " + ll[0].toFixed(3) + "°, " + ll[1].toFixed(3) + "°\n";
@@ -8687,11 +8934,11 @@ table.t.mc td.pc{white-space:nowrap}
   function initHelp() {
     $("#helpBtn").onclick = () => openModal(`<header><h2>Cómo se usa</h2><button class="btn x">Cerrar</button></header><div class="bd">
   <ul>
-    <li><b>Defensa:</b> elegí un sistema y tocá el mapa. Seleccionalo para cambiar mástil, orientación del sector (Patriot, S-400), rumbo del AEW, munición e interceptores por blanco. Arrastrá para mover.</li>
+    <li><b>Defensa:</b> elegí un sistema y tocá el mapa. Seleccionalo para cambiar mástil, orientación del sector (Patriot, S-400), rumbo del AEW, munición e interceptores por blanco. Arrastrá para mover. Shift + click suma o saca defensas de un grupo, y Shift + arrastrar sobre el mapa vacío las selecciona con un rectángulo, para cambiarles algo a todas juntas. En cada radar podés elegir cuándo emite (siempre, con la primera alerta o nunca): uno que emite ve, pero el enemigo lo ubica.</li>
     <li><b>Ataque:</b> elegí el arma, cantidad, horario (o "sincronizar llegada" para saturar), altura y maniobra; después "Trazar ruta". Los balísticos y supersónicos se lanzan desde fuera del mapa en la dirección que marques.</li>
     <li><b>Guerra electrónica:</b> jammers de ruido (aéreo o Krasukha) y supresor GNSS. Las líneas violeta muestran qué radar está siendo interferido.</li>
     <li><b>Cobertura:</b> el mapa sombrea en turquesa dónde tus sensores ven un blanco de referencia a cierta altura sobre el terreno, considerando relieve real, curvatura terrestre, RCS en la banda de cada radar e interferencia. Bajá la altura y vas a ver aparecer los huecos de los valles.</li>
-    <li><b>Simulación:</b> ▶ Iniciar, velocidades 1×–60×. "Vista del defensor" oculta lo que no fue detectado y muestra los señuelos igual que las armas reales.</li>
+    <li><b>Simulación:</b> ▶ Iniciar, velocidades 1×–60×. El selector de vista cambia qué se muestra: "Vista del defensor" oculta lo que no fue detectado y muestra los señuelos igual que las armas reales; "Vista del atacante" muestra sus armas y solo las defensas que conoce (las de radar, por su emisión; las demás, desde que disparan), sin su estado, su munición ni los interceptores.</li>
     <li><b>Guardar y cargar:</b> "Guardar" descarga lo que armaste (objetivos, defensas, ataques, jammers, reglas y metas) como archivo .json; "Cargar" lo vuelve a abrir, también en otra computadora. Al cargar se revisa que el mapa exista y que las armas y defensas estén en el catálogo; si algo falla, no se toca lo que tenías. Un escenario sobre un relieve .hgt necesita que cargues ese relieve antes.</li>
     <li><b>Relieve propio:</b> "Cargar relieve .hgt" acepta tiles SRTM descomprimidos (por ejemplo N50E030.hgt para Kyiv), de 1201×1201 o 3601×3601 muestras.</li>
   </ul>
@@ -8747,8 +8994,8 @@ table.t.mc td.pc{white-space:nowrap}
     for (const k of keys) if (o[k] !== void 0) r[k] = structuredClone(o[k]);
     return r;
   };
-  var OBJ_KEYS = ["id", "type", "x", "y", "name", "short", "maxHp", "desc", "cp"];
-  var DEF_KEYS = ["id", "type", "x", "y", "name", "az", "mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2", "cp", "decoyDoc", "owner"];
+  var OBJ_KEYS = ["id", "type", "x", "y", "name", "short", "maxHp", "desc", "cp", "hpNow"];
+  var DEF_KEYS = ["id", "type", "x", "y", "name", "az", "mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2", "cp", "decoyDoc", "owner", "emcon", "hp", "dmgRadar", "dmgLauncher"];
   var SALVO_KEYS = ["id", "type", "count", "interval", "tStart", "sync", "tArrive", "agl", "launchDist", "maneuver", "decoys", "link", "crpa", "pts", "targetUnit", "targetObj"];
   var JAM_KEYS = ["id", "type", "x", "y", "alt", "on", "mode", "target"];
   var META_KEYS = ["name", "player", "time", "description", "forces", "conditions", "rulesText", "goals", "success", "failure"];
@@ -8881,7 +9128,7 @@ table.t.mc td.pc{white-space:nowrap}
         return { id: id(w, g.id) };
       }
       pos(w, g.x, g.y);
-      return { id: id(w, g.id), type: g.type, x: g.x, y: g.y, name: str(w + " · name", g.name, 120, false), short: str(w + " · short", g.short, 60), maxHp: num2(w + " · maxHp", g.maxHp, 1, 1e5, { opt: true }), desc: str(w + " · desc", g.desc, 1e3), cp: str(w + " · cp", g.cp, 20) || void 0 };
+      return { id: id(w, g.id), type: g.type, x: g.x, y: g.y, name: str(w + " · name", g.name, 120, false), short: str(w + " · short", g.short, 60), maxHp: num2(w + " · maxHp", g.maxHp, 1, 1e5, { opt: true }), desc: str(w + " · desc", g.desc, 1e3), cp: str(w + " · cp", g.cp, 20) || void 0, hpNow: num2(w + " · hpNow", g.hpNow, 0, 1e5, { opt: true }) };
     });
     const defs = list("defs", setup.defs).map((u, i) => {
       const w = `Defensa ${i + 1}${typeof u.name === "string" ? " (" + u.name + ")" : ""}`;
@@ -8907,6 +9154,10 @@ table.t.mc td.pc{white-space:nowrap}
         cp: str(w + " · cp", u.cp, 20) || void 0,
         owner: u.owner === void 0 ? void 0 : ["UA", "RU"].includes(u.owner) ? u.owner : (err(`${w} · owner: "${String(u.owner)}" no es "UA" ni "RU".`), void 0),
         decoyDoc: u.decoyDoc === void 0 ? void 0 : ["ignorar", "tirar"].includes(u.decoyDoc) ? u.decoyDoc : (err(`${w} · decoyDoc: "${String(u.decoyDoc)}" no es "ignorar" ni "tirar".`), void 0),
+        hp: num2(w + " · hp", u.hp, 1, UNIT_TARGET.hp, { int: true, opt: true }),
+        dmgRadar: bool(w + " · dmgRadar", u.dmgRadar),
+        dmgLauncher: bool(w + " · dmgLauncher", u.dmgLauncher),
+        emcon: u.emcon === void 0 ? void 0 : ["siempre", "alerta", "silencio"].includes(u.emcon) ? u.emcon : (err(`${w} · emcon: "${String(u.emcon)}" no es "siempre", "alerta" ni "silencio".`), void 0),
         c2: u.c2 === void 0 ? void 0 : C2_LEVELS[u.c2] ? u.c2 : (err(`${w} · c2: "${String(u.c2)}" no es un nivel de C2 válido (${Object.keys(C2_LEVELS).join(", ")}).`), void 0)
       };
     });
@@ -9036,10 +9287,10 @@ table.t.mc td.pc{white-space:nowrap}
     S.sel = null;
     S.mode = "select";
     const objId = /* @__PURE__ */ new Map(), defId = /* @__PURE__ */ new Map();
-    for (const g of data.setup.objs) objId.set(g.id, addObj(g.type, g.x, g.y, { name: g.name, short: g.short, hp: g.maxHp, desc: g.desc, cp: g.cp }).id);
+    for (const g of data.setup.objs) objId.set(g.id, addObj(g.type, g.x, g.y, { name: g.name, short: g.short, hp: g.maxHp, desc: g.desc, cp: g.cp, hpNow: g.hpNow }).id);
     for (const d of data.setup.defs) {
       const u = addDef(d.type, d.x, d.y, { name: d.name, az: d.az });
-      for (const k of ["mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2", "cp", "decoyDoc", "owner"]) if (d[k] !== void 0) u[k] = d[k];
+      for (const k of ["mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2", "cp", "decoyDoc", "owner", "emcon", "hp", "dmgRadar", "dmgLauncher"]) if (d[k] !== void 0) u[k] = d[k];
       defId.set(d.id, u.id);
     }
     for (const sv of data.setup.salvos) {
@@ -9233,6 +9484,7 @@ table.t.mc td.pc{white-space:nowrap}
   };
   hooks.onUnitLost = schedCov;
   hooks.defenderView = isDefenderView;
+  hooks.attackerView = isAttackerView;
   initView($("#map"));
   initInput();
   initControls();

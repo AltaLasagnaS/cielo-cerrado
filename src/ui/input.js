@@ -10,9 +10,9 @@ import { isOffmap, speedAt } from '../physics/kinematics.js';
 import { relativeRelief, slopeAt, terrainClass, RELIEF_RADIUS_KM } from '../physics/terrain-analysis.js';
 import { S } from '../sim/state.js';
 import { label, uLabel } from '../sim/log.js';
-import { contactOf } from '../sim/contacts.js';
+import { contactOf, attackerKnows } from '../sim/contacts.js';
 import { cv, V, toS, toW, fitView } from '../render/view.js';
-import { $, isDefenderView } from './dom.js';
+import { $, isDefenderView, isAttackerView } from './dom.js';
 import { schedCov } from './coverage.js';
 import { togglePlay } from './controls.js';
 import { setMode, updateModebar, finishRoute, toast, proposePlacement, confirmPlacement, cancelPlacement } from './modes.js';
@@ -33,7 +33,8 @@ export function hitTest(sx, sy) {
       const [a, b] = toS(c.x, c.y); if (Math.hypot(a - sx, b - sy) < 9) return { kind: 'thr', id: th.id };
     }
   }
-  for (const u of units) { const [a, b] = toS(u.x, u.y); if (Math.hypot(a - sx, b - sy) < 11) return { kind: 'def', id: u.id }; }
+  const av = S.started && !S.replay && isAttackerView();   // vista del atacante: no se tocan las defensas que no conoce
+  for (const u of units) { if (av && !attackerKnows(u, S.t)) continue; const [a, b] = toS(u.x, u.y); if (Math.hypot(a - sx, b - sy) < 11) return { kind: 'def', id: u.id }; }
   for (const j of jams) { const [a, b] = toS(j.x, j.y); if (Math.hypot(a - sx, b - sy) < 11) return { kind: 'jam', id: j.id }; }
   for (const g of objs) { const [a, b] = toS(g.x, g.y); if (Math.hypot(a - sx, b - sy) < 11) return { kind: 'obj', id: g.id }; }
   if (!S.started) for (const sv of S.setup.salvos) { for (let i = 1; i < sv.pts.length; i++) { const [a, b] = toS(...sv.pts[i - 1]), [c2, d2] = toS(...sv.pts[i]); if (segDist(sx, sy, a, b, c2, d2) < 6) return { kind: 'salvo', id: sv.id }; } }
@@ -79,6 +80,20 @@ function click(g) {
   if (g.hit) { S.sel = g.hit; renderSel(); }
 }
 
+/**
+ * Termina el rectángulo de selección (S.box, en km): suma al grupo las defensas que quedaron adentro.
+ * Solo las del armado (antes de iniciar), así que no consulta nada oculto.
+ */
+export function boxSelect() {
+  const b = S.box; S.box = null; if (!b) return;
+  const [x0, x1] = [Math.min(b.a[0], b.b[0]), Math.max(b.a[0], b.b[0])], [y0, y1] = [Math.min(b.a[1], b.b[1]), Math.max(b.a[1], b.b[1])];
+  const ins = S.setup.defs.filter(u => u.x >= x0 && u.x <= x1 && u.y >= y0 && u.y <= y1).map(u => u.id);
+  if (!S.multi.length && S.sel?.kind === 'def') S.multi = [S.sel.id];
+  S.multi = [...new Set([...S.multi, ...ins])];
+  S.sel = S.multi.length === 1 ? { kind: 'def', id: S.multi[0] } : null; if (S.multi.length === 1) S.multi = [];
+  renderSel();
+}
+
 export function initInput() {
 cv.addEventListener('pointerdown', e => {
   cv.setPointerCapture(e.pointerId); pointers.set(e.pointerId, evPos(e));
@@ -96,10 +111,14 @@ cv.addEventListener('pointermove', e => {
       if (Math.hypot(sx - g.sx, sy - g.sy) < DRAG_PX) return;
       // arrastrar algo ya ubicado solo en modo selección y antes de iniciar; si no, se mueve el mapa
       const movable = S.mode === 'select' && !S.started && g.hit && SETUP_LIST[g.hit.kind];
-      g.kind = movable ? 'move' : 'pan';
+      // Shift + arrastrar sobre el mapa vacío (antes de iniciar): rectángulo de selección múltiple (F03)
+      const box = S.mode === 'select' && !S.started && g.shift && !g.hit;
+      g.kind = movable ? 'move' : box ? 'box' : 'pan';
+      if (box) S.box = { a: toW(g.sx, g.sy), b: toW(sx, sy) };
       if (movable) { S.sel = g.hit; renderSel(); }
     }
     if (g.kind === 'pan') { V.cx = g.cx - (sx - g.sx) / V.s; V.cy = g.cy - (sy - g.sy) / V.s; return; }
+    if (g.kind === 'box') { if (S.box) S.box.b = toW(sx, sy); return; }
     const [wx, wy] = toW(sx, sy), o = SETUP_LIST[g.hit.kind]().find(v => v.id === g.hit.id);
     if (o) {
       o.x = +wx.toFixed(2); o.y = +wy.toFixed(2);
@@ -116,6 +135,7 @@ const endPtr = e => {
   if (!g || e.type === 'pointercancel') return;
   if (!g.kind) click(g);
   else if (g.kind === 'move') { schedCov(); renderSel(); }
+  else if (g.kind === 'box') boxSelect();
 };
 cv.addEventListener('pointerup', endPtr); cv.addEventListener('pointercancel', endPtr);
 cv.addEventListener('pointerleave', () => { $('#tip').hidden = true; });
@@ -149,13 +169,13 @@ function showTip(sx, sy) {
       txt = 'Pista #' + th.id + (c.lost ? ' · perdida hace ' + Math.round(c.age) + ' s' : '') + '\nAlt: ' + Math.round(c.z) + ' m (' + Math.round(c.z - surf(c.x, c.y)) + ' AGL)\nVel: ' + kmh(c.v) + ' · ' + mach(c.v) + ' (estimada)\nDetectada por: ' + by;
     } else {
       const p = th.p, v = speedAt(th, S.t);
-      txt = label(th) + '\nAlt: ' + Math.round(p.z) + ' m (' + Math.round(p.z - surf(p.x, p.y)) + ' AGL)\nVel: ' + kmh(v) + ' · ' + mach(v) + '\nA ' + p.rem.toFixed(1) + ' km del blanco\nDetectada por: ' + by;
+      txt = label(th) + '\nAlt: ' + Math.round(p.z) + ' m (' + Math.round(p.z - surf(p.x, p.y)) + ' AGL)\nVel: ' + kmh(v) + ' · ' + mach(v) + '\nA ' + p.rem.toFixed(1) + ' km del blanco' + (S.started && !S.replay && isAttackerView() ? '' : '\nDetectada por: ' + by);   // el atacante no sabe qué sensores lo ven
     }
   } else if (h && h.kind === 'def') {
     const u = (S.started ? S.units : S.setup.defs).find(u => u.id === h.id); txt = (u.name || D(u).short) + '\n' + D(u).name;
   } else if (h && h.kind === 'obj') {
     const g = (S.started ? S.objs : S.setup.objs).find(v => v.id === h.id), hp = g.hp ?? g.maxHp;
-    txt = 'OBJETIVO: ' + g.name + '\n' + TARGET_TYPES[g.type].name + '\nHP ' + hp + ' / ' + g.maxHp + ' · ' + TARGET_STATUS[g.status || 'operational'];
+    txt = 'OBJETIVO: ' + g.name + '\n' + TARGET_TYPES[g.type].name + (S.started && !S.replay && isAttackerView() ? '\nDaño: sin evaluar (vista del atacante)' : '\nHP ' + hp + ' / ' + g.maxHp + ' · ' + TARGET_STATUS[g.status || 'operational']);
   } else if (MAP && wx >= 0 && wy >= 0 && wx <= MAP.wKm && wy <= MAP.hKm) {
     const e = elev(wx, wy), ll = latlon(wx, wy);
     txt = wx.toFixed(1) + ' / ' + wy.toFixed(1) + ' km · ' + ll[0].toFixed(3) + '°, ' + ll[1].toFixed(3) + '°\n';
