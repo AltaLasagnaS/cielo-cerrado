@@ -914,19 +914,20 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
-| Tiempo de recarga de la batería (s) | 1.800 | **2.400** | 3.600 | baja | [1] | foro de CMO: ≈40 min; 30–60 min por lanzador con grúa |
-| Radar: detección contra 1 m² (km) | 90 | **100** | 120 | baja | [2] | est: 170 km es el alcance instrumentado; avión grande 150–170 km, escalado con σ^¼ |
-| Radar: sector de búsqueda (°) | 90 | **90** | 120 | media | [2] | búsqueda 90°, seguimiento 120° |
+| Radar: blancos que puede seguir a la vez | 50 | **100** | 150 | media | [1] | hasta 100 blancos en seguimiento mientras guía 9 misiles |
+| Tiempo de recarga de la batería (s) | 1.800 | **2.400** | 3.600 | baja | [2] | foro de CMO: ≈40 min; 30–60 min por lanzador con grúa |
+| Radar: detección contra 1 m² (km) | 90 | **100** | 120 | baja | [3] | est: 170 km es el alcance instrumentado; avión grande 150–170 km, escalado con σ^¼ |
+| Radar: sector de búsqueda (°) | 90 | **90** | 120 | media | [3] | búsqueda 90°, seguimiento 120° |
 | Radar: refresco (s) | 1 | **2** | 3 | baja | — | est: barrido electrónico en sector fijo |
 | Radar: discriminación de señuelos (×, divide el τ de su banda) (×) | 1 | **4** | 8 | baja | — | est: el MPQ-65 es un arreglo de fase multifunción con modos de discriminación de blancos balísticos; no hay cifra pública. ×4 compensa la dificultad de los señuelos de balístico (DECOY_HARD) y los clasifica al ritmo de un señuelo común |
-| Alcance vs aeronaves/crucero (km) | 60 | **100** | 120 | baja | [3] | — |
-| Alcance vs balísticos (km) | 30 | **40** | 60 | baja | [3] | — |
-| Techo (m) | 35.000 | **36.000** | 40.000 | media | [3] | — |
+| Alcance vs aeronaves/crucero (km) | 60 | **100** | 120 | baja | [1] | — |
+| Alcance vs balísticos (km) | 30 | **40** | 60 | baja | [1] | — |
+| Techo (m) | 35.000 | **36.000** | 40.000 | media | [1] | — |
 | Velocidad media del interceptor hasta el alcance máximo (m/s) | 1.100 | **1.300** | 1.500 | baja | — | est: ≈0,75 × velocidad máxima |
 | Velocidad máxima del interceptor (m/s) | 1.400 | **1.700** | 2.000 | baja | — | est: Mach 4–5 según prensa; sin dato oficial del PAC-3 MSE |
 | Duración del motor del interceptor (s) | 6 | **10** | 15 | baja | — | est: motor de doble pulso; sin dato público de duración |
 | Tiempo de reacción (s) | 8 | **9** | 15 | baja | [4] | — |
-| Canales simultáneos | 6 | **8** | 9 | media | [2] | 9 misiles guiados a la vez |
+| Canales simultáneos | 6 | **8** | 9 | media | [3] | 9 misiles guiados a la vez |
 | Munición de la unidad | 12 | **16** | 48 | media | [5] | M903: 12 MSE; 6–8 lanzadores por batería |
 | Costo por disparo | US$4 M | **US$4.2 M** | US$5.3 M | alta | [6] [7] | FY2025: 4,19 M; plurianual 2025 ≈4,97 M con costos asociados |
 | Pk por disparo vs drones | 0,8 | **0,9** | 0,95 | baja | — | est |
@@ -935,9 +936,9 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 | Pk por disparo vs balísticos | 0,4 | **0,7** | 0,85 | media | [9] [10] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
 | Pk por disparo vs hipersónicos | 0,3 | **0,5** | 0,7 | baja | [11] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
 
-1. [Foro de Matrix Games: recargar una batería Patriot en CMO (≈40 min, ejemplo de juego)](http://www.matrixgames.com/forums/viewtopic.php?t=294701)
-2. [Radartutorial: AN/MPQ-53](https://www.radartutorial.eu/19.kartei/06.missile/karte003.en.html)
-3. [Wikipedia: MIM-104 Patriot](https://en.wikipedia.org/wiki/MIM-104_Patriot)
+1. [Wikipedia: MIM-104 Patriot](https://en.wikipedia.org/wiki/MIM-104_Patriot)
+2. [Foro de Matrix Games: recargar una batería Patriot en CMO (≈40 min, ejemplo de juego)](http://www.matrixgames.com/forums/viewtopic.php?t=294701)
+3. [Radartutorial: AN/MPQ-53](https://www.radartutorial.eu/19.kartei/06.missile/karte003.en.html)
 4. [Army Recognition: SAMP/T vs Patriot en Ucrania](https://www.armyrecognition.com/focus-analysis-conflicts/army/defence-security-industry-technology/french-samp-t-vs-u-s-patriot-air-defense-systems-technical-and-operational-analysis-in-ukraine)
 5. [CSIS Missile Defense: Patriot](https://missilethreat.csis.org/system/patriot/)
 6. [US Army FY2025 Missile Procurement (P-40, costo unitario PAC-3 MSE)](https://www.asafm.army.mil/Portals/72/Documents/BudgetMaterial/2025/Base%20Budget/Procurement/Missile-Procurement-Army.pdf)
@@ -973,14 +974,15 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
-| Radar: detección contra 1 m² (km) | 90 | **100** | 120 | baja | [1] | mismo radar que el MSE |
+| Radar: blancos que puede seguir a la vez | 50 | **100** | 150 | media | [1] | mismo radar AN/MPQ-65 |
+| Radar: detección contra 1 m² (km) | 90 | **100** | 120 | baja | [2] | mismo radar que el MSE |
 | Radar: discriminación de señuelos (×, divide el τ de su banda) (×) | 1 | **4** | 8 | baja | — | est: mismo radar que el MSE |
-| Radar: sector de búsqueda (°) | 90 | **90** | 120 | media | [1] | — |
-| Alcance vs aeronaves/crucero (km) | 120 | **160** | 160 | baja | [2] | — |
+| Radar: sector de búsqueda (°) | 90 | **90** | 120 | media | [2] | — |
+| Alcance vs aeronaves/crucero (km) | 120 | **160** | 160 | baja | [1] | — |
 | Alcance vs balísticos (km) | 15 | **20** | 30 | baja | — | — |
-| Techo (m) | 24.000 | **24.000** | 32.000 | baja | [2] | — |
+| Techo (m) | 24.000 | **24.000** | 32.000 | baja | [1] | — |
 | Velocidad media del interceptor hasta el alcance máximo (m/s) | 800 | **900** | 1.100 | baja | — | est: Mach 3,5 máx. |
-| Velocidad máxima del interceptor (m/s) | 1.200 | **1.500** | 1.600 | baja | [2] | Wikipedia: PAC-2 GEM+ 5.630 km/h ≈ 1.560 m/s; otras fuentes dan Mach 3,5 |
+| Velocidad máxima del interceptor (m/s) | 1.200 | **1.500** | 1.600 | baja | [1] | Wikipedia: PAC-2 GEM+ 5.630 km/h ≈ 1.560 m/s; otras fuentes dan Mach 3,5 |
 | Duración del motor del interceptor (s) | 9 | **12** | 15 | baja | — | est: motor de una etapa |
 | Costo por disparo | US$2 M | **US$3 M** | US$4 M | baja | [3] | precio oficial no público |
 | Pk por disparo vs crucero | 0,7 | **0,85** | 0,9 | baja | — | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
@@ -988,8 +990,8 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 | Pk por disparo vs balísticos | 0,2 | **0,4** | 0,6 | baja | — | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
 | Pk por disparo vs hipersónicos | 0,1 | **0,25** | 0,4 | baja | — | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
 
-1. [Radartutorial: AN/MPQ-53](https://www.radartutorial.eu/19.kartei/06.missile/karte003.en.html)
-2. [Wikipedia: MIM-104 Patriot](https://en.wikipedia.org/wiki/MIM-104_Patriot)
+1. [Wikipedia: MIM-104 Patriot](https://en.wikipedia.org/wiki/MIM-104_Patriot)
+2. [Radartutorial: AN/MPQ-53](https://www.radartutorial.eu/19.kartei/06.missile/karte003.en.html)
 3. [Army Recognition: pedido de GEM-T 2026](https://www.armyrecognition.com/news/army-news/2026/us-army-pac-2-gem-t-patriot-interceptor-order)
 
 #### Fuentes generales
@@ -1016,25 +1018,27 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
-| Radar: detección contra 1 m² (km) | 70 | **80** | 100 | media | [1] [2] | Arabel: ~100 km, banda X, 60 rpm |
-| Alcance vs aeronaves/crucero (km) | 50 | **100** | 120 | media | [1] [2] | 100 km por encima de 3 km de altura, 50 km por debajo |
-| Alcance vs balísticos (km) | 20 | **25** | 35 | baja | [1] | prueba: intercepción a 26 km de distancia |
-| Techo (m) | 20.000 | **20.000** | 20.000 | media | [1] | — |
+| Radar: blancos que puede seguir a la vez | 100 | **100** | 130 | media | [1] | Arabel: hasta 100 blancos (otras fichas dicen más de 130) |
+| Radar: detección contra 1 m² (km) | 70 | **80** | 100 | media | [2] [3] | Arabel: ~100 km, banda X, 60 rpm |
+| Alcance vs aeronaves/crucero (km) | 50 | **100** | 120 | media | [2] [3] | 100 km por encima de 3 km de altura, 50 km por debajo |
+| Alcance vs balísticos (km) | 20 | **25** | 35 | baja | [2] | prueba: intercepción a 26 km de distancia |
+| Techo (m) | 20.000 | **20.000** | 20.000 | media | [2] | — |
 | Velocidad media del interceptor hasta el alcance máximo (m/s) | 950 | **1.050** | 1.200 | baja | — | est: 1,4 km/s máx. |
-| Velocidad máxima del interceptor (m/s) | 1.200 | **1.400** | 1.500 | baja | [1] | 1,4 km/s máx. |
+| Velocidad máxima del interceptor (m/s) | 1.200 | **1.400** | 1.500 | baja | [2] | 1,4 km/s máx. |
 | Duración del motor del interceptor (s) | 4 | **6** | 10 | baja | — | est: booster de unos 3,5 s y sostenedor |
-| Tiempo de reacción (s) | 5 | **8** | 10 | baja | [3] | — |
-| Canales simultáneos | 10 | **10** | 10 | media | [2] | — |
-| Munición de la unidad | 24 | **32** | 48 | media | [1] | 4–6 lanzadores × 8 |
+| Tiempo de reacción (s) | 5 | **8** | 10 | baja | [4] | — |
+| Canales simultáneos | 10 | **10** | 10 | media | [3] | — |
+| Munición de la unidad | 24 | **32** | 48 | media | [2] | 4–6 lanzadores × 8 |
 | Costo por disparo | US$1 M | **US$2 M** | US$3 M | baja | — | sin precio oficial; €1–2,5 M según fuentes |
 | Pk por disparo vs crucero | 0,75 | **0,88** | 0,95 | media | — | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
-| Pk por disparo vs balísticos | 0,3 | **0,6** | 0,8 | baja | [3] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk"); problemas de software reportados en 2025 |
-| Pk por disparo vs hipersónicos | 0,2 | **0,4** | 0,6 | baja | [4] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
+| Pk por disparo vs balísticos | 0,3 | **0,6** | 0,8 | baja | [4] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk"); problemas de software reportados en 2025 |
+| Pk por disparo vs hipersónicos | 0,2 | **0,4** | 0,6 | baja | [5] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
 
-1. [Army Technology: Aster 30](https://www.army-technology.com/projects/aster-30/)
-2. [CSIS Missile Defense: SAMP/T](https://missilethreat.csis.org/defsys/samp-t/)
-3. [Army Recognition: SAMP/T vs Patriot en Ucrania](https://www.armyrecognition.com/focus-analysis-conflicts/army/defence-security-industry-technology/french-samp-t-vs-u-s-patriot-air-defense-systems-technical-and-operational-analysis-in-ukraine)
-4. [NV: SAMP/T y Patriot interceptan Zircon (mar-2024)](https://english.nv.ua/nation/ukraine-uses-european-samp-t-and-american-patriot-systems-to-intercept-russian-zircon-missiles-50404796.html)
+1. [Radartutorial: Arabel (SAMP/T)](https://www.radartutorial.eu/19.kartei/04.battle/karte035.en.html)
+2. [Army Technology: Aster 30](https://www.army-technology.com/projects/aster-30/)
+3. [CSIS Missile Defense: SAMP/T](https://missilethreat.csis.org/defsys/samp-t/)
+4. [Army Recognition: SAMP/T vs Patriot en Ucrania](https://www.armyrecognition.com/focus-analysis-conflicts/army/defence-security-industry-technology/french-samp-t-vs-u-s-patriot-air-defense-systems-technical-and-operational-analysis-in-ukraine)
+5. [NV: SAMP/T y Patriot interceptan Zircon (mar-2024)](https://english.nv.ua/nation/ukraine-uses-european-samp-t-and-american-patriot-systems-to-intercept-russian-zircon-missiles-50404796.html)
 
 #### Fuentes generales
 
@@ -1061,26 +1065,28 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Radar: blancos que puede seguir a la vez | 500 | **1.500** | 1.500 | media | [1] | TRML-4D: unos 1.500 blancos hasta 250 km (Hensoldt) |
 | Tiempo de recarga de la batería (s) | 600 | **1.200** | 2.400 | baja | — | est: sin dato público firme |
-| Radar: detección contra 1 m² (km) | 80 | **100** | 150 | media | [1] | cazas a más de 120 km, misiles supersónicos a más de 60 km |
-| Alcance vs aeronaves/crucero (km) | 40 | **40** | 40 | alta | [2] | — |
+| Radar: detección contra 1 m² (km) | 80 | **100** | 150 | media | [2] | cazas a más de 120 km, misiles supersónicos a más de 60 km |
+| Alcance vs aeronaves/crucero (km) | 40 | **40** | 40 | alta | [3] | — |
 | Alcance vs balísticos (km) | 0 | **0** | 10 | baja | — | sin datos públicos de capacidad antibalística (se quitó del modelo) |
-| Techo (m) | 20.000 | **20.000** | 20.000 | alta | [2] | — |
+| Techo (m) | 20.000 | **20.000** | 20.000 | alta | [3] | — |
 | Altura mínima de enfrentamiento (m) | 5 | **10** | 30 | baja | — | est: no publicado; buscador IR de imagen, sin problema de clutter de mar |
 | Velocidad media del interceptor hasta el alcance máximo (m/s) | 650 | **750** | 850 | baja | — | est: ≈Mach 3 máx. |
 | Velocidad máxima del interceptor (m/s) | 900 | **1.000** | 1.100 | baja | — | est: ≈Mach 3 (la versión corta SLS: Mach 2, 680 m/s) |
 | Duración del motor del interceptor (s) | 4 | **6** | 10 | baja | — | est |
 | Blanco más rápido enfrentable (m/s) | 1.000 | **1.200** | 1.500 | baja | — | est: no hay datos contra blancos de Mach 3+ |
-| Canales simultáneos | 8 | **8** | 12 | baja | [3] | "100% en oleadas de más de 12 blancos" |
-| Costo por disparo | US$430k | **US$500k** | US$610k | media | [2] | €400–565k |
-| Pk por disparo vs drones | 0,8 | **0,9** | 0,97 | media | [3] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
-| Pk por disparo vs crucero | 0,8 | **0,88** | 0,97 | media | [3] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
-| Pk por disparo vs supersónicos | 0,1 | **0,2** | 0,35 | baja | [4] | est: sin datos contra Mach 2–4; Oniks 5,7% a nivel nacional |
+| Canales simultáneos | 8 | **8** | 12 | baja | [4] | "100% en oleadas de más de 12 blancos" |
+| Costo por disparo | US$430k | **US$500k** | US$610k | media | [3] | €400–565k |
+| Pk por disparo vs drones | 0,8 | **0,9** | 0,97 | media | [4] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
+| Pk por disparo vs crucero | 0,8 | **0,88** | 0,97 | media | [4] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk") |
+| Pk por disparo vs supersónicos | 0,1 | **0,2** | 0,35 | baja | [5] | est: sin datos contra Mach 2–4; Oniks 5,7% a nivel nacional |
 
-1. [Hensoldt: TRML-4D](https://www.hensoldt.net/products/trml-4d-air-surveillance-and-target-acquisition-radar)
-2. [Wikipedia: IRIS-T SL](https://en.wikipedia.org/wiki/IRIS-T_SL)
-3. [Defense Mirror: Diehl, IRIS-T SLM ~100% en Ucrania](https://defensemirror.com/news/34282/IRIS_T_SLM_air_defence_system_Achieved_100_Per_Cent_Hit_Rate_in_Ukraine__Diehl_Defence)
-4. [Defense Express: estadística de Syrskyi (24/02/2022–21/08/2024)](https://en.defence-ua.com/news/cinc_of_ukraines_forces_syrskii_releases_statistics_on_missiles_and_drones_usage_by_russians_number_of_destroyed_threats-11588.html)
+1. [Wikipedia: TRML](https://en.wikipedia.org/wiki/TRML)
+2. [Hensoldt: TRML-4D](https://www.hensoldt.net/products/trml-4d-air-surveillance-and-target-acquisition-radar)
+3. [Wikipedia: IRIS-T SL](https://en.wikipedia.org/wiki/IRIS-T_SL)
+4. [Defense Mirror: Diehl, IRIS-T SLM ~100% en Ucrania](https://defensemirror.com/news/34282/IRIS_T_SLM_air_defence_system_Achieved_100_Per_Cent_Hit_Rate_in_Ukraine__Diehl_Defence)
+5. [Defense Express: estadística de Syrskyi (24/02/2022–21/08/2024)](https://en.defence-ua.com/news/cinc_of_ukraines_forces_syrskii_releases_statistics_on_missiles_and_drones_usage_by_russians_number_of_destroyed_threats-11588.html)
 
 #### Fuentes generales
 
@@ -1107,6 +1113,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Radar: blancos que puede seguir a la vez | 50 | **60** | 100 | media | [1] | Sentinel: más de 50 blancos simultáneos |
 | Tiempo de recarga de la batería (s) | 900 | **1.800** | 3.600 | baja | — | est: lanzador de 6 AMRAAM recargado con grúa; sin dato público firme |
 | Radar: detección contra 1 m² (km) | 40 | **60** | 90 | media | [1] | 40 km el básico, 120 km el F1/A3 |
 | Alcance vs aeronaves/crucero (km) | 25 | **35** | 40 | media | [2] | — |
@@ -1153,6 +1160,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Radar: blancos que puede seguir a la vez | 12 | **24** | 50 | baja | [1] | 30N6 Flap Lid A: hasta 24 blancos en seguimiento; la batería suma el radar de búsqueda de la red |
 | Radar: detección contra 1 m² (km) | 80 | **100** | 130 | baja | [1] | est |
 | Radar: sector de búsqueda (°) | 90 | **90** | 90 | alta | [1] | — |
 | Alcance vs aeronaves/crucero (km) | 47 | **75** | 75 | alta | [2] | 5V55K 47 km / 5V55R 75 km |
@@ -1195,19 +1203,21 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
-| Radar: detección contra 1 m² (km) | 35 | **50** | 85 | baja | [1] | 9S18M1 85 km a altura; 9S35 est 40–50 km |
-| Alcance vs aeronaves/crucero (km) | 33 | **35** | 42 | media | [2] | — |
+| Radar: blancos que puede seguir a la vez | 50 | **50** | 100 | media | [1] | 9S18M: hasta 50 blancos y designación a 6 |
+| Radar: detección contra 1 m² (km) | 35 | **50** | 85 | baja | [2] | 9S18M1 85 km a altura; 9S35 est 40–50 km |
+| Alcance vs aeronaves/crucero (km) | 33 | **35** | 42 | media | [3] | — |
 | Velocidad media del interceptor hasta el alcance máximo (m/s) | 550 | **650** | 750 | baja | — | est: ≈850 m/s máx. |
-| Velocidad máxima del interceptor (m/s) | 800 | **850** | 1.000 | media | [1] | ≈850 m/s máx. |
-| Duración del motor del interceptor (s) | 12 | **15** | 18 | media | [1] | 9M38: motor de dos regímenes con unos 15 s de combustión total |
-| Blanco más rápido enfrentable (m/s) | 800 | **830** | 1.000 | media | [1] | — |
-| Tiempo de reacción (s) | 15 | **22** | 25 | media | [2] | — |
+| Velocidad máxima del interceptor (m/s) | 800 | **850** | 1.000 | media | [2] | ≈850 m/s máx. |
+| Duración del motor del interceptor (s) | 12 | **15** | 18 | media | [2] | 9M38: motor de dos regímenes con unos 15 s de combustión total |
+| Blanco más rápido enfrentable (m/s) | 800 | **830** | 1.000 | media | [2] | — |
+| Tiempo de reacción (s) | 15 | **22** | 25 | media | [3] | — |
 | Costo por disparo | US$300k | **US$500k** | US$1 M | baja | — | est |
-| Pk por disparo vs crucero | 0,4 | **0,5** | 0,75 | media | [3] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk"). Bajada de 0,6 a 0,5 al recalibrar con npm run calibrar: la energía del interceptor (#26) ya premia los tiros cortos contra crucero rasante |
+| Pk por disparo vs crucero | 0,4 | **0,5** | 0,75 | media | [4] | calibrada contra tasas reportadas en Ucrania (ver "Calibración de Pk"). Bajada de 0,6 a 0,5 al recalibrar con npm run calibrar: la energía del interceptor (#26) ya premia los tiros cortos contra crucero rasante |
 
-1. [Wikipedia: Buk missile system](https://en.wikipedia.org/wiki/Buk_missile_system)
-2. [Missilery.info: Buk-M1](https://en.missilery.info/missile/bukm1)
-3. [Defense Express: estadística de Syrskyi (24/02/2022–21/08/2024)](https://en.defence-ua.com/news/cinc_of_ukraines_forces_syrskii_releases_statistics_on_missiles_and_drones_usage_by_russians_number_of_destroyed_threats-11588.html)
+1. [Radartutorial: 9S18M (radar de búsqueda del Buk)](https://www.radartutorial.eu/19.kartei/02.surv/karte093.en.html)
+2. [Wikipedia: Buk missile system](https://en.wikipedia.org/wiki/Buk_missile_system)
+3. [Missilery.info: Buk-M1](https://en.missilery.info/missile/bukm1)
+4. [Defense Express: estadística de Syrskyi (24/02/2022–21/08/2024)](https://en.defence-ua.com/news/cinc_of_ukraines_forces_syrskii_releases_statistics_on_missiles_and_drones_usage_by_russians_number_of_destroyed_threats-11588.html)
 
 #### Fuentes generales
 
@@ -1233,6 +1243,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Radar: blancos que puede seguir a la vez | 5 | **10** | 20 | baja | — | est: radar de búsqueda con seguimiento mientras explora; sin cifra pública |
 | Alcance vs aeronaves/crucero (km) | 3,5 | **4** | 5,5 | media | [1] | — |
 | Techo (m) | 2.500 | **3.000** | 3.500 | baja | — | est |
 | Munición de la unidad | 16 | **20** | 32 | media | [1] | 640 proyectiles / 20–40 por ráfaga |
@@ -1356,6 +1367,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Radar: blancos que puede seguir a la vez | 10 | **25** | 50 | baja | — | est: radares de búsqueda PAR y CWAR con seguimiento automático; sin cifra pública |
 | Radar: detección contra 1 m² (km) | 50 | **70** | 100 | baja | [1] | CMO: HPIR 45 nmi (83 km) y PAR 54 nmi (100 km) de alcance instrumentado; est contra 1 m² |
 | Alcance vs aeronaves/crucero (km) | 35 | **40** | 50 | media | [1] [2] | CMO 22 nmi ≈ 40 km; OSINT 35–50 km |
 | Velocidad media del interceptor hasta el alcance máximo (m/s) | 600 | **700** | 850 | baja | [2] | Mach 2,5 máx.; est media |
@@ -1393,6 +1405,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Radar: blancos que puede seguir a la vez | 5 | **10** | 20 | baja | — | est: la imagen sale del P-18/P-19 con ploteo; el SNR-125 sigue un blanco a la vez |
 | Radar: detección contra 1 m² (km) | 30 | **40** | 60 | baja | [1] | CMO: SNR-125 32 nmi (59 km) instrumentado; est contra 1 m² |
 | Alcance vs aeronaves/crucero (km) | 18 | **25** | 30 | media | [2] [1] | Newa-SC con 5V27: 25 km; CMO 10–16 nmi |
 | Velocidad media del interceptor hasta el alcance máximo (m/s) | 500 | **600** | 900 | baja | — | est |
@@ -1431,6 +1444,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Radar: blancos que puede seguir a la vez | 5 | **10** | 20 | baja | — | est: el 5N62 ilumina un blanco; la imagen viene de la red |
 | Radar: detección contra 1 m² (km) | 150 | **250** | 400 | baja | [1] | CMO: 5N62 220 nmi (≈400 km) contra blancos grandes; est contra 1 m² |
 | Alcance vs aeronaves/crucero (km) | 150 | **250** | 300 | media | [1] [2] | 5V28 ≈250 km, 5V28M ≈300 km; derribo a ≈308 km reclamado |
 | Altura mínima de enfrentamiento (m) | 200 | **300** | 300 | media | [1] | CMO 198 m; fuentes clásicas 300 m |
@@ -1467,17 +1481,19 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
-| Radar: detección contra 1 m² (km) | 25 | **30** | 36 | media | [1] | 36 km vs 2 m² |
-| Alcance vs aeronaves/crucero (km) | 18 | **18** | 20 | media | [2] | — |
-| Velocidad media del interceptor hasta el alcance máximo (m/s) | 780 | **900** | 1.000 | media | [2] [1] | — |
-| Velocidad máxima del interceptor (m/s) | 1.100 | **1.300** | 1.300 | media | [1] | el booster lo lleva a 1.300 m/s |
-| Duración del motor del interceptor (s) | 1,5 | **2** | 2,5 | media | [1] | booster de 1,5–2 s; la segunda etapa es un dardo sin motor |
-| Canales simultáneos | 2 | **3** | 4 | baja | [1] | — |
+| Radar: blancos que puede seguir a la vez | 10 | **20** | 40 | baja | [1] | est: el Pantsir-SM declara 40 con radar nuevo; el S1, menos |
+| Radar: detección contra 1 m² (km) | 25 | **30** | 36 | media | [2] | 36 km vs 2 m² |
+| Alcance vs aeronaves/crucero (km) | 18 | **18** | 20 | media | [3] | — |
+| Velocidad media del interceptor hasta el alcance máximo (m/s) | 780 | **900** | 1.000 | media | [3] [2] | — |
+| Velocidad máxima del interceptor (m/s) | 1.100 | **1.300** | 1.300 | media | [2] | el booster lo lleva a 1.300 m/s |
+| Duración del motor del interceptor (s) | 1,5 | **2** | 2,5 | media | [2] | booster de 1,5–2 s; la segunda etapa es un dardo sin motor |
+| Canales simultáneos | 2 | **3** | 4 | baja | [2] | — |
 | Costo por disparo | US$100k | **US$150k** | US$200k | baja | — | est |
 | Pk por disparo vs crucero | 0,4 | **0,6** | 0,75 | baja | — | est |
 
-1. [Ausairpower: Pantsir](https://www.ausairpower.net/APA-96K6-Pantsir-2K22-Tunguska.html)
-2. [GlobalSecurity: misil 57E6](https://www.globalsecurity.org/military/world/russia/57e6.htm)
+1. [Wikipedia: Pantsir missile system](https://en.wikipedia.org/wiki/Pantsir_missile_system)
+2. [Ausairpower: Pantsir](https://www.ausairpower.net/APA-96K6-Pantsir-2K22-Tunguska.html)
+3. [GlobalSecurity: misil 57E6](https://www.globalsecurity.org/military/world/russia/57e6.htm)
 
 #### Fuentes generales
 
@@ -1502,16 +1518,17 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
-| Radar: detección contra 1 m² (km) | 20 | **25** | 32 | media | [1] [2] | >30 km contra cazas |
-| Alcance vs aeronaves/crucero (km) | 15 | **15** | 16 | media | [3] [1] | — |
+| Radar: blancos que puede seguir a la vez | 10 | **48** | 48 | media | [1] | Tor-M2: procesa 48 blancos y sigue 10 para tiro |
+| Radar: detección contra 1 m² (km) | 20 | **25** | 32 | media | [2] [1] | >30 km contra cazas |
+| Alcance vs aeronaves/crucero (km) | 15 | **15** | 16 | media | [3] [2] | — |
 | Velocidad media del interceptor hasta el alcance máximo (m/s) | 600 | **700** | 850 | baja | — | est |
 | Velocidad máxima del interceptor (m/s) | 850 | **1.000** | 1.000 | baja | — | est: Mach 3 aprox. |
 | Duración del motor del interceptor (s) | 3 | **4** | 6 | baja | — | est |
 | Costo por disparo | US$200k | **US$300k** | US$500k | baja | — | est |
 | Pk por disparo vs crucero | 0,5 | **0,7** | 0,8 | baja | — | est |
 
-1. [Army Recognition: Tor-M2E](https://www.armyrecognition.com/military-products/army/air-defense-systems/air-defense-vehicles/tor-m2e)
-2. [Wikipedia: Tor missile system](https://en.wikipedia.org/wiki/Tor_missile_system)
+1. [Wikipedia: Tor missile system](https://en.wikipedia.org/wiki/Tor_missile_system)
+2. [Army Recognition: Tor-M2E](https://www.armyrecognition.com/military-products/army/air-defense-systems/air-defense-vehicles/tor-m2e)
 3. [GlobalSecurity: 9M338](https://www.globalsecurity.org/military/world/russia/sa-15-9m338.htm)
 
 #### Fuentes generales
@@ -1538,8 +1555,9 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
-| Radar: detección contra 1 m² (km) | 150 | **200** | 250 | baja | [1] | 92N6: 250–340 km contra blancos grandes |
-| Alcance vs aeronaves/crucero (km) | 240 | **250** | 250 | alta | [2] | — |
+| Radar: blancos que puede seguir a la vez | 100 | **100** | 300 | media | [1] | 92N6: hasta 100 blancos en seguimiento |
+| Radar: detección contra 1 m² (km) | 150 | **200** | 250 | baja | [2] | 92N6: 250–340 km contra blancos grandes |
+| Alcance vs aeronaves/crucero (km) | 240 | **250** | 250 | alta | [1] | — |
 | Alcance vs balísticos (km) | 40 | **60** | 60 | media | [3] | — |
 | Velocidad media del interceptor hasta el alcance máximo (m/s) | 1.300 | **1.500** | 1.700 | baja | — | est: 2.000 m/s máx. |
 | Velocidad máxima del interceptor (m/s) | 1.800 | **2.000** | 2.000 | baja | — | est: 2.000 m/s máx. |
@@ -1548,8 +1566,8 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 | Pk por disparo vs crucero | 0,5 | **0,7** | 0,85 | baja | — | est |
 | Pk por disparo vs balísticos | 0,3 | **0,5** | 0,7 | baja | [4] | las cifras rusas contra ATACMS (≈79%) no son verificables |
 
-1. [Army Recognition: radar 92N6E](https://www.armyrecognition.com/military-products/army/radars/air-defense-radars/96n6-92n6e-grave-stone-radar)
-2. [Wikipedia: S-400 missile system](https://en.wikipedia.org/wiki/S-400_missile_system)
+1. [Wikipedia: S-400 missile system](https://en.wikipedia.org/wiki/S-400_missile_system)
+2. [Army Recognition: radar 92N6E](https://www.armyrecognition.com/military-products/army/radars/air-defense-radars/96n6-92n6e-grave-stone-radar)
 3. [CSIS Missile Defense: S-400](https://missilethreat.csis.org/defsys/s-400-triumf/)
 4. [TASS (MoD ruso, cifras sin verificar): ATACMS "interceptados"](https://tass.com/politics/1874721)
 
@@ -1575,6 +1593,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Radar: blancos que puede seguir a la vez | 50 | **100** | 300 | baja | — | est: extractor automático de un radar de vigilancia moderno; sin cifra pública |
 | Radar: detección contra 1 m² (km) | 110 | **175** | 200 | media | [1] [2] | 200 km instrumentados |
 | Radar: refresco (s) | 5 | **5** | 10 | media | [1] | 6 o 12 rpm |
 
@@ -1602,6 +1621,7 @@ P-18MR contra 1 m²: 35 km a 100 m de altura, 120 km a 5 km
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Radar: blancos que puede seguir a la vez | 10 | **30** | 50 | baja | — | est: P-18MR modernizado con extractor digital; sin cifra pública |
 | Radar: detección contra 1 m² (km) | 120 | **160** | 200 | baja | [1] | — |
 | Radar: refresco (s) | 6 | **6** | 6 | alta | [2] | 10 rpm |
 
@@ -1656,6 +1676,7 @@ P-18MR contra 1 m²: 35 km a 100 m de altura, 120 km a 5 km
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Radar: blancos que puede seguir a la vez | 100 | **300** | 1.000 | baja | — | est: sin cifra pública confirmada |
 | Radar: detección contra 1 m² (km) | 200 | **240** | 280 | media | [1] [2] | cazas a 330–350 km |
 | Radar: sector de búsqueda (°) | 150 | **150** | 160 | media | [1] | — |
 | Altitud de patrulla (m) | 5.000 | **6.000** | 7.600 | media | [3] | — |
@@ -1686,6 +1707,7 @@ P-18MR contra 1 m²: 35 km a 100 m de altura, 120 km a 5 km
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Radar: blancos que puede seguir a la vez | 50 | **50** | 150 | baja | [1] | est: el A-50 original se cita con unos 50 blancos; el A-50U, más |
 | Radar: detección contra 1 m² (km) | 180 | **230** | 300 | baja | [1] | est |
 | Altitud de patrulla (m) | 8.000 | **9.000** | 10.000 | baja | — | est |
 

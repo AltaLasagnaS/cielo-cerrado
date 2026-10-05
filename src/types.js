@@ -66,6 +66,8 @@
  * @property {number} scan   Período de barrido (s)
  * @property {number} [integrationPulses] Pulsos integrados no coherentemente por decisión: entero 1–128, Swerling lento 1/3. Ausente = aproximación anterior (no dato real de un pulso); requiere fuente/UNC antes de asignarlo. No se deduce de scan.
  * @property {number} [altMax] Altura máxima detectable (m, acústico)
+ * @property {number} [tracks] Blancos que puede seguir a la vez (pistas reales + falsas); sin dato, sin límite
+ * @property {boolean} [slb] Blanqueo de lóbulos laterales: borra falsos blancos DRFM que entran por los costados
  * @property {number} [res]  Resolución en distancia (m); sin dato, la típica de CLUTTER (physics/clutter.js)
  * @property {number} [prf]  PRF (Hz) del MTI; sin dato, la de alcance sin ambigüedad ruK·R1
  * @property {number} [bwEl] Ancho de haz en elevación (°); sin dato, el de la banda (BANDS[band].bw)

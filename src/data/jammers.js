@@ -51,10 +51,17 @@ export const CRPA_SIZES = [0, 4, 8, 12, 16];
  *   puntual: concentrada en la frecuencia de UN radar elegido (j.target): ×gain contra ese radar,
  *            nada contra los demás. Un radar con agilidad de frecuencia (radar.agile) salta de
  *            frecuencia pulso a pulso y le deja solo ×agileGain: contra él hay que usar barrera.
+ *   DRFM:    no mete ruido: graba el pulso del radar y lo devuelve con demoras y corrimientos Doppler,
+ *            así que sus copias reciben toda la ganancia de procesamiento del radar (el eccm no las
+ *            achica) y el radar las ve como blancos. Crea falseTargets falsos blancos por barrido
+ *            (valor de juego) que ocupan la capacidad de seguimiento (radar.tracks). Entran por el
+ *            lóbulo principal cuando el haz pasa por el jammer, y por los laterales si son fuertes,
+ *            salvo que el radar tenga blanqueo de lóbulos laterales (radar.slb). Ver docs/FISICA.md §4.
  * gain 10 (10 dB) es un valor de juego: la ganancia real es el cociente entre el ancho de la banda
  * barrida y el del radar, y puede ser mucho mayor.
  */
 export const JAM_MODES = {
   barrage: { name: 'Barrera (toda la banda)', gain: 1 },
-  spot: { name: 'Puntual (contra un radar)', gain: 10, agileGain: 0.1 }
+  spot: { name: 'Puntual (contra un radar)', gain: 10, agileGain: 0.1 },
+  drfm: { name: 'Engaño DRFM (falsos blancos)', gain: 0, coherent: true, falseTargets: 20 }
 };

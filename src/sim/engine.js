@@ -9,7 +9,7 @@ import { money } from '../util/format.js';
 import { nextId } from '../util/ids.js';
 import { rnd } from '../util/rng.js';
 import { surf, los } from '../physics/terrain.js';
-import { antZ, aspectCos, belowCeiling, detR, inSector, jamJ, pdScan, PD_CUTOFF, confirms, scanHistory } from '../physics/radar.js';
+import { antZ, aspectCos, belowCeiling, detR, inSector, jamJ, pdScan, PD_CUTOFF, confirms, scanHistory, falseTracks } from '../physics/radar.js';
 import { buildThreat, posAt, speedAt } from '../physics/kinematics.js';
 import { gnssNavError, crpaOverwhelmed } from '../physics/navigation.js';
 import { RADAR_GUID, isTBM, trackOK, reactionStart, solve, calcPk, effectiveC2 } from '../physics/engagement.js';
@@ -90,6 +90,11 @@ export function step(dt) {
     if (!u.alive) continue; const d = D(u); if (!d.radar) continue;
     if (t < u.nextScan) continue; u.nextScan = t + d.radar.scan;
     const r = d.radar, uz = antZ(u), wx = WEATHER[S.weather];
+    // capacidad de seguimiento (radar.tracks): pistas abiertas + falsos blancos DRFM; una pista nueva no
+    // entra si está lleno (las abiertas se mantienen)
+    const keep = r.scan * 2 + 0.6, cap = r.tracks ?? Infinity, fake = cap < Infinity ? falseTracks(u, S.jamsLive) : 0;
+    let held = 0;
+    if (cap < Infinity) for (const th of S.threats) if (th.alive && t - (th.det[u.id] ?? -1e9) <= keep) held++;
     for (const th of S.threats) {
       if (!th.alive || !th.p) continue; const p = th.p;
       const dx = p.x - u.x, dy = p.y - u.y, dh = Math.hypot(dx, dy);
@@ -112,7 +117,12 @@ export function step(dt) {
           // los barridos en que el blanco no llegó a sortearse (fuera del sector o muy lejos) cuentan como "no visto"
           const mnT = th.mnT || (th.mnT = {});
           const bits = scanHistory(th.mn[u.id] ?? 0, mnT[u.id], t, r.scan, hit); th.mn[u.id] = bits; mnT[u.id] = t;
-          ok = hit && (t - (th.det[u.id] ?? -1e9) <= r.scan * 2 + 0.6 || confirms(bits));
+          const open = t - (th.det[u.id] ?? -1e9) <= keep;
+          ok = hit && (open || confirms(bits));
+          if (ok && !open && cap < Infinity) {
+            if (held + fake >= cap) { ok = false; if (!u.satLog) { u.satLog = true; log('w', uLabel(u) + ' no puede abrir más pistas: ' + held + ' reales' + (fake ? ' y ' + fake + ' falsas (engaño DRFM)' : '') + ' llenan su capacidad de ' + cap + '.'); } }
+            else held++;
+          }
         }
       }
       if (ok) {

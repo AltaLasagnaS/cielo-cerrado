@@ -13,7 +13,7 @@ export const PL = {
   rcs: ['RCS frontal (X/S)', 'm²'], rcsSide: ['RCS lateral (X/S)', 'm²'], rcsRear: ['RCS de cola (X/S)', 'm²'], rcsVHF: ['RCS en VHF', 'm²'], cep: ['CEP', 'm'], cost: ['Costo unitario', 'M US$'],
   decoys: ['Señuelos por misil', ''], manPk: ['Efecto de su maniobra terminal sobre la Pk', '×'],
   'info.rangeKm': ['Alcance', 'km'], 'info.warheadKg': ['Ojiva', 'kg'],
-  'radar.R1': ['Radar: detección contra 1 m²', 'km'], 'radar.sector': ['Radar: sector de búsqueda', '°'], 'radar.scan': ['Radar: refresco', 's'], 'radar.altMax': ['Altura máxima detectable', 'm'], 'radar.discrim': ['Radar: discriminación de señuelos (×, divide el τ de su banda)', '×'],
+  'radar.R1': ['Radar: detección contra 1 m²', 'km'], 'radar.sector': ['Radar: sector de búsqueda', '°'], 'radar.scan': ['Radar: refresco', 's'], 'radar.altMax': ['Altura máxima detectable', 'm'], 'radar.discrim': ['Radar: discriminación de señuelos (×, divide el τ de su banda)', '×'], 'radar.tracks': ['Radar: blancos que puede seguir a la vez', ''],
   'sam.maxR': ['Alcance vs aeronaves/crucero', 'km'], 'sam.maxRtbm': ['Alcance vs balísticos', 'km'], 'sam.altMax': ['Techo', 'm'], 'sam.altMin': ['Altura mínima de enfrentamiento', 'm'],
   'sam.vInt': ['Velocidad media del interceptor hasta el alcance máximo', 'm/s'], 'sam.vmax': ['Velocidad máxima del interceptor', 'm/s'], 'sam.tb': ['Duración del motor del interceptor', 's'], 'sam.vmaxT': ['Blanco más rápido enfrentable', 'm/s'], 'sam.react': ['Tiempo de reacción', 's'],
   'sam.ch': ['Canales simultáneos', ''], 'sam.mag': ['Munición de la unidad', ''], 'sam.reloadS': ['Tiempo de recarga de la batería', 's'], 'sam.reserve': ['Reserva para recargar', ''], 'sam.cost': ['Costo por disparo', 'M US$'],
@@ -250,6 +250,7 @@ export const UNC = {
   },
   def: {
     patriot: {
+      'radar.tracks': U(50, 100, 150, 'media', S_('wp:MIM-104_Patriot'), 'hasta 100 blancos en seguimiento mientras guía 9 misiles'),
       'sam.reloadS': U(1800, 2400, 3600, 'baja', S_('cmo_reload'), 'foro de CMO: ≈40 min; 30–60 min por lanzador con grúa'),
       'radar.R1': U(90, 100, 120, 'baja', S_('rt_mpq53'), 'est: 170 km es el alcance instrumentado; avión grande 150–170 km, escalado con σ^¼'),
       'radar.sector': U(90, 90, 120, 'media', S_('rt_mpq53'), 'búsqueda 90°, seguimiento 120°'),
@@ -272,6 +273,7 @@ export const UNC = {
       'sam.pk.hiper': U(0.3, 0.5, 0.7, 'baja', S_('nv_zircon'), PK_NOTE)
     },
     patriot2: {
+      'radar.tracks': U(50, 100, 150, 'media', S_('wp:MIM-104_Patriot'), 'mismo radar AN/MPQ-65'),
       'radar.R1': U(90, 100, 120, 'baja', S_('rt_mpq53'), 'mismo radar que el MSE'),
       'radar.discrim': U(1, 4, 8, 'baja', [], 'est: mismo radar que el MSE'),
       'radar.sector': U(90, 90, 120, 'media', S_('rt_mpq53'), ''),
@@ -288,6 +290,7 @@ export const UNC = {
       'sam.pk.hiper': U(0.1, 0.25, 0.4, 'baja', [], PK_NOTE)
     },
     sampt: {
+      'radar.tracks': U(100, 100, 130, 'media', S_('rt_arabel'), 'Arabel: hasta 100 blancos (otras fichas dicen más de 130)'),
       'radar.R1': U(70, 80, 100, 'media', S_('at_aster', 'csis_sampt'), 'Arabel: ~100 km, banda X, 60 rpm'),
       'sam.maxR': U(50, 100, 120, 'media', S_('at_aster', 'csis_sampt'), '100 km por encima de 3 km de altura, 50 km por debajo'),
       'sam.maxRtbm': U(20, 25, 35, 'baja', S_('at_aster'), 'prueba: intercepción a 26 km de distancia'),
@@ -304,6 +307,7 @@ export const UNC = {
       'sam.pk.hiper': U(0.2, 0.4, 0.6, 'baja', S_('nv_zircon'), PK_NOTE)
     },
     irist: {
+      'radar.tracks': U(500, 1500, 1500, 'media', S_('wp:TRML'), 'TRML-4D: unos 1.500 blancos hasta 250 km (Hensoldt)'),
       'sam.reloadS': U(600, 1200, 2400, 'baja', [], 'est: sin dato público firme'),
       'radar.R1': U(80, 100, 150, 'media', S_('hensoldt'), 'cazas a más de 120 km, misiles supersónicos a más de 60 km'),
       'sam.maxR': U(40, 40, 40, 'alta', S_('wp:IRIS-T_SL'), ''),
@@ -321,6 +325,7 @@ export const UNC = {
       'sam.pk.supersonico': U(0.1, 0.2, 0.35, 'baja', S_('syrskyi'), 'est: sin datos contra Mach 2–4; Oniks 5,7% a nivel nacional')
     },
     nasams: {
+      'radar.tracks': U(50, 60, 100, 'media', S_('wp:AN/MPQ-64_Sentinel'), 'Sentinel: más de 50 blancos simultáneos'),
       'sam.reloadS': U(900, 1800, 3600, 'baja', [], 'est: lanzador de 6 AMRAAM recargado con grúa; sin dato público firme'),
       'radar.R1': U(40, 60, 90, 'media', S_('wp:AN/MPQ-64_Sentinel'), '40 km el básico, 120 km el F1/A3'),
       'sam.maxR': U(25, 35, 40, 'media', S_('crs_nasams'), ''),
@@ -335,6 +340,7 @@ export const UNC = {
       'sam.pk.supersonico': U(0.25, 0.4, 0.6, 'baja', [], 'est')
     },
     s300: {
+      'radar.tracks': U(12, 24, 50, 'baja', S_('apa_fc'), '30N6 Flap Lid A: hasta 24 blancos en seguimiento; la batería suma el radar de búsqueda de la red'),
       'radar.R1': U(80, 100, 130, 'baja', S_('apa_fc'), 'est'),
       'radar.sector': U(90, 90, 90, 'alta', S_('apa_fc'), ''),
       'sam.maxR': U(47, 75, 75, 'alta', S_('wp:S-300_missile_system'), '5V55K 47 km / 5V55R 75 km'),
@@ -348,6 +354,7 @@ export const UNC = {
       'sam.pk.balistico': U(0.05, 0.15, 0.3, 'baja', S_('syrskyi'), PK_NOTE)
     },
     buk: {
+      'radar.tracks': U(50, 50, 100, 'media', S_('rt_9s18m'), '9S18M: hasta 50 blancos y designación a 6'),
       'radar.R1': U(35, 50, 85, 'baja', S_('wp:Buk_missile_system'), '9S18M1 85 km a altura; 9S35 est 40–50 km'),
       'sam.maxR': U(33, 35, 42, 'media', S_('missilery_buk'), ''),
       'sam.vInt': U(550, 650, 750, 'baja', [], 'est: ≈850 m/s máx.'),
@@ -359,6 +366,7 @@ export const UNC = {
       'sam.pk.crucero': U(0.4, 0.5, 0.75, 'media', S_('syrskyi'), PK_NOTE + '. Bajada de 0,6 a 0,5 al recalibrar con npm run calibrar: la energía del interceptor (#26) ya premia los tiros cortos contra crucero rasante')
     },
     gepard: {
+      'radar.tracks': U(5, 10, 20, 'baja', [], 'est: radar de búsqueda con seguimiento mientras explora; sin cifra pública'),
       'sam.maxR': U(3.5, 4, 5.5, 'media', S_('wp:Flakpanzer_Gepard'), ''),
       'sam.altMax': U(2500, 3000, 3500, 'baja', [], 'est'),
       'sam.mag': U(16, 20, 32, 'media', S_('wp:Flakpanzer_Gepard'), '640 proyectiles / 20–40 por ráfaga'),
@@ -386,6 +394,7 @@ export const UNC = {
       'sam.pk.dron': U(0.4, 0.6, 0.75, 'media', S_('dn_interceptors'), '>60% de éxito por salida')
     },
     hawk: {
+      'radar.tracks': U(10, 25, 50, 'baja', [], 'est: radares de búsqueda PAR y CWAR con seguimiento automático; sin cifra pública'),
       'radar.R1': U(50, 70, 100, 'baja', S_('cmo_db3k_sam'), 'CMO: HPIR 45 nmi (83 km) y PAR 54 nmi (100 km) de alcance instrumentado; est contra 1 m²'),
       'sam.maxR': U(35, 40, 50, 'media', S_('cmo_db3k_sam', 'db_hawk'), 'CMO 22 nmi ≈ 40 km; OSINT 35–50 km'),
       'sam.vInt': U(600, 700, 850, 'baja', S_('db_hawk'), 'Mach 2,5 máx.; est media'),
@@ -396,6 +405,7 @@ export const UNC = {
       'sam.pk.dron': U(0.4, 0.6, 0.8, 'baja', S_('db_hawk'), PK_NOTE)
     },
     s125: {
+      'radar.tracks': U(5, 10, 20, 'baja', [], 'est: la imagen sale del P-18/P-19 con ploteo; el SNR-125 sigue un blanco a la vez'),
       'radar.R1': U(30, 40, 60, 'baja', S_('cmo_db3k_sam'), 'CMO: SNR-125 32 nmi (59 km) instrumentado; est contra 1 m²'),
       'sam.maxR': U(18, 25, 30, 'media', S_('mil_newa', 'cmo_db3k_sam'), 'Newa-SC con 5V27: 25 km; CMO 10–16 nmi'),
       'sam.vInt': U(500, 600, 900, 'baja', [], 'est'),
@@ -406,6 +416,7 @@ export const UNC = {
       'sam.pk.crucero': U(0.35, 0.55, 0.7, 'baja', S_('kp_s125'), PK_NOTE)
     },
     s200: {
+      'radar.tracks': U(5, 10, 20, 'baja', [], 'est: el 5N62 ilumina un blanco; la imagen viene de la red'),
       'radar.R1': U(150, 250, 400, 'baja', S_('cmo_db3k_sam'), 'CMO: 5N62 220 nmi (≈400 km) contra blancos grandes; est contra 1 m²'),
       'sam.maxR': U(150, 250, 300, 'media', S_('cmo_db3k_sam', 'dua_s200'), '5V28 ≈250 km, 5V28M ≈300 km; derribo a ≈308 km reclamado'),
       'sam.altMin': U(200, 300, 300, 'media', S_('cmo_db3k_sam'), 'CMO 198 m; fuentes clásicas 300 m'),
@@ -415,6 +426,7 @@ export const UNC = {
       'sam.pk.crucero': U(0.1, 0.25, 0.4, 'baja', [], 'est: pensado contra aviones grandes. ' + PK_NOTE)
     },
     pantsir: {
+      'radar.tracks': U(10, 20, 40, 'baja', S_('wp:Pantsir_missile_system'), 'est: el Pantsir-SM declara 40 con radar nuevo; el S1, menos'),
       'radar.R1': U(25, 30, 36, 'media', S_('apa_pantsir'), '36 km vs 2 m²'),
       'sam.maxR': U(18, 18, 20, 'media', S_('gs_57e6'), ''),
       'sam.vInt': U(780, 900, 1000, 'media', S_('gs_57e6', 'apa_pantsir'), ''),
@@ -425,6 +437,7 @@ export const UNC = {
       'sam.pk.crucero': U(0.4, 0.6, 0.75, 'baja', [], 'est')
     },
     tor: {
+      'radar.tracks': U(10, 48, 48, 'media', S_('wp:Tor_missile_system'), 'Tor-M2: procesa 48 blancos y sigue 10 para tiro'),
       'radar.R1': U(20, 25, 32, 'media', S_('ar_tor', 'wp:Tor_missile_system'), '>30 km contra cazas'),
       'sam.maxR': U(15, 15, 16, 'media', S_('gs_9m338', 'ar_tor'), ''),
       'sam.vInt': U(600, 700, 850, 'baja', [], 'est'),
@@ -434,6 +447,7 @@ export const UNC = {
       'sam.pk.crucero': U(0.5, 0.7, 0.8, 'baja', [], 'est')
     },
     s400: {
+      'radar.tracks': U(100, 100, 300, 'media', S_('wp:S-400_missile_system'), '92N6: hasta 100 blancos en seguimiento'),
       'radar.R1': U(150, 200, 250, 'baja', S_('ar_92n6'), '92N6: 250–340 km contra blancos grandes'),
       'sam.maxR': U(240, 250, 250, 'alta', S_('wp:S-400_missile_system'), ''),
       'sam.maxRtbm': U(40, 60, 60, 'media', S_('csis_s400'), ''),
@@ -445,10 +459,12 @@ export const UNC = {
       'sam.pk.balistico': U(0.3, 0.5, 0.7, 'baja', S_('tass_atacms'), 'las cifras rusas contra ATACMS (≈79%) no son verificables')
     },
     ewr: {
+      'radar.tracks': U(50, 100, 300, 'baja', [], 'est: extractor automático de un radar de vigilancia moderno; sin cifra pública'),
       'radar.R1': U(110, 175, 200, 'media', S_('rt_36d6', 'uos_36d6'), '200 km instrumentados'),
       'radar.scan': U(5, 5, 10, 'media', S_('rt_36d6'), '6 o 12 rpm')
     },
     p18: {
+      'radar.tracks': U(10, 30, 50, 'baja', [], 'est: P-18MR modernizado con extractor digital; sin cifra pública'),
       'radar.R1': U(120, 160, 200, 'baja', S_('dx_p18'), ''),
       'radar.scan': U(6, 6, 6, 'alta', S_('wp:P-18_radar'), '10 rpm')
     },
@@ -457,11 +473,13 @@ export const UNC = {
       'radar.altMax': U(2000, 3000, 4000, 'baja', [], 'est')
     },
     aew_s340: {
+      'radar.tracks': U(100, 300, 1000, 'baja', [], 'est: sin cifra pública confirmada'),
       'radar.R1': U(200, 240, 280, 'media', S_('gs_erieye', 'wp:Erieye'), 'cazas a 330–350 km'),
       'radar.sector': U(150, 150, 160, 'media', S_('gs_erieye'), ''),
       alt: U(5000, 6000, 7600, 'media', S_('wp:Saab_340_AEW&C'), '')
     },
     aew_a50: {
+      'radar.tracks': U(50, 50, 150, 'baja', S_('wp:Beriev_A-50'), 'est: el A-50 original se cita con unos 50 blancos; el A-50U, más'),
       'radar.R1': U(180, 230, 300, 'baja', S_('wp:Beriev_A-50'), 'est'),
       alt: U(8000, 9000, 10000, 'baja', [], 'est')
     }

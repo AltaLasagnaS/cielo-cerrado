@@ -114,14 +114,15 @@ export function renderSel(live) {
 /** Defensas cuyo radar trabaja en alguna banda del jammer J (blancos posibles del ruido puntual). */
 const jamTargets = J => S.setup.defs.filter(u => D(u).radar && J.bands.includes(D(u).radar.band));
 
-/** Modo del jammer (barrera o puntual) y, si es puntual, el radar elegido. */
+/** Modo del jammer (barrera, puntual o engaño DRFM) y, si es puntual, el radar elegido. */
 function jamModeHtml(j, J) {
   const ed = !S.started, tg = S.setup.defs.find(u => u.id === j.target), r = tg && D(tg).radar;
   const opts = Object.entries(JAM_MODES).map(([k, M]) => `<option value="${k}" ${(j.mode || 'barrage') === k ? 'selected' : ''}>${esc(M.name)}</option>`).join('');
-  let h = `<div class="field" title="Barrera: reparte la potencia en toda la banda. Puntual: la concentra en la frecuencia de un radar (×${JAM_MODES.spot.gain}), pero un radar con agilidad de frecuencia salta y la deja en ×${JAM_MODES.spot.agileGain}."><label for="jMode">Ruido</label><select id="jMode" class="sel" ${ed ? '' : 'disabled'}>${opts}</select></div>`;
+  let h = `<div class="field" title="Barrera: reparte la potencia en toda la banda. Puntual: la concentra en la frecuencia de un radar (×${JAM_MODES.spot.gain}), pero un radar con agilidad de frecuencia salta y la deja en ×${JAM_MODES.spot.agileGain}. DRFM: no mete ruido; devuelve copias del pulso que el radar toma por blancos (${JAM_MODES.drfm.falseTargets} falsos blancos)."><label for="jMode">Modo</label><select id="jMode" class="sel" ${ed ? '' : 'disabled'}>${opts}</select></div>`;
   if (j.mode === 'spot') {
     h += `<div class="field"><label for="jTgt">Contra el radar de</label><select id="jTgt" class="sel" ${ed ? '' : 'disabled'}>${jamTargets(J).map(u => `<option value="${u.id}" ${u.id === j.target ? 'selected' : ''}>${esc(u.name)} (${D(u).radar.band})</option>`).join('') || '<option>No hay radares en sus bandas</option>'}</select></div>`;
     if (r) h += `<p class="hint">${r.agile ? `${esc(tg.name)} tiene agilidad de frecuencia: salta de frecuencia y el ruido puntual casi no le hace nada (×${JAM_MODES.spot.agileGain}). Contra él conviene la barrera.` : `${esc(tg.name)} no tiene agilidad de frecuencia: el ruido puntual le pega ×${JAM_MODES.spot.gain} más que la barrera. A los demás radares no los toca.`}</p>`;
   }
+  if (j.mode === 'drfm') h += `<p class="hint">Engaño DRFM: no tapa con ruido. Crea ${JAM_MODES.drfm.falseTargets} falsos blancos en cada radar que lo recibe fuerte; ocupan su capacidad de seguimiento y, si está llena, el radar no abre pistas nuevas. Entran por el haz principal y, si el jammer está cerca, por los costados, salvo en radares con blanqueo de lóbulos laterales.</p>`;
   return h;
 }

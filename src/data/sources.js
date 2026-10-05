@@ -148,6 +148,8 @@ export const SRC = {
   afm_f16ew: ['Air & Space Forces Magazine: la USAF reprogramó la GE de los F-16 ucranianos (ago-2024)', 'https://www.airandspaceforces.com/ukraine-f-16-electronic-warfare-us-air-force/'],
   twz_f16pods: ['TWZ: los F-16 ucranianos, en servicio con pods de autoprotección (ALQ-162(V)6)', 'https://www.twz.com/air/f-16-officially-in-ukrainian-service-self-protection-pods-included'],
   rusi_storm: ['RUSI: Stormbreak (2023)', 'https://static.rusi.org/Stormbreak-Special-Report-web-final_0.pdf'],
+  rt_9s18m: ['Radartutorial: 9S18M (radar de búsqueda del Buk)', 'https://www.radartutorial.eu/19.kartei/02.surv/karte093.en.html'],
+  rt_arabel: ['Radartutorial: Arabel (SAMP/T)', 'https://www.radartutorial.eu/19.kartei/04.battle/karte035.en.html'],
   // clutter (physics/clutter.js)
   skolnik_mti: ['Shrader y Gregers-Hansen, "MTI Radar", cap. 15 del Radar Handbook (Skolnik, 2.ª ed., 1990): tabla 15.1 (espectro del clutter), tabla 15.2 (reflectividad, de Barton) y ec. 15.9–15.11 (factor de mejora)', 'https://helitavia.com/skolnik/Skolnik_chapter_15.pdf'],
   nrl_sea: ['Gregers-Hansen y Mital, "An Improved Empirical Model for Radar Sea Clutter Reflectivity", NRL/MR/5310--12-9346 (2012); coeficientes en la implementación pública de scivision', 'https://github.com/scivision/nrl-radar-sea-clutter/blob/main/NRL_SigmaSea.m'],

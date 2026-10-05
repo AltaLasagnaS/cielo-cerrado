@@ -186,6 +186,24 @@ Solo suman los jammers activos de la **misma banda**, de un **bando distinto**, 
 
 El alcance queda en `R' = R·(1/(1+J))^¼`. La Pk de los guiados que dependen del radar se multiplica por `1/(1 + 0,08·J)`, con un piso de 0,5 (§7).
 
+### Engaño DRFM y capacidad de seguimiento
+
+Un jammer con memoria digital de RF (**DRFM**, modo `drfm`) no mete ruido: graba el pulso del radar y lo devuelve con demoras y corrimientos Doppler. Como la copia es coherente, recibe toda la ganancia de procesamiento del radar (el `eccm` no la achica) y el radar la toma por un blanco (`physics/radar.js#falseTracks`):
+
+```
+J = P · G / d²            (sin el descuento de eccm)
+falso blanco si J ≥ SNR50 (12,8 dB)
+  lóbulo principal (G = 1): cuando el haz pasa por el jammer, si está en el sector del radar
+  lóbulos laterales cercanos (G = 0,05 o 0,01): solo si el radar NO tiene blanqueo (radar.slb)
+cada jammer que pasa el umbral suma JAM_MODES.drfm.falseTargets = 20 falsos blancos por barrido
+```
+
+El **blanqueo de lóbulos laterales** (SLB) compara cada pulso con una antena auxiliar y borra los que llegan más fuertes por ella: sirve contra pulsos sueltos (falsos blancos), no contra ruido continuo. El cancelador (`slc`) es al revés. Se asigna `slb` a los radares que tienen cancelador (Patriot, Arabel, TRML-4D, 92N6, 36D6), porque los dos usan los mismos canales auxiliares; es una estimación. La agilidad de frecuencia no alcanza: el DRFM responde al pulso que acaba de recibir, así que puede poner falsos blancos detrás de su posición.
+
+**Capacidad de seguimiento** (`radar.tracks`, con rango y fuente en `UNC.def`): blancos que el radar puede seguir a la vez. Patriot 100, Arabel 100, TRML-4D 1.500, Sentinel más de 50, 30N6 24, 9S18M 50, Tor 48, 92N6 100; el resto es estimación. En cada barrido, las pistas abiertas más los falsos blancos ocupan esa capacidad. Si está llena, el radar **no abre pistas nuevas** (las abiertas se mantienen) y el registro lo avisa. También pasa sin engaño: en el puente de Monterey, un Pantsir con capacidad 20 se llena con el enjambre.
+
+No se modela todavía: arrastre de la ventana de distancia o velocidad contra un seguimiento (RGPO/VGPO, hace falta un jammer a bordo del blanco), disparos desperdiciados contra falsos blancos ni chequeos de coherencia distancia-Doppler de cada radar.
+
 ### GNSS
 
 Las armas con `T.gnss` < 1 (dependencia del satélite: 1 = inmune) que entran en el radio de un anti-GNSS acumulan un error de navegación que se suma a la dispersión de la caída (§10):

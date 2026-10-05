@@ -119,7 +119,7 @@ export function jamJ(u, az, list) {
   const r = D(u).radar; if (!r || r.band === 'ACU' || r.band === 'OPT') return 0;
   let J = 0; const bw = BANDS[r.band].bw, uz = antZ(u), sl = r.lowSL ? LOW_SIDELOBES : SIDELOBES, side = r.slc ? [] : null;
   for (const j of list) {
-    const JJ = JAMMERS[j.type]; if (!j.on || j.dead || JJ.gnssJam || !JJ.bands.includes(r.band)) continue;
+    const JJ = JAMMERS[j.type]; if (!j.on || j.dead || JJ.gnssJam || !JJ.bands.includes(r.band) || JAM_MODES[j.mode]?.coherent) continue;
     // Un interferidor de un bando no degrada sus propios radares. `both` queda reservado para
     // equipos cuyo rol puede cambiar; no asumimos fratricidio como efecto normal.
     if (JJ.side !== 'both' && D(u).side !== 'both' && JJ.side === D(u).side) continue;
@@ -137,6 +137,30 @@ export function jamJ(u, az, list) {
   }
   if (side) { side.sort((a, b) => b - a); side.forEach((v, k) => { J += k < r.slc ? v * SLC_RESIDUAL : v; }); }
   return J * Math.pow(10, -(r.eccm || 0) / 10);
+}
+
+/**
+ * Falsos blancos que los interferidores DRFM (modo 'drfm', data/jammers.js#JAM_MODES) le meten por barrido
+ * al radar de u. Una copia coherente recibe toda la ganancia de procesamiento, así que su relación con el
+ * ruido es J = P · G / d² sin el descuento de eccm, y el radar la toma por un blanco si J ≥ SNR50:
+ *   lóbulo principal (el haz pasa por el jammer si está en su sector): G = 1;
+ *   lóbulos laterales cercanos: G = SIDELOBES.near (o LOW_SIDELOBES), salvo blanqueo (radar.slb).
+ * Cada jammer que pasa el umbral suma JAM_MODES.drfm.falseTargets. El cancelador (slc) no sirve: está
+ * hecho para ruido continuo, no para pulsos sueltos.
+ */
+export function falseTracks(u, list) {
+  const r = D(u).radar; if (!r || r.band === 'ACU' || r.band === 'OPT') return 0;
+  const M = JAM_MODES.drfm, uz = antZ(u), sl = r.lowSL ? LOW_SIDELOBES : SIDELOBES; let n = 0;
+  for (const j of list) {
+    const JJ = JAMMERS[j.type]; if (j.mode !== 'drfm' || !j.on || j.dead || JJ.gnssJam || !JJ.bands.includes(r.band)) continue;
+    if (JJ.side !== 'both' && D(u).side !== 'both' && JJ.side === D(u).side) continue;
+    const p = jamPos(j); if (!los(p[0], p[1], p[2], u.x, u.y, uz)) continue;
+    const d = Math.hypot(p[0] - u.x, p[1] - u.y, (p[2] - uz) / 1000) + 1, base = JJ.P / (d * d);
+    const main = inSector(u, azOf(p[0] - u.x, p[1] - u.y)) && base >= SNR50;
+    const side = !r.slb && base * sl.near >= SNR50;
+    if (main || side) n += M.falseTargets;
+  }
+  return n;
 }
 
 /**
