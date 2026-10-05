@@ -1944,6 +1944,7 @@ Parámetros de juego (sin fuente): vida, huella y vulnerabilidad relativa.
 | Depósito de munición | 900 | 40 m | ×1.4 | Las explosiones secundarias amplifican el daño de cada impacto. |
 | Sitio de comunicaciones | 500 | 15 m | ×1.1 | Torres y equipos de enlace: blancos chicos y frágiles. |
 | Infraestructura | 1500 | 60 m | ×0.9 | Puerto, puente, subestación eléctrica o similar. |
+| Buque mercante | 1200 | 90 m | ×0.8 | Granelero o carguero amarrado o fondeado (≈180 m de eslora): casco de acero compartimentado, difícil de hundir, pero un impacto incendia la carga y lo deja fuera de servicio. |
 
 ## Calibración de Pk
 

@@ -13,7 +13,8 @@ export const TARGET_TYPES = {
   command: { name: 'Puesto de mando', icon: 'C', hp: 900, radius: 20, vuln: 0.8, desc: 'Estructura reforzada o semienterrada.' },
   ammo: { name: 'Depósito de munición', icon: 'M', hp: 900, radius: 40, vuln: 1.4, desc: 'Las explosiones secundarias amplifican el daño de cada impacto.' },
   comms: { name: 'Sitio de comunicaciones', icon: 'T', hp: 500, radius: 15, vuln: 1.1, desc: 'Torres y equipos de enlace: blancos chicos y frágiles.' },
-  infra: { name: 'Infraestructura', icon: 'I', hp: 1500, radius: 60, vuln: 0.9, desc: 'Puerto, puente, subestación eléctrica o similar.' }
+  infra: { name: 'Infraestructura', icon: 'I', hp: 1500, radius: 60, vuln: 0.9, desc: 'Puerto, puente, subestación eléctrica o similar.' },
+  ship: { name: 'Buque mercante', icon: 'B', hp: 1200, radius: 90, vuln: 0.8, desc: 'Granelero o carguero amarrado o fondeado (≈180 m de eslora): casco de acero compartimentado, difícil de hundir, pero un impacto incendia la carga y lo deja fuera de servicio.' }
 };
 
 /** Estados de un objetivo (códigos internos → texto en pantalla). */

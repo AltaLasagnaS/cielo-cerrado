@@ -370,6 +370,53 @@ export const SCENARIOS = {
     success: 'Defensa: la terminal de granos de Chornomorsk sigue operativa al terminar el ataque.',
     failure: 'Defensa: la terminal de granos queda dañada o destruida.'
   },
+  od_corredor: {
+    map: 'odesa', name: 'Odesa · el corredor de granos bajo misiles balísticos (defensa ucraniana)',
+    player: 'defensa',
+    time: '21:00 hora local · otoño',
+    description: 'Inspirado en los ataques de octubre de 2024 contra barcos civiles en los puertos de la región de Odesa, en el corredor que Ucrania abrió después de que Rusia dejó el acuerdo de granos: el 6 de octubre un misil balístico dañó al Paresa, cargado con unas 6.000 t de maíz; el 7 y el 14 de octubre fueron alcanzados el Optima y el NS Moon en el puerto de Odesa (Kyiv Independent, Maritime Executive). En tres meses se dañaron 22 buques civiles. Acá hay dos barcos en el puerto de Odesa y uno en Chornomorsk. Contra un Iskander-M la defensa de esta región casi no tiene con qué (con esta defensa, la defensa gana 0 de 40 noches: los balísticos alcanzan a los barcos, como pasó). Probá agregar un Patriot. La composición es ilustrativa, la real no es pública.',
+    forces: {
+      defensa: 'Radar 3D y radar VHF, una batería S-300PS, un IRIS-T sobre la ciudad, dos Gepard en los puertos y grupos móviles en la costa. Red coordinada. Sin Patriot.',
+      ataque: '5 Iskander-M desde el este (Crimea y Jersón) contra los barcos y 10 Shahed que entran desde el mar contra el puerto de Odesa.'
+    },
+    conditions: 'Noche de otoño despejada, sin viento.',
+    rules: { c2: 'coordinada', doctrine: 'salva', weather: 'despejado' },
+    rulesText: ['Red coordinada y doctrina de salva.', 'Los Iskander-M bajan casi en vertical a más de Mach 5: el S-300PS tiene poca Pk contra ellos y el IRIS-T no puede enfrentarlos.', 'Los Shahed llegan primero, los misiles a los 15 minutos.'],
+    objectives: [
+      { type: 'ship', name: 'Granelero en el puerto de Odesa', short: 'Granelero Odesa', x: 57.2, y: 55.2, desc: 'Granelero amarrado en el puerto de Odesa (como el Optima, oct-2024).' },
+      { type: 'ship', name: 'Carguero en el puerto de Odesa', short: 'Carguero Odesa', x: 57.4, y: 54.6, desc: 'Carguero en el puerto de Odesa (como el NS Moon, oct-2024).' },
+      { type: 'ship', name: 'Granelero en Chornomorsk', short: 'Granelero Chornomorsk', x: 52.5, y: 76.5, desc: 'Granelero cargando maíz frente a la terminal de granos de Chornomorsk.' },
+      { type: 'infra', name: 'Puerto de Odesa', short: 'Puerto Odesa', x: 56.6, y: 55.4, desc: 'Terminales y muelles del puerto de Odesa.' }
+    ],
+    defs: [
+      { type: 'ewr', owner: 'UA', x: 49, y: 81, name: 'Radar 3D' },
+      { type: 'p18', owner: 'UA', x: 40, y: 60, name: 'Radar VHF' },
+      { type: 's300', x: 49.5, y: 78, az: 90, name: 'S-300-1' },
+      { type: 'irist', x: 48.5, y: 82, name: 'IRIS-T-1' },
+      { type: 'gepard', x: 55, y: 56.5, name: 'Gepard-1' },
+      { type: 'gepard', x: 49.5, y: 73.5, name: 'Gepard-2' },
+      { type: 'mfg', x: 54.5, y: 62, name: 'Grupo móvil 1' },
+      { type: 'mfg', x: 51, y: 70, name: 'Grupo móvil 2' },
+      { type: 'acoustic', x: 55, y: 66, name: 'Acústico 1' },
+      { type: 'acoustic', x: 53, y: 45, name: 'Acústico 2' }
+    ],
+    salvos: [
+      { type: 'shahed', count: 10, interval: 30, tStart: 0, agl: 1500, pts: [[76.5, 70], [56.6, 55.4]], targetObj: 'Puerto de Odesa' },
+      { type: 'isk_m', count: 2, interval: 20, sync: true, tArrive: 900, pts: [[76.5, 50], [57.2, 55.2]], targetObj: 'Granelero en el puerto de Odesa' },
+      { type: 'isk_m', count: 1, interval: 20, sync: true, tArrive: 930, pts: [[76.5, 50], [57.4, 54.6]], targetObj: 'Carguero en el puerto de Odesa' },
+      { type: 'isk_m', count: 2, interval: 20, sync: true, tArrive: 960, pts: [[76.5, 60], [52.5, 76.5]], targetObj: 'Granelero en Chornomorsk' }
+    ],
+    jams: [],
+    goals: [
+      { side: 'ataque', primary: true, kind: 'damage', target: 'Granelero en el puerto de Odesa', min: 0.3, text: 'Dañar el granelero del puerto de Odesa (≥ 30%)' },
+      { side: 'ataque', primary: false, kind: 'damage', target: 'Granelero en Chornomorsk', min: 0.3, text: 'Dañar el granelero de Chornomorsk (≥ 30%)' },
+      { side: 'defensa', primary: true, kind: 'protect', target: 'Granelero en el puerto de Odesa', text: 'Mantener operativo el granelero del puerto de Odesa' },
+      { side: 'defensa', primary: true, kind: 'protect', target: 'Granelero en Chornomorsk', text: 'Mantener operativo el granelero de Chornomorsk' },
+      { side: 'defensa', primary: false, kind: 'survive', target: 'Carguero en el puerto de Odesa', text: 'Que el carguero no sea destruido' }
+    ],
+    success: 'Defensa: los dos graneleros siguen operativos al terminar el ataque.',
+    failure: 'Defensa: algún granelero queda dañado.'
+  },
   od_vacio: { map: 'odesa', name: 'Odesa · vacío', player: 'defensa', description: 'Mapa libre sobre el relieve real de Odesa y la costa del mar Negro (SRTM): ubicá objetivos, defensas, ataques y guerra electrónica.', objectives: [], defs: [], salvos: [], jams: [], goals: [] },
   kh_vacio: { map: 'kharkiv', name: 'Járkov · vacío', player: 'defensa', description: 'Mapa libre sobre el relieve real de Járkov (SRTM): ubicá objetivos, defensas, ataques y guerra electrónica.', objectives: [], defs: [], salvos: [], jams: [], goals: [] },
   kv_vacio: { map: 'kyiv', name: 'Kiev · vacío', player: 'defensa', description: 'Mapa libre sobre el relieve real de Kiev (SRTM): ubicá objetivos, defensas, ataques y guerra electrónica.', objectives: [], defs: [], salvos: [], jams: [], goals: [] },

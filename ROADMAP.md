@@ -6,7 +6,7 @@ Son ideas ordenadas por prioridad, no promesas. Cada ítem que cambie resultados
 
 ## Próximo
 
-- **Perspectivas por bando** (etapa 1 del plan de Codex, [`PLAN-MAESTRO.md`](experimentos/catalogo-presupuesto/docs/PLAN-MAESTRO.md)): dueño explícito de cada unidad, separado del país del equipo; lo que sabe cada bando (lo propio, y del enemigo solo contactos con edad e identificación); interfaz en modo laboratorio, defensa o ataque; y tiro sin trampa (predecir con la pista observada, no con la trayectoria real). Destraba la niebla de guerra, el briefing propio, el presupuesto y la campaña.
+- **Perspectivas por bando, segunda parte** (etapa 1 del plan de Codex, [`PLAN-MAESTRO.md`](experimentos/catalogo-presupuesto/docs/PLAN-MAESTRO.md)). Ya están el dueño explícito de cada unidad (`u.owner`) y la vista del defensor con contactos (posición estimada, edad, último reporte; ficha de pista sin la verdad). Falta: **vista del atacante** (qué sabe el atacante de la defensa; hay que filtrar también el registro, los tooltips y el debrief para no filtrar información) y **tiro sin trampa** (hoy la solución de tiro predice el punto de encuentro con la ruta real del arma). *(Para decidir con el usuario: pasar a predecir con la pista observada cambia resultados y calibración, y para modelarlo bien hace falta saber cuánto corrige cada misil en vuelo, que no es público.)*
 
 ## Física (cada ítem es **[sim]**)
 
@@ -28,7 +28,7 @@ Propuesta detallada, con orden, dificultad, datos y pruebas: [docs/investigacion
 - Niebla de guerra más estricta: ver **Perspectivas por bando**.
 - Misión de un solo bando con briefing propio, presupuesto y medios finitos (etapa 3 del plan de Codex; prototipo en `experimentos/catalogo-presupuesto/`).
 - Campaña corta con estado persistente (etapa 6 del plan de Codex).
-- Corredor del mar Negro. *Espera barcos como objetivo* (Kiev, Járkov y Odesa ya están).
+- Corredor del mar Negro, segunda parte: barcos que navegan por el corredor (ya están los barcos amarrados como objetivo y el escenario `od_corredor`). *Espera movilidad* (etapa 5 del plan de Codex).
 - Plataformas aéreas propias: patrullas de cazas como interceptores. *El plan de Codex las deja para el final* (etapa 7).
 - Idioma inglés (los textos ya están separados de la lógica en buena parte). Baja prioridad.
 
