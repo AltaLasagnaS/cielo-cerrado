@@ -379,6 +379,7 @@ Pk = sam.pk[clase] × modificadores, acotada a [0; 0,98]           (physics/enga
 | Interferencia sobre el radar de la batería (J > 1) | 1/(1 + 0,08·J), mínimo 0,5 |
 | Blanco a más del 80% de `vmaxT` | 0,8 |
 | Energía del misil en el encuentro (no cañones ni drones interceptores) | `energyPk(f)`, hasta 1,25 |
+| Maniobra en el aire fino de la altura (misma condición) | `altitudePk`, hasta 1 (abajo) |
 
 **Energía** (`energyPk`): con `f = r / (maxR × rangeFactor)` (fracción del alcance cinemático, **sin** la doctrina: la energía depende de la física, no de la regla de tiro).
 
@@ -397,6 +398,16 @@ energía(f) = 1                       si f ≤ 0,75
            = 1 − 2·(f − 0,75)        hasta 0,5 en f = 1
 energyPk(f) = min(1,25; energía(f) / energía(0,9))
 ```
+
+**Maniobra según la altura** (`altitudePk`, `physics/atmosphere.js`). La aceleración lateral que logra un misil con sus aletas es proporcional a la presión dinámica ½ρv², y el aire se afina con la altura: según la Atmósfera Estándar Internacional (ISO 2533, igual a la US Standard Atmosphere 1976 hasta 32 km), la densidad relativa σ es 0,60 a 5 km, 0,34 a 10 km, 0,16 a 15 km, 0,072 a 20 km y 0,032 a 25 km (prueba contra la tabla, ±0,5%). Cada misil tiene `sam.hFull`: la altura hasta la que, a velocidad máxima, todavía llega a su límite estructural de aceleración. Medido en fracciones de ese límite:
+
+```
+disponible  a/gmax = min(1, σ(h)/σ(hFull) · E)        E = (v/vmax)², la energía de arriba
+necesario   n = 1 contra un blanco que maniobra en su fase terminal, 1/3 si no maniobra (est)
+altitudePk = min(1, min(1, σ/σF·E/n) / min(1, E/n))   (lo que agrega la altura; energyPk ya cuenta la velocidad)
+```
+
+Abajo de `hFull` el factor vale 1, así que las Pk calibradas a baja altura no cambian. Arriba baja: un S-300 que alcanza a un blanco que maniobra a 25 km conserva menos de la mitad. Los misiles con **empuje lateral directo** (`sam.dthrust`: PAC-3 con sus motores de control, Aster con PIF-PAF) maniobran con cohetes y no dependen del aire (×1). `hFull` es una estimación por clase, con rango en UNC (largo alcance 15 km, alcance medio 10 km, defensa de punto 5 km): la aceleración máxima por altura de cada misil no es pública (handoff de datos, tema 4). No se modela todavía que las amenazas también maniobren menos arriba.
 
 Es **relativa al tiro típico** (f = 0,9 → ×1) porque las Pk base ya están calibradas con episodios reales de tiros cerca del alcance máximo: aplicarla en absoluto contaría dos veces la pérdida de energía (una versión así bajaba Kiev de ≈70% a ≈25% de noches defendidas). Un tiro corto vale hasta ×1,25 (todavía acotado por el tope de 0,98). En el borde, con perfil, ×0,85–0,93 según el misil; sin perfil, ×0,71. Los valores 0,75, 0,5 y 0,9 son estimaciones de juego; la forma sigue los pasos A y B de `docs/investigacion/mejoras-fisica.md` §8. Todavía no cuenta la altura (aire menos denso arriba, menos maniobra).
 

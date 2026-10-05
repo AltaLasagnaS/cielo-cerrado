@@ -13,7 +13,7 @@ export const PL = {
   rcs: ['RCS frontal (X/S)', 'm²'], rcsSide: ['RCS lateral (X/S)', 'm²'], rcsRear: ['RCS de cola (X/S)', 'm²'], rcsVHF: ['RCS en VHF', 'm²'], cep: ['CEP', 'm'], cost: ['Costo unitario', 'M US$'],
   decoys: ['Señuelos por misil', ''], manPk: ['Efecto de su maniobra terminal sobre la Pk', '×'],
   'info.rangeKm': ['Alcance', 'km'], 'info.warheadKg': ['Ojiva', 'kg'],
-  'radar.R1': ['Radar: detección contra 1 m²', 'km'], 'radar.sector': ['Radar: sector de búsqueda', '°'], 'radar.scan': ['Radar: refresco', 's'], 'radar.altMax': ['Altura máxima detectable', 'm'], 'radar.discrim': ['Radar: discriminación de señuelos (×, divide el τ de su banda)', '×'], 'radar.tracks': ['Radar: blancos que puede seguir a la vez', ''], 'sam.pkHoj': ['Pk de un disparo home-on-jam contra un jammer aéreo', ''],
+  'radar.R1': ['Radar: detección contra 1 m²', 'km'], 'radar.sector': ['Radar: sector de búsqueda', '°'], 'radar.scan': ['Radar: refresco', 's'], 'radar.altMax': ['Altura máxima detectable', 'm'], 'radar.discrim': ['Radar: discriminación de señuelos (×, divide el τ de su banda)', '×'], 'radar.tracks': ['Radar: blancos que puede seguir a la vez', ''], 'sam.pkHoj': ['Pk de un disparo home-on-jam contra un jammer aéreo', ''], 'sam.hFull': ['Altura hasta la que maniobra con toda su aceleración a velocidad máxima', 'm'],
   'sam.maxR': ['Alcance vs aeronaves/crucero', 'km'], 'sam.maxRtbm': ['Alcance vs balísticos', 'km'], 'sam.altMax': ['Techo', 'm'], 'sam.altMin': ['Altura mínima de enfrentamiento', 'm'],
   'sam.vInt': ['Velocidad media del interceptor hasta el alcance máximo', 'm/s'], 'sam.vmax': ['Velocidad máxima del interceptor', 'm/s'], 'sam.tb': ['Duración del motor del interceptor', 's'], 'sam.vmaxT': ['Blanco más rápido enfrentable', 'm/s'], 'sam.react': ['Tiempo de reacción', 's'],
   'sam.ch': ['Canales simultáneos', ''], 'sam.mag': ['Munición de la unidad', ''], 'sam.reloadS': ['Tiempo de recarga de la batería', 's'], 'sam.reserve': ['Reserva para recargar', ''], 'sam.cost': ['Costo por disparo', 'M US$'],
@@ -273,6 +273,7 @@ export const UNC = {
       'sam.pk.hiper': U(0.3, 0.5, 0.7, 'baja', S_('nv_zircon'), PK_NOTE)
     },
     patriot2: {
+      'sam.hFull': U(10000, 15000, 20000, 'baja', [], 'est: misil de gran altura (techo 24 km); sin dato publicado de g por altura'),
       'sam.pkHoj': U(0.2, 0.5, 0.7, 'baja', S_('wp:Active_radar_homing'), 'la variante MIM-104B (ASOJ) se diseñó contra jammers stand-off con home-on-jam; Pk est: guiado solo angular, sin distancia'),
       'radar.tracks': U(50, 100, 150, 'media', S_('wp:MIM-104_Patriot'), 'mismo radar AN/MPQ-65'),
       'radar.R1': U(90, 100, 120, 'baja', S_('rt_mpq53'), 'mismo radar que el MSE'),
@@ -308,6 +309,7 @@ export const UNC = {
       'sam.pk.hiper': U(0.2, 0.4, 0.6, 'baja', S_('nv_zircon'), PK_NOTE)
     },
     irist: {
+      'sam.hFull': U(6000, 10000, 14000, 'baja', [], 'est: IR de alta maniobra; su versión aire-aire declara 60 g a baja altura'),
       'radar.tracks': U(500, 1500, 1500, 'media', S_('wp:TRML'), 'TRML-4D: unos 1.500 blancos hasta 250 km (Hensoldt)'),
       'sam.reloadS': U(600, 1200, 2400, 'baja', [], 'est: sin dato público firme'),
       'radar.R1': U(80, 100, 150, 'media', S_('hensoldt'), 'cazas a más de 120 km, misiles supersónicos a más de 60 km'),
@@ -326,6 +328,7 @@ export const UNC = {
       'sam.pk.supersonico': U(0.1, 0.2, 0.35, 'baja', S_('syrskyi'), 'est: sin datos contra Mach 2–4; Oniks 5,7% a nivel nacional')
     },
     nasams: {
+      'sam.hFull': U(6000, 10000, 14000, 'baja', [], 'est: AIM-120 lanzado desde tierra'),
       'sam.pkHoj': U(0.2, 0.5, 0.7, 'baja', S_('wp:Active_radar_homing', 'wp:AIM-120_AMRAAM'), 'el AIM-120 tiene modo home-on-jam; Pk est: guiado solo angular, sin distancia'),
       'radar.tracks': U(50, 60, 100, 'media', S_('wp:AN/MPQ-64_Sentinel'), 'Sentinel: más de 50 blancos simultáneos'),
       'sam.reloadS': U(900, 1800, 3600, 'baja', [], 'est: lanzador de 6 AMRAAM recargado con grúa; sin dato público firme'),
@@ -342,6 +345,7 @@ export const UNC = {
       'sam.pk.supersonico': U(0.25, 0.4, 0.6, 'baja', [], 'est')
     },
     s300: {
+      'sam.hFull': U(10000, 15000, 20000, 'baja', [], 'est: techo 27 km; sin dato publicado de g por altura'),
       'radar.tracks': U(12, 24, 50, 'baja', S_('apa_fc'), '30N6 Flap Lid A: hasta 24 blancos en seguimiento; la batería suma el radar de búsqueda de la red'),
       'radar.R1': U(80, 100, 130, 'baja', S_('apa_fc'), 'est'),
       'radar.sector': U(90, 90, 90, 'alta', S_('apa_fc'), ''),
@@ -356,6 +360,7 @@ export const UNC = {
       'sam.pk.balistico': U(0.05, 0.15, 0.3, 'baja', S_('syrskyi'), PK_NOTE)
     },
     buk: {
+      'sam.hFull': U(6000, 10000, 14000, 'baja', [], 'est: techo 22 km pero diseñado para alturas medias'),
       'radar.tracks': U(50, 50, 100, 'media', S_('rt_9s18m'), '9S18M: hasta 50 blancos y designación a 6'),
       'radar.R1': U(35, 50, 85, 'baja', S_('wp:Buk_missile_system'), '9S18M1 85 km a altura; 9S35 est 40–50 km'),
       'sam.maxR': U(33, 35, 42, 'media', S_('missilery_buk'), ''),
@@ -382,6 +387,7 @@ export const UNC = {
       'sam.pk.dron': U(0.05, 0.2, 0.3, 'baja', [], PK_NOTE)
     },
     manpads: {
+      'sam.hFull': U(1000, 2000, 3000, 'baja', [], 'est: misil chico de baja altura'),
       'sam.maxR': U(4.5, 4.8, 6, 'alta', S_('wp:FIM-92_Stinger', 'wp:9K38_Igla'), ''),
       'sam.vInt': U(450, 550, 650, 'baja', [], 'est: modelo legado de velocidad constante, sin perfil de motor por falta de datos (docs/FISICA.md §6). Una sola entrada para Stinger, Igla y RBS 70: no implica que sean equivalentes'),
       'sam.cost': U(0.06, 0.45, 0.5, 'media', S_('wp:FIM-92_Stinger', 'wp:9K38_Igla'), 'Igla 60–80k; Stinger >400k'),
@@ -396,6 +402,7 @@ export const UNC = {
       'sam.pk.dron': U(0.4, 0.6, 0.75, 'media', S_('dn_interceptors'), '>60% de éxito por salida')
     },
     hawk: {
+      'sam.hFull': U(5000, 8000, 12000, 'baja', [], 'est'),
       'sam.pkHoj': U(0.1, 0.3, 0.5, 'baja', S_('wp:MIM-23_Hawk'), 'el I-Hawk tenía un modo home-on-jam "potencial"; Pk est, menor que en misiles modernos'),
       'radar.tracks': U(10, 25, 50, 'baja', [], 'est: radares de búsqueda PAR y CWAR con seguimiento automático; sin cifra pública'),
       'radar.R1': U(50, 70, 100, 'baja', S_('cmo_db3k_sam'), 'CMO: HPIR 45 nmi (83 km) y PAR 54 nmi (100 km) de alcance instrumentado; est contra 1 m²'),
@@ -408,6 +415,7 @@ export const UNC = {
       'sam.pk.dron': U(0.4, 0.6, 0.8, 'baja', S_('db_hawk'), PK_NOTE)
     },
     s125: {
+      'sam.hFull': U(6000, 10000, 14000, 'baja', [], 'est'),
       'radar.tracks': U(5, 10, 20, 'baja', [], 'est: la imagen sale del P-18/P-19 con ploteo; el SNR-125 sigue un blanco a la vez'),
       'radar.R1': U(30, 40, 60, 'baja', S_('cmo_db3k_sam'), 'CMO: SNR-125 32 nmi (59 km) instrumentado; est contra 1 m²'),
       'sam.maxR': U(18, 25, 30, 'media', S_('mil_newa', 'cmo_db3k_sam'), 'Newa-SC con 5V27: 25 km; CMO 10–16 nmi'),
@@ -419,6 +427,7 @@ export const UNC = {
       'sam.pk.crucero': U(0.35, 0.55, 0.7, 'baja', S_('kp_s125'), PK_NOTE)
     },
     s200: {
+      'sam.hFull': U(12000, 18000, 24000, 'baja', [], 'est: misil grande para blancos muy altos (techo 40 km)'),
       'radar.tracks': U(5, 10, 20, 'baja', [], 'est: el 5N62 ilumina un blanco; la imagen viene de la red'),
       'radar.R1': U(150, 250, 400, 'baja', S_('cmo_db3k_sam'), 'CMO: 5N62 220 nmi (≈400 km) contra blancos grandes; est contra 1 m²'),
       'sam.maxR': U(150, 250, 300, 'media', S_('cmo_db3k_sam', 'dua_s200'), '5V28 ≈250 km, 5V28M ≈300 km; derribo a ≈308 km reclamado'),
@@ -429,6 +438,7 @@ export const UNC = {
       'sam.pk.crucero': U(0.1, 0.25, 0.4, 'baja', [], 'est: pensado contra aviones grandes. ' + PK_NOTE)
     },
     pantsir: {
+      'sam.hFull': U(3000, 5000, 8000, 'baja', [], 'est: defensa de punto de baja altura'),
       'radar.tracks': U(10, 20, 40, 'baja', S_('wp:Pantsir_missile_system'), 'est: el Pantsir-SM declara 40 con radar nuevo; el S1, menos'),
       'radar.R1': U(25, 30, 36, 'media', S_('apa_pantsir'), '36 km vs 2 m²'),
       'sam.maxR': U(18, 18, 20, 'media', S_('gs_57e6'), ''),
@@ -440,6 +450,7 @@ export const UNC = {
       'sam.pk.crucero': U(0.4, 0.6, 0.75, 'baja', [], 'est')
     },
     tor: {
+      'sam.hFull': U(3000, 5000, 8000, 'baja', [], 'est: defensa de punto de baja altura'),
       'radar.tracks': U(10, 48, 48, 'media', S_('wp:Tor_missile_system'), 'Tor-M2: procesa 48 blancos y sigue 10 para tiro'),
       'radar.R1': U(20, 25, 32, 'media', S_('ar_tor', 'wp:Tor_missile_system'), '>30 km contra cazas'),
       'sam.maxR': U(15, 15, 16, 'media', S_('gs_9m338', 'ar_tor'), ''),
@@ -450,6 +461,7 @@ export const UNC = {
       'sam.pk.crucero': U(0.5, 0.7, 0.8, 'baja', [], 'est')
     },
     s400: {
+      'sam.hFull': U(10000, 15000, 20000, 'baja', [], 'est: techo 27 km; sin dato publicado de g por altura'),
       'radar.tracks': U(100, 100, 300, 'media', S_('wp:S-400_missile_system'), '92N6: hasta 100 blancos en seguimiento'),
       'radar.R1': U(150, 200, 250, 'baja', S_('ar_92n6'), '92N6: 250–340 km contra blancos grandes'),
       'sam.maxR': U(240, 250, 250, 'alta', S_('wp:S-400_missile_system'), ''),

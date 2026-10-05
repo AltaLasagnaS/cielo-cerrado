@@ -7,6 +7,7 @@ import { surf } from './terrain.js';
 import { jamJ } from './radar.js';
 import { posAt, speedAt, termZone } from './kinematics.js';
 import { profileOf, hasProfile, timeTo, energyAt } from './interceptor.js';
+import { isaSigma } from './atmosphere.js';
 
 /** Guiados que necesitan que el radar PROPIO de la batería vea el blanco hasta el final. */
 export const RADAR_GUID = ['TVM', 'SARH', 'mando', 'cañón'];
@@ -99,6 +100,31 @@ export function energyPk(sm, f, tbm = false) {
   return Math.min(1.25, energyAt(P, f * R) / energyAt(P, ENERGY_REF * R));
 }
 
+/**
+ * Fracción de su aceleración lateral máxima que necesita el interceptor (est, docs/FISICA.md §7): contra
+ * un blanco que maniobra en su fase terminal, toda (la guía proporcional pide ≈3 veces la aceleración del
+ * blanco); contra uno que no maniobra, un tercio (errores de rumbo y correcciones de la guía).
+ */
+export const NEED_MAN = 1, NEED_STRAIGHT = 1 / 3;
+
+/**
+ * Factor de Pk por maniobra en altura (docs/FISICA.md §7). La aceleración lateral aerodinámica es
+ * proporcional a la presión dinámica ½ρv²; un misil la usa hasta su límite estructural (gmax). Se mide
+ * en fracciones de gmax: a/gmax = min(1, σ(h)/σ(hFull) · E), con E = (v/vmax)² la energía en el punto de
+ * encuentro (la misma de energyPk) y hFull (sam.hFull) la altura hasta la que a velocidad máxima todavía
+ * llega a gmax. Con la fracción necesaria n (NEED_MAN o NEED_STRAIGHT), el factor de maniobra es
+ * min(1, a/(n·gmax)). energyPk ya cuenta la parte de la velocidad, así que acá va solo lo que agrega la
+ * altura: min(1, σ/σF·E/n) / min(1, E/n), nunca mayor que 1 (abajo de hFull no cambia nada: las Pk
+ * calibradas quedan igual). Los misiles con empuje lateral directo (sam.dthrust: PAC-3, Aster) maniobran
+ * con cohetes y no dependen del aire: ×1. Sin hFull, ×1.
+ */
+export function altitudePk(sm, f, tbm, z, maneuvering) {
+  if (!sm.hFull || sm.dthrust || !usesEnergy(sm.guid)) return 1;
+  const E = hasProfile(sm) ? energyAt(profileOf(sm), f * (tbm ? sm.maxRtbm : sm.maxR) * 1000) : energy(f);
+  const n = maneuvering ? NEED_MAN : NEED_STRAIGHT, k = isaSigma(z) / isaSigma(sm.hFull);
+  return Math.min(1, Math.min(1, k * E / n) / Math.min(1, E / n));
+}
+
 /** ¿El guiado depende de la energía de un misil? Los cañones y los drones interceptores (con motor todo el vuelo) no. */
 export const usesEnergy = guid => guid !== 'cañón' && guid !== 'operador';
 
@@ -165,18 +191,20 @@ export function solve(u, th, t, pct = 1) {
  * Modificadores: maniobra terminal (×manPk del blanco, ×0,85 contra cañones), bengalas contra IR
  * (×0,85), blanco sin motor contra IR (×0,3, T.cold: planeadoras), baja firma (×0,85 buscador activo, ×0,75 guiado desde tierra), interferencia sobre el
  * radar de la batería (×1/(1+0,08·J), mín. ×0,5), blanco a más del 80% de vmaxT (×0,8) y energía
- * del misil en el punto de encuentro (×energyPk, solo si se pasa f = r / alcance cinemático de solve).
+ * del misil en el punto de encuentro (×energyPk, solo si se pasa f = r / alcance cinemático de solve) y
+ * maniobra en el aire fino de la altura (×altitudePk, misma condición).
  * jams = interferidores activos de la corrida.
  */
 export function calcPk(u, th, t, jams, f = null) {
   const sm = D(u).sam; let pk = sm.pk[th.cls] || 0;
   const p = th.p; if (!p) return 0;
-  if (th.maneuver && p.rem < termZone(th)) pk *= sm.guid === 'cañón' ? 0.85 : (th.T.manPk ?? 0.7);
+  const man = !!th.maneuver && p.rem < termZone(th);
+  if (man) pk *= sm.guid === 'cañón' ? 0.85 : (th.T.manPk ?? 0.7);
   if (th.T.ir && (sm.guid === 'IR')) pk *= 0.85;
   if (th.T.cold && sm.guid === 'IR') pk *= 0.3;   // sin motor (planeadora): casi no hay calor para el buscador IR
   if (th.T.lo && sm.guid !== 'IR' && sm.guid !== 'cañón') pk *= sm.guid === 'activo' ? 0.85 : 0.75;
   if (RADAR_GUID.includes(sm.guid) || sm.guid === 'activo') { const J = jamJ(u, azOf(p.x - u.x, p.y - u.y), jams); if (J > 1) pk *= Math.max(0.5, 1 / (1 + 0.08 * J)); }
   const v = speedAt(th, t); if (v > 0.8 * sm.vmaxT) pk *= 0.8;
-  if (f !== null && usesEnergy(sm.guid)) pk *= energyPk(sm, f, isTBM(th));
+  if (f !== null && usesEnergy(sm.guid)) pk *= energyPk(sm, f, isTBM(th)) * altitudePk(sm, f, isTBM(th), p.z, man);
   return clamp(pk, 0, 0.98);
 }

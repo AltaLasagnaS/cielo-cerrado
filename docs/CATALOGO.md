@@ -974,6 +974,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Altura hasta la que maniobra con toda su aceleración a velocidad máxima (m) | 10.000 | **15.000** | 20.000 | baja | — | est: misil de gran altura (techo 24 km); sin dato publicado de g por altura |
 | Pk de un disparo home-on-jam contra un jammer aéreo | 0,2 | **0,5** | 0,7 | baja | [1] | la variante MIM-104B (ASOJ) se diseñó contra jammers stand-off con home-on-jam; Pk est: guiado solo angular, sin distancia |
 | Radar: blancos que puede seguir a la vez | 50 | **100** | 150 | media | [2] | mismo radar AN/MPQ-65 |
 | Radar: detección contra 1 m² (km) | 90 | **100** | 120 | baja | [3] | mismo radar que el MSE |
@@ -1067,6 +1068,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Altura hasta la que maniobra con toda su aceleración a velocidad máxima (m) | 6.000 | **10.000** | 14.000 | baja | — | est: IR de alta maniobra; su versión aire-aire declara 60 g a baja altura |
 | Radar: blancos que puede seguir a la vez | 500 | **1.500** | 1.500 | media | [1] | TRML-4D: unos 1.500 blancos hasta 250 km (Hensoldt) |
 | Tiempo de recarga de la batería (s) | 600 | **1.200** | 2.400 | baja | — | est: sin dato público firme |
 | Radar: detección contra 1 m² (km) | 80 | **100** | 150 | media | [2] | cazas a más de 120 km, misiles supersónicos a más de 60 km |
@@ -1115,6 +1117,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Altura hasta la que maniobra con toda su aceleración a velocidad máxima (m) | 6.000 | **10.000** | 14.000 | baja | — | est: AIM-120 lanzado desde tierra |
 | Pk de un disparo home-on-jam contra un jammer aéreo | 0,2 | **0,5** | 0,7 | baja | [1] [2] | el AIM-120 tiene modo home-on-jam; Pk est: guiado solo angular, sin distancia |
 | Radar: blancos que puede seguir a la vez | 50 | **60** | 100 | media | [3] | Sentinel: más de 50 blancos simultáneos |
 | Tiempo de recarga de la batería (s) | 900 | **1.800** | 3.600 | baja | — | est: lanzador de 6 AMRAAM recargado con grúa; sin dato público firme |
@@ -1164,6 +1167,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Altura hasta la que maniobra con toda su aceleración a velocidad máxima (m) | 10.000 | **15.000** | 20.000 | baja | — | est: techo 27 km; sin dato publicado de g por altura |
 | Radar: blancos que puede seguir a la vez | 12 | **24** | 50 | baja | [1] | 30N6 Flap Lid A: hasta 24 blancos en seguimiento; la batería suma el radar de búsqueda de la red |
 | Radar: detección contra 1 m² (km) | 80 | **100** | 130 | baja | [1] | est |
 | Radar: sector de búsqueda (°) | 90 | **90** | 90 | alta | [1] | — |
@@ -1207,6 +1211,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Altura hasta la que maniobra con toda su aceleración a velocidad máxima (m) | 6.000 | **10.000** | 14.000 | baja | — | est: techo 22 km pero diseñado para alturas medias |
 | Radar: blancos que puede seguir a la vez | 50 | **50** | 100 | media | [1] | 9S18M: hasta 50 blancos y designación a 6 |
 | Radar: detección contra 1 m² (km) | 35 | **50** | 85 | baja | [2] | 9S18M1 85 km a altura; 9S35 est 40–50 km |
 | Alcance vs aeronaves/crucero (km) | 33 | **35** | 42 | media | [3] | — |
@@ -1306,6 +1311,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Altura hasta la que maniobra con toda su aceleración a velocidad máxima (m) | 1.000 | **2.000** | 3.000 | baja | — | est: misil chico de baja altura |
 | Alcance vs aeronaves/crucero (km) | 4,5 | **4,8** | 6 | alta | [1] [2] | — |
 | Velocidad media del interceptor hasta el alcance máximo (m/s) | 450 | **550** | 650 | baja | — | est: modelo legado de velocidad constante, sin perfil de motor por falta de datos (docs/FISICA.md §6). Una sola entrada para Stinger, Igla y RBS 70: no implica que sean equivalentes |
 | Costo por disparo | US$60k | **US$450k** | US$500k | media | [1] [2] | Igla 60–80k; Stinger >400k |
@@ -1371,6 +1377,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Altura hasta la que maniobra con toda su aceleración a velocidad máxima (m) | 5.000 | **8.000** | 12.000 | baja | — | est |
 | Pk de un disparo home-on-jam contra un jammer aéreo | 0,1 | **0,3** | 0,5 | baja | [1] | el I-Hawk tenía un modo home-on-jam "potencial"; Pk est, menor que en misiles modernos |
 | Radar: blancos que puede seguir a la vez | 10 | **25** | 50 | baja | — | est: radares de búsqueda PAR y CWAR con seguimiento automático; sin cifra pública |
 | Radar: detección contra 1 m² (km) | 50 | **70** | 100 | baja | [2] | CMO: HPIR 45 nmi (83 km) y PAR 54 nmi (100 km) de alcance instrumentado; est contra 1 m² |
@@ -1411,6 +1418,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Altura hasta la que maniobra con toda su aceleración a velocidad máxima (m) | 6.000 | **10.000** | 14.000 | baja | — | est |
 | Radar: blancos que puede seguir a la vez | 5 | **10** | 20 | baja | — | est: la imagen sale del P-18/P-19 con ploteo; el SNR-125 sigue un blanco a la vez |
 | Radar: detección contra 1 m² (km) | 30 | **40** | 60 | baja | [1] | CMO: SNR-125 32 nmi (59 km) instrumentado; est contra 1 m² |
 | Alcance vs aeronaves/crucero (km) | 18 | **25** | 30 | media | [2] [1] | Newa-SC con 5V27: 25 km; CMO 10–16 nmi |
@@ -1450,6 +1458,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Altura hasta la que maniobra con toda su aceleración a velocidad máxima (m) | 12.000 | **18.000** | 24.000 | baja | — | est: misil grande para blancos muy altos (techo 40 km) |
 | Radar: blancos que puede seguir a la vez | 5 | **10** | 20 | baja | — | est: el 5N62 ilumina un blanco; la imagen viene de la red |
 | Radar: detección contra 1 m² (km) | 150 | **250** | 400 | baja | [1] | CMO: 5N62 220 nmi (≈400 km) contra blancos grandes; est contra 1 m² |
 | Alcance vs aeronaves/crucero (km) | 150 | **250** | 300 | media | [1] [2] | 5V28 ≈250 km, 5V28M ≈300 km; derribo a ≈308 km reclamado |
@@ -1487,6 +1496,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Altura hasta la que maniobra con toda su aceleración a velocidad máxima (m) | 3.000 | **5.000** | 8.000 | baja | — | est: defensa de punto de baja altura |
 | Radar: blancos que puede seguir a la vez | 10 | **20** | 40 | baja | [1] | est: el Pantsir-SM declara 40 con radar nuevo; el S1, menos |
 | Radar: detección contra 1 m² (km) | 25 | **30** | 36 | media | [2] | 36 km vs 2 m² |
 | Alcance vs aeronaves/crucero (km) | 18 | **18** | 20 | media | [3] | — |
@@ -1524,6 +1534,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Altura hasta la que maniobra con toda su aceleración a velocidad máxima (m) | 3.000 | **5.000** | 8.000 | baja | — | est: defensa de punto de baja altura |
 | Radar: blancos que puede seguir a la vez | 10 | **48** | 48 | media | [1] | Tor-M2: procesa 48 blancos y sigue 10 para tiro |
 | Radar: detección contra 1 m² (km) | 20 | **25** | 32 | media | [2] [1] | >30 km contra cazas |
 | Alcance vs aeronaves/crucero (km) | 15 | **15** | 16 | media | [3] [2] | — |
@@ -1561,6 +1572,7 @@ Misil de crucero grande y barato: crucero a 850–900 km/h y 20–40 m de altura
 
 | Parámetro | Mín | Probable | Máx | Confianza | Fuentes | Razonamiento |
 |---|---:|---:|---:|---|---|---|
+| Altura hasta la que maniobra con toda su aceleración a velocidad máxima (m) | 10.000 | **15.000** | 20.000 | baja | — | est: techo 27 km; sin dato publicado de g por altura |
 | Radar: blancos que puede seguir a la vez | 100 | **100** | 300 | media | [1] | 92N6: hasta 100 blancos en seguimiento |
 | Radar: detección contra 1 m² (km) | 150 | **200** | 250 | baja | [2] | 92N6: 250–340 km contra blancos grandes |
 | Alcance vs aeronaves/crucero (km) | 240 | **250** | 250 | alta | [1] | — |
@@ -1944,12 +1956,12 @@ Casos corridos con el motor (Monte Carlo) para ajustar las Pk contra episodios r
 | Caso | Dato real | Objetivo | Simulado | Con Pk mín–máx |
 |---|---|---|---:|---|
 | 16 Kh-101 (cada 5 s) contra IRIS-T + NASAMS + radar 3D | NASAMS: 94% reclamado; IRIS-T: "casi 100%" (≈240 derribos). Datos de operador/fabricante, sesgados hacia arriba. | 85–100% | 100% | 100–100% |
-| 20 Kalibr (cada 3 s) contra S-300PS + Buk-M1 + radar 3D | 67% para crucero a nivel nacional (feb-22 → ago-24), con defensa mayormente soviética. | 60–85% | 74% | 61–96% |
+| 20 Kalibr (cada 3 s) contra S-300PS + Buk-M1 + radar 3D | 67% para crucero a nivel nacional (feb-22 → ago-24), con defensa mayormente soviética. | 60–85% | 75% | 61–98% |
 | 60 Shahed + 30 Gerbera contra 2 Gepard, 3 grupos móviles, 2 equipos de interceptores, red acústica | Derribo cinético 52% (mar–may 25) a 63% (2022–24); el resto de la neutralización es guerra electrónica, que el juego no modela como pérdida. | 50–70% | 64% | 45–78% |
 | 8 Iskander-M con maniobra 2025 y señuelos contra una batería Patriot de 3 lanzadores (36 PAC-3 MSE) | 37% nacional en jun–sep 25 (IC95% 31–45%), cota inferior de lo que pasa dentro de cobertura; 6–17% en otoño 2025. | 35–65% | 53% | 34–56% |
 | 6 Kinzhal contra 1 Patriot MSE | 6 de 6 sobre Kyiv el 16/5/2023 (IC95% 61–100%); 25% a nivel nacional. | 61–100% | 98% | 80–100% |
 | 12 Kh-22 (cada 5 s) contra 1 Patriot MSE (16 misiles) | 9 de 12 sobre Kyiv el 2/2/2026 (IC95% 47–91%). | 47–91% | 62% | 48–67% |
 | 6 Kh-22 contra IRIS-T + NASAMS, sin Patriot | 3 de más de 400 derribados antes de feb-2026 (IC95% 0–2%). | 0–10% | 0% | 0–0% |
-| 6 Kh-22 contra S-300PS + radar 3D, sin Patriot | 3 de más de 400 derribados antes de feb-2026 por la defensa sin Patriot, que incluía S-300 sobre las ciudades atacadas (IC95% 0–2%). | 0–10% | 5% | 2–10% |
+| 6 Kh-22 contra S-300PS + radar 3D, sin Patriot | 3 de más de 400 derribados antes de feb-2026 por la defensa sin Patriot, que incluía S-300 sobre las ciudades atacadas (IC95% 0–2%). | 0–10% | 2% | 0–2% |
 | 6 Oniks (perfil hi-lo) contra IRIS-T + NASAMS ubicados en el blanco | 5,7% a nivel nacional (12 de 211). No hay datos dentro de cobertura: caso de control, sin objetivo. | — | 57% | 38–86% |
 | 4 Zircon contra Patriot + SAMP/T | 2 de 2 sobre Kyiv el 25/3/2024 (IC95% 34–100%); 33% nacional hasta ago-24. | 34–100% | 99% | 79–100% |
