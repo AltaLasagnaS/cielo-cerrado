@@ -1,6 +1,6 @@
 // Tarjeta "Selección": detalle y parámetros editables de lo que esté seleccionado en el mapa
 // (defensa, jammer, salva o amenaza en vuelo).
-import { THREATS, JAMMERS, JAM_MODES, TARGET_TYPES, TARGET_STATUS, D, DATALINKS, datalinksOf, UNIT_TARGET, C2_LEVELS } from '../../data/index.js';
+import { THREATS, JAMMERS, JAM_MODES, TARGET_TYPES, TARGET_STATUS, D, DATALINKS, datalinksOf, UNIT_TARGET, C2_LEVELS, C2_ORDER } from '../../data/index.js';
 import { esc, fmtT, kmh, money } from '../../util/format.js';
 import { releaseId } from '../../util/ids.js';
 import { surf, latlon } from '../../physics/terrain.js';
@@ -60,7 +60,7 @@ export function renderSel(live) {
       if (d.sam || r) html += `<h3>Enlace técnico de pistas</h3>`;
       if (datalinksOf(d).length) html += `<label class="check"><input type="checkbox" id="sLink" ${u.link !== false ? 'checked' : ''}> Datalink activo (${esc(links)})</label><p class="hint">Al apagarlo, esta unidad deja de publicar y recibir pistas de tiro por enlaces compatibles. Conserva su sensor propio y puede recibir alertas C2 si la coordinación general lo permite.</p>`;
       else if (d.sam || r) html += `<p class="hint">Sin enlace técnico compatible: las alertas C2 no son una pista de tiro ni permiten guiar un misil con un sensor ajeno.</p>`;
-      if (d.sam || r) html += `<h3>Coordinación C2 (general)</h3><p class="hint">${esc(C2_LEVELS[S.c2].name)}. Se cambia en Defensa para toda la red. En Desconectada no hay alertas compartidas, pistas de red ni reparto de blancos; las unidades conservan sus sensores y disparos propios. El datalink de esta unidad no cambia ese nivel general.</p>`;
+      if (d.sam || r) html += `<h3>Coordinación C2</h3><p class="hint">Red: ${esc(C2_LEVELS[S.c2].name)} (se cambia en Defensa). En Desconectada no hay alertas compartidas, pistas de red ni reparto de blancos; las unidades conservan sus sensores y disparos propios.</p><div class="field"><label for="sC2">Esta unidad</label><select id="sC2" class="sel">${['', ...C2_ORDER.slice(0, C2_ORDER.indexOf(S.c2))].map(k => `<option value="${k}" ${(u.c2 || '') === k ? 'selected' : ''}>${k ? esc(C2_LEVELS[k].name) : 'Igual que la red'}</option>`).join('')}</select></div><p class="hint">Una unidad puede quedar con menos coordinación que la red (por ejemplo, una batería aislada o que no está en el mismo puesto de mando). Desconectada: ni avisa ni recibe.</p>`;
       if (d.sam) html += `<label class="check"><input type="checkbox" id="sNoD" ${u.noDrones ? 'checked' : ''}> No gastar en drones (reservar para misiles)</label><div class="field"><label for="sMag">Munición disponible</label><input id="sMag" class="inp" type="number" min="1" max="200" value="${u.mag}"></div><div class="field"><label for="sRes">Reserva para recargar (${Math.round(d.sam.reloadS / 60)} min por recarga)</label><input id="sRes" class="inp" type="number" min="0" max="500" value="${u.reserve ?? 0}"></div><div class="field"><label for="sSal">Interceptores por blanco</label><input id="sSal" class="inp" type="number" min="1" max="4" value="${u.salvo}"></div>`;
     }
     html += `<div class="row"><button class="btn sm" id="sInfo">Ficha</button>${ed ? '<button class="btn sm danger" id="sDel">Eliminar</button>' : ''}</div>`;
@@ -71,6 +71,7 @@ export function renderSel(live) {
       bind('#sMast', 'mast', 1); bind('#sAlt', 'alt', 1); bind('#sAz', 'az', 1); bind('#sMag', 'mag'); bind('#sRes', 'reserve'); bind('#sSal', 'salvo');
       if ($('#sNoD')) $('#sNoD').onchange = e => { u.noDrones = e.target.checked; };
       if ($('#sLink')) $('#sLink').onchange = e => { u.link = e.target.checked; };
+      if ($('#sC2')) $('#sC2').onchange = e => { if (e.target.value) u.c2 = e.target.value; else delete u.c2; };
       $('#sDel').onclick = () => { S.setup.defs = S.setup.defs.filter(v => v.id !== u.id); S.sel = null; renderSel(); schedCov(); };
     }
   } else if (sel.kind === 'jam') {

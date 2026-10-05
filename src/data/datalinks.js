@@ -30,6 +30,26 @@ export const DATALINKS = {
   }
 };
 
+/**
+ * Pasarelas entre familias (docs/FISICA.md §6, "Enlaces"): una pista publicada en la red a llega a los
+ * usuarios de la red b (y al revés) con gwLag segundos más de demora, y un disparo con esa pista rinde
+ * ×gwPk (la conversión de formato y la demora agregan error de posición). Rango y fuentes en UNC.gw.
+ */
+export const GATEWAYS = {
+  ua_l16: {
+    name: 'Pasarela Link 16 ↔ red C2 ucraniana', a: 'l16', b: 'ua_c2', gwLag: 10, gwPk: 0.95,
+    note: 'Ucrania convirtió la salida de sus radares soviéticos a su imagen aérea común con los sistemas occidentales ("cajas negras" de conversión, 2022–24) y firmó la licencia de Link 16 en 2025. Demora y pérdida: estimación.',
+    sources: ['ms_lessons', 'nv_l16']
+  }
+};
+
+/** Pasarelas que llevan pistas de otra red a la red key: [{ from, G }]. */
+export function gatewaysInto(key) {
+  const out = [];
+  for (const G of Object.values(GATEWAYS)) { if (G.a === key) out.push({ from: G.b, G }); else if (G.b === key) out.push({ from: G.a, G }); }
+  return out;
+}
+
 export const datalinksOf = u => {
   const links = u?.datalinks ?? u?.links ?? [];
   return Array.isArray(links) ? links.filter(k => DATALINKS[k]) : [];

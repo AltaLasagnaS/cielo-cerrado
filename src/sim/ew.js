@@ -6,7 +6,7 @@ import { rnd } from '../util/rng.js';
 import { azOf } from '../util/math.js';
 import { jamJ, jamPos, antZ } from '../physics/radar.js';
 import { STROBE_J, FIX_MAX_KM, bearingSigma, fixError } from '../physics/jamloc.js';
-import { effectiveC2 } from '../physics/engagement.js';
+import { effectiveC2, unitC2 } from '../physics/engagement.js';
 import { profileOf, timeTo } from '../physics/interceptor.js';
 import { S } from './state.js';
 import { log, uLabel } from './log.js';
@@ -39,14 +39,15 @@ export function ewStep(t) {
     else log('x', 'El misil home-on-jam de ' + uLabel(h.u) + ' falla contra el ' + JJ.short + '.');
   }
   if (t < S.ewNext) return; S.ewNext = t + EW_DT;
-  const share = C2_LEVELS[effectiveC2(S.c2, S.objs)].share;
+  const c2g = effectiveC2(S.c2, S.objs), inNet = s => C2_LEVELS[unitC2(s.u, c2g)].share !== 'none';
   for (const j of S.jamsLive) {
     const JJ = JAMMERS[j.type]; if (JJ.gnssJam || !j.on || j.dead) continue;
     const st = strobes(j); if (!st.length) continue;
     // triangulación: hace falta compartir marcaciones entre unidades (cualquier C2 menos "desconectada")
-    if (share !== 'none' && st.length >= 2) {
+    const net = st.filter(inNet);
+    if (net.length >= 2) {
       let best = Infinity, pair = null;
-      for (let a = 0; a < st.length; a++) for (let b = a + 1; b < st.length; b++) { const e = fixError(st[a], st[b], j.x, j.y); if (e < best) { best = e; pair = [st[a].u, st[b].u]; } }
+      for (let a = 0; a < net.length; a++) for (let b = a + 1; b < net.length; b++) { const e = fixError(net[a], net[b], j.x, j.y); if (e < best) { best = e; pair = [net[a].u, net[b].u]; } }
       if (best <= FIX_MAX_KM && (!j.fix || best < j.fix.err)) {
         if (!j.fix) log('l', JJ.short + ' ubicado por triangulación entre ' + uLabel(pair[0]) + ' y ' + uLabel(pair[1]) + ': error ≈ ' + best.toFixed(1) + ' km.');
         j.fix = { t, err: best };

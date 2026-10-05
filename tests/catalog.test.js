@@ -1,7 +1,7 @@
 // Integridad del catálogo: atrapa errores de tipeo al agregar armas, fuentes o escenarios.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { THREATS, DEFENSES, JAMMERS, BANDS, CLS_NAME, UNC, OBS, SRC, SCENARIOS, TERRAIN, PL, TARGET_TYPES, C2_LEVELS, CLUTTER, applySample, applyProbable } from '../src/data/index.js';
+import { THREATS, DEFENSES, JAMMERS, BANDS, CLS_NAME, UNC, OBS, SRC, SCENARIOS, TERRAIN, PL, TARGET_TYPES, C2_LEVELS, CLUTTER, GATEWAYS, applySample, applyProbable } from '../src/data/index.js';
 
 const PROFILES = ['drone', 'cruise', 'bunt', 'ballistic', 'highdive', 'hilo', 'glide'];
 
@@ -29,7 +29,7 @@ test('jammers: bandas existentes', () => {
 });
 
 test('incertidumbre: rangos ordenados, confianza válida, etiquetas y fuentes existentes', () => {
-  const CAT = { thr: THREATS, def: DEFENSES, jam: JAMMERS, c2: C2_LEVELS, clu: CLUTTER };
+  const CAT = { thr: THREATS, def: DEFENSES, jam: JAMMERS, c2: C2_LEVELS, clu: CLUTTER, gw: GATEWAYS };
   for (const [kind, set] of Object.entries(UNC)) for (const [k, params] of Object.entries(set)) {
     assert.ok(CAT[kind][k], `UNC.${kind}.${k} no existe en el catálogo`);
     for (const [path, u] of Object.entries(params)) {
@@ -108,8 +108,8 @@ test('los valores escritos en el catálogo coinciden con el probable de UNC (lec
   // Se importan los módulos crudos en un proceso aparte para ver los literales antes de applyProbable().
   const { execFileSync } = await import('node:child_process');
   const out = execFileSync(process.execPath, ['--input-type=module', '-e', `
-    const { THREATS } = await import('./src/data/threats.js'); const { DEFENSES } = await import('./src/data/defenses.js'); const { JAMMERS } = await import('./src/data/jammers.js'); const { C2_LEVELS } = await import('./src/data/c2.js'); const { CLUTTER } = await import('./src/data/clutter.js');
-    console.log(JSON.stringify({ thr: THREATS, def: DEFENSES, jam: JAMMERS, c2: C2_LEVELS, clu: CLUTTER }));`], { encoding: 'utf8' });
+    const { THREATS } = await import('./src/data/threats.js'); const { DEFENSES } = await import('./src/data/defenses.js'); const { JAMMERS } = await import('./src/data/jammers.js'); const { C2_LEVELS } = await import('./src/data/c2.js'); const { CLUTTER } = await import('./src/data/clutter.js'); const { GATEWAYS } = await import('./src/data/datalinks.js');
+    console.log(JSON.stringify({ thr: THREATS, def: DEFENSES, jam: JAMMERS, c2: C2_LEVELS, clu: CLUTTER, gw: GATEWAYS }));`], { encoding: 'utf8' });
   const raw = JSON.parse(out), get = (o, p) => p.split('.').reduce((a, k) => a?.[k], o);
   for (const [kind, set] of Object.entries(UNC)) for (const [k, params] of Object.entries(set)) for (const [path, u] of Object.entries(params)) {
     if (path.startsWith('info.')) continue;

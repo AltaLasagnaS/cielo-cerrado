@@ -21,6 +21,7 @@ export const PL = {
   'sam.pk.balistico': ['Pk por disparo vs balísticos', ''], 'sam.pk.hiper': ['Pk por disparo vs hipersónicos', ''],
   landDb: ['Clutter de suelo rasante (σ°F⁴ mediano)', 'dB'], reliefDb: ['Variación del clutter de suelo con el relieve', '± dB'], res: ['Resolución en distancia típica', 'm'], ruK: ['Alcance sin ambigüedad del MTI (× R1)', '×'],
   mtiCap: ['Techo del factor de mejora MTI', 'dB'], pdCap: ['Factor de mejora pulso-Doppler', 'dB'], landSv: ['Dispersión de velocidad del clutter de suelo', 'm/s'], seaSv: ['Dispersión de velocidad del clutter de mar', 'm/s'], rainSv: ['Dispersión de velocidad del clutter de lluvia', 'm/s'],
+  gwLag: ['Demora agregada por la pasarela', 's'], gwPk: ['Pk de un disparo con pista que pasó por la pasarela (factor)', '×'],
   alt: ['Altitud de patrulla', 'm'], remotePk: ['Pk de un disparo con pista de red (factor)', '×'], radius: ['Radio de efecto', 'km'], spoofKm: ['Desvío típico por engaño GNSS', 'km'], P: ['Potencia relativa (juego)', '']
 };
 export const RCS_NOTE = 'est: sin medición pública; analogía con la tabla de GlobalSecurity (Tomahawk 0,5 m², ALCM furtivo <0,05, Harpoon/Exocet 0,1) y tamaño/forma';
@@ -516,6 +517,13 @@ export const UNC = {
     f16ecm: {
       P: U(1e4, 3e4, 1e5, 'baja', S_('ng_alq131', 'fas_alq131'), 'parámetro de juego: potencia y bandas del pod no son públicas. Un orden de magnitud menos que el Il-22PP (3e5): un pod de caza tiene menos potencia y antenas mucho más chicas; est'),
       alt: U(300, 4000, 8000, 'baja', [], 'est: los F-16 ucranianos vuelan bajo para sobrevivir y suben para lanzar; altura de patrulla de juego')
+    }
+  },
+  // pasarelas entre familias de enlaces (data/datalinks.js#GATEWAYS)
+  gw: {
+    ua_l16: {
+      gwLag: U(3, 10, 30, 'baja', S_('ms_lessons'), 'est: conversión de formato y retransmisión; sin cifra pública'),
+      gwPk: U(0.85, 0.95, 1, 'baja', S_('ms_lessons'), 'est: la demora y la conversión agregan error de posición a la pista')
     }
   },
   // modelo de clutter (data/clutter.js, physics/clutter.js); valores por clase de radar, no por sistema

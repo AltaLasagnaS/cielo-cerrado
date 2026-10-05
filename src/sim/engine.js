@@ -12,7 +12,7 @@ import { surf, los } from '../physics/terrain.js';
 import { antZ, aspectCos, belowCeiling, detR, inSector, jamJ, pdScan, PD_CUTOFF, confirms, scanHistory, falseTracks } from '../physics/radar.js';
 import { buildThreat, posAt, speedAt } from '../physics/kinematics.js';
 import { gnssNavError, crpaOverwhelmed } from '../physics/navigation.js';
-import { RADAR_GUID, isTBM, trackOK, reactionStart, solve, calcPk, effectiveC2 } from '../physics/engagement.js';
+import { RADAR_GUID, isTBM, trackOK, reactionStart, solve, calcPk, effectiveC2, unitC2, netPk } from '../physics/engagement.js';
 import { C2_LEVELS } from '../data/index.js';
 import { damageAt, targetStatus } from '../physics/damage.js';
 import { azOf } from '../util/math.js';
@@ -130,10 +130,12 @@ export function step(dt) {
         th.det[u.id] = t;
         const g = classifyGain(r);   // seguimiento con radar de tiro: aprende a distinguir señuelos
         if (g) { th.clsT = (th.clsT || 0) + g; th.clsTau = Math.min(th.clsTau ?? Infinity, classifyTau(r)); const c = classify(th); if (c && !th.clsAs) { th.clsAs = c; if (c === 'señuelo' && S.ignoreDecoys) log('d', 'Pista #' + th.id + ' clasificada como señuelo por ' + uLabel(u) + (th.isDecoy ? '.' : ' (¡error: era ' + th.T.short + '!).')); } }
-        // La coordinación C2 puede repartir una alerta aun cuando el datalink de tiro esté apagado.
-        if (th.cueFirst === null) th.cueFirst = t;
+        // La coordinación C2 puede repartir una alerta aun cuando el datalink de tiro esté apagado; una
+        // unidad asignada a "desconectada" (u.c2) no avisa ni publica.
+        const inNet = u.c2 !== 'desconectada';
+        if (th.cueFirst === null && inNet) th.cueFirst = t;
         // Una pista de tiro solo entra a la red por un transporte compatible y encendido.
-        if (u.link !== false) for (const key of datalinksOf(D(u))) {
+        if (u.link !== false && inNet) for (const key of datalinksOf(D(u))) {
           const n = th.net[key] || (th.net[key] = { first: null, last: -1e9 });
           if (n.first === null) n.first = t;
           n.last = t;
@@ -171,7 +173,7 @@ export function step(dt) {
     if (!th.alive) { log('d', it.shot + ' de ' + uLabel(u) + ': blanco ya destruido, autodestrucción.'); continue; }
     // guiado por el radar de la batería (SARH, TVM, mando): si la batería cayó, el misil queda sin guía
     if (!u.alive && RADAR_GUID.includes(D(u).sam.guid)) { log('x', it.shot + ' de ' + uLabel(u) + ' pierde la guía: su batería fue destruida.'); continue; }
-    const pk = calcPk(u, th, t, S.jamsLive, it.f ?? null) * (it.remote ? C2_LEVELS[it.c2].remotePk : 1);   // error de posición de la pista de red
+    const pk = calcPk(u, th, t, S.jamsLive, it.f ?? null) * (it.remote ? C2_LEVELS[it.c2].remotePk * (it.gw ?? 1) : 1);   // error de posición de la pista de red (y de la pasarela)
     if (rnd() < pk) {
       th.alive = false; th.killed = true; th.tEnd = t; S.stats.killed++; if (th.isDecoy) S.stats.decoysKilled++;
       const p = th.p || it; S.fx.push({ x: p.x, y: p.y, rt: performance.now(), c: '#6fd08c' });
@@ -277,7 +279,7 @@ function reaches(v, th, t) {
 export function engage(u, t) {
   const d = D(u), sm = d.sam; const ch = sm.ch;
   if (u.active >= ch) return;
-  const c2 = effectiveC2(S.c2, S.objs), L = C2_LEVELS[c2];
+  const c2net = effectiveC2(S.c2, S.objs), c2 = unitC2(u, c2net), L = C2_LEVELS[c2];
   const cand = [];
   for (const th of S.threats) if (canEngage(u, th, t, c2, false)) cand.push([th, th.p.rem / Math.max(1, th.T.v)]);
   cand.sort((a, b) => a[1] - b[1]);
@@ -287,7 +289,7 @@ export function engage(u, t) {
     if (L.best && u.link !== false) {
       // mejor tirador ahora: otra batería con enlace que también puede tirar ya y es mejor
       const mine = shooterScore(u, th, t, f.sol.f);
-      const better = S.units.some(v => { if (v === u || v.link === false || !canEngage(v, th, t, c2, true)) return false; const fv = solveFor(v, th, t); return !!fv && shooterScore(v, th, t, fv.sol.f) > mine * (th.cls === 'dron' ? 0.999 : 1.001); });
+      const better = S.units.some(v => { if (v === u || v.link === false || !canEngage(v, th, t, unitC2(v, c2net), true)) return false; const fv = solveFor(v, th, t); return !!fv && shooterScore(v, th, t, fv.sol.f) > mine * (th.cls === 'dron' ? 0.999 : 1.001); });
       if (better) continue;
       // defensa por capas: un dron se le deja a una capa al menos 2 veces más barata por derribo que
       // tenga munición y por cuya envolvente vaya a pasar antes de llegar
@@ -300,7 +302,7 @@ export function engage(u, t) {
     const { sol, remote } = f;
     const n = Math.min(S.doctrine === 'salva' ? (u.salvo || sm.salvo) : 1, u.magLeft, ch - u.active);
     for (let k = 0; k < n; k++) {
-      const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f };
+      const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f, gw: remote ? (netPk(u, th, t, c2) || 1) : 1 };
       S.ints.push(it); (th.fly = th.fly || []).push(it);
       S.rec?.ints.push(it); u.magLeft--; u.active++; S.stats.shots++; S.stats.defCost += sm.cost; recUnit(u);
       S.stats.byUnit[uLabel(u)] = (S.stats.byUnit[uLabel(u)] || 0) + 1;

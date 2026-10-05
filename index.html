@@ -714,6 +714,8 @@ table.t.mc td.pc{white-space:nowrap}
     rusi_storm: ["RUSI: Stormbreak (2023)", "https://static.rusi.org/Stormbreak-Special-Report-web-final_0.pdf"],
     rt_9s18m: ["Radartutorial: 9S18M (radar de búsqueda del Buk)", "https://www.radartutorial.eu/19.kartei/02.surv/karte093.en.html"],
     rt_arabel: ["Radartutorial: Arabel (SAMP/T)", "https://www.radartutorial.eu/19.kartei/04.battle/karte035.en.html"],
+    ms_lessons: ["MissileStrikes: Lessons from Ukraine air defense (integración de radares soviéticos con la imagen común; fuente secundaria)", "https://missilestrikes.com/guide/lessons-from-ukraine-air-defense/"],
+    nv_l16: ["NV: Ucrania se integra al sistema de aviación de la OTAN (licencia Link 16, 2025)", "https://english.nv.ua/nation/ukraine-integrates-into-nato-s-aviation-system-defense-ministry-says-50518462.html"],
     // clutter (physics/clutter.js)
     skolnik_mti: ['Shrader y Gregers-Hansen, "MTI Radar", cap. 15 del Radar Handbook (Skolnik, 2.ª ed., 1990): tabla 15.1 (espectro del clutter), tabla 15.2 (reflectividad, de Barton) y ec. 15.9–15.11 (factor de mejora)', "https://helitavia.com/skolnik/Skolnik_chapter_15.pdf"],
     nrl_sea: ['Gregers-Hansen y Mital, "An Improved Empirical Model for Radar Sea Clutter Reflectivity", NRL/MR/5310--12-9346 (2012); coeficientes en la implementación pública de scivision', "https://github.com/scivision/nrl-radar-sea-clutter/blob/main/NRL_SigmaSea.m"],
@@ -1678,6 +1680,8 @@ table.t.mc td.pc{white-space:nowrap}
     landSv: ["Dispersión de velocidad del clutter de suelo", "m/s"],
     seaSv: ["Dispersión de velocidad del clutter de mar", "m/s"],
     rainSv: ["Dispersión de velocidad del clutter de lluvia", "m/s"],
+    gwLag: ["Demora agregada por la pasarela", "s"],
+    gwPk: ["Pk de un disparo con pista que pasó por la pasarela (factor)", "×"],
     alt: ["Altitud de patrulla", "m"],
     remotePk: ["Pk de un disparo con pista de red (factor)", "×"],
     radius: ["Radio de efecto", "km"],
@@ -2178,6 +2182,13 @@ table.t.mc td.pc{white-space:nowrap}
         alt: U(300, 4e3, 8e3, "baja", [], "est: los F-16 ucranianos vuelan bajo para sobrevivir y suben para lanzar; altura de patrulla de juego")
       }
     },
+    // pasarelas entre familias de enlaces (data/datalinks.js#GATEWAYS)
+    gw: {
+      ua_l16: {
+        gwLag: U(3, 10, 30, "baja", S_("ms_lessons"), "est: conversión de formato y retransmisión; sin cifra pública"),
+        gwPk: U(0.85, 0.95, 1, "baja", S_("ms_lessons"), "est: la demora y la conversión agregan error de posición a la pista")
+      }
+    },
     // modelo de clutter (data/clutter.js, physics/clutter.js); valores por clase de radar, no por sistema
     clu: {
       modelo: {
@@ -2258,6 +2269,54 @@ table.t.mc td.pc{white-space:nowrap}
       seaSv: 0.9,
       rainSv: 2
     }
+  };
+
+  // src/data/datalinks.js
+  var DATALINKS = {
+    l16: {
+      name: "Link 16 / MIDS",
+      capability: "track",
+      confidence: "media",
+      note: "Familia de intercambio táctico occidental; el acceso y la capacidad de engage-on-remote dependen de la integración concreta.",
+      sources: ["crs_nasams", "kongsberg"]
+    },
+    ua_c2: {
+      name: "Red C2 nacional ucraniana",
+      capability: "track",
+      confidence: "media",
+      note: "Gateway nacional para sistemas soviéticos y occidentales; no se presume interoperabilidad de calidad de tiro entre todos los usuarios.",
+      sources: ["ua_mix"]
+    },
+    ru_c2: {
+      name: "Red automatizada rusa",
+      capability: "track",
+      confidence: "media",
+      note: "Familia Polyana/Baikal/Senezh; el comportamiento real de cada despliegue no es público.",
+      sources: ["ru_polyana"]
+    }
+  };
+  var GATEWAYS = {
+    ua_l16: {
+      name: "Pasarela Link 16 ↔ red C2 ucraniana",
+      a: "l16",
+      b: "ua_c2",
+      gwLag: 10,
+      gwPk: 0.95,
+      note: 'Ucrania convirtió la salida de sus radares soviéticos a su imagen aérea común con los sistemas occidentales ("cajas negras" de conversión, 2022–24) y firmó la licencia de Link 16 en 2025. Demora y pérdida: estimación.',
+      sources: ["ms_lessons", "nv_l16"]
+    }
+  };
+  function gatewaysInto(key) {
+    const out = [];
+    for (const G of Object.values(GATEWAYS)) {
+      if (G.a === key) out.push({ from: G.b, G });
+      else if (G.b === key) out.push({ from: G.a, G });
+    }
+    return out;
+  }
+  var datalinksOf = (u) => {
+    const links = u?.datalinks ?? u?.links ?? [];
+    return Array.isArray(links) ? links.filter((k) => DATALINKS[k]) : [];
   };
 
   // src/data/bands.js
@@ -2867,35 +2926,6 @@ table.t.mc td.pc{white-space:nowrap}
     gb_vacio: { map: "goteborg", name: "Gotemburgo · vacío", player: "defensa", description: "Mapa libre para armar tu propio escenario: ubicá objetivos, defensas, ataques y guerra electrónica.", objectives: [], defs: [], salvos: [], jams: [], goals: [] }
   };
 
-  // src/data/datalinks.js
-  var DATALINKS = {
-    l16: {
-      name: "Link 16 / MIDS",
-      capability: "track",
-      confidence: "media",
-      note: "Familia de intercambio táctico occidental; el acceso y la capacidad de engage-on-remote dependen de la integración concreta.",
-      sources: ["crs_nasams", "kongsberg"]
-    },
-    ua_c2: {
-      name: "Red C2 nacional ucraniana",
-      capability: "track",
-      confidence: "media",
-      note: "Gateway nacional para sistemas soviéticos y occidentales; no se presume interoperabilidad de calidad de tiro entre todos los usuarios.",
-      sources: ["ua_mix"]
-    },
-    ru_c2: {
-      name: "Red automatizada rusa",
-      capability: "track",
-      confidence: "media",
-      note: "Familia Polyana/Baikal/Senezh; el comportamiento real de cada despliegue no es público.",
-      sources: ["ru_polyana"]
-    }
-  };
-  var datalinksOf = (u) => {
-    const links = u?.datalinks ?? u?.links ?? [];
-    return Array.isArray(links) ? links.filter((k) => DATALINKS[k]) : [];
-  };
-
   // src/data/weather.js
   var WEATHER = {
     despejado: {
@@ -3116,7 +3146,7 @@ table.t.mc td.pc{white-space:nowrap}
     }
     a[ks[ks.length - 1]] = v;
   }
-  var CAT_OF = { thr: THREATS, def: DEFENSES, jam: JAMMERS, c2: C2_LEVELS, clu: CLUTTER };
+  var CAT_OF = { thr: THREATS, def: DEFENSES, jam: JAMMERS, c2: C2_LEVELS, clu: CLUTTER, gw: GATEWAYS };
   function applyProbable() {
     for (const [kind, set] of Object.entries(UNC)) for (const [k, params] of Object.entries(set)) {
       const obj = CAT_OF[kind][k];
@@ -4203,10 +4233,7 @@ table.t.mc td.pc{white-space:nowrap}
   var isTBM = (th) => th.cls === "balistico" || th.cls === "hiper";
   function trackOK(u, th, t, c2) {
     const d = D(u), L = C2_LEVELS[c2], own = d.radar ? t - (th.det[u.id] ?? -1e9) <= d.radar.scan * 2 + 0.6 : false;
-    const compatible = datalinksOf(d).some((key) => {
-      const n2 = th.net?.[key];
-      return n2 && n2.first != null && t - n2.first >= L.lag && t - n2.last <= L.window;
-    });
+    const compatible = netPk(u, th, t, c2) > 0;
     const legacy = !th.net && th.netFirst != null && t - th.netFirst >= L.lag && t - th.lastNet <= L.window;
     const netT = u.link !== false && (L.share === "track" || L.share === "fire") && (compatible || legacy);
     if (d.sam.guid === "cañón") return own;
@@ -4214,6 +4241,17 @@ table.t.mc td.pc{white-space:nowrap}
     if (d.sam.guid === "operador") return netT;
     return own || netT;
   }
+  function netPk(u, th, t, c2) {
+    const L = C2_LEVELS[c2];
+    let best = 0;
+    const fresh = (n2, lag) => n2 && n2.first != null && t - n2.first >= L.lag + lag && t - n2.last <= L.window;
+    for (const key of datalinksOf(D(u))) {
+      if (fresh(th.net?.[key], 0)) return 1;
+      for (const { from, G } of gatewaysInto(key)) if (fresh(th.net?.[from], G.gwLag)) best = Math.max(best, G.gwPk);
+    }
+    return best;
+  }
+  var unitC2 = (u, c2) => u.c2 && C2_ORDER.indexOf(u.c2) >= 0 && C2_ORDER.indexOf(u.c2) < C2_ORDER.indexOf(c2) ? u.c2 : c2;
   function reactionStart(th, t, c2, u = null) {
     const L = C2_LEVELS[c2];
     if ((L.share === "cue" || L.share === "fire") && th.cueFirst != null) return Math.min(t, th.cueFirst + L.lag);
@@ -4434,19 +4472,20 @@ table.t.mc td.pc{white-space:nowrap}
     }
     if (t < S.ewNext) return;
     S.ewNext = t + EW_DT;
-    const share = C2_LEVELS[effectiveC2(S.c2, S.objs)].share;
+    const c2g = effectiveC2(S.c2, S.objs), inNet = (s) => C2_LEVELS[unitC2(s.u, c2g)].share !== "none";
     for (const j of S.jamsLive) {
       const JJ = JAMMERS[j.type];
       if (JJ.gnssJam || !j.on || j.dead) continue;
       const st = strobes(j);
       if (!st.length) continue;
-      if (share !== "none" && st.length >= 2) {
+      const net = st.filter(inNet);
+      if (net.length >= 2) {
         let best = Infinity, pair = null;
-        for (let a = 0; a < st.length; a++) for (let b = a + 1; b < st.length; b++) {
-          const e = fixError(st[a], st[b], j.x, j.y);
+        for (let a = 0; a < net.length; a++) for (let b = a + 1; b < net.length; b++) {
+          const e = fixError(net[a], net[b], j.x, j.y);
           if (e < best) {
             best = e;
-            pair = [st[a].u, st[b].u];
+            pair = [net[a].u, net[b].u];
           }
         }
         if (best <= FIX_MAX_KM && (!j.fix || best < j.fix.err)) {
@@ -4645,8 +4684,9 @@ table.t.mc td.pc{white-space:nowrap}
               if (c === "señuelo" && S.ignoreDecoys) log("d", "Pista #" + th.id + " clasificada como señuelo por " + uLabel(u) + (th.isDecoy ? "." : " (¡error: era " + th.T.short + "!)."));
             }
           }
-          if (th.cueFirst === null) th.cueFirst = t;
-          if (u.link !== false) for (const key of datalinksOf(D(u))) {
+          const inNet = u.c2 !== "desconectada";
+          if (th.cueFirst === null && inNet) th.cueFirst = t;
+          if (u.link !== false && inNet) for (const key of datalinksOf(D(u))) {
             const n2 = th.net[key] || (th.net[key] = { first: null, last: -1e9 });
             if (n2.first === null) n2.first = t;
             n2.last = t;
@@ -4698,7 +4738,7 @@ table.t.mc td.pc{white-space:nowrap}
         log("x", it.shot + " de " + uLabel(u) + " pierde la guía: su batería fue destruida.");
         continue;
       }
-      const pk = calcPk(u, th, t, S.jamsLive, it.f ?? null) * (it.remote ? C2_LEVELS[it.c2].remotePk : 1);
+      const pk = calcPk(u, th, t, S.jamsLive, it.f ?? null) * (it.remote ? C2_LEVELS[it.c2].remotePk * (it.gw ?? 1) : 1);
       if (rnd() < pk) {
         th.alive = false;
         th.killed = true;
@@ -4787,7 +4827,7 @@ table.t.mc td.pc{white-space:nowrap}
     const d = D(u), sm = d.sam;
     const ch = sm.ch;
     if (u.active >= ch) return;
-    const c2 = effectiveC2(S.c2, S.objs), L = C2_LEVELS[c2];
+    const c2net = effectiveC2(S.c2, S.objs), c2 = unitC2(u, c2net), L = C2_LEVELS[c2];
     const cand = [];
     for (const th of S.threats) if (canEngage(u, th, t, c2, false)) cand.push([th, th.p.rem / Math.max(1, th.T.v)]);
     cand.sort((a, b) => a[1] - b[1]);
@@ -4802,7 +4842,7 @@ table.t.mc td.pc{white-space:nowrap}
       if (L.best && u.link !== false) {
         const mine = shooterScore(u, th, t, f.sol.f);
         const better = S.units.some((v) => {
-          if (v === u || v.link === false || !canEngage(v, th, t, c2, true)) return false;
+          if (v === u || v.link === false || !canEngage(v, th, t, unitC2(v, c2net), true)) return false;
           const fv = solveFor(v, th, t);
           return !!fv && shooterScore(v, th, t, fv.sol.f) > mine * (th.cls === "dron" ? 0.999 : 1.001);
         });
@@ -4816,7 +4856,7 @@ table.t.mc td.pc{white-space:nowrap}
       const { sol, remote } = f;
       const n2 = Math.min(S.doctrine === "salva" ? u.salvo || sm.salvo : 1, u.magLeft, ch - u.active);
       for (let k = 0; k < n2; k++) {
-        const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f };
+        const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f, gw: remote ? netPk(u, th, t, c2) || 1 : 1 };
         S.ints.push(it);
         (th.fly = th.fly || []).push(it);
         S.rec?.ints.push(it);
@@ -4960,6 +5000,7 @@ table.t.mc td.pc{white-space:nowrap}
   function addDef(type, x, y, o = {}) {
     const d = DEFENSES[type];
     const u = { id: nextId(), type, x, y, az: o.az ?? defaultAz(x, y), mast: d.radar ? d.kind === "aew" ? 0 : d.radar.mast : 2, alt: d.alt, mag: d.sam ? d.sam.mag : 0, reserve: d.sam ? o.reserve ?? d.sam.reserve ?? 0 : 0, salvo: d.sam ? d.sam.salvo : 0, noDrones: d.sam ? !!d.sam.noDrones : false, link: o.link ?? true, name: o.name || nextName(type) };
+    if (o.c2) u.c2 = o.c2;
     S.setup.defs.push(u);
     return u;
   }
@@ -6756,7 +6797,7 @@ table.t.mc td.pc{white-space:nowrap}
         if (d.sam || r) html += `<h3>Enlace técnico de pistas</h3>`;
         if (datalinksOf(d).length) html += `<label class="check"><input type="checkbox" id="sLink" ${u.link !== false ? "checked" : ""}> Datalink activo (${esc(links)})</label><p class="hint">Al apagarlo, esta unidad deja de publicar y recibir pistas de tiro por enlaces compatibles. Conserva su sensor propio y puede recibir alertas C2 si la coordinación general lo permite.</p>`;
         else if (d.sam || r) html += `<p class="hint">Sin enlace técnico compatible: las alertas C2 no son una pista de tiro ni permiten guiar un misil con un sensor ajeno.</p>`;
-        if (d.sam || r) html += `<h3>Coordinación C2 (general)</h3><p class="hint">${esc(C2_LEVELS[S.c2].name)}. Se cambia en Defensa para toda la red. En Desconectada no hay alertas compartidas, pistas de red ni reparto de blancos; las unidades conservan sus sensores y disparos propios. El datalink de esta unidad no cambia ese nivel general.</p>`;
+        if (d.sam || r) html += `<h3>Coordinación C2</h3><p class="hint">Red: ${esc(C2_LEVELS[S.c2].name)} (se cambia en Defensa). En Desconectada no hay alertas compartidas, pistas de red ni reparto de blancos; las unidades conservan sus sensores y disparos propios.</p><div class="field"><label for="sC2">Esta unidad</label><select id="sC2" class="sel">${["", ...C2_ORDER.slice(0, C2_ORDER.indexOf(S.c2))].map((k) => `<option value="${k}" ${(u.c2 || "") === k ? "selected" : ""}>${k ? esc(C2_LEVELS[k].name) : "Igual que la red"}</option>`).join("")}</select></div><p class="hint">Una unidad puede quedar con menos coordinación que la red (por ejemplo, una batería aislada o que no está en el mismo puesto de mando). Desconectada: ni avisa ni recibe.</p>`;
         if (d.sam) html += `<label class="check"><input type="checkbox" id="sNoD" ${u.noDrones ? "checked" : ""}> No gastar en drones (reservar para misiles)</label><div class="field"><label for="sMag">Munición disponible</label><input id="sMag" class="inp" type="number" min="1" max="200" value="${u.mag}"></div><div class="field"><label for="sRes">Reserva para recargar (${Math.round(d.sam.reloadS / 60)} min por recarga)</label><input id="sRes" class="inp" type="number" min="0" max="500" value="${u.reserve ?? 0}"></div><div class="field"><label for="sSal">Interceptores por blanco</label><input id="sSal" class="inp" type="number" min="1" max="4" value="${u.salvo}"></div>`;
       }
       html += `<div class="row"><button class="btn sm" id="sInfo">Ficha</button>${ed ? '<button class="btn sm danger" id="sDel">Eliminar</button>' : ""}</div>`;
@@ -6783,6 +6824,10 @@ table.t.mc td.pc{white-space:nowrap}
         };
         if ($("#sLink")) $("#sLink").onchange = (e) => {
           u.link = e.target.checked;
+        };
+        if ($("#sC2")) $("#sC2").onchange = (e) => {
+          if (e.target.value) u.c2 = e.target.value;
+          else delete u.c2;
         };
         $("#sDel").onclick = () => {
           S.setup.defs = S.setup.defs.filter((v) => v.id !== u.id);
@@ -8098,7 +8143,7 @@ table.t.mc td.pc{white-space:nowrap}
     return r;
   };
   var OBJ_KEYS = ["id", "type", "x", "y", "name", "short", "maxHp", "desc"];
-  var DEF_KEYS = ["id", "type", "x", "y", "name", "az", "mast", "alt", "mag", "salvo", "noDrones", "link", "reserve"];
+  var DEF_KEYS = ["id", "type", "x", "y", "name", "az", "mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2"];
   var SALVO_KEYS = ["id", "type", "count", "interval", "tStart", "sync", "tArrive", "agl", "launchDist", "maneuver", "decoys", "link", "crpa", "pts", "targetUnit", "targetObj"];
   var JAM_KEYS = ["id", "type", "x", "y", "alt", "on", "mode", "target"];
   var META_KEYS = ["name", "player", "time", "description", "forces", "conditions", "rulesText", "goals", "success", "failure"];
@@ -8253,7 +8298,8 @@ table.t.mc td.pc{white-space:nowrap}
         salvo: num2(w + " · salvo", u.salvo, 0, 10, { int: true, opt: true }),
         noDrones: bool(w + " · noDrones", u.noDrones),
         link: bool(w + " · link", u.link),
-        reserve: num2(w + " · reserve", u.reserve, 0, 1e3, { int: true, opt: true })
+        reserve: num2(w + " · reserve", u.reserve, 0, 1e3, { int: true, opt: true }),
+        c2: u.c2 === void 0 ? void 0 : C2_LEVELS[u.c2] ? u.c2 : (err(`${w} · c2: "${String(u.c2)}" no es un nivel de C2 válido (${Object.keys(C2_LEVELS).join(", ")}).`), void 0)
       };
     });
     const objIds = new Set(objs.filter(Boolean).map((g) => g.id)), defIds = new Set(defs.filter(Boolean).map((u) => u.id));
@@ -8362,7 +8408,7 @@ table.t.mc td.pc{white-space:nowrap}
     for (const g of data.setup.objs) objId.set(g.id, addObj(g.type, g.x, g.y, { name: g.name, short: g.short, hp: g.maxHp, desc: g.desc }).id);
     for (const d of data.setup.defs) {
       const u = addDef(d.type, d.x, d.y, { name: d.name, az: d.az });
-      for (const k of ["mast", "alt", "mag", "salvo", "noDrones", "link", "reserve"]) if (d[k] !== void 0) u[k] = d[k];
+      for (const k of ["mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2"]) if (d[k] !== void 0) u[k] = d[k];
       defId.set(d.id, u.id);
     }
     for (const sv of data.setup.salvos) {

@@ -10,6 +10,7 @@ import { S } from './state.js';
 export function addDef(type, x, y, o = {}) {
   const d = DEFENSES[type];
   const u = { id: nextId(), type, x, y, az: o.az ?? defaultAz(x, y), mast: d.radar ? (d.kind === 'aew' ? 0 : d.radar.mast) : 2, alt: d.alt, mag: d.sam ? d.sam.mag : 0, reserve: d.sam ? (o.reserve ?? d.sam.reserve ?? 0) : 0, salvo: d.sam ? d.sam.salvo : 0, noDrones: d.sam ? !!d.sam.noDrones : false, link: o.link ?? true, name: o.name || nextName(type) };
+  if (o.c2) u.c2 = o.c2;
   S.setup.defs.push(u); return u;
 }
 
