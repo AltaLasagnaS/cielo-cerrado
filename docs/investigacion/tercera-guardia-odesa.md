@@ -3,7 +3,8 @@
 `experimentos/catalogo-presupuesto/data/port-campaign-extended.mjs` exporta
 `extendedPortCampaignDefinition(selection)`. Usa las mismas elecciones y el mismo
 contrato de `portCampaignDefinition`; no modifica esa fábrica ni el controlador
-de campaña de `src/ui/`. La integración nativa actual sigue creando dos guardias.
+de campaña de `src/ui/`. Desde #69, la ventana de Campaña del juego ofrece elegir
+la duración (selector "Duración": dos o tres guardias) y usa esta fábrica para tres.
 
 La definición opcional agrega una tercera guardia 24 horas después del cierre de
 la segunda. Reutiliza **od_puertos sin modificar las salvas**: es otro ejercicio
@@ -40,6 +41,6 @@ final. Usa Playwright (`PLAYWRIGHT_MODULE` y `CHROMIUM_PATH` opcionales). Corre 
 solicitudes a sitios externos; es una prueba contra el servidor fuente, no una
 afirmación de funcionamiento de esta opción en un bundle antiguo.
 
-Para ofrecerla como opción nueva en el menú, el controlador nativo deberá elegir
-la fábrica de tres guardias explícitamente. Ese cambio queda a cargo del PR de
-integración de Claude; esta entrega sólo añade definición, pruebas y documentación.
+En el juego, `src/ui/campaign.js` elige esta fábrica cuando se pide "Tres guardias"
+(#69); la de dos sigue siendo la opción por defecto. La prueba de navegador
+`tests/ui.browser.mjs` juega las tres guardias desde esa pantalla.
