@@ -204,6 +204,18 @@ El **blanqueo de lóbulos laterales** (SLB) compara cada pulso con una antena au
 
 No se modela todavía: arrastre de la ventana de distancia o velocidad contra un seguimiento (RGPO/VGPO, hace falta un jammer a bordo del blanco), disparos desperdiciados contra falsos blancos ni chequeos de coherencia distancia-Doppler de cada radar.
 
+### Triangulación y home-on-jam
+
+Un radar interferido ve la **dirección** del jammer (el strobe), no la distancia. Con J/N ≥ 0 dB marca esa dirección con el error angular de un monopulso, y dos radares que comparten marcaciones por la red (cualquier nivel de C2 salvo "desconectada") lo ubican donde se cruzan (`physics/jamloc.js`, `sim/ew.js`, cada 5 s):
+
+```
+σθ = θ3 / (1,6 · √(2·J/N))      (piso 0,05°)
+error = √((d1·σ1)² + (d2·σ2)²) / sin Δ     Δ = ángulo entre las marcaciones (mínimo 10°)
+ubicado si error ≤ 5 km
+```
+
+Con el jammer ubicado, una batería con modo **home-on-jam** (`sam.hoj`: PAC-2 GEM-T, por la variante MIM-104B pensada contra jammers stand-off; AIM-120 del NASAMS; I-Hawk), cuyo radar oye ese ruido y que lo tiene dentro de su alcance y techo, le dispara un misil que se guía a la emisión. Pk `sam.pkHoj` (0,5 en PAC-2 y AIM-120, 0,3 en el Hawk; estimadas, con rango en UNC: el guiado solo angular no sabe la distancia y la espoleta trabaja peor). Un jammer derribado deja de interferir. Solo contra jammers aéreos: los terrestres quedan para cuando haya artillería o misiles antirradiación. El mapa muestra el círculo de error del jammer ubicado y una cruz si cae.
+
 ### GNSS
 
 Las armas con `T.gnss` < 1 (dependencia del satélite: 1 = inmune) que entran en el radio de un anti-GNSS acumulan un error de navegación que se suma a la dispersión de la caída (§10):

@@ -20,11 +20,12 @@ import { S, newStats } from './state.js';
 import { hooks } from './hooks.js';
 import { log, event, label, uLabel } from './log.js';
 import { recReset, recUnit, recObj } from './replay.js';
+import { ewStep } from './ew.js';
 
 /** Arma la corrida a partir de S.setup: copia unidades y jammers y programa todos los lanzamientos. */
 export function startSim() {
   S.units = S.setup.defs.map(d => ({ ...d, alive: true, hp: UNIT_TARGET.hp, dmgRadar: false, dmgLauncher: false, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
-  S.jamsLive = S.setup.jams.map(j => ({ ...j, _losMap: {} }));
+  S.jamsLive = S.setup.jams.map(j => ({ ...j, _losMap: {} })); S.hoj = []; S.ewNext = 0;
   S.objs = S.setup.objs.map(g => ({ ...g, hp: g.maxHp, status: 'operational', hits: 0, dmgBy: {} }));
   S.threats = []; S.ints = []; S.fx = []; S.impacts = []; S.stats = newStats(); S.log = []; S.events = []; S.arrivals = [];
   S.pending = []; recReset();
@@ -39,7 +40,7 @@ export function startSim() {
 }
 
 /** Vuelve al modo edición: descarta la corrida (el setup queda intacto). */
-export function resetState() { S.rec = null; S.replay = null; S.autoPhase = 'calm'; S.running = false; S.started = false; S.t = 0; S.units = []; S.jamsLive = []; S.objs = []; S.events = []; S.arrivals = []; S.pending = []; S.threats = []; S.ints = []; S.fx = []; S.impacts = []; S.stats = newStats(); S.log = []; }
+export function resetState() { S.rec = null; S.replay = null; S.autoPhase = 'calm'; S.running = false; S.started = false; S.t = 0; S.units = []; S.jamsLive = []; S.hoj = []; S.ewNext = 0; S.objs = []; S.events = []; S.arrivals = []; S.pending = []; S.threats = []; S.ints = []; S.fx = []; S.impacts = []; S.stats = newStats(); S.log = []; }
 
 /** Avanza la simulación dt segundos. */
 export function step(dt) {
@@ -154,6 +155,8 @@ export function step(dt) {
       log('w', uLabel(u) + ' empieza a recargar (' + Math.round(D(u).sam.reloadS / 60) + ' min).');
     }
   }
+  // guerra electrónica de la defensa: triangulación de jammers y disparos home-on-jam
+  ewStep(t);
   // enfrentamientos (cada 1 s simulado por unidad)
   for (const u of S.units) {
     if (!u.alive || !D(u).sam || u.dmgLauncher || u.magLeft <= 0) continue;

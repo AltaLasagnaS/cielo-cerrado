@@ -78,6 +78,8 @@
  * Arma de una defensa.
  * @typedef {Object} Sam
  * @property {number} maxR     Alcance contra aeronaves y crucero (km)
+ * @property {boolean} [hoj] Modo home-on-jam: puede guiarse al ruido de un jammer aéreo ya ubicado (sim/ew.js)
+ * @property {number} [pkHoj] Pk de ese disparo (sin distancia al blanco: menor que la normal)
  * @property {number} maxRtbm  Alcance contra balísticos (km; 0 = no puede)
  * @property {number} minR     Alcance mínimo (km)
  * @property {number} altMin   Piso (m AGL)

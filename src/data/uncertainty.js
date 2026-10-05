@@ -13,7 +13,7 @@ export const PL = {
   rcs: ['RCS frontal (X/S)', 'm²'], rcsSide: ['RCS lateral (X/S)', 'm²'], rcsRear: ['RCS de cola (X/S)', 'm²'], rcsVHF: ['RCS en VHF', 'm²'], cep: ['CEP', 'm'], cost: ['Costo unitario', 'M US$'],
   decoys: ['Señuelos por misil', ''], manPk: ['Efecto de su maniobra terminal sobre la Pk', '×'],
   'info.rangeKm': ['Alcance', 'km'], 'info.warheadKg': ['Ojiva', 'kg'],
-  'radar.R1': ['Radar: detección contra 1 m²', 'km'], 'radar.sector': ['Radar: sector de búsqueda', '°'], 'radar.scan': ['Radar: refresco', 's'], 'radar.altMax': ['Altura máxima detectable', 'm'], 'radar.discrim': ['Radar: discriminación de señuelos (×, divide el τ de su banda)', '×'], 'radar.tracks': ['Radar: blancos que puede seguir a la vez', ''],
+  'radar.R1': ['Radar: detección contra 1 m²', 'km'], 'radar.sector': ['Radar: sector de búsqueda', '°'], 'radar.scan': ['Radar: refresco', 's'], 'radar.altMax': ['Altura máxima detectable', 'm'], 'radar.discrim': ['Radar: discriminación de señuelos (×, divide el τ de su banda)', '×'], 'radar.tracks': ['Radar: blancos que puede seguir a la vez', ''], 'sam.pkHoj': ['Pk de un disparo home-on-jam contra un jammer aéreo', ''],
   'sam.maxR': ['Alcance vs aeronaves/crucero', 'km'], 'sam.maxRtbm': ['Alcance vs balísticos', 'km'], 'sam.altMax': ['Techo', 'm'], 'sam.altMin': ['Altura mínima de enfrentamiento', 'm'],
   'sam.vInt': ['Velocidad media del interceptor hasta el alcance máximo', 'm/s'], 'sam.vmax': ['Velocidad máxima del interceptor', 'm/s'], 'sam.tb': ['Duración del motor del interceptor', 's'], 'sam.vmaxT': ['Blanco más rápido enfrentable', 'm/s'], 'sam.react': ['Tiempo de reacción', 's'],
   'sam.ch': ['Canales simultáneos', ''], 'sam.mag': ['Munición de la unidad', ''], 'sam.reloadS': ['Tiempo de recarga de la batería', 's'], 'sam.reserve': ['Reserva para recargar', ''], 'sam.cost': ['Costo por disparo', 'M US$'],
@@ -273,6 +273,7 @@ export const UNC = {
       'sam.pk.hiper': U(0.3, 0.5, 0.7, 'baja', S_('nv_zircon'), PK_NOTE)
     },
     patriot2: {
+      'sam.pkHoj': U(0.2, 0.5, 0.7, 'baja', S_('wp:Active_radar_homing'), 'la variante MIM-104B (ASOJ) se diseñó contra jammers stand-off con home-on-jam; Pk est: guiado solo angular, sin distancia'),
       'radar.tracks': U(50, 100, 150, 'media', S_('wp:MIM-104_Patriot'), 'mismo radar AN/MPQ-65'),
       'radar.R1': U(90, 100, 120, 'baja', S_('rt_mpq53'), 'mismo radar que el MSE'),
       'radar.discrim': U(1, 4, 8, 'baja', [], 'est: mismo radar que el MSE'),
@@ -325,6 +326,7 @@ export const UNC = {
       'sam.pk.supersonico': U(0.1, 0.2, 0.35, 'baja', S_('syrskyi'), 'est: sin datos contra Mach 2–4; Oniks 5,7% a nivel nacional')
     },
     nasams: {
+      'sam.pkHoj': U(0.2, 0.5, 0.7, 'baja', S_('wp:Active_radar_homing', 'wp:AIM-120_AMRAAM'), 'el AIM-120 tiene modo home-on-jam; Pk est: guiado solo angular, sin distancia'),
       'radar.tracks': U(50, 60, 100, 'media', S_('wp:AN/MPQ-64_Sentinel'), 'Sentinel: más de 50 blancos simultáneos'),
       'sam.reloadS': U(900, 1800, 3600, 'baja', [], 'est: lanzador de 6 AMRAAM recargado con grúa; sin dato público firme'),
       'radar.R1': U(40, 60, 90, 'media', S_('wp:AN/MPQ-64_Sentinel'), '40 km el básico, 120 km el F1/A3'),
@@ -394,6 +396,7 @@ export const UNC = {
       'sam.pk.dron': U(0.4, 0.6, 0.75, 'media', S_('dn_interceptors'), '>60% de éxito por salida')
     },
     hawk: {
+      'sam.pkHoj': U(0.1, 0.3, 0.5, 'baja', S_('wp:MIM-23_Hawk'), 'el I-Hawk tenía un modo home-on-jam "potencial"; Pk est, menor que en misiles modernos'),
       'radar.tracks': U(10, 25, 50, 'baja', [], 'est: radares de búsqueda PAR y CWAR con seguimiento automático; sin cifra pública'),
       'radar.R1': U(50, 70, 100, 'baja', S_('cmo_db3k_sam'), 'CMO: HPIR 45 nmi (83 km) y PAR 54 nmi (100 km) de alcance instrumentado; est contra 1 m²'),
       'sam.maxR': U(35, 40, 50, 'media', S_('cmo_db3k_sam', 'db_hawk'), 'CMO 22 nmi ≈ 40 km; OSINT 35–50 km'),

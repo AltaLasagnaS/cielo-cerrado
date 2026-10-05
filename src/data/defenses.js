@@ -27,7 +27,7 @@ export const DEFENSES = {
     name: 'Patriot (PAC-2 GEM-T)', short: 'Patriot GEM-T', side: 'UA', kind: 'sam', color: '#62b6ff',
     datalinks: ['l16'],
     radar: { name: 'AN/MPQ-65', agile: true, slb: true, slc: 1, discrim: 4, band: 'C', mti: 'pd', R1: 100, mast: 4, mastRange: [4, 4], mastNote: 'Fija: la antena va sobre el semirremolque M860. El mástil de ≈30 m (AMG) es de comunicaciones, no del radar.', sector: 90, eccm: 10, tracks: 100, scan: 2 },
-    sam: { maxR: 160, maxRtbm: 20, minR: 3, altMin: 60, altMax: 24000, vInt: 900, vmax: 1500, tb: 12, vmaxT: 2500, react: 9, ch: 8, mag: 16, reserve: 16, reloadS: 2400, salvo: 2, guid: 'TVM', shot: 'PAC-2 GEM-T', noDrones: true, cost: 3, pk: { dron: 0.8, crucero: 0.85, supersonico: 0.55, balistico: 0.4, hiper: 0.25 } },
+    sam: { hoj: true, pkHoj: 0.5, maxR: 160, maxRtbm: 20, minR: 3, altMin: 60, altMax: 24000, vInt: 900, vmax: 1500, tb: 12, vmaxT: 2500, react: 9, ch: 8, mag: 16, reserve: 16, reloadS: 2400, salvo: 2, guid: 'TVM', shot: 'PAC-2 GEM-T', noDrones: true, cost: 3, pk: { dron: 0.8, crucero: 0.85, supersonico: 0.55, balistico: 0.4, hiper: 0.25 } },
     range: '≈160 km vs aeronaves, ≈20 km vs balísticos', interceptor: 'GEM-T: fragmentación, guiado TVM (necesita que el radar propio vea el blanco), Mach ≈3,5',
     notes: ['Mayor alcance contra aviones y misiles de crucero que el MSE, pero peor contra balísticos.', '4 misiles por lanzador M901/M903.', 'Precio unitario no publicado: US$2–4 M según estimaciones de prensa.'],
     sources: [WP('MIM-104_Patriot'), SRC.csis_patriot, SRC.ar_gemt]
@@ -54,7 +54,7 @@ export const DEFENSES = {
     name: 'NASAMS (AIM-120 AMRAAM)', short: 'NASAMS', side: 'UA', kind: 'sam', color: '#62b6ff',
     datalinks: ['l16'],
     radar: { name: 'AN/MPQ-64 Sentinel', agile: true, lowSL: true, band: 'X', mti: 'pd', R1: 60, mast: 4, mastRange: [4, 4], mastNote: 'Fija: Sentinel sobre remolque (altura estimada).', sector: 360, eccm: 8, tracks: 60, scan: 2 },
-    sam: { maxR: 35, maxRtbm: 0, minR: 1, altMin: 30, altMax: 15000, vInt: 900, vmax: 1370, tb: 8, vmaxT: 1000, react: 6, ch: 6, mag: 18, reserve: 12, reloadS: 1800, salvo: 1, guid: 'activo', shot: 'AIM-120', cost: 1.07, pk: { dron: 0.85, crucero: 0.88, supersonico: 0.4, balistico: 0, hiper: 0 } },
+    sam: { hoj: true, pkHoj: 0.5, maxR: 35, maxRtbm: 0, minR: 1, altMin: 30, altMax: 15000, vInt: 900, vmax: 1370, tb: 8, vmaxT: 1000, react: 6, ch: 6, mag: 18, reserve: 12, reloadS: 1800, salvo: 1, guid: 'activo', shot: 'AIM-120', cost: 1.07, pk: { dron: 0.85, crucero: 0.88, supersonico: 0.4, balistico: 0, hiper: 0 } },
     range: '≈35–40 km (AMRAAM-ER: 50–60 km)', interceptor: 'AIM-120: misil aire-aire adaptado, buscador radar activo',
     notes: ['Noruega reclamó 94% de éxito en Ucrania (feb-2025, ~900 AMRAAM); no se aclara si es por disparo o por blanco y ~60% de los blancos eran crucero.', 'Sentinel: banda X, 30 rpm (refresco 2 s); 40 km el modelo básico, 120 km el F1.', '3 lanzadores de 6 misiles por unidad de fuego. No sirve contra balísticos.'],
     sources: [WP('NASAMS'), SRC.crs_nasams, SRC.kongsberg, SRC.aw_nasams, SRC.dod_p1_25]
@@ -117,7 +117,7 @@ export const DEFENSES = {
     name: 'MIM-23B I-Hawk (Fase III)', short: 'Hawk', side: 'UA', kind: 'sam', color: '#62b6ff',
     datalinks: [],
     radar: { name: 'AN/MPQ-61 HPIR (+ AN/MPQ-50 PAR, AN/MPQ-62 CWAR)', band: 'X', mti: 'pd', R1: 70, mast: 4, mastRange: [4, 4], mastNote: 'Fija: radares sobre remolques (altura estimada).', sector: 360, eccm: 5, tracks: 25, scan: 2 },
-    sam: { maxR: 40, maxRtbm: 0, minR: 1.5, altMin: 60, altMax: 17700, vInt: 700, vmaxT: 820, react: 15, ch: 2, mag: 9, reserve: 9, reloadS: 1200, salvo: 2, guid: 'SARH', shot: 'MIM-23B', cost: 0.3, pk: { dron: 0.6, crucero: 0.7, supersonico: 0.4, balistico: 0, hiper: 0 } },
+    sam: { hoj: true, pkHoj: 0.3, maxR: 40, maxRtbm: 0, minR: 1.5, altMin: 60, altMax: 17700, vInt: 700, vmaxT: 820, react: 15, ch: 2, mag: 9, reserve: 9, reloadS: 1200, salvo: 2, guid: 'SARH', shot: 'MIM-23B', cost: 0.3, pk: { dron: 0.6, crucero: 0.7, supersonico: 0.4, balistico: 0, hiper: 0 } },
     range: '1,5–40 km, techo ≈17 km', interceptor: 'MIM-23B: ≈Mach 2,5, semiactivo: el HPIR ilumina el blanco hasta el impacto',
     notes: ['España entregó baterías Fase III desde fines de 2022 (21 lanzadores, radares MPQ-61 y MPQ-62) y más lanzadores en 2023–24; EE. UU. aportó misiles.', 'Una sola unidad ucraniana reclamó 14 misiles de crucero y 40 Shahed derribados.', 'Cada HPIR guía contra un blanco a la vez: dos secciones de fuego = dos canales.'],
     sources: [WP('MIM-23_Hawk'), SRC.mil_hawk, SRC.db_hawk, SRC.cmo_db3k_sam]

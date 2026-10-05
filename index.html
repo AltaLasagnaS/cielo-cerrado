@@ -1242,7 +1242,7 @@ table.t.mc td.pc{white-space:nowrap}
       color: "#62b6ff",
       datalinks: ["l16"],
       radar: { name: "AN/MPQ-65", agile: true, slb: true, slc: 1, discrim: 4, band: "C", mti: "pd", R1: 100, mast: 4, mastRange: [4, 4], mastNote: "Fija: la antena va sobre el semirremolque M860. El mástil de ≈30 m (AMG) es de comunicaciones, no del radar.", sector: 90, eccm: 10, tracks: 100, scan: 2 },
-      sam: { maxR: 160, maxRtbm: 20, minR: 3, altMin: 60, altMax: 24e3, vInt: 900, vmax: 1500, tb: 12, vmaxT: 2500, react: 9, ch: 8, mag: 16, reserve: 16, reloadS: 2400, salvo: 2, guid: "TVM", shot: "PAC-2 GEM-T", noDrones: true, cost: 3, pk: { dron: 0.8, crucero: 0.85, supersonico: 0.55, balistico: 0.4, hiper: 0.25 } },
+      sam: { hoj: true, pkHoj: 0.5, maxR: 160, maxRtbm: 20, minR: 3, altMin: 60, altMax: 24e3, vInt: 900, vmax: 1500, tb: 12, vmaxT: 2500, react: 9, ch: 8, mag: 16, reserve: 16, reloadS: 2400, salvo: 2, guid: "TVM", shot: "PAC-2 GEM-T", noDrones: true, cost: 3, pk: { dron: 0.8, crucero: 0.85, supersonico: 0.55, balistico: 0.4, hiper: 0.25 } },
       range: "≈160 km vs aeronaves, ≈20 km vs balísticos",
       interceptor: "GEM-T: fragmentación, guiado TVM (necesita que el radar propio vea el blanco), Mach ≈3,5",
       notes: ["Mayor alcance contra aviones y misiles de crucero que el MSE, pero peor contra balísticos.", "4 misiles por lanzador M901/M903.", "Precio unitario no publicado: US$2–4 M según estimaciones de prensa."],
@@ -1284,7 +1284,7 @@ table.t.mc td.pc{white-space:nowrap}
       color: "#62b6ff",
       datalinks: ["l16"],
       radar: { name: "AN/MPQ-64 Sentinel", agile: true, lowSL: true, band: "X", mti: "pd", R1: 60, mast: 4, mastRange: [4, 4], mastNote: "Fija: Sentinel sobre remolque (altura estimada).", sector: 360, eccm: 8, tracks: 60, scan: 2 },
-      sam: { maxR: 35, maxRtbm: 0, minR: 1, altMin: 30, altMax: 15e3, vInt: 900, vmax: 1370, tb: 8, vmaxT: 1e3, react: 6, ch: 6, mag: 18, reserve: 12, reloadS: 1800, salvo: 1, guid: "activo", shot: "AIM-120", cost: 1.07, pk: { dron: 0.85, crucero: 0.88, supersonico: 0.4, balistico: 0, hiper: 0 } },
+      sam: { hoj: true, pkHoj: 0.5, maxR: 35, maxRtbm: 0, minR: 1, altMin: 30, altMax: 15e3, vInt: 900, vmax: 1370, tb: 8, vmaxT: 1e3, react: 6, ch: 6, mag: 18, reserve: 12, reloadS: 1800, salvo: 1, guid: "activo", shot: "AIM-120", cost: 1.07, pk: { dron: 0.85, crucero: 0.88, supersonico: 0.4, balistico: 0, hiper: 0 } },
       range: "≈35–40 km (AMRAAM-ER: 50–60 km)",
       interceptor: "AIM-120: misil aire-aire adaptado, buscador radar activo",
       notes: ["Noruega reclamó 94% de éxito en Ucrania (feb-2025, ~900 AMRAAM); no se aclara si es por disparo o por blanco y ~60% de los blancos eran crucero.", "Sentinel: banda X, 30 rpm (refresco 2 s); 40 km el modelo básico, 120 km el F1.", "3 lanzadores de 6 misiles por unidad de fuego. No sirve contra balísticos."],
@@ -1382,7 +1382,7 @@ table.t.mc td.pc{white-space:nowrap}
       color: "#62b6ff",
       datalinks: [],
       radar: { name: "AN/MPQ-61 HPIR (+ AN/MPQ-50 PAR, AN/MPQ-62 CWAR)", band: "X", mti: "pd", R1: 70, mast: 4, mastRange: [4, 4], mastNote: "Fija: radares sobre remolques (altura estimada).", sector: 360, eccm: 5, tracks: 25, scan: 2 },
-      sam: { maxR: 40, maxRtbm: 0, minR: 1.5, altMin: 60, altMax: 17700, vInt: 700, vmaxT: 820, react: 15, ch: 2, mag: 9, reserve: 9, reloadS: 1200, salvo: 2, guid: "SARH", shot: "MIM-23B", cost: 0.3, pk: { dron: 0.6, crucero: 0.7, supersonico: 0.4, balistico: 0, hiper: 0 } },
+      sam: { hoj: true, pkHoj: 0.3, maxR: 40, maxRtbm: 0, minR: 1.5, altMin: 60, altMax: 17700, vInt: 700, vmaxT: 820, react: 15, ch: 2, mag: 9, reserve: 9, reloadS: 1200, salvo: 2, guid: "SARH", shot: "MIM-23B", cost: 0.3, pk: { dron: 0.6, crucero: 0.7, supersonico: 0.4, balistico: 0, hiper: 0 } },
       range: "1,5–40 km, techo ≈17 km",
       interceptor: "MIM-23B: ≈Mach 2,5, semiactivo: el HPIR ilumina el blanco hasta el impacto",
       notes: ["España entregó baterías Fase III desde fines de 2022 (21 lanzadores, radares MPQ-61 y MPQ-62) y más lanzadores en 2023–24; EE. UU. aportó misiles.", "Una sola unidad ucraniana reclamó 14 misiles de crucero y 40 Shahed derribados.", "Cada HPIR guía contra un blanco a la vez: dos secciones de fuego = dos canales."],
@@ -1648,6 +1648,7 @@ table.t.mc td.pc{white-space:nowrap}
     "radar.altMax": ["Altura máxima detectable", "m"],
     "radar.discrim": ["Radar: discriminación de señuelos (×, divide el τ de su banda)", "×"],
     "radar.tracks": ["Radar: blancos que puede seguir a la vez", ""],
+    "sam.pkHoj": ["Pk de un disparo home-on-jam contra un jammer aéreo", ""],
     "sam.maxR": ["Alcance vs aeronaves/crucero", "km"],
     "sam.maxRtbm": ["Alcance vs balísticos", "km"],
     "sam.altMax": ["Techo", "m"],
@@ -1931,6 +1932,7 @@ table.t.mc td.pc{white-space:nowrap}
         "sam.pk.hiper": U(0.3, 0.5, 0.7, "baja", S_("nv_zircon"), PK_NOTE)
       },
       patriot2: {
+        "sam.pkHoj": U(0.2, 0.5, 0.7, "baja", S_("wp:Active_radar_homing"), "la variante MIM-104B (ASOJ) se diseñó contra jammers stand-off con home-on-jam; Pk est: guiado solo angular, sin distancia"),
         "radar.tracks": U(50, 100, 150, "media", S_("wp:MIM-104_Patriot"), "mismo radar AN/MPQ-65"),
         "radar.R1": U(90, 100, 120, "baja", S_("rt_mpq53"), "mismo radar que el MSE"),
         "radar.discrim": U(1, 4, 8, "baja", [], "est: mismo radar que el MSE"),
@@ -1983,6 +1985,7 @@ table.t.mc td.pc{white-space:nowrap}
         "sam.pk.supersonico": U(0.1, 0.2, 0.35, "baja", S_("syrskyi"), "est: sin datos contra Mach 2–4; Oniks 5,7% a nivel nacional")
       },
       nasams: {
+        "sam.pkHoj": U(0.2, 0.5, 0.7, "baja", S_("wp:Active_radar_homing", "wp:AIM-120_AMRAAM"), "el AIM-120 tiene modo home-on-jam; Pk est: guiado solo angular, sin distancia"),
         "radar.tracks": U(50, 60, 100, "media", S_("wp:AN/MPQ-64_Sentinel"), "Sentinel: más de 50 blancos simultáneos"),
         "sam.reloadS": U(900, 1800, 3600, "baja", [], "est: lanzador de 6 AMRAAM recargado con grúa; sin dato público firme"),
         "radar.R1": U(40, 60, 90, "media", S_("wp:AN/MPQ-64_Sentinel"), "40 km el básico, 120 km el F1/A3"),
@@ -2052,6 +2055,7 @@ table.t.mc td.pc{white-space:nowrap}
         "sam.pk.dron": U(0.4, 0.6, 0.75, "media", S_("dn_interceptors"), ">60% de éxito por salida")
       },
       hawk: {
+        "sam.pkHoj": U(0.1, 0.3, 0.5, "baja", S_("wp:MIM-23_Hawk"), 'el I-Hawk tenía un modo home-on-jam "potencial"; Pk est, menor que en misiles modernos'),
         "radar.tracks": U(10, 25, 50, "baja", [], "est: radares de búsqueda PAR y CWAR con seguimiento automático; sin cifra pública"),
         "radar.R1": U(50, 70, 100, "baja", S_("cmo_db3k_sam"), "CMO: HPIR 45 nmi (83 km) y PAR 54 nmi (100 km) de alcance instrumentado; est contra 1 m²"),
         "sam.maxR": U(35, 40, 50, "media", S_("cmo_db3k_sam", "db_hawk"), "CMO 22 nmi ≈ 40 km; OSINT 35–50 km"),
@@ -3259,6 +3263,8 @@ table.t.mc td.pc{white-space:nowrap}
     // corrida en curso
     units: [],
     jamsLive: [],
+    hoj: [],
+    ewNext: 0,
     objs: [],
     pending: [],
     threats: [],
@@ -4352,10 +4358,96 @@ table.t.mc td.pc{white-space:nowrap}
   }
   var replayEnd = () => S.t;
 
+  // src/physics/jamloc.js
+  var STROBE_J = 1;
+  var MIN_CROSS = 10;
+  var FIX_MAX_KM = 5;
+  var KM = 1.6;
+  var SIGMA_MIN = 0.05;
+  var bearingSigma = (bwDeg, J) => Math.max(SIGMA_MIN, bwDeg / (KM * Math.sqrt(2 * Math.max(J, 1e-9))));
+  function fixError(a, b, jx, jy) {
+    const ax = jx - a.x, ay = jy - a.y, bx = jx - b.x, by = jy - b.y;
+    const d1 = Math.hypot(ax, ay), d2 = Math.hypot(bx, by);
+    if (d1 < 1e-6 || d2 < 1e-6) return 0;
+    const sin = Math.abs(ax * by - ay * bx) / (d1 * d2);
+    if (sin < Math.sin(MIN_CROSS * Math.PI / 180)) return Infinity;
+    const r = Math.PI / 180;
+    return Math.hypot(d1 * a.sigma * r, d2 * b.sigma * r) / sin;
+  }
+
+  // src/sim/ew.js
+  var EW_DT = 5;
+  function strobes(j) {
+    const JJ = JAMMERS[j.type], out = [];
+    for (const u of S.units) {
+      const r = D(u).radar;
+      if (!u.alive || !r || r.band === "ACU" || r.band === "OPT") continue;
+      if (JJ.side !== "both" && D(u).side === JJ.side) continue;
+      const p = jamPos(j), J = jamJ(u, azOf(p[0] - u.x, p[1] - u.y), [j]);
+      if (J >= STROBE_J) out.push({ u, x: u.x, y: u.y, sigma: bearingSigma(BANDS[r.band].bw, J), J });
+    }
+    return out;
+  }
+  function ewStep(t) {
+    for (const h of S.hoj) {
+      if (h.done || t < h.tH) continue;
+      h.done = true;
+      h.j.hojBusy = false;
+      h.u.active = Math.max(0, h.u.active - 1);
+      const sm = D(h.u).sam, JJ = JAMMERS[h.j.type];
+      if (h.j.dead) continue;
+      if (rnd() < sm.pkHoj) {
+        h.j.dead = true;
+        log("k", uLabel(h.u) + " derriba al " + JJ.short + " guiándose a su ruido (home-on-jam) — Pk " + Math.round(sm.pkHoj * 100) + "%.");
+      } else log("x", "El misil home-on-jam de " + uLabel(h.u) + " falla contra el " + JJ.short + ".");
+    }
+    if (t < S.ewNext) return;
+    S.ewNext = t + EW_DT;
+    const share = C2_LEVELS[effectiveC2(S.c2, S.objs)].share;
+    for (const j of S.jamsLive) {
+      const JJ = JAMMERS[j.type];
+      if (JJ.gnssJam || !j.on || j.dead) continue;
+      const st = strobes(j);
+      if (!st.length) continue;
+      if (share !== "none" && st.length >= 2) {
+        let best = Infinity, pair = null;
+        for (let a = 0; a < st.length; a++) for (let b = a + 1; b < st.length; b++) {
+          const e = fixError(st[a], st[b], j.x, j.y);
+          if (e < best) {
+            best = e;
+            pair = [st[a].u, st[b].u];
+          }
+        }
+        if (best <= FIX_MAX_KM && (!j.fix || best < j.fix.err)) {
+          if (!j.fix) log("l", JJ.short + " ubicado por triangulación entre " + uLabel(pair[0]) + " y " + uLabel(pair[1]) + ": error ≈ " + best.toFixed(1) + " km.");
+          j.fix = { t, err: best };
+        }
+      }
+      if (!JJ.air || !j.fix || j.hojBusy) continue;
+      for (const s of st) {
+        const u = s.u, sm = D(u).sam;
+        if (!sm?.hoj || u.dmgLauncher || u.magLeft <= 0 || u.reloadUntil !== null) continue;
+        const p = jamPos(j), d = Math.hypot(p[0] - u.x, p[1] - u.y, (p[2] - antZ(u)) / 1e3);
+        if (d > sm.maxR || p[2] > sm.altMax) continue;
+        u.magLeft--;
+        u.active++;
+        recUnit(u);
+        S.stats.shots++;
+        S.stats.defCost += sm.cost;
+        S.hoj.push({ u, j, tH: t + timeTo(profileOf(sm), d * 1e3) });
+        j.hojBusy = true;
+        log("l", uLabel(u) + " dispara un misil home-on-jam contra el " + JJ.short + " a " + d.toFixed(0) + " km.");
+        break;
+      }
+    }
+  }
+
   // src/sim/engine.js
   function startSim() {
     S.units = S.setup.defs.map((d) => ({ ...d, alive: true, hp: UNIT_TARGET.hp, dmgRadar: false, dmgLauncher: false, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
     S.jamsLive = S.setup.jams.map((j) => ({ ...j, _losMap: {} }));
+    S.hoj = [];
+    S.ewNext = 0;
     S.objs = S.setup.objs.map((g) => ({ ...g, hp: g.maxHp, status: "operational", hits: 0, dmgBy: {} }));
     S.threats = [];
     S.ints = [];
@@ -4389,6 +4481,8 @@ table.t.mc td.pc{white-space:nowrap}
     S.t = 0;
     S.units = [];
     S.jamsLive = [];
+    S.hoj = [];
+    S.ewNext = 0;
     S.objs = [];
     S.events = [];
     S.arrivals = [];
@@ -4552,6 +4646,7 @@ table.t.mc td.pc{white-space:nowrap}
         log("w", uLabel(u) + " empieza a recargar (" + Math.round(D(u).sam.reloadS / 60) + " min).");
       }
     }
+    ewStep(t);
     for (const u of S.units) {
       if (!u.alive || !D(u).sam || u.dmgLauncher || u.magLeft <= 0) continue;
       if (t < u.nextEval) continue;
@@ -5201,7 +5296,7 @@ table.t.mc td.pc{white-space:nowrap}
       const d = D(u);
       if (!d.radar || d.radar.band === "ACU" || d.radar.band === "OPT") continue;
       for (const j of jams) {
-        if (JAMMERS[j.type].gnssJam || !j.on) continue;
+        if (JAMMERS[j.type].gnssJam || !j.on || j.dead) continue;
         const jaz = azOf(j.x - u.x, j.y - u.y);
         const J = jamJ(u, jaz, [j]);
         if (J < 0.2) continue;
@@ -5230,7 +5325,7 @@ table.t.mc td.pc{white-space:nowrap}
         ctx.stroke();
         ctx.setLineDash([]);
       }
-      ctx.fillStyle = j.on ? "#c58cff" : "#5d4a75";
+      ctx.fillStyle = j.on && !j.dead ? "#c58cff" : "#5d4a75";
       ctx.strokeStyle = isSel ? "#e6a53c" : "#1a1024";
       ctx.lineWidth = isSel ? 2 : 1;
       ctx.beginPath();
@@ -5241,6 +5336,24 @@ table.t.mc td.pc{white-space:nowrap}
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
+      if (S.started && j.fix && !j.dead) {
+        ctx.strokeStyle = "rgba(230,165,60,.8)";
+        ctx.setLineDash([2, 3]);
+        ctx.beginPath();
+        ctx.arc(sx, sy, Math.max(6, j.fix.err * V.s), 0, 7);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+      if (S.started && j.dead) {
+        ctx.strokeStyle = "#ff5b4d";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(sx - 7, sy - 7);
+        ctx.lineTo(sx + 7, sy + 7);
+        ctx.moveTo(sx + 7, sy - 7);
+        ctx.lineTo(sx - 7, sy + 7);
+        ctx.stroke();
+      }
       labelAt(sx, sy, J.short, "#d8b8ff");
     }
     for (const u of units) {
