@@ -8,7 +8,7 @@
 // objetivos que existan en el catálogo, mapa conocido, posiciones dentro del mapa, números
 // finitos y en rango, y blancos de las salvas que existan. Solo se copian los campos conocidos.
 // Formato: ver docs/ARQUITECTURA.md § "Archivo de escenario".
-import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES, TERRAIN, SCENARIOS, C2_LEVELS, c2FromNet, WEATHER, CRPA_SIZES, JAM_MODES, TIMES_OF_DAY, GATEWAYS } from '../data/index.js';
+import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES, TERRAIN, SCENARIOS, C2_LEVELS, c2FromNet, WEATHER, CRPA_SIZES, JAM_MODES, TIMES_OF_DAY, GATEWAYS, UNIT_TARGET } from '../data/index.js';
 import { MAP } from '../physics/terrain.js';
 import { S } from './state.js';
 import { addObj, addDef, addSalvo, addJam } from './setup.js';
@@ -24,8 +24,8 @@ const GOAL_KINDS = ['destroy', 'damage', 'protect', 'survive', 'killUnit', 'keep
 const DOCTRINES = ['salva', 'sls'];
 
 const pick = (o, keys) => { const r = {}; for (const k of keys) if (o[k] !== undefined) r[k] = structuredClone(o[k]); return r; };
-const OBJ_KEYS = ['id', 'type', 'x', 'y', 'name', 'short', 'maxHp', 'desc', 'cp'];
-const DEF_KEYS = ['id', 'type', 'x', 'y', 'name', 'az', 'mast', 'alt', 'mag', 'salvo', 'noDrones', 'link', 'reserve', 'c2', 'cp', 'decoyDoc', 'owner'];
+const OBJ_KEYS = ['id', 'type', 'x', 'y', 'name', 'short', 'maxHp', 'desc', 'cp', 'hpNow'];
+const DEF_KEYS = ['id', 'type', 'x', 'y', 'name', 'az', 'mast', 'alt', 'mag', 'salvo', 'noDrones', 'link', 'reserve', 'c2', 'cp', 'decoyDoc', 'owner', 'emcon', 'hp', 'dmgRadar', 'dmgLauncher'];
 const SALVO_KEYS = ['id', 'type', 'count', 'interval', 'tStart', 'sync', 'tArrive', 'agl', 'launchDist', 'maneuver', 'decoys', 'link', 'crpa', 'pts', 'targetUnit', 'targetObj'];
 const JAM_KEYS = ['id', 'type', 'x', 'y', 'alt', 'on', 'mode', 'target'];
 const META_KEYS = ['name', 'player', 'time', 'description', 'forces', 'conditions', 'rulesText', 'goals', 'success', 'failure'];
@@ -127,7 +127,7 @@ export function validateScenario(raw) {
     const w = `Objetivo ${i + 1}${typeof g.name === 'string' ? ' (' + g.name + ')' : ''}`;
     if (!TARGET_TYPES[g.type]) { err(`${w}: tipo de objetivo desconocido "${String(g.type)}". Válidos: ${Object.keys(TARGET_TYPES).join(', ')}.`); return { id: id(w, g.id) }; }   // el id sigue contando para no sumar errores en cascada
     pos(w, g.x, g.y);
-    return { id: id(w, g.id), type: g.type, x: g.x, y: g.y, name: str(w + ' · name', g.name, 120, false), short: str(w + ' · short', g.short, 60), maxHp: num(w + ' · maxHp', g.maxHp, 1, 100000, { opt: true }), desc: str(w + ' · desc', g.desc, 1000), cp: str(w + ' · cp', g.cp, 20) || undefined };
+    return { id: id(w, g.id), type: g.type, x: g.x, y: g.y, name: str(w + ' · name', g.name, 120, false), short: str(w + ' · short', g.short, 60), maxHp: num(w + ' · maxHp', g.maxHp, 1, 100000, { opt: true }), desc: str(w + ' · desc', g.desc, 1000), cp: str(w + ' · cp', g.cp, 20) || undefined, hpNow: num(w + ' · hpNow', g.hpNow, 0, 100000, { opt: true }) };
   });
   // defensas
   const defs = list('defs', setup.defs).map((u, i) => {
@@ -142,6 +142,8 @@ export function validateScenario(raw) {
       cp: str(w + ' · cp', u.cp, 20) || undefined,
       owner: u.owner === undefined ? undefined : (['UA', 'RU'].includes(u.owner) ? u.owner : (err(`${w} · owner: "${String(u.owner)}" no es "UA" ni "RU".`), undefined)),
       decoyDoc: u.decoyDoc === undefined ? undefined : (['ignorar', 'tirar'].includes(u.decoyDoc) ? u.decoyDoc : (err(`${w} · decoyDoc: "${String(u.decoyDoc)}" no es "ignorar" ni "tirar".`), undefined)),
+      hp: num(w + ' · hp', u.hp, 1, UNIT_TARGET.hp, { int: true, opt: true }), dmgRadar: bool(w + ' · dmgRadar', u.dmgRadar), dmgLauncher: bool(w + ' · dmgLauncher', u.dmgLauncher),
+      emcon: u.emcon === undefined ? undefined : (['siempre', 'alerta', 'silencio'].includes(u.emcon) ? u.emcon : (err(`${w} · emcon: "${String(u.emcon)}" no es "siempre", "alerta" ni "silencio".`), undefined)),
       c2: u.c2 === undefined ? undefined : (C2_LEVELS[u.c2] ? u.c2 : (err(`${w} · c2: "${String(u.c2)}" no es un nivel de C2 válido (${Object.keys(C2_LEVELS).join(', ')}).`), undefined))
     };
   });
@@ -247,10 +249,10 @@ export function loadScenarioData(data) {
   if (MAP?.key !== data.map.key) throw new Error(`loadScenarioData: el mapa activo es ${MAP?.key}, el escenario es de ${data.map.key}`);
   S.setup = { objs: [], defs: [], salvos: [], jams: [] }; S.sel = null; S.mode = 'select';
   const objId = new Map(), defId = new Map();
-  for (const g of data.setup.objs) objId.set(g.id, addObj(g.type, g.x, g.y, { name: g.name, short: g.short, hp: g.maxHp, desc: g.desc, cp: g.cp }).id);
+  for (const g of data.setup.objs) objId.set(g.id, addObj(g.type, g.x, g.y, { name: g.name, short: g.short, hp: g.maxHp, desc: g.desc, cp: g.cp, hpNow: g.hpNow }).id);
   for (const d of data.setup.defs) {
     const u = addDef(d.type, d.x, d.y, { name: d.name, az: d.az });
-    for (const k of ['mast', 'alt', 'mag', 'salvo', 'noDrones', 'link', 'reserve', 'c2', 'cp', 'decoyDoc', 'owner']) if (d[k] !== undefined) u[k] = d[k];
+    for (const k of ['mast', 'alt', 'mag', 'salvo', 'noDrones', 'link', 'reserve', 'c2', 'cp', 'decoyDoc', 'owner', 'emcon', 'hp', 'dmgRadar', 'dmgLauncher']) if (d[k] !== undefined) u[k] = d[k];
     defId.set(d.id, u.id);
   }
   for (const sv of data.setup.salvos) {

@@ -58,7 +58,7 @@ export function createMonteCarlo({ runs = 20, seed = 1, sample = true } = {}) {
   const mc = { runs, seed, sample, results: /** @type {any[]} */ ([]), done: false, cancelled: false, current: -1 };
   active = mc;
   let rng = null, deadline = 0;
-  const saved = { ...hooks }, quiet = { onLog() {}, onEnd() {}, onUnitLost() {}, defenderView: () => false };
+  const saved = { ...hooks }, quiet = { onLog() {}, onEnd() {}, onUnitLost() {}, defenderView: () => false, attackerView: () => false };
 
   mc.tick = (budgetMs = 40) => {
     if (mc.done) return true;
