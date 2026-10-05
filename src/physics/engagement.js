@@ -1,12 +1,13 @@
 // @ts-check
 // ---------------- ENFRENTAMIENTO ----------------
 // Seguimiento, solución de tiro y probabilidad de derribo (Pk). Ver docs/FISICA.md §6–§7.
-import { D, C2_LEVELS, C2_ORDER, C2_NODES, datalinksOf } from '../data/index.js';
+import { D, C2_LEVELS, C2_ORDER, C2_NODES, datalinksOf, gatewaysInto } from '../data/index.js';
 import { azOf, clamp } from '../util/math.js';
 import { surf } from './terrain.js';
 import { jamJ } from './radar.js';
 import { posAt, speedAt, termZone } from './kinematics.js';
 import { profileOf, hasProfile, timeTo, energyAt } from './interceptor.js';
+import { isaSigma } from './atmosphere.js';
 
 /** Guiados que necesitan que el radar PROPIO de la batería vea el blanco hasta el final. */
 export const RADAR_GUID = ['TVM', 'SARH', 'mando', 'cañón'];
@@ -25,12 +26,9 @@ export const isTBM = th => th.cls === 'balistico' || th.cls === 'hiper';
  * siempre con su propio sensor; drones interceptores (operador) usan la de red; misiles activos/IR
  * aceptan cualquiera.
  */
-export function trackOK(u, th, t, c2) {
+export function trackOK(u, th, t, c2, gws = []) {
   const d = D(u), L = C2_LEVELS[c2], own = d.radar ? (t - (th.det[u.id] ?? -1e9)) <= d.radar.scan * 2 + 0.6 : false;
-  const compatible = datalinksOf(d).some(key => {
-    const n = th.net?.[key];
-    return n && n.first != null && t - n.first >= L.lag && t - n.last <= L.window;
-  });
+  const compatible = netPk(u, th, t, c2, gws) > 0;
   // Fallback para pistas creadas por escenarios/archivos de la versión anterior al desglose por red.
   const legacy = !th.net && th.netFirst != null && t - th.netFirst >= L.lag && t - th.lastNet <= L.window;
   const netT = u.link !== false && (L.share === 'track' || L.share === 'fire') && (compatible || legacy);
@@ -41,26 +39,60 @@ export function trackOK(u, th, t, c2) {
 }
 
 /**
+ * Pista de red utilizable por u contra th (docs/FISICA.md §6, "Enlaces"): 1 si llega por una red propia
+ * (después de la demora del nivel de C2 y mientras siga fresca), gwPk si solo llega a través de una
+ * pasarela habilitada en el escenario (gws: ids de data/datalinks.js#GATEWAYS, con gwLag de demora extra),
+ * 0 si no hay. No mira u.link ni el nivel de C2 (lo hace trackOK).
+ */
+export function netPk(u, th, t, c2, gws = []) {
+  const L = C2_LEVELS[c2]; let best = 0;
+  const fresh = (n, lag) => n && n.first != null && t - n.first >= L.lag + lag && t - n.last <= L.window;
+  const cp = cpOf(u);
+  for (const key of datalinksOf(D(u))) {
+    if (fresh(th.net?.[netKey(key, cp)], 0)) return 1;
+    for (const { from, G, id } of gatewaysInto(key)) if (gws.includes(id) && fresh(th.net?.[netKey(from, cp)], G.gwLag)) best = Math.max(best, G.gwPk);
+  }
+  return best;
+}
+
+/**
+ * Puestos de mando (docs/FISICA.md §6): cada unidad pertenece a uno (u.cp; '' = el principal). Las pistas,
+ * las alertas, el reparto de blancos y la triangulación solo circulan dentro de un puesto.
+ */
+export const cpOf = u => (u?.cp || '');
+/** Clave de red de una familia de enlace dentro de un puesto de mando. */
+export const netKey = (key, cp) => (cp ? key + '@' + cp : key);
+/** Primera alerta que tuvo el puesto cp sobre th (null si ninguna). */
+export const cueOf = (th, cp) => (cp ? (th.cueCp?.[cp] ?? null) : th.cueFirst);
+
+/** Nivel de C2 de una unidad: el de la red (c2), salvo que la unidad esté asignada a uno menor (u.c2). */
+export const unitC2 = (u, c2) => (u.c2 && C2_ORDER.indexOf(u.c2) >= 0 && C2_ORDER.indexOf(u.c2) < C2_ORDER.indexOf(c2) ? u.c2 : c2);
+
+/**
  * Desde cuándo cuenta el tiempo de reacción de u contra th: normalmente desde que tiene pista; con
  * alerta de la red (todos los niveles salvo 'desconectada' y 'coordinada', que conserva el
  * comportamiento histórico) desde que llegó la alerta, si fue antes.
  */
+/** @param {any} [u] */
 export function reactionStart(th, t, c2, u = null) {
   const L = C2_LEVELS[c2];
-  if ((L.share === 'cue' || L.share === 'fire') && th.cueFirst != null) return Math.min(t, th.cueFirst + L.lag);
+  const cue = cueOf(th, cpOf(u));
+  if ((L.share === 'cue' || L.share === 'fire') && cue != null) return Math.min(t, cue + L.lag);
   // Compatibilidad con objetos de pruebas y escenarios guardados anteriores.
-  if ((L.share === 'cue' || L.share === 'fire') && th.cueFirst == null && th.netFirst != null && u?.link !== false) return Math.min(t, th.netFirst + L.lag);
+  if ((L.share === 'cue' || L.share === 'fire') && cue == null && !cpOf(u) && th.netFirst != null && u?.link !== false) return Math.min(t, th.netFirst + L.lag);
   return t;
 }
 
 /**
  * Nivel de C2 efectivo: el elegido (c2) menos lo que se perdió con los objetivos de C2 destruidos
  * (data/c2.js#C2_NODES): un puesto de mando destruido deja la defensa desconectada y cada sitio de
- * comunicaciones destruido la baja un nivel.
+ * comunicaciones destruido la baja un nivel. Con varios puestos de mando (u.cp), un nodo con g.cp solo afecta
+ * a las unidades de ese puesto; uno sin cp, a todas.
  */
-export function effectiveC2(c2, objs) {
+export function effectiveC2(c2, objs, cp = '') {
   let i = C2_ORDER.indexOf(c2);
   for (const g of objs) {
+    if (g.cp && g.cp !== (cp || '')) continue;   // nodo de otro puesto de mando
     const n = g.status === 'destroyed' && C2_NODES[g.type]; if (!n) continue;
     i = n === 'all' ? 0 : i - n;
   }
@@ -97,6 +129,31 @@ export function energyPk(sm, f, tbm = false) {
   if (!hasProfile(sm)) return Math.min(1.25, energy(f) / energy(ENERGY_REF));
   const P = profileOf(sm), R = (tbm ? sm.maxRtbm : sm.maxR) * 1000;
   return Math.min(1.25, energyAt(P, f * R) / energyAt(P, ENERGY_REF * R));
+}
+
+/**
+ * Fracción de su aceleración lateral máxima que necesita el interceptor (est, docs/FISICA.md §7): contra
+ * un blanco que maniobra en su fase terminal, toda (la guía proporcional pide ≈3 veces la aceleración del
+ * blanco); contra uno que no maniobra, un tercio (errores de rumbo y correcciones de la guía).
+ */
+export const NEED_MAN = 1, NEED_STRAIGHT = 1 / 3;
+
+/**
+ * Factor de Pk por maniobra en altura (docs/FISICA.md §7). La aceleración lateral aerodinámica es
+ * proporcional a la presión dinámica ½ρv²; un misil la usa hasta su límite estructural (gmax). Se mide
+ * en fracciones de gmax: a/gmax = min(1, σ(h)/σ(hFull) · E), con E = (v/vmax)² la energía en el punto de
+ * encuentro (la misma de energyPk) y hFull (sam.hFull) la altura hasta la que a velocidad máxima todavía
+ * llega a gmax. Con la fracción necesaria n (NEED_MAN o NEED_STRAIGHT), el factor de maniobra es
+ * min(1, a/(n·gmax)). energyPk ya cuenta la parte de la velocidad, así que acá va solo lo que agrega la
+ * altura: min(1, σ/σF·E/n) / min(1, E/n), nunca mayor que 1 (abajo de hFull no cambia nada: las Pk
+ * calibradas quedan igual). Los misiles con empuje lateral directo (sam.dthrust: PAC-3, Aster) maniobran
+ * con cohetes y no dependen del aire: ×1. Sin hFull, ×1.
+ */
+export function altitudePk(sm, f, tbm, z, maneuvering) {
+  if (!sm.hFull || sm.dthrust || !usesEnergy(sm.guid)) return 1;
+  const E = hasProfile(sm) ? energyAt(profileOf(sm), f * (tbm ? sm.maxRtbm : sm.maxR) * 1000) : energy(f);
+  const n = maneuvering ? NEED_MAN : NEED_STRAIGHT, k = isaSigma(z) / isaSigma(sm.hFull);
+  return Math.min(1, Math.min(1, k * E / n) / Math.min(1, E / n));
 }
 
 /** ¿El guiado depende de la energía de un misil? Los cañones y los drones interceptores (con motor todo el vuelo) no. */
@@ -165,18 +222,21 @@ export function solve(u, th, t, pct = 1) {
  * Modificadores: maniobra terminal (×manPk del blanco, ×0,85 contra cañones), bengalas contra IR
  * (×0,85), blanco sin motor contra IR (×0,3, T.cold: planeadoras), baja firma (×0,85 buscador activo, ×0,75 guiado desde tierra), interferencia sobre el
  * radar de la batería (×1/(1+0,08·J), mín. ×0,5), blanco a más del 80% de vmaxT (×0,8) y energía
- * del misil en el punto de encuentro (×energyPk, solo si se pasa f = r / alcance cinemático de solve).
+ * del misil en el punto de encuentro (×energyPk, solo si se pasa f = r / alcance cinemático de solve) y
+ * maniobra en el aire fino de la altura (×altitudePk, misma condición).
  * jams = interferidores activos de la corrida.
  */
+/** @param {number | null} [f] */
 export function calcPk(u, th, t, jams, f = null) {
   const sm = D(u).sam; let pk = sm.pk[th.cls] || 0;
   const p = th.p; if (!p) return 0;
-  if (th.maneuver && p.rem < termZone(th)) pk *= sm.guid === 'cañón' ? 0.85 : (th.T.manPk ?? 0.7);
+  const man = !!th.maneuver && p.rem < termZone(th);
+  if (man) pk *= sm.guid === 'cañón' ? 0.85 : (th.T.manPk ?? 0.7);
   if (th.T.ir && (sm.guid === 'IR')) pk *= 0.85;
   if (th.T.cold && sm.guid === 'IR') pk *= 0.3;   // sin motor (planeadora): casi no hay calor para el buscador IR
   if (th.T.lo && sm.guid !== 'IR' && sm.guid !== 'cañón') pk *= sm.guid === 'activo' ? 0.85 : 0.75;
   if (RADAR_GUID.includes(sm.guid) || sm.guid === 'activo') { const J = jamJ(u, azOf(p.x - u.x, p.y - u.y), jams); if (J > 1) pk *= Math.max(0.5, 1 / (1 + 0.08 * J)); }
   const v = speedAt(th, t); if (v > 0.8 * sm.vmaxT) pk *= 0.8;
-  if (f !== null && usesEnergy(sm.guid)) pk *= energyPk(sm, f, isTBM(th));
+  if (f !== null && usesEnergy(sm.guid)) pk *= energyPk(sm, f, isTBM(th)) * altitudePk(sm, f, isTBM(th), p.z, man);
   return clamp(pk, 0, 0.98);
 }

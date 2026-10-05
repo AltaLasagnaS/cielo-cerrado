@@ -1,6 +1,6 @@
 # Estado y relevo: leer primero
 
-Registro original: 4 de octubre de 2026, base `9cafba0`. Reconciliado el 5 de octubre contra `main` `872b6bf` (merge #53) y #61 experimental. #42 incorporó el perfil del interceptor y #43 el paquete experimental; #47 corrigió Kiev/solveTd y #49 la UX chica. Los estados de documentos en `archivo/` son históricos, no estados actuales.
+Registro original: 4 de octubre de 2026, base `9cafba0`. Reconciliado el 5 de octubre contra `main` `0a77102` (merge #59), #61 experimental y continuación de perspectivas #64. #42 incorporó el perfil del interceptor y #43 el paquete experimental; #47 corrigió Kiev/solveTd y #49 la UX chica. Los estados de documentos en `archivo/` son históricos, no estados actuales.
 
 ## Qué pidió el usuario
 
@@ -34,7 +34,7 @@ Conservar todo lo conversado y el trabajo previo, mantener la estructura del pro
 | Componentes/logística | Inventario tipado por depósito/lanzador, cargas explícitas, daño autorizado, tránsito, entregas, reparación con fondos/repuestos | Variantes nuevas activas, cálculo físico propio, trayectos geográficos, severidad de averías o autoridad del motor integrada |
 | Continuidad | Misiones experimentales conservan equipos/daño/munición/ofertas/fondos/repuestos/trabajos y reloj, con replay | Campaña jugable, objetivos progresivos, cambio de escenario o inteligencia persistente por bando |
 | Briefing propio | Proyección de preparación con recursos del libro y reportes autorizados fechados | Niebla de guerra del motor, IA limitada, contactos vivos ni debrief de combate |
-| Pedidos de interfaz | Delete/enteros/explicación C2 implementados en main; Academia actualizada. Regla/track/doctrina/multiselección registrados | Regla, track persistente conocido, multiselección, doctrina por unidad y nuevas etiquetas en la UI activa. C2 individual está en #59, todavía no en main |
+| Pedidos de interfaz | Delete/enteros/explicación C2, regla, track, doctrina, Shift+clic, rótulos y C2 individual en main (#59) | Menú/tutorial, selección por rectángulo y auditoría de conocimiento por bando; continuación de perspectivas en #64 |
 | Física | `solveTd` corregido en main; investigación independiente #54–58. No se modifica desde esta entrega | Validación completa de todos los supuestos; los datos desconocidos no se completan artificialmente |
 
 Todo lo ejecutable de esta entrega vive en `experimentos/catalogo-presupuesto/`. No se importa desde `src/` y no cambia resultados, escenarios, golden o archivos generados del juego.
@@ -51,7 +51,7 @@ Una integración futura exige designar un único responsable para cada archivo c
 
 1. Revisar estos contratos con el panorama conocido por bando que implemente Claude.
 2. Completar una configuración del catálogo por vez, sin tocar consumidores hasta tener evidencia suficiente.
-3. Repartir los archivos de regla/selección de contacto/doctrina/multiselección; Delete/enteros/explicaciones ya están hechos y verificados en main.
+3. Mantener el reparto confirmado: Claude conecta el adaptador a `src/` después de actualizar #61; Codex continúa datos y menú/tutorial en experimentos. Regla/track/doctrina/Shift+clic ya están en main.
 4. Integrar una sola misión con briefing y recursos; después persistencia de componentes, logística e inteligencia para campaña.
 
 ## Cómo retomar sin perder contexto

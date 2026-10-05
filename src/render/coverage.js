@@ -1,3 +1,4 @@
+// @ts-check
 // Capa de cobertura: turquesa donde algún sensor ve el blanco de referencia (más intenso con 2+),
 // oscuro en los huecos. La grilla es por celda; acá se pinta a k× resolución interpolando
 // bilinealmente "visible / no visible" y suavizando el borde, para que al acercar no aparezcan
@@ -11,7 +12,7 @@ const smooth = f => { const t = clamp((f - 0.35) / 0.3, 0, 1); return t * t * (3
 export function paintCoverage(cov, W, H) {
   const k = clamp(Math.floor(Math.sqrt(MAX_PX / (W * H))), 1, 3), RW = W * k, RH = H * k;
   covCanvas.width = RW; covCanvas.height = RH;
-  const cx = covCanvas.getContext('2d'), img = cx.createImageData(RW, RH), px = img.data;
+  const cx = /** @type {CanvasRenderingContext2D} */ (covCanvas.getContext('2d')), img = cx.createImageData(RW, RH), px = img.data;
   const at = (g, fx, fy) => {
     const j = fx | 0, i = fy | 0, tx = fx - j, ty = fy - i, q = i * W + j;
     return (g(q) * (1 - tx) + g(q + 1) * tx) * (1 - ty) + (g(q + W) * (1 - tx) + g(q + W + 1) * tx) * ty;

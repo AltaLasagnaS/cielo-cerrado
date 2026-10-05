@@ -1,7 +1,8 @@
+// @ts-check
 // ---------------- DIBUJO ----------------
 // Redibuja todo el mapa en cada cuadro: relieve, cobertura, grilla, anillos de alcance, sectores,
 // "strobes" de interferencia, rutas, jammers, unidades, impactos, amenazas, interceptores y explosiones.
-import { THREATS, JAMMERS, DEFENSES, TARGET_TYPES, D } from '../data/index.js';
+import { THREATS, JAMMERS, DEFENSES, TARGET_TYPES, D, sideOf } from '../data/index.js';
 import { azOf, clamp } from '../util/math.js';
 import { MAP } from '../physics/terrain.js';
 import { jamJ, horizon } from '../physics/radar.js';
@@ -9,6 +10,7 @@ import { surf } from '../physics/terrain.js';
 import { isOffmap, posAt } from '../physics/kinematics.js';
 import { profileOf, distAt } from '../physics/interceptor.js';
 import { S } from '../sim/state.js';
+import { contactOf } from '../sim/contacts.js';
 import { hooks } from '../sim/hooks.js';
 import { frameAt } from '../sim/replay.js';
 import { cv, ctx, dpr, V, toS } from './view.js';
@@ -47,7 +49,7 @@ export function draw() {
     if (dead) continue;
     const isSel = S.sel && S.sel.kind === 'def' && S.sel.id === u.id;
     if (d.sam) {
-      ctx.setLineDash([5, 5]); ctx.strokeStyle = isSel ? 'rgba(230,165,60,.9)' : (d.side === 'RU' ? 'rgba(255,159,90,.45)' : 'rgba(98,182,255,.45)'); ctx.lineWidth = isSel ? 1.6 : 1;
+      ctx.setLineDash([5, 5]); ctx.strokeStyle = isSel ? 'rgba(230,165,60,.9)' : (sideOf(u) === 'RU' ? 'rgba(255,159,90,.45)' : 'rgba(98,182,255,.45)'); ctx.lineWidth = isSel ? 1.6 : 1;
       ctx.beginPath(); ctx.arc(sx, sy, d.sam.maxR * V.s, 0, 7); ctx.stroke();
       if (d.sam.maxRtbm && d.sam.maxRtbm !== d.sam.maxR) { ctx.setLineDash([2, 4]); ctx.beginPath(); ctx.arc(sx, sy, d.sam.maxRtbm * V.s, 0, 7); ctx.stroke(); }
       ctx.setLineDash([]);
@@ -84,8 +86,8 @@ export function draw() {
   // unidades
   for (const u of units) {
     const d = D(u), [sx, sy] = toS(u.x, u.y), dead = S.started && !u.alive;
-    const isSel = S.sel && S.sel.kind === 'def' && S.sel.id === u.id;
-    const c = d.side === 'RU' ? '#ff9f5a' : '#62b6ff';
+    const isSel = (S.sel && S.sel.kind === 'def' && S.sel.id === u.id) || S.multi.includes(u.id);
+    const c = sideOf(u) === 'RU' ? '#ff9f5a' : '#62b6ff';
     ctx.lineWidth = isSel ? 2.2 : 1.2; ctx.strokeStyle = isSel ? '#e6a53c' : '#08101a'; ctx.fillStyle = dead ? '#3a4452' : c;
     ctx.beginPath();
     if (d.kind === 'sensor' || d.kind === 'aew') { ctx.moveTo(sx, sy - 8); ctx.lineTo(sx + 8, sy); ctx.lineTo(sx, sy + 8); ctx.lineTo(sx - 8, sy); ctx.closePath(); }
@@ -105,6 +107,8 @@ export function draw() {
   for (const im of R ? R.impacts : S.impacts) { const [sx, sy] = toS(im.x, im.y); ctx.strokeStyle = im.k === 'hit' ? '#ff5b4d' : im.k === 'miss' ? '#e6a53c' : '#6b7888'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(sx - 5, sy - 5); ctx.lineTo(sx + 5, sy + 5); ctx.moveTo(sx + 5, sy - 5); ctx.lineTo(sx - 5, sy + 5); ctx.stroke(); }
   // amenazas
   const dv = hooks.defenderView();
+  // vista del defensor (no en la repetición, que muestra la verdad): solo contactos, con su edad
+  if (dv && !R) { drawContacts(tNow); } else
   for (const th of R ? R.threats : S.threats) {
     if (!th.alive || !th.p) continue;
     const tracked = tNow - th.lastNet <= 12;
@@ -138,6 +142,40 @@ export function draw() {
   const now = performance.now();
   S.fx = S.fx.filter(f => now - f.rt < 1400);
   for (const f of S.fx) { const k = (now - f.rt) / 1400, [sx, sy] = toS(f.x, f.y); ctx.strokeStyle = f.c; ctx.globalAlpha = 1 - k; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(sx, sy, (f.big ? 6 : 3) + k * (f.big ? 26 : 14), 0, 7); ctx.stroke(); ctx.globalAlpha = 1; }
+  // regla de medición (modo 'measure', ui/input.js): solo puntos que tocó el usuario, nada oculto
+  if (S.mode === 'measure' && S.measure?.a) drawMeasure(S.measure);
+}
+
+/** Distancia horizontal (km) y rumbo (°, desde el norte) entre dos puntos del mapa. */
+export function measureOf(a, b) {
+  const dx = b[0] - a[0], dy = b[1] - a[1];
+  return { km: Math.hypot(dx, dy), az: (Math.atan2(dx, -dy) * 180 / Math.PI + 360) % 360 };
+}
+
+/** Línea de la regla con su distancia y rumbo en el medio. */
+function drawMeasure(m) {
+  const b = m.b || m.cur; if (!b) return;
+  const [x1, y1] = toS(...m.a), [x2, y2] = toS(...b), r = measureOf(m.a, b);
+  ctx.strokeStyle = '#ffd36b'; ctx.lineWidth = 1.6; ctx.setLineDash([6, 4]); ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.setLineDash([]);
+  for (const [x, y] of [[x1, y1], [x2, y2]]) { ctx.fillStyle = '#ffd36b'; ctx.beginPath(); ctx.arc(x, y, 3, 0, 7); ctx.fill(); }
+  labelAt((x1 + x2) / 2 - 10, (y1 + y2) / 2 - 12, r.km.toFixed(r.km < 10 ? 2 : 1) + ' km · ' + Math.round(r.az) + '°', '#ffd36b');
+}
+
+/**
+ * Contactos de la defensa (sim/contacts.js): pistas vivas en su posición estimada y pistas perdidas como
+ * último reporte fechado. No usa la posición real, la ruta ni la identidad del arma.
+ */
+function drawContacts(tNow) {
+  for (const th of S.threats) {
+    if (th.isDecoyChild && !th.seen) continue;
+    const c = contactOf(th, tNow); if (!c) continue;
+    const [sx, sy] = toS(c.x, c.y), hd = Math.atan2(c.vy, c.vx);
+    ctx.save(); ctx.translate(sx, sy); ctx.rotate(hd);
+    ctx.fillStyle = c.lost ? 'transparent' : '#ff5b4d'; ctx.strokeStyle = c.lost ? 'rgba(255,91,77,.6)' : '#2a0806'; ctx.lineWidth = 1.2;
+    if (c.lost) ctx.setLineDash([2, 2]);
+    ctx.beginPath(); ctx.moveTo(8, 0); ctx.lineTo(-6, -4); ctx.lineTo(-6, 4); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.setLineDash([]); ctx.restore();
+    if (V.s > 9 || c.lost) { ctx.font = '10px "IBM Plex Mono", monospace'; ctx.fillStyle = c.lost ? 'rgba(255,190,180,.6)' : 'rgba(255,190,180,.9)'; ctx.fillText('#' + th.id + (c.lost ? ' · hace ' + Math.round(c.age) + ' s' : ''), sx + 7, sy - 6); }
+  }
 }
 
 /** Etiqueta con fondo oscuro a la derecha de un símbolo. */

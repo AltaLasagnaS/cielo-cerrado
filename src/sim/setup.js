@@ -1,7 +1,7 @@
 // @ts-check
 // ---------------- ARMADO DEL ESCENARIO ----------------
 // Funciones para agregar defensas, salvas y jammers a S.setup (antes de iniciar la corrida).
-import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES, C2_LEVELS, c2FromNet, WEATHER, WEATHER_DEFAULT } from '../data/index.js';
+import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES, C2_LEVELS, c2FromNet, WEATHER, WEATHER_DEFAULT, TIMES_OF_DAY, TOD_DEFAULT, GATEWAYS, JAM_MODES } from '../data/index.js';
 import { azOf } from '../util/math.js';
 import { nextId } from '../util/ids.js';
 import { S } from './state.js';
@@ -10,6 +10,10 @@ import { S } from './state.js';
 export function addDef(type, x, y, o = {}) {
   const d = DEFENSES[type];
   const u = { id: nextId(), type, x, y, az: o.az ?? defaultAz(x, y), mast: d.radar ? (d.kind === 'aew' ? 0 : d.radar.mast) : 2, alt: d.alt, mag: d.sam ? d.sam.mag : 0, reserve: d.sam ? (o.reserve ?? d.sam.reserve ?? 0) : 0, salvo: d.sam ? d.sam.salvo : 0, noDrones: d.sam ? !!d.sam.noDrones : false, link: o.link ?? true, name: o.name || nextName(type) };
+  if (o.c2) u.c2 = o.c2;
+  if (o.cp) u.cp = o.cp;
+  if (o.owner === 'UA' || o.owner === 'RU') u.owner = o.owner;   // quién la opera (data/index.js#sideOf)
+  if (o.decoyDoc === 'ignorar' || o.decoyDoc === 'tirar') u.decoyDoc = o.decoyDoc;   // doctrina de señuelos propia; sin dato, la general   // puesto de mando (physics/engagement.js#cpOf); sin dato, el principal
   S.setup.defs.push(u); return u;
 }
 
@@ -35,11 +39,12 @@ export function addSalvo(o) {
   S.setup.salvos.push(sv); return sv;
 }
 
-/** Ubica un objetivo. o = { name?, short?, hp?, desc? }. */
+/** Ubica un objetivo. o = { name?, short?, hp?, desc?, cp? (puesto de mando de un nodo de C2) }. */
 export function addObj(type, x, y, o = {}) {
   const tt = TARGET_TYPES[type];
   const n = S.setup.objs.filter(g => g.type === type).length + 1;
   const g = { id: nextId(), type, x, y, name: o.name || tt.name + ' ' + n, short: o.short || '', maxHp: o.hp || tt.hp, desc: o.desc || '' };
+  if (o.cp) g.cp = o.cp;   // nodo de C2 de un puesto de mando (solo afecta a sus unidades)
   S.setup.objs.push(g); return g;
 }
 
@@ -47,13 +52,13 @@ export function addObj(type, x, y, o = {}) {
 export const targetName = sv => sv.targetUnit ? S.setup.defs.find(u => u.id === sv.targetUnit)?.name : sv.targetObj ? S.setup.objs.find(g => g.id === sv.targetObj)?.name : null;
 
 /**
- * Despliega un interferidor. o = { alt? (aéreos), mode? ('barrage' | 'spot', data/jammers.js#JAM_MODES),
+ * Despliega un interferidor. o = { alt? (aéreos), mode? ('barrage' | 'spot' | 'drfm', data/jammers.js#JAM_MODES),
  * target? (ruido puntual: nombre o id de la defensa cuyo radar interfiere) }.
  */
 export function addJam(type, x, y, o = {}) {
   const J = JAMMERS[type], u = o.target != null ? S.setup.defs.find(v => v.name === o.target || v.id === o.target) : null;
   const j = { id: nextId(), type, x, y, alt: o.alt ?? J.alt, on: true };
-  if (J.bands) { j.mode = o.mode === 'spot' ? 'spot' : 'barrage'; j.target = u ? u.id : null; }
+  if (J.bands) { j.mode = JAM_MODES[o.mode] ? o.mode : 'barrage'; j.target = u ? u.id : null; }
   S.setup.jams.push(j); return j;
 }
 
@@ -73,6 +78,9 @@ export function applyScenario(sc) {
   }
   S.weather = WEATHER[sc.rules?.weather] ? sc.rules.weather : WEATHER_DEFAULT;
   S.wind = { v: sc.rules?.wind?.v ?? 0, from: sc.rules?.wind?.from ?? 0 };   // viento del escenario: sin dato, calma
+  S.gateways = (sc.rules?.gateways || []).filter(k => GATEWAYS[k]);   // pasarelas entre redes: sin dato, ninguna
+  S.tod = TIMES_OF_DAY[sc.rules?.tod] ? sc.rules.tod : TOD_DEFAULT;   // momento del día: sin dato, noche
+  S.wxPlan = (sc.rules?.wxPlan || []).filter(c => WEATHER[c.weather]).map(c => ({ t: c.t, weather: c.weather }));   // cambios de tiempo
   S.ignoreDecoys = !!sc.rules?.ignoreDecoys;   // el clima es del escenario: sin dato, despejado
   S.fireRange = sc.rules?.fireRange ?? 1;   // doctrina de alcance del escenario: sin dato, todo el alcance
   S.scen = sc;

@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- GUARDAR / CARGAR ESCENARIO (archivo JSON) ----------------
 // Botones "Guardar" y "Cargar" de la barra superior. El formato y la validación están en
 // sim/scenario-io.js; acá solo se descarga y se lee el archivo y se cambia de mapa si hace falta.
@@ -43,7 +44,7 @@ export function saveScenario() {
 export function loadFromObject(raw, fileName = 'archivo') {
   const res = validateScenario(raw);
   if (!res.ok) { showErrors(fileName, res.errors); return res; }
-  const { data } = res;
+  const { data } = res; if (!data || !data.map) return res;
   resetSim();
   if (data.map.builtin && MAP?.key !== data.map.key) applyMap(builtinMap(data.map.key));
   loadScenarioData(data);

@@ -1,10 +1,11 @@
+// @ts-check
 // ---------------- ACADEMIA ----------------
 // Conceptos físicos y de radar que usa el motor, explicados de forma breve pero correcta, con una
 // sección "En el simulador" que muestra las variables y funciones reales y números calculados en vivo
 // desde el catálogo (no hay valores copiados a mano: si cambia un dato, cambia la explicación).
 //
 // Cada concepto: { id, group, title, body() → HTML, engine() → HTML, widget? { html(), mount(el) } }
-import { BANDS, THREATS, DEFENSES, JAMMERS, UNC, CLS_NAME, TARGET_TYPES, DAMAGE, C2_LEVELS, DATALINKS, WEATHER, UNIT_TARGET, UNIT_DAMAGE, UNIT_COMP_AT } from '../data/index.js';
+import { BANDS, THREATS, DEFENSES, JAMMERS, UNC, CLS_NAME, TARGET_TYPES, DAMAGE, C2_LEVELS, DATALINKS, GATEWAYS, WEATHER, UNIT_TARGET, UNIT_DAMAGE, UNIT_COMP_AT } from '../data/index.js';
 import { esc, kmh } from '../util/format.js';
 import { KR, HORIZON_K, LOS_MARGIN } from '../physics/constants.js';
 import { rcsAt, horizon, pdRel } from '../physics/radar.js';
@@ -18,7 +19,8 @@ export const CONCEPT_GROUPS = ['Radar y bandas', 'Detección y terreno', 'Guerra
 
 const code = s => `<code>${esc(s)}</code>`;
 const n = (v, d = 0) => (+v).toLocaleString('es-AR', { maximumFractionDigits: d, minimumFractionDigits: d });
-const lambdaTxt = ([a, b]) => { const f = v => v >= 1 ? n(v, 1) + ' m' : v >= 0.01 ? n(v * 100, 1) + ' cm' : v >= 1e-3 ? n(v * 1000, 1) + ' mm' : n(v * 1e6, 1) + ' µm'; return f(a) + ' – ' + f(b); };
+/** @param {number[]} l [mín, máx] en metros */
+const lambdaTxt = l => { const [a, b] = l; const f = v => v >= 1 ? n(v, 1) + ' m' : v >= 0.01 ? n(v * 100, 1) + ' cm' : v >= 1e-3 ? n(v * 1000, 1) + ' mm' : n(v * 1e6, 1) + ' µm'; return f(a) + ' – ' + f(b); };
 const radarBands = ['VHF', 'L', 'S', 'C', 'X', 'Ku'];
 const rcsTxt = v => v < 0.1 ? n(v, 3) : n(v, 2);
 
@@ -77,7 +79,7 @@ export const CONCEPTS = [
       <p>Ejemplo, Shahed: frente <b>${THREATS.shahed.rcs}</b>, costado <b>${THREATS.shahed.rcsSide}</b> y cola <b>${THREATS.shahed.rcsRear}</b> m². Son la media geométrica entre el modelado de Járkov y la base de CMO, que difieren mucho; el rango completo está en su ficha.</p>`,
     widget: {
       html: () => `<div class="widget"><div class="field"><label for="aThr">Amenaza</label><select id="aThr" class="sel">${Object.entries(THREATS).map(([k, t]) => `<option value="${k}" ${k === 'shahed' ? 'selected' : ''}>${esc(t.short)}</option>`).join('')}</select></div>
-        <div class="field"><label for="aRad">Radar</label><select id="aRad" class="sel">${Object.entries(DEFENSES).filter(([, d]) => d.radar && radarBands.includes(d.radar.band)).map(([k, d]) => `<option value="${k}" ${k === 'pantsir' ? 'selected' : ''}>${esc(d.short)} (${d.radar.band})</option>`).join('')}</select></div>
+        <div class="field"><label for="aRad">Radar</label><select id="aRad" class="sel">${Object.entries(DEFENSES).filter(([, d]) => d.radar && radarBands.includes(d.radar.band)).map(([k, d]) => `<option value="${k}" ${k === 'pantsir' ? 'selected' : ''}>${esc(d.short)} (${d.radar?.band})</option>`).join('')}</select></div>
         <div class="field"><label for="aAng">Ángulo de aspecto (0° = de frente, 90° = de costado, 180° = de cola)</label><span class="val" id="aAngV"></span><input id="aAng" type="range" min="0" max="180" step="5" value="90"></div>
         <p class="wout" id="aOut"></p></div>`,
       mount: el => {
@@ -99,7 +101,7 @@ export const CONCEPTS = [
       <p>Hace falta <b>16 veces más RCS para duplicar el alcance</b>; con una RCS 10 veces menor, el alcance cae a 0,56 veces. Por eso la furtividad ayuda, pero no hace invisible: acorta la distancia de detección.</p>`,
     engine: () => `<p>${code('detR(u, th, J) = R1 · σ_banda^¼ · (1/(1+J))^¼')}, donde ${code('R1')} es el alcance del radar contra 1 m² (dato del catálogo, con rango y fuentes) y J la interferencia. Ese alcance es el de 50% por barrido: más cerca la probabilidad sube rápido (75% al 80% del alcance, 96% a la mitad) y más lejos baja (26% a 1,2 veces). Un eco suelto no abre una pista: hacen falta 2 en los últimos 3 barridos ("2 de 3"). Sale de la relación señal/ruido con fluctuación Swerling 1 (drones y misiles de crucero: muchos reflectores parecidos, la RCS titila mucho) o Swerling 3 (balísticos: un reflector dominante; titila menos, así que de cerca se ven más seguido, 83% al 80% del alcance, y de lejos algo menos, 18% a 1,2 veces). Los blancos rasantes compiten con el eco del suelo o del mar de su misma celda, y en lluvia con el de las gotas (clutter: Billingsley, modelo NRL y Barton); el filtro lo baja poco en un radar sin MTI, unos 35 dB en un MTI contra el suelo (menos contra mar y lluvia) y 55 dB en un pulso-Doppler, y un radar Doppler no ve en ese barrido a un blanco que le pasa exactamente de costado (notch).</p>`,
     widget: {
-      html: () => `<div class="widget"><div class="field"><label for="wRad">Radar</label><select id="wRad" class="sel">${Object.entries(DEFENSES).filter(([, d]) => d.radar && radarBands.includes(d.radar.band)).map(([k, d]) => `<option value="${k}" ${k === 'ewr' ? 'selected' : ''}>${esc(d.short)} (${d.radar.band}, ${d.radar.R1} km vs 1 m²)</option>`).join('')}</select></div>
+      html: () => `<div class="widget"><div class="field"><label for="wRad">Radar</label><select id="wRad" class="sel">${Object.entries(DEFENSES).filter(([, d]) => d.radar && radarBands.includes(d.radar.band)).map(([k, d]) => `<option value="${k}" ${k === 'ewr' ? 'selected' : ''}>${esc(d.short)} (${d.radar?.band}, ${d.radar?.R1} km vs 1 m²)</option>`).join('')}</select></div>
         <div class="field"><label for="wSig">RCS del blanco en la banda del radar</label><span class="val" id="wSigV"></span><input id="wSig" type="range" min="-3" max="1" step="0.05" value="-1"></div>
         <p class="wout" id="wOut"></p><div class="tblwrap"><table class="t" id="wTbl"></table></div></div>`,
       mount: el => {
@@ -217,7 +219,7 @@ export const CONCEPTS = [
       <p>En Ucrania conviven niveles muy distintos: sistemas occidentales con enlace Link 16 (Patriot, NASAMS), sistemas soviéticos que entran a la imagen aérea nacional mediante "cajas negras" de conversión y unidades que reciben la situación aérea en tabletas (Virazh-Planshet). Del lado ruso, puestos automatizados como Polyana-D4M1 integran brigadas de S-300, Buk, Tor y Pantsir.</p>`,
     engine: () => `<p>El nivel se elige en la pestaña Defensa (${code('S.c2')}) y lo usan ${code('trackOK()')} y ${code('reactionStart()')}:</p>
       <div class="tblwrap"><table class="t"><thead><tr><th>Nivel</th><th>Demora de la red</th><th>Tira con pista ajena</th><th>Reparto de blancos</th></tr></thead><tbody>${Object.values(C2_LEVELS).map(L => `<tr><td>${esc(L.name)}</td><td>${L.share === 'none' ? '—' : L.lag + ' s'}</td><td>${{ none: 'no', cue: 'no (solo alerta)', track: 'activos/IR e interceptores', fire: 'también guiados por radar' }[L.share]}</td><td>${L.deconf ? 'sí' : 'no'}</td></tr>`).join('')}</tbody></table></div>
-      <p>Además: un disparo con pista ajena pierde un poco de Pk en coordinada (×${C2_LEVELS.coordinada.remotePk}, error de posición de la pista); cada unidad puede tener o no <b>enlace de datos</b> (casilla en el panel de selección); en integrada, cada blanco va al <b>mejor tirador</b> y los drones se dejan a la capa más barata que los espera más adelante; y si el atacante destruye un <b>puesto de mando</b> la defensa queda desconectada (cada sitio de comunicaciones destruido la baja un nivel). Las pistas de red viajan por <b>familias de enlace</b> (${Object.values(DATALINKS).map(l => esc(l.name)).join(', ')}): una unidad recibe la pista de un sensor solo si comparten alguna (la ficha muestra la de cada sistema). La casilla de enlace apaga esos transportes, pero no la coordinación de C2: las alertas pueden seguir llegando. No hay todavía pasarelas entre familias ni un control de pertenencia a la red de mando por unidad: ver ROADMAP.</p>`
+      <p>Además: un disparo con pista ajena pierde un poco de Pk en coordinada (×${C2_LEVELS.coordinada.remotePk}, error de posición de la pista); cada unidad puede tener o no <b>enlace de datos</b> (casilla en el panel de selección); en integrada, cada blanco va al <b>mejor tirador</b> y los drones se dejan a la capa más barata que los espera más adelante; y si el atacante destruye un <b>puesto de mando</b> la defensa queda desconectada (cada sitio de comunicaciones destruido la baja un nivel). Las pistas de red viajan por <b>familias de enlace</b> (${Object.values(DATALINKS).map(l => esc(l.name)).join(', ')}): una unidad recibe la pista de un sensor solo si comparten alguna (la ficha muestra la de cada sistema). La casilla de enlace apaga esos transportes, pero no la coordinación de C2: las alertas pueden seguir llegando. Una <b>pasarela</b> entre familias (${Object.values(GATEWAYS).map(g => esc(g.name)).join(', ')}) pasa pistas con demora y algo menos de Pk, pero viene apagada: no hay fuente de que esas pistas sirvan para disparar (se habilita en Defensa). Cada unidad puede tener <b>menos coordinación que la red</b> (${code('u.c2')}) y pertenecer a un <b>puesto de mando</b> (${code('u.cp')}): pistas, alertas y reparto solo circulan dentro de cada puesto, y un puesto de mando destruido degrada solo a sus unidades.</p>`
   },
   {
     id: 'clima', group: 'Radar y bandas', title: 'Clima: lluvia, nubes y niebla',

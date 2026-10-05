@@ -1,13 +1,15 @@
+// @ts-check
 // ---------------- VISTA ----------------
 // Cámara del mapa: centro (cx, cy) en km y escala s en píxeles CSS por km.
 import { MAP } from '../physics/terrain.js';
 import { draw } from './draw.js';
 
 /** Canvas del mapa, su contexto 2D y la relación de píxeles del dispositivo. */
-export let cv = null, ctx = null, dpr = 1;
+/** Lienzo del mapa y su contexto 2D (initView los asigna al arrancar, antes del primer dibujo). */
+export let cv = /** @type {HTMLCanvasElement} */ (/** @type {unknown} */ (null)), ctx = /** @type {CanvasRenderingContext2D} */ (/** @type {unknown} */ (null)), dpr = 1;
 export const V = { cx: 50, cy: 50, s: 6 };
 
-export function initView(canvas) { cv = canvas; ctx = cv.getContext('2d'); }
+export function initView(canvas) { cv = canvas; ctx = /** @type {CanvasRenderingContext2D} */ (cv.getContext('2d')); }
 
 /** Ajusta la resolución del canvas a su tamaño en pantalla. */
 export function resize() { const r = cv.getBoundingClientRect(); dpr = window.devicePixelRatio || 1; cv.width = Math.max(1, r.width * dpr); cv.height = Math.max(1, r.height * dpr); draw(); }
