@@ -59,3 +59,4 @@ jobs:
           done
           node experimentos/catalogo-presupuesto/tests/demo.browser.mjs
           node experimentos/catalogo-presupuesto/tests/logistics.browser.mjs
+          node experimentos/catalogo-presupuesto/tests/ports.browser.mjs
