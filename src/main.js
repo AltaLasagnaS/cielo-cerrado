@@ -13,7 +13,7 @@ import { addDef, addSalvo, addJam } from './sim/setup.js';
 import { initView, resize, fitView } from './render/view.js';
 import { draw } from './render/draw.js';
 import { buildBase } from './render/terrain.js';
-import { $, isDefenderView } from './ui/dom.js';
+import { $, isDefenderView, isAttackerView } from './ui/dom.js';
 import { loadScenario, resetSim } from './ui/app.js';
 import { schedCov, computeCov } from './ui/coverage.js';
 import { initControls, updatePlay } from './ui/controls.js';
@@ -40,6 +40,7 @@ hooks.onLog = markLogDirty;
 hooks.onEnd = () => { updatePlay(); renderStats(); openDebrief(); };
 hooks.onUnitLost = schedCov;
 hooks.defenderView = isDefenderView;
+hooks.attackerView = isAttackerView;
 
 initView($('#map'));
 initInput();

@@ -544,7 +544,7 @@ table.t.mc td.pc{white-space:nowrap}
         <span class="clock" id="clock">T+00:00</span>
         <span class="tscale" id="tscale"></span>
         <div class="speeds" id="speeds"></div>
-        <label class="check" style="font-size:12px"><input type="checkbox" id="defView"> Vista del defensor</label>
+        <select id="view" class="sel" style="font-size:12px;width:auto" aria-label="Qué se muestra en el mapa" title="Completa: la verdad. Defensor: solo sus pistas. Atacante: sus armas y las defensas que conoce."><option value="all">Vista completa</option><option value="def">Vista del defensor</option><option value="atk">Vista del atacante</option></select>
       </div>
       <div class="replaybar" id="replayBar" role="group" aria-label="Repetición de la corrida" hidden></div>
       <div class="relief" id="relief" role="group" aria-label="Lectura del relieve"><span>Relieve</span></div>
@@ -3555,7 +3555,9 @@ table.t.mc td.pc{white-space:nowrap}
     onUnitLost() {
     },
     /** ¿El jugador está en "vista del defensor"? (solo cambia el texto del registro). */
-    defenderView: () => false
+    defenderView: () => false,
+    /** ¿El jugador está en "vista del atacante"? (solo cambia el dibujo y lo que se puede tocar). */
+    attackerView: () => false
   };
 
   // src/physics/decoys.js
@@ -4771,6 +4773,7 @@ table.t.mc td.pc{white-space:nowrap}
         recUnit(u);
         S.stats.shots++;
         S.stats.defCost += sm.cost;
+        u.revealed ?? (u.revealed = t);
         S.hoj.push({ u, j, tH: t + timeTo(profileOf(sm), d * 1e3) });
         j.hojBusy = true;
         log("l", uLabel(u) + " dispara un misil home-on-jam contra el " + JJ.short + " a " + d.toFixed(0) + " km.");
@@ -4817,6 +4820,11 @@ table.t.mc td.pc{white-space:nowrap}
     const lost = age > TRACK_AGE || !th.alive;
     const k = lost ? 0 : age;
     return { x: s.x + vx * k, y: s.y + vy * k, z: s.z + vz * k, vx, vy, v: Math.hypot(vx, vy) * 1e3, age, lost, by: s.by };
+  }
+  function attackerKnows(u, t) {
+    const r = D(u).radar;
+    if (r && r.band !== "ACU" && r.band !== "OPT") return true;
+    return u.revealed != null && u.revealed <= t;
   }
 
   // src/sim/engine.js
@@ -5199,6 +5207,7 @@ table.t.mc td.pc{white-space:nowrap}
         S.stats.shots++;
         S.stats.defCost += sm.cost;
         recUnit(u);
+        u.revealed ?? (u.revealed = t);
         S.stats.byUnit[uLabel(u)] = (S.stats.byUnit[uLabel(u)] || 0) + 1;
       }
       event("Primer interceptor lanzado: " + uLabel(u) + " contra " + label(th), "firstShot");
@@ -5221,6 +5230,7 @@ table.t.mc td.pc{white-space:nowrap}
       S.stats.shots++;
       S.stats.defCost += sm.cost;
       recUnit(u);
+      u.revealed ?? (u.revealed = t);
     }
     log("w", uLabel(u) + " dispara " + n2 + "× " + sm.shot + " contra un falso blanco (engaño DRFM).");
     if (u.magLeft === 0) log("w", uLabel(u) + " se queda sin munición.");
@@ -5645,8 +5655,9 @@ table.t.mc td.pc{white-space:nowrap}
     ctx.fillStyle = "#0a1520";
     ctx.fillRect(0, 0, w, h);
     const [ox, oy] = toS(0, 0), mw = MAP.wKm * V.s, mh = MAP.hKm * V.s;
+    const av = S.started && !R && hooks.attackerView();
     drawTerrain({ ctx, dpr, s: V.s, ox, oy }, S.relief);
-    if (S.showCov && covCanvas.width) {
+    if (S.showCov && covCanvas.width && !av) {
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = "high";
       ctx.drawImage(covCanvas, ox, oy, mw, mh);
@@ -5684,12 +5695,12 @@ table.t.mc td.pc{white-space:nowrap}
       ctx.fillStyle = "rgba(235,240,245,.85)";
       ctx.fillText(p[0], sx + 5, sy + 4);
     }
-    const units = R ? R.units : S.started ? S.units : S.setup.defs;
+    const units = (R ? R.units : S.started ? S.units : S.setup.defs).filter((u) => !av || attackerKnows(u, tNow));
     const jams = S.started ? S.jamsLive : S.setup.jams;
     for (const u of units) {
       const d = D(u);
       const [sx, sy] = toS(u.x, u.y);
-      const dead = S.started && !u.alive;
+      const dead = S.started && !u.alive && !av;
       if (dead) continue;
       const isSel = S.sel && S.sel.kind === "def" && S.sel.id === u.id;
       if (d.sam) {
@@ -5748,7 +5759,7 @@ table.t.mc td.pc{white-space:nowrap}
     }
     if (!R && (!S.started || !S.running)) for (const sv of S.setup.salvos) drawRoute(sv, S.sel && S.sel.kind === "salvo" && S.sel.id === sv.id);
     if (S.route) drawRoute({ type: S.atk.type, pts: S.route.pts, preview: true }, true);
-    for (const g of R ? R.objs : S.started ? S.objs : S.setup.objs) drawObjective(g, S.sel && S.sel.kind === "obj" && S.sel.id === g.id);
+    for (const g of R ? R.objs : S.started ? S.objs : S.setup.objs) drawObjective(g, S.sel && S.sel.kind === "obj" && S.sel.id === g.id, av);
     for (const j of jams) {
       const J = JAMMERS[j.type], [sx, sy] = toS(j.x, j.y);
       const isSel = S.sel && S.sel.kind === "jam" && S.sel.id === j.id;
@@ -5771,7 +5782,7 @@ table.t.mc td.pc{white-space:nowrap}
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
-      if (S.started && j.fix && !j.dead) {
+      if (S.started && j.fix && !j.dead && !av) {
         ctx.strokeStyle = "rgba(230,165,60,.8)";
         ctx.setLineDash([2, 3]);
         ctx.beginPath();
@@ -5792,7 +5803,7 @@ table.t.mc td.pc{white-space:nowrap}
       labelAt(sx, sy, J.short, "#d8b8ff");
     }
     for (const u of units) {
-      const d = D(u), [sx, sy] = toS(u.x, u.y), dead = S.started && !u.alive;
+      const d = D(u), [sx, sy] = toS(u.x, u.y), dead = S.started && !u.alive && !av;
       const isSel = S.sel && S.sel.kind === "def" && S.sel.id === u.id || S.multi.includes(u.id);
       const c = sideOf(u) === "RU" ? "#ff9f5a" : "#62b6ff";
       ctx.lineWidth = isSel ? 2.2 : 1.2;
@@ -5823,7 +5834,7 @@ table.t.mc td.pc{white-space:nowrap}
         ctx.arc(sx, sy, 12, 0, 7);
         ctx.stroke();
       }
-      if (S.started && !dead && (u.dmgRadar || u.dmgLauncher)) {
+      if (S.started && !dead && !av && (u.dmgRadar || u.dmgLauncher)) {
         ctx.strokeStyle = "#e6a53c";
         ctx.lineWidth = 2;
         ctx.beginPath();
@@ -5840,7 +5851,7 @@ table.t.mc td.pc{white-space:nowrap}
         ctx.lineTo(sx - 7, sy + 7);
         ctx.stroke();
       }
-      const ammo = S.started && d.sam && u.alive ? " " + u.magLeft : "";
+      const ammo = S.started && d.sam && u.alive && !av ? " " + u.magLeft : "";
       labelAt(sx, sy, (u.name || d.short) + ammo, dead ? "#6b7888" : "#e6eef6");
     }
     if (S.preview) drawPreview(S.preview);
@@ -5912,7 +5923,7 @@ table.t.mc td.pc{white-space:nowrap}
           ctx.fillText(dv ? "#" + th.id : th.T.short, sx + 7, sy - 6);
         }
       }
-    for (const it of R ? R.ints : S.ints) {
+    if (!av) for (const it of R ? R.ints : S.ints) {
       if (it.done || tNow < it.tL) continue;
       const P = profileOf(D(it.u).sam), fl = Math.max(0.1, it.tH - it.tL);
       const f = clamp(distAt(P, tNow - it.tL) / Math.max(1, distAt(P, fl)), 0, 1);
@@ -6081,8 +6092,8 @@ table.t.mc td.pc{white-space:nowrap}
     }
   }
   var STATUS_COLOR = { operational: "#6fd08c", damaged: "#e6a53c", destroyed: "#ff5b4d" };
-  function drawObjective(g, isSel) {
-    const tt = TARGET_TYPES[g.type], [sx, sy] = toS(g.x, g.y), hp = g.hp ?? g.maxHp, st = g.status || "operational", col = STATUS_COLOR[st];
+  function drawObjective(g, isSel, hide = false) {
+    const tt = TARGET_TYPES[g.type], [sx, sy] = toS(g.x, g.y), hp = hide ? g.maxHp : g.hp ?? g.maxHp, st = hide ? "operational" : g.status || "operational", col = hide ? "#8a9aac" : STATUS_COLOR[st];
     const rpx = tt.radius / 1e3 * V.s;
     if (rpx > 4) {
       ctx.strokeStyle = "rgba(242,212,138,.35)";
@@ -6200,7 +6211,8 @@ table.t.mc td.pc{white-space:nowrap}
 
   // src/ui/dom.js
   var $ = (s) => document.querySelector(s);
-  var isDefenderView = () => $("#defView").checked;
+  var isDefenderView = () => $("#view")?.value === "def";
+  var isAttackerView = () => $("#view")?.value === "atk";
 
   // src/physics/coverage.js
   function coverageGrid(units, jams, ref, agl, wx = null) {
@@ -6362,7 +6374,7 @@ table.t.mc td.pc{white-space:nowrap}
     const saved = { ...hooks }, quiet = { onLog() {
     }, onEnd() {
     }, onUnitLost() {
-    }, defenderView: () => false };
+    }, defenderView: () => false, attackerView: () => false };
     mc.tick = (budgetMs = 40) => {
       if (mc.done) return true;
       const t0 = Date.now();
@@ -6521,7 +6533,10 @@ table.t.mc td.pc{white-space:nowrap}
       resetSim();
       renderAll();
     };
-    $("#defView").onchange = draw;
+    $("#view").onchange = () => {
+      renderAll();
+      draw();
+    };
   }
   function togglePlay() {
     if (isMonteCarloRunning()) return;
@@ -7293,6 +7308,10 @@ table.t.mc td.pc{white-space:nowrap}
       const ll = latlon(u.x, u.y);
       const ed = !S.started;
       const ground = Math.round(surf(u.x, u.y));
+      if (S.started && !S.replay && isAttackerView()) {
+        el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(d.short)}</b><dl class="kv"><dt>Posición</dt><dd>${u.x.toFixed(1)}, ${u.y.toFixed(1)} km</dd>${r && r.band !== "ACU" && r.band !== "OPT" ? `<dt>Radar</dt><dd>${esc(r.name)} · ${r.band}</dd>` : ""}${d.sam ? `<dt>Alcance (catálogo)</dt><dd>${d.sam.maxR} km</dd>` : ""}<dt>Estado</dt><dd>desconocido</dd></dl><p class="hint">Vista del atacante: ${r && r.band !== "ACU" && r.band !== "OPT" ? "ubicada por su emisión de radar" : "ubicada al disparar"}. No se sabe si está dañada ni cuánta munición le queda.</p>`;
+        return;
+      }
       let html = `<h3>Selección</h3><div class="row" style="justify-content:space-between"><b style="font-size:15px">${esc(u.name)}</b><span class="chip ${d.side === "RU" ? "ru" : "ua"}">${esc(d.short)}</span></div>
       <dl class="kv"><dt>Posición</dt><dd>${u.x.toFixed(1)}, ${u.y.toFixed(1)} km</dd><dt>Lat/Lon</dt><dd>${ll[0].toFixed(3)}°, ${ll[1].toFixed(3)}°</dd><dt>Terreno</dt><dd>${ground} m</dd>`;
       if (r && r.band !== "ACU") {
@@ -7432,6 +7451,10 @@ table.t.mc td.pc{white-space:nowrap}
       if (!g) {
         S.sel = null;
         return renderSel();
+      }
+      if (S.started && !S.replay && isAttackerView()) {
+        el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">OBJETIVO: ${esc(g.name)}</b><dl class="kv"><dt>Tipo</dt><dd>${esc(TARGET_TYPES[g.type].name)}</dd><dt>Posición</dt><dd>${g.x.toFixed(1)}, ${g.y.toFixed(1)} km</dd><dt>Daño</dt><dd>sin evaluar</dd></dl><p class="hint">Vista del atacante: el daño se conoce en el debrief.</p>`;
+        return;
       }
       const tt = TARGET_TYPES[g.type], hp = g.hp ?? g.maxHp, st = g.status || "operational", ll = latlon(g.x, g.y);
       const dmgBy = Object.entries(g.dmgBy || {}).sort((a, b) => b[1] - a[1]).map(([k, v]) => esc(k) + " " + v).join(", ");
@@ -8475,7 +8498,9 @@ table.t.mc td.pc{white-space:nowrap}
         if (Math.hypot(a - sx, b - sy) < 9) return { kind: "thr", id: th.id };
       }
     }
+    const av = S.started && !S.replay && isAttackerView();
     for (const u of units) {
+      if (av && !attackerKnows(u, S.t)) continue;
       const [a, b] = toS(u.x, u.y);
       if (Math.hypot(a - sx, b - sy) < 11) return { kind: "def", id: u.id };
     }
@@ -8702,7 +8727,7 @@ table.t.mc td.pc{white-space:nowrap}
       txt = (u.name || D(u).short) + "\n" + D(u).name;
     } else if (h && h.kind === "obj") {
       const g = (S.started ? S.objs : S.setup.objs).find((v) => v.id === h.id), hp = g.hp ?? g.maxHp;
-      txt = "OBJETIVO: " + g.name + "\n" + TARGET_TYPES[g.type].name + "\nHP " + hp + " / " + g.maxHp + " · " + TARGET_STATUS[g.status || "operational"];
+      txt = "OBJETIVO: " + g.name + "\n" + TARGET_TYPES[g.type].name + (S.started && !S.replay && isAttackerView() ? "\nDaño: sin evaluar (vista del atacante)" : "\nHP " + hp + " / " + g.maxHp + " · " + TARGET_STATUS[g.status || "operational"]);
     } else if (MAP && wx >= 0 && wy >= 0 && wx <= MAP.wKm && wy <= MAP.hKm) {
       const e = elev(wx, wy), ll = latlon(wx, wy);
       txt = wx.toFixed(1) + " / " + wy.toFixed(1) + " km · " + ll[0].toFixed(3) + "°, " + ll[1].toFixed(3) + "°\n";
@@ -8734,7 +8759,7 @@ table.t.mc td.pc{white-space:nowrap}
     <li><b>Ataque:</b> elegí el arma, cantidad, horario (o "sincronizar llegada" para saturar), altura y maniobra; después "Trazar ruta". Los balísticos y supersónicos se lanzan desde fuera del mapa en la dirección que marques.</li>
     <li><b>Guerra electrónica:</b> jammers de ruido (aéreo o Krasukha) y supresor GNSS. Las líneas violeta muestran qué radar está siendo interferido.</li>
     <li><b>Cobertura:</b> el mapa sombrea en turquesa dónde tus sensores ven un blanco de referencia a cierta altura sobre el terreno, considerando relieve real, curvatura terrestre, RCS en la banda de cada radar e interferencia. Bajá la altura y vas a ver aparecer los huecos de los valles.</li>
-    <li><b>Simulación:</b> ▶ Iniciar, velocidades 1×–60×. "Vista del defensor" oculta lo que no fue detectado y muestra los señuelos igual que las armas reales.</li>
+    <li><b>Simulación:</b> ▶ Iniciar, velocidades 1×–60×. El selector de vista cambia qué se muestra: "Vista del defensor" oculta lo que no fue detectado y muestra los señuelos igual que las armas reales; "Vista del atacante" muestra sus armas y solo las defensas que conoce (las de radar, por su emisión; las demás, desde que disparan), sin su estado, su munición ni los interceptores.</li>
     <li><b>Guardar y cargar:</b> "Guardar" descarga lo que armaste (objetivos, defensas, ataques, jammers, reglas y metas) como archivo .json; "Cargar" lo vuelve a abrir, también en otra computadora. Al cargar se revisa que el mapa exista y que las armas y defensas estén en el catálogo; si algo falla, no se toca lo que tenías. Un escenario sobre un relieve .hgt necesita que cargues ese relieve antes.</li>
     <li><b>Relieve propio:</b> "Cargar relieve .hgt" acepta tiles SRTM descomprimidos (por ejemplo N50E030.hgt para Kyiv), de 1201×1201 o 3601×3601 muestras.</li>
   </ul>
@@ -9276,6 +9301,7 @@ table.t.mc td.pc{white-space:nowrap}
   };
   hooks.onUnitLost = schedCov;
   hooks.defenderView = isDefenderView;
+  hooks.attackerView = isAttackerView;
   initView($("#map"));
   initInput();
   initControls();

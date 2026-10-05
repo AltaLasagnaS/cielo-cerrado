@@ -21,7 +21,7 @@ export function initControls() {
   $('#speeds').onclick = e => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.s === 'auto') S.auto = true; else { S.auto = false; S.speed = +b.dataset.s; } updatePlay(); };
   $('#play').onclick = togglePlay;
   $('#reset').onclick = () => { resetSim(); renderAll(); };
-  $('#defView').onchange = draw;
+  $('#view').onchange = () => { renderAll(); draw(); };
 }
 
 /** Iniciar → pausar → seguir; al terminar, "nueva corrida" vuelve al modo edición. */

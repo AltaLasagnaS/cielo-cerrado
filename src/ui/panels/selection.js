@@ -11,7 +11,7 @@ import { S } from '../../sim/state.js';
 import { label, uLabel } from '../../sim/log.js';
 import { targetName } from '../../sim/setup.js';
 import { warheadKg, directDamage } from '../../physics/damage.js';
-import { $, isDefenderView } from '../dom.js';
+import { $, isDefenderView, isAttackerView } from '../dom.js';
 import { draw } from '../../render/draw.js';
 import { contactOf } from '../../sim/contacts.js';
 import { schedCov } from '../coverage.js';
@@ -85,6 +85,11 @@ export function renderSel(live) {
     const u = (S.started ? S.units : S.setup.defs).find(v => v.id === sel.id); if (!u) { S.sel = null; return renderSel(); }
     const d = D(u), r = d.radar; const ll = latlon(u.x, u.y); const ed = !S.started;
     const ground = Math.round(surf(u.x, u.y));
+    if (S.started && !S.replay && isAttackerView()) {
+      // vista del atacante: dónde está y qué es (catálogo), no su estado, munición ni enlaces
+      el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(d.short)}</b><dl class="kv"><dt>Posición</dt><dd>${u.x.toFixed(1)}, ${u.y.toFixed(1)} km</dd>${r && r.band !== 'ACU' && r.band !== 'OPT' ? `<dt>Radar</dt><dd>${esc(r.name)} · ${r.band}</dd>` : ''}${d.sam ? `<dt>Alcance (catálogo)</dt><dd>${d.sam.maxR} km</dd>` : ''}<dt>Estado</dt><dd>desconocido</dd></dl><p class="hint">Vista del atacante: ${r && r.band !== 'ACU' && r.band !== 'OPT' ? 'ubicada por su emisión de radar' : 'ubicada al disparar'}. No se sabe si está dañada ni cuánta munición le queda.</p>`;
+      return;
+    }
     let html = `<h3>Selección</h3><div class="row" style="justify-content:space-between"><b style="font-size:15px">${esc(u.name)}</b><span class="chip ${d.side === 'RU' ? 'ru' : 'ua'}">${esc(d.short)}</span></div>
       <dl class="kv"><dt>Posición</dt><dd>${u.x.toFixed(1)}, ${u.y.toFixed(1)} km</dd><dt>Lat/Lon</dt><dd>${ll[0].toFixed(3)}°, ${ll[1].toFixed(3)}°</dd><dt>Terreno</dt><dd>${ground} m</dd>`;
     if (r && r.band !== 'ACU') { const hor = horizon(antZ(u) - (d.kind === 'aew' ? 0 : ground), 50); html += `<dt>Radar</dt><dd>${esc(r.name)} · ${r.band}</dd><dt>Horizonte vs blanco a 50 m</dt><dd>${hor.toFixed(0)} km</dd>`; }
@@ -148,6 +153,10 @@ export function renderSel(live) {
     if ($('#vDel')) $('#vDel').onclick = () => { S.setup.salvos = S.setup.salvos.filter(v => v.id !== sv.id); S.sel = null; renderSel(); renderAtk(); };
   } else if (sel.kind === 'obj') {
     const g = (S.started ? S.objs : S.setup.objs).find(v => v.id === sel.id); if (!g) { S.sel = null; return renderSel(); }
+    if (S.started && !S.replay && isAttackerView()) {
+      el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">OBJETIVO: ${esc(g.name)}</b><dl class="kv"><dt>Tipo</dt><dd>${esc(TARGET_TYPES[g.type].name)}</dd><dt>Posición</dt><dd>${g.x.toFixed(1)}, ${g.y.toFixed(1)} km</dd><dt>Daño</dt><dd>sin evaluar</dd></dl><p class="hint">Vista del atacante: el daño se conoce en el debrief.</p>`;
+      return;
+    }
     const tt = TARGET_TYPES[g.type], hp = g.hp ?? g.maxHp, st = g.status || 'operational', ll = latlon(g.x, g.y);
     const dmgBy = Object.entries(g.dmgBy || {}).sort((a, b) => b[1] - a[1]).map(([k, v]) => esc(k) + ' ' + v).join(', ');
     el.innerHTML = `<h3>Selección</h3><div class="row" style="justify-content:space-between"><b style="font-size:15px">OBJETIVO: ${esc(g.name)}</b><span class="chip st-${st}">${TARGET_STATUS[st]}</span></div>

@@ -322,7 +322,7 @@ export function engage(u, t) {
     for (let k = 0; k < n; k++) {
       const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f, gw: remote ? (netPk(u, th, t, c2, S.gateways) || 1) : 1 };
       S.ints.push(it); (th.fly = th.fly || []).push(it);
-      S.rec?.ints.push(it); u.magLeft--; u.active++; S.stats.shots++; S.stats.defCost += sm.cost; recUnit(u);
+      S.rec?.ints.push(it); u.magLeft--; u.active++; S.stats.shots++; S.stats.defCost += sm.cost; recUnit(u); u.revealed ??= t;   // el lanzamiento la delata (vista del atacante)
       S.stats.byUnit[uLabel(u)] = (S.stats.byUnit[uLabel(u)] || 0) + 1;
     }
     event('Primer interceptor lanzado: ' + uLabel(u) + ' contra ' + label(th), 'firstShot');
@@ -337,7 +337,7 @@ function phantomShot(u, t) {
   const a = (u.az || 0) * Math.PI / 180, r = sm.maxR * 0.6, tau = timeTo(profileOf(sm), r * 1000);
   for (let k = 0; k < n; k++) {
     const it = { u, th: null, phantom: true, x0: u.x, y0: u.y, px: u.x + Math.sin(a) * r, py: u.y - Math.cos(a) * r, tL: t + k * 0.6, tH: t + tau + k * 0.6, shot: sm.shot, done: false };
-    S.ints.push(it); S.rec?.ints.push(it); u.magLeft--; u.active++; S.stats.shots++; S.stats.defCost += sm.cost; recUnit(u);
+    S.ints.push(it); S.rec?.ints.push(it); u.magLeft--; u.active++; S.stats.shots++; S.stats.defCost += sm.cost; recUnit(u); u.revealed ??= t;
   }
   log('w', uLabel(u) + ' dispara ' + n + '× ' + sm.shot + ' contra un falso blanco (engaño DRFM).');
   if (u.magLeft === 0) log('w', uLabel(u) + ' se queda sin munición.');

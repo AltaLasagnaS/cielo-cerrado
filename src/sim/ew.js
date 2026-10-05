@@ -62,7 +62,7 @@ export function ewStep(t) {
       if (!sm?.hoj || u.dmgLauncher || u.magLeft <= 0 || u.reloadUntil !== null) continue;
       const p = jamPos(j), d = Math.hypot(p[0] - u.x, p[1] - u.y, (p[2] - antZ(u)) / 1000);
       if (d > sm.maxR || p[2] > sm.altMax) continue;
-      u.magLeft--; u.active++; recUnit(u); S.stats.shots++; S.stats.defCost += sm.cost;
+      u.magLeft--; u.active++; recUnit(u); S.stats.shots++; S.stats.defCost += sm.cost; u.revealed ??= t;
       S.hoj.push({ u, j, tH: t + timeTo(profileOf(sm), d * 1000) });
       j.hojBusy = true;
       log('l', uLabel(u) + ' dispara un misil home-on-jam contra el ' + JJ.short + ' a ' + d.toFixed(0) + ' km.');

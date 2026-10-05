@@ -1,7 +1,8 @@
 // Contactos de la defensa (sim/contacts.js): lo que sabe la defensa, sin la verdad.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { noteSeen, contactOf, TRACK_AGE, LOST_AGE } from '../src/sim/contacts.js';
+import { noteSeen, contactOf, attackerKnows, TRACK_AGE, LOST_AGE } from '../src/sim/contacts.js';
+import { DEFENSES } from '../src/data/index.js';
 import { runScenario } from './helpers.js';
 
 test('contacto: posición estimada por estima mientras vive la pista y último reporte cuando se pierde', () => {
@@ -27,4 +28,17 @@ test('contacto: no depende de la posición real después de la última detecció
 test('contacto: anotar detecciones no cambia los resultados (mismo escenario, mismas golden)', () => {
   const S = runScenario('mb_noche', { seed: 1 });
   assert.ok(S.threats.some(t => t.seen), 'el motor anota detecciones');
+});
+
+test('vista del atacante: conoce las defensas con radar desde el principio; las demás, desde que disparan', () => {
+  const S = runScenario('gb_refineria', { seed: 1 });
+  const radar = S.units.filter(u => { const r = DEFENSES[u.type].radar; return r && r.band !== 'ACU' && r.band !== 'OPT'; });
+  const quiet = S.units.filter(u => !radar.includes(u));
+  assert.ok(radar.length && quiet.length, 'el escenario tiene de las dos');
+  for (const u of radar) assert.ok(attackerKnows(u, 0), u.type + ': emite, el atacante la ubica');
+  for (const u of quiet) {
+    assert.equal(attackerKnows(u, 0), false, u.type + ': antes de disparar no se la conoce');
+    if (u.revealed != null) assert.ok(attackerKnows(u, u.revealed) && !attackerKnows(u, u.revealed - 1), u.type + ': desde su primer disparo');
+  }
+  assert.ok(quiet.some(u => u.revealed != null), 'alguna sin radar disparó');
 });

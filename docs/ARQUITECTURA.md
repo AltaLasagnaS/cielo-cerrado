@@ -129,13 +129,15 @@ El debrief tiene un botón **Ver repetición**: el mapa vuelve a mostrar la corr
 
 ## Vista del defensor (`sim/contacts.js`)
 
-Con la casilla **Vista del defensor**, el mapa, la ayuda emergente y la ficha de una pista muestran **contactos**, no la verdad. Cada detección de la defensa anota la posición vista (`th.seen`, y la anterior en `th.seenPrev`); `contactOf(th, t)` da la posición estimada por estima (última posición + velocidad de las dos últimas detecciones × edad) mientras la pista vive (12 s, la ventana de la red), y el último reporte fechado cuando se pierde (hasta 90 s). No muestra el tipo de arma, su blanco, su ruta ni la distancia que le falta; tocar el mapa selecciona el contacto donde se lo ve. Anotar no consume azar (las golden no cambian; `tests/contacts.test.js`). La repetición sigue mostrando la verdad.
+Con el selector de vista en **Vista del defensor**, el mapa, la ayuda emergente y la ficha de una pista muestran **contactos**, no la verdad. Cada detección de la defensa anota la posición vista (`th.seen`, y la anterior en `th.seenPrev`); `contactOf(th, t)` da la posición estimada por estima (última posición + velocidad de las dos últimas detecciones × edad) mientras la pista vive (12 s, la ventana de la red), y el último reporte fechado cuando se pierde (hasta 90 s). No muestra el tipo de arma, su blanco, su ruta ni la distancia que le falta; tocar el mapa selecciona el contacto donde se lo ve. Anotar no consume azar (las golden no cambian; `tests/contacts.test.js`). La repetición sigue mostrando la verdad.
 
 Cada unidad tiene un **dueño explícito** (`u.owner`, `data/index.js#sideOf`): quién la opera, separado del país del equipo (un 36D6 o un Buk puede ser de cualquiera de los dos bandos).
 
 **Tiro sin omnisciencia**: la solución de tiro (`physics/engagement.js#solve`) predice el punto de encuentro con la pista observada (`physics/track.js`: última detección y velocidad medida), no con la ruta real; solo los balísticos usan la trayectoria verdadera, que la física fija. Al llegar, `arrivalReach` decide con la posición real si al misil le alcanza la energía (docs/FISICA.md §6).
 
-Lo que falta de las **perspectivas por bando** (etapa 1 del plan de Codex): vista del atacante.
+## Vista del atacante (`sim/contacts.js#attackerKnows`)
+
+Con el selector en **Vista del atacante**, durante la corrida el mapa muestra sus armas (la verdad: son suyas) y solo las defensas que conoce: las que tienen radar que emite (también el AEW), porque la inteligencia de señales las ubica por su emisión, y las demás (cañones, MANPADS, drones interceptores, sensores acústicos u ópticos) recién desde su primer disparo (`u.revealed`, lo anota el motor sin consumir azar; las golden no cambian). No muestra si una defensa está dañada o destruida, su munición, los interceptores en vuelo, la cobertura de radar, la ubicación de los jammers por triangulación ni el daño de los objetivos; la ficha y la ayuda emergente muestran solo posición, tipo y alcance de catálogo. La repetición sigue mostrando la verdad. No se modela el control de emisiones (un radar que se apaga para no delatarse). (Pendiente: el registro, el panel de resultados, la lista de objetivos y el debrief todavía muestran la verdad en las dos vistas; hay que separar los mensajes por bando.)
 
 ## Modo Monte Carlo (`sim/montecarlo.js`)
 

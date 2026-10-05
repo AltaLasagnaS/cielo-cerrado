@@ -10,9 +10,9 @@ import { isOffmap, speedAt } from '../physics/kinematics.js';
 import { relativeRelief, slopeAt, terrainClass, RELIEF_RADIUS_KM } from '../physics/terrain-analysis.js';
 import { S } from '../sim/state.js';
 import { label, uLabel } from '../sim/log.js';
-import { contactOf } from '../sim/contacts.js';
+import { contactOf, attackerKnows } from '../sim/contacts.js';
 import { cv, V, toS, toW, fitView } from '../render/view.js';
-import { $, isDefenderView } from './dom.js';
+import { $, isDefenderView, isAttackerView } from './dom.js';
 import { schedCov } from './coverage.js';
 import { togglePlay } from './controls.js';
 import { setMode, updateModebar, finishRoute, toast, proposePlacement, confirmPlacement, cancelPlacement } from './modes.js';
@@ -33,7 +33,8 @@ export function hitTest(sx, sy) {
       const [a, b] = toS(c.x, c.y); if (Math.hypot(a - sx, b - sy) < 9) return { kind: 'thr', id: th.id };
     }
   }
-  for (const u of units) { const [a, b] = toS(u.x, u.y); if (Math.hypot(a - sx, b - sy) < 11) return { kind: 'def', id: u.id }; }
+  const av = S.started && !S.replay && isAttackerView();   // vista del atacante: no se tocan las defensas que no conoce
+  for (const u of units) { if (av && !attackerKnows(u, S.t)) continue; const [a, b] = toS(u.x, u.y); if (Math.hypot(a - sx, b - sy) < 11) return { kind: 'def', id: u.id }; }
   for (const j of jams) { const [a, b] = toS(j.x, j.y); if (Math.hypot(a - sx, b - sy) < 11) return { kind: 'jam', id: j.id }; }
   for (const g of objs) { const [a, b] = toS(g.x, g.y); if (Math.hypot(a - sx, b - sy) < 11) return { kind: 'obj', id: g.id }; }
   if (!S.started) for (const sv of S.setup.salvos) { for (let i = 1; i < sv.pts.length; i++) { const [a, b] = toS(...sv.pts[i - 1]), [c2, d2] = toS(...sv.pts[i]); if (segDist(sx, sy, a, b, c2, d2) < 6) return { kind: 'salvo', id: sv.id }; } }
@@ -155,7 +156,7 @@ function showTip(sx, sy) {
     const u = (S.started ? S.units : S.setup.defs).find(u => u.id === h.id); txt = (u.name || D(u).short) + '\n' + D(u).name;
   } else if (h && h.kind === 'obj') {
     const g = (S.started ? S.objs : S.setup.objs).find(v => v.id === h.id), hp = g.hp ?? g.maxHp;
-    txt = 'OBJETIVO: ' + g.name + '\n' + TARGET_TYPES[g.type].name + '\nHP ' + hp + ' / ' + g.maxHp + ' · ' + TARGET_STATUS[g.status || 'operational'];
+    txt = 'OBJETIVO: ' + g.name + '\n' + TARGET_TYPES[g.type].name + (S.started && !S.replay && isAttackerView() ? '\nDaño: sin evaluar (vista del atacante)' : '\nHP ' + hp + ' / ' + g.maxHp + ' · ' + TARGET_STATUS[g.status || 'operational']);
   } else if (MAP && wx >= 0 && wy >= 0 && wx <= MAP.wKm && wy <= MAP.hKm) {
     const e = elev(wx, wy), ll = latlon(wx, wy);
     txt = wx.toFixed(1) + ' / ' + wy.toFixed(1) + ' km · ' + ll[0].toFixed(3) + '°, ' + ll[1].toFixed(3) + '°\n';

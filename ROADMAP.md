@@ -6,7 +6,7 @@ Son ideas ordenadas por prioridad, no promesas. Cada ítem que cambie resultados
 
 ## Próximo
 
-- **Perspectivas por bando, segunda parte** (etapa 1 del plan de Codex, [`PLAN-MAESTRO.md`](experimentos/catalogo-presupuesto/docs/PLAN-MAESTRO.md)). Ya están el dueño explícito de cada unidad (`u.owner`) y la vista del defensor con contactos (posición estimada, edad, último reporte; ficha de pista sin la verdad). Ya está también el **tiro sin omnisciencia** (la defensa apunta con su pista; CHANGELOG). Falta: **vista del atacante** (qué sabe el atacante de la defensa; hay que filtrar también el registro, los tooltips y el debrief para no filtrar información).
+- **Perspectivas por bando, segunda parte** (etapa 1 del plan de Codex, [`PLAN-MAESTRO.md`](experimentos/catalogo-presupuesto/docs/PLAN-MAESTRO.md)). Ya están el dueño explícito de cada unidad (`u.owner`) y la vista del defensor con contactos (posición estimada, edad, último reporte; ficha de pista sin la verdad). Ya está también el **tiro sin omnisciencia** (la defensa apunta con su pista; CHANGELOG). Ya está también la **vista del atacante** en el mapa, la ficha y la ayuda emergente. Falta: filtrar por bando el registro, el panel de resultados, la lista de objetivos y el debrief (hoy muestran la verdad en las dos vistas), y el control de emisiones (radares que se apagan para no delatarse).
 
 ## Física (cada ítem es **[sim]**)
 
