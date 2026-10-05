@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- INTERACCIÓN ----------------
 // Mouse/táctil sobre el mapa: seleccionar, arrastrar unidades, ubicar, trazar rutas, pan y zoom
 // (rueda o pellizco), tooltip; y atajos de teclado (Esc, Enter, barra espaciadora).
@@ -118,7 +119,7 @@ $('#zfit').onclick = fitView;
 $('#zrule').onclick = () => setMode(S.mode === 'measure' ? 'select' : 'measure');
 document.addEventListener('keydown', e => {
   if (!$('#modal').hidden) { if (e.key === 'Escape') { e.preventDefault(); closeModal(); } return; }
-  if (e.target.closest?.('input,select,textarea,[contenteditable]:not([contenteditable="false"]),[role="textbox"]')) return;
+  if (/** @type {HTMLElement} */ (e.target).closest?.('input,select,textarea,[contenteditable]:not([contenteditable="false"]),[role="textbox"]')) return;
   if (e.key === 'Delete') { if (deleteSelected()) e.preventDefault(); return; }
   if (e.key === 'Escape') { if (S.preview) cancelPlacement(); else setMode('select'); }
   if (e.key === 'Enter') { if (S.preview) confirmPlacement(); else if (S.mode === 'route') finishRoute(); }

@@ -1,3 +1,4 @@
+// @ts-check
 // Tarjeta "Selección": detalle y parámetros editables de lo que esté seleccionado en el mapa
 // (defensa, jammer, salva o amenaza en vuelo).
 import { THREATS, JAMMERS, JAM_MODES, TARGET_TYPES, TARGET_STATUS, D, DATALINKS, datalinksOf, UNIT_TARGET, C2_LEVELS, C2_ORDER, C2_NODES } from '../../data/index.js';

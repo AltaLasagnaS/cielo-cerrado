@@ -1,3 +1,4 @@
+// @ts-check
 // Control "Relieve" sobre el mapa: cambia el modo de lectura del terreno (solo visual).
 import { S } from '../sim/state.js';
 import { RELIEF_MODES } from '../render/terrain.js';

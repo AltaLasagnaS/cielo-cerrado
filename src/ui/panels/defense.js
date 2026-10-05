@@ -1,3 +1,4 @@
+// @ts-check
 // Pestaña "Defensa": catálogo de sistemas para ubicar, mando y control, y opciones de cobertura.
 import { DEFENSES, THREATS, C2_LEVELS, WEATHER, TIMES_OF_DAY, GATEWAYS } from '../../data/index.js';
 import { esc } from '../../util/format.js';
@@ -12,7 +13,7 @@ import { renderSel } from './selection.js';
 
 /** Direcciones de donde sopla el viento (rosa de 8). */
 const WIND_DIRS = [['Norte', 0], ['Noreste', 45], ['Este', 90], ['Sudeste', 135], ['Sur', 180], ['Sudoeste', 225], ['Oeste', 270], ['Noroeste', 315]];
-const windTxt = () => S.wind.v ? `${S.wind.v} m/s (${Math.round(S.wind.v * 3.6)} km/h) desde ${(WIND_DIRS.find(([, a]) => a === S.wind.from) || [S.wind.from + '°'])[0].toLowerCase()}` : 'calma';
+const windTxt = () => S.wind.v ? `${S.wind.v} m/s (${Math.round(S.wind.v * 3.6)} km/h) desde ${String((WIND_DIRS.find(([, a]) => a === S.wind.from) || [S.wind.from + '°'])[0]).toLowerCase()}` : 'calma';
 
 /** Botón de unidad con su "i" para abrir la ficha. */
 export function unitBtn(key, def, act, cls) { return `<button class="ub ${cls} ${act ? 'act' : ''}" data-k="${key}" title="${esc(def.name)}"><span>${esc(def.short)}</span><i data-info="${key}" role="button" aria-label="Ficha">i</i></button>`; }

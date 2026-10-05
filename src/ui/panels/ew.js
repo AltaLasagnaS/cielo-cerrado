@@ -1,3 +1,4 @@
+// @ts-check
 // Pestaña "Guerra E.": ubicar interferidores, prenderlos/apagarlos y explicación del modelo.
 import { JAMMERS } from '../../data/index.js';
 import { esc } from '../../util/format.js';

@@ -1,3 +1,4 @@
+// @ts-check
 // Orquesta el cálculo de cobertura: se programa con un pequeño retardo (120 ms) para no recalcular
 // en cada movimiento de un control, calcula la grilla, la pinta y actualiza el panel.
 import { THREATS } from '../data/index.js';
@@ -21,6 +22,6 @@ export function computeCov() {
   const jams = S.started ? S.jamsLive : S.setup.jams;
   const cov = coverageGrid(units, jams, THREATS[S.covRef], S.covAgl, wxNow());
   paintCoverage(cov, MAP.W, MAP.H);
-  S._cov = cov; S.covStat = { pct: Math.round(100 * cov.reduce((a, v) => a + (v > 0), 0) / (MAP.W * MAP.H)) };
+  S._cov = cov; S.covStat = { pct: Math.round(100 * cov.reduce((a, v) => a + (v > 0 ? 1 : 0), 0) / (MAP.W * MAP.H)) };
   draw(); renderCovInfo();
 }

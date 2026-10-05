@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- FICHAS ----------------
 // Ventanas modales: ficha de cada arma/defensa/jammer (datos, notas, quién lo detecta, tasas reales,
 // confianza de los datos y fuentes), comparativas y calibración de Pk.

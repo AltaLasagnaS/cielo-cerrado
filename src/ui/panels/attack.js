@@ -1,3 +1,4 @@
+// @ts-check
 // Pestaña "Ataque": configurar una salva nueva, trazar su ruta y listar las programadas.
 import { CLS_NAME, THREATS, TARGET_TYPES, CRPA_SIZES } from '../../data/index.js';
 import { targetName } from '../../sim/setup.js';

@@ -3275,8 +3275,8 @@ table.t.mc td.pc{white-space:nowrap}
   function elev(x, y) {
     const c = MAP.cellKm, fx = x / c - 0.5, fy = y / c - 0.5;
     if (fx < 0 || fy < 0 || fx >= MAP.W - 1 || fy >= MAP.H - 1) return -10;
-    const j = fx | 0, i = fy | 0, tx = fx - j, ty = fy - i, W = MAP.W, d = MAP.data, k = i * W + j;
-    return (d[k] * (1 - tx) + d[k + 1] * tx) * (1 - ty) + (d[k + W] * (1 - tx) + d[k + W + 1] * tx) * ty;
+    const j = fx | 0, i = fy | 0, tx = fx - j, ty = fy - i, W2 = MAP.W, d = MAP.data, k = i * W2 + j;
+    return (d[k] * (1 - tx) + d[k + 1] * tx) * (1 - ty) + (d[k + W2] * (1 - tx) + d[k + W2 + 1] * tx) * ty;
   }
   var surf = (x, y) => Math.max(0, elev(x, y));
   function los(ax, ay, az, bx, by, bz) {
@@ -3303,16 +3303,16 @@ table.t.mc td.pc{white-space:nowrap}
     const dv = new DataView(buf);
     const { lat0, lon0 } = tile;
     const latc = lat0 + 0.5, kmx = 111.32 * Math.cos(latc * Math.PI / 180), kmy = 111;
-    const cell = 200, W = Math.round(kmx * 1e3 / cell), H = Math.round(kmy * 1e3 / cell);
-    const data = new Int16Array(W * H);
-    for (let i = 0; i < H; i++) for (let j = 0; j < W; j++) {
-      const sy = (i + 0.5) / H * (n2 - 1), sx = (j + 0.5) / W * (n2 - 1);
+    const cell = 200, W2 = Math.round(kmx * 1e3 / cell), H = Math.round(kmy * 1e3 / cell);
+    const data = new Int16Array(W2 * H);
+    for (let i = 0; i < H; i++) for (let j = 0; j < W2; j++) {
+      const sy = (i + 0.5) / H * (n2 - 1), sx = (j + 0.5) / W2 * (n2 - 1);
       const a = Math.floor(sy), b = Math.floor(sx);
       let v = dv.getInt16((a * n2 + b) * 2, false);
       if (v < -1e3) v = 0;
-      data[i * W + j] = v <= 0 ? -5 : v;
+      data[i * W2 + j] = v <= 0 ? -5 : v;
     }
-    return { map: { key: "hgt", name: fileName, W, H, cell, latN: lat0 + 1, lonW: lon0, dlat: 1 / H, dlon: 1 / W, places: [], data }, kmx, kmy };
+    return { map: { key: "hgt", name: fileName, W: W2, H, cell, latN: lat0 + 1, lonW: lon0, dlat: 1 / H, dlon: 1 / W2, places: [], data }, kmx, kmy };
   }
 
   // src/sim/state.js
@@ -3620,28 +3620,28 @@ table.t.mc td.pc{white-space:nowrap}
     return a;
   }
   function analyze(map) {
-    const { W, H, data } = map;
-    const I = new Float64Array((W + 1) * (H + 1));
+    const { W: W2, H, data } = map;
+    const I = new Float64Array((W2 + 1) * (H + 1));
     for (let i = 0; i < H; i++) {
       let row = 0;
-      for (let j = 0; j < W; j++) {
-        row += Math.max(0, data[i * W + j]);
-        I[(i + 1) * (W + 1) + j + 1] = I[i * (W + 1) + j + 1] + row;
+      for (let j = 0; j < W2; j++) {
+        row += Math.max(0, data[i * W2 + j]);
+        I[(i + 1) * (W2 + 1) + j + 1] = I[i * (W2 + 1) + j + 1] + row;
       }
     }
     const R = Math.max(1, Math.round(RELIEF_RADIUS_KM / map.cellKm));
-    const mean = new Float32Array(W * H);
-    for (let i = 0; i < H; i++) for (let j = 0; j < W; j++) {
-      const i0 = Math.max(0, i - R), i1 = Math.min(H, i + R + 1), j0 = Math.max(0, j - R), j1 = Math.min(W, j + R + 1);
-      const s = I[i1 * (W + 1) + j1] - I[i0 * (W + 1) + j1] - I[i1 * (W + 1) + j0] + I[i0 * (W + 1) + j0];
-      mean[i * W + j] = s / ((i1 - i0) * (j1 - j0));
+    const mean = new Float32Array(W2 * H);
+    for (let i = 0; i < H; i++) for (let j = 0; j < W2; j++) {
+      const i0 = Math.max(0, i - R), i1 = Math.min(H, i + R + 1), j0 = Math.max(0, j - R), j1 = Math.min(W2, j + R + 1);
+      const s = I[i1 * (W2 + 1) + j1] - I[i0 * (W2 + 1) + j1] - I[i1 * (W2 + 1) + j0] + I[i0 * (W2 + 1) + j0];
+      mean[i * W2 + j] = s / ((i1 - i0) * (j1 - j0));
     }
     return { data: map.data, mean, peaks: findPeaks(map), contours: null };
   }
   function sampleGrid(map, g, x, y) {
     const c = map.cellKm, fx = clamp(x / c - 0.5, 0, map.W - 1.001), fy = clamp(y / c - 0.5, 0, map.H - 1.001);
-    const j = fx | 0, i = fy | 0, tx = fx - j, ty = fy - i, W = map.W, k = i * W + j;
-    return (g[k] * (1 - tx) + g[k + 1] * tx) * (1 - ty) + (g[k + W] * (1 - tx) + g[k + W + 1] * tx) * ty;
+    const j = fx | 0, i = fy | 0, tx = fx - j, ty = fy - i, W2 = map.W, k = i * W2 + j;
+    return (g[k] * (1 - tx) + g[k + 1] * tx) * (1 - ty) + (g[k + W2] * (1 - tx) + g[k + W2 + 1] * tx) * ty;
   }
   function relativeRelief(x, y) {
     return surf(x, y) - sampleGrid(MAP, analysis().mean, x, y);
@@ -3660,19 +3660,19 @@ table.t.mc td.pc{white-space:nowrap}
     return Math.abs(rel) > 25 ? "Terreno ondulado" : "Llano";
   }
   function findPeaks(map) {
-    const { W, H, data, cellKm: c } = map;
+    const { W: W2, H, data, cellKm: c } = map;
     let maxE = 0;
     for (let k = 0; k < data.length; k++) if (data[k] > maxE) maxE = data[k];
     const minRelief = Math.max(25, 0.04 * maxE);
     const rMax = Math.max(1, Math.round(1 / c)), rMin = Math.max(2, Math.round(3 / c));
     const cand = [];
-    for (let i = 1; i < H - 1; i++) for (let j = 1; j < W - 1; j++) {
-      const k = i * W + j, e = data[k];
+    for (let i = 1; i < H - 1; i++) for (let j = 1; j < W2 - 1; j++) {
+      const k = i * W2 + j, e = data[k];
       if (e <= 0) continue;
       let ok = true;
       for (let di = -1; di <= 1 && ok; di++) for (let dj = -1; dj <= 1; dj++) {
         if (!di && !dj) continue;
-        const n2 = data[k + di * W + dj];
+        const n2 = data[k + di * W2 + dj];
         if (n2 > e || n2 === e && (di < 0 || di === 0 && dj < 0)) {
           ok = false;
           break;
@@ -3682,12 +3682,12 @@ table.t.mc td.pc{white-space:nowrap}
     }
     const peaks = [];
     for (const k of cand) {
-      const i = k / W | 0, j = k - i * W, e = data[k];
+      const i = k / W2 | 0, j = k - i * W2, e = data[k];
       let dom = true;
       for (let di = -rMax; di <= rMax && dom; di++) for (let dj = -rMax; dj <= rMax; dj++) {
         const ii = i + di, jj = j + dj;
-        if (ii < 0 || jj < 0 || ii >= H || jj >= W) continue;
-        if (data[ii * W + jj] > e) {
+        if (ii < 0 || jj < 0 || ii >= H || jj >= W2) continue;
+        if (data[ii * W2 + jj] > e) {
           dom = false;
           break;
         }
@@ -3696,8 +3696,8 @@ table.t.mc td.pc{white-space:nowrap}
       let lo = e;
       for (let di = -rMin; di <= rMin; di++) for (let dj = -rMin; dj <= rMin; dj++) {
         const ii = i + di, jj = j + dj;
-        if (ii < 0 || jj < 0 || ii >= H || jj >= W) continue;
-        const v = Math.max(0, data[ii * W + jj]);
+        if (ii < 0 || jj < 0 || ii >= H || jj >= W2) continue;
+        const v = Math.max(0, data[ii * W2 + jj]);
         if (v < lo) lo = v;
       }
       if (e - lo >= minRelief) peaks.push({ x: (j + 0.5) * c, y: (i + 0.5) * c, e, relief: e - lo });
@@ -3714,7 +3714,7 @@ table.t.mc td.pc{white-space:nowrap}
   function contourLines(map = MAP) {
     const a = analysis(map);
     if (a.contours) return a.contours;
-    const { W, H, data, cellKm: c } = map;
+    const { W: W2, H, data, cellKm: c } = map;
     let maxE = 0;
     for (let k = 0; k < data.length; k++) if (data[k] > maxE) maxE = data[k];
     const interval = contourInterval(Math.max(50, maxE));
@@ -3723,9 +3723,9 @@ table.t.mc td.pc{white-space:nowrap}
     for (let L = interval; L < maxE; L += interval) levels.push(L);
     for (const L of levels) {
       const out = L === 0.5 ? res.coast : Math.round(L / interval) % 5 === 0 ? res.index : res.minor;
-      for (let i = 0; i < H - 1; i++) for (let j = 0; j < W - 1; j++) {
-        const k = i * W + j;
-        const v0 = data[k], v1 = data[k + 1], v2 = data[k + W + 1], v3 = data[k + W];
+      for (let i = 0; i < H - 1; i++) for (let j = 0; j < W2 - 1; j++) {
+        const k = i * W2 + j;
+        const v0 = data[k], v1 = data[k + 1], v2 = data[k + W2 + 1], v3 = data[k + W2];
         const idx = (v0 > L ? 8 : 0) | (v1 > L ? 4 : 0) | (v2 > L ? 2 : 0) | (v3 > L ? 1 : 0);
         if (idx === 0 || idx === 15) continue;
         const x0 = (j + 0.5) * c, y0 = (i + 0.5) * c;
@@ -4436,8 +4436,8 @@ table.t.mc td.pc{white-space:nowrap}
   var directDamage = (T) => DAMAGE.K * Math.pow(warheadKg(T), DAMAGE.EXP) * (T.dmgMult ?? 1);
   var radius50 = (T) => DAMAGE.R50K * Math.cbrt(warheadKg(T));
   function damageAt(T, type, dist) {
-    const tt = typeof type === "string" ? TARGET_TYPES[type] : type, W = warheadKg(T);
-    if (!W || !tt) return { dmg: 0, factor: 0, edge: dist };
+    const tt = typeof type === "string" ? TARGET_TYPES[type] : type, W2 = warheadKg(T);
+    if (!W2 || !tt) return { dmg: 0, factor: 0, edge: dist };
     const edge = Math.max(0, dist - tt.radius);
     const factor = 1 / (1 + (edge / radius50(T)) ** 2);
     if (factor < DAMAGE.CUTOFF) return { dmg: 0, factor: 0, edge };
@@ -4600,8 +4600,8 @@ table.t.mc td.pc{white-space:nowrap}
 
   // src/sim/weather-now.js
   function wxNow() {
-    const W = WEATHER[S.wxLive ?? S.weather] || WEATHER.despejado;
-    return S.tod === "dia" ? { ...W, opt: W.opt * ENV.modelo.optDay } : W;
+    const W2 = WEATHER[S.wxLive ?? S.weather] || WEATHER.despejado;
+    return S.tod === "dia" ? { ...W2, opt: W2.opt * ENV.modelo.optDay } : W2;
   }
   function wxReset() {
     S.wxLive = S.weather;
@@ -5266,14 +5266,14 @@ table.t.mc td.pc{white-space:nowrap}
     return Math.max(0, (nx * lx + ny * ly + lz) / n2);
   }
   function buildRaster(mode) {
-    const { W, H, data } = MAP;
-    const k = clamp(Math.floor(Math.sqrt(MAX_PX / (W * H))), 1, 4), RW = W * k, RH = H * k;
+    const { W: W2, H, data } = MAP;
+    const k = clamp(Math.floor(Math.sqrt(MAX_PX / (W2 * H))), 1, 4), RW = W2 * k, RH = H * k;
     const E = new Float32Array(RW * RH);
     for (let py = 0; py < RH; py++) {
       const fy = clamp((py + 0.5) / k - 0.5, 0, H - 1.001), i = fy | 0, ty = fy - i;
       for (let px2 = 0; px2 < RW; px2++) {
-        const fx = clamp((px2 + 0.5) / k - 0.5, 0, W - 1.001), j = fx | 0, tx = fx - j, q = i * W + j;
-        E[py * RW + px2] = (data[q] * (1 - tx) + data[q + 1] * tx) * (1 - ty) + (data[q + W] * (1 - tx) + data[q + W + 1] * tx) * ty;
+        const fx = clamp((px2 + 0.5) / k - 0.5, 0, W2 - 1.001), j = fx | 0, tx = fx - j, q = i * W2 + j;
+        E[py * RW + px2] = (data[q] * (1 - tx) + data[q + 1] * tx) * (1 - ty) + (data[q + W2] * (1 - tx) + data[q + W2 + 1] * tx) * ty;
       }
     }
     const cv2 = document.createElement("canvas");
@@ -5285,7 +5285,7 @@ table.t.mc td.pc{white-space:nowrap}
     for (let y = 0; y < RH; y++) for (let x = 0; x < RW; x++) {
       const o = y * RW + x, e = E[o];
       let r, g, b;
-      const wet = water && water[Math.min(H - 1, y / k | 0) * W + Math.min(W - 1, x / k | 0)] === 1;
+      const wet = water && water[Math.min(H - 1, y / k | 0) * W2 + Math.min(W2 - 1, x / k | 0)] === 1;
       if (e <= 0 || wet) {
         const t = wet ? 0.05 : clamp(-e / 2500, 0, 1);
         r = 22 - 12 * t;
@@ -5417,20 +5417,20 @@ table.t.mc td.pc{white-space:nowrap}
     const t = clamp((f - 0.35) / 0.3, 0, 1);
     return t * t * (3 - 2 * t);
   };
-  function paintCoverage(cov, W, H) {
-    const k = clamp(Math.floor(Math.sqrt(MAX_PX2 / (W * H))), 1, 3), RW = W * k, RH = H * k;
+  function paintCoverage(cov, W2, H) {
+    const k = clamp(Math.floor(Math.sqrt(MAX_PX2 / (W2 * H))), 1, 3), RW = W2 * k, RH = H * k;
     covCanvas.width = RW;
     covCanvas.height = RH;
     const cx = covCanvas.getContext("2d"), img = cx.createImageData(RW, RH), px = img.data;
     const at = (g, fx, fy) => {
-      const j = fx | 0, i = fy | 0, tx = fx - j, ty = fy - i, q = i * W + j;
-      return (g(q) * (1 - tx) + g(q + 1) * tx) * (1 - ty) + (g(q + W) * (1 - tx) + g(q + W + 1) * tx) * ty;
+      const j = fx | 0, i = fy | 0, tx = fx - j, ty = fy - i, q = i * W2 + j;
+      return (g(q) * (1 - tx) + g(q + 1) * tx) * (1 - ty) + (g(q + W2) * (1 - tx) + g(q + W2 + 1) * tx) * ty;
     };
     const one = (q) => cov[q] > 0 ? 1 : 0, two = (q) => cov[q] > 1 ? 1 : 0;
     for (let y = 0; y < RH; y++) {
       const fy = clamp((y + 0.5) / k - 0.5, 0, H - 1.001);
       for (let x = 0; x < RW; x++) {
-        const fx = clamp((x + 0.5) / k - 0.5, 0, W - 1.001);
+        const fx = clamp((x + 0.5) / k - 0.5, 0, W2 - 1.001);
         const a1 = smooth(at(one, fx, fy)), a2 = smooth(at(two, fx, fy)), o = (y * RW + x) * 4;
         const aCov = 62 + 43 * a2;
         px[o] = 10 + 69 * a1;
@@ -6001,8 +6001,8 @@ table.t.mc td.pc{white-space:nowrap}
 
   // src/physics/coverage.js
   function coverageGrid(units, jams, ref, agl, wx = null) {
-    const W = MAP.W, H = MAP.H, c = MAP.cellKm, data = MAP.data;
-    const cov = new Uint8Array(W * H), stamp = new Int32Array(W * H).fill(-1);
+    const W2 = MAP.W, H = MAP.H, c = MAP.cellKm, data = MAP.data;
+    const cov = new Uint8Array(W2 * H), stamp = new Int32Array(W2 * H).fill(-1);
     let ri = 0;
     for (const u of units) {
       const d = D(u), r = d.radar;
@@ -6010,9 +6010,9 @@ table.t.mc td.pc{white-space:nowrap}
       ri++;
       if (r.band === "ACU") {
         if (ref.cls !== "dron" || agl > (r.altMax || 3e3)) continue;
-        const R = detR(u, ref, 0, 1, wx), i0 = Math.max(0, (u.y - R) / c | 0), i1 = Math.min(H - 1, (u.y + R) / c | 0), j0 = Math.max(0, (u.x - R) / c | 0), j1 = Math.min(W - 1, (u.x + R) / c | 0);
+        const R = detR(u, ref, 0, 1, wx), i0 = Math.max(0, (u.y - R) / c | 0), i1 = Math.min(H - 1, (u.y + R) / c | 0), j0 = Math.max(0, (u.x - R) / c | 0), j1 = Math.min(W2 - 1, (u.x + R) / c | 0);
         for (let i = i0; i <= i1; i++) for (let j = j0; j <= j1; j++) {
-          const k = i * W + j;
+          const k = i * W2 + j;
           if (stamp[k] !== ri && Math.hypot((j + 0.5) * c - u.x, (i + 0.5) * c - u.y) <= R) {
             stamp[k] = ri;
             cov[k]++;
@@ -6050,8 +6050,8 @@ table.t.mc td.pc{white-space:nowrap}
           let e = 0, k = -1;
           if (dist >= tmin) {
             const j = x / c | 0, i = y / c | 0;
-            if (j >= 0 && i >= 0 && j < W && i < H) {
-              k = i * W + j;
+            if (j >= 0 && i >= 0 && j < W2 && i < H) {
+              k = i * W2 + j;
               e = Math.max(0, data[k]);
             }
           }
@@ -6351,7 +6351,8 @@ table.t.mc td.pc{white-space:nowrap}
   var CONCEPT_GROUPS = ["Radar y bandas", "Detección y terreno", "Guerra electrónica", "Enfrentamiento"];
   var code = (s) => `<code>${esc(s)}</code>`;
   var n = (v, d = 0) => (+v).toLocaleString("es-AR", { maximumFractionDigits: d, minimumFractionDigits: d });
-  var lambdaTxt = ([a, b]) => {
+  var lambdaTxt = (l) => {
+    const [a, b] = l;
     const f = (v) => v >= 1 ? n(v, 1) + " m" : v >= 0.01 ? n(v * 100, 1) + " cm" : v >= 1e-3 ? n(v * 1e3, 1) + " mm" : n(v * 1e6, 1) + " µm";
     return f(a) + " – " + f(b);
   };
@@ -6614,7 +6615,7 @@ table.t.mc td.pc{white-space:nowrap}
       title: "Clima: lluvia, nubes y niebla",
       body: () => `<p>El tiempo no afecta igual a todos los sensores. La <b>lluvia</b> absorbe y dispersa las microondas, tanto más cuanto más alta es la frecuencia: un radar en banda S o L casi no la nota, uno en X la siente y uno en Ku pierde mucho alcance en una tormenta. Por eso los radares de alerta usan bandas bajas y los de guiado (X, Ku) sufren más.</p><p>Los sensores <b>ópticos e infrarrojos</b> (los grupos móviles con ametralladoras y cámaras térmicas, los MANPADS) son los más castigados: la lluvia o la niebla les achican el alcance a una fracción y las <b>nubes</b> les tapan todo lo que vuela por encima, aunque se escuche el motor. La red <b>acústica</b> oye menos con lluvia y viento.</p>`,
       engine: () => `<p>El clima se elige en la pestaña Defensa (${code("S.weather")}) y queda fijo todo el escenario. La atenuación del radar sale de la Rec. ITU-R P.838-3: ${code("γ = k · R^α")} dB/km, con k y α según la frecuencia de cada banda (${code("BANDS[b].ghz")}), sobre un camino de lluvia de hasta ${code("rainKm")}. El alcance resuelve ${code("R = R0 · 10^(−γ·min(R, L)/20)")}. Con lluvia de 4 mm/h, γ por banda: ${["S", "C", "X", "Ku"].map((b) => b + " " + rainGamma(b, 4).toFixed(3)).join(" · ")} dB/km.</p>
-      <div class="tblwrap"><table class="t"><thead><tr><th>Clima</th><th>Lluvia</th><th>Óptico/IR</th><th>Techo para ópticos</th><th>Acústico</th></tr></thead><tbody>${Object.values(WEATHER).map((W) => `<tr><td>${esc(W.name)}</td><td>${W.rain ? W.rain + " mm/h en " + W.rainKm + " km" : "—"}</td><td>×${W.opt}</td><td>${W.ceiling != null ? W.ceiling + " m" : "—"}</td><td>×${W.acu}</td></tr>`).join("")}</tbody></table></div>
+      <div class="tblwrap"><table class="t"><thead><tr><th>Clima</th><th>Lluvia</th><th>Óptico/IR</th><th>Techo para ópticos</th><th>Acústico</th></tr></thead><tbody>${Object.values(WEATHER).map((W2) => `<tr><td>${esc(W2.name)}</td><td>${W2.rain ? W2.rain + " mm/h en " + W2.rainKm + " km" : "—"}</td><td>×${W2.opt}</td><td>${W2.ceiling != null ? W2.ceiling + " m" : "—"}</td><td>×${W2.acu}</td></tr>`).join("")}</tbody></table></div>
       <p>Los factores ópticos y acústicos son estimaciones de juego (el manual de CMO dice que la lluvia deja lo visual en 1–5% y degrada mucho el IR). El <b>viento</b> (${code("S.wind")}) cambia la velocidad sobre el suelo de drones y misiles de crucero en cada tramo de su ruta: ${code("Vg = W·u + √(v² − (W×u)²)")} (corrigen la deriva). Con 10 m/s de frente, un Shahed tarda un 24% más y un Kalibr un 4%. No se modela el día y la noche. La lluvia y el mar también devuelven eco (clutter): ver Detección.</p>`
     },
     {
@@ -6682,7 +6683,11 @@ table.t.mc td.pc{white-space:nowrap}
   }
   function initAcademy() {
     document.addEventListener("click", (e) => {
-      const el = e.target.closest("[data-concept]");
+      const el = (
+        /** @type {HTMLElement | null} */
+        /** @type {HTMLElement} */
+        e.target.closest("[data-concept]")
+      );
       if (!el) return;
       e.preventDefault();
       e.stopPropagation();
@@ -7839,7 +7844,10 @@ table.t.mc td.pc{white-space:nowrap}
   }
   function initTabs() {
     document.querySelector(".tabs").onclick = (e) => {
-      const b = e.target.closest("button");
+      const b = (
+        /** @type {HTMLElement} */
+        e.target.closest("button")
+      );
       if (!b) return;
       for (const x of document.querySelectorAll(".tabs button")) x.classList.toggle("act", x === b);
       for (const t of ["def", "atk", "ew", "cat", "edu"]) $("#tab-" + t).hidden = t !== b.dataset.tab;
@@ -7954,7 +7962,7 @@ table.t.mc td.pc{white-space:nowrap}
 
   // src/ui/panels/defense.js
   var WIND_DIRS = [["Norte", 0], ["Noreste", 45], ["Este", 90], ["Sudeste", 135], ["Sur", 180], ["Sudoeste", 225], ["Oeste", 270], ["Noroeste", 315]];
-  var windTxt = () => S.wind.v ? `${S.wind.v} m/s (${Math.round(S.wind.v * 3.6)} km/h) desde ${(WIND_DIRS.find(([, a]) => a === S.wind.from) || [S.wind.from + "°"])[0].toLowerCase()}` : "calma";
+  var windTxt = () => S.wind.v ? `${S.wind.v} m/s (${Math.round(S.wind.v * 3.6)} km/h) desde ${String((WIND_DIRS.find(([, a]) => a === S.wind.from) || [S.wind.from + "°"])[0]).toLowerCase()}` : "calma";
   function unitBtn(key, def, act, cls) {
     return `<button class="ub ${cls} ${act ? "act" : ""}" data-k="${key}" title="${esc(def.name)}"><span>${esc(def.short)}</span><i data-info="${key}" role="button" aria-label="Ficha">i</i></button>`;
   }
@@ -7979,11 +7987,11 @@ table.t.mc td.pc{white-space:nowrap}
       <div class="field" title="Alcance efectivo = alcance máximo × geometría (menos contra un blanco que se aleja). Esperar a que el blanco se acerque deja menos tiempo para un segundo tiro, pero el misil llega con más energía y la Pk sube."><label for="optFR">Disparar dentro del ${'<span id="frVal">' + Math.round(S.fireRange * 100) + "%</span>"} del alcance ${infoBtn("energia")}</label><input type="range" id="optFR" min="50" max="100" step="5" value="${Math.round(S.fireRange * 100)}"></div>
     </div>
     <div class="grp"><h3>Clima ${infoBtn("clima")}</h3>
-      <div class="field"><label for="optWx">Tiempo</label><select id="optWx" class="sel">${Object.entries(WEATHER).map(([k, W]) => `<option value="${k}" ${S.weather === k ? "selected" : ""}>${esc(W.name)}</option>`).join("")}</select></div>
+      <div class="field"><label for="optWx">Tiempo</label><select id="optWx" class="sel">${Object.entries(WEATHER).map(([k, W2]) => `<option value="${k}" ${S.weather === k ? "selected" : ""}>${esc(W2.name)}</option>`).join("")}</select></div>
       <p class="hint" id="wxInfo">${esc(WEATHER[S.weather].desc)}</p>
       <div class="field"><label for="optTod">Momento</label><select id="optTod" class="sel">${Object.entries(TIMES_OF_DAY).map(([k, D2]) => `<option value="${k}" ${S.tod === k ? "selected" : ""}>${esc(D2.name)}</option>`).join("")}</select></div>
       <p class="hint" id="todInfo">${esc(TIMES_OF_DAY[S.tod].desc)}</p>
-      <div class="field" title="El tiempo puede cambiar durante la noche: a los minutos indicados pasa al estado elegido (por ejemplo, entra una tormenta)."><label for="optWx2">Después cambia a</label><select id="optWx2" class="sel"><option value="">(no cambia)</option>${Object.entries(WEATHER).map(([k, W]) => `<option value="${k}" ${S.wxPlan[0]?.weather === k ? "selected" : ""}>${esc(W.name)}</option>`).join("")}</select></div>
+      <div class="field" title="El tiempo puede cambiar durante la noche: a los minutos indicados pasa al estado elegido (por ejemplo, entra una tormenta)."><label for="optWx2">Después cambia a</label><select id="optWx2" class="sel"><option value="">(no cambia)</option>${Object.entries(WEATHER).map(([k, W2]) => `<option value="${k}" ${S.wxPlan[0]?.weather === k ? "selected" : ""}>${esc(W2.name)}</option>`).join("")}</select></div>
       <div class="field"><label for="optWxT">A los (minutos)</label><input id="optWxT" class="inp" type="number" min="1" max="600" value="${Math.round((S.wxPlan[0]?.t ?? 1800) / 60)}"></div>
       <div class="field" title="Viento en superficie (a 10 m), igual en todo el mapa; arriba sopla más (≈1,9 veces a 1.000 m). Los drones y misiles de crucero vuelan a su velocidad respecto del aire: con viento de frente tardan más y con viento de cola llegan antes. A un Shahed (≈185 km/h) le pesa mucho; a un misil de crucero, poco. No afecta a balísticos ni planeadoras."><label for="optWind">Viento ${infoBtn("clima")}</label><span class="val" id="windVal">${windTxt()}</span><input type="range" id="optWind" min="0" max="30" step="1" value="${S.wind.v}"></div>
       <div class="field"><label for="optWindFrom">Sopla desde</label><select id="optWindFrom" class="sel">${WIND_DIRS.map(([n2, a]) => `<option value="${a}" ${S.wind.from === a ? "selected" : ""}>${n2} (${a}°)</option>`).join("")}</select></div>
@@ -8133,7 +8141,7 @@ table.t.mc td.pc{white-space:nowrap}
     const cov = coverageGrid(units, jams, THREATS[S.covRef], S.covAgl, wxNow());
     paintCoverage(cov, MAP.W, MAP.H);
     S._cov = cov;
-    S.covStat = { pct: Math.round(100 * cov.reduce((a, v) => a + (v > 0), 0) / (MAP.W * MAP.H)) };
+    S.covStat = { pct: Math.round(100 * cov.reduce((a, v) => a + (v > 0 ? 1 : 0), 0) / (MAP.W * MAP.H)) };
     draw();
     renderCovInfo();
   }
@@ -8344,7 +8352,10 @@ table.t.mc td.pc{white-space:nowrap}
         }
         return;
       }
-      if (e.target.closest?.('input,select,textarea,[contenteditable]:not([contenteditable="false"]),[role="textbox"]')) return;
+      if (
+        /** @type {HTMLElement} */
+        e.target.closest?.('input,select,textarea,[contenteditable]:not([contenteditable="false"]),[role="textbox"]')
+      ) return;
       if (e.key === "Delete") {
         if (deleteSelected()) e.preventDefault();
         return;
@@ -8934,7 +8945,8 @@ table.t.mc td.pc{white-space:nowrap}
   }, 0);
   function startLoop() {
     document.addEventListener("pointerdown", (e) => {
-      pressedBtn = e.target.closest?.("button") || null;
+      pressedBtn = /** @type {HTMLElement} */
+      e.target.closest?.("button") || null;
     }, true);
     document.addEventListener("pointerup", release, true);
     document.addEventListener("pointercancel", release, true);
@@ -8942,8 +8954,12 @@ table.t.mc td.pc{white-space:nowrap}
   }
 
   // src/main.js
-  window.DEFENSES_REF = DEFENSES;
-  window.CC_DATA = { SRC, UNC, OBS, CAL, PL, applyProbable, applySample, sampleU };
+  var W = (
+    /** @type {any} */
+    window
+  );
+  W.DEFENSES_REF = DEFENSES;
+  W.CC_DATA = { SRC, UNC, OBS, CAL, PL, applyProbable, applySample, sampleU };
   hooks.onLog = markLogDirty;
   hooks.onEnd = () => {
     updatePlay();
@@ -8988,8 +9004,8 @@ table.t.mc td.pc{white-space:nowrap}
   resize();
   fitView();
   startLoop();
-  window.__S = S;
-  window.__dbg = { flat: () => {
+  W.__S = S;
+  W.__dbg = { flat: () => {
     MAP.data = new Int16Array(MAP.data.length);
     MAP.key = "flat";
     MAP.max = 0;

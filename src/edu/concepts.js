@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- ACADEMIA ----------------
 // Conceptos físicos y de radar que usa el motor, explicados de forma breve pero correcta, con una
 // sección "En el simulador" que muestra las variables y funciones reales y números calculados en vivo
@@ -18,7 +19,8 @@ export const CONCEPT_GROUPS = ['Radar y bandas', 'Detección y terreno', 'Guerra
 
 const code = s => `<code>${esc(s)}</code>`;
 const n = (v, d = 0) => (+v).toLocaleString('es-AR', { maximumFractionDigits: d, minimumFractionDigits: d });
-const lambdaTxt = ([a, b]) => { const f = v => v >= 1 ? n(v, 1) + ' m' : v >= 0.01 ? n(v * 100, 1) + ' cm' : v >= 1e-3 ? n(v * 1000, 1) + ' mm' : n(v * 1e6, 1) + ' µm'; return f(a) + ' – ' + f(b); };
+/** @param {number[]} l [mín, máx] en metros */
+const lambdaTxt = l => { const [a, b] = l; const f = v => v >= 1 ? n(v, 1) + ' m' : v >= 0.01 ? n(v * 100, 1) + ' cm' : v >= 1e-3 ? n(v * 1000, 1) + ' mm' : n(v * 1e6, 1) + ' µm'; return f(a) + ' – ' + f(b); };
 const radarBands = ['VHF', 'L', 'S', 'C', 'X', 'Ku'];
 const rcsTxt = v => v < 0.1 ? n(v, 3) : n(v, 2);
 

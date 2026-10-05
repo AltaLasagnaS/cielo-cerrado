@@ -1,3 +1,4 @@
+// @ts-check
 // Modos de edición del mapa y la barra de avisos/confirmación.
 //   select   seleccionar y mover lo ya ubicado
 //   placeDef ubicar una defensa · placeJam un interferidor · placeObj un objetivo

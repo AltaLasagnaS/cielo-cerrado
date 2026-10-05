@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- BUCLE PRINCIPAL ----------------
 // Un cuadro por requestAnimationFrame: avanza la simulación (tiempo real × velocidad, en pasos de
 // 0,25 s simulados), redibuja el mapa y, cada 10 cuadros, refresca los paneles.
@@ -55,7 +56,7 @@ let pressedBtn = null;
 const release = () => setTimeout(() => { pressedBtn = null; }, 0);
 
 export function startLoop() {
-  document.addEventListener('pointerdown', e => { pressedBtn = e.target.closest?.('button') || null; }, true);
+  document.addEventListener('pointerdown', e => { pressedBtn = /** @type {HTMLElement} */ (e.target).closest?.('button') || null; }, true);
   document.addEventListener('pointerup', release, true);
   document.addEventListener('pointercancel', release, true);
   requestAnimationFrame(loop);

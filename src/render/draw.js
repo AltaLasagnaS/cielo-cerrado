@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- DIBUJO ----------------
 // Redibuja todo el mapa en cada cuadro: relieve, cobertura, grilla, anillos de alcance, sectores,
 // "strobes" de interferencia, rutas, jammers, unidades, impactos, amenazas, interceptores y explosiones.

@@ -1,3 +1,4 @@
+// @ts-check
 // Pestaña "Catálogo": listado de todo lo modelado con acceso a fichas, comparativas y calibración.
 import { THREATS, DEFENSES, JAMMERS } from '../../data/index.js';
 import { esc, kmh } from '../../util/format.js';

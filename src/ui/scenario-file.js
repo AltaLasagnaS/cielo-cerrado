@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- GUARDAR / CARGAR ESCENARIO (archivo JSON) ----------------
 // Botones "Guardar" y "Cargar" de la barra superior. El formato y la validación están en
 // sim/scenario-io.js; acá solo se descarga y se lee el archivo y se cambia de mapa si hace falta.

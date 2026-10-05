@@ -1,3 +1,4 @@
+// @ts-check
 // Capa de cobertura: turquesa donde algún sensor ve el blanco de referencia (más intenso con 2+),
 // oscuro en los huecos. La grilla es por celda; acá se pinta a k× resolución interpolando
 // bilinealmente "visible / no visible" y suavizando el borde, para que al acercar no aparezcan

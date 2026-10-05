@@ -1,3 +1,4 @@
+// @ts-check
 // Acciones de alto nivel que combinan simulación, dibujo e interfaz.
 import { SCENARIOS } from '../data/index.js';
 import { setMap, builtinMap, MAP } from '../physics/terrain.js';

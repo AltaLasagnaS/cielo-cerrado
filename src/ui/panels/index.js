@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- PANELES ----------------
 // Cada pestaña del panel izquierdo y cada tarjeta del derecho tiene su módulo. Todos regeneran su
 // HTML completo a partir de S (no hay estado propio en el DOM).
@@ -20,5 +21,5 @@ export function renderAll() { renderTabs(); renderAtk(); renderCat(); renderAcad
 
 /** Cambio de pestaña (Defensa / Ataque / Guerra E. / Catálogo). */
 export function initTabs() {
-  document.querySelector('.tabs').onclick = e => { const b = e.target.closest('button'); if (!b) return; for (const x of document.querySelectorAll('.tabs button')) x.classList.toggle('act', x === b); for (const t of ['def', 'atk', 'ew', 'cat', 'edu']) $('#tab-' + t).hidden = t !== b.dataset.tab; };
+  /** @type {HTMLElement} */ (document.querySelector('.tabs')).onclick = e => { const b = /** @type {HTMLElement} */ (e.target).closest('button'); if (!b) return; for (const x of document.querySelectorAll('.tabs button')) x.classList.toggle('act', x === b); for (const t of ['def', 'atk', 'ew', 'cat', 'edu']) $('#tab-' + t).hidden = t !== b.dataset.tab; };
 }

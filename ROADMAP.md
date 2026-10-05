@@ -34,7 +34,7 @@ Propuesta detallada, con orden, dificultad, datos y pruebas: [docs/investigacion
 
 ## Técnica
 
-- `@ts-check`, segunda parte (ya está en `util`, `data`, `physics` y `sim`, y corre en la CI): sumar `render` y `ui` (falta tipar el DOM) y activar `strictNullChecks` (49 avisos, todos por el mapa activo `MAP` que empieza en `null`; ninguno es un error real).
+- `strictNullChecks` (el `@ts-check` ya está en todas las capas y corre en la CI): 1.186 avisos, casi todos porque el estado `S` no tiene un tipo declarado (los arreglos vacíos del estado quedan como `never[]`). Hace falta un typedef del estado y del setup antes de activarlo.
 - Versión de escritorio opcional (Tauri o Electron), solo si hace falta acceso a archivos grandes.
 
 Hecho en esta etapa (ver CHANGELOG): perfil del interceptor, viento, integración de pulsos opcional, repetición de la corrida, editor de metas, escenario de Odesa, tipografías sin conexión, pruebas de navegador en la CI y `@ts-check` en las capas de abajo.

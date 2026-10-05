@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- VISTA ----------------
 // Cámara del mapa: centro (cx, cy) en km y escala s en píxeles CSS por km.
 import { MAP } from '../physics/terrain.js';

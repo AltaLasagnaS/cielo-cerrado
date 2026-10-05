@@ -1,3 +1,4 @@
+// @ts-check
 // Tarjetas "Resultado" y "Registro".
 import { fmtT, esc, money } from '../../util/format.js';
 import { S } from '../../sim/state.js';

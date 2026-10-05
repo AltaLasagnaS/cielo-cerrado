@@ -1,3 +1,4 @@
+// @ts-check
 // Academia: ventana de cada concepto y botones ⓘ en toda la interfaz.
 // Cualquier elemento con data-concept="id" abre el concepto (ver edu/concepts.js).
 import { BANDS } from '../data/index.js';
@@ -30,7 +31,7 @@ export function openConcept(id) { pushModalFn(() => showConcept(id)); }
 export function initAcademy() {
   // fase de captura: el ⓘ no dispara el click de la fila o botón que lo contiene
   document.addEventListener('click', e => {
-    const el = e.target.closest('[data-concept]'); if (!el) return;
+    const el = /** @type {HTMLElement | null} */ (/** @type {HTMLElement} */ (e.target).closest('[data-concept]')); if (!el) return;
     e.preventDefault(); e.stopPropagation(); openConcept(el.dataset.concept);
   }, true);
 }
