@@ -150,7 +150,7 @@ function showTip(sx, sy) {
       txt = 'Pista #' + th.id + (c.lost ? ' · perdida hace ' + Math.round(c.age) + ' s' : '') + '\nAlt: ' + Math.round(c.z) + ' m (' + Math.round(c.z - surf(c.x, c.y)) + ' AGL)\nVel: ' + kmh(c.v) + ' · ' + mach(c.v) + ' (estimada)\nDetectada por: ' + by;
     } else {
       const p = th.p, v = speedAt(th, S.t);
-      txt = label(th) + '\nAlt: ' + Math.round(p.z) + ' m (' + Math.round(p.z - surf(p.x, p.y)) + ' AGL)\nVel: ' + kmh(v) + ' · ' + mach(v) + '\nA ' + p.rem.toFixed(1) + ' km del blanco\nDetectada por: ' + by;
+      txt = label(th) + '\nAlt: ' + Math.round(p.z) + ' m (' + Math.round(p.z - surf(p.x, p.y)) + ' AGL)\nVel: ' + kmh(v) + ' · ' + mach(v) + '\nA ' + p.rem.toFixed(1) + ' km del blanco' + (S.started && !S.replay && isAttackerView() ? '' : '\nDetectada por: ' + by);   // el atacante no sabe qué sensores lo ven
     }
   } else if (h && h.kind === 'def') {
     const u = (S.started ? S.units : S.setup.defs).find(u => u.id === h.id); txt = (u.name || D(u).short) + '\n' + D(u).name;

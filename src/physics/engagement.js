@@ -39,6 +39,29 @@ export function trackOK(u, th, t, c2, gws = []) {
   return own || netT;
 }
 
+/** Clave de la pista propia del radar de u en th.obs (physics/track.js). */
+export const ownKey = u => 'u' + u.id;
+
+/**
+ * Pistas (claves de th.obs) con las que u puede apuntar a th: las mismas reglas que trackOK (la propia,
+ * la de cada red compatible de su puesto y la que llega por una pasarela habilitada). La solución de tiro
+ * mide la velocidad del blanco solo con estas: una pista que no le llega no le sirve.
+ */
+export function trackKeys(u, th, t, c2, gws = []) {
+  const d = D(u), L = C2_LEVELS[c2], g = d.sam.guid, keys = [];
+  const own = d.radar ? (t - (th.det[u.id] ?? -1e9)) <= d.radar.scan * 2 + 0.6 : false;
+  if (own && g !== 'operador') keys.push(ownKey(u));
+  const netOK = u.link !== false && g !== 'cañón' && (L.share === 'fire' || (L.share === 'track' && !RADAR_GUID.includes(g)));
+  if (!netOK) return keys;
+  const fresh = (n, lag) => n && n.first != null && t - n.first >= L.lag + lag && t - n.last <= L.window;
+  const cp = cpOf(u);
+  for (const key of datalinksOf(d)) {
+    if (fresh(th.net?.[netKey(key, cp)], 0)) keys.push(netKey(key, cp));
+    for (const { from, G, id } of gatewaysInto(key)) if (gws.includes(id) && fresh(th.net?.[netKey(from, cp)], G.gwLag)) keys.push(netKey(from, cp));
+  }
+  return keys;
+}
+
 /**
  * Pista de red utilizable por u contra th (docs/FISICA.md §6, "Enlaces"): 1 si llega por una red propia
  * (después de la demora del nivel de C2 y mientras siga fresca), gwPk si solo llega a través de una
@@ -185,13 +208,14 @@ function closingCos(th, tt, p, x, y, z) {
  * → { tau (s desde t), p (posición prevista del blanco), r (km), f (r / alcance cinemático, para energyPk),
  *     v (m/s medida por la pista; null en balísticos) } o null. La llegada se verifica con arrivalReach.
  */
-export function solve(u, th, t, pct = 1) {
+/** @param {string[] | null} [keys] pistas utilizables (trackKeys); sin ellas, la imagen de toda la defensa */
+export function solve(u, th, t, pct = 1, keys = null) {
   const sm = D(u).sam, tbm = isTBM(th);
   const maxR = tbm ? sm.maxRtbm : sm.maxR; const lz = surf(u.x, u.y) + 2;
   const P = profileOf(sm);
   // Dónde va a estar el blanco: un balístico sigue una trayectoria que la física fija desde el
   // lanzamiento (la ruta es la verdadera); el resto se extrapola en línea recta desde la pista (track.js)
-  const vel = tbm ? null : trackVel(th); if (!tbm && !vel) return null;
+  const vel = tbm ? null : trackVel(th, keys); if (!tbm && !vel) return null;
   const at = tt => tbm ? posAt(th, tt) : predictAt(vel, tt);
   const cosAt = (tt, p) => tbm ? closingCos(th, tt, p, u.x, u.y, lz) : velCos(vel, p, u.x, u.y, lz);
   // Una doctrina menor que el 100% retiene el lanzamiento hasta que el blanco entra en su

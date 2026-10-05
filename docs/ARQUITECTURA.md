@@ -133,7 +133,7 @@ Con el selector de vista en **Vista del defensor**, el mapa, la ayuda emergente 
 
 Cada unidad tiene un **dueño explícito** (`u.owner`, `data/index.js#sideOf`): quién la opera, separado del país del equipo (un 36D6 o un Buk puede ser de cualquiera de los dos bandos).
 
-**Tiro sin omnisciencia**: la solución de tiro (`physics/engagement.js#solve`) predice el punto de encuentro con la pista observada (`physics/track.js`: última detección y velocidad medida), no con la ruta real; solo los balísticos usan la trayectoria verdadera, que la física fija. Al llegar, `arrivalReach` decide con la posición real si al misil le alcanza la energía (docs/FISICA.md §6).
+**Tiro sin omnisciencia**: la solución de tiro (`physics/engagement.js#solve`) predice el punto de encuentro con la pista observada (`physics/track.js`: última detección y velocidad medida en una pista que le llega a esa batería, `th.obs` y `trackKeys`), no con la ruta real; solo los balísticos usan la trayectoria verdadera, que la física fija. Al llegar, `arrivalReach` decide con la posición real si al misil le alcanza la energía (docs/FISICA.md §6).
 
 ## Vista del atacante (`sim/contacts.js#attackerKnows`)
 

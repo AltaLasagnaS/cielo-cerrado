@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { DEFENSES } from '../src/data/index.js';
 import { setMap, flatMap } from '../src/physics/terrain.js';
 import { buildThreat, posAt } from '../src/physics/kinematics.js';
-import { solve, arrivalReach } from '../src/physics/engagement.js';
+import { solve, arrivalReach, trackKeys } from '../src/physics/engagement.js';
 import { trackVel, predictAt, PRED_FLOOR } from '../src/physics/track.js';
 import { seeTrack } from './helpers.js';
 
@@ -65,4 +65,18 @@ test('balísticos: la trayectoria la fija la física, el tiro no necesita pista 
   let sol = null; for (let t = 0; t < th.ft && !sol; t++) sol = solve(u, th, t);
   assert.ok(sol, 'sin pista medida igual hay solución');
   assert.equal(sol.v, null);
+});
+
+test('trackKeys: la velocidad sale solo de pistas que le llegan a la batería (propia, su red, su puesto)', () => {
+  const pair = (x, t) => ({ s: { x, y: 40, z: 50, t }, q: { x: x - 0.24, y: 40, z: 50, t: t - 1 } });
+  const th = { det: {}, net: { l16: { first: 0, last: 10 }, ua_c2: { first: 0, last: 10 } }, obs: { l16: pair(10, 10), ua_c2: pair(20, 10) } };
+  const nasams = { id: 7, type: 'nasams', x: 40, y: 40, link: true };
+  const keys = trackKeys(nasams, th, 10, 'coordinada');
+  assert.deepEqual(keys, ['l16'], 'NASAMS: Link 16 sí, la red C2 ucraniana no (familia incompatible)');
+  assert.equal(trackVel(th, keys).s.x, 10, 'la velocidad sale de esa pista, no de la de otra red');
+  assert.deepEqual(trackKeys({ ...nasams, cp: 'B' }, th, 10, 'coordinada'), [], 'otro puesto de mando: ninguna');
+  assert.equal(solve({ ...nasams, cp: 'B' }, th, 10, 1, []), null, 'sin pista que le llegue no hay solución');
+  assert.deepEqual(trackKeys({ ...nasams, link: false }, th, 10, 'coordinada'), [], 'sin enlace: solo la propia (y no la tiene)');
+  th.det[7] = 10; th.obs.u7 = pair(30, 10);
+  assert.deepEqual(trackKeys({ ...nasams, link: false }, th, 10, 'coordinada'), ['u7'], 'su propio radar');
 });

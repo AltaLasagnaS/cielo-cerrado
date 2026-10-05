@@ -13,7 +13,7 @@ import { targetName } from '../../sim/setup.js';
 import { warheadKg, directDamage } from '../../physics/damage.js';
 import { $, isDefenderView, isAttackerView } from '../dom.js';
 import { draw } from '../../render/draw.js';
-import { contactOf } from '../../sim/contacts.js';
+import { contactOf, attackerKnows } from '../../sim/contacts.js';
 import { schedCov } from '../coverage.js';
 import { openFicha } from '../fichas.js';
 import { renderAtk, removeObj } from './attack.js';
@@ -86,6 +86,7 @@ export function renderSel(live) {
     const d = D(u), r = d.radar; const ll = latlon(u.x, u.y); const ed = !S.started;
     const ground = Math.round(surf(u.x, u.y));
     if (S.started && !S.replay && isAttackerView()) {
+      if (!attackerKnows(u, S.t)) { S.sel = null; return renderSel(); }   // una selección previa no la delata
       // vista del atacante: dónde está y qué es (catálogo), no su estado, munición ni enlaces
       el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(d.short)}</b><dl class="kv"><dt>Posición</dt><dd>${u.x.toFixed(1)}, ${u.y.toFixed(1)} km</dd>${r && r.band !== 'ACU' && r.band !== 'OPT' ? `<dt>Radar</dt><dd>${esc(r.name)} · ${r.band}</dd>` : ''}${d.sam ? `<dt>Alcance (catálogo)</dt><dd>${d.sam.maxR} km</dd>` : ''}<dt>Estado</dt><dd>desconocido</dd></dl><p class="hint">Vista del atacante: ${r && r.band !== 'ACU' && r.band !== 'OPT' ? 'ubicada por su emisión de radar' : 'ubicada al disparar'}. No se sabe si está dañada ni cuánta munición le queda.</p>`;
       return;
@@ -179,7 +180,7 @@ export function renderSel(live) {
     }
     if (!th || !th.p) { el.innerHTML = '<h3>Selección</h3><p class="hint">La amenaza ya no está en vuelo.</p>'; return; }
     const p = th.p, v = speedAt(th, S.t);
-    el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(label(th))}</b><dl class="kv"><dt>Altitud</dt><dd>${Math.round(p.z)} m (${Math.round(p.z - surf(p.x, p.y))} AGL)</dd><dt>Velocidad</dt><dd>${kmh(v)}</dd><dt>Al blanco</dt><dd>${p.rem.toFixed(1)} km</dd><dt>Primera detección</dt><dd>${th.firstDet === null ? '—' : fmtT(th.firstDet)}</dd></dl><div class="row"><button class="btn sm" id="tInfo">Ficha</button></div>`;
+    el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(label(th))}</b><dl class="kv"><dt>Altitud</dt><dd>${Math.round(p.z)} m (${Math.round(p.z - surf(p.x, p.y))} AGL)</dd><dt>Velocidad</dt><dd>${kmh(v)}</dd><dt>Al blanco</dt><dd>${p.rem.toFixed(1)} km</dd>${S.started && !S.replay && isAttackerView() ? '' : `<dt>Primera detección</dt><dd>${th.firstDet === null ? '—' : fmtT(th.firstDet)}</dd>`}</dl><div class="row"><button class="btn sm" id="tInfo">Ficha</button></div>`;
     $('#tInfo').onclick = () => openFicha('thr', th.type);
   }
 }

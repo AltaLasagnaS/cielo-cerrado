@@ -1,7 +1,8 @@
 // @ts-check
 // ---------------- PISTA OBSERVADA ----------------
-// Lo que la defensa sabe del movimiento de una amenaza: las dos últimas detecciones (th.seen y
-// th.seenPrev, las anota sim/contacts.js#noteSeen). De ahí sale la velocidad medida y la posición
+// Lo que la defensa sabe del movimiento de una amenaza: las dos últimas detecciones de cada pista
+// (th.obs[clave] = { s, q }: la propia de cada radar, 'u' + id, y la de cada red, netKey; las anota
+// sim/contacts.js#noteObs). Una batería solo usa las pistas que le llegan (engagement.js#trackKeys). De ahí sale la velocidad medida y la posición
 // extrapolada en línea recta, que usan el contacto del mapa y la solución de tiro (physics/engagement.js#solve).
 // Ver docs/FISICA.md §6 ("Tiro sin omnisciencia"). Nunca mira la posición real ni la ruta futura.
 import { surf } from './terrain.js';
@@ -12,14 +13,26 @@ export const VEL_GAP = 12;
 export const PRED_FLOOR = 5;
 
 /**
- * Velocidad medida entre las dos últimas detecciones de th:
+ * Velocidad medida entre las dos últimas detecciones de th (de las pistas keys, si se pasan):
  *   { s (última detección), vx, vy (km/s), vAgl (m/s, cambio de altura sobre el terreno), v (m/s) } o
  *   null si hay una sola o están separadas más de VEL_GAP (sin velocidad no hay predicción).
  * La altura se extrapola sobre el terreno y no sobre el mar: un crucero que sigue el relieve mantiene su
  * altura AGL; uno en picada la pierde.
  */
-export function trackVel(th) {
-  const s = th.seen, q = th.seenPrev; if (!s || !q) return null;
+/** @param {string[] | null} [keys] */
+export function trackVel(th, keys = null) {
+  // sin claves: la imagen de toda la defensa (th.seen); con claves: la más reciente de esas pistas
+  if (keys) {
+    let best = null;
+    for (const k of keys) { const o = th.obs?.[k], v = o && pairVel(o.s, o.q); if (v && (!best || v.s.t > best.s.t)) best = v; }
+    return best;
+  }
+  return pairVel(th.seen, th.seenPrev);
+}
+
+/** Velocidad entre dos detecciones q → s (ver trackVel). */
+function pairVel(s, q) {
+  if (!s || !q) return null;
   const dt = s.t - q.t; if (!(dt > 0) || dt > VEL_GAP) return null;
   const vx = (s.x - q.x) / dt, vy = (s.y - q.y) / dt;
   const vAgl = ((s.z - surf(s.x, s.y)) - (q.z - surf(q.x, q.y))) / dt;

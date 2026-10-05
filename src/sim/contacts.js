@@ -18,6 +18,14 @@ export function noteSeen(th, t, by) {
   th.seen = { x: p.x, y: p.y, z: p.z, t, by };
 }
 
+/** Anota una detección en la pista key de th (th.obs: 'u' + id del radar, o la clave de una red; physics/track.js). */
+export function noteObs(th, key, t) {
+  const p = th.p; if (!p) return;
+  const m = th.obs || (th.obs = {}), o = m[key] || (m[key] = { s: null, q: null });
+  if (o.s && t - o.s.t > 0.5) o.q = o.s;
+  o.s = { x: p.x, y: p.y, z: p.z, t };
+}
+
 /**
  * Contacto de la defensa sobre th en el instante t:
  *   { x, y, z (estimados), vx, vy (km/s), v (m/s), age (s), lost (bool), by } o null si nunca se vio o

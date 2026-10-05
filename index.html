@@ -4374,6 +4374,35 @@ table.t.mc td.pc{white-space:nowrap}
     return Math.hypot((b.x - a.x) * 1e3, (b.y - a.y) * 1e3, b.z - a.z);
   }
 
+  // src/physics/track.js
+  var VEL_GAP = 12;
+  var PRED_FLOOR = 5;
+  function trackVel(th, keys = null) {
+    if (keys) {
+      let best = null;
+      for (const k of keys) {
+        const o = th.obs?.[k], v = o && pairVel(o.s, o.q);
+        if (v && (!best || v.s.t > best.s.t)) best = v;
+      }
+      return best;
+    }
+    return pairVel(th.seen, th.seenPrev);
+  }
+  function pairVel(s, q) {
+    if (!s || !q) return null;
+    const dt = s.t - q.t;
+    if (!(dt > 0) || dt > VEL_GAP) return null;
+    const vx = (s.x - q.x) / dt, vy = (s.y - q.y) / dt;
+    const vAgl = (s.z - surf(s.x, s.y) - (q.z - surf(q.x, q.y))) / dt;
+    return { s, vx, vy, vAgl, v: Math.hypot(vx * 1e3, vy * 1e3, (s.z - q.z) / dt) };
+  }
+  function predictAt(vel, tt) {
+    if (!vel) return null;
+    const { s } = vel, k = tt - s.t, x = s.x + vel.vx * k, y = s.y + vel.vy * k;
+    const g = surf(x, y), agl = Math.max(PRED_FLOOR, s.z - surf(s.x, s.y) + vel.vAgl * k);
+    return { x, y, z: g + agl, agl };
+  }
+
   // src/physics/navigation.js
   var SEEKER_ACQ = 0.9;
   function gnssNavError(T, J, link = false) {
@@ -4453,25 +4482,6 @@ table.t.mc td.pc{white-space:nowrap}
     return S20 * Math.pow(1 + (h - 2e4) / 216650, -35.1632);
   }
 
-  // src/physics/track.js
-  var VEL_GAP = 12;
-  var PRED_FLOOR = 5;
-  function trackVel(th) {
-    const s = th.seen, q = th.seenPrev;
-    if (!s || !q) return null;
-    const dt = s.t - q.t;
-    if (!(dt > 0) || dt > VEL_GAP) return null;
-    const vx = (s.x - q.x) / dt, vy = (s.y - q.y) / dt;
-    const vAgl = (s.z - surf(s.x, s.y) - (q.z - surf(q.x, q.y))) / dt;
-    return { s, vx, vy, vAgl, v: Math.hypot(vx * 1e3, vy * 1e3, (s.z - q.z) / dt) };
-  }
-  function predictAt(vel, tt) {
-    if (!vel) return null;
-    const { s } = vel, k = tt - s.t, x = s.x + vel.vx * k, y = s.y + vel.vy * k;
-    const g = surf(x, y), agl = Math.max(PRED_FLOOR, s.z - surf(s.x, s.y) + vel.vAgl * k);
-    return { x, y, z: g + agl, agl };
-  }
-
   // src/physics/engagement.js
   var RADAR_GUID = ["TVM", "SARH", "mando", "cañón"];
   var isTBM = (th) => th.cls === "balistico" || th.cls === "hiper";
@@ -4484,6 +4494,21 @@ table.t.mc td.pc{white-space:nowrap}
     if (RADAR_GUID.includes(d.sam.guid)) return own || L.share === "fire" && netT;
     if (d.sam.guid === "operador") return netT;
     return own || netT;
+  }
+  var ownKey = (u) => "u" + u.id;
+  function trackKeys(u, th, t, c2, gws = []) {
+    const d = D(u), L = C2_LEVELS[c2], g = d.sam.guid, keys = [];
+    const own = d.radar ? t - (th.det[u.id] ?? -1e9) <= d.radar.scan * 2 + 0.6 : false;
+    if (own && g !== "operador") keys.push(ownKey(u));
+    const netOK = u.link !== false && g !== "cañón" && (L.share === "fire" || L.share === "track" && !RADAR_GUID.includes(g));
+    if (!netOK) return keys;
+    const fresh = (n2, lag) => n2 && n2.first != null && t - n2.first >= L.lag + lag && t - n2.last <= L.window;
+    const cp = cpOf(u);
+    for (const key of datalinksOf(d)) {
+      if (fresh(th.net?.[netKey(key, cp)], 0)) keys.push(netKey(key, cp));
+      for (const { from, G, id } of gatewaysInto(key)) if (gws.includes(id) && fresh(th.net?.[netKey(from, cp)], G.gwLag)) keys.push(netKey(from, cp));
+    }
+    return keys;
   }
   function netPk(u, th, t, c2, gws = []) {
     const L = C2_LEVELS[c2];
@@ -4546,12 +4571,12 @@ table.t.mc td.pc{white-space:nowrap}
     const nv = Math.hypot(vx, vy, vz), nl = Math.hypot(lx, ly, lzk);
     return nv && nl ? (vx * lx + vy * ly + vz * lzk) / (nv * nl) : 1;
   }
-  function solve(u, th, t, pct3 = 1) {
+  function solve(u, th, t, pct3 = 1, keys = null) {
     const sm = D(u).sam, tbm = isTBM(th);
     const maxR = tbm ? sm.maxRtbm : sm.maxR;
     const lz = surf(u.x, u.y) + 2;
     const P = profileOf(sm);
-    const vel = tbm ? null : trackVel(th);
+    const vel = tbm ? null : trackVel(th, keys);
     if (!tbm && !vel) return null;
     const at = (tt) => tbm ? posAt(th, tt) : predictAt(vel, tt);
     const cosAt = (tt, p) => tbm ? closingCos(th, tt, p, u.x, u.y, lz) : velCos(vel, p, u.x, u.y, lz);
@@ -4810,6 +4835,13 @@ table.t.mc td.pc{white-space:nowrap}
     if (th.seen && t - th.seen.t > 0.5) th.seenPrev = th.seen;
     th.seen = { x: p.x, y: p.y, z: p.z, t, by };
   }
+  function noteObs(th, key, t) {
+    const p = th.p;
+    if (!p) return;
+    const m = th.obs || (th.obs = {}), o = m[key] || (m[key] = { s: null, q: null });
+    if (o.s && t - o.s.t > 0.5) o.q = o.s;
+    o.s = { x: p.x, y: p.y, z: p.z, t };
+  }
   function contactOf(th, t) {
     const s = th.seen;
     if (!s) return null;
@@ -4995,6 +5027,7 @@ table.t.mc td.pc{white-space:nowrap}
         if (ok) {
           th.det[u.id] = t;
           noteSeen(th, t, u.id);
+          noteObs(th, ownKey(u), t);
           const g = classifyGain(r);
           if (g) {
             th.clsT = (th.clsT || 0) + g;
@@ -5019,6 +5052,7 @@ table.t.mc td.pc{white-space:nowrap}
             const nk = netKey(key, cp), n2 = th.net[nk] || (th.net[nk] = { first: null, last: -1e9 });
             if (n2.first === null) n2.first = t;
             n2.last = t;
+            noteObs(th, nk, t);
             th.lastNet = t;
             if (th.netFirst === null) th.netFirst = t;
           }
@@ -5128,9 +5162,9 @@ table.t.mc td.pc{white-space:nowrap}
     if (ign && th.clsAs === "señuelo") return null;
     return { pre: true };
   }
-  function solveFor(u, th, t) {
+  function solveFor(u, th, t, c2) {
     const sm = D(u).sam, r = D(u).radar;
-    const sol = solve(u, th, t, S.fireRange ?? 1);
+    const sol = solve(u, th, t, S.fireRange ?? 1, trackKeys(u, th, t, c2, S.gateways));
     if (!sol) return null;
     if ((sol.v ?? speedAt(th, t + sol.tau)) > sm.vmaxT) return null;
     const remote = !(r && t - (th.det[u.id] ?? -1e9) <= r.scan * 2 + 0.6);
@@ -5154,11 +5188,13 @@ table.t.mc td.pc{white-space:nowrap}
     return dumps.some((g) => g.status !== "destroyed" && Math.hypot(g.x - u.x, g.y - u.y) <= RESUPPLY_KM);
   }
   var costPerKill = (u, th, t) => D(u).sam.cost / Math.max(0.01, calcPk(u, th, t, S.jamsLive));
-  function reaches(v, th, t) {
-    const sm = D(v).sam, lz = surf(v.x, v.y) + 2, tEnd = th.tLaunch + th.ft - 1;
+  function reaches(v, th, t, keys) {
+    const sm = D(v).sam, lz = surf(v.x, v.y) + 2, tbm = isTBM(th), vel = tbm ? null : trackVel(th, keys);
+    if (!tbm && !vel) return false;
+    const tEnd = tbm ? th.tLaunch + th.ft - 1 : t + 3600;
     for (let tt = t + 2; tt < tEnd; tt += 2) {
-      const p = posAt(th, tt);
-      if (!p) break;
+      const p = tbm ? posAt(th, tt) : predictAt(vel, tt);
+      if (!p || p.x < 0 || p.y < 0 || p.x > MAP.wKm || p.y > MAP.hKm) break;
       if (Math.hypot(p.x - v.x, p.y - v.y) <= sm.maxR * 0.9 && p.z - lz <= sm.altMax && p.z - surf(p.x, p.y) >= sm.altMin) return true;
     }
     return false;
@@ -5179,19 +5215,19 @@ table.t.mc td.pc{white-space:nowrap}
         sat[k] = (sat[k] || 0) + 1;
         break;
       }
-      const f = solveFor(u, th, t);
+      const f = solveFor(u, th, t, c2);
       if (!f) continue;
       if (L.best && u.link !== false) {
         const mine = shooterScore(u, th, t, f.sol.f);
         const better = S.units.some((v) => {
           if (v === u || v.link === false || cpOf(v) !== cp || !canEngage(v, th, t, unitC2(v, c2net), true)) return false;
-          const fv = solveFor(v, th, t);
+          const fv = solveFor(v, th, t, unitC2(v, c2net));
           return !!fv && shooterScore(v, th, t, fv.sol.f) > mine * (th.cls === "dron" ? 0.999 : 1.001);
         });
         if (better) continue;
         if (th.cls === "dron") {
-          const cpk = costPerKill(u, th, t);
-          const layer = S.units.some((v) => v !== u && v.alive && v.link !== false && cpOf(v) === cp && D(v).sam && v.magLeft > 0 && !v.noDrones && D(v).sam.maxR > 0 && costPerKill(v, th, t) * 2 <= cpk && reaches(v, th, t));
+          const cpk = costPerKill(u, th, t), keys = trackKeys(u, th, t, c2, S.gateways);
+          const layer = S.units.some((v) => v !== u && v.alive && v.link !== false && cpOf(v) === cp && D(v).sam && v.magLeft > 0 && !v.noDrones && D(v).sam.maxR > 0 && costPerKill(v, th, t) * 2 <= cpk && reaches(v, th, t, keys));
           if (layer) continue;
         }
       }
@@ -7309,6 +7345,10 @@ table.t.mc td.pc{white-space:nowrap}
       const ed = !S.started;
       const ground = Math.round(surf(u.x, u.y));
       if (S.started && !S.replay && isAttackerView()) {
+        if (!attackerKnows(u, S.t)) {
+          S.sel = null;
+          return renderSel();
+        }
         el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(d.short)}</b><dl class="kv"><dt>Posición</dt><dd>${u.x.toFixed(1)}, ${u.y.toFixed(1)} km</dd>${r && r.band !== "ACU" && r.band !== "OPT" ? `<dt>Radar</dt><dd>${esc(r.name)} · ${r.band}</dd>` : ""}${d.sam ? `<dt>Alcance (catálogo)</dt><dd>${d.sam.maxR} km</dd>` : ""}<dt>Estado</dt><dd>desconocido</dd></dl><p class="hint">Vista del atacante: ${r && r.band !== "ACU" && r.band !== "OPT" ? "ubicada por su emisión de radar" : "ubicada al disparar"}. No se sabe si está dañada ni cuánta munición le queda.</p>`;
         return;
       }
@@ -7491,7 +7531,7 @@ table.t.mc td.pc{white-space:nowrap}
         return;
       }
       const p = th.p, v = speedAt(th, S.t);
-      el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(label(th))}</b><dl class="kv"><dt>Altitud</dt><dd>${Math.round(p.z)} m (${Math.round(p.z - surf(p.x, p.y))} AGL)</dd><dt>Velocidad</dt><dd>${kmh(v)}</dd><dt>Al blanco</dt><dd>${p.rem.toFixed(1)} km</dd><dt>Primera detección</dt><dd>${th.firstDet === null ? "—" : fmtT(th.firstDet)}</dd></dl><div class="row"><button class="btn sm" id="tInfo">Ficha</button></div>`;
+      el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(label(th))}</b><dl class="kv"><dt>Altitud</dt><dd>${Math.round(p.z)} m (${Math.round(p.z - surf(p.x, p.y))} AGL)</dd><dt>Velocidad</dt><dd>${kmh(v)}</dd><dt>Al blanco</dt><dd>${p.rem.toFixed(1)} km</dd>${S.started && !S.replay && isAttackerView() ? "" : `<dt>Primera detección</dt><dd>${th.firstDet === null ? "—" : fmtT(th.firstDet)}</dd>`}</dl><div class="row"><button class="btn sm" id="tInfo">Ficha</button></div>`;
       $("#tInfo").onclick = () => openFicha("thr", th.type);
     }
   }
@@ -8720,7 +8760,7 @@ table.t.mc td.pc{white-space:nowrap}
         txt = "Pista #" + th.id + (c.lost ? " · perdida hace " + Math.round(c.age) + " s" : "") + "\nAlt: " + Math.round(c.z) + " m (" + Math.round(c.z - surf(c.x, c.y)) + " AGL)\nVel: " + kmh(c.v) + " · " + mach(c.v) + " (estimada)\nDetectada por: " + by;
       } else {
         const p = th.p, v = speedAt(th, S.t);
-        txt = label(th) + "\nAlt: " + Math.round(p.z) + " m (" + Math.round(p.z - surf(p.x, p.y)) + " AGL)\nVel: " + kmh(v) + " · " + mach(v) + "\nA " + p.rem.toFixed(1) + " km del blanco\nDetectada por: " + by;
+        txt = label(th) + "\nAlt: " + Math.round(p.z) + " m (" + Math.round(p.z - surf(p.x, p.y)) + " AGL)\nVel: " + kmh(v) + " · " + mach(v) + "\nA " + p.rem.toFixed(1) + " km del blanco" + (S.started && !S.replay && isAttackerView() ? "" : "\nDetectada por: " + by);
       }
     } else if (h && h.kind === "def") {
       const u = (S.started ? S.units : S.setup.defs).find((u2) => u2.id === h.id);

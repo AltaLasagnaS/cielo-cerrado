@@ -8,12 +8,13 @@ import { classify, classifyGain, classifyTau } from '../physics/decoys.js';
 import { money } from '../util/format.js';
 import { nextId } from '../util/ids.js';
 import { rnd } from '../util/rng.js';
-import { surf, los } from '../physics/terrain.js';
+import { surf, los, MAP } from '../physics/terrain.js';
 import { antZ, aspectCos, belowCeiling, detR, inSector, jamJ, pdScan, PD_CUTOFF, confirms, scanHistory, falseTracks } from '../physics/radar.js';
 import { buildThreat, posAt, speedAt } from '../physics/kinematics.js';
+import { trackVel, predictAt } from '../physics/track.js';
 import { gnssNavError, crpaOverwhelmed } from '../physics/navigation.js';
 import { profileOf, timeTo } from '../physics/interceptor.js';
-import { RADAR_GUID, isTBM, trackOK, reactionStart, solve, arrivalReach, calcPk, effectiveC2, unitC2, netPk, cpOf, netKey } from '../physics/engagement.js';
+import { RADAR_GUID, isTBM, trackOK, reactionStart, solve, arrivalReach, trackKeys, ownKey, calcPk, effectiveC2, unitC2, netPk, cpOf, netKey } from '../physics/engagement.js';
 import { C2_LEVELS } from '../data/index.js';
 import { damageAt, targetStatus } from '../physics/damage.js';
 import { azOf } from '../util/math.js';
@@ -23,7 +24,7 @@ import { log, event, label, uLabel } from './log.js';
 import { recReset, recUnit, recObj } from './replay.js';
 import { ewStep } from './ew.js';
 import { wxNow, wxReset, wxStep } from './weather-now.js';
-import { noteSeen } from './contacts.js';
+import { noteSeen, noteObs } from './contacts.js';
 
 /** Arma la corrida a partir de S.setup: copia unidades y jammers y programa todos los lanzamientos. */
 export function startSim() {
@@ -132,7 +133,7 @@ export function step(dt) {
         }
       }
       if (ok) {
-        th.det[u.id] = t; noteSeen(th, t, u.id);
+        th.det[u.id] = t; noteSeen(th, t, u.id); noteObs(th, ownKey(u), t);
         const g = classifyGain(r);   // seguimiento con radar de tiro: aprende a distinguir señuelos
         if (g) { th.clsT = (th.clsT || 0) + g; th.clsTau = Math.min(th.clsTau ?? Infinity, classifyTau(r)); const c = classify(th); if (c && !th.clsAs) { th.clsAs = c; if (c === 'señuelo' && S.ignoreDecoys) log('d', 'Pista #' + th.id + ' clasificada como señuelo por ' + uLabel(u) + (th.isDecoy ? '.' : ' (¡error: era ' + th.T.short + '!).')); } }
         // La coordinación C2 puede repartir una alerta aun cuando el datalink de tiro esté apagado; una
@@ -144,7 +145,7 @@ export function step(dt) {
         if (u.link !== false && inNet) for (const key of datalinksOf(D(u))) {
           const nk = netKey(key, cp), n = th.net[nk] || (th.net[nk] = { first: null, last: -1e9 });
           if (n.first === null) n.first = t;
-          n.last = t;
+          n.last = t; noteObs(th, nk, t);
           th.lastNet = t; if (th.netFirst === null) th.netFirst = t;
         }
         if (th.firstDet === null) { th.firstDet = t; th.detKm = p.rem; log('l', 'Primera detección: ' + label(th) + ' por ' + uLabel(u) + ' a ' + Math.hypot(p.x - u.x, p.y - u.y).toFixed(1) + ' km, ' + Math.round(p.z - surf(p.x, p.y)) + ' m AGL.'); event('Primera detección: ' + label(th) + ' por ' + uLabel(u), 'firstDet'); }
@@ -229,9 +230,9 @@ function canEngage(u, th, t, c2, probe) {
 }
 
 /** Segunda mitad de canEngage (lo caro): solución de tiro y cobertura del punto de encuentro. */
-function solveFor(u, th, t) {
+function solveFor(u, th, t, c2) {
   const sm = D(u).sam, r = D(u).radar;
-  const sol = solve(u, th, t, S.fireRange ?? 1); if (!sol) return null;
+  const sol = solve(u, th, t, S.fireRange ?? 1, trackKeys(u, th, t, c2, S.gateways)); if (!sol) return null;
   if ((sol.v ?? speedAt(th, t + sol.tau)) > sm.vmaxT) return null;   // velocidad medida (la verdadera solo en balísticos)
   const remote = !(r && t - (th.det[u.id] ?? -1e9) <= r.scan * 2 + 0.6);
   if (RADAR_GUID.includes(sm.guid) && sm.guid !== 'cañón') {
@@ -272,13 +273,17 @@ export function canResupply(u) {
 const costPerKill = (u, th, t) => D(u).sam.cost / Math.max(0.01, calcPk(u, th, t, S.jamsLive));
 
 /**
- * ¿La ruta que le queda a th pasa por la envolvente de v (90% del alcance, entre su piso y su techo)
- * antes de llegar? Muestrea cada 2 s. Sirve para dejarle un dron a una capa más barata.
+ * ¿La trayectoria prevista de th (con las pistas de quien decide; hasta que sale del mapa) pasa por la envolvente de v (90% del
+ * alcance, entre su piso y su techo)? Muestrea cada 2 s. Sirve para dejarle un dron a una capa más barata.
  */
-function reaches(v, th, t) {
-  const sm = D(v).sam, lz = surf(v.x, v.y) + 2, tEnd = th.tLaunch + th.ft - 1;
+/** @param {string[]} keys pistas de quien decide (trackKeys) */
+function reaches(v, th, t, keys) {
+  // con la trayectoria que se puede prever con esas pistas (la verdadera solo en balísticos), no con la ruta real
+  const sm = D(v).sam, lz = surf(v.x, v.y) + 2, tbm = isTBM(th), vel = tbm ? null : trackVel(th, keys);
+  if (!tbm && !vel) return false;
+  const tEnd = tbm ? th.tLaunch + th.ft - 1 : t + 3600;
   for (let tt = t + 2; tt < tEnd; tt += 2) {
-    const p = posAt(th, tt); if (!p) break;
+    const p = tbm ? posAt(th, tt) : predictAt(vel, tt); if (!p || p.x < 0 || p.y < 0 || p.x > MAP.wKm || p.y > MAP.hKm) break;   // la línea prevista hasta que sale del mapa
     if (Math.hypot(p.x - v.x, p.y - v.y) <= sm.maxR * 0.9 && p.z - lz <= sm.altMax && p.z - surf(p.x, p.y) >= sm.altMin) return true;
   }
   return false;
@@ -303,17 +308,17 @@ export function engage(u, t) {
   if (ph > 0 && u.active < ch && u.magLeft > 0 && rnd() < ph / (ph + cand.length)) phantomShot(u, t);
   for (const [th] of cand) {
     if (u.active >= ch || u.magLeft <= 0) { const k = uLabel(u), sat = u.magLeft <= 0 ? S.stats.satMag : S.stats.satChannels; sat[k] = (sat[k] || 0) + 1; break; }
-    const f = solveFor(u, th, t); if (!f) continue;
+    const f = solveFor(u, th, t, c2); if (!f) continue;
     if (L.best && u.link !== false) {
       // mejor tirador ahora: otra batería con enlace que también puede tirar ya y es mejor
       const mine = shooterScore(u, th, t, f.sol.f);
-      const better = S.units.some(v => { if (v === u || v.link === false || cpOf(v) !== cp || !canEngage(v, th, t, unitC2(v, c2net), true)) return false; const fv = solveFor(v, th, t); return !!fv && shooterScore(v, th, t, fv.sol.f) > mine * (th.cls === 'dron' ? 0.999 : 1.001); });
+      const better = S.units.some(v => { if (v === u || v.link === false || cpOf(v) !== cp || !canEngage(v, th, t, unitC2(v, c2net), true)) return false; const fv = solveFor(v, th, t, unitC2(v, c2net)); return !!fv && shooterScore(v, th, t, fv.sol.f) > mine * (th.cls === 'dron' ? 0.999 : 1.001); });
       if (better) continue;
       // defensa por capas: un dron se le deja a una capa al menos 2 veces más barata por derribo que
       // tenga munición y por cuya envolvente vaya a pasar antes de llegar
       if (th.cls === 'dron') {
-        const cpk = costPerKill(u, th, t);
-        const layer = S.units.some(v => v !== u && v.alive && v.link !== false && cpOf(v) === cp && D(v).sam && v.magLeft > 0 && !v.noDrones && D(v).sam.maxR > 0 && costPerKill(v, th, t) * 2 <= cpk && reaches(v, th, t));
+        const cpk = costPerKill(u, th, t), keys = trackKeys(u, th, t, c2, S.gateways);   // la prevé quien decide, con sus pistas
+        const layer = S.units.some(v => v !== u && v.alive && v.link !== false && cpOf(v) === cp && D(v).sam && v.magLeft > 0 && !v.noDrones && D(v).sam.maxR > 0 && costPerKill(v, th, t) * 2 <= cpk && reaches(v, th, t, keys));
         if (layer) continue;
       }
     }
