@@ -11,6 +11,7 @@ import { resetSim } from './app.js';
 import { schedCov } from './coverage.js';
 import { setMode, toast } from './modes.js';
 import { renderAll } from './panels/index.js';
+import { campaignBattle } from './campaign.js';
 import { renderStats, renderLog } from './panels/results.js';
 import { renderScenario } from './panels/scenario.js';
 import { AUTO_PHASES } from '../sim/pace.js';
@@ -22,7 +23,7 @@ export function initControls() {
   $('#speeds').innerHTML = `<button data-s="auto" title="Rápido cuando no pasa nada, lento cuando hay combate">Auto</button>` + SPEEDS.map(s => `<button data-s="${s}">${s}×</button>`).join('');
   $('#speeds').onclick = e => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.s === 'auto') S.auto = true; else { S.auto = false; S.speed = +b.dataset.s; } updatePlay(); };
   $('#play').onclick = togglePlay;
-  $('#reset').onclick = () => { resetSim(); renderAll(); };
+  $('#reset').onclick = () => { if (campaignBattle()) { toast('Hay una guardia de campaña en curso: terminala primero.'); return; } resetSim(); renderAll(); };
   $('#view').onchange = () => { renderAll(); renderStats(); renderLog(); renderScenario(); draw(); };
 }
 

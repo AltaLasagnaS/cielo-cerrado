@@ -1,4 +1,4 @@
-import { deepFreeze, id, integer, safeSum } from './common.mjs';
+import { deepFreeze, id, integer, safeSum, seconds } from './common.mjs';
 
 // Physical inventory contract. It records authorized outcomes from one engine;
 // it does not calculate damage, detection, guidance, repair or delivery times.
@@ -8,6 +8,7 @@ const fields = {
   transfer: ['fromId', 'toId', 'ammunitionId', 'quantity'],
   expend: ['fromId', 'ammunitionId', 'quantity'],
   loss: ['fromId', 'ammunitionId', 'quantity'],
+  receipt: ['toId', 'ammunitionId', 'quantity'],
   condition: ['componentId', 'condition']
 };
 
@@ -129,7 +130,7 @@ export function createInventory(raw) {
   const state = { version: 1, initial, sideId: initial.sideId, atSeconds: 0,
     components: initial.components.map(row => ({ ...row, condition: 'operational' })),
     stock: structuredClone(initial.stock),
-    totals: initial.ammunitionIds.map(ammunitionId => ({ ammunitionId, expended: 0, lost: 0 })), events: [] };
+    totals: initial.ammunitionIds.map(ammunitionId => ({ ammunitionId, acquired: 0, expended: 0, lost: 0 })), events: [] };
   if (!initial.locations.every(location => fits(state, location))) throw Error('Carga inicial no admitida');
   return keep(state);
 }
@@ -139,7 +140,7 @@ export function applyInventoryEvent(state, raw) {
   if (!Object.hasOwn(fields, raw?.kind)) throw Error('Evento desconocido');
   exact(raw, ['eventId', 'sideId', 'atSeconds', 'kind', ...fields[raw.kind]], 'Evento');
   const event = { eventId: id(raw.eventId, 'eventId'), sideId: id(raw.sideId, 'sideId'),
-    atSeconds: integer(raw.atSeconds, 'atSeconds'), kind: raw.kind };
+    atSeconds: seconds(raw.atSeconds, 'atSeconds'), kind: raw.kind };
   for (const key of fields[raw.kind]) {
     event[key] = key === 'quantity' ? integer(raw[key], key, 1)
       : key === 'condition' ? raw[key] : id(raw[key], key);
@@ -154,7 +155,7 @@ export function applyInventoryEvent(state, raw) {
   if (event.atSeconds < state.atSeconds) throw Error('Evento fuera de orden temporal');
   const next = structuredClone(state);
   if (event.kind === 'condition') {
-    if (!['operational', 'disabled', 'destroyed'].includes(event.condition)) throw Error('Condición inválida');
+    if (!['operational', 'degraded', 'disabled', 'destroyed'].includes(event.condition)) throw Error('Condición inválida');
     const component = next.components.find(row => row.id === event.componentId);
     if (!component) throw Error('Componente inexistente');
     if (component.condition === 'destroyed' && event.condition !== 'destroyed') throw Error('Componente destruido no se resucita');
@@ -166,6 +167,16 @@ export function applyInventoryEvent(state, raw) {
         total.lost = safeSum(total.lost, row.quantity); row.quantity = 0;
       }
     }
+  } else if (event.kind === 'receipt') {
+    const destination = next.initial.locations.find(row => row.id === event.toId);
+    const total = next.totals.find(row => row.ammunitionId === event.ammunitionId);
+    if (destination?.kind !== 'depot' || !total) throw Error('Entrega requiere depósito y munición conocidos');
+    const initialTotal = next.initial.stock.filter(row => row.ammunitionId === event.ammunitionId)
+      .reduce((sum, row) => safeSum(sum, row.quantity), 0);
+    total.acquired = safeSum(total.acquired, event.quantity);
+    safeSum(initialTotal, total.acquired);
+    const row = entry(next, destination.id, event.ammunitionId);
+    row.quantity = safeSum(row.quantity, event.quantity);
   } else {
     const source = next.initial.locations.find(row => row.id === event.fromId);
     if (!source || !next.initial.ammunitionIds.includes(event.ammunitionId)) throw Error('Origen o munición inexistente');
@@ -174,16 +185,19 @@ export function applyInventoryEvent(state, raw) {
     if (event.kind === 'transfer') {
       const target = next.initial.locations.find(value => value.id === event.toId);
       if (!target || target.id === source.id) throw Error('Destino inválido');
-      if (target.kind === 'launcher' && next.components.find(value => value.id === target.componentId).condition !== 'operational') throw Error('Lanzador destino no operativo');
+      if (target.kind === 'launcher' && !['operational', 'degraded'].includes(next.components.find(value => value.id === target.componentId).condition)) throw Error('Lanzador destino no operativo');
       row.quantity -= event.quantity;
       const destination = entry(next, target.id, event.ammunitionId);
       destination.quantity = safeSum(destination.quantity, event.quantity);
-      if (!fits(next, target)) throw Error('Carga mixta o capacidad no admitida');
+      if (!fits(next, target)) {
+        const error = Error('Carga mixta o capacidad no admitida');
+        error.code = 'LOAD_NOT_ADMITTED'; throw error;
+      }
     } else {
       if (event.kind === 'expend') {
         if (source.kind !== 'launcher') throw Error('No se dispara desde un depósito');
         const required = [source.componentId, ...source.launchDependencies];
-        if (required.some(componentId => next.components.find(value => value.id === componentId).condition !== 'operational')) throw Error('Dependencia de lanzamiento no operativa');
+        if (required.some(componentId => !['operational', 'degraded'].includes(next.components.find(value => value.id === componentId).condition))) throw Error('Dependencia de lanzamiento no operativa');
       }
       row.quantity -= event.quantity;
       const total = next.totals.find(value => value.ammunitionId === event.ammunitionId);
