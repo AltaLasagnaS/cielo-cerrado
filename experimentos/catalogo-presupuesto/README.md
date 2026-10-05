@@ -48,6 +48,8 @@ Cada evento lleva bando e ID. Repetir exactamente un comando no duplica compras 
 
 Ver las [fichas](docs/FICHAS.md), el [diseño de briefing/campaña](docs/BRIEFING-CAMPANA.md) y la [guía de integración](docs/INTEGRACION.md).
 
+La [revisión de fuentes de juegos](docs/FUENTES-DE-JUEGOS.md) conserva trece fichas de misiles, referencias de sensores/lanzadores y una consulta de CWDB 512, con unidades, procedencia y contradicciones pendientes.
+
 Para retomar todo lo hablado: [estado e índice de continuidad](docs/ESTADO-Y-RELEVO.md), [plan maestro](docs/PLAN-MAESTRO.md), [decisiones](docs/DECISIONES.md) y [pendientes](docs/PENDIENTES.md). Se preservaron también las referencias y los documentos externos originales, distinguiendo sus estados históricos.
 
 El contrato ejecutable de varias etapas y briefing está en [PROTOCOLO-PROTOTIPO.md](docs/PROTOCOLO-PROTOTIPO.md). No implementa cambio de escenario, daño, reparación, contactos ni campaña jugable. Los intervalos contables no son el reloj del combate.

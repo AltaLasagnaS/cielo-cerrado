@@ -1,0 +1,61 @@
+{
+  "format": "cielo-cerrado/cwdb-schema-review",
+  "version": 1,
+  "source": {
+    "file": "CWDB_512.db3",
+    "sha256": "4a4ba98ecad165268b4df488b50099b77fb6b3759fd0e70839a922ae22ea2ce4",
+    "database": "CWDB",
+    "buildLabel": 512,
+    "versionBasis": "supplied-filename",
+    "verifiedInternalBuild": null,
+    "role": "game-database"
+  },
+  "counts": {
+    "DataWeapon": 1856,
+    "DataSensor": 2619,
+    "DataMount": 1552,
+    "DataFacility": 2406,
+    "DataWeaponRecord": 4934
+  },
+  "selectedSensor": {
+    "table": "DataSensor",
+    "rawFields": {
+      "ID": 234,
+      "Name": "Low Blow [SNR-125]",
+      "Comments": "-",
+      "RangeMax": 32.0,
+      "ScanInterval": 1,
+      "RadarPRF": 0,
+      "RadarPulseWidth": 0.0,
+      "RadarPeakPower": 0.0,
+      "MaxContactsIlluminate": 1
+    },
+    "codes": [
+      {
+        "CodeID": 3001,
+        "Description": "Pulse-Only Radar"
+      },
+      {
+        "CodeID": 4001,
+        "Description": "Continuous Wave Illumination"
+      }
+    ],
+    "normalizedPhysicalParameters": null,
+    "note": "Valores crudos; cero puede ser valor inicial. Unidades/semántica pendientes."
+  },
+  "selectedWeapons": [
+    {
+      "ID": 16,
+      "Name": "SA-3b Goa [5V27, V-601P]"
+    },
+    {
+      "ID": 168,
+      "Name": "SA-3a Goa [5V24, V-600P]"
+    },
+    {
+      "ID": 1010,
+      "Name": "SA-3c Goa [5V27D, V-601PD]"
+    }
+  ],
+  "runtimeEnabled": false
+}
