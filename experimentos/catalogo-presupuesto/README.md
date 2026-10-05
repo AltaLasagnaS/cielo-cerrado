@@ -48,6 +48,8 @@ Cada evento lleva bando e ID. Repetir exactamente un comando no duplica compras 
 
 ## Diseño y entrega
 
+La [vista previa de menú y tutorial](docs/MENU-Y-TUTORIAL.md) está en `demo/menu.html`. Permite completar un entrenamiento de recursos en seis pasos con guardado y continuidad, sin cambiar la interfaz activa del juego.
+
 Ver las [fichas](docs/FICHAS.md), el [diseño de briefing/campaña](docs/BRIEFING-CAMPANA.md) y la [guía de integración](docs/INTEGRACION.md).
 
 Para retomar todo lo hablado: [estado e índice de continuidad](docs/ESTADO-Y-RELEVO.md), [plan maestro](docs/PLAN-MAESTRO.md), [decisiones](docs/DECISIONES.md) y [pendientes](docs/PENDIENTES.md). Se preservaron también las referencias y los documentos externos originales, distinguiendo sus estados históricos.

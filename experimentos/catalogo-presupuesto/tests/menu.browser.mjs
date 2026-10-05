@@ -1,0 +1,50 @@
+import assert from 'node:assert/strict';
+
+const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
+const url = process.env.TEST_MENU_URL || 'http://127.0.0.1:8766/demo/menu.html';
+const origin = new URL(url).origin;
+const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, headless: true, args: ['--no-sandbox'] });
+try {
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  const errors = [], external = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.route('**/*', route => {
+    if (route.request().url().startsWith(origin + '/')) return route.continue();
+    external.push(route.request().url()); return route.abort();
+  });
+  await page.goto(url); await page.waitForFunction(() => window.__tutorialMenu);
+  const select = async name => { await page.locator(`[data-page="${name}"]`).click(); await page.locator(`#page-${name}`).waitFor({ state: 'visible' }); };
+  await select('campaign'); assert.match(await page.locator('#page-campaign').textContent(), /pendientes de integración/);
+  await select('tutorial');
+  assert.equal(await page.locator('#training-balance').textContent(), '100');
+  assert.equal(await page.locator('[data-action="consume"]').isDisabled(), true);
+  await page.locator('[data-action="buy"]').click();
+  await page.locator('#training-quantity').fill('1.5'); await page.locator('[data-action="load"]').click();
+  assert.match(await page.locator('#status').textContent(), /entera/);
+  assert.equal(await page.evaluate(() => window.__tutorialMenu.getStep()), 1);
+  assert.equal(await page.locator('#training-balance').textContent(), '80');
+  await page.locator('#training-quantity').fill('2'); await page.locator('[data-action="load"]').click();
+  await page.locator('#training-save').click(); const saved = await page.locator('#training-saved').inputValue();
+  await select('reference'); await page.locator('#reference-family').selectOption('patriot');
+  assert.equal(await page.locator('#reference-list li').count(), 3);
+  await select('settings'); await page.locator('#large-text').check();
+  assert.equal(await page.locator('body').evaluate(el => el.classList.contains('large-text')), true);
+  await select('tutorial'); assert.equal(await page.evaluate(() => window.__tutorialMenu.getStep()), 2);
+  await page.locator('[data-action="activate"]').click(); await page.locator('[data-action="consume"]').click();
+  await page.locator('[data-action="finish"]').click(); await page.locator('[data-action="begin-mission"]').click();
+  assert.equal(await page.locator('#training-balance').textContent(), '80');
+  assert.equal(await page.locator('#training-reserve').textContent(), '2');
+  assert.equal(await page.locator('#training-ready').textContent(), '1');
+  assert.match(await page.locator('#lesson-progress').textContent(), /completo/);
+  await page.locator('#training-saved').fill('{bad'); await page.locator('#training-restore').click();
+  assert.equal(await page.evaluate(() => window.__tutorialMenu.getStep()), 6);
+  await page.locator('#training-saved').fill(saved); await page.locator('#training-restore').click();
+  assert.equal(await page.evaluate(() => window.__tutorialMenu.getStep()), 2);
+  await page.locator('#training-reset').click(); assert.equal(await page.locator('#training-balance').textContent(), '100');
+  await select('scenarios'); assert.ok((await page.locator('#open-simulator').getAttribute('href')).endsWith('index.html'));
+  await page.setViewportSize({ width: 390, height: 844 }); await select('tutorial');
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+  await page.goto(url + '#unknown'); await page.locator('#page-home').waitFor({ state: 'visible' });
+  assert.deepEqual(errors, []); assert.deepEqual(external, []);
+  console.log('Menú y tutorial: navegación, recursos reales del libro, fracciones, guardado, biblioteca, continuidad y móvil OK.');
+} finally { await browser.close(); }
