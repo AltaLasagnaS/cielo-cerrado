@@ -5,7 +5,7 @@ import { esc } from '../../util/format.js';
 import { MAP } from '../../physics/terrain.js';
 import { S } from '../../sim/state.js';
 import { frameAt } from '../../sim/replay.js';
-import { $ } from '../dom.js';
+import { $, isAttackerView } from '../dom.js';
 import { openModal } from '../fichas.js';
 import { renderSel } from './selection.js';
 import { openGoalsEditor, setGoalsSavedHook } from '../goals-editor.js';
@@ -14,6 +14,8 @@ const SIDE = { ataque: 'Ataque', defensa: 'Defensa' };
 const KIND = { destroy: 'destruir', damage: 'dañar', protect: 'proteger', survive: 'que sobreviva', killUnit: 'destruir unidad', keepUnit: 'conservar unidad' };
 
 const objRow = g => {
+  // vista del atacante durante la noche: el daño no se conoce hasta el debrief
+  if (S.started && !S.replay && isAttackerView()) return `<div class="sobj" data-oid="${g.id}"><span class="t">${esc(TARGET_TYPES[g.type].icon)} · ${esc(g.name)}</span><span class="chip">sin evaluar</span></div>`;
   const hp = g.hp ?? g.maxHp, st = g.status || 'operational';
   return `<div class="sobj" data-oid="${g.id}"><span class="t">${esc(TARGET_TYPES[g.type].icon)} · ${esc(g.name)}</span><span class="chip st-${st}">${TARGET_STATUS[st]}</span><div class="hpbar"><i class="st-${st}" style="width:${(100 * Math.max(0, hp) / g.maxHp).toFixed(1)}%"></i></div><span class="n">HP ${Math.max(0, hp)} / ${g.maxHp}</span></div>`;
 };

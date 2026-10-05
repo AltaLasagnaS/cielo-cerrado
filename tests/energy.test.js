@@ -9,7 +9,7 @@ import { solve, calcPk, rangeFactor, energy, energyPk, ENERGY_REF } from '../src
 import { S } from '../src/sim/state.js';
 import { applyScenario } from '../src/sim/setup.js';
 import { exportScenario, validateScenario, loadScenarioData } from '../src/sim/scenario-io.js';
-import { useMap, clearSetup } from './helpers.js';
+import { useMap, clearSetup, seeTrack } from './helpers.js';
 
 const unit = (type, x, y) => ({ id: 1, type, x, y, az: 0, mast: DEFENSES[type].radar?.mast ?? 2, alt: DEFENSES[type].alt });
 const flat = () => setMap(flatMap(400, 400, 200));   // 80 × 80 km a nivel del mar
@@ -17,7 +17,7 @@ const flat = () => setMap(flatMap(400, 400, 200));   // 80 × 80 km a nivel del 
 const kalibr = (a, b) => buildThreat({ id: 9, type: 'kalibr', count: 1, pts: [a, b], agl: 50 }, 0, 0);
 /** Primera solución de tiro probando cada 1 s, como hace el motor (engage corre una vez por segundo). */
 function firstSol(u, th, pct = 1) {
-  for (let t = 0; t < th.ft; t++) { const sol = solve(u, th, t, pct); if (sol) return { ...sol, t }; }
+  for (let t = 0; t < th.ft; t++) { const sol = solve(u, seeTrack(th, t), t, pct); if (sol) return { ...sol, t }; }
   return null;
 }
 

@@ -9,7 +9,7 @@ Desplegás radares, baterías antiaéreas y guerra electrónica sobre relieve re
 **Abrí `index.html` en el navegador** (doble clic). Es un único archivo autocontenido: no necesita instalación ni conexión. Incluye las tipografías y sus licencias; se ve igual con y sin internet. Procedencia y tamaño en [docs/TIPOGRAFIAS.md](docs/TIPOGRAFIAS.md).
 
 Primeros pasos:
-1. Elegí un escenario arriba a la derecha y leé el **briefing**. Hay ocho jugables: la noche de ataque combinado sobre Monterey, el ataque a la base con S-400 en Gotemburgo, la **defensa de la refinería de Hisingen** (Gotemburgo), el **ataque al puente de Moss Landing** (Monterey), la **noche contra la energía de Kiev**, las **bombas planeadoras sobre Járkov** la **noche de los puertos de Odesa** y el **corredor de granos de Odesa** (barcos bajo misiles balísticos), los cuatro últimos sobre el relieve real de cada ciudad. Con el botón **Metas** podés elegir de qué bando jugás y cambiar las metas de cada uno.
+1. Elegí un escenario arriba a la derecha y leé el **briefing**. Hay ocho jugables: la noche de ataque combinado sobre Monterey, el ataque a la base con S-400 en Gotemburgo, la **defensa de la refinería de Hisingen** (Gotemburgo), el **ataque al puente de Moss Landing** (Monterey), la **noche contra la energía de Kiev**, las **bombas planeadoras sobre Járkov**, la **noche de los puertos de Odesa** y el **corredor de granos de Odesa** (barcos bajo misiles balísticos), los cuatro últimos sobre el relieve real de cada ciudad. Con el botón **Metas** podés elegir de qué bando jugás y cambiar las metas de cada uno.
 2. Tocá **▶ Iniciar**. La velocidad **Auto** acelera cuando no pasa nada y frena cuando hay combate.
 3. Al terminar se abre el **debrief**, con un botón para **ver la repetición** de la corrida sobre el mapa con una línea de tiempo. ¿Fue suerte? El botón **Monte Carlo** corre la misma situación muchas veces y muestra la probabilidad de que cada objetivo sobreviva.
 4. Probá cambiar cosas: mové defensas (antes de iniciar), agregá ataques en la pestaña **Ataque** o activá la capa **Relieve → Puntos altos** para ubicar radares en cotas dominantes.
@@ -20,12 +20,14 @@ Primeros pasos:
 
 - **Radar:** ecuación del radar (R ∝ σ^¼), RCS por banda (VHF a Ku), sectores de antena y probabilidad de detección por barrido.
 - **Terreno:** relieve real con línea de vista, curvatura terrestre con refracción estándar (Tierra 4/3), horizonte de radar y altura de mástil. Mapa de cobertura y capas de lectura del relieve (puntos altos, curvas de nivel, sombreado).
-- **Guerra electrónica:** interferencia de ruido con lóbulos principal y laterales y margen ECCM; supresión y engaño GNSS. Sistemas rusos y ucranianos.
-- **Enfrentamiento:** pistas propias y de red, tiempo de reacción, canales de tiro, munición, solución de intercepción, Pk por clase de blanco con modificadores (maniobra, bengalas, furtividad, interferencia, velocidad), señuelos y doctrina de tiro.
+- **Guerra electrónica:** interferencia de ruido con lóbulos principal y laterales y margen ECCM; engaño DRFM con falsos blancos; triangulación de jammers y home-on-jam; supresión y engaño GNSS. Sistemas rusos y ucranianos.
+- **Clutter y clima:** eco del suelo, del mar y de la lluvia; lluvia, nieve y niebla; día y noche; viento según la altura.
+- **Enfrentamiento:** pistas propias y de red (con familias de enlace y puestos de mando), tiempo de reacción, canales de tiro, munición, solución de intercepción con lo que ve la defensa (no con la ruta real del arma), energía del interceptor, Pk por clase de blanco con modificadores (maniobra, bengalas, furtividad, interferencia, velocidad, altura), señuelos y doctrina de tiro.
+- **Perspectivas:** vista completa, del defensor (solo sus pistas) o del atacante (sus armas y las defensas que conoce).
 - **Daño:** objetivos con vida (depósitos, bases, radares…), dispersión por CEP y daño según la ojiva y la distancia.
 - **Economía:** costo de cada interceptor y de cada arma.
 
-Catálogo: 16 amenazas, 19 defensas y sensores y 8 sistemas de guerra electrónica. Cada parámetro tiene rango (mín / probable / máx), confianza y fuentes: ver **[docs/CATALOGO.md](docs/CATALOGO.md)**.
+Catálogo: 17 amenazas, 22 defensas y sensores y 8 sistemas de guerra electrónica. Cada parámetro tiene rango (mín / probable / máx), confianza y fuentes: ver **[docs/CATALOGO.md](docs/CATALOGO.md)**.
 
 > Es un juego educativo con datos públicos aproximados, **no una herramienta de planificación**. Los valores de RCS y Pk son estimaciones: los reales son secretos.
 
@@ -39,7 +41,7 @@ npm run dev        # servidor en http://localhost:8000 que recarga al guardar
 npm test           # pruebas (física, catálogo, daño, corridas completas)
 npm run build      # regenera index.html (el juego en un solo archivo)
 npm run docs       # regenera docs/CATALOGO.md desde los datos
-npm run typecheck  # revisa los tipos (JSDoc + @ts-check) en util, data, physics y sim
+npm run typecheck  # revisa los tipos (JSDoc + @ts-check, con strictNullChecks) en todas las capas
 npm run check      # todo lo anterior y verifica que index.html y el catálogo estén al día
 npm run mc         # Monte Carlo de los escenarios en Node (40 noches)
 npm run calibrar   # casos de calibración de la Pk contra episodios reales

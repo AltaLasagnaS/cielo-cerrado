@@ -19,6 +19,7 @@ El juego es una página web estática hecha con **JavaScript moderno (módulos E
 | `onEnd` | Actualiza los controles y abre el debrief |
 | `onUnitLost` | Recalcula la cobertura |
 | `defenderView` | Consulta la vista del defensor (cambia el texto del registro) |
+| `attackerView` | Consulta la vista del atacante (cambia el dibujo y lo que se puede tocar) |
 
 ## Mapa de archivos
 
@@ -37,7 +38,8 @@ El juego es una página web estática hecha con **JavaScript moderno (módulos E
 - `terrain-analysis.js`: puntos altos, relieve relativo, curvas (solo visual).
 - `radar.js`: RCS por banda, alcance, sectores, interferencia, horizonte.
 - `kinematics.js`: trayectorias de las amenazas.
-- `engagement.js`: pistas, solución de tiro, Pk.
+- `engagement.js`: pistas, solución de tiro (`solve`, `trackKeys`, `arrivalReach`), Pk.
+- `track.js`: pista observada: velocidad medida y posición prevista en línea recta (tiro sin omnisciencia).
 - `coverage.js`: viewshed de cobertura.
 - `damage.js`: daño a objetivos.
 - `constants.js`: KR (Tierra 4/3), margen de LOS, coeficiente del horizonte.
@@ -50,9 +52,10 @@ El juego es una página web estática hecha con **JavaScript moderno (módulos E
 - `engine.js`: `startSim`, `step(dt)`, `engage`, `impact`.
 - `log.js`: registro y eventos de la línea de tiempo.
 - `replay.js`: repetición de la corrida (anota los cambios y reconstruye el mapa en cualquier instante).
-- `contacts.js`: lo que sabe la defensa de cada amenaza (última detección, posición estimada, edad); lo usa la vista del defensor.
+- `contacts.js`: lo que sabe cada bando: la defensa de cada amenaza (última detección, posición estimada, edad; pistas por radar y por red en `th.obs`) y el atacante de cada defensa (`attackerKnows`). Lo usan las vistas y la solución de tiro.
 - `ew.js`: guerra electrónica de la defensa (triangulación de jammers, home-on-jam). `weather-now.js`: clima vigente (plan de cambios, día y noche).
 - `goals.js`, `debrief.js`: evaluación de metas y análisis final.
+- `mission.js`: informe de fin de misión para la campaña (`missionReport(bando)`): metas de ese bando, sus medios (vida, componentes, munición, si el enemigo los ubicó), el registro como lo conoce y lo gastado. La continuidad entra por el armado: `defs[].hp`, `dmgRadar`, `dmgLauncher`, `mag`, `reserve` y `objectives[].hpNow`.
 - `pace.js`: fases del modo de velocidad Auto.
 - `hooks.js`: enganches hacia la interfaz.
 
@@ -129,11 +132,17 @@ El debrief tiene un botón **Ver repetición**: el mapa vuelve a mostrar la corr
 
 ## Vista del defensor (`sim/contacts.js`)
 
-Con la casilla **Vista del defensor**, el mapa, la ayuda emergente y la ficha de una pista muestran **contactos**, no la verdad. Cada detección de la defensa anota la posición vista (`th.seen`, y la anterior en `th.seenPrev`); `contactOf(th, t)` da la posición estimada por estima (última posición + velocidad de las dos últimas detecciones × edad) mientras la pista vive (12 s, la ventana de la red), y el último reporte fechado cuando se pierde (hasta 90 s). No muestra el tipo de arma, su blanco, su ruta ni la distancia que le falta; tocar el mapa selecciona el contacto donde se lo ve. Anotar no consume azar (las golden no cambian; `tests/contacts.test.js`). La repetición sigue mostrando la verdad.
+Con el selector de vista en **Vista del defensor**, el mapa, la ayuda emergente y la ficha de una pista muestran **contactos**, no la verdad. Cada detección de la defensa anota la posición vista (`th.seen`, y la anterior en `th.seenPrev`); `contactOf(th, t)` da la posición estimada por estima (última posición + velocidad de las dos últimas detecciones × edad) mientras la pista vive (12 s, la ventana de la red), y el último reporte fechado cuando se pierde (hasta 90 s). No muestra el tipo de arma, su blanco, su ruta ni la distancia que le falta; tocar el mapa selecciona el contacto donde se lo ve. Anotar no consume azar (las golden no cambian; `tests/contacts.test.js`). La repetición sigue mostrando la verdad.
 
 Cada unidad tiene un **dueño explícito** (`u.owner`, `data/index.js#sideOf`): quién la opera, separado del país del equipo (un 36D6 o un Buk puede ser de cualquiera de los dos bandos).
 
-Lo que falta de las **perspectivas por bando** (etapa 1 del plan de Codex): vista del atacante y **tiro sin omnisciencia** (hoy la solución de tiro predice el punto de encuentro con la ruta real del arma; pasar a predecir con la pista observada cambia resultados y calibración, así que queda para decidir con el usuario).
+**Tiro sin omnisciencia**: la solución de tiro (`physics/engagement.js#solve`) predice el punto de encuentro con la pista observada (`physics/track.js`: última detección y velocidad medida en una pista que le llega a esa batería, `th.obs` y `trackKeys`), no con la ruta real; solo los balísticos usan la trayectoria verdadera, que la física fija. Al llegar, `arrivalReach` decide con la posición real si al misil le alcanza la energía (docs/FISICA.md §6).
+
+## Vista del atacante (`sim/contacts.js#attackerKnows`)
+
+Con el selector en **Vista del atacante**, durante la corrida el mapa muestra sus armas (la verdad: son suyas) y solo las defensas que conoce: las que tienen un radar que ya emitió (`u.emitFrom`, también el AEW), porque la inteligencia de señales las ubica por su emisión, y las demás (cañones, MANPADS, drones interceptores, sensores acústicos u ópticos, radares en silencio) recién desde su primer disparo (`u.revealed`). El motor anota las dos cosas sin consumir azar (las golden no cambian). No muestra si una defensa está dañada o destruida, su munición, los interceptores en vuelo, la cobertura de radar, la ubicación de los jammers por triangulación ni el daño de los objetivos; la ficha y la ayuda emergente muestran solo posición, tipo y alcance de catálogo. La repetición sigue mostrando la verdad. Con el control de emisiones (`u.emcon`, docs/FISICA.md §6) un radar puede quedar apagado hasta la primera alerta o todo el tiempo, y así no se delata. 
+
+**Registro, resultados y objetivos por bando** (`sim/log.js`): cada mensaje lleva quién puede saberlo (`who`: `'def'`, `'atk'` o `'all'`) y, si la defensa lo cuenta distinto, su versión (`alt`, que nombra la amenaza como `pista #N (clasificación)`, sin el tipo real). `logFor(entradas, vista)` filtra. La defensa ve sus detecciones, disparos, derribos, recargas, daños propios e impactos; el atacante, lo de sus armas (señuelos, GNSS, CRPA); los dos, el inicio, el clima y el resumen final. El panel de resultados muestra a cada bando solo sus números (el defensor no sabe cuántas armas se lanzaron ni cuáles eran señuelos; el atacante no sabe cuántas llegaron) y la lista de objetivos del atacante dice "sin evaluar". **El debrief muestra toda la verdad a propósito**: es el análisis posterior de la noche, para aprender qué pasó. La decisión de la defensa al repartir blancos usa su estimación de la Pk (`calcPk(..., est = true)`: última posición vista, velocidad medida, sin saber si el blanco va a estar en su maniobra terminal).
 
 ## Modo Monte Carlo (`sim/montecarlo.js`)
 
