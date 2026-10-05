@@ -1,3 +1,4 @@
+// @ts-check
 // Atajos de DOM.
 
 /** querySelector corto. */

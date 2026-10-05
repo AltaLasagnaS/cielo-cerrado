@@ -1,3 +1,4 @@
+// @ts-check
 // Ventana "Cómo se usa".
 import { $ } from './dom.js';
 import { openModal } from './fichas.js';

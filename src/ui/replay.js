@@ -1,3 +1,4 @@
+// @ts-check
 // Barra de repetición sobre el mapa (se abre desde el debrief). Mueve S.replay.t; el mapa dibuja el
 // cuadro reconstruido de ese instante (sim/replay.js#frameAt, render/draw.js).
 import { esc, fmtT } from '../util/format.js';

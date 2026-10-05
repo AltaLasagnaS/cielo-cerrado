@@ -1,3 +1,4 @@
+// @ts-check
 // Tarjeta "Escenario" (panel derecho) y ventana de briefing: para qué se juega cada escenario.
 import { TARGET_TYPES, TARGET_STATUS, TERRAIN } from '../../data/index.js';
 import { esc } from '../../util/format.js';

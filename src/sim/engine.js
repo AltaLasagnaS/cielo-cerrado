@@ -3,7 +3,7 @@
 // Bucle de paso fijo: la interfaz llama a step(dt) con dt ≤ 0,25 s de tiempo simulado.
 // Cada paso: lanzamientos → movimiento/señuelos/GNSS → barridos de sensores → decisiones de tiro
 // → resolución de interceptores → fin de corrida. Ver docs/ARQUITECTURA.md.
-import { D, JAMMERS, TARGET_STATUS, WEATHER, UNIT_TARGET, UNIT_DAMAGE, UNIT_COMP_AT, datalinksOf } from '../data/index.js';
+import { D, JAMMERS, JAM_MODES, TARGET_STATUS, UNIT_TARGET, UNIT_DAMAGE, UNIT_COMP_AT, datalinksOf } from '../data/index.js';
 import { classify, classifyGain, classifyTau } from '../physics/decoys.js';
 import { money } from '../util/format.js';
 import { nextId } from '../util/ids.js';
@@ -12,7 +12,8 @@ import { surf, los } from '../physics/terrain.js';
 import { antZ, aspectCos, belowCeiling, detR, inSector, jamJ, pdScan, PD_CUTOFF, confirms, scanHistory, falseTracks } from '../physics/radar.js';
 import { buildThreat, posAt, speedAt } from '../physics/kinematics.js';
 import { gnssNavError, crpaOverwhelmed } from '../physics/navigation.js';
-import { RADAR_GUID, isTBM, trackOK, reactionStart, solve, calcPk, effectiveC2 } from '../physics/engagement.js';
+import { profileOf, timeTo } from '../physics/interceptor.js';
+import { RADAR_GUID, isTBM, trackOK, reactionStart, solve, calcPk, effectiveC2, unitC2, netPk, cpOf, netKey } from '../physics/engagement.js';
 import { C2_LEVELS } from '../data/index.js';
 import { damageAt, targetStatus } from '../physics/damage.js';
 import { azOf } from '../util/math.js';
@@ -21,11 +22,13 @@ import { hooks } from './hooks.js';
 import { log, event, label, uLabel } from './log.js';
 import { recReset, recUnit, recObj } from './replay.js';
 import { ewStep } from './ew.js';
+import { wxNow, wxReset, wxStep } from './weather-now.js';
+import { noteSeen } from './contacts.js';
 
 /** Arma la corrida a partir de S.setup: copia unidades y jammers y programa todos los lanzamientos. */
 export function startSim() {
   S.units = S.setup.defs.map(d => ({ ...d, alive: true, hp: UNIT_TARGET.hp, dmgRadar: false, dmgLauncher: false, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
-  S.jamsLive = S.setup.jams.map(j => ({ ...j, _losMap: {} })); S.hoj = []; S.ewNext = 0;
+  S.jamsLive = S.setup.jams.map(j => ({ ...j, _losMap: {} })); S.hoj = []; S.ewNext = 0; wxReset();
   S.objs = S.setup.objs.map(g => ({ ...g, hp: g.maxHp, status: 'operational', hits: 0, dmgBy: {} }));
   S.threats = []; S.ints = []; S.fx = []; S.impacts = []; S.stats = newStats(); S.log = []; S.events = []; S.arrivals = [];
   S.pending = []; recReset();
@@ -40,11 +43,12 @@ export function startSim() {
 }
 
 /** Vuelve al modo edición: descarta la corrida (el setup queda intacto). */
-export function resetState() { S.rec = null; S.replay = null; S.autoPhase = 'calm'; S.running = false; S.started = false; S.t = 0; S.units = []; S.jamsLive = []; S.hoj = []; S.ewNext = 0; S.objs = []; S.events = []; S.arrivals = []; S.pending = []; S.threats = []; S.ints = []; S.fx = []; S.impacts = []; S.stats = newStats(); S.log = []; }
+export function resetState() { S.rec = null; S.replay = null; S.autoPhase = 'calm'; S.running = false; S.started = false; S.t = 0; S.units = []; S.jamsLive = []; S.hoj = []; S.ewNext = 0; S.wxLive = null; S.wxIdx = 0; S.objs = []; S.events = []; S.arrivals = []; S.pending = []; S.threats = []; S.ints = []; S.fx = []; S.impacts = []; S.stats = newStats(); S.log = []; }
 
 /** Avanza la simulación dt segundos. */
 export function step(dt) {
   const t = S.t + dt; S.t = t;
+  wxStep(t);
   // lanzamientos
   while (S.pending.length && S.pending[0].tLaunch <= t) {
     const th = S.pending.shift(); th.alive = true; S.threats.push(th);
@@ -90,10 +94,11 @@ export function step(dt) {
   for (const u of S.units) {
     if (!u.alive) continue; const d = D(u); if (!d.radar) continue;
     if (t < u.nextScan) continue; u.nextScan = t + d.radar.scan;
-    const r = d.radar, uz = antZ(u), wx = WEATHER[S.weather];
+    const r = d.radar, uz = antZ(u), wx = wxNow();
     // capacidad de seguimiento (radar.tracks): pistas abiertas + falsos blancos DRFM; una pista nueva no
     // entra si está lleno (las abiertas se mantienen)
-    const keep = r.scan * 2 + 0.6, cap = r.tracks ?? Infinity, fake = cap < Infinity ? falseTracks(u, S.jamsLive) : 0;
+    const keep = r.scan * 2 + 0.6, cap = r.tracks ?? Infinity, fake = falseTracks(u, S.jamsLive);
+    u.fake = fake;   // falsos blancos DRFM de este barrido: ocupan capacidad y pueden atraer disparos (engage)
     let held = 0;
     if (cap < Infinity) for (const th of S.threats) if (th.alive && t - (th.det[u.id] ?? -1e9) <= keep) held++;
     for (const th of S.threats) {
@@ -127,14 +132,17 @@ export function step(dt) {
         }
       }
       if (ok) {
-        th.det[u.id] = t;
+        th.det[u.id] = t; noteSeen(th, t, u.id);
         const g = classifyGain(r);   // seguimiento con radar de tiro: aprende a distinguir señuelos
         if (g) { th.clsT = (th.clsT || 0) + g; th.clsTau = Math.min(th.clsTau ?? Infinity, classifyTau(r)); const c = classify(th); if (c && !th.clsAs) { th.clsAs = c; if (c === 'señuelo' && S.ignoreDecoys) log('d', 'Pista #' + th.id + ' clasificada como señuelo por ' + uLabel(u) + (th.isDecoy ? '.' : ' (¡error: era ' + th.T.short + '!).')); } }
-        // La coordinación C2 puede repartir una alerta aun cuando el datalink de tiro esté apagado.
-        if (th.cueFirst === null) th.cueFirst = t;
+        // La coordinación C2 puede repartir una alerta aun cuando el datalink de tiro esté apagado; una
+        // unidad asignada a "desconectada" (u.c2) no avisa ni publica.
+        const inNet = u.c2 !== 'desconectada';
+        const cp = cpOf(u);
+        if (inNet) { if (!cp) { if (th.cueFirst === null) th.cueFirst = t; } else { const m = th.cueCp || (th.cueCp = {}); if (m[cp] == null) m[cp] = t; } }
         // Una pista de tiro solo entra a la red por un transporte compatible y encendido.
-        if (u.link !== false) for (const key of datalinksOf(D(u))) {
-          const n = th.net[key] || (th.net[key] = { first: null, last: -1e9 });
+        if (u.link !== false && inNet) for (const key of datalinksOf(D(u))) {
+          const nk = netKey(key, cp), n = th.net[nk] || (th.net[nk] = { first: null, last: -1e9 });
           if (n.first === null) n.first = t;
           n.last = t;
           th.lastNet = t; if (th.netFirst === null) th.netFirst = t;
@@ -167,11 +175,12 @@ export function step(dt) {
   for (const it of S.ints) {
     if (it.done || t < it.tH) continue;
     it.done = true; const u = it.u; u.active = Math.max(0, u.active - 1);
+    if (it.phantom) { log('x', it.shot + ' de ' + uLabel(u) + ' no encuentra nada: era un falso blanco.'); continue; }
     const th = it.th;
     if (!th.alive) { log('d', it.shot + ' de ' + uLabel(u) + ': blanco ya destruido, autodestrucción.'); continue; }
     // guiado por el radar de la batería (SARH, TVM, mando): si la batería cayó, el misil queda sin guía
     if (!u.alive && RADAR_GUID.includes(D(u).sam.guid)) { log('x', it.shot + ' de ' + uLabel(u) + ' pierde la guía: su batería fue destruida.'); continue; }
-    const pk = calcPk(u, th, t, S.jamsLive, it.f ?? null) * (it.remote ? C2_LEVELS[it.c2].remotePk : 1);   // error de posición de la pista de red
+    const pk = calcPk(u, th, t, S.jamsLive, it.f ?? null) * (it.remote ? C2_LEVELS[it.c2].remotePk * (it.gw ?? 1) : 1);   // error de posición de la pista de red (y de la pasarela)
     if (rnd() < pk) {
       th.alive = false; th.killed = true; th.tEnd = t; S.stats.killed++; if (th.isDecoy) S.stats.decoysKilled++;
       const p = th.p || it; S.fx.push({ x: p.x, y: p.y, rt: performance.now(), c: '#6fd08c' });
@@ -203,13 +212,16 @@ function canEngage(u, th, t, c2, probe) {
   const maxR = isTBM(th) ? sm.maxRtbm : sm.maxR; if (!maxR) return null;
   if (u.noDrones && th.cls === 'dron') return null;
   if (Math.hypot(th.p.x - u.x, th.p.y - u.y) > maxR + 120) return null;
-  if (!trackOK(u, th, t, c2)) { if (!probe) delete u.avail[th.id]; return null; }
+  if (!trackOK(u, th, t, c2, S.gateways)) { if (!probe) delete u.avail[th.id]; return null; }
   let av = u.avail[th.id];
   if (av === undefined) { av = reactionStart(th, t, c2, u); if (!probe) u.avail[th.id] = av; }
   if (t - av < sm.react * (u.dmgRadar ? UNIT_DAMAGE.react : 1)) return null;   // radar de tiro dañado: reacción más lenta
   const flying = (th.fly || []).filter(i => !i.done);
-  if (C2_LEVELS[c2].deconf ? flying.length : flying.some(i => i.u === u)) return null;
-  if (S.ignoreDecoys && th.clsAs === 'señuelo') return null;   // doctrina: no gastar en pistas clasificadas como señuelo
+  if (C2_LEVELS[c2].deconf ? flying.some(i => cpOf(i.u) === cpOf(u)) : flying.some(i => i.u === u)) return null;   // la coordinación es dentro del puesto de mando
+  // doctrina de señuelos: la de la unidad (u.decoyDoc) o, si hereda, la general; decide con la clasificación
+  // conocida (th.clsAs), no con la identidad real
+  const ign = u.decoyDoc === 'ignorar' ? true : u.decoyDoc === 'tirar' ? false : S.ignoreDecoys;
+  if (ign && th.clsAs === 'señuelo') return null;
   return { pre: true };
 }
 
@@ -224,7 +236,7 @@ function solveFor(u, th, t) {
     // con pista ajena (C2 integrada), su radar tiene que cubrir el punto de encuentro: sector y alcance
     if (remote) {
       const az = azOf(sol.p.x - u.x, sol.p.y - u.y), dk = Math.hypot(sol.p.x - u.x, sol.p.y - u.y, (sol.p.z - antZ(u)) / 1000);
-      if (!inSector(u, az) || dk > detR(u, th, jamJ(u, az, S.jamsLive), 1, WEATHER[S.weather])) return null;
+      if (!inSector(u, az) || dk > detR(u, th, jamJ(u, az, S.jamsLive), 1, wxNow())) return null;
     }
   }
   return { sol, remote };
@@ -235,6 +247,7 @@ function solveFor(u, th, t) {
  * derribo (costo del disparo / Pk); contra el resto, la mayor Pk. f = fracción del alcance del tiro
  * (solve), para contar la energía del misil.
  */
+/** @param {number | null} [f] */
 function shooterScore(u, th, t, f = null) {
   const pk = Math.max(0.01, calcPk(u, th, t, S.jamsLive, f));
   return th.cls === 'dron' ? -D(u).sam.cost / pk : pk;
@@ -277,30 +290,34 @@ function reaches(v, th, t) {
 export function engage(u, t) {
   const d = D(u), sm = d.sam; const ch = sm.ch;
   if (u.active >= ch) return;
-  const c2 = effectiveC2(S.c2, S.objs), L = C2_LEVELS[c2];
+  const cp = cpOf(u), c2net = effectiveC2(S.c2, S.objs, cp), c2 = unitC2(u, c2net), L = C2_LEVELS[c2];
   const cand = [];
   for (const th of S.threats) if (canEngage(u, th, t, c2, false)) cand.push([th, th.p.rem / Math.max(1, th.T.v)]);
   cand.sort((a, b) => a[1] - b[1]);
+  // falsos blancos DRFM que pasan la clasificación (JAM_MODES.drfm.fooled): compiten con las pistas reales
+  // por los disparos de esta evaluación; si sale uno, la batería gasta una salva en la nada
+  const ph = Math.round((u.fake || 0) * JAM_MODES.drfm.fooled);
+  if (ph > 0 && u.active < ch && u.magLeft > 0 && rnd() < ph / (ph + cand.length)) phantomShot(u, t);
   for (const [th] of cand) {
     if (u.active >= ch || u.magLeft <= 0) { const k = uLabel(u), sat = u.magLeft <= 0 ? S.stats.satMag : S.stats.satChannels; sat[k] = (sat[k] || 0) + 1; break; }
     const f = solveFor(u, th, t); if (!f) continue;
     if (L.best && u.link !== false) {
       // mejor tirador ahora: otra batería con enlace que también puede tirar ya y es mejor
       const mine = shooterScore(u, th, t, f.sol.f);
-      const better = S.units.some(v => { if (v === u || v.link === false || !canEngage(v, th, t, c2, true)) return false; const fv = solveFor(v, th, t); return !!fv && shooterScore(v, th, t, fv.sol.f) > mine * (th.cls === 'dron' ? 0.999 : 1.001); });
+      const better = S.units.some(v => { if (v === u || v.link === false || cpOf(v) !== cp || !canEngage(v, th, t, unitC2(v, c2net), true)) return false; const fv = solveFor(v, th, t); return !!fv && shooterScore(v, th, t, fv.sol.f) > mine * (th.cls === 'dron' ? 0.999 : 1.001); });
       if (better) continue;
       // defensa por capas: un dron se le deja a una capa al menos 2 veces más barata por derribo que
       // tenga munición y por cuya envolvente vaya a pasar antes de llegar
       if (th.cls === 'dron') {
         const cpk = costPerKill(u, th, t);
-        const layer = S.units.some(v => v !== u && v.alive && v.link !== false && D(v).sam && v.magLeft > 0 && !v.noDrones && D(v).sam.maxR > 0 && costPerKill(v, th, t) * 2 <= cpk && reaches(v, th, t));
+        const layer = S.units.some(v => v !== u && v.alive && v.link !== false && cpOf(v) === cp && D(v).sam && v.magLeft > 0 && !v.noDrones && D(v).sam.maxR > 0 && costPerKill(v, th, t) * 2 <= cpk && reaches(v, th, t));
         if (layer) continue;
       }
     }
     const { sol, remote } = f;
     const n = Math.min(S.doctrine === 'salva' ? (u.salvo || sm.salvo) : 1, u.magLeft, ch - u.active);
     for (let k = 0; k < n; k++) {
-      const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f };
+      const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f, gw: remote ? (netPk(u, th, t, c2, S.gateways) || 1) : 1 };
       S.ints.push(it); (th.fly = th.fly || []).push(it);
       S.rec?.ints.push(it); u.magLeft--; u.active++; S.stats.shots++; S.stats.defCost += sm.cost; recUnit(u);
       S.stats.byUnit[uLabel(u)] = (S.stats.byUnit[uLabel(u)] || 0) + 1;
@@ -309,6 +326,18 @@ export function engage(u, t) {
     if (u.magLeft === 0) { log('w', uLabel(u) + ' se queda sin munición.'); event(uLabel(u) + ' se queda sin munición', 'empty:' + u.id); }
     log('l', uLabel(u) + ' dispara ' + n + '× ' + sm.shot + ' contra ' + (th.isDecoy && hooks.defenderView() ? 'pista #' + th.id : label(th)) + ' — intercepción a ' + sol.r.toFixed(1) + ' km en ' + sol.tau.toFixed(0) + ' s' + (remote ? ' (con pista de la red)' : '') + '.');
   }
+}
+
+/** Salva contra un falso blanco DRFM: el misil vuela hacia el sector del radar y no encuentra nada. */
+function phantomShot(u, t) {
+  const sm = D(u).sam, n = Math.min(S.doctrine === 'salva' ? (u.salvo || sm.salvo) : 1, u.magLeft, sm.ch - u.active);
+  const a = (u.az || 0) * Math.PI / 180, r = sm.maxR * 0.6, tau = timeTo(profileOf(sm), r * 1000);
+  for (let k = 0; k < n; k++) {
+    const it = { u, th: null, phantom: true, x0: u.x, y0: u.y, px: u.x + Math.sin(a) * r, py: u.y - Math.cos(a) * r, tL: t + k * 0.6, tH: t + tau + k * 0.6, shot: sm.shot, done: false };
+    S.ints.push(it); S.rec?.ints.push(it); u.magLeft--; u.active++; S.stats.shots++; S.stats.defCost += sm.cost; recUnit(u);
+  }
+  log('w', uLabel(u) + ' dispara ' + n + '× ' + sm.shot + ' contra un falso blanco (engaño DRFM).');
+  if (u.magLeft === 0) log('w', uLabel(u) + ' se queda sin munición.');
 }
 
 /**

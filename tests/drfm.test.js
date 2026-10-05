@@ -37,3 +37,60 @@ test('DRFM: no afecta radares de otra banda ni sensores ópticos', () => {
   assert.equal(falseTracks({ id: 1, type: 'p18', x: 10, y: 10 }, [soj(10, 40)]), 0, 'VHF fuera de las bandas del jammer');
   assert.equal(falseTracks({ id: 1, type: 'mfg', x: 10, y: 10 }, [soj(10, 40)]), 0);
 });
+
+test('DRFM: una parte de los falsos blancos pasa la clasificación y la batería les gasta misiles', async () => {
+  const { S } = await import('../src/sim/state.js');
+  const { addDef, addSalvo, addJam } = await import('../src/sim/setup.js');
+  const { clearSetup, runCurrent } = await import('./helpers.js');
+  const run = mode => {
+    useMap('monterey', { flat: true }); clearSetup();
+    addDef('nasams', 40, 40, { name: 'N' });
+    addJam('soj', 40, 10, { alt: 8000, mode });
+    addSalvo({ type: 'kh101', count: 4, interval: 20, pts: [[40, 0], [40, 39]] });
+    runCurrent(3); return S;
+  };
+  const S1 = run('drfm');
+  assert.ok(S1.log.some(l => /falso blanco \(engaño DRFM\)/.test(l.msg)), 'dispara contra falsos blancos');
+  assert.ok(S1.log.some(l => /no encuentra nada/.test(l.msg)), 'y esos misiles no encuentran nada');
+  const S2 = run('barrage');
+  assert.ok(!S2.log.some(l => /falso blanco/.test(l.msg)), 'con ruido no hay falsos blancos');
+});
+
+test('DRFM: también se lo ubica por triangulación cuando el haz lo ilumina', async () => {
+  const { S } = await import('../src/sim/state.js');
+  const { startSim, step } = await import('../src/sim/engine.js');
+  const { addDef, addJam } = await import('../src/sim/setup.js');
+  const { clearSetup } = await import('./helpers.js');
+  const { setRandom, seeded } = await import('../src/util/rng.js');
+  useMap('monterey', { flat: true }); clearSetup();
+  addDef('nasams', 30, 10, { az: 0 }); addDef('nasams', 50, 10, { az: 0 });
+  addJam('soj', 40, -10 + 40, { alt: 8000, mode: 'drfm' });
+  setRandom(seeded(1));
+  try { startSim(); for (let k = 0; k < 40; k++) step(0.25); } finally { setRandom(null); }
+  assert.ok(S.jamsLive[0].fix, 'ubicado');
+});
+
+test('DRFM: el modo se conserva al cargar un escenario o un archivo', async () => {
+  const { S } = await import('../src/sim/state.js');
+  const { addJam } = await import('../src/sim/setup.js');
+  const { exportScenario, validateScenario, loadScenarioData } = await import('../src/sim/scenario-io.js');
+  const { clearSetup } = await import('./helpers.js');
+  useMap('monterey'); clearSetup();
+  assert.equal(addJam('soj', 40, 10, { mode: 'drfm' }).mode, 'drfm');
+  const v = validateScenario(JSON.parse(JSON.stringify(exportScenario())));
+  assert.ok(v.ok, v.errors.join('; '));
+  clearSetup(); loadScenarioData(v.data);
+  assert.equal(S.setup.jams[0].mode, 'drfm');
+});
+
+test('dueño explícito: un equipo de "ambos bandos" operado por Rusia no sufre el jammer ruso', async () => {
+  const { sideOf } = await import('../src/data/index.js');
+  const { jamJ } = await import('../src/physics/radar.js');
+  useMap('monterey', { flat: true });
+  const u = { id: 1, type: 'ewr', x: 10, y: 10, az: 0 };   // 36D6: catálogo 'both'
+  assert.equal(sideOf(u), 'both');
+  const j = { type: 'soj', x: 10, y: 60, alt: 8000, on: true, mode: 'barrage' };
+  assert.ok(jamJ(u, 180, [j]) > 0, 'sin dueño: lo interfiere cualquiera');
+  assert.equal(jamJ({ ...u, owner: 'RU' }, 180, [j]), 0, 'operado por Rusia: su propio jammer no lo toca');
+  assert.ok(jamJ({ ...u, owner: 'UA' }, 180, [j]) > 0);
+});

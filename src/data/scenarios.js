@@ -36,8 +36,8 @@ export const SCENARIOS = {
       { type: 'airbase', name: 'Aeródromo de Marina', short: 'Aeródromo Marina', x: 51.5, y: 55.5, desc: 'Base de la aviación de defensa. No está atacada al comienzo: protegela si agregás ataques.' }
     ],
     defs: [
-      { type: 'ewr', x: 85.4, y: 53.2, name: 'Radar 3D (cerro Gabilan)' },
-      { type: 'p18', x: 70, y: 40, name: 'Radar VHF' },
+      { type: 'ewr', owner: 'UA', x: 85.4, y: 53.2, name: 'Radar 3D (cerro Gabilan)' },
+      { type: 'p18', owner: 'UA', x: 70, y: 40, name: 'Radar VHF' },
       { type: 'patriot', x: 58, y: 58, az: 320, name: 'Patriot-1' },
       { type: 'irist', x: 44, y: 67, name: 'IRIS-T-1' },
       { type: 'nasams', x: 56, y: 62, name: 'NASAMS-1' },
@@ -94,8 +94,8 @@ export const SCENARIOS = {
       { type: 'pantsir', x: 54, y: 30, name: 'Pantsir-1' },
       { type: 'pantsir', x: 55, y: 22, name: 'Pantsir-2' },
       { type: 'tor', x: 56, y: 38, name: 'Tor-M2' },
-      { type: 'buk', x: 48, y: 20, name: 'Buk-M1' },
-      { type: 'p18', x: 58, y: 14, name: 'Radar VHF' }
+      { type: 'buk', owner: 'RU', x: 48, y: 20, name: 'Buk-M1' },
+      { type: 'p18', owner: 'RU', x: 58, y: 14, name: 'Radar VHF' }
     ],
     salvos: [
       { type: 'storm', count: 16, interval: 6, sync: true, tArrive: 1480, agl: 35, pts: [[0, 60], [30, 46], [44, 38], [57.8, 32.5]], targetObj: 'Depósito de munición' },
@@ -134,13 +134,13 @@ export const SCENARIOS = {
       { type: 'infra', name: 'Puerto de Gotemburgo', short: 'Puerto', x: 55.6, y: 33.9, desc: 'Terminales de contenedores: blanco de los Kinzhal.' }
     ],
     defs: [
-      { type: 'ewr', x: 53, y: 29.5, name: 'Radar 3D (Hisingen)' },
+      { type: 'ewr', owner: 'UA', x: 53, y: 29.5, name: 'Radar 3D (Hisingen)' },
       { type: 'aew_s340', x: 30, y: 50, az: 0, name: 'Saab AEW' },
       { type: 'patriot', x: 55, y: 32, az: 260, name: 'Patriot-1' },
       { type: 'irist', x: 49.5, y: 33, name: 'IRIS-T-1' },
       { type: 'nasams', x: 48, y: 32.5, name: 'NASAMS-1' },
-      { type: 'manpads', x: 50.6, y: 34, name: 'RBS 70-1' },
-      { type: 'manpads', x: 54.4, y: 33.6, name: 'RBS 70-2' },
+      { type: 'manpads', owner: 'UA', x: 50.6, y: 34, name: 'RBS 70-1' },
+      { type: 'manpads', owner: 'UA', x: 54.4, y: 33.6, name: 'RBS 70-2' },
       { type: 'mfg', x: 47, y: 31, name: 'Grupo móvil 1' },
       { type: 'mfg', x: 52.5, y: 35.2, name: 'Grupo móvil 2' },
       { type: 'acoustic', x: 46, y: 33, name: 'Acústico 1' },
@@ -191,9 +191,9 @@ export const SCENARIOS = {
       { type: 'pantsir', x: 52.8, y: 41.3, name: 'Pantsir-1' },
       { type: 'pantsir', x: 51, y: 39.5, name: 'Pantsir-2' },
       { type: 'tor', x: 53.5, y: 40, name: 'Tor-M2' },
-      { type: 'buk', x: 56, y: 44, name: 'Buk-M1' },
-      { type: 'ewr', x: 61, y: 40, name: 'Radar 3D' },
-      { type: 'p18', x: 58, y: 40, name: 'Radar VHF' }
+      { type: 'buk', owner: 'RU', x: 56, y: 44, name: 'Buk-M1' },
+      { type: 'ewr', owner: 'RU', x: 61, y: 40, name: 'Radar 3D' },
+      { type: 'p18', owner: 'RU', x: 58, y: 40, name: 'Radar VHF' }
     ],
     salvos: [
       { type: 'storm', count: 10, interval: 5, sync: true, tArrive: 1500, agl: 35, pts: [[0, 58], [30, 52], [44, 45], [51.8, 40.9]], targetObj: 'Puente de la autopista 1' },
@@ -218,7 +218,7 @@ export const SCENARIOS = {
     map: 'kyiv', name: 'Kiev · noche contra la energía (defensa ucraniana)',
     player: 'defensa',
     time: '01:30 hora local · invierno',
-    description: 'Una noche típica de la campaña rusa contra la energía ucraniana: oleadas de Shahed desde el norte y el este, señuelos Gerbera para gastar munición, misiles de crucero Kh-101 y Kalibr, y balísticos Iskander-M y Kinzhal al final, todo para llegar casi junto. Los blancos son las centrales de cogeneración que dan luz y calefacción a la ciudad y la represa de Kiev. Las posiciones de la defensa son ilustrativas, no las reales.',
+    description: 'Una noche típica de la campaña rusa contra la energía ucraniana: oleadas de Shahed desde el norte y el este, señuelos Gerbera para gastar munición, misiles de crucero Kh-101 y Kalibr, y balísticos Iskander-M y Kinzhal al final, todo para llegar casi junto. Los blancos son las centrales de cogeneración que dan luz y calefacción a la ciudad y la represa de Kiev. Época: invierno 2024–25, así que los drones traen antenas CRPA Kometa de 8 elementos y todavía no módems mesh (docs/investigacion/guerra-electronica-ucraniana.md). Las posiciones de la defensa son ilustrativas, no las reales.',
     forces: {
       defensa: 'Defensa por capas de la capital: radar 3D y radar VHF de alerta, Patriot (sector hacia el noreste), NASAMS, IRIS-T, dos Gepard junto a las centrales, tres grupos móviles, red acústica, drones interceptores y la red anti-GNSS Pokrova sobre la ciudad. Red de mando integrada.',
       ataque: '24 Shahed en dos oleadas, 10 Gerbera, 7 Kh-101, 6 Kalibr, 3 Iskander-M con señuelos y 2 Kinzhal.'
@@ -232,8 +232,8 @@ export const SCENARIOS = {
       { type: 'infra', name: 'Represa de Kiev', short: 'Represa', x: 36.3, y: 45.7, hp: 2500, desc: 'Central hidroeléctrica de Vyshhorod, al pie del embalse de Kiev.' }
     ],
     defs: [
-      { type: 'ewr', x: 30, y: 72, name: 'Radar 3D' },
-      { type: 'p18', x: 52, y: 60, name: 'Radar VHF' },
+      { type: 'ewr', owner: 'UA', x: 30, y: 72, name: 'Radar 3D' },
+      { type: 'p18', owner: 'UA', x: 52, y: 60, name: 'Radar VHF' },
       { type: 'patriot', x: 33, y: 60, az: 40, name: 'Patriot-1' },
       { type: 'nasams', x: 44, y: 58, name: 'NASAMS-1' },
       { type: 'irist', x: 34, y: 67, name: 'IRIS-T-1' },
@@ -248,9 +248,9 @@ export const SCENARIOS = {
       { type: 'intdrone', x: 44, y: 63, name: 'Interceptores-1' }
     ],
     salvos: [
-      { type: 'shahed', count: 18, interval: 20, tStart: 0, agl: 1500, pts: [[40, 0], [42, 30], [46.9, 52]], targetObj: 'Central CHP-6' },
+      { type: 'shahed', count: 18, crpa: 8, interval: 20, tStart: 0, agl: 1500, pts: [[40, 0], [42, 30], [46.9, 52]], targetObj: 'Central CHP-6' },
       { type: 'gerbera', count: 10, interval: 25, tStart: 60, agl: 900, pts: [[70, 5], [50, 30], [44, 55]] },
-      { type: 'shahed', count: 6, interval: 30, tStart: 120, agl: 2000, pts: [[70, 40], [55, 55], [40.3, 67.4]], targetObj: 'Central CHP-5' },
+      { type: 'shahed', count: 6, crpa: 8, interval: 30, tStart: 120, agl: 2000, pts: [[70, 40], [55, 55], [40.3, 67.4]], targetObj: 'Central CHP-5' },
       { type: 'kh101', count: 7, interval: 10, sync: true, tArrive: 1500, agl: 40, pts: [[0, 30], [20, 50], [40.3, 67.4]], targetObj: 'Central CHP-5' },
       { type: 'kalibr', count: 6, interval: 8, sync: true, tArrive: 1490, agl: 50, pts: [[45, 111], [42, 90], [40.3, 67.4]], targetObj: 'Central CHP-5' },
       { type: 'isk_m', count: 3, interval: 15, sync: true, tArrive: 1520, launchDist: 400, maneuver: true, decoys: true, pts: [[70, 0], [46.9, 52]], targetObj: 'Central CHP-6' },
@@ -275,7 +275,7 @@ export const SCENARIOS = {
     map: 'kharkiv', name: 'Járkov · bombas planeadoras (defensa ucraniana)',
     player: 'defensa',
     time: '06:10 hora local · madrugada',
-    description: 'Járkov está a 30 km de la frontera rusa: los Su-34 sueltan bombas FAB-500 con kit UMPK desde Belgorod, a 9–12 km de altura y a 50–70 km del blanco, sin entrar al alcance de casi ninguna defensa. Las bombas planean sin motor, casi no tienen firma infrarroja y llegan muchas juntas. Esta mañana van contra la central CHP-5 de Podvirky (ya dañada en marzo de 2024) y el centro de la ciudad, mezcladas con Shahed para gastar munición. Las bombas traen antenas CRPA Kometa de 12 elementos: las dos estaciones Lima de la ciudad no les alcanzan. Las posiciones de las defensas son ilustrativas.',
+    description: 'Járkov está a 30 km de la frontera rusa: los Su-34 sueltan bombas FAB-500 con kit UMPK desde Belgorod, a 9–12 km de altura y a 50–70 km del blanco, sin entrar al alcance de casi ninguna defensa. Las bombas planean sin motor, casi no tienen firma infrarroja y llegan muchas juntas. Esta mañana van contra la central CHP-5 de Podvirky (ya dañada en marzo de 2024) y el centro de la ciudad, mezcladas con Shahed para gastar munición. Las bombas traen antenas CRPA Kometa de 12 elementos (desde abril de 2025) y los Shahed, CRPA de 16 y módem mesh/LTE: las dos estaciones Lima de la ciudad no les alcanzan. Las posiciones de las defensas son ilustrativas.',
     forces: {
       defensa: 'Radar 3D y radar VHF de alerta, una batería Patriot al sur de la ciudad (sector hacia el norte), IRIS-T junto a la CHP-5, NASAMS, un Gepard, dos grupos móviles, red acústica y dos estaciones anti-GNSS Lima. Red de mando coordinada.',
       ataque: '30 bombas UMPK en tres oleadas de 10 (CRPA Kometa de 12 elementos) y 12 Shahed.'
@@ -289,8 +289,8 @@ export const SCENARIOS = {
       { type: 'infra', name: 'Central de Zmiiv', short: 'Zmiiv', x: 38, y: 101.3, hp: 2000, desc: 'Central térmica de Zmiiv (Slobozhanske), al sur. Destruida en marzo de 2024; acá está en pie y no la atacan esta mañana.' }
     ],
     defs: [
-      { type: 'ewr', x: 22, y: 66, name: 'Radar 3D' },
-      { type: 'p18', x: 30, y: 60, name: 'Radar VHF' },
+      { type: 'ewr', owner: 'UA', x: 22, y: 66, name: 'Radar 3D' },
+      { type: 'p18', owner: 'UA', x: 30, y: 60, name: 'Radar VHF' },
       { type: 'patriot', x: 14, y: 68, az: 0, name: 'Patriot-1' },
       { type: 'irist', x: 9, y: 61, name: 'IRIS-T-1' },
       { type: 'nasams', x: 19, y: 59, name: 'NASAMS-1' },
@@ -301,7 +301,7 @@ export const SCENARIOS = {
       { type: 'acoustic', x: 34, y: 45, name: 'Acústico 2' }
     ],
     salvos: [
-      { type: 'shahed', count: 12, interval: 25, tStart: 0, agl: 1500, pts: [[60, 0], [40, 30], [16.5, 56.3]], targetObj: 'Centro de Járkov' },
+      { type: 'shahed', count: 12, crpa: 16, link: true, interval: 25, tStart: 0, agl: 1500, pts: [[60, 0], [40, 30], [16.5, 56.3]], targetObj: 'Centro de Járkov' },
       { type: 'kab', count: 10, interval: 4, sync: true, tArrive: 600, crpa: 12, pts: [[8, 0], [7.2, 58.7]], targetObj: 'Central CHP-5' },
       { type: 'kab', count: 10, interval: 4, sync: true, tArrive: 900, crpa: 12, pts: [[20, 0], [16.5, 56.3]], targetObj: 'Centro de Járkov' },
       { type: 'kab', count: 10, interval: 4, sync: true, tArrive: 1200, crpa: 12, pts: [[12, 0], [7.2, 58.7]], targetObj: 'Central CHP-5' }
@@ -338,8 +338,8 @@ export const SCENARIOS = {
       { type: 'infra', name: 'Centro de Odesa', short: 'Centro', x: 56.1, y: 58, hp: 2500, desc: 'Centro histórico y administrativo de la ciudad.' }
     ],
     defs: [
-      { type: 'ewr', x: 49, y: 81, name: 'Radar 3D' },
-      { type: 'p18', x: 40, y: 60, name: 'Radar VHF' },
+      { type: 'ewr', owner: 'UA', x: 49, y: 81, name: 'Radar 3D' },
+      { type: 'p18', owner: 'UA', x: 40, y: 60, name: 'Radar VHF' },
       { type: 's300', x: 49.5, y: 78, az: 135, name: 'S-300-1' },
       { type: 'irist', x: 48.5, y: 82, name: 'IRIS-T-1' },
       { type: 'gepard', x: 55, y: 56.5, name: 'Gepard-1' },
@@ -369,6 +369,53 @@ export const SCENARIOS = {
     ],
     success: 'Defensa: la terminal de granos de Chornomorsk sigue operativa al terminar el ataque.',
     failure: 'Defensa: la terminal de granos queda dañada o destruida.'
+  },
+  od_corredor: {
+    map: 'odesa', name: 'Odesa · el corredor de granos bajo misiles balísticos (defensa ucraniana)',
+    player: 'defensa',
+    time: '21:00 hora local · otoño',
+    description: 'Inspirado en los ataques de octubre de 2024 contra barcos civiles en los puertos de la región de Odesa, en el corredor que Ucrania abrió después de que Rusia dejó el acuerdo de granos: el 6 de octubre un misil balístico dañó al Paresa, cargado con unas 6.000 t de maíz; el 7 y el 14 de octubre fueron alcanzados el Optima y el NS Moon en el puerto de Odesa (Kyiv Independent, Maritime Executive). En tres meses se dañaron 22 buques civiles. Acá hay dos barcos en el puerto de Odesa y uno en Chornomorsk. Contra un Iskander-M la defensa de esta región casi no tiene con qué (con esta defensa, la defensa gana 0 de 40 noches: los balísticos alcanzan a los barcos, como pasó). Probá agregar un Patriot. La composición es ilustrativa, la real no es pública.',
+    forces: {
+      defensa: 'Radar 3D y radar VHF, una batería S-300PS, un IRIS-T sobre la ciudad, dos Gepard en los puertos y grupos móviles en la costa. Red coordinada. Sin Patriot.',
+      ataque: '5 Iskander-M desde el este (Crimea y Jersón) contra los barcos y 10 Shahed que entran desde el mar contra el puerto de Odesa.'
+    },
+    conditions: 'Noche de otoño despejada, sin viento.',
+    rules: { c2: 'coordinada', doctrine: 'salva', weather: 'despejado' },
+    rulesText: ['Red coordinada y doctrina de salva.', 'Los Iskander-M bajan casi en vertical a más de Mach 5: el S-300PS tiene poca Pk contra ellos y el IRIS-T no puede enfrentarlos.', 'Los Shahed llegan primero, los misiles a los 15 minutos.'],
+    objectives: [
+      { type: 'ship', name: 'Granelero en el puerto de Odesa', short: 'Granelero Odesa', x: 57.2, y: 55.2, desc: 'Granelero amarrado en el puerto de Odesa (como el Optima, oct-2024).' },
+      { type: 'ship', name: 'Carguero en el puerto de Odesa', short: 'Carguero Odesa', x: 57.4, y: 54.6, desc: 'Carguero en el puerto de Odesa (como el NS Moon, oct-2024).' },
+      { type: 'ship', name: 'Granelero en Chornomorsk', short: 'Granelero Chornomorsk', x: 52.5, y: 76.5, desc: 'Granelero cargando maíz frente a la terminal de granos de Chornomorsk.' },
+      { type: 'infra', name: 'Puerto de Odesa', short: 'Puerto Odesa', x: 56.6, y: 55.4, desc: 'Terminales y muelles del puerto de Odesa.' }
+    ],
+    defs: [
+      { type: 'ewr', owner: 'UA', x: 49, y: 81, name: 'Radar 3D' },
+      { type: 'p18', owner: 'UA', x: 40, y: 60, name: 'Radar VHF' },
+      { type: 's300', x: 49.5, y: 78, az: 90, name: 'S-300-1' },
+      { type: 'irist', x: 48.5, y: 82, name: 'IRIS-T-1' },
+      { type: 'gepard', x: 55, y: 56.5, name: 'Gepard-1' },
+      { type: 'gepard', x: 49.5, y: 73.5, name: 'Gepard-2' },
+      { type: 'mfg', x: 54.5, y: 62, name: 'Grupo móvil 1' },
+      { type: 'mfg', x: 51, y: 70, name: 'Grupo móvil 2' },
+      { type: 'acoustic', x: 55, y: 66, name: 'Acústico 1' },
+      { type: 'acoustic', x: 53, y: 45, name: 'Acústico 2' }
+    ],
+    salvos: [
+      { type: 'shahed', count: 10, interval: 30, tStart: 0, agl: 1500, pts: [[76.5, 70], [56.6, 55.4]], targetObj: 'Puerto de Odesa' },
+      { type: 'isk_m', count: 2, interval: 20, sync: true, tArrive: 900, pts: [[76.5, 50], [57.2, 55.2]], targetObj: 'Granelero en el puerto de Odesa' },
+      { type: 'isk_m', count: 1, interval: 20, sync: true, tArrive: 930, pts: [[76.5, 50], [57.4, 54.6]], targetObj: 'Carguero en el puerto de Odesa' },
+      { type: 'isk_m', count: 2, interval: 20, sync: true, tArrive: 960, pts: [[76.5, 60], [52.5, 76.5]], targetObj: 'Granelero en Chornomorsk' }
+    ],
+    jams: [],
+    goals: [
+      { side: 'ataque', primary: true, kind: 'damage', target: 'Granelero en el puerto de Odesa', min: 0.3, text: 'Dañar el granelero del puerto de Odesa (≥ 30%)' },
+      { side: 'ataque', primary: false, kind: 'damage', target: 'Granelero en Chornomorsk', min: 0.3, text: 'Dañar el granelero de Chornomorsk (≥ 30%)' },
+      { side: 'defensa', primary: true, kind: 'protect', target: 'Granelero en el puerto de Odesa', text: 'Mantener operativo el granelero del puerto de Odesa' },
+      { side: 'defensa', primary: true, kind: 'protect', target: 'Granelero en Chornomorsk', text: 'Mantener operativo el granelero de Chornomorsk' },
+      { side: 'defensa', primary: false, kind: 'survive', target: 'Carguero en el puerto de Odesa', text: 'Que el carguero no sea destruido' }
+    ],
+    success: 'Defensa: los dos graneleros siguen operativos al terminar el ataque.',
+    failure: 'Defensa: algún granelero queda dañado.'
   },
   od_vacio: { map: 'odesa', name: 'Odesa · vacío', player: 'defensa', description: 'Mapa libre sobre el relieve real de Odesa y la costa del mar Negro (SRTM): ubicá objetivos, defensas, ataques y guerra electrónica.', objectives: [], defs: [], salvos: [], jams: [], goals: [] },
   kh_vacio: { map: 'kharkiv', name: 'Járkov · vacío', player: 'defensa', description: 'Mapa libre sobre el relieve real de Járkov (SRTM): ubicá objetivos, defensas, ataques y guerra electrónica.', objectives: [], defs: [], salvos: [], jams: [], goals: [] },

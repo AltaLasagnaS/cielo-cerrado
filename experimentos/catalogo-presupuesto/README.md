@@ -11,6 +11,8 @@ Trabajo original en una carpeta experimental independiente. No cambia `src/`, es
 - Prototipo puro e inmutable de presupuesto, disponibilidad, compras, cancelaciones, asignación previa, consumo y guardado por eventos.
 - Continuidad del mismo libro entre etapas: conserva recursos/cotizaciones/consumo, registra intervalo y no reembolsa adquisiciones comprometidas en misiones anteriores.
 - Proyección de briefing de preparación con tareas públicas, recursos propios y reportes fechados; no recibe verdad enemiga ni funciona como vista de combate.
+- Inventario físico por componente, munición tipada y cargas completas explícitas: conserva existencias, disparos y pérdidas, y exige componentes de lanzamiento operativos. Ver [el contrato](docs/COMPONENTES-E-INVENTARIO.md).
+- Evidencia separada para GEM-T, PAC-3 CRI/MSE y S-300PT/PT-1KD/PS: capacidades desconocidas siguen como `null`. Ver [el relevo de variantes](docs/RELEVO-DATOS-2026-10-05.md).
 - Pruebas sin dependencias y demostración ejecutable en Node.
 
 ## Ejecutar
@@ -36,7 +38,7 @@ Ninguna configuración nueva está habilitada en el simulador. Los parámetros f
 
 Las configuraciones son candidatos de investigación; la compatibilidad familiar no prueba la composición, disponibilidad nacional, fecha, carga mixta ni empleo remoto de una batería concreta.
 
-El prototipo de presupuesto no es una pantalla del juego ni un motor de logística: no aplica límites de contenedores físicos, daño, recargas durante misión, entregas, reparación o rutas. Eso requiere integración con Claude después de estabilizar sus cambios.
+El prototipo de presupuesto no es una pantalla del juego ni un motor de logística. El contrato de componentes valida capacidades y registra consecuencias autorizadas por el motor; no calcula daño, recargas durante misión, entregas, reparación ni rutas. La integración con el simulador sigue pendiente y requiere un solo dueño de la munición y del daño.
 
 Las cotizaciones se congelan al crear el plan. Los montos son enteros: `credits` identifica créditos ficticios; `USD-2025-minor`, por ejemplo, indica unidades monetarias menores con moneda/año, no permite mezclar ni convertir monedas. La exigencia de referencias es una comprobación de metadatos, no una auditoría automática de veracidad de precios.
 

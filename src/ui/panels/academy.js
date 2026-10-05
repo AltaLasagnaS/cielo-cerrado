@@ -1,3 +1,4 @@
+// @ts-check
 // Pestaña "Academia": índice de conceptos físicos y de radar que usa el motor.
 import { BANDS } from '../../data/index.js';
 import { esc } from '../../util/format.js';

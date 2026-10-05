@@ -1,3 +1,4 @@
+// @ts-check
 // No copiar al escenario números vacíos, fuera de rango o fraccionarios en campos enteros.
 // Se permite editar el texto; al salir del campo se recupera el último valor válido.
 export function bindNumber(input, get, set, { integer = false } = {}) {

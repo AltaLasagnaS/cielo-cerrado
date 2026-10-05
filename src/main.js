@@ -1,3 +1,4 @@
+// @ts-check
 // ===================== CIELO CERRADO =====================
 // Punto de entrada. Conecta las capas en este orden:
 //   data (catálogo) → physics (modelos) → sim (estado y bucle) → render (canvas) → ui (paneles)
@@ -31,7 +32,8 @@ import { openBriefing } from './ui/panels/scenario.js';
 import { startLoop } from './ui/loop.js';
 
 // Acceso desde la consola del navegador (depuración y herramientas externas).
-window.DEFENSES_REF = DEFENSES; window.CC_DATA = { SRC, UNC, OBS, CAL, PL, applyProbable, applySample, sampleU };
+const W = /** @type {any} */ (window);
+W.DEFENSES_REF = DEFENSES; W.CC_DATA = { SRC, UNC, OBS, CAL, PL, applyProbable, applySample, sampleU };
 
 // La simulación avisa a la interfaz a través de estos enganches.
 hooks.onLog = markLogDirty;
@@ -63,4 +65,4 @@ loadScenario('mb_noche');
 resize(); fitView();
 startLoop();
 
-window.__S = S; window.__dbg = { flat: () => { MAP.data = new Int16Array(MAP.data.length); MAP.key = 'flat'; MAP.max = 0; MAP.min = 0; buildBase(); }, computeCov, draw, addDef, addSalvo, addJam, startSim, step, resetSim, loadScenario, renderAll, openDebrief, openMonteCarlo, loadFromObject, saveScenario };
+W.__S = S; W.__dbg = { flat: () => { MAP.data = new Int16Array(MAP.data.length); MAP.key = 'flat'; MAP.max = 0; MAP.min = 0; buildBase(); }, computeCov, draw, addDef, addSalvo, addJam, startSim, step, resetSim, loadScenario, renderAll, openDebrief, openMonteCarlo, loadFromObject, saveScenario };

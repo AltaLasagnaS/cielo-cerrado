@@ -1,3 +1,4 @@
+// @ts-check
 // Pestaña "Guerra E.": ubicar interferidores, prenderlos/apagarlos y explicación del modelo.
 import { JAMMERS } from '../../data/index.js';
 import { esc } from '../../util/format.js';
@@ -8,12 +9,25 @@ import { setMode, toast } from '../modes.js';
 import { openFicha } from '../fichas.js';
 import { infoBtn } from '../academy.js';
 
+/**
+ * Rótulo de rol y bando de un equipo de guerra electrónica, en texto (no solo color): quién lo opera y
+ * contra quién trabaja. El bando del operador (side) no es el país de fabricación.
+ */
+export function roleTag(J) {
+  const who = J.side === 'RU' ? 'ruso' : J.side === 'UA' ? 'ucraniano' : 'ambos bandos';
+  const role = J.gnssJam ? 'anti-GNSS: desvía armas del atacante' : 'contra radares de la defensa';
+  return `${J.gnssJam ? 'Defensor' : 'Atacante'} · ${who} · ${role}`;
+}
+
+/** Rótulo corto para los botones: "Atac. RU", "Def. UA". */
+export const roleShort = J => (J.gnssJam ? 'Def.' : 'Atac.') + ' ' + (J.side === 'both' ? 'ambos' : J.side);
+
 export function renderEW() {
   const el = $('#tab-ew');
   el.innerHTML = `
-    <p class="hint">El efecto depende del <b>rol</b>, no de la bandera: los interferidores de radar degradan los radares de la defensa (herramienta del atacante) y los anti-GNSS desvían las armas del atacante (herramienta del defensor).</p><div class="grp"><h3>Interferidores y contramedidas</h3><div class="unitgrid">${Object.entries(JAMMERS).map(([k, j]) => `<button class="ub ew ${S.mode === 'placeJam' && S.placeType === k ? 'act' : ''}" data-k="${k}" title="${esc(j.name)}"><span>${esc(j.short)}</span><i data-info="${k}" role="button" aria-label="Ficha">i</i></button>`).join('')}</div></div>
+    <p class="hint">El efecto depende del <b>rol</b>, no de la bandera: los interferidores de radar degradan los radares de la defensa (herramienta del atacante) y los anti-GNSS desvían las armas del atacante (herramienta del defensor).</p><div class="grp"><h3>Interferidores y contramedidas</h3><div class="unitgrid">${Object.entries(JAMMERS).map(([k, j]) => `<button class="ub ew ${S.mode === 'placeJam' && S.placeType === k ? 'act' : ''}" data-k="${k}" title="${esc(j.name)} — ${roleTag(j)}"><span>${esc(j.short)}</span><small class="side">${roleShort(j)}</small><i data-info="${k}" role="button" aria-label="Ficha">i</i></button>`).join('')}</div></div>
     <label class="check"><input type="checkbox" id="optStr" ${S.strobes ? 'checked' : ''}> Mostrar "strobes" de interferencia (líneas violeta radar → jammer)</label>
-    <div class="grp"><h3>Desplegados</h3><div class="list" id="jList">${S.setup.jams.map(j => `<div class="item vio"><span class="t">${esc(JAMMERS[j.type].name)}</span><span class="s">${j.x.toFixed(1)}, ${j.y.toFixed(1)} km${JAMMERS[j.type].air ? ' · ' + j.alt + ' m' : ''}</span><span class="a"><button class="btn sm ${j.on ? 'on' : ''}" data-tog="${j.id}">${j.on ? 'Activo' : 'Apagado'}</button><button class="btn sm danger" data-del="${j.id}" aria-label="Borrar">✕</button></span></div>`).join('') || '<p class="hint">Ninguno.</p>'}</div></div>
+    <div class="grp"><h3>Desplegados</h3><div class="list" id="jList">${S.setup.jams.map(j => `<div class="item vio"><span class="t">${esc(JAMMERS[j.type].name)} <small class="side">${roleTag(JAMMERS[j.type])}</small></span><span class="s">${j.x.toFixed(1)}, ${j.y.toFixed(1)} km${JAMMERS[j.type].air ? ' · ' + j.alt + ' m' : ''}</span><span class="a"><button class="btn sm ${j.on ? 'on' : ''}" data-tog="${j.id}">${j.on ? 'Activo' : 'Apagado'}</button><button class="btn sm danger" data-del="${j.id}" aria-label="Borrar">✕</button></span></div>`).join('') || '<p class="hint">Ninguno.</p>'}</div></div>
     <div class="grp"><h3>Modelo ${infoBtn('noise')} ${infoBtn('lobes')} ${infoBtn('eccm')} ${infoBtn('gnss')}</h3><p class="hint">Jammer de ruido: reduce el alcance de detección como <b>R' = R·(1/(1+J/N))<sup>¼</sup></b>. J/N cae con la distancia al cuadrado, solo afecta radares de la misma banda, necesita línea de vista y es ~25 dB más débil fuera del lóbulo principal. Elegí barrera o ruido puntual (contra un radar) en el panel de selección del jammer. Cada radar tiene sus ECCM: agilidad de frecuencia (anula el puntual), lóbulos bajos y canceladores de los lóbulos laterales (no pueden con un jammer alineado con los blancos). La ficha del jammer muestra la distancia de quemado de cada radar. El anti-GNSS no toca radares: desvía armas que navegan por satélite.</p></div>`;
   el.onclick = e => {
     const inf = e.target.closest('[data-info]'); if (inf) { e.stopPropagation(); openFicha('jam', inf.dataset.info); return; }
