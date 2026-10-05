@@ -14,6 +14,7 @@ import { renderScenario } from './panels/scenario.js';
 import { autoPhase, AUTO_PHASES } from '../sim/pace.js';
 import { currentSpeed, renderTimeScale } from './controls.js';
 import { tickReplay } from './replay.js';
+import { campaignBattle, campaignStep } from './campaign.js';
 
 const clock = createSimClock();
 let runUnits = null;
@@ -32,7 +33,8 @@ function loop(now) {
   if (runUnits !== S.units) { clock.reset(); runUnits = S.units; }
   if (S.running) {
     if (S.auto) updateAutoPhase(now);
-    clock.advance(dtr * currentSpeed(), dt => { step(dt); return S.running; });
+    // una guardia de campaña avanza por su puente (lleva la munición en el libro de recursos de la campaña)
+    clock.advance(dtr * currentSpeed(), dt => { if (campaignBattle()) return campaignStep(); step(dt); return S.running; });
     $('#clock').textContent = fmtT(S.t);
   }
   if (S.replay) tickReplay(dtr);
