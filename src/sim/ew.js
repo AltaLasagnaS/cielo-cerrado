@@ -50,7 +50,7 @@ export function ewStep(t) {
       let best = Infinity, pair = null;
       // las marcaciones se cruzan solo entre unidades del mismo puesto de mando
       for (let a = 0; a < net.length; a++) for (let b = a + 1; b < net.length; b++) { if (cpOf(net[a].u) !== cpOf(net[b].u)) continue; const e = fixError(net[a], net[b], j.x, j.y); if (e < best) { best = e; pair = [net[a].u, net[b].u]; } }
-      if (best <= FIX_MAX_KM && (!j.fix || best < j.fix.err)) {
+      if (pair && best <= FIX_MAX_KM && (!j.fix || best < j.fix.err)) {
         if (!j.fix) log('l', JJ.short + ' ubicado por triangulación entre ' + uLabel(pair[0]) + ' y ' + uLabel(pair[1]) + ': error ≈ ' + best.toFixed(1) + ' km.');
         j.fix = { t, err: best };
       }

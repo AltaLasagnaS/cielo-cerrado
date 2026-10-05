@@ -58,7 +58,7 @@ function buildRaster(mode) {
   }
   // 2) color + sombreado
   const cv = document.createElement('canvas'); cv.width = RW; cv.height = RH;
-  const cx = cv.getContext('2d'), img = cx.createImageData(RW, RH), px = img.data;
+  const cx = /** @type {CanvasRenderingContext2D} */ (cv.getContext('2d')), img = cx.createImageData(RW, RH), px = img.data;
   // escala de tintas desde la tierra más baja del mapa (en mapas sin mar, como Kiev, todo está a
   // 80–200 m: sin esto saldría casi de un solo color). Con mar, la base es 0 m como siempre.
   const base = Math.max(0, MAP.min), maxE = Math.max(base + 50, MAP.max), step = MAP.cell / k, zf = mode === 'shade' ? 3 : 2;

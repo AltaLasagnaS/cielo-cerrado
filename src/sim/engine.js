@@ -247,6 +247,7 @@ function solveFor(u, th, t) {
  * derribo (costo del disparo / Pk); contra el resto, la mayor Pk. f = fracción del alcance del tiro
  * (solve), para contar la energía del misil.
  */
+/** @param {number | null} [f] */
 function shooterScore(u, th, t, f = null) {
   const pk = Math.max(0.01, calcPk(u, th, t, S.jamsLive, f));
   return th.cls === 'dron' ? -D(u).sam.cost / pk : pk;

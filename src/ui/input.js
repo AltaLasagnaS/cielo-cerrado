@@ -145,7 +145,7 @@ function showTip(sx, sy) {
     const by = Object.keys(th.det).filter(k => S.t - th.det[k] < 12).map(k => uLabel(S.units.find(u => u.id == k))).join(', ') || 'nadie';
     if (dv) {
       // solo lo que sabe la defensa: posición y velocidad estimadas por la pista, edad del último reporte
-      const c = contactOf(th, S.t);
+      const c = contactOf(th, S.t); if (!c) return;
       txt = 'Pista #' + th.id + (c.lost ? ' · perdida hace ' + Math.round(c.age) + ' s' : '') + '\nAlt: ' + Math.round(c.z) + ' m (' + Math.round(c.z - surf(c.x, c.y)) + ' AGL)\nVel: ' + kmh(c.v) + ' · ' + mach(c.v) + ' (estimada)\nDetectada por: ' + by;
     } else {
       const p = th.p, v = speedAt(th, S.t);

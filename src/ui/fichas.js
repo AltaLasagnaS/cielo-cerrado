@@ -16,6 +16,7 @@ const REF_RADARS = ['ewr', 'p18', 'patriot', 'irist', 'nasams', 'gepard', 's400'
 // Cada ventana registra cómo volver a abrirse (reopen); el historial guarda esas funciones.
 let current = null; const history = [];
 /** Abre la ventana. reopen = función que la vuelve a abrir (para el botón "Volver"). */
+/** @param {string} html @param {(() => any) | null} [reopen] */
 export function openModal(html, reopen = null) { $('#sheet').innerHTML = html; $('#modal').hidden = false; $('#sheet').scrollTop = 0; current = reopen; const x = $('#sheet .x'); if (x) x.onclick = closeModal; const bk = $('#sheet .back'); if (bk) bk.onclick = goBack; }
 /** Abre una ventana "encima" de la actual, guardando la actual para volver. */
 export function pushModal(html, reopen) { if (!$('#modal').hidden && current) history.push(current); openModal(html, reopen); }

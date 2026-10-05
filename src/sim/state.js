@@ -6,22 +6,22 @@
 
 export const S = {
   // escenario armado por el jugador
-  setup: { objs: [], defs: [], salvos: [], jams: [] },
+  setup: { objs: /** @type {any[]} */ ([]), defs: /** @type {any[]} */ ([]), salvos: /** @type {any[]} */ ([]), jams: /** @type {any[]} */ ([]) },
   // escenario cargado (data/scenarios.js) o null si es un relieve importado
-  scen: null,
+  scen: /** @type {any} */ (null),
   // opciones de mando (c2 = nivel de integración, ver data/c2.js; fireRange = disparar dentro de esa
   // fracción del alcance efectivo), clima (data/weather.js) y de visualización
-  c2: 'coordinada', doctrine: 'salva', fireRange: 1, weather: 'despejado', tod: 'noche', wxPlan: [], gateways: [], wind: { v: 0, from: 0 }, ignoreDecoys: false, showCov: true, covRef: 'kh101', covAgl: 50, strobes: true, relief: 'normal',
+  c2: 'coordinada', doctrine: 'salva', fireRange: 1, weather: 'despejado', tod: 'noche', wxPlan: /** @type {any[]} */ ([]), gateways: /** @type {any[]} */ ([]), wind: { v: 0, from: 0 }, ignoreDecoys: false, showCov: true, covRef: 'kh101', covAgl: 50, strobes: true, relief: 'normal',
   // reloj y control de la corrida
   t: 0, running: false, started: false, speed: 15, auto: true, autoPhase: 'calm',
   // corrida en curso
-  units: [], jamsLive: [], hoj: [], ewNext: 0, wxLive: null, wxIdx: 0, objs: [], pending: [], threats: [], ints: [], fx: [], impacts: [], log: [], stats: null,
+  units: /** @type {any[]} */ ([]), jamsLive: /** @type {any[]} */ ([]), hoj: /** @type {any[]} */ ([]), ewNext: 0, wxLive: /** @type {any} */ (null), wxIdx: 0, objs: /** @type {any[]} */ ([]), pending: /** @type {any[]} */ ([]), threats: /** @type {any[]} */ ([]), ints: /** @type {any[]} */ ([]), fx: /** @type {any[]} */ ([]), impacts: /** @type {any[]} */ ([]), log: /** @type {any[]} */ ([]), stats: /** @type {any} */ (null),
   // eventos clave para la línea de tiempo del debrief y detalle de cada arma que llegó al blanco
-  events: [], arrivals: [],
+  events: /** @type {any[]} */ ([]), arrivals: /** @type {any[]} */ ([]),
   // interfaz: selección, modo de edición, ruta en trazado y salva en preparación
-  sel: null, multi: [], mode: 'select', placeType: null, route: null, atk: null, measure: null,
+  sel: /** @type {any} */ (null), multi: /** @type {any[]} */ ([]), mode: 'select', placeType: /** @type {any} */ (null), route: /** @type {any} */ (null), atk: /** @type {any} */ (null), measure: /** @type {any} */ (null),
   // última cobertura calculada (grilla y % del mapa cubierto)
-  _cov: null, covStat: null
+  _cov: /** @type {any} */ (null), covStat: /** @type {any} */ (null)
 };
 
 /** Contadores de resultado de una corrida. Costos en millones de US$. */

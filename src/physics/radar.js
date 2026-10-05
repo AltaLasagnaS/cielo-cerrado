@@ -117,7 +117,7 @@ export function modeGain(j, u, r) {
  */
 export function jamJ(u, az, list) {
   const r = D(u).radar; if (!r || r.band === 'ACU' || r.band === 'OPT') return 0;
-  let J = 0; const bw = BANDS[r.band].bw, uz = antZ(u), sl = r.lowSL ? LOW_SIDELOBES : SIDELOBES, side = r.slc ? [] : null;
+  let J = 0; const bw = BANDS[r.band].bw, uz = antZ(u), sl = r.lowSL ? LOW_SIDELOBES : SIDELOBES, side = /** @type {number[] | null} */ (r.slc ? [] : null);
   for (const j of list) {
     const JJ = JAMMERS[j.type]; if (!j.on || j.dead || JJ.gnssJam || !JJ.bands.includes(r.band) || JAM_MODES[j.mode]?.coherent) continue;
     // Un interferidor de un bando no degrada sus propios radares. `both` queda reservado para
@@ -183,6 +183,7 @@ export function falseTracks(u, list) {
  * lo aplican quienes conocen la altura del blanco (sim/engine.js, physics/coverage.js).
  * Un sensor dañado durante la corrida (u.dmgRadar, daño funcional) ve ×UNIT_DAMAGE.radarR.
  */
+/** @param {any} [wx] clima (data/weather.js) o null */
 export function detR(u, th, J, ca = 1, wx = null) {
   const r = D(u).radar, dmg = u.dmgRadar ? UNIT_DAMAGE.radarR : 1;
   if (r.band === 'ACU') return r.R1 * (wx ? wx.acu : 1) * dmg;

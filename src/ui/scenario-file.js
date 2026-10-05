@@ -44,7 +44,7 @@ export function saveScenario() {
 export function loadFromObject(raw, fileName = 'archivo') {
   const res = validateScenario(raw);
   if (!res.ok) { showErrors(fileName, res.errors); return res; }
-  const { data } = res;
+  const { data } = res; if (!data || !data.map) return res;
   resetSim();
   if (data.map.builtin && MAP?.key !== data.map.key) applyMap(builtinMap(data.map.key));
   loadScenarioData(data);

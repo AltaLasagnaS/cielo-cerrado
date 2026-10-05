@@ -73,6 +73,7 @@ export const unitC2 = (u, c2) => (u.c2 && C2_ORDER.indexOf(u.c2) >= 0 && C2_ORDE
  * alerta de la red (todos los niveles salvo 'desconectada' y 'coordinada', que conserva el
  * comportamiento histórico) desde que llegó la alerta, si fue antes.
  */
+/** @param {any} [u] */
 export function reactionStart(th, t, c2, u = null) {
   const L = C2_LEVELS[c2];
   const cue = cueOf(th, cpOf(u));
@@ -225,6 +226,7 @@ export function solve(u, th, t, pct = 1) {
  * maniobra en el aire fino de la altura (×altitudePk, misma condición).
  * jams = interferidores activos de la corrida.
  */
+/** @param {number | null} [f] */
 export function calcPk(u, th, t, jams, f = null) {
   const sm = D(u).sam; let pk = sm.pk[th.cls] || 0;
   const p = th.p; if (!p) return 0;
