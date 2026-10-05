@@ -12,6 +12,7 @@ import { DEFENSES } from './defenses.js';
 import { JAMMERS } from './jammers.js';
 import { UNC } from './uncertainty.js';
 import { C2_LEVELS } from './c2.js';
+import { CLUTTER } from './clutter.js';
 
 export { WP, SRC, S_, SRC_REF } from './sources.js';
 export { BANDS } from './bands.js';
@@ -25,6 +26,7 @@ export { SCENARIOS } from './scenarios.js';
 export { C2_LEVELS, C2_DEFAULT, C2_ORDER, C2_NODES, c2FromNet } from './c2.js';
 export { DATALINKS, datalinksOf, commonDatalinks, canShareTrack } from './datalinks.js';
 export { WEATHER, WEATHER_DEFAULT } from './weather.js';
+export { CLUTTER } from './clutter.js';
 export { TARGET_TYPES, TARGET_STATUS, DAMAGED_AT, DAMAGE, UNIT_TARGET, UNIT_DAMAGE, UNIT_COMP_AT } from './targets.js';
 export { TERRAIN } from './terrain/index.js';
 
@@ -37,7 +39,7 @@ export function getPath(o, path) { return path.split('.').reduce((a, k) => (a ==
 export function setPath(o, path, v) { const ks = path.split('.'); let a = o; for (let i = 0; i < ks.length - 1; i++) { if (a[ks[i]] == null) a[ks[i]] = {}; a = a[ks[i]]; } a[ks[ks.length - 1]] = v; }
 
 /** Qué catálogo corresponde a cada sección de UNC. */
-export const CAT_OF = { thr: THREATS, def: DEFENSES, jam: JAMMERS, c2: C2_LEVELS };
+export const CAT_OF = { thr: THREATS, def: DEFENSES, jam: JAMMERS, c2: C2_LEVELS, clu: CLUTTER };
 
 /** Escribe el valor probable (u.p) de cada parámetro con incertidumbre sobre el catálogo. */
 export function applyProbable() {

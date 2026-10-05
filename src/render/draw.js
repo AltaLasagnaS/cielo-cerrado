@@ -62,7 +62,7 @@ export function draw() {
   // strobes de interferencia
   if (S.strobes) for (const u of units) {
     if (S.started && !u.alive) continue; const d = D(u); if (!d.radar || d.radar.band === 'ACU' || d.radar.band === 'OPT') continue;
-    for (const j of jams) { if (JAMMERS[j.type].gnssJam || !j.on) continue; const jaz = azOf(j.x - u.x, j.y - u.y); const J = jamJ(u, jaz, [j]); if (J < 0.2) continue;
+    for (const j of jams) { if (JAMMERS[j.type].gnssJam || !j.on || j.dead) continue; const jaz = azOf(j.x - u.x, j.y - u.y); const J = jamJ(u, jaz, [j]); if (J < 0.2) continue;
       const [a, b] = toS(u.x, u.y), [c2, d2] = toS(j.x, j.y); ctx.strokeStyle = `rgba(197,140,255,${clamp(0.25 + Math.log10(J + 1) * 0.3, 0.25, 0.9)})`; ctx.lineWidth = 1.2; ctx.setLineDash([8, 4]); ctx.beginPath(); ctx.moveTo(a, b); ctx.lineTo(c2, d2); ctx.stroke(); ctx.setLineDash([]); }
   }
   // rutas de salvas (setup)
@@ -74,8 +74,11 @@ export function draw() {
   for (const j of jams) {
     const J = JAMMERS[j.type], [sx, sy] = toS(j.x, j.y); const isSel = S.sel && S.sel.kind === 'jam' && S.sel.id === j.id;
     if (J.gnssJam) { ctx.strokeStyle = j.on ? 'rgba(197,140,255,.6)' : 'rgba(197,140,255,.2)'; ctx.setLineDash([3, 5]); ctx.beginPath(); ctx.arc(sx, sy, J.radius * V.s, 0, 7); ctx.stroke(); ctx.setLineDash([]); }
-    ctx.fillStyle = j.on ? '#c58cff' : '#5d4a75'; ctx.strokeStyle = isSel ? '#e6a53c' : '#1a1024'; ctx.lineWidth = isSel ? 2 : 1;
+    ctx.fillStyle = j.on && !j.dead ? '#c58cff' : '#5d4a75'; ctx.strokeStyle = isSel ? '#e6a53c' : '#1a1024'; ctx.lineWidth = isSel ? 2 : 1;
     ctx.beginPath(); for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4, rr = k % 2 ? 4 : 9; ctx.lineTo(sx + Math.cos(a) * rr, sy + Math.sin(a) * rr); } ctx.closePath(); ctx.fill(); ctx.stroke();
+    // ubicado por triangulación (sim/ew.js): círculo del error; derribado (home-on-jam): cruz
+    if (S.started && j.fix && !j.dead) { ctx.strokeStyle = 'rgba(230,165,60,.8)'; ctx.setLineDash([2, 3]); ctx.beginPath(); ctx.arc(sx, sy, Math.max(6, j.fix.err * V.s), 0, 7); ctx.stroke(); ctx.setLineDash([]); }
+    if (S.started && j.dead) { ctx.strokeStyle = '#ff5b4d'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(sx - 7, sy - 7); ctx.lineTo(sx + 7, sy + 7); ctx.moveTo(sx + 7, sy - 7); ctx.lineTo(sx - 7, sy + 7); ctx.stroke(); }
     labelAt(sx, sy, J.short, '#d8b8ff');
   }
   // unidades

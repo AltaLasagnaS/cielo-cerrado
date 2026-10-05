@@ -7,9 +7,8 @@ import { angDiff, azOf } from '../util/math.js';
 import { HORIZON_K } from './constants.js';
 import { surf, los } from './terrain.js';
 import { rainGamma, rainRange } from './weather.js';
-import { slopeAt } from './terrain-analysis.js';
-import { clamp } from '../util/math.js';
 import { PFA, noncoherentPd, integratedSnr50 } from './pulse-integration.js';
+import { clutterRcs } from './clutter.js';
 
 /**
  * RCS (m²) de una amenaza en una banda, vista con aspecto ca (ver aspectFactor; 1 = de frente).
@@ -120,7 +119,7 @@ export function jamJ(u, az, list) {
   const r = D(u).radar; if (!r || r.band === 'ACU' || r.band === 'OPT') return 0;
   let J = 0; const bw = BANDS[r.band].bw, uz = antZ(u), sl = r.lowSL ? LOW_SIDELOBES : SIDELOBES, side = r.slc ? [] : null;
   for (const j of list) {
-    const JJ = JAMMERS[j.type]; if (!j.on || j.dead || JJ.gnssJam || !JJ.bands.includes(r.band)) continue;
+    const JJ = JAMMERS[j.type]; if (!j.on || j.dead || JJ.gnssJam || !JJ.bands.includes(r.band) || JAM_MODES[j.mode]?.coherent) continue;
     // Un interferidor de un bando no degrada sus propios radares. `both` queda reservado para
     // equipos cuyo rol puede cambiar; no asumimos fratricidio como efecto normal.
     if (JJ.side !== 'both' && D(u).side !== 'both' && JJ.side === D(u).side) continue;
@@ -138,6 +137,30 @@ export function jamJ(u, az, list) {
   }
   if (side) { side.sort((a, b) => b - a); side.forEach((v, k) => { J += k < r.slc ? v * SLC_RESIDUAL : v; }); }
   return J * Math.pow(10, -(r.eccm || 0) / 10);
+}
+
+/**
+ * Falsos blancos que los interferidores DRFM (modo 'drfm', data/jammers.js#JAM_MODES) le meten por barrido
+ * al radar de u. Una copia coherente recibe toda la ganancia de procesamiento, así que su relación con el
+ * ruido es J = P · G / d² sin el descuento de eccm, y el radar la toma por un blanco si J ≥ SNR50:
+ *   lóbulo principal (el haz pasa por el jammer si está en su sector): G = 1;
+ *   lóbulos laterales cercanos: G = SIDELOBES.near (o LOW_SIDELOBES), salvo blanqueo (radar.slb).
+ * Cada jammer que pasa el umbral suma JAM_MODES.drfm.falseTargets. El cancelador (slc) no sirve: está
+ * hecho para ruido continuo, no para pulsos sueltos.
+ */
+export function falseTracks(u, list) {
+  const r = D(u).radar; if (!r || r.band === 'ACU' || r.band === 'OPT') return 0;
+  const M = JAM_MODES.drfm, uz = antZ(u), sl = r.lowSL ? LOW_SIDELOBES : SIDELOBES; let n = 0;
+  for (const j of list) {
+    const JJ = JAMMERS[j.type]; if (j.mode !== 'drfm' || !j.on || j.dead || JJ.gnssJam || !JJ.bands.includes(r.band)) continue;
+    if (JJ.side !== 'both' && D(u).side !== 'both' && JJ.side === D(u).side) continue;
+    const p = jamPos(j); if (!los(p[0], p[1], p[2], u.x, u.y, uz)) continue;
+    const d = Math.hypot(p[0] - u.x, p[1] - u.y, (p[2] - uz) / 1000) + 1, base = JJ.P / (d * d);
+    const main = inSector(u, azOf(p[0] - u.x, p[1] - u.y)) && base >= SNR50;
+    const side = !r.slb && base * sl.near >= SNR50;
+    if (main || side) n += M.falseTargets;
+  }
+  return n;
 }
 
 /**
@@ -231,22 +254,8 @@ export const pdRel = (m, k, pulses = 1) => {
   return k > 0 ? noncoherentPd(anchor * k, pulses, m) : 0;
 };
 
-/**
- * Clutter: un blanco a menos de CLUTTER_AGL m sobre el suelo se ve "contra el suelo" y compite con
- * su eco. Pérdida máxima (dB) según el procesamiento del radar (radar.mti): 'none' sin filtro de
- * blancos móviles, 'mti' filtro clásico, 'pd' pulso-Doppler. Escala con lo rasante del blanco y con
- * la rugosidad del suelo (pendiente local; el mar cuenta como moderado). Valores estimados.
- */
-export const CLUTTER_DB = { none: 20, mti: 10, pd: 3 };
-export const CLUTTER_AGL = 300;
 /** Notch Doppler: velocidad radial (m/s) por debajo de la cual el filtro borra el blanco. */
 export const NOTCH_MS = { mti: 15, pd: 8 };
-
-export function clutterLossDb(r, agl, x, y) {
-  const base = CLUTTER_DB[r.mti]; if (!base || agl >= CLUTTER_AGL) return 0;
-  const rough = surf(x, y) <= 0 ? 0.7 : clamp(0.5 + slopeAt(x, y) / 10, 0.5, 1.5);
-  return base * rough * (1 - Math.max(0, agl) / CLUTTER_AGL);
-}
 
 /** ¿El blanco cae en el notch Doppler del radar? (velocidad radial = |v|·cos del aspecto) */
 export function inNotch(r, th, ca) {
@@ -254,16 +263,29 @@ export function inNotch(r, th, ca) {
   return Math.hypot(v[0], v[1], v[2]) * Math.abs(ca) < thr;
 }
 
+/** SNR que da Pd = 50% (por pulso) con la fluctuación m y pulses pulsos integrados. */
+const snr50Of = (m, pulses) => (pulses > 1 ? integratedSnr50(pulses, m) : m === 3 ? SNR50_3 : SNR50);
+
 /**
  * Pd de un barrido del radar de u contra th a distancia rr (km), con alcance R (detR, ya con
- * interferencia y clima), a agl m sobre el suelo en (x, y) y con aspecto ca.
+ * interferencia y clima), a agl m sobre la superficie en (x, y) y con aspecto ca. wx: clima.
+ * El clutter que sobrevive al filtro (physics/clutter.js) se suma al ruido:
+ *   SINR = 1 / (1/SNR + C/σ)   con SNR = SNR50 · (R/rr)⁴ y C/σ = clutter residual / RCS del blanco.
+ * El umbral de detección contra el residuo es el mismo que contra ruido (factor de visibilidad del
+ * clutter = SNR50): se trata el residuo como ruido. Ver docs/FISICA.md §2.
  */
-export function pdScan(u, th, rr, R, agl, x, y, ca) {
+export function pdScan(u, th, rr, R, agl, x, y, ca, wx = null) {
   const r = D(u).radar; if (rr > PD_CUTOFF * R) return 0;
-  if (r.band !== 'OPT' && r.band !== 'ACU' && inNotch(r, th, ca)) return 0;
-  const loss = r.band === 'OPT' || r.band === 'ACU' ? 0 : clutterLossDb(r, agl, x, y);
-  const pulses = r.band === 'OPT' || r.band === 'ACU' ? 1 : r.integrationPulses;
-  return pdRel(swerlingOf(th), Math.pow(R / Math.max(rr, 1e-3), 4) / Math.pow(10, loss / 10), pulses);
+  const em = r.band !== 'OPT' && r.band !== 'ACU';
+  if (em && inNotch(r, th, ca)) return 0;
+  const pulses = em ? r.integrationPulses : 1, m = swerlingOf(th);
+  let k = Math.pow(R / Math.max(rr, 1e-3), 4);
+  if (em) {
+    const c = clutterRcs(r, u.x, u.y, antZ(u), rr, agl, x, y, wx), C = c.surface + c.rain;
+    const sig = rcsAt(th.T || th, r.band, ca);
+    if (C > 0 && sig > 0) k = 1 / (1 / k + snr50Of(m, pulses ?? 1) * C / sig);
+  }
+  return pdRel(m, k, pulses);
 }
 
 /** Horizonte de radar (km) entre una antena a hr metros y un blanco a ht metros, Tierra 4/3. */

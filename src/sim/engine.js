@@ -9,7 +9,7 @@ import { money } from '../util/format.js';
 import { nextId } from '../util/ids.js';
 import { rnd } from '../util/rng.js';
 import { surf, los } from '../physics/terrain.js';
-import { antZ, aspectCos, belowCeiling, detR, inSector, jamJ, pdScan, PD_CUTOFF, confirms, scanHistory } from '../physics/radar.js';
+import { antZ, aspectCos, belowCeiling, detR, inSector, jamJ, pdScan, PD_CUTOFF, confirms, scanHistory, falseTracks } from '../physics/radar.js';
 import { buildThreat, posAt, speedAt } from '../physics/kinematics.js';
 import { gnssNavError, crpaOverwhelmed } from '../physics/navigation.js';
 import { RADAR_GUID, isTBM, trackOK, reactionStart, solve, calcPk, effectiveC2 } from '../physics/engagement.js';
@@ -20,11 +20,12 @@ import { S, newStats } from './state.js';
 import { hooks } from './hooks.js';
 import { log, event, label, uLabel } from './log.js';
 import { recReset, recUnit, recObj } from './replay.js';
+import { ewStep } from './ew.js';
 
 /** Arma la corrida a partir de S.setup: copia unidades y jammers y programa todos los lanzamientos. */
 export function startSim() {
   S.units = S.setup.defs.map(d => ({ ...d, alive: true, hp: UNIT_TARGET.hp, dmgRadar: false, dmgLauncher: false, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
-  S.jamsLive = S.setup.jams.map(j => ({ ...j, _losMap: {} }));
+  S.jamsLive = S.setup.jams.map(j => ({ ...j, _losMap: {} })); S.hoj = []; S.ewNext = 0;
   S.objs = S.setup.objs.map(g => ({ ...g, hp: g.maxHp, status: 'operational', hits: 0, dmgBy: {} }));
   S.threats = []; S.ints = []; S.fx = []; S.impacts = []; S.stats = newStats(); S.log = []; S.events = []; S.arrivals = [];
   S.pending = []; recReset();
@@ -39,7 +40,7 @@ export function startSim() {
 }
 
 /** Vuelve al modo edición: descarta la corrida (el setup queda intacto). */
-export function resetState() { S.rec = null; S.replay = null; S.autoPhase = 'calm'; S.running = false; S.started = false; S.t = 0; S.units = []; S.jamsLive = []; S.objs = []; S.events = []; S.arrivals = []; S.pending = []; S.threats = []; S.ints = []; S.fx = []; S.impacts = []; S.stats = newStats(); S.log = []; }
+export function resetState() { S.rec = null; S.replay = null; S.autoPhase = 'calm'; S.running = false; S.started = false; S.t = 0; S.units = []; S.jamsLive = []; S.hoj = []; S.ewNext = 0; S.objs = []; S.events = []; S.arrivals = []; S.pending = []; S.threats = []; S.ints = []; S.fx = []; S.impacts = []; S.stats = newStats(); S.log = []; }
 
 /** Avanza la simulación dt segundos. */
 export function step(dt) {
@@ -90,6 +91,11 @@ export function step(dt) {
     if (!u.alive) continue; const d = D(u); if (!d.radar) continue;
     if (t < u.nextScan) continue; u.nextScan = t + d.radar.scan;
     const r = d.radar, uz = antZ(u), wx = WEATHER[S.weather];
+    // capacidad de seguimiento (radar.tracks): pistas abiertas + falsos blancos DRFM; una pista nueva no
+    // entra si está lleno (las abiertas se mantienen)
+    const keep = r.scan * 2 + 0.6, cap = r.tracks ?? Infinity, fake = cap < Infinity ? falseTracks(u, S.jamsLive) : 0;
+    let held = 0;
+    if (cap < Infinity) for (const th of S.threats) if (th.alive && t - (th.det[u.id] ?? -1e9) <= keep) held++;
     for (const th of S.threats) {
       if (!th.alive || !th.p) continue; const p = th.p;
       const dx = p.x - u.x, dy = p.y - u.y, dh = Math.hypot(dx, dy);
@@ -102,8 +108,8 @@ export function step(dt) {
         const ca = aspectCos(th, u.x, u.y, uz), agl = p.z - surf(p.x, p.y);
         if (rr > PD_CUTOFF * detR(u, th, 0, ca, wx) || !belowCeiling(r, wx, agl)) continue;
         const J = jamJ(u, az, S.jamsLive); const R = detR(u, th, J, ca, wx);
-        // probabilidad de detección del barrido: SNR con fluctuación Swerling 1, clutter y notch Doppler
-        const pd = pdScan(u, th, rr, R, agl, p.x, p.y, ca);
+        // probabilidad de detección del barrido: SNR con fluctuación Swerling, clutter (suelo, mar, lluvia) y notch Doppler
+        const pd = pdScan(u, th, rr, R, agl, p.x, p.y, ca, wx);
         const hit = pd > 0 && rnd() <= pd && los(u.x, u.y, uz, p.x, p.y, p.z);
         if (r.band === 'OPT') ok = hit;
         else {
@@ -112,7 +118,12 @@ export function step(dt) {
           // los barridos en que el blanco no llegó a sortearse (fuera del sector o muy lejos) cuentan como "no visto"
           const mnT = th.mnT || (th.mnT = {});
           const bits = scanHistory(th.mn[u.id] ?? 0, mnT[u.id], t, r.scan, hit); th.mn[u.id] = bits; mnT[u.id] = t;
-          ok = hit && (t - (th.det[u.id] ?? -1e9) <= r.scan * 2 + 0.6 || confirms(bits));
+          const open = t - (th.det[u.id] ?? -1e9) <= keep;
+          ok = hit && (open || confirms(bits));
+          if (ok && !open && cap < Infinity) {
+            if (held + fake >= cap) { ok = false; if (!u.satLog) { u.satLog = true; log('w', uLabel(u) + ' no puede abrir más pistas: ' + held + ' reales' + (fake ? ' y ' + fake + ' falsas (engaño DRFM)' : '') + ' llenan su capacidad de ' + cap + '.'); } }
+            else held++;
+          }
         }
       }
       if (ok) {
@@ -144,6 +155,8 @@ export function step(dt) {
       log('w', uLabel(u) + ' empieza a recargar (' + Math.round(D(u).sam.reloadS / 60) + ' min).');
     }
   }
+  // guerra electrónica de la defensa: triangulación de jammers y disparos home-on-jam
+  ewStep(t);
   // enfrentamientos (cada 1 s simulado por unidad)
   for (const u of S.units) {
     if (!u.alive || !D(u).sam || u.dmgLauncher || u.magLeft <= 0) continue;

@@ -15,7 +15,7 @@ export const S = {
   // reloj y control de la corrida
   t: 0, running: false, started: false, speed: 15, auto: true, autoPhase: 'calm',
   // corrida en curso
-  units: [], jamsLive: [], objs: [], pending: [], threats: [], ints: [], fx: [], impacts: [], log: [], stats: null,
+  units: [], jamsLive: [], hoj: [], ewNext: 0, objs: [], pending: [], threats: [], ints: [], fx: [], impacts: [], log: [], stats: null,
   // eventos clave para la línea de tiempo del debrief y detalle de cada arma que llegó al blanco
   events: [], arrivals: [],
   // interfaz: selección, modo de edición, ruta en trazado y salva en preparación
