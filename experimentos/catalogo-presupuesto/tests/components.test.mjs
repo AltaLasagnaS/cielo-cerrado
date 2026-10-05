@@ -25,7 +25,7 @@ function conserve(state) {
   for (const total of state.totals) {
     const current = state.stock.filter(row => row.ammunitionId === total.ammunitionId).reduce((sum, row) => sum + row.quantity, 0);
     const initial = state.initial.stock.filter(row => row.ammunitionId === total.ammunitionId).reduce((sum, row) => sum + row.quantity, 0);
-    assert.equal(current + total.expended + total.lost, initial);
+    assert.equal(current + total.expended + total.lost, initial + total.acquired);
   }
 }
 
@@ -94,4 +94,16 @@ test('unknown capacities, invalid identities, fractions, side and oversized tota
   assert.throws(() => applyInventoryEvent(state, event('loss', { fromId: 'depot', ammunitionId: 'alpha', quantity: 1, truth: {} })), /campos/);
   assert.throws(() => applyInventoryEvent(structuredClone(state), event('loss', { fromId: 'depot', ammunitionId: 'alpha', quantity: 1 })), /ajeno/);
   assert.ok(Object.isFrozen(state.stock));
+});
+
+test('authorized receipts add acquisitions once and never load an incompatible launcher directly', () => {
+  let state = createInventory(fixture());
+  const receipt = event('receipt', { toId: 'depot', ammunitionId: 'alpha', quantity: 5 });
+  state = applyInventoryEvent(state, receipt);
+  assert.equal(qty(state, 'depot', 'alpha'), 25);
+  assert.equal(state.totals[0].acquired, 5);
+  assert.equal(applyInventoryEvent(state, receipt), state);
+  assert.throws(() => applyInventoryEvent(state, event('receipt', { toId: 'first', ammunitionId: 'alpha', quantity: 2 })), /depósito/);
+  assert.deepEqual(loadInventory(saveInventory(state)), state);
+  conserve(state);
 });

@@ -1,6 +1,6 @@
 # Estado y relevo: leer primero
 
-Fecha de corte: 4 de octubre de 2026. Base: `9cafba0` de `main`. #42 incorporó el perfil del interceptor y #43 incorporó el paquete experimental. Los estados de documentos en `archivo/` son históricos, no estados actuales.
+Registro original: 4 de octubre de 2026, base `9cafba0`. Reconciliado el 5 de octubre contra `main` `0a77102` (merge #59), #61 experimental y continuación de perspectivas #64. #42 incorporó el perfil del interceptor y #43 el paquete experimental; #47 corrigió Kiev/solveTd y #49 la UX chica. Los estados de documentos en `archivo/` son históricos, no estados actuales.
 
 ## Qué pidió el usuario
 
@@ -20,6 +20,9 @@ Conservar todo lo conversado y el trabajo previo, mantener la estructura del pro
 - [NOTAS-USUARIO.md](NOTAS-USUARIO.md): contexto de las observaciones de interfaz.
 - [VERIFICACION.md](VERIFICACION.md): pruebas ejecutadas y límites concretos de lo comprobado.
 - [MENSAJE-PARA-CLAUDE.md](MENSAJE-PARA-CLAUDE.md): relevo listo para copiar, no enviado automáticamente.
+- [COMPONENTES-E-INVENTARIO.md](COMPONENTES-E-INVENTARIO.md): contrato ejecutable de munición tipada, dependencias y pérdidas.
+- [LOGISTICA-Y-CONTINUIDAD.md](LOGISTICA-Y-CONTINUIDAD.md): plazos, recursos, tránsito, reparación y demo nuevos, sin integración al juego.
+- [AUTONOMIA-2026-10-05.md](AUTONOMIA-2026-10-05.md): autorización de coordinación directa, entregas y dependencias actuales.
 - `archivo/`: contrato, matriz y entrega externos originales preservados, con advertencia histórica.
 
 ## Estado real de funcionalidades
@@ -27,11 +30,12 @@ Conservar todo lo conversado y el trabajo previo, mantener la estructura del pro
 | Área | Qué hay | Qué NO hay todavía |
 |---|---|---|
 | Catálogo | Referencias, fuentes y validadores; diez candidatos deshabilitados | Nuevas configuraciones activas o prestaciones/precios certificados |
-| Presupuesto | Libro inmutable, compra/cancelación, disponibilidad, preparación/consumo, replay | Pantalla económica en el juego, contenedores físicos o suministros en tránsito |
-| Continuidad | `begin-mission` conserva recursos, consumo, ofertas y tiempo entre misiones | Campaña jugable, bajas/daño, reparaciones, refuerzos ni cambio de escenario |
+| Presupuesto | Libro inicial y nueva autoridad logística con compras/plazos/cancelación declarada; una sola munición física | Pantalla económica conectada al combate, precios reales certificados |
+| Componentes/logística | Inventario tipado por depósito/lanzador, cargas explícitas, daño autorizado, tránsito, entregas, reparación con fondos/repuestos | Variantes nuevas activas, cálculo físico propio, trayectos geográficos, severidad de averías o autoridad del motor integrada |
+| Continuidad | Misiones experimentales conservan equipos/daño/munición/ofertas/fondos/repuestos/trabajos y reloj, con replay | Campaña jugable, objetivos progresivos, cambio de escenario o inteligencia persistente por bando |
 | Briefing propio | Proyección de preparación con recursos del libro y reportes autorizados fechados | Niebla de guerra del motor, IA limitada, contactos vivos ni debrief de combate |
-| Pedidos de interfaz | Registrados con aceptación y dependencias | Delete, multiselección, C2/doctrina por unidad ni nuevas etiquetas en la UI activa |
-| Física | Perfil existente en main; ninguna modificación desde esta entrega | Validación completa de todos los supuestos físicos o corrección del límite matemático reportado |
+| Pedidos de interfaz | Delete/enteros/explicación C2, regla, track, doctrina, Shift+clic, rótulos y C2 individual en main (#59) | Menú/tutorial, selección por rectángulo y auditoría de conocimiento por bando; continuación de perspectivas en #64 |
+| Física | `solveTd` corregido en main; investigación independiente #54–58. No se modifica desde esta entrega | Validación completa de todos los supuestos; los datos desconocidos no se completan artificialmente |
 
 Todo lo ejecutable de esta entrega vive en `experimentos/catalogo-presupuesto/`. No se importa desde `src/` y no cambia resultados, escenarios, golden o archivos generados del juego.
 
@@ -47,7 +51,7 @@ Una integración futura exige designar un único responsable para cada archivo c
 
 1. Revisar estos contratos con el panorama conocido por bando que implemente Claude.
 2. Completar una configuración del catálogo por vez, sin tocar consumidores hasta tener evidencia suficiente.
-3. Acordar una PR pequeña de interfaz para Delete/enteros/explicaciones, con pruebas de navegador; C2 por unidad y multiselección son features distintas.
+3. Mantener el reparto confirmado: Claude conecta el adaptador a `src/` después de actualizar #61; Codex continúa datos y menú/tutorial en experimentos. Regla/track/doctrina/Shift+clic ya están en main.
 4. Integrar una sola misión con briefing y recursos; después persistencia de componentes, logística e inteligencia para campaña.
 
 ## Cómo retomar sin perder contexto
