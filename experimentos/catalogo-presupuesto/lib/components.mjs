@@ -8,6 +8,7 @@ const fields = {
   transfer: ['fromId', 'toId', 'ammunitionId', 'quantity'],
   expend: ['fromId', 'ammunitionId', 'quantity'],
   loss: ['fromId', 'ammunitionId', 'quantity'],
+  receipt: ['toId', 'ammunitionId', 'quantity'],
   condition: ['componentId', 'condition']
 };
 
@@ -129,7 +130,7 @@ export function createInventory(raw) {
   const state = { version: 1, initial, sideId: initial.sideId, atSeconds: 0,
     components: initial.components.map(row => ({ ...row, condition: 'operational' })),
     stock: structuredClone(initial.stock),
-    totals: initial.ammunitionIds.map(ammunitionId => ({ ammunitionId, expended: 0, lost: 0 })), events: [] };
+    totals: initial.ammunitionIds.map(ammunitionId => ({ ammunitionId, acquired: 0, expended: 0, lost: 0 })), events: [] };
   if (!initial.locations.every(location => fits(state, location))) throw Error('Carga inicial no admitida');
   return keep(state);
 }
@@ -166,6 +167,16 @@ export function applyInventoryEvent(state, raw) {
         total.lost = safeSum(total.lost, row.quantity); row.quantity = 0;
       }
     }
+  } else if (event.kind === 'receipt') {
+    const destination = next.initial.locations.find(row => row.id === event.toId);
+    const total = next.totals.find(row => row.ammunitionId === event.ammunitionId);
+    if (destination?.kind !== 'depot' || !total) throw Error('Entrega requiere depósito y munición conocidos');
+    const initialTotal = next.initial.stock.filter(row => row.ammunitionId === event.ammunitionId)
+      .reduce((sum, row) => safeSum(sum, row.quantity), 0);
+    total.acquired = safeSum(total.acquired, event.quantity);
+    safeSum(initialTotal, total.acquired);
+    const row = entry(next, destination.id, event.ammunitionId);
+    row.quantity = safeSum(row.quantity, event.quantity);
   } else {
     const source = next.initial.locations.find(row => row.id === event.fromId);
     if (!source || !next.initial.ammunitionIds.includes(event.ammunitionId)) throw Error('Origen o munición inexistente');
@@ -178,7 +189,10 @@ export function applyInventoryEvent(state, raw) {
       row.quantity -= event.quantity;
       const destination = entry(next, target.id, event.ammunitionId);
       destination.quantity = safeSum(destination.quantity, event.quantity);
-      if (!fits(next, target)) throw Error('Carga mixta o capacidad no admitida');
+      if (!fits(next, target)) {
+        const error = Error('Carga mixta o capacidad no admitida');
+        error.code = 'LOAD_NOT_ADMITTED'; throw error;
+      }
     } else {
       if (event.kind === 'expend') {
         if (source.kind !== 'launcher') throw Error('No se dispara desde un depósito');

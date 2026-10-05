@@ -33,10 +33,24 @@ function uniqueList(rows, name, normalize) {
 export function buildPreparationBriefing(plan, input) {
   savePlan(plan); // Verify it is a state produced by the allocation ledger.
   if (plan.phase !== 'planning') throw new Error('El briefing de preparación requiere fase planning');
+  const briefing = normalizePreparationBriefing(input, { sideId: plan.sideId, missionId: plan.missions.at(-1).id });
+  return deepFreeze({
+    format: 'cielo-cerrado/preparation-briefing-prototype', version: 1, ...briefing,
+    resources: {
+      unit: plan.unit, balance: plan.balance,
+      inventory: Object.entries(plan.inventory).sort(([left], [right]) => left < right ? -1 : left > right ? 1 : 0)
+        .map(([itemId, stock]) => ({ itemId, reserve: stock.reserve, ready: stock.ready, consumed: stock.consumed }))
+    }
+  });
+}
+
+// Shared report/objective validation. Resource owners verify their own state
+// and phase before calling; this function never reads world truth.
+export function normalizePreparationBriefing(input, context) {
   record(input, ['sideId', 'missionId', 'role', 'title', 'issuedAtSeconds', 'objectives', 'intelligence'], 'briefing');
   const sideId = id(input.sideId, 'sideId');
   const missionId = id(input.missionId, 'missionId');
-  if (sideId !== plan.sideId || missionId !== plan.missions.at(-1).id) throw new Error('Briefing de otro bando o misión');
+  if (sideId !== context.sideId || missionId !== context.missionId) throw new Error('Briefing de otro bando o misión');
   if (!['attack', 'defence'].includes(input.role)) throw new Error('Rol de misión inválido');
   const issuedAtSeconds = integer(input.issuedAtSeconds, 'issuedAtSeconds');
   const objectives = uniqueList(input.objectives, 'objetivos', row => {
@@ -57,13 +71,7 @@ export function buildPreparationBriefing(plan, input) {
       deliveryDelaySeconds: integer(receivedAtSeconds - observedAtSeconds, 'demora') };
   });
   return deepFreeze({
-    format: 'cielo-cerrado/preparation-briefing-prototype', version: 1,
     sideId, missionId, role: input.role, title: text(input.title, 'title'), issuedAtSeconds,
-    objectives, intelligence,
-    resources: {
-      unit: plan.unit, balance: plan.balance,
-      inventory: Object.entries(plan.inventory).sort(([left], [right]) => left < right ? -1 : left > right ? 1 : 0)
-        .map(([itemId, stock]) => ({ itemId, reserve: stock.reserve, ready: stock.ready, consumed: stock.consumed }))
-    }
+    objectives, intelligence
   });
 }

@@ -6,9 +6,9 @@ Cada instancia pertenece a un bando. Sensores, lanzadores y control conservan id
 
 Las existencias se separan por munición y ubicación: depósito o lanzador concreto. Las cargas admitidas son patrones explícitos; una carga parcial debe ser subconjunto de **un mismo patrón**. Admitir A sola y B sola no admite automáticamente A+B. La configuración lleva fuente o etiqueta ficticia/legado; capacidad desconocida impide habilitar el lanzador. El adaptador de datos todavía necesita cerrar fuentes y parámetros físicos; no se activaron las variantes de investigación.
 
-Eventos: `transfer`, `expend`, `loss`, `condition`, con ID único, bando y tiempo simulado entero. Transferir no crea munición; disparar sólo puede salir de un lanzador operativo con sus dependencias disponibles. Destruir un lanzador contabiliza pérdida de su carga, sin tocar los otros o el depósito. Una reparación completada puede notificarse como recuperación de un componente deshabilitado, pero este contrato no la provoca ni descuenta recursos: el futuro proceso logístico debe autorizarla. Un componente destruido no se resucita.
+Eventos: `transfer`, `expend`, `loss`, `condition`, `receipt`, con ID único, bando y tiempo simulado entero. Transferir no crea munición; disparar sólo puede salir de un lanzador operativo con sus dependencias disponibles. Destruir un lanzador contabiliza pérdida de su carga, sin tocar los otros o el depósito. Una reparación completada puede notificarse como recuperación de un componente deshabilitado; el [contrato logístico](LOGISTICA-Y-CONTINUIDAD.md) autoriza su plazo y recursos. Un componente destruido no se resucita. `receipt` registra una adquisición entregada a un depósito, no carga directamente un lanzador ni representa por sí mismo autorización de compra.
 
-Se conserva, por cada tipo: existencias actuales + disparadas + perdidas = existencias iniciales. No se cobra al disparar: el contrato no maneja dinero. El futuro puente económico debe registrar adquisiciones/entregas y consumo de manera atómica, sin mantener dos cantidades físicas independientes.
+Se conserva, por cada tipo: existencias actuales + disparadas + perdidas = existencias iniciales + adquiridas. No se cobra al disparar: el contrato no maneja dinero. El puente logístico registra adquisiciones/entregas y consumo de manera atómica, sin mantener dos cantidades físicas independientes.
 
 Los eventos son cronológicos, inmutables, acotados e idempotentes ante reintento idéntico. Un ID repetido con otro contenido se rechaza. Guardado guarda inicial y eventos, y reconstruye; no confía en un snapshot mutable de existencias. No es autenticación ni protección contra inspección de un juego local; sólo los eventos autorizados del motor deben entrar aquí.
 
@@ -19,4 +19,4 @@ node --test experimentos/catalogo-presupuesto/tests/*.test.mjs
 node experimentos/catalogo-presupuesto/scripts/check.mjs
 ```
 
-(Pendiente de integración: eventos del motor por componente, adquisición/entrega económica atómica, migración del legado y consumidores/UI coordinados con Claude. No se cierra «componentes integrados» por existir este contrato.)
+(Pendiente de integración: eventos del motor por componente, migración del legado y consumidores/UI coordinados con Claude. No se cierra «componentes integrados» por existir este contrato.)

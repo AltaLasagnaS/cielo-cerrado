@@ -13,6 +13,7 @@ Trabajo original en una carpeta experimental independiente. No cambia `src/`, es
 - Proyección de briefing de preparación con tareas públicas, recursos propios y reportes fechados; no recibe verdad enemiga ni funciona como vista de combate.
 - Inventario físico por componente, munición tipada y cargas completas explícitas: conserva existencias, disparos y pérdidas, y exige componentes de lanzamiento operativos. Ver [el contrato](docs/COMPONENTES-E-INVENTARIO.md).
 - Evidencia separada para GEM-T, PAC-3 CRI/MSE y S-300PT/PT-1KD/PS: capacidades desconocidas siguen como `null`. Ver [el relevo de variantes](docs/RELEVO-DATOS-2026-10-05.md).
+- Contrato de [logística y continuidad](docs/LOGISTICA-Y-CONTINUIDAD.md), con fondos, pedidos, traslado en tránsito, reparación con repuestos y plazos, y conservación entre misiones. La [demo de navegador](demo/logistics.html) usa exclusivamente datos ficticios.
 - Pruebas sin dependencias y demostración ejecutable en Node.
 
 ## Ejecutar
@@ -38,7 +39,7 @@ Ninguna configuración nueva está habilitada en el simulador. Los parámetros f
 
 Las configuraciones son candidatos de investigación; la compatibilidad familiar no prueba la composición, disponibilidad nacional, fecha, carga mixta ni empleo remoto de una batería concreta.
 
-El prototipo de presupuesto no es una pantalla del juego ni un motor de logística. El contrato de componentes valida capacidades y registra consecuencias autorizadas por el motor; no calcula daño, recargas durante misión, entregas, reparación ni rutas. La integración con el simulador sigue pendiente y requiere un solo dueño de la munición y del daño.
+El prototipo de presupuesto no es una pantalla del juego. El contrato de componentes registra consecuencias autorizadas por el motor; no calcula daño. La extensión logística agenda traslados, entregas y reparación con plazos explícitos, pero no simula trayectos, personal, severidad de averías ni batallas. La integración con el simulador sigue pendiente y requiere un solo dueño de la munición, el reloj y el daño.
 
 Las cotizaciones se congelan al crear el plan. Los montos son enteros: `credits` identifica créditos ficticios; `USD-2025-minor`, por ejemplo, indica unidades monetarias menores con moneda/año, no permite mezclar ni convertir monedas. La exigencia de referencias es una comprobación de metadatos, no una auditoría automática de veracidad de precios.
 
@@ -58,7 +59,7 @@ Las observaciones nuevas sobre enteros, C2 por unidad, señuelos, selección mú
 
 Hay también una [nota matemática reproducible](docs/NOTA-INTERCEPTOR.md) sobre el main nuevo; no se modificó ese módulo ni se comprobó impacto en parámetros actuales.
 
-La prueba opcional de navegador se ejecuta con `node tests/demo.browser.mjs`, con el servidor estático y Playwright/Chromium disponibles. Acepta `PLAYWRIGHT_MODULE`, `CHROMIUM_PATH` y `TEST_URL`. La workflow mínima no instala navegadores: ejecuta las pruebas puras y los chequeos de catálogo/guardado; el smoke de navegador se verifica aparte.
+Las pruebas de navegador se ejecutan con `node tests/demo.browser.mjs` y `node tests/logistics.browser.mjs`, con el servidor estático y Playwright/Chromium disponibles. Aceptan `PLAYWRIGHT_MODULE`, `CHROMIUM_PATH` y `TEST_URL` / `TEST_LOGISTICS_URL`. La workflow experimental mantiene el chequeo puro y añade un trabajo separado de Chromium con la versión de Playwright fijada por la suite principal.
 
 `node tests/simulator-observations.browser.mjs` es un diagnóstico opcional del juego base servido desde la raíz; usa `TEST_SIM_URL` (por defecto puerto 8768). Confirma rechazo de fracciones en tres cantidades y borrado con Delete en preparación. La prueba completa de campos, ventanas, simulación y Monte Carlo está en `tests/browser/ux.browser.mjs` del repositorio principal.
 
