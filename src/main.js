@@ -30,6 +30,7 @@ import { openDebrief } from './ui/debrief.js';
 import { openMonteCarlo } from './ui/montecarlo.js';
 import { openBriefing } from './ui/panels/scenario.js';
 import { startLoop } from './ui/loop.js';
+import { openCampaign, campaignBattle, campaignStep } from './ui/campaign.js';
 
 // Acceso desde la consola del navegador (depuración y herramientas externas).
 const W = /** @type {any} */ (window);
@@ -37,7 +38,7 @@ W.DEFENSES_REF = DEFENSES; W.CC_DATA = { SRC, UNC, OBS, CAL, PL, applyProbable, 
 
 // La simulación avisa a la interfaz a través de estos enganches.
 hooks.onLog = markLogDirty;
-hooks.onEnd = () => { updatePlay(); renderStats(); openDebrief(); };
+hooks.onEnd = () => { updatePlay(); renderStats(); if (!campaignBattle()) openDebrief(); };   // la campaña abre su propio parte
 hooks.onUnitLost = schedCov;
 hooks.defenderView = isDefenderView;
 hooks.attackerView = isAttackerView;
@@ -56,14 +57,15 @@ $('#mcBtn').onclick = openMonteCarlo;
 
 const sc = $('#scenario');
 sc.innerHTML = Object.entries(SCENARIOS).map(([k, s]) => `<option value="${k}">${esc(s.name)}</option>`).join('');
-sc.onchange = e => { if (SCENARIOS[e.target.value]) { loadScenario(e.target.value); openBriefing(); } };
+sc.onchange = e => { if (campaignBattle()) { e.target.value = ''; openCampaign(); return; } if (SCENARIOS[e.target.value]) { loadScenario(e.target.value); openBriefing(); } };
 let fitted = false;
 new ResizeObserver(() => { resize(); if (!fitted) { fitView(); fitted = true; } }).observe($('#mapwrap'));
 // si cambia la densidad de píxeles (zoom del navegador, otro monitor) se rehace el canvas
 const watchDpr = () => matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`).addEventListener('change', () => { resize(); watchDpr(); }, { once: true });
 watchDpr();
+$('#campBtn').onclick = openCampaign;
 loadScenario('mb_noche');
 resize(); fitView();
 startLoop();
 
-W.__S = S; W.__dbg = { flat: () => { MAP.data = new Int16Array(MAP.data.length); MAP.key = 'flat'; MAP.max = 0; MAP.min = 0; buildBase(); }, computeCov, draw, addDef, addSalvo, addJam, startSim, step, resetSim, loadScenario, renderAll, openDebrief, openMonteCarlo, loadFromObject, saveScenario };
+W.__S = S; W.__dbg = { flat: () => { MAP.data = new Int16Array(MAP.data.length); MAP.key = 'flat'; MAP.max = 0; MAP.min = 0; buildBase(); }, computeCov, draw, addDef, addSalvo, addJam, startSim, step, resetSim, loadScenario, renderAll, openDebrief, openMonteCarlo, loadFromObject, saveScenario, openCampaign, campaignStep };
