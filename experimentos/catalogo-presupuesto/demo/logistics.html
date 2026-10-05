@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Cielo Cerrado · recursos entre misiones</title>
+  <style>
+    :root { color-scheme: dark; font: 16px/1.5 system-ui,sans-serif; background:#111921; color:#e7eef4; }
+    * { box-sizing:border-box; } body { max-width:1100px; margin:auto; padding:24px 16px 60px; }
+    h1 { font-size:clamp(1.5rem,4vw,2rem); } h2 { font-size:1.15rem; margin-top:0; }
+    a { color:#9ecfff; } .notice { border-left:3px solid #e9bd65; padding-left:14px; color:#dfd1ac; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr)); gap:16px; }
+    section { background:#1b2732; border:1px solid #354858; border-radius:10px; padding:18px; margin:16px 0; min-width:0; }
+    button,input,select,textarea { font:inherit; color:inherit; background:#26394a; border:1px solid #668398; border-radius:5px; padding:8px; }
+    button { cursor:pointer; } button:disabled { opacity:.4; cursor:not-allowed; } input { width:100px; }
+    .controls { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:12px 0; }
+    .muted { color:#b5c6d1; font-size:.9rem; } .scroll { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; } th,td { text-align:left; padding:8px 4px; border-bottom:1px solid #354858; font-size:.85rem; }
+    #status { min-height:1.5em; color:#94e1b6; } #status.error { color:#ffb4a8; }
+    textarea { width:100%; min-height:130px; font:.8rem monospace; margin:12px 0; }
+    #briefing-output { white-space:pre-wrap; overflow-wrap:anywhere; font-size:.9rem; }
+    :focus-visible { outline:3px solid #e9bd65; outline-offset:3px; }
+  </style>
+</head>
+<body>
+  <h1>Recursos entre misiones</h1>
+  <p class="notice">Laboratorio de campaña separado del simulador. Equipos Alpha/Beta, capacidades, créditos y plazos son ficticios. Permite revisar pérdidas y continuidad; todavía no representa una batalla ni una campaña jugable.</p>
+  <p><a href="./index.html">Presupuesto anterior</a> · <a href="../docs/LOGISTICA-Y-CONTINUIDAD.md">Contrato y límites</a></p>
+  <p>Fondos: <strong id="balance"></strong> créditos · tiempo: <strong id="clock"></strong> s · misión: <strong id="mission"></strong> · <span id="phase"></span></p>
+  <p id="status" role="status" aria-live="polite"></p>
+  <div class="controls">
+    <label for="quantity">Cantidad</label><input id="quantity" type="number" min="1" step="1" value="4">
+    <label for="ammunition">Munición</label><select id="ammunition"><option value="alpha">Alpha</option><option value="beta">Beta</option></select>
+  </div>
+  <div class="grid">
+    <section>
+      <h2>Suministro y recarga</h2>
+      <p>Alpha: 25 créditos por unidad, entrega en 300 s, cancelable antes de llegar. Beta: 15 créditos, 180 s, pedido firme. Existencias del proveedor limitadas.</p>
+      <div class="controls"><button id="order">Pedir suministro</button><button id="reload">Enviar al lanzador</button></div>
+      <p class="muted">Cada traslado tarda 60 s y cuesta 10 créditos. La carga queda en tránsito hasta llegar. Alpha y Beta no pueden mezclarse en este lanzador de ejemplo. Un retorno tarda otros 60 s y cuesta otros 10 créditos.</p>
+      <div class="scroll"><table><thead><tr><th>Ubicación</th><th>Alpha</th><th>Beta</th></tr></thead><tbody id="stock"></tbody></table></div>
+      <p>Adquiridas / disparadas / perdidas: <span id="totals"></span></p>
+    </section>
+    <section>
+      <h2>Equipos y mantenimiento</h2>
+      <label for="component">Componente</label><select id="component"><option value="radar">Radar</option><option value="launcher">Lanzador</option><option value="control">Control</option></select>
+      <div class="controls"><button id="disable">Averiar</button><button id="destroy">Destruir</button><button id="repair">Reparar</button></div>
+      <p class="muted">Reparación: 240 s, 50 créditos y un repuesto. Los componentes destruidos no se reparan. Un radar o control averiado bloquea el disparo; destruir el lanzador pierde su carga.</p>
+      <p>Repuestos: <span id="spares"></span></p>
+      <ul id="components"></ul>
+      <div class="controls"><button id="cargo-loss">Perder carga en tránsito</button><button id="fire">Registrar disparo</button></div>
+      <p class="muted">Estos botones introducen resultados para probar el contrato; no calculan impactos ni detección.</p>
+    </section>
+  </div>
+  <section>
+    <h2>Reloj y misiones</h2>
+    <div class="controls"><label for="seconds">Avanzar (s)</label><input id="seconds" type="number" min="1" step="1" value="60"><button id="advance">Avanzar tiempo</button></div>
+    <div class="controls"><button id="activate">Iniciar misión</button><button id="finish">Terminar misión</button><button id="next">Siguiente misión</button></div>
+    <p class="muted">Cambiar de misión conserva munición, daños, repuestos, pedidos y fondos. El paso de misión no entrega ni repara por sí solo. Esta demo controla el reloj manualmente; en el juego lo controlará el motor.</p>
+    <div class="scroll"><table><thead><tr><th>Trabajo</th><th>Tipo</th><th>Vence (s)</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="jobs"></tbody></table></div>
+  </section>
+  <section>
+    <h2>Briefing propio de preparación</h2>
+    <p class="muted">Objetivo e inteligencia ficticios y fechados. No incluye el plan enemigo. Los reportes envejecen desde su observación; no se vuelven recientes al cambiar de misión.</p>
+    <button id="briefing">Ver briefing propio</button>
+    <pre id="briefing-output" aria-label="Briefing propio"></pre>
+  </section>
+  <section>
+    <h2>Guardar y retomar</h2>
+    <div class="controls"><button id="save">Generar guardado</button><button id="restore">Restaurar</button><button id="reset">Reiniciar ejemplo</button></div>
+    <textarea id="saved" aria-label="Campaña guardada en JSON" spellcheck="false"></textarea>
+    <p class="muted">Reconstruye eventos y trabajos; no confía en un saldo o inventario editado como snapshot. Un archivo local sigue siendo inspeccionable y modificable.</p>
+  </section>
+  <script type="module" src="./logistics-app.mjs"></script>
+</body>
+</html>

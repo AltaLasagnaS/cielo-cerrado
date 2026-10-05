@@ -131,6 +131,22 @@ try {
   assert.ok(box.want >= 2, 'el rectángulo de prueba abarca varias defensas: ' + box.want);
   assert.equal(await page.evaluate(() => window.__S.multi.length), box.want, 'selecciona las defensas de adentro');
   assert.equal(await page.evaluate(() => window.__S.box), null, 'y borra el rectángulo');
+  // campaña (lógica de Codex, experimentos/catalogo-presupuesto): asignar, pedir y cargar munición, jugar la
+  // guardia en el mapa y llegar al parte de cierre y a la guardia siguiente
+  page.on('dialog', d => d.accept());
+  await page.click('#campBtn'); await page.click('#cCreate');
+  assert.match(await page.locator('#sheet').innerText(), /Preparar la guardia/i);
+  const camp = await page.$$eval('[data-order]', bs => bs.map(b => /** @type {HTMLElement} */ (b).dataset.order));
+  for (const id of camp) { await page.fill('#cq-' + id, '2'); await page.click(`[data-order="${id}"]`); }
+  while (await page.$('#cWait:not([disabled])')) await page.click('#cWait');
+  for (const id of camp) { await page.fill('#cq-' + id, '2'); await page.click(`[data-load="${id}"]`); }
+  while (await page.$('#cWait:not([disabled])')) await page.click('#cWait');
+  await page.click('#cStart');
+  assert.equal(await page.locator('#view').inputValue(), 'def', 'la guardia se juega en vista del defensor');
+  await page.evaluate(() => { let k = 0; while (window.__dbg.campaignStep() && k < 40000) k++; });
+  assert.match(await page.locator('#sheet').innerText(), /Parte de cierre/i);
+  await page.click('#cNext');
+  assert.match(await page.locator('#sheet').innerText(), /Segunda guardia/i, 'la campaña sigue con la guardia siguiente');
   assert.deepEqual(errors, []);
-  console.log('Interfaz: valores numéricos, atajos, Monte Carlo, Academia de pulsos, regla, selección múltiple y por rectángulo OK');
+  console.log('Interfaz: valores numéricos, atajos, Monte Carlo, Academia de pulsos, regla, selección múltiple y por rectángulo, campaña OK');
 } finally { await browser.close(); }

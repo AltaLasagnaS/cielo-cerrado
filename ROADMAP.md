@@ -26,8 +26,7 @@ Propuesta detallada, con orden, dificultad, datos y pruebas: [docs/investigacion
 ## Juego
 
 - Niebla de guerra más estricta: ver **Perspectivas por bando**.
-- Misión de un solo bando con briefing propio, presupuesto y medios finitos (etapa 3 del plan de Codex; prototipo en `experimentos/catalogo-presupuesto/`).
-- Campaña corta con estado persistente (etapa 6 del plan de Codex).
+- **Campaña experimental de Odesa en el juego** (botón Campaña; lógica de Codex en `experimentos/catalogo-presupuesto/`): dos guardias con presupuesto, munición pedida y cargada con plazos, daño y munición que se arrastran, guardado entre guardias. Falta: más misiones y campaña del atacante (Codex), configuraciones y precios con evidencia, traslados por el mapa, reporte de daño incierto para el atacante y restaurar una guardia a mitad de camino.
 - Corredor del mar Negro, segunda parte: barcos que navegan por el corredor (ya están los barcos amarrados como objetivo y el escenario `od_corredor`). *Espera movilidad* (etapa 5 del plan de Codex).
 - Plataformas aéreas propias: patrullas de cazas como interceptores. *El plan de Codex las deja para el final* (etapa 7).
 - Idioma inglés (los textos ya están separados de la lógica en buena parte). Baja prioridad.

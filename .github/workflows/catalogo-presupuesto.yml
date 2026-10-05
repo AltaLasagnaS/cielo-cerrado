@@ -30,3 +30,33 @@ jobs:
         run: node experimentos/catalogo-presupuesto/scripts/demo.mjs
       - name: Continuidad de recursos y briefing propios
         run: node experimentos/catalogo-presupuesto/scripts/campaign-demo.mjs
+
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: tests/browser/package-lock.json
+      - name: Playwright aislado con versión fijada
+        run: npm ci --prefix tests/browser
+      - name: Chromium
+        working-directory: tests/browser
+        run: npx --no-install playwright install --with-deps chromium
+      - name: Presupuesto y logística en el navegador
+        env:
+          PLAYWRIGHT_MODULE: ${{ github.workspace }}/tests/browser/node_modules/playwright/index.mjs
+        run: |
+          python -m http.server --bind 127.0.0.1 8766 --directory experimentos/catalogo-presupuesto > /tmp/experimental-http.log 2>&1 &
+          EXPERIMENT_SERVER_PID=$!
+          trap 'kill "$EXPERIMENT_SERVER_PID" 2>/dev/null || true' EXIT
+          for attempt in {1..100}; do
+            if curl --fail --silent http://127.0.0.1:8766/demo/ > /dev/null; then break; fi
+            sleep 0.2
+          done
+          node experimentos/catalogo-presupuesto/tests/demo.browser.mjs
+          node experimentos/catalogo-presupuesto/tests/logistics.browser.mjs
+          node experimentos/catalogo-presupuesto/tests/ports.browser.mjs

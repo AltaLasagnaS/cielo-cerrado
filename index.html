@@ -517,6 +517,7 @@ table.t.mc td.pc{white-space:nowrap}
       <input id="loadScen" type="file" accept=".json,application/json" hidden>
       <label class="btn" for="hgt" title="Cargar un tile SRTM .hgt descomprimido">Cargar relieve .hgt</label>
       <input id="hgt" type="file" accept=".hgt" hidden>
+      <button id="campBtn" class="btn" title="Campaña experimental: varias guardias seguidas con presupuesto, munición limitada y daño que se arrastra">Campaña</button>
       <button id="helpBtn" class="btn">Cómo se usa</button>
     </div>
   </header>
@@ -725,7 +726,7 @@ table.t.mc td.pc{white-space:nowrap}
     billingsley: ['Billingsley, Low-Angle Radar Land Clutter (2002), resumido en Greco, "Radar Clutter Modeling" (Univ. de Pisa): σ°F⁴ espacial mediano ≈ −30 dB en 37 sitios rurales, VHF a banda X', "https://docenti.ing.unipi.it/m.greco/esami_lab/Radar/Clutter_modeling.pdf"]
   };
   var S_ = (...ids) => ids;
-  var SRC_REF = (id) => SRC[id] || (id.startsWith("wp:") ? WP(id.slice(3)) : [id, ""]);
+  var SRC_REF = (id2) => SRC[id2] || (id2.startsWith("wp:") ? WP(id2.slice(3)) : [id2, ""]);
 
   // src/data/threats.js
   var CLS_NAME = { dron: "Dron de ataque / señuelo", crucero: "Misil de crucero subsónico", supersonico: "Misil supersónico", balistico: "Balístico / aerobalístico", hiper: "Hipersónico (planeo/crucero)" };
@@ -2317,11 +2318,11 @@ table.t.mc td.pc{white-space:nowrap}
       sources: ["ms_lessons", "nv_l16"]
     }
   };
-  function gatewaysInto(key) {
+  function gatewaysInto(key2) {
     const out = [];
-    for (const [id, G] of Object.entries(GATEWAYS)) {
-      if (G.a === key) out.push({ from: G.b, G, id });
-      else if (G.b === key) out.push({ from: G.a, G, id });
+    for (const [id2, G] of Object.entries(GATEWAYS)) {
+      if (G.a === key2) out.push({ from: G.b, G, id: id2 });
+      else if (G.b === key2) out.push({ from: G.a, G, id: id2 });
     }
     return out;
   }
@@ -3315,9 +3316,9 @@ table.t.mc td.pc{white-space:nowrap}
     for (let q = 0; q < n2; q++) out[q] = bin.charCodeAt(q >> 3) >> (q & 7) & 1;
     return out;
   }
-  function builtinMap(key) {
-    const t = TERRAIN[key];
-    return { key, name: t.name, W: t.W, H: t.H, cell: t.cell, latN: t.latN, lonW: t.lonW, dlat: t.dlat, dlon: t.dlon, places: t.places.filter((p) => p[1] >= 0 && p[1] <= t.W * t.cell / 1e3 && p[2] >= 0 && p[2] <= t.H * t.cell / 1e3), data: decodeB64(t.b64), water: t.water ? decodeBits(t.water, t.W * t.H) : null };
+  function builtinMap(key2) {
+    const t = TERRAIN[key2];
+    return { key: key2, name: t.name, W: t.W, H: t.H, cell: t.cell, latN: t.latN, lonW: t.lonW, dlat: t.dlat, dlon: t.dlon, places: t.places.filter((p) => p[1] >= 0 && p[1] <= t.W * t.cell / 1e3 && p[2] >= 0 && p[2] <= t.H * t.cell / 1e3), data: decodeB64(t.b64), water: t.water ? decodeBits(t.water, t.W * t.H) : null };
   }
   function isWater(x, y) {
     const w = MAP?.water;
@@ -3742,8 +3743,8 @@ table.t.mc td.pc{white-space:nowrap}
   }
   function integratedSnr50(pulses = 1, model = 1) {
     validate(pulses, model);
-    const key = `${pulses}/${model}`;
-    if (anchors.has(key)) return anchors.get(key);
+    const key2 = `${pulses}/${model}`;
+    if (anchors.has(key2)) return anchors.get(key2);
     let lo = 0, hi = 64;
     for (let j = 0; j < 80; j++) {
       const mid = (lo + hi) / 2;
@@ -3751,7 +3752,7 @@ table.t.mc td.pc{white-space:nowrap}
       else hi = mid;
     }
     const value = (lo + hi) / 2;
-    anchors.set(key, value);
+    anchors.set(key2, value);
     return value;
   }
 
@@ -3952,12 +3953,12 @@ table.t.mc td.pc{white-space:nowrap}
       SEEN = /* @__PURE__ */ new Map();
       SEEN_MAP = MAP;
     }
-    const key = ux.toFixed(2) + "," + uy.toFixed(2) + "," + uz.toFixed(0) + "," + Math.round(x * 5) + "," + Math.round(y * 5);
-    let v = SEEN.get(key);
+    const key2 = ux.toFixed(2) + "," + uy.toFixed(2) + "," + uz.toFixed(0) + "," + Math.round(x * 5) + "," + Math.round(y * 5);
+    let v = SEEN.get(key2);
     if (v === void 0) {
       if (SEEN.size > 2e5) SEEN.clear();
       v = los(ux, uy, uz, x, y, zs + LOS_MARGIN + 1);
-      SEEN.set(key, v);
+      SEEN.set(key2, v);
     }
     return v;
   }
@@ -4066,7 +4067,7 @@ table.t.mc td.pc{white-space:nowrap}
     if (j.target !== u.id) return 0;
     return r.agile ? M.agileGain : M.gain;
   }
-  function jamJ(u, az, list) {
+  function jamJ(u, az, list4) {
     const r = D(u).radar;
     if (!r || r.band === "ACU" || r.band === "OPT") return 0;
     let J = 0;
@@ -4074,17 +4075,17 @@ table.t.mc td.pc{white-space:nowrap}
       /** @type {number[] | null} */
       r.slc ? [] : null
     );
-    for (const j of list) {
+    for (const j of list4) {
       const JJ = JAMMERS[j.type];
       if (!j.on || j.dead || JJ.gnssJam || !JJ.bands.includes(r.band) || JAM_MODES[j.mode]?.coherent) continue;
       if (JJ.side !== "both" && sideOf(u) !== "both" && JJ.side === sideOf(u)) continue;
-      const key = u.id + "|" + u.x.toFixed(2) + "|" + u.y.toFixed(2) + "|" + j.x.toFixed(2) + "|" + j.y.toFixed(2) + "|" + (u.mast || 0) + "|" + (u.alt || 0) + "|" + (j.alt || 0);
+      const key2 = u.id + "|" + u.x.toFixed(2) + "|" + u.y.toFixed(2) + "|" + j.x.toFixed(2) + "|" + j.y.toFixed(2) + "|" + (u.mast || 0) + "|" + (u.alt || 0) + "|" + (j.alt || 0);
       j._losMap = j._losMap || {};
-      if (j._losMap[key] === void 0) {
+      if (j._losMap[key2] === void 0) {
         const p2 = jamPos(j);
-        j._losMap[key] = los(p2[0], p2[1], p2[2], u.x, u.y, uz);
+        j._losMap[key2] = los(p2[0], p2[1], p2[2], u.x, u.y, uz);
       }
-      if (!j._losMap[key]) continue;
+      if (!j._losMap[key2]) continue;
       const p = jamPos(j);
       const dkm = Math.hypot(p[0] - u.x, p[1] - u.y, (p[2] - uz) / 1e3) + 1;
       const jaz = azOf(p[0] - u.x, p[1] - u.y), dd = angDiff(jaz, az);
@@ -4109,12 +4110,12 @@ table.t.mc td.pc{white-space:nowrap}
     const d = Math.hypot(p[0] - u.x, p[1] - u.y, (p[2] - uz) / 1e3) + 1, J = JAMMERS[j.type].P / (d * d);
     return inSector(u, azOf(p[0] - u.x, p[1] - u.y)) ? J : -J;
   }
-  function falseTracks(u, list) {
+  function falseTracks(u, list4) {
     const r = D(u).radar;
     if (!r || r.band === "ACU" || r.band === "OPT") return 0;
     const M = JAM_MODES.drfm, uz = antZ(u), sl = r.lowSL ? LOW_SIDELOBES : SIDELOBES;
     let n2 = 0;
-    for (const j of list) {
+    for (const j of list4) {
       const JJ = JAMMERS[j.type];
       if (j.mode !== "drfm" || !j.on || j.dead || JJ.gnssJam || !JJ.bands.includes(r.band)) continue;
       if (JJ.side !== "both" && sideOf(u) !== "both" && JJ.side === sideOf(u)) continue;
@@ -4381,10 +4382,10 @@ table.t.mc td.pc{white-space:nowrap}
   // src/physics/track.js
   var VEL_GAP = 12;
   var PRED_FLOOR = 5;
-  function trackVel(th, keys = null) {
-    if (keys) {
+  function trackVel(th, keys2 = null) {
+    if (keys2) {
       let best = null;
-      for (const k of keys) {
+      for (const k of keys2) {
         const o = th.obs?.[k], v = o && pairVel(o.s, o.q);
         if (v && (!best || v.s.t > best.s.t)) best = v;
       }
@@ -4392,9 +4393,9 @@ table.t.mc td.pc{white-space:nowrap}
     }
     return pairVel(th.seen, th.seenPrev);
   }
-  function lastSeen(th, keys) {
+  function lastSeen(th, keys2) {
     let best = null;
-    for (const k of keys) {
+    for (const k of keys2) {
       const s = th.obs?.[k]?.s;
       if (s && (!best || s.t > best.t)) best = s;
     }
@@ -4498,43 +4499,43 @@ table.t.mc td.pc{white-space:nowrap}
   var RADAR_GUID = ["TVM", "SARH", "mando", "cañón"];
   var isTBM = (th) => th.cls === "balistico" || th.cls === "hiper";
   function trackOK(u, th, t, c2, gws = []) {
-    const d = D(u), L = C2_LEVELS[c2], own = d.radar ? t - (th.det[u.id] ?? -1e9) <= d.radar.scan * 2 + 0.6 : false;
+    const d = D(u), L = C2_LEVELS[c2], own2 = d.radar ? t - (th.det[u.id] ?? -1e9) <= d.radar.scan * 2 + 0.6 : false;
     const compatible = netPk(u, th, t, c2, gws) > 0;
     const legacy = !th.net && th.netFirst != null && t - th.netFirst >= L.lag && t - th.lastNet <= L.window;
     const netT = u.link !== false && (L.share === "track" || L.share === "fire") && (compatible || legacy);
-    if (d.sam.guid === "cañón") return own;
-    if (RADAR_GUID.includes(d.sam.guid)) return own || L.share === "fire" && netT;
+    if (d.sam.guid === "cañón") return own2;
+    if (RADAR_GUID.includes(d.sam.guid)) return own2 || L.share === "fire" && netT;
     if (d.sam.guid === "operador") return netT;
-    return own || netT;
+    return own2 || netT;
   }
   var ownKey = (u) => "u" + u.id;
   function trackKeys(u, th, t, c2, gws = []) {
-    const d = D(u), L = C2_LEVELS[c2], g = d.sam.guid, keys = [];
-    const own = d.radar ? t - (th.det[u.id] ?? -1e9) <= d.radar.scan * 2 + 0.6 : false;
-    if (own && g !== "operador") keys.push(ownKey(u));
+    const d = D(u), L = C2_LEVELS[c2], g = d.sam.guid, keys2 = [];
+    const own2 = d.radar ? t - (th.det[u.id] ?? -1e9) <= d.radar.scan * 2 + 0.6 : false;
+    if (own2 && g !== "operador") keys2.push(ownKey(u));
     const netOK = u.link !== false && g !== "cañón" && (L.share === "fire" || L.share === "track" && !RADAR_GUID.includes(g));
-    if (!netOK) return keys;
+    if (!netOK) return keys2;
     const fresh = (n2, lag) => n2 && n2.first != null && t - n2.first >= L.lag + lag && t - n2.last <= L.window;
     const cp = cpOf(u);
-    for (const key of datalinksOf(d)) {
-      if (fresh(th.net?.[netKey(key, cp)], 0)) keys.push(netKey(key, cp));
-      for (const { from, G, id } of gatewaysInto(key)) if (gws.includes(id) && fresh(th.net?.[netKey(from, cp)], G.gwLag)) keys.push(netKey(from, cp));
+    for (const key2 of datalinksOf(d)) {
+      if (fresh(th.net?.[netKey(key2, cp)], 0)) keys2.push(netKey(key2, cp));
+      for (const { from, G, id: id2 } of gatewaysInto(key2)) if (gws.includes(id2) && fresh(th.net?.[netKey(from, cp)], G.gwLag)) keys2.push(netKey(from, cp));
     }
-    return keys;
+    return keys2;
   }
   function netPk(u, th, t, c2, gws = []) {
     const L = C2_LEVELS[c2];
     let best = 0;
     const fresh = (n2, lag) => n2 && n2.first != null && t - n2.first >= L.lag + lag && t - n2.last <= L.window;
     const cp = cpOf(u);
-    for (const key of datalinksOf(D(u))) {
-      if (fresh(th.net?.[netKey(key, cp)], 0)) return 1;
-      for (const { from, G, id } of gatewaysInto(key)) if (gws.includes(id) && fresh(th.net?.[netKey(from, cp)], G.gwLag)) best = Math.max(best, G.gwPk);
+    for (const key2 of datalinksOf(D(u))) {
+      if (fresh(th.net?.[netKey(key2, cp)], 0)) return 1;
+      for (const { from, G, id: id2 } of gatewaysInto(key2)) if (gws.includes(id2) && fresh(th.net?.[netKey(from, cp)], G.gwLag)) best = Math.max(best, G.gwPk);
     }
     return best;
   }
   var cpOf = (u) => u?.cp || "";
-  var netKey = (key, cp) => cp ? key + "@" + cp : key;
+  var netKey = (key2, cp) => cp ? key2 + "@" + cp : key2;
   var cueOf = (th, cp) => cp ? th.cueCp?.[cp] ?? null : th.cueFirst;
   var unitC2 = (u, c2) => u.c2 && C2_ORDER.indexOf(u.c2) >= 0 && C2_ORDER.indexOf(u.c2) < C2_ORDER.indexOf(c2) ? u.c2 : c2;
   function reactionStart(th, t, c2, u = null) {
@@ -4583,12 +4584,12 @@ table.t.mc td.pc{white-space:nowrap}
     const nv = Math.hypot(vx, vy, vz), nl = Math.hypot(lx, ly, lzk);
     return nv && nl ? (vx * lx + vy * ly + vz * lzk) / (nv * nl) : 1;
   }
-  function solve(u, th, t, pct3 = 1, keys = null) {
+  function solve(u, th, t, pct3 = 1, keys2 = null) {
     const sm = D(u).sam, tbm = isTBM(th);
     const maxR = tbm ? sm.maxRtbm : sm.maxR;
     const lz = surf(u.x, u.y) + 2;
     const P = profileOf(sm);
-    const vel = tbm ? null : trackVel(th, keys);
+    const vel = tbm ? null : trackVel(th, keys2);
     if (!tbm && !vel) return null;
     const at = (tt) => tbm ? posAt(th, tt) : predictAt(vel, tt);
     const cosAt = (tt, p) => tbm ? closingCos(th, tt, p, u.x, u.y, lz) : velCos(vel, p, u.x, u.y, lz);
@@ -4690,9 +4691,9 @@ table.t.mc td.pc{white-space:nowrap}
   function uLabel(u) {
     return u.name || D(u).short;
   }
-  function event(text, key) {
-    if (key && S.events.some((e) => e.key === key)) return;
-    S.events.push({ t: S.t, text, key: key || null });
+  function event(text3, key2) {
+    if (key2 && S.events.some((e) => e.key === key2)) return;
+    S.events.push({ t: S.t, text: text3, key: key2 || null });
   }
 
   // src/sim/replay.js
@@ -4855,10 +4856,10 @@ table.t.mc td.pc{white-space:nowrap}
     if (th.seen && t - th.seen.t > 0.5) th.seenPrev = th.seen;
     th.seen = { x: p.x, y: p.y, z: p.z, t, by };
   }
-  function noteObs(th, key, t) {
+  function noteObs(th, key2, t) {
     const p = th.p;
     if (!p) return;
-    const m = th.obs || (th.obs = {}), o = m[key] || (m[key] = { s: null, q: null });
+    const m = th.obs || (th.obs = {}), o = m[key2] || (m[key2] = { s: null, q: null });
     if (o.s && t - o.s.t > 0.5) o.q = o.s;
     o.s = { x: p.x, y: p.y, z: p.z, t };
   }
@@ -5019,11 +5020,11 @@ table.t.mc td.pc{white-space:nowrap}
       u.nextScan = t + d.radar.scan;
       if (isEmitter(d.radar)) u.emitFrom ?? (u.emitFrom = t);
       const r = d.radar, uz = antZ(u), wx = wxNow();
-      const keep = r.scan * 2 + 0.6, cap = r.tracks ?? Infinity, fake = falseTracks(u, S.jamsLive);
+      const keep4 = r.scan * 2 + 0.6, cap = r.tracks ?? Infinity, fake = falseTracks(u, S.jamsLive);
       u.fake = fake;
       let held = 0;
       if (cap < Infinity) {
-        for (const th of S.threats) if (th.alive && t - (th.det[u.id] ?? -1e9) <= keep) held++;
+        for (const th of S.threats) if (th.alive && t - (th.det[u.id] ?? -1e9) <= keep4) held++;
       }
       for (const th of S.threats) {
         if (!th.alive || !th.p) continue;
@@ -5048,7 +5049,7 @@ table.t.mc td.pc{white-space:nowrap}
             const bits = scanHistory(th.mn[u.id] ?? 0, mnT[u.id], t, r.scan, hit);
             th.mn[u.id] = bits;
             mnT[u.id] = t;
-            const open = t - (th.det[u.id] ?? -1e9) <= keep;
+            const open = t - (th.det[u.id] ?? -1e9) <= keep4;
             ok = hit && (open || confirms(bits));
             if (ok && !open && cap < Infinity) {
               if (held + fake >= cap) {
@@ -5085,8 +5086,8 @@ table.t.mc td.pc{white-space:nowrap}
               if (m[cp] == null) m[cp] = t;
             }
           }
-          if (u.link !== false && inNet) for (const key of datalinksOf(D(u))) {
-            const nk = netKey(key, cp), n2 = th.net[nk] || (th.net[nk] = { first: null, last: -1e9 });
+          if (u.link !== false && inNet) for (const key2 of datalinksOf(D(u))) {
+            const nk = netKey(key2, cp), n2 = th.net[nk] || (th.net[nk] = { first: null, last: -1e9 });
             if (n2.first === null) n2.first = t;
             n2.last = t;
             noteObs(th, nk, t);
@@ -5242,8 +5243,8 @@ table.t.mc td.pc{white-space:nowrap}
     return dumps.some((g) => g.status !== "destroyed" && Math.hypot(g.x - u.x, g.y - u.y) <= RESUPPLY_KM);
   }
   var costPerKill = (u, th, t) => D(u).sam.cost / Math.max(0.01, calcPk(u, th, t, S.jamsLive, null, true));
-  function reaches(v, th, t, keys) {
-    const sm = D(v).sam, lz = surf(v.x, v.y) + 2, tbm = isTBM(th), vel = tbm ? null : trackVel(th, keys);
+  function reaches(v, th, t, keys2) {
+    const sm = D(v).sam, lz = surf(v.x, v.y) + 2, tbm = isTBM(th), vel = tbm ? null : trackVel(th, keys2);
     if (!tbm && !vel) return false;
     const tEnd = tbm ? th.tLaunch + th.ft - 1 : t + 3600;
     for (let tt = t + 2; tt < tEnd; tt += 2) {
@@ -5284,8 +5285,8 @@ table.t.mc td.pc{white-space:nowrap}
         });
         if (better) continue;
         if (th.cls === "dron") {
-          const cpk = costPerKill(u, th, t), keys = trackKeys(u, th, t, c2, S.gateways);
-          const layer = S.units.some((v) => v !== u && v.alive && v.link !== false && cpOf(v) === cp && D(v).sam && v.magLeft > 0 && !v.noDrones && D(v).sam.maxR > 0 && costPerKill(v, th, t) * 2 <= cpk && reaches(v, th, t, keys));
+          const cpk = costPerKill(u, th, t), keys2 = trackKeys(u, th, t, c2, S.gateways);
+          const layer = S.units.some((v) => v !== u && v.alive && v.link !== false && cpOf(v) === cp && D(v).sam && v.magLeft > 0 && !v.noDrones && D(v).sam.maxR > 0 && costPerKill(v, th, t) * 2 <= cpk && reaches(v, th, t, keys2));
           if (layer) continue;
         }
       }
@@ -5498,7 +5499,7 @@ table.t.mc td.pc{white-space:nowrap}
   function addSalvo(o) {
     const T = THREATS[o.type];
     const sv = { id: nextId(), type: o.type, count: o.count || 1, interval: o.interval ?? 20, tStart: o.tStart || 0, sync: !!o.sync, tArrive: o.tArrive || 0, agl: o.agl ?? T.agl, launchDist: o.launchDist ?? T.launchDist, maneuver: o.maneuver ?? T.maneuver, decoys: !!o.decoys, link: !!o.link, crpa: o.crpa ?? 0, pts: o.pts, targetUnit: null, targetObj: null };
-    const find = (list, ref) => list.find((v) => v.name === ref || v.id === ref);
+    const find = (list4, ref) => list4.find((v) => v.name === ref || v.id === ref);
     if (o.targetUnit) {
       const u = find(S.setup.defs, o.targetUnit);
       if (u) {
@@ -6440,8 +6441,8 @@ table.t.mc td.pc{white-space:nowrap}
       result = n2 === prim.length ? "exito" : n2 ? "parcial" : "fracaso";
     }
     const sec = mine.filter((g) => !g.primary);
-    const text = result ? { exito: "Éxito", parcial: "Éxito parcial", fracaso: "Fracaso" }[result] + (sec.length ? ` · secundarias ${sec.filter((g) => g.met).length}/${sec.length}` : "") : "Sin metas definidas";
-    return { goals, outcome: { side, result, text } };
+    const text3 = result ? { exito: "Éxito", parcial: "Éxito parcial", fracaso: "Fracaso" }[result] + (sec.length ? ` · secundarias ${sec.filter((g) => g.met).length}/${sec.length}` : "") : "Sin metas definidas";
+    return { goals, outcome: { side, result, text: text3 } };
   }
 
   // src/sim/clock.js
@@ -6452,8 +6453,8 @@ table.t.mc td.pc{white-space:nowrap}
       reset() {
         pending = 0;
       },
-      advance(seconds, step2) {
-        pending += seconds;
+      advance(seconds2, step2) {
+        pending += seconds2;
         while (pending + 1e-9 >= SIM_STEP) {
           pending = Math.max(0, pending - SIM_STEP);
           if (step2(SIM_STEP) === false) {
@@ -6624,92 +6625,1616 @@ table.t.mc td.pc{white-space:nowrap}
     return { n: n2, sample, seed, scen, player: scen?.player || null, outcome, goals, objectives, unitsLost, metrics, interceptHist: histogram(rate, 0, 1, 10) };
   }
 
-  // src/sim/debrief.js
-  var sum = (a, f) => a.reduce((s, x) => s + f(x), 0);
-  var LOST_M = 2e3;
-  function buildDebrief(S2) {
-    const st = S2.stats, real = S2.threats.filter((t) => !t.isDecoy), decoys = S2.threats.filter((t) => t.isDecoy);
-    const arrivals = S2.arrivals;
-    const { goals, outcome } = evaluateGoals(S2.scen, S2);
-    const byType = {};
-    for (const t of S2.threats) {
-      const k = t.isDecoyChild ? t.T.short + " (señuelo)" : t.T.short;
-      const b = byType[k] || (byType[k] = { launched: 0, killed: 0, arrived: 0, shotsAt: 0 });
-      b.launched++;
-      if (t.killed) b.killed++;
-      else if (t.done) b.arrived++;
-      b.shotsAt += (t.fly || []).length;
+  // experimentos/catalogo-presupuesto/data/port-campaign.mjs
+  var PORT_BUDGET = 1500;
+  var PORT_CHOICES = [
+    { id: "radar", type: "ewr", name: "Radar 3D", cost: 80, x: 49, y: 81 },
+    { id: "vhf", type: "p18", name: "Radar VHF", cost: 60, x: 40, y: 60 },
+    { id: "s125", type: "s125", name: "S-125-1", cost: 150, x: 54, y: 69 },
+    { id: "buk", type: "buk", name: "Buk-1", cost: 250, x: 51, y: 74 },
+    { id: "s300", type: "s300", name: "S-300-1", cost: 300, x: 49.5, y: 78 },
+    { id: "mobile", type: "mfg", name: "Grupo móvil 1", cost: 20, x: 54.5, y: 62 },
+    { id: "iris", type: "irist", name: "IRIS-T-1", cost: 350, x: 48.5, y: 82, later: true }
+  ];
+  function portCampaignDefinition(selection = ["radar", "vhf", "s125", "buk", "mobile"]) {
+    if (!Array.isArray(selection) || !selection.length || new Set(selection).size !== selection.length || selection.some((id2) => !PORT_CHOICES.some((c) => c.id === id2))) throw Error("Selección de medios inválida");
+    const chosen = PORT_CHOICES.filter((c) => selection.includes(c.id));
+    const spent = chosen.reduce((n2, c) => n2 + c.cost, 0);
+    if (spent > PORT_BUDGET) throw Error("La asignación excede el presupuesto");
+    const basis2 = () => ({ kind: "fictional", sourceIds: [], note: "Créditos, disponibilidad y plazos de suministro de la campaña hipotética; no precios ni contratos reales." });
+    const inventory = {
+      sideId: "ua",
+      ammunitionIds: [],
+      components: [],
+      configurations: [],
+      locations: [{ id: "depot", kind: "depot" }],
+      stock: []
+    };
+    const assets = [], quotes = [], services = [], spares = [{ id: "parts", quantity: 6 }];
+    for (const c of chosen) {
+      const d = DEFENSES[c.type], components = [];
+      if (d.radar) {
+        inventory.components.push({ id: `${c.id}-sensor`, kind: "sensor" });
+        components.push(`${c.id}-sensor`);
+      }
+      if (d.sam) {
+        const ammo = `legacy-${c.id}`;
+        inventory.ammunitionIds.push(ammo);
+        inventory.components.push({ id: `${c.id}-launcher`, kind: "launcher" }, { id: `${c.id}-control`, kind: "control" });
+        components.push(`${c.id}-launcher`, `${c.id}-control`);
+        inventory.configurations.push({
+          id: `${c.id}-aggregate`,
+          basis: {
+            kind: "legacy-estimate",
+            sourceIds: [],
+            note: `Agregado del catálogo actual ${d.short}: ${d.sam.mag} disparos. No es la capacidad certificada de un lanzador ni una variante nueva.`
+          },
+          loadouts: [{ id: `${c.id}-only`, rounds: [{ ammunitionId: ammo, quantity: d.sam.mag }] }]
+        });
+        inventory.locations.push(
+          {
+            id: `${c.id}-ready`,
+            kind: "launcher",
+            componentId: `${c.id}-launcher`,
+            configurationId: `${c.id}-aggregate`,
+            launchDependencies: components.filter((id2) => !id2.endsWith("-launcher"))
+          },
+          { id: `${c.id}-cargo`, kind: "depot" }
+        );
+        inventory.stock.push({ locationId: "depot", ammunitionId: ammo, quantity: 0 });
+        quotes.push({
+          id: `${c.id}-supply`,
+          ammunitionId: ammo,
+          toId: "depot",
+          price: c.type === "mfg" ? 1 : 10,
+          quantityLimit: d.sam.mag * 3,
+          leadSeconds: 120,
+          cancellable: true,
+          basis: basis2()
+        });
+        services.push({
+          id: `${c.id}-reload`,
+          kind: "transfer",
+          fromId: "depot",
+          toId: `${c.id}-ready`,
+          transitId: `${c.id}-cargo`,
+          recoveryId: "depot",
+          ammunitionIds: [ammo],
+          fee: 0,
+          durationSeconds: d.sam.reloadS,
+          basis: basis2()
+        });
+      }
+      if (components.length) services.push({
+        id: `${c.id}-repair`,
+        kind: "repair",
+        componentIds: components,
+        spareId: "parts",
+        spareQuantity: 1,
+        fee: 50,
+        durationSeconds: 600,
+        basis: basis2()
+      });
+      assets.push({
+        id: c.id,
+        kind: "unit",
+        engineType: c.type,
+        engineName: c.name,
+        mapKey: "odesa",
+        x: c.x,
+        y: c.y,
+        az: 135,
+        maxHp: UNIT_TARGET.hp,
+        hp: UNIT_TARGET.hp,
+        componentIds: components,
+        repairComponentId: components.find((id2) => id2.endsWith("-sensor")) ?? components[0] ?? null
+      });
     }
-    const objectives = S2.objs.map((o) => ({ name: o.name, type: o.type, status: o.status, dmg: o.maxHp - o.hp, maxHp: o.maxHp, hits: o.hits, dmgBy: o.dmgBy }));
-    const dmgSorted = Object.entries(st.dmgByWeapon).sort((a, b) => b[1] - a[1]);
-    const magTotal = sum(S2.units, (u) => u.mag || 0), magLeft = sum(S2.units, (u) => DEFENSES[u.type].sam ? u.magLeft : 0);
-    const lost = S2.units.filter((u) => !u.alive).map((u) => u.name);
-    const detected = real.filter((t) => t.firstDet !== null && t.detKm != null);
-    const attack = {
-      launched: st.launched,
-      real: real.length,
-      decoys: st.decoys,
-      intercepted: st.killed - st.decoysKilled,
-      decoysKilled: st.decoysKilled,
-      impacts: st.hits,
-      misses: st.misses,
-      lostLocally: arrivals.filter((a) => a.nav > LOST_M).length,
-      byType
+    const objectiveIds = /* @__PURE__ */ new Map();
+    for (const scenario of ["od_puertos", "od_corredor"]) for (const g of SCENARIOS[scenario].objectives) {
+      if (objectiveIds.has(g.name)) continue;
+      const id2 = `site-${objectiveIds.size + 1}`, hp = g.hp ?? TARGET_TYPES[g.type].hp;
+      objectiveIds.set(g.name, id2);
+      assets.push({
+        id: id2,
+        kind: "objective",
+        engineType: g.type,
+        engineName: g.name,
+        mapKey: "odesa",
+        x: g.x,
+        y: g.y,
+        az: 0,
+        maxHp: hp,
+        hp,
+        componentIds: [],
+        repairComponentId: null
+      });
+    }
+    const mission = (id2, scenarioKey, title, next2, delayBeforeSeconds, later) => ({
+      id: id2,
+      scenarioKey,
+      title,
+      mapKey: "odesa",
+      role: "defence",
+      delayBeforeSeconds,
+      planningSeconds: 7200,
+      allowedAssetIds: [...chosen.filter((c) => later || !c.later).map((c) => c.id), ...SCENARIOS[scenarioKey].objectives.map((o) => objectiveIds.get(o.name))],
+      allowedQuoteIds: quotes.filter((q) => later || !q.id.startsWith("iris-")).map((q) => q.id),
+      objectives: SCENARIOS[scenarioKey].goals.filter((g) => g.side === "defensa" && (g.kind !== "keepUnit" || chosen.some((c) => c.name === g.target))).map((g, i) => ({ id: `${id2}-goal-${i + 1}`, text: g.text, deadlineSeconds: null })),
+      next: { exito: next2, parcial: next2, fracaso: next2 }
+    });
+    return {
+      id: "odessa-resource-campaign",
+      title: "Odesa: sostener los puertos",
+      basis: `Campaña hipotética con escenarios del catálogo, sin reconstruir una cronología histórica. ${PORT_BUDGET} créditos de asignación; ${spent} asignados a medios, ${PORT_BUDGET - spent} restantes. Costos/suministros son supuestos. Capacidades de combate conservan las estimaciones del catálogo legado, no equivalencias entre variantes.`,
+      resourceInitial: { inventory, budget: PORT_BUDGET - spent, unit: "credits", missionId: "first-watch", quotes, services, spares },
+      assets,
+      missions: [
+        mission("first-watch", "od_puertos", "Primera guardia: medios de origen soviético y grupos móviles", "second-watch", 0, false),
+        mission("second-watch", "od_corredor", "Segunda guardia: barcos y continuidad de recursos", null, 86400, true)
+      ]
     };
-    const damage = {
-      total: st.damage,
-      byWeapon: dmgSorted,
-      top: dmgSorted[0] || null,
-      avgMiss: st.missN ? st.missSum / st.missN : null,
-      objsDestroyed: st.objsDestroyed,
-      objsSurviving: S2.objs.filter((o) => o.status !== "destroyed").length
-    };
-    const defense = {
-      shots: st.shots,
-      magLeft,
-      magTotal,
-      defCost: st.defCost,
-      atkCost: st.atkCost,
-      lost,
-      byUnit: st.byUnit,
-      perKill: st.killed ? st.shots / st.killed : null,
-      avgDetKm: detected.length ? sum(detected, (t) => t.detKm) / detected.length : null
-    };
-    const timeline = [...S2.events].sort((a, b) => a.t - b.t);
-    return { scen: S2.scen, t: S2.t, goals, outcome, objectives, attack, damage, defense, timeline, why: explain(S2, arrivals, decoys) };
   }
-  function explain(S2, arrivals, decoys) {
-    const out = [], st = S2.stats, list = (a) => [...new Set(a.map((x) => THREATS[x.type].short))].join(", ");
-    const real = arrivals;
-    if (!S2.threats.length) return ["No hubo ataques: agregá salvas en la pestaña Ataque."];
-    if (!real.length) out.push("Ninguna arma real llegó a su blanco: todas fueron derribadas o eran señuelos. La defensa por capas cubrió las rutas de ataque.");
-    const never = real.filter((a) => a.det === null);
-    if (never.length) out.push(`${never.length} arma(s) llegaron sin haber sido detectadas nunca (${list(never)}). Típico de blancos rasantes: el horizonte de radar y el relieve los ocultan. Probá subir mástiles, sumar un AEW o ubicar sensores sobre cotas altas (capa "Puntos altos").`);
-    const unengaged = real.filter((a) => a.det !== null && a.shots === 0);
-    if (unengaged.length) {
-      const lead = unengaged.reduce((s, a) => s + (a.t - a.det), 0) / unengaged.length;
-      out.push(`${unengaged.length} arma(s) fueron detectadas pero nadie les disparó (${list(unengaged)}), en promedio ${Math.round(lead)} s antes de llegar. Causas posibles: fuera del alcance o de la envolvente de altura, tiempo de reacción mayor que la ventana, clase no enfrentable (p. ej. IRIS-T o NASAMS contra balísticos), canales ocupados o sin munición.`);
+
+  // experimentos/catalogo-presupuesto/lib/common.mjs
+  function deepFreeze(value) {
+    if (value && typeof value === "object" && !Object.isFrozen(value)) {
+      for (const child of Object.values(value)) deepFreeze(child);
+      Object.freeze(value);
     }
-    const survived = real.filter((a) => a.shots > 0);
-    if (survived.length) out.push(`${survived.length} arma(s) sobrevivieron a ${survived.reduce((s, a) => s + a.shots, 0)} interceptor(es) disparados contra ellas (${list(survived)}): la Pk por disparo nunca es 100% y baja con maniobra terminal, baja firma, bengalas o interferencia.`);
-    const decoyShots = decoys.reduce((s, t) => s + (t.fly || []).length, 0);
-    const clsDecoys = decoys.filter((t) => t.clsAs === "señuelo").length, wrong = S2.threats.filter((t) => !t.isDecoy && t.clsAs === "señuelo");
-    if (clsDecoys) out.push(`Los radares de tiro reconocieron ${clsDecoys} de ${decoys.length} señuelo(s)${S2.ignoreDecoys ? " y dejaron de tirarles" : '; con la doctrina "no tirarle a pistas clasificadas como señuelo" se habrían ahorrado interceptores'}.`);
-    if (wrong.length) out.push(`${wrong.length} arma(s) real(es) se clasificaron por error como señuelo (${wrong.map((t) => t.T.short).join(", ")})${S2.ignoreDecoys ? " y no se les tiró" : ""}.`);
-    if (S2.stats.reloads) out.push(`Hubo ${S2.stats.reloads} recarga(s) de baterías durante el ataque.`);
-    if (decoyShots) out.push(`Los señuelos consumieron ${decoyShots} interceptor(es) que no se usaron contra armas reales. La "vista del defensor" muestra cómo los ve el operador: iguales a las armas.`);
-    const empty = S2.events.filter((e) => e.key && e.key.startsWith("empty:"));
-    if (empty.length) out.push(`Se quedaron sin munición: ${empty.map((e) => e.text.replace(" se queda sin munición", "")).join(", ")}. Mientras recargan (o sin reserva), la saturación agota los cargadores antes de que llegue lo más peligroso.`);
-    const sat = Object.entries(st.satChannels).sort((a, b) => b[1] - a[1]);
-    if (sat.length) out.push(`Saturación de canales de tiro: ${sat.slice(0, 3).map(([k, v]) => `${k} (${v} s)`).join(", ")} tuvo más blancos que canales simultáneos.`);
-    const gnss = real.filter((a) => a.nav > 150 && a.nav <= LOST_M), lostL = real.filter((a) => a.nav > LOST_M);
-    if (gnss.length) out.push(`${gnss.length} arma(s) fueron desviadas por interferencia GNSS (${list(gnss)}).`);
-    if (lostL.length) out.push(`${lostL.length} arma(s) quedaron "perdidas localmente": el engaño GNSS las desvió más de ${LOST_M / 1e3} km (${list(lostL)}). Ojo al comparar con las cifras oficiales ucranianas: esa categoría real también incluye señuelos y fallas.`);
-    const hurt = S2.units.filter((u) => u.alive && (u.dmgRadar || u.dmgLauncher));
-    if (hurt.length) out.push(`Unidades dañadas por explosiones cercanas: ${hurt.map((u) => u.name + " (" + [u.dmgRadar ? "radar" : "", u.dmgLauncher ? "lanzador" : ""].filter(Boolean).join(" y ") + ")").join(", ")}. Un radar dañado ve menos y reacciona más lento; un lanzador dañado no dispara aunque le queden misiles.`);
-    if (S2.units.some((u) => !u.alive)) out.push(`Unidades perdidas: ${S2.units.filter((u) => !u.alive).map((u) => u.name).join(", ")}. Una batería destruida deja un hueco de cobertura para lo que viene después.`);
-    if (st.killed) out.push(`Economía: la defensa gastó US$${st.defCost.toFixed(1)} M y el ataque US$${st.atkCost.toFixed(1)} M. ${st.defCost > st.atkCost ? "Defender costó más que atacar: es la lógica de los drones baratos y los señuelos." : "Defender costó menos que atacar."}`);
-    return out;
+    return value;
+  }
+  function id(value, name = "id") {
+    if (typeof value !== "string" || !/^[a-z][a-z0-9-]{0,79}$/.test(value)) {
+      throw new Error(`${name}: identificador inválido`);
+    }
+    return value;
+  }
+  function integer(value, name, minimum = 0) {
+    if (!Number.isSafeInteger(value) || value < minimum) {
+      throw new Error(`${name}: entero seguro mayor o igual a ${minimum} requerido`);
+    }
+    return value;
+  }
+  function safeProduct(a, b) {
+    return integer(a * b, "producto");
+  }
+  function safeSum(a, b) {
+    return integer(a + b, "suma");
+  }
+  function seconds(value, name = "tiempo", signed = false) {
+    if (typeof value !== "number" || !Number.isFinite(value) || Math.abs(value) > 1e9 || !signed && value < 0) {
+      throw Error(`${name}: segundos finitos dentro del intervalo admitido requeridos`);
+    }
+    return value;
+  }
+  function addSeconds(a, b) {
+    return seconds(a + b, "suma de tiempo");
+  }
+
+  // experimentos/catalogo-presupuesto/lib/components.mjs
+  var states = /* @__PURE__ */ new WeakSet();
+  var LIMIT = 1e4;
+  var fields = {
+    transfer: ["fromId", "toId", "ammunitionId", "quantity"],
+    expend: ["fromId", "ammunitionId", "quantity"],
+    loss: ["fromId", "ammunitionId", "quantity"],
+    receipt: ["toId", "ammunitionId", "quantity"],
+    condition: ["componentId", "condition"]
+  };
+  function exact(value, keys2, label2) {
+    if (!value || typeof value !== "object" || Array.isArray(value) || Object.keys(value).some((key2) => !keys2.includes(key2))) throw Error(`${label2}: campos inválidos`);
+  }
+  function list(value, label2, max = 200) {
+    if (!Array.isArray(value) || value.length > max) throw Error(`${label2}: lista inválida`);
+    return value;
+  }
+  function unique(values, label2) {
+    if (new Set(values).size !== values.length) throw Error(`${label2}: duplicado`);
+  }
+  function known(state) {
+    if (!states.has(state)) throw Error("Inventario ajeno; usar loadInventory");
+  }
+  function keep(state) {
+    deepFreeze(state);
+    states.add(state);
+    return state;
+  }
+  function normalizeInitial(raw) {
+    exact(raw, ["sideId", "ammunitionIds", "components", "locations", "configurations", "stock"], "Inventario");
+    const sideId = id(raw.sideId, "sideId");
+    const ammunitionIds = list(raw.ammunitionIds, "municiones").map((value) => id(value, "ammunitionId"));
+    unique(ammunitionIds, "municiones");
+    const components = list(raw.components, "componentes").map((row) => {
+      exact(row, ["id", "kind"], "Componente");
+      if (!["launcher", "sensor", "control"].includes(row.kind)) throw Error("Tipo de componente inválido");
+      return { id: id(row.id, "componentId"), kind: row.kind };
+    });
+    unique(components.map((row) => row.id), "componentes");
+    const configurations = list(raw.configurations, "configuraciones").map((row) => {
+      exact(row, ["id", "loadouts", "basis"], "Configuración");
+      exact(row.basis, ["kind", "note", "sourceIds"], "Evidencia");
+      if (!["fictional", "documented", "legacy-estimate"].includes(row.basis.kind) || typeof row.basis.note !== "string" || !row.basis.note.trim() || row.basis.note.length > 2e3) throw Error("Evidencia de configuración requerida");
+      const sourceIds = list(row.basis.sourceIds, "fuentes").map((value) => id(value, "sourceId"));
+      if (row.basis.kind === "documented" && !sourceIds.length) throw Error("Configuración documentada sin fuente");
+      const loadouts = list(row.loadouts, "cargas admitidas").map((loadout) => {
+        exact(loadout, ["id", "rounds"], "Carga");
+        const rounds = list(loadout.rounds, "munición de carga").map((round) => {
+          exact(round, ["ammunitionId", "quantity"], "Munición");
+          const ammunitionId = id(round.ammunitionId, "ammunitionId");
+          if (!ammunitionIds.includes(ammunitionId)) throw Error("Munición desconocida");
+          return { ammunitionId, quantity: integer(round.quantity, "cantidad de carga", 1) };
+        });
+        if (!rounds.length) throw Error("Carga vacía");
+        unique(rounds.map((round) => round.ammunitionId), "munición de carga");
+        return { id: id(loadout.id, "loadoutId"), rounds };
+      });
+      if (!loadouts.length) throw Error("Capacidad desconocida: no se habilita lanzador");
+      unique(loadouts.map((loadout) => loadout.id), "cargas");
+      return {
+        id: id(row.id, "configurationId"),
+        loadouts,
+        basis: { kind: row.basis.kind, note: row.basis.note, sourceIds }
+      };
+    });
+    unique(configurations.map((row) => row.id), "configuraciones");
+    const locations = list(raw.locations, "ubicaciones").map((row) => {
+      exact(row, ["id", "kind", "componentId", "configurationId", "launchDependencies"], "Ubicación");
+      const locationId = id(row.id, "locationId");
+      if (row.kind === "depot") {
+        if (["componentId", "configurationId", "launchDependencies"].some((key2) => Object.hasOwn(row, key2))) {
+          throw Error("Depósito no es un lanzador");
+        }
+        return { id: locationId, kind: "depot" };
+      }
+      if (row.kind !== "launcher") throw Error("Ubicación inválida");
+      const componentId = id(row.componentId, "componentId");
+      if (components.find((component) => component.id === componentId)?.kind !== "launcher") throw Error("Lanzador inexistente");
+      const configurationId = id(row.configurationId, "configurationId");
+      if (!configurations.some((configuration) => configuration.id === configurationId)) throw Error("Configuración inexistente");
+      const launchDependencies = list(row.launchDependencies, "dependencias").map((value) => id(value, "dependencyId"));
+      unique(launchDependencies, "dependencias");
+      if (launchDependencies.some((value) => !components.some((component) => component.id === value))) throw Error("Dependencia inexistente");
+      return { id: locationId, kind: "launcher", componentId, configurationId, launchDependencies };
+    });
+    unique(locations.map((row) => row.id), "ubicaciones");
+    unique(locations.filter((row) => row.kind === "launcher").map((row) => row.componentId), "ubicación de lanzador");
+    const stock3 = list(raw.stock, "existencias", LIMIT).map((row) => {
+      exact(row, ["locationId", "ammunitionId", "quantity"], "Existencias");
+      const locationId = id(row.locationId, "locationId");
+      const ammunitionId = id(row.ammunitionId, "ammunitionId");
+      if (!locations.some((location) => location.id === locationId) || !ammunitionIds.includes(ammunitionId)) throw Error("Existencias sin identidad válida");
+      return { locationId, ammunitionId, quantity: integer(row.quantity, "existencias") };
+    });
+    unique(stock3.map((row) => `${row.locationId}/${row.ammunitionId}`), "existencias");
+    for (const ammunitionId of ammunitionIds) stock3.filter((row) => row.ammunitionId === ammunitionId).reduce((total, row) => safeSum(total, row.quantity), 0);
+    return { sideId, ammunitionIds, components, locations, configurations, stock: stock3 };
+  }
+  function entry(state, locationId, ammunitionId) {
+    let row = state.stock.find((value) => value.locationId === locationId && value.ammunitionId === ammunitionId);
+    if (!row) {
+      row = { locationId, ammunitionId, quantity: 0 };
+      state.stock.push(row);
+    }
+    return row;
+  }
+  function fits(state, location) {
+    if (location.kind === "depot") return true;
+    const cargo = state.stock.filter((row) => row.locationId === location.id && row.quantity > 0);
+    const configuration = state.initial.configurations.find((row) => row.id === location.configurationId);
+    return configuration.loadouts.some((loadout) => cargo.every((row) => row.quantity <= (loadout.rounds.find((round) => round.ammunitionId === row.ammunitionId)?.quantity ?? 0)));
+  }
+  function createInventory(raw) {
+    const initial = normalizeInitial(raw);
+    const state = {
+      version: 1,
+      initial,
+      sideId: initial.sideId,
+      atSeconds: 0,
+      components: initial.components.map((row) => ({ ...row, condition: "operational" })),
+      stock: structuredClone(initial.stock),
+      totals: initial.ammunitionIds.map((ammunitionId) => ({ ammunitionId, acquired: 0, expended: 0, lost: 0 })),
+      events: []
+    };
+    if (!initial.locations.every((location) => fits(state, location))) throw Error("Carga inicial no admitida");
+    return keep(state);
+  }
+  function applyInventoryEvent(state, raw) {
+    known(state);
+    if (!Object.hasOwn(fields, raw?.kind)) throw Error("Evento desconocido");
+    exact(raw, ["eventId", "sideId", "atSeconds", "kind", ...fields[raw.kind]], "Evento");
+    const event2 = {
+      eventId: id(raw.eventId, "eventId"),
+      sideId: id(raw.sideId, "sideId"),
+      atSeconds: seconds(raw.atSeconds, "atSeconds"),
+      kind: raw.kind
+    };
+    for (const key2 of fields[raw.kind]) {
+      event2[key2] = key2 === "quantity" ? integer(raw[key2], key2, 1) : key2 === "condition" ? raw[key2] : id(raw[key2], key2);
+    }
+    if (event2.sideId !== state.sideId) throw Error("Evento de otro bando");
+    const previous = state.events.find((row) => row.eventId === event2.eventId);
+    if (previous) {
+      if (JSON.stringify(previous) !== JSON.stringify(event2)) throw Error("eventId reutilizado");
+      return state;
+    }
+    if (state.events.length >= LIMIT) throw Error("Demasiados eventos");
+    if (event2.atSeconds < state.atSeconds) throw Error("Evento fuera de orden temporal");
+    const next2 = structuredClone(state);
+    if (event2.kind === "condition") {
+      if (!["operational", "degraded", "disabled", "destroyed"].includes(event2.condition)) throw Error("Condición inválida");
+      const component = next2.components.find((row) => row.id === event2.componentId);
+      if (!component) throw Error("Componente inexistente");
+      if (component.condition === "destroyed" && event2.condition !== "destroyed") throw Error("Componente destruido no se resucita");
+      component.condition = event2.condition;
+      if (event2.condition === "destroyed") {
+        const location = next2.initial.locations.find((row) => row.componentId === component.id);
+        if (location) for (const row of next2.stock.filter((value) => value.locationId === location.id)) {
+          const total = next2.totals.find((value) => value.ammunitionId === row.ammunitionId);
+          total.lost = safeSum(total.lost, row.quantity);
+          row.quantity = 0;
+        }
+      }
+    } else if (event2.kind === "receipt") {
+      const destination = next2.initial.locations.find((row2) => row2.id === event2.toId);
+      const total = next2.totals.find((row2) => row2.ammunitionId === event2.ammunitionId);
+      if (destination?.kind !== "depot" || !total) throw Error("Entrega requiere depósito y munición conocidos");
+      const initialTotal = next2.initial.stock.filter((row2) => row2.ammunitionId === event2.ammunitionId).reduce((sum2, row2) => safeSum(sum2, row2.quantity), 0);
+      total.acquired = safeSum(total.acquired, event2.quantity);
+      safeSum(initialTotal, total.acquired);
+      const row = entry(next2, destination.id, event2.ammunitionId);
+      row.quantity = safeSum(row.quantity, event2.quantity);
+    } else {
+      const source2 = next2.initial.locations.find((row2) => row2.id === event2.fromId);
+      if (!source2 || !next2.initial.ammunitionIds.includes(event2.ammunitionId)) throw Error("Origen o munición inexistente");
+      const row = entry(next2, source2.id, event2.ammunitionId);
+      if (row.quantity < event2.quantity) throw Error("Existencias insuficientes");
+      if (event2.kind === "transfer") {
+        const target = next2.initial.locations.find((value) => value.id === event2.toId);
+        if (!target || target.id === source2.id) throw Error("Destino inválido");
+        if (target.kind === "launcher" && !["operational", "degraded"].includes(next2.components.find((value) => value.id === target.componentId).condition)) throw Error("Lanzador destino no operativo");
+        row.quantity -= event2.quantity;
+        const destination = entry(next2, target.id, event2.ammunitionId);
+        destination.quantity = safeSum(destination.quantity, event2.quantity);
+        if (!fits(next2, target)) {
+          const error = Error("Carga mixta o capacidad no admitida");
+          error.code = "LOAD_NOT_ADMITTED";
+          throw error;
+        }
+      } else {
+        if (event2.kind === "expend") {
+          if (source2.kind !== "launcher") throw Error("No se dispara desde un depósito");
+          const required = [source2.componentId, ...source2.launchDependencies];
+          if (required.some((componentId) => !["operational", "degraded"].includes(next2.components.find((value) => value.id === componentId).condition))) throw Error("Dependencia de lanzamiento no operativa");
+        }
+        row.quantity -= event2.quantity;
+        const total = next2.totals.find((value) => value.ammunitionId === event2.ammunitionId);
+        const key2 = event2.kind === "expend" ? "expended" : "lost";
+        total[key2] = safeSum(total[key2], event2.quantity);
+      }
+    }
+    next2.atSeconds = event2.atSeconds;
+    next2.events.push(event2);
+    return keep(next2);
+  }
+
+  // experimentos/catalogo-presupuesto/lib/logistics.mjs
+  var states2 = /* @__PURE__ */ new WeakSet();
+  var keys = {
+    order: ["jobId", "quoteId", "quantity"],
+    transfer: ["jobId", "serviceId", "ammunitionId", "quantity"],
+    repair: ["jobId", "serviceId", "componentId"],
+    cancel: ["jobId"],
+    outcome: ["outcome"],
+    advance: [],
+    activate: [],
+    finish: [],
+    "begin-mission": ["missionId"]
+  };
+  var MAX = 1e4;
+  function exact2(value, allowed, label2) {
+    if (!value || typeof value !== "object" || Array.isArray(value) || Object.keys(value).some((key2) => !allowed.includes(key2))) throw Error(`${label2}: campos inválidos`);
+  }
+  function list2(value, label2, limit = 200) {
+    if (!Array.isArray(value) || value.length > limit) throw Error(`${label2}: lista inválida`);
+    return value;
+  }
+  function unique2(rows, label2) {
+    if (new Set(rows.map((row) => row.id)).size !== rows.length) throw Error(`${label2}: duplicado`);
+  }
+  function positiveSeconds(value, label2) {
+    seconds(value, label2);
+    if (value <= 0) throw Error(`${label2}: duración positiva requerida`);
+    return value;
+  }
+  function keep2(state) {
+    deepFreeze(state);
+    states2.add(state);
+    return state;
+  }
+  function basis(raw, unit, label2) {
+    exact2(raw, ["kind", "note", "sourceIds"], label2);
+    const sourceIds = list2(raw.sourceIds, "fuentes").map((value) => id(value, "sourceId"));
+    if (!["fictional", "documented"].includes(raw.kind) || typeof raw.note !== "string" || !raw.note.trim() || raw.note.length > 2e3) throw Error("Costo/tiempo requiere alcance y evidencia");
+    if ((unit !== "credits" || raw.kind === "documented") && (raw.kind !== "documented" || !sourceIds.length)) {
+      throw Error("Moneda o dato documentado requieren fuentes");
+    }
+    return { kind: raw.kind, note: raw.note, sourceIds };
+  }
+  function normalize(raw) {
+    exact2(raw, ["inventory", "budget", "unit", "missionId", "quotes", "services", "spares"], "Campaña");
+    const inventory = createInventory(raw.inventory).initial;
+    const unit = raw.unit;
+    if (unit !== "credits" && !(typeof unit === "string" && /^[A-Z]{3}-[0-9]{4}-minor$/.test(unit))) throw Error("Unidad monetaria inválida");
+    const depot = (value) => inventory.locations.find((row) => row.id === value)?.kind === "depot";
+    const quotes = list2(raw.quotes, "cotizaciones").map((row) => {
+      exact2(row, ["id", "ammunitionId", "toId", "price", "quantityLimit", "leadSeconds", "cancellable", "basis"], "Cotización");
+      const ammunitionId = id(row.ammunitionId, "ammunitionId"), toId = id(row.toId, "toId");
+      if (!inventory.ammunitionIds.includes(ammunitionId) || !depot(toId)) throw Error("Entrega sin depósito o munición conocidos");
+      if (typeof row.cancellable !== "boolean") throw Error("Cotización requiere condición de cancelación explícita");
+      return {
+        id: id(row.id),
+        ammunitionId,
+        toId,
+        cancellable: row.cancellable,
+        price: integer(row.price, "precio"),
+        quantityLimit: integer(row.quantityLimit, "disponibilidad"),
+        leadSeconds: positiveSeconds(row.leadSeconds, "plazo"),
+        basis: basis(row.basis, unit, "Evidencia de entrega")
+      };
+    });
+    unique2(quotes, "cotizaciones");
+    const spares = list2(raw.spares, "repuestos").map((row) => {
+      exact2(row, ["id", "quantity"], "Repuesto");
+      return { id: id(row.id), quantity: integer(row.quantity, "repuestos") };
+    });
+    unique2(spares, "repuestos");
+    const services = list2(raw.services, "servicios").map((row) => {
+      const common = ["id", "kind", "fee", "durationSeconds", "basis"];
+      const extra = row.kind === "transfer" ? ["fromId", "toId", "transitId", "recoveryId", "ammunitionIds"] : ["componentIds", "spareId", "spareQuantity"];
+      exact2(row, [...common, ...extra], "Servicio");
+      const service = {
+        id: id(row.id),
+        kind: row.kind,
+        fee: integer(row.fee, "costo de servicio"),
+        durationSeconds: positiveSeconds(row.durationSeconds, "duración"),
+        basis: basis(row.basis, unit, "Evidencia de servicio")
+      };
+      if (row.kind === "transfer") {
+        for (const key2 of ["fromId", "toId", "transitId", "recoveryId"]) service[key2] = id(row[key2], key2);
+        if (!depot(service.transitId) || !depot(service.recoveryId) || !inventory.locations.some((location) => location.id === service.fromId) || !inventory.locations.some((location) => location.id === service.toId) || (/* @__PURE__ */ new Set([service.fromId, service.toId, service.transitId])).size !== 3) throw Error("Ruta logística inválida");
+        service.ammunitionIds = list2(row.ammunitionIds, "municiones del servicio").map((value) => id(value));
+        if (!service.ammunitionIds.length || service.ammunitionIds.some((value) => !inventory.ammunitionIds.includes(value))) throw Error("Munición del servicio desconocida");
+        if (inventory.stock.some((stock3) => stock3.locationId === service.transitId && stock3.quantity > 0)) throw Error("Tránsito debe empezar vacío");
+      } else if (row.kind === "repair") {
+        service.componentIds = list2(row.componentIds, "componentes reparables").map((value) => id(value));
+        service.spareId = id(row.spareId);
+        service.spareQuantity = integer(row.spareQuantity, "repuestos requeridos", 1);
+        if (!service.componentIds.length || service.componentIds.some((value) => !inventory.components.some((component) => component.id === value)) || !spares.some((spare) => spare.id === service.spareId)) throw Error("Reparación sin componente o repuesto conocido");
+      } else throw Error("Servicio desconocido");
+      return service;
+    });
+    unique2(services, "servicios");
+    const transitIds = services.filter((row) => row.kind === "transfer").map((row) => row.transitId);
+    if (quotes.some((row) => transitIds.includes(row.toId)) || new Set(transitIds).size !== transitIds.length || services.some((row) => row.kind === "transfer" && [row.fromId, row.toId, row.recoveryId].some((value) => transitIds.includes(value)))) throw Error("Tránsito reservado para una sola ruta");
+    const initial = {
+      inventory,
+      budget: integer(raw.budget, "presupuesto"),
+      unit,
+      missionId: id(raw.missionId),
+      quotes,
+      services,
+      spares
+    };
+    if (JSON.stringify(initial).length > 1024 * 1024) throw Error("Configuración demasiado grande");
+    return initial;
+  }
+  function createCampaign(raw) {
+    const initial = normalize(raw);
+    return keep2({
+      version: 1,
+      initial,
+      sideId: initial.inventory.sideId,
+      unit: initial.unit,
+      balance: initial.budget,
+      clockSeconds: 0,
+      phase: "planning",
+      inventory: createInventory(initial.inventory),
+      spares: structuredClone(initial.spares),
+      quotes: initial.quotes.map((row) => ({ id: row.id, remaining: row.quantityLimit })),
+      jobs: [],
+      missions: [{ id: initial.missionId, status: "planning", startedAtSeconds: null, endedAtSeconds: null }],
+      commands: []
+    });
+  }
+  function stock(state, locationId, ammunitionId) {
+    return state.inventory.stock.find((row) => row.locationId === locationId && row.ammunitionId === ammunitionId)?.quantity ?? 0;
+  }
+  function condition(state, componentId) {
+    return state.inventory.components.find((row) => row.id === componentId)?.condition;
+  }
+  function record(state, atSeconds, kind, properties) {
+    state.inventory = applyInventoryEvent(state.inventory, {
+      eventId: `ledger-event-${state.inventory.events.length}`,
+      sideId: state.sideId,
+      atSeconds,
+      kind,
+      ...properties
+    });
+  }
+  function pay(state, amount) {
+    if (amount > state.balance) throw Error("Presupuesto insuficiente");
+    state.balance -= amount;
+  }
+  function newJob(state, command2) {
+    if (state.jobs.some((job) => job.id === command2.jobId)) throw Error("jobId ya utilizado");
+    if (state.jobs.length >= MAX) throw Error("Demasiados trabajos");
+  }
+  function eventRoom(state, extra) {
+    const reserved = state.jobs.filter((job) => job.status === "pending").length;
+    if (state.inventory.events.length + reserved + extra > MAX) throw Error("Límite de eventos de inventario alcanzado");
+  }
+  function serviceFor(state, command2, kind) {
+    const service = state.initial.services.find((row) => row.id === command2.serviceId && row.kind === kind);
+    if (!service) throw Error("Servicio inexistente");
+    if (state.jobs.some((job) => job.serviceId === service.id && ["pending", "interrupted"].includes(job.status))) throw Error("Servicio ocupado");
+    return service;
+  }
+  function complete(state, job) {
+    if (job.kind === "delivery") {
+      record(state, job.dueAtSeconds, "receipt", { toId: job.toId, ammunitionId: job.ammunitionId, quantity: job.quantity });
+      job.status = "completed";
+    } else if (job.kind === "repair") {
+      if (condition(state, job.componentId) === "destroyed") job.status = "failed";
+      else {
+        record(state, job.dueAtSeconds, "condition", { componentId: job.componentId, condition: "operational" });
+        job.status = "completed";
+      }
+    } else {
+      const available = stock(state, job.transitId, job.ammunitionId);
+      const destination = state.inventory.initial.locations.find((row) => row.id === job.toId);
+      const destinationReady = destination.kind === "depot" || ["operational", "degraded"].includes(condition(state, destination.componentId));
+      if (available < job.quantity || !destinationReady) {
+        job.status = available === 0 ? "lost" : "interrupted";
+        return;
+      }
+      try {
+        record(state, job.dueAtSeconds, "transfer", {
+          fromId: job.transitId,
+          toId: job.toId,
+          ammunitionId: job.ammunitionId,
+          quantity: job.quantity
+        });
+        job.status = job.returning ? "returned" : "completed";
+      } catch (error) {
+        if (error.code !== "LOAD_NOT_ADMITTED") throw error;
+        job.status = "interrupted";
+      }
+    }
+  }
+  function normalizeCommand(raw) {
+    if (!Object.hasOwn(keys, raw?.kind)) throw Error("Comando desconocido");
+    exact2(raw, ["commandId", "sideId", "atSeconds", "kind", ...keys[raw.kind]], "Comando");
+    const command2 = { commandId: id(raw.commandId), sideId: id(raw.sideId), atSeconds: seconds(raw.atSeconds, "tiempo"), kind: raw.kind };
+    for (const key2 of keys[raw.kind]) command2[key2] = key2 === "quantity" ? integer(raw[key2], "cantidad", 1) : key2 === "outcome" ? structuredClone(raw[key2]) : id(raw[key2], key2);
+    if (command2.kind === "outcome") {
+      const fields2 = command2.outcome?.kind === "condition" ? ["componentId", "condition"] : ["fromId", "ammunitionId", "quantity"];
+      if (!["condition", "expend", "loss"].includes(command2.outcome?.kind)) throw Error("Resultado de combate inválido");
+      exact2(command2.outcome, ["kind", ...fields2], "Resultado");
+      command2.outcome = { kind: command2.outcome.kind, ...Object.fromEntries(fields2.map((key2) => [key2, command2.outcome[key2]])) };
+      if (command2.outcome.kind === "condition" && !["degraded", "disabled", "destroyed"].includes(command2.outcome.condition)) throw Error("Recuperación requiere reparación");
+    }
+    return command2;
+  }
+  function applyCampaignCommand(state, raw) {
+    if (!states2.has(state)) throw Error("Campaña ajena; usar loadCampaign");
+    const command2 = normalizeCommand(raw);
+    if (command2.sideId !== state.sideId) throw Error("Comando de otro bando");
+    const prior = state.commands.find((row) => row.commandId === command2.commandId);
+    if (prior) {
+      if (JSON.stringify(prior) !== JSON.stringify(command2)) throw Error("commandId reutilizado");
+      return state;
+    }
+    if (state.commands.length >= MAX) throw Error("Demasiados comandos");
+    if (command2.kind === "advance" ? command2.atSeconds < state.clockSeconds : command2.atSeconds !== state.clockSeconds) throw Error("Tiempo fuera del reloj autorizado");
+    const { inventory, ...rest } = state;
+    const next2 = { ...structuredClone(rest), inventory };
+    switch (command2.kind) {
+      case "order": {
+        newJob(next2, command2);
+        eventRoom(next2, 1);
+        const quote = next2.initial.quotes.find((row) => row.id === command2.quoteId);
+        const availability = next2.quotes.find((row) => row.id === command2.quoteId);
+        if (!quote || command2.quantity > availability.remaining) throw Error("Cotización inexistente o disponibilidad insuficiente");
+        let lifetime = next2.initial.inventory.stock.filter((row) => row.ammunitionId === quote.ammunitionId).reduce((total, row) => safeSum(total, row.quantity), 0);
+        lifetime = safeSum(lifetime, next2.inventory.totals.find((row) => row.ammunitionId === quote.ammunitionId).acquired);
+        for (const job of next2.jobs.filter((row) => row.kind === "delivery" && row.status === "pending" && row.ammunitionId === quote.ammunitionId)) {
+          lifetime = safeSum(lifetime, job.quantity);
+        }
+        safeSum(lifetime, command2.quantity);
+        const dueAtSeconds = addSeconds(next2.clockSeconds, quote.leadSeconds);
+        const paid = safeProduct(quote.price, command2.quantity);
+        pay(next2, paid);
+        availability.remaining -= command2.quantity;
+        next2.jobs.push({
+          id: command2.jobId,
+          kind: "delivery",
+          quoteId: quote.id,
+          toId: quote.toId,
+          ammunitionId: quote.ammunitionId,
+          quantity: command2.quantity,
+          paid,
+          dueAtSeconds,
+          status: "pending"
+        });
+        break;
+      }
+      case "transfer": {
+        newJob(next2, command2);
+        const service = serviceFor(next2, command2, "transfer");
+        eventRoom(next2, 2);
+        if (!service.ammunitionIds.includes(command2.ammunitionId)) throw Error("Munición no admitida por el servicio");
+        const dueAtSeconds = addSeconds(next2.clockSeconds, service.durationSeconds);
+        pay(next2, service.fee);
+        record(next2, next2.clockSeconds, "transfer", {
+          fromId: service.fromId,
+          toId: service.transitId,
+          ammunitionId: command2.ammunitionId,
+          quantity: command2.quantity
+        });
+        next2.jobs.push({
+          id: command2.jobId,
+          kind: "transfer",
+          serviceId: service.id,
+          fromId: service.fromId,
+          toId: service.toId,
+          transitId: service.transitId,
+          recoveryId: service.recoveryId,
+          ammunitionId: command2.ammunitionId,
+          quantity: command2.quantity,
+          paid: service.fee,
+          dueAtSeconds,
+          status: "pending"
+        });
+        break;
+      }
+      case "repair": {
+        newJob(next2, command2);
+        const service = serviceFor(next2, command2, "repair");
+        eventRoom(next2, 1);
+        if (!service.componentIds.includes(command2.componentId) || !["disabled", "degraded"].includes(condition(next2, command2.componentId))) throw Error("Componente no reparable");
+        if (next2.jobs.some((job) => job.kind === "repair" && job.componentId === command2.componentId && job.status === "pending")) throw Error("Componente ya en reparación");
+        const spare = next2.spares.find((row) => row.id === service.spareId);
+        if (spare.quantity < service.spareQuantity) throw Error("Repuestos insuficientes");
+        const dueAtSeconds = addSeconds(next2.clockSeconds, service.durationSeconds);
+        pay(next2, service.fee);
+        spare.quantity -= service.spareQuantity;
+        next2.jobs.push({
+          id: command2.jobId,
+          kind: "repair",
+          serviceId: service.id,
+          componentId: command2.componentId,
+          paid: service.fee,
+          dueAtSeconds,
+          status: "pending"
+        });
+        break;
+      }
+      case "cancel": {
+        const job = next2.jobs.find((row) => row.id === command2.jobId);
+        if (!job || !["pending", "interrupted"].includes(job.status)) throw Error("Trabajo no cancelable");
+        if (job.kind === "delivery") {
+          if (!next2.initial.quotes.find((row) => row.id === job.quoteId).cancellable) throw Error("Pedido no admite cancelación");
+          next2.balance = safeSum(next2.balance, job.paid);
+          next2.quotes.find((row) => row.id === job.quoteId).remaining += job.quantity;
+        } else if (job.kind === "transfer") {
+          if (job.returning) throw Error("Retorno ya está en curso");
+          const remaining = stock(next2, job.transitId, job.ammunitionId);
+          if (remaining) {
+            if (job.status === "interrupted") eventRoom(next2, 1);
+            const service = next2.initial.services.find((row) => row.id === job.serviceId);
+            const dueAtSeconds = addSeconds(next2.clockSeconds, service.durationSeconds);
+            pay(next2, service.fee);
+            job.returning = true;
+            job.toId = job.recoveryId;
+            job.quantity = remaining;
+            job.paid = safeSum(job.paid, service.fee);
+            job.dueAtSeconds = dueAtSeconds;
+            job.status = "pending";
+            break;
+          }
+        }
+        job.status = "cancelled";
+        break;
+      }
+      case "outcome": {
+        eventRoom(next2, 1);
+        const { kind, ...properties } = command2.outcome;
+        if (kind === "expend" && next2.phase !== "active") throw Error("Disparo requiere misión activa");
+        record(next2, next2.clockSeconds, kind, properties);
+        break;
+      }
+      case "advance": {
+        const due = next2.jobs.filter((job) => job.status === "pending" && job.dueAtSeconds <= command2.atSeconds).sort((a, b) => a.dueAtSeconds - b.dueAtSeconds);
+        for (const job of due) complete(next2, job);
+        next2.clockSeconds = command2.atSeconds;
+        break;
+      }
+      case "activate": {
+        if (next2.phase !== "planning") throw Error("Misión no está en preparación");
+        next2.phase = "active";
+        const mission = next2.missions.at(-1);
+        mission.status = "active";
+        mission.startedAtSeconds = next2.clockSeconds;
+        break;
+      }
+      case "finish": {
+        if (next2.phase !== "active") throw Error("Misión no está activa");
+        next2.phase = "completed";
+        const mission = next2.missions.at(-1);
+        mission.status = "completed";
+        mission.endedAtSeconds = next2.clockSeconds;
+        break;
+      }
+      case "begin-mission": {
+        if (next2.phase !== "completed") throw Error("Debe terminar la misión anterior");
+        if (next2.missions.length >= 100 || next2.missions.some((row) => row.id === command2.missionId)) throw Error("Identidad o límite de misiones inválido");
+        next2.phase = "planning";
+        next2.missions.push({ id: command2.missionId, status: "planning", startedAtSeconds: null, endedAtSeconds: null });
+        break;
+      }
+    }
+    next2.commands.push(command2);
+    return keep2(next2);
+  }
+  function saveCampaign(state) {
+    if (!states2.has(state)) throw Error("Campaña ajena");
+    const text3 = JSON.stringify({ format: "cielo-cerrado/logistics-campaign", version: 1, initial: state.initial, commands: state.commands });
+    if (text3.length > 8 * 1024 * 1024) throw Error("Guardado demasiado grande");
+    return text3;
+  }
+  function loadCampaign(text3) {
+    if (typeof text3 !== "string" || text3.length > 8 * 1024 * 1024) throw Error("Archivo de campaña inválido");
+    const raw = JSON.parse(text3);
+    exact2(raw, ["format", "version", "initial", "commands"], "Guardado");
+    if (raw.format !== "cielo-cerrado/logistics-campaign" || raw.version !== 1) throw Error("Formato de campaña desconocido");
+    let state = createCampaign(raw.initial);
+    for (const command2 of list2(raw.commands, "comandos", MAX)) state = applyCampaignCommand(state, command2);
+    return state;
+  }
+
+  // experimentos/catalogo-presupuesto/lib/briefing.mjs
+  function record2(value, keys2, name) {
+    if (!value || typeof value !== "object" || Array.isArray(value) || Object.keys(value).some((key2) => !keys2.includes(key2))) throw new Error(`${name}: campos no admitidos`);
+    return value;
+  }
+  function text(value, name) {
+    if (typeof value !== "string" || !value.trim() || value.length > 2e3) throw new Error(`${name}: texto inválido`);
+    return value;
+  }
+  function signedTime(value, name) {
+    if (!Number.isSafeInteger(value)) throw new Error(`${name}: segundos enteros requeridos`);
+    return value;
+  }
+  function uniqueList(rows, name, normalize3) {
+    if (!Array.isArray(rows) || rows.length > 100) throw new Error(`${name}: lista inválida`);
+    const ids = /* @__PURE__ */ new Set();
+    return rows.map((row) => {
+      const normalized = normalize3(row);
+      if (ids.has(normalized.id)) throw new Error(`${name}: ID duplicado`);
+      ids.add(normalized.id);
+      return normalized;
+    });
+  }
+  function normalizePreparationBriefing(input, context, { fractionalTime = false } = {}) {
+    const time = fractionalTime ? seconds : integer;
+    const signed = fractionalTime ? (value, name) => seconds(value, name, true) : signedTime;
+    record2(input, ["sideId", "missionId", "role", "title", "issuedAtSeconds", "objectives", "intelligence"], "briefing");
+    const sideId = id(input.sideId, "sideId");
+    const missionId = id(input.missionId, "missionId");
+    if (sideId !== context.sideId || missionId !== context.missionId) throw new Error("Briefing de otro bando o misión");
+    if (!["attack", "defence"].includes(input.role)) throw new Error("Rol de misión inválido");
+    const issuedAtSeconds = time(input.issuedAtSeconds, "issuedAtSeconds");
+    const objectives = uniqueList(input.objectives, "objetivos", (row) => {
+      record2(row, ["id", "text", "deadlineSeconds"], "objetivo");
+      return {
+        id: id(row.id),
+        text: text(row.text, "objetivo"),
+        deadlineSeconds: row.deadlineSeconds === null ? null : time(row.deadlineSeconds, "deadlineSeconds")
+      };
+    });
+    if (!objectives.length) throw new Error("El briefing necesita al menos un objetivo");
+    const intelligence = uniqueList(input.intelligence, "inteligencia", (row) => {
+      record2(row, ["id", "text", "confidence", "sourceLabel", "observedAtSeconds", "receivedAtSeconds"], "reporte");
+      if (!["confirmed", "probable", "unconfirmed"].includes(row.confidence)) throw new Error("Confianza de reporte inválida");
+      const observedAtSeconds = signed(row.observedAtSeconds, "observedAtSeconds");
+      const receivedAtSeconds = signed(row.receivedAtSeconds, "receivedAtSeconds");
+      if (observedAtSeconds > receivedAtSeconds || receivedAtSeconds > issuedAtSeconds) throw new Error("Cronología de reporte inválida");
+      return {
+        id: id(row.id),
+        text: text(row.text, "reporte"),
+        confidence: row.confidence,
+        sourceLabel: text(row.sourceLabel, "sourceLabel"),
+        observedAtSeconds,
+        receivedAtSeconds,
+        ageSeconds: time(issuedAtSeconds - observedAtSeconds, "antigüedad"),
+        deliveryDelaySeconds: time(receivedAtSeconds - observedAtSeconds, "demora")
+      };
+    });
+    return deepFreeze({
+      sideId,
+      missionId,
+      role: input.role,
+      title: text(input.title, "title"),
+      issuedAtSeconds,
+      objectives,
+      intelligence
+    });
+  }
+
+  // experimentos/catalogo-presupuesto/lib/operations.mjs
+  var states3 = /* @__PURE__ */ new WeakSet();
+  var RESULTS = ["exito", "parcial", "fracaso"];
+  var MAX_EVENTS = 2e3;
+  var exact3 = (v, keys2, label2) => {
+    if (!v || typeof v !== "object" || Array.isArray(v) || Object.keys(v).some((k) => !keys2.includes(k))) throw Error(`${label2}: campos inválidos`);
+  };
+  var text2 = (v, label2) => {
+    if (typeof v !== "string" || !v.trim() || v.length > 2e3) throw Error(`${label2}: texto inválido`);
+    return v;
+  };
+  var key = (v) => {
+    if (typeof v !== "string" || !/^[a-z][a-z0-9_]{0,79}$/.test(v)) throw Error("Clave de escenario/mapa inválida");
+    return v;
+  };
+  var list3 = (v, label2, max = 100) => {
+    if (!Array.isArray(v) || v.length > max) throw Error(`${label2}: lista inválida`);
+    return v;
+  };
+  var unique3 = (rows, label2) => {
+    if (new Set(rows.map((r) => r.id)).size !== rows.length) throw Error(`${label2}: ID duplicado`);
+  };
+  var coordinate = (v) => {
+    if (typeof v !== "number" || !Number.isFinite(v) || v < 0 || v > 1e4) throw Error("Coordenada inválida");
+    return v;
+  };
+  function keep3(state) {
+    deepFreeze(state);
+    states3.add(state);
+    return state;
+  }
+  function own(state) {
+    if (!states3.has(state)) throw Error("Operación ajena; usar loadOperations");
+  }
+  var current = (state) => state.definition.missions.find((m) => m.id === state.currentMissionId);
+  var reportInput = (r) => Object.fromEntries(["id", "text", "confidence", "sourceLabel", "observedAtSeconds", "receivedAtSeconds"].map((k) => [k, r[k]]));
+  function normalize2(raw) {
+    exact3(raw, ["id", "title", "resourceInitial", "assets", "missions", "basis"], "Operación");
+    const resourceInitial = createCampaign(raw.resourceInitial).initial;
+    const assets = list3(raw.assets, "activos").map((a) => {
+      exact3(a, ["id", "kind", "engineType", "engineName", "mapKey", "x", "y", "az", "maxHp", "hp", "componentIds", "repairComponentId"], "Activo propio");
+      if (!["unit", "objective"].includes(a.kind)) throw Error("Clase de activo inválida");
+      const maxHp = integer(a.maxHp, "HP máximo", 1), hp = integer(a.hp, "HP");
+      if (hp > maxHp) throw Error("HP supera máximo");
+      const componentIds = list3(a.componentIds, "componentes del activo").map((c) => id(c));
+      if (new Set(componentIds).size !== componentIds.length || componentIds.some((c) => !resourceInitial.inventory.components.some((row) => row.id === c))) throw Error("Componente propio desconocido");
+      const repairComponentId = a.repairComponentId === null ? null : id(a.repairComponentId);
+      if (repairComponentId !== null && !componentIds.includes(repairComponentId)) throw Error("Reparación no corresponde al activo");
+      if (!Number.isFinite(a.az) || a.az < 0 || a.az >= 360) throw Error("Azimut inválido");
+      return {
+        id: id(a.id),
+        kind: a.kind,
+        engineType: key(a.engineType),
+        engineName: text2(a.engineName, "nombre"),
+        mapKey: key(a.mapKey),
+        x: coordinate(a.x),
+        y: coordinate(a.y),
+        az: a.az,
+        maxHp,
+        hp,
+        componentIds,
+        repairComponentId
+      };
+    });
+    unique3(assets, "activos");
+    if (new Set(assets.map((a) => `${a.kind}/${a.engineName}`)).size !== assets.length) throw Error("Nombre de motor duplicado");
+    const used = assets.flatMap((a) => a.componentIds);
+    if (new Set(used).size !== used.length) throw Error("Componente físico asignado a dos activos");
+    const missions = list3(raw.missions, "misiones", 20).map((m) => {
+      exact3(m, ["id", "title", "scenarioKey", "mapKey", "role", "delayBeforeSeconds", "planningSeconds", "allowedAssetIds", "allowedQuoteIds", "objectives", "next"], "Misión");
+      if (!["defence", "attack"].includes(m.role)) throw Error("Rol inválido");
+      const allowedAssetIds = list3(m.allowedAssetIds, "medios").map((v) => id(v)), allowedQuoteIds = list3(m.allowedQuoteIds, "ofertas").map((v) => id(v));
+      if (new Set(allowedAssetIds).size !== allowedAssetIds.length || allowedAssetIds.some((v) => !assets.some((a) => a.id === v))) throw Error("Activo permitido desconocido/duplicado");
+      if (new Set(allowedQuoteIds).size !== allowedQuoteIds.length || allowedQuoteIds.some((v) => !resourceInitial.quotes.some((q) => q.id === v))) throw Error("Oferta permitida desconocida/duplicada");
+      exact3(m.next, RESULTS, "Continuación");
+      const next2 = Object.fromEntries(RESULTS.map((r) => [r, m.next[r] === null ? null : id(m.next[r])]));
+      const objectives = normalizePreparationBriefing(
+        {
+          sideId: resourceInitial.inventory.sideId,
+          missionId: m.id,
+          role: m.role,
+          title: m.title,
+          issuedAtSeconds: 0,
+          objectives: m.objectives,
+          intelligence: []
+        },
+        { sideId: resourceInitial.inventory.sideId, missionId: m.id },
+        { fractionalTime: true }
+      ).objectives;
+      return {
+        id: id(m.id),
+        title: text2(m.title, "título"),
+        scenarioKey: key(m.scenarioKey),
+        mapKey: key(m.mapKey),
+        role: m.role,
+        delayBeforeSeconds: seconds(m.delayBeforeSeconds),
+        planningSeconds: seconds(m.planningSeconds),
+        allowedAssetIds,
+        allowedQuoteIds,
+        objectives,
+        next: next2
+      };
+    });
+    unique3(missions, "misiones");
+    if (!missions.length || missions[0].id !== resourceInitial.missionId || missions[0].delayBeforeSeconds !== 0) throw Error("Primera misión/origen inválidos");
+    for (const [i, m] of missions.entries()) for (const to of Object.values(m.next)) {
+      if (to !== null && missions.findIndex((next2) => next2.id === to) <= i) throw Error("Continuación desconocida, cíclica o hacia atrás");
+    }
+    const reachable = /* @__PURE__ */ new Set([missions[0].id]);
+    for (const m of missions) if (reachable.has(m.id)) {
+      for (const to of Object.values(m.next)) if (to) reachable.add(to);
+    }
+    if (reachable.size !== missions.length) throw Error("Misión inalcanzable");
+    const basis2 = text2(raw.basis, "alcance de campaña");
+    const definition = { id: id(raw.id), title: text2(raw.title, "título"), resourceInitial, assets, missions, basis: basis2 };
+    if (JSON.stringify(definition).length > 2 * 1024 * 1024) throw Error("Definición demasiado grande");
+    return definition;
+  }
+  function createOperations(raw) {
+    const definition = normalize2(raw), resources = createCampaign(definition.resourceInitial);
+    return keep3({
+      definition,
+      resources,
+      currentMissionId: definition.missions[0].id,
+      phase: "planning",
+      enteredAtSeconds: 0,
+      assets: structuredClone(definition.assets),
+      intelligence: [],
+      history: [],
+      events: [],
+      usedRecoveryJobs: []
+    });
+  }
+  function descendant(state, resources) {
+    saveCampaign(resources);
+    if (JSON.stringify(resources.initial) !== JSON.stringify(state.resources.initial) || resources.commands.length < state.resources.commands.length || JSON.stringify(resources.commands.slice(0, state.resources.commands.length)) !== JSON.stringify(state.resources.commands)) throw Error("Libro sustituido o historia retrocedida");
+    if (resources.sideId !== state.resources.sideId || resources.missions.at(-1).id !== state.currentMissionId) throw Error("Libro de otro bando/misión");
+  }
+  function evolve(state, event2, change) {
+    own(state);
+    if (state.events.length >= MAX_EVENTS) throw Error("Límite de eventos de operación");
+    const prior = state.events.find((e) => e.requestId === event2.requestId);
+    if (prior) {
+      if (JSON.stringify(prior) !== JSON.stringify(event2)) throw Error("requestId reutilizado");
+      return state;
+    }
+    return keep3({ ...state, ...change, events: [...state.events, event2] });
+  }
+  function applyOperationResourceCommand(state, command2) {
+    own(state);
+    if (state.phase !== "planning") throw Error("Órdenes logísticas del jugador requieren preparación");
+    const mission = current(state);
+    if (!["order", "transfer", "repair", "cancel", "advance"].includes(command2.kind)) throw Error("Acción de preparación inválida");
+    if (command2.kind === "order" && !mission.allowedQuoteIds.includes(command2.quoteId)) throw Error("Oferta no disponible en esta etapa");
+    if (command2.atSeconds > addSeconds(state.enteredAtSeconds, mission.planningSeconds)) throw Error("Terminó la ventana de preparación");
+    const resources = applyCampaignCommand(state.resources, command2);
+    if (resources === state.resources) return state;
+    return evolve(state, { kind: "sync", requestId: id(command2.commandId), commandCount: resources.commands.length }, { resources });
+  }
+  function activateOperationMission(state, requestId) {
+    own(state);
+    id(requestId);
+    const prior = state.events.find((e) => e.requestId === requestId);
+    if (prior) {
+      if (prior.kind !== "activate") throw Error("requestId reutilizado");
+      return state;
+    }
+    if (state.phase !== "planning") throw Error("Misión no está en preparación");
+    const mission = current(state);
+    if (state.resources.clockSeconds > addSeconds(state.enteredAtSeconds, mission.planningSeconds)) throw Error("Terminó la preparación");
+    const resources = applyCampaignCommand(state.resources, {
+      commandId: requestId,
+      sideId: state.resources.sideId,
+      atSeconds: state.resources.clockSeconds,
+      kind: "activate"
+    });
+    return evolve(state, { kind: "activate", requestId, commandCount: resources.commands.length }, { resources, phase: "active" });
+  }
+  function syncOperationResources(state, resources, requestId) {
+    own(state);
+    id(requestId);
+    descendant(state, resources);
+    if (state.phase !== "active" || resources.phase !== "active") throw Error("Sincronizar requiere combate activo");
+    return evolve(state, { kind: "sync", requestId, commandCount: resources.commands.length }, { resources });
+  }
+  function completeOperationMission(state, input) {
+    own(state);
+    exact3(input, ["requestId", "resources", "result", "assetOutcomes", "intelligence", "summary"], "Debrief propio");
+    id(input.requestId);
+    const priorEvent = state.events.find((e) => e.requestId === input.requestId);
+    if (priorEvent) {
+      saveCampaign(input.resources);
+      if (priorEvent.kind !== "complete" || JSON.stringify(input.resources.initial) !== JSON.stringify(state.resources.initial) || input.resources.commands.length !== priorEvent.commandCount || JSON.stringify(input.resources.commands) !== JSON.stringify(state.resources.commands.slice(0, priorEvent.commandCount))) throw Error("requestId reutilizado");
+      const m = state.definition.missions.find((m2) => m2.id === priorEvent.debrief.missionId);
+      const reports2 = normalizePreparationBriefing(
+        {
+          sideId: input.resources.sideId,
+          missionId: m.id,
+          role: m.role,
+          title: m.title,
+          issuedAtSeconds: input.resources.clockSeconds,
+          objectives: m.objectives,
+          intelligence: input.intelligence
+        },
+        { sideId: input.resources.sideId, missionId: m.id },
+        { fractionalTime: true }
+      ).intelligence;
+      const rows2 = list3(input.assetOutcomes, "estado propio").map((r) => {
+        exact3(r, ["id", "hp", "x", "y", "mapKey", "restoredByJobId"], "Resultado");
+        return { id: r.id, hp: r.hp, x: r.x, y: r.y, mapKey: r.mapKey, restoredByJobId: r.restoredByJobId };
+      });
+      if (input.result !== priorEvent.debrief.result || input.summary !== priorEvent.debrief.summary || JSON.stringify(rows2) !== JSON.stringify(priorEvent.debrief.assetOutcomes) || JSON.stringify(reports2) !== JSON.stringify(priorEvent.debrief.intelligence)) throw Error("requestId reutilizado");
+      return state;
+    }
+    descendant(state, input.resources);
+    if (!RESULTS.includes(input.result)) throw Error("Resultado inválido");
+    if (state.phase !== "active" || input.resources.phase !== "completed") throw Error("El motor debe finalizar el libro antes del debrief");
+    const at = input.resources.clockSeconds, mission = current(state);
+    const briefing = normalizePreparationBriefing(
+      {
+        sideId: input.resources.sideId,
+        missionId: mission.id,
+        role: mission.role,
+        title: mission.title,
+        issuedAtSeconds: at,
+        objectives: mission.objectives,
+        intelligence: input.intelligence
+      },
+      { sideId: input.resources.sideId, missionId: mission.id },
+      { fractionalTime: true }
+    );
+    const rows = list3(input.assetOutcomes, "estado propio").map((row) => {
+      exact3(row, ["id", "hp", "x", "y", "mapKey", "restoredByJobId"], "Resultado de activo");
+      const asset = state.assets.find((a) => a.id === row.id);
+      if (!asset || !mission.allowedAssetIds.includes(row.id)) throw Error("Activo no pertenece a la misión");
+      const hp = integer(row.hp, "HP");
+      if (hp > asset.maxHp) throw Error("HP supera máximo");
+      const restoredByJobId = row.restoredByJobId === null ? null : id(row.restoredByJobId);
+      if (hp > asset.hp) {
+        const job = input.resources.jobs.find((j) => j.id === restoredByJobId && j.kind === "repair" && j.status === "completed" && j.componentId === asset.repairComponentId);
+        if (!job || state.usedRecoveryJobs.includes(job.id) || asset.hp === 0) throw Error("Recuperación sin trabajo pagado y terminado");
+      } else if (restoredByJobId !== null) throw Error("Trabajo de recuperación sin recuperación");
+      if (row.mapKey !== mission.mapKey) throw Error("Resultado en otro mapa");
+      return { id: id(row.id), hp, x: coordinate(row.x), y: coordinate(row.y), mapKey: key(row.mapKey), restoredByJobId };
+    });
+    unique3(rows, "resultados propios");
+    if (rows.length !== mission.allowedAssetIds.length) throw Error("Falta estado de activos propios de la misión");
+    const recovered = rows.map((r) => r.restoredByJobId).filter(Boolean);
+    if (new Set(recovered).size !== recovered.length) throw Error("Reparación aplicada a dos activos");
+    const assets = state.assets.map((a) => {
+      const row = rows.find((r) => r.id === a.id);
+      return row ? { ...a, hp: row.hp, x: row.x, y: row.y, mapKey: row.mapKey } : a;
+    });
+    const reports = new Map(state.intelligence.map((r) => [r.id, r]));
+    for (const report of briefing.intelligence) {
+      const prior = reports.get(report.id);
+      if (prior && JSON.stringify(prior) !== JSON.stringify(report)) {
+        const fields2 = ["text", "confidence", "sourceLabel", "observedAtSeconds", "receivedAtSeconds"];
+        if (fields2.some((f) => prior[f] !== report[f])) throw Error("Reporte reescrito");
+      }
+      reports.set(report.id, report);
+    }
+    if (reports.size > 100) throw Error("Demasiados reportes persistentes");
+    const debrief = {
+      missionId: mission.id,
+      result: input.result,
+      atSeconds: at,
+      summary: text2(input.summary, "resumen"),
+      assetOutcomes: rows,
+      intelligence: briefing.intelligence
+    };
+    const event2 = { kind: "complete", requestId: input.requestId, commandCount: input.resources.commands.length, debrief };
+    return evolve(state, event2, {
+      resources: input.resources,
+      phase: "debrief",
+      assets,
+      intelligence: [...reports.values()],
+      history: [...state.history, debrief],
+      usedRecoveryJobs: [...state.usedRecoveryJobs, ...recovered]
+    });
+  }
+  function continueOperations(state, requestId) {
+    own(state);
+    id(requestId);
+    const prior = state.events.find((e) => e.requestId === requestId);
+    if (prior) {
+      if (prior.kind !== "continue") throw Error("requestId reutilizado");
+      return state;
+    }
+    if (state.phase !== "debrief") throw Error("Terminar y revisar misión antes de continuar");
+    const to = current(state).next[state.history.at(-1).result];
+    if (to === null) return evolve(state, { kind: "continue", requestId, commandCount: state.resources.commands.length, missionId: null }, { phase: "finished" });
+    const mission = state.definition.missions.find((m) => m.id === to);
+    const clock2 = addSeconds(state.resources.clockSeconds, mission.delayBeforeSeconds);
+    let resources = applyCampaignCommand(state.resources, { commandId: `${requestId}-time`, sideId: state.resources.sideId, atSeconds: clock2, kind: "advance" });
+    resources = applyCampaignCommand(resources, { commandId: requestId, sideId: resources.sideId, atSeconds: clock2, kind: "begin-mission", missionId: to });
+    return evolve(
+      state,
+      { kind: "continue", requestId, commandCount: resources.commands.length, missionId: to },
+      { resources, currentMissionId: to, phase: "planning", enteredAtSeconds: clock2 }
+    );
+  }
+  function operationMission(state) {
+    own(state);
+    const mission = current(state);
+    return deepFreeze({ ...mission, assets: structuredClone(state.assets.filter((a) => mission.allowedAssetIds.includes(a.id))) });
+  }
+  function operationView(state) {
+    own(state);
+    const mission = current(state), at = state.resources.clockSeconds;
+    const briefing = normalizePreparationBriefing(
+      {
+        sideId: state.resources.sideId,
+        missionId: mission.id,
+        role: mission.role,
+        title: mission.title,
+        issuedAtSeconds: at,
+        objectives: mission.objectives,
+        intelligence: state.intelligence.map(reportInput)
+      },
+      { sideId: state.resources.sideId, missionId: mission.id },
+      { fractionalTime: true }
+    );
+    return deepFreeze({
+      campaignId: state.definition.id,
+      campaignTitle: state.definition.title,
+      basis: state.definition.basis,
+      sideId: state.resources.sideId,
+      phase: state.phase,
+      missionId: mission.id,
+      title: mission.title,
+      atSeconds: at,
+      preparationEndsAtSeconds: addSeconds(state.enteredAtSeconds, mission.planningSeconds),
+      briefing,
+      assets: structuredClone(state.assets.filter((a) => mission.allowedAssetIds.includes(a.id))),
+      resources: {
+        balance: state.resources.balance,
+        unit: state.resources.unit,
+        stock: structuredClone(state.resources.inventory.stock),
+        jobs: structuredClone(state.resources.jobs),
+        spares: structuredClone(state.resources.spares),
+        quotes: state.resources.initial.quotes.filter((q) => mission.allowedQuoteIds.includes(q.id)).map((q) => ({ ...structuredClone(q), remaining: state.resources.quotes.find((row) => row.id === q.id).remaining }))
+      },
+      debrief: state.phase === "debrief" || state.phase === "finished" ? structuredClone(state.history.at(-1)) : null
+    });
+  }
+  function saveOperations(state) {
+    own(state);
+    const saved = JSON.stringify({
+      format: "cielo-cerrado/operations",
+      version: 1,
+      definition: state.definition,
+      resources: JSON.parse(saveCampaign(state.resources)),
+      events: state.events
+    });
+    if (saved.length > 12 * 1024 * 1024) throw Error("Guardado de operación demasiado grande");
+    return saved;
+  }
+  function loadOperations(saved, expectedSideId) {
+    if (typeof saved !== "string" || saved.length > 12 * 1024 * 1024) throw Error("Guardado inválido");
+    const raw = JSON.parse(saved);
+    exact3(raw, ["format", "version", "definition", "resources", "events"], "Guardado");
+    if (raw.format !== "cielo-cerrado/operations" || raw.version !== 1) throw Error("Formato de operación inválido");
+    let state = createOperations(raw.definition);
+    if (state.resources.sideId !== id(expectedSideId)) throw Error("Operación de otro bando");
+    const final = loadCampaign(JSON.stringify(raw.resources), expectedSideId);
+    if (JSON.stringify(final.initial) !== JSON.stringify(state.resources.initial)) throw Error("Inventario inicial sustituido");
+    let count = 0;
+    for (const event2 of list3(raw.events, "eventos", MAX_EVENTS)) {
+      integer(event2.commandCount, "cursor");
+      if (event2.commandCount < count || event2.commandCount > final.commands.length) throw Error("Cursor de recursos inválido");
+      const resources = loadCampaign(JSON.stringify({ ...raw.resources, commands: final.commands.slice(0, event2.commandCount) }), expectedSideId);
+      const allowed = event2.kind === "complete" ? ["kind", "requestId", "commandCount", "debrief"] : event2.kind === "continue" ? ["kind", "requestId", "commandCount", "missionId"] : ["kind", "requestId", "commandCount"];
+      exact3(event2, allowed, "Evento");
+      if (event2.kind === "sync") {
+        if (state.phase === "planning") {
+          for (const command2 of resources.commands.slice(count)) state = applyOperationResourceCommand(state, command2);
+        } else state = syncOperationResources(state, resources, event2.requestId);
+      } else if (event2.kind === "activate") state = activateOperationMission(state, event2.requestId);
+      else if (event2.kind === "complete") {
+        exact3(event2.debrief, ["missionId", "result", "atSeconds", "summary", "assetOutcomes", "intelligence"], "Debrief");
+        if (event2.debrief.missionId !== state.currentMissionId || event2.debrief.atSeconds !== resources.clockSeconds) throw Error("Debrief de otra misión/tiempo");
+        state = completeOperationMission(state, {
+          requestId: event2.requestId,
+          resources,
+          result: event2.debrief.result,
+          assetOutcomes: event2.debrief.assetOutcomes,
+          intelligence: event2.debrief.intelligence.map(reportInput),
+          summary: event2.debrief.summary
+        });
+      } else if (event2.kind === "continue") state = continueOperations(state, event2.requestId);
+      else throw Error("Evento de operación desconocido");
+      if (JSON.stringify(state.events.at(-1)) !== JSON.stringify(event2) || JSON.stringify(state.resources.commands) !== JSON.stringify(resources.commands)) throw Error("Replay divergente");
+      count = event2.commandCount;
+    }
+    if (count !== final.commands.length) throw Error("Comandos de recursos sin evento autorizado");
+    return state;
+  }
+
+  // experimentos/catalogo-presupuesto/lib/mission-adapter.mjs
+  function exact4(value, keys2, name) {
+    if (!value || typeof value !== "object" || Array.isArray(value) || Object.keys(value).some((key2) => !keys2.includes(key2))) throw Error(`${name}: campos inválidos`);
+  }
+  function normalizeBindings(campaign, raw) {
+    if (!Array.isArray(raw) || raw.length > 200) throw Error("Asignaciones inválidas");
+    const result = raw.map((binding) => {
+      exact4(binding, ["unitId", "readyLocationId", "reserveLocationId", "ammunitionIds", "reloadServiceId"], "Asignación");
+      const unitId = integer(binding.unitId, "unitId", 1);
+      const readyLocationId = id(binding.readyLocationId), reserveLocationId = id(binding.reserveLocationId);
+      const inventory = campaign.initial.inventory;
+      const ready = inventory.locations.find((row) => row.id === readyLocationId);
+      const reserve = inventory.locations.find((row) => row.id === reserveLocationId);
+      if (ready?.kind !== "launcher" || reserve?.kind !== "depot") throw Error("Asignación sin lanzador/reserva físicos");
+      if (!Array.isArray(binding.ammunitionIds) || !binding.ammunitionIds.length || binding.ammunitionIds.length > 200) throw Error("Municiones de asignación inválidas");
+      const ammunitionIds = binding.ammunitionIds.map((value) => id(value));
+      const configuration = inventory.configurations.find((row) => row.id === ready.configurationId);
+      if (new Set(ammunitionIds).size !== ammunitionIds.length || ammunitionIds.some((value) => !inventory.ammunitionIds.includes(value) || !configuration.loadouts.some((loadout) => loadout.rounds.some((round) => round.ammunitionId === value)))) throw Error("Munición no admitida por el lanzador");
+      const reloadServiceId = binding.reloadServiceId === null ? null : id(binding.reloadServiceId);
+      if (reloadServiceId !== null) {
+        const service = campaign.initial.services.find((row) => row.id === reloadServiceId);
+        if (service?.kind !== "transfer" || service.fromId !== reserveLocationId || service.toId !== readyLocationId || ammunitionIds.some((value) => !service.ammunitionIds.includes(value))) throw Error("Servicio de recarga no corresponde a la asignación");
+      }
+      return { unitId, readyLocationId, reserveLocationId, ammunitionIds, reloadServiceId };
+    });
+    if (new Set(result.map((row) => row.unitId)).size !== result.length || new Set(result.map((row) => row.readyLocationId)).size !== result.length) throw Error("Unidad/lanzador asignado dos veces");
+    if (JSON.stringify(result).length > 512 * 1024) throw Error("Asignaciones demasiado grandes");
+    return deepFreeze(result);
+  }
+  function attachMission(campaign, input) {
+    saveCampaign(campaign);
+    exact4(input, ["sideId", "bindings"], "Adaptador");
+    const sideId = id(input.sideId);
+    if (sideId !== campaign.sideId) throw Error("Adaptador de otro bando");
+    if (!["active", "completed"].includes(campaign.phase)) throw Error("Activar la misión antes de conectar el motor");
+    const bindings = normalizeBindings(campaign, input.bindings);
+    const originSeconds = campaign.missions.at(-1).startedAtSeconds;
+    let current3 = campaign, serial2 = 0;
+    function bindingOf(unitId) {
+      integer(unitId, "unitId", 1);
+      const binding = bindings.find((row) => row.unitId === unitId);
+      if (!binding) throw Error("Unidad sin asignación propia");
+      return binding;
+    }
+    function roundOf(binding, ammunitionId) {
+      id(ammunitionId);
+      if (!binding.ammunitionIds.includes(ammunitionId)) throw Error("Munición ajena a la asignación");
+    }
+    function clockId(state) {
+      let value;
+      do {
+        value = `adapter-clock-${++serial2}`;
+      } while (state.commands.some((row) => row.commandId === value));
+      return value;
+    }
+    function advance(state, missionSeconds) {
+      const atSeconds = addSeconds(originSeconds, seconds(missionSeconds, "tiempo de misión"));
+      if (atSeconds < state.clockSeconds) throw Error("Reloj de misión retrocede");
+      if (atSeconds === state.clockSeconds) return state;
+      return applyCampaignCommand(state, { commandId: clockId(state), sideId, atSeconds, kind: "advance" });
+    }
+    function execute(request, kind, properties) {
+      id(request.requestId, "requestId");
+      const atSeconds = addSeconds(originSeconds, seconds(request.missionSeconds, "tiempo de misión"));
+      const command2 = { commandId: request.requestId, sideId, atSeconds, kind, ...properties };
+      if (current3.commands.some((row) => row.commandId === request.requestId)) {
+        current3 = applyCampaignCommand(current3, command2);
+        return current3;
+      }
+      if (current3.phase !== "active") throw Error("La sesión de combate terminó");
+      let next2 = advance(current3, request.missionSeconds);
+      next2 = applyCampaignCommand(next2, command2);
+      current3 = next2;
+      return current3;
+    }
+    const adapter = {
+      getCampaign: () => current3,
+      getMissionSeconds: () => (current3.phase === "completed" ? current3.missions.at(-1).endedAtSeconds : current3.clockSeconds) - originSeconds,
+      ammunition(unitId) {
+        const binding = bindingOf(unitId);
+        const stock3 = (locationId, ammunitionId) => current3.inventory.stock.find((row) => row.locationId === locationId && row.ammunitionId === ammunitionId)?.quantity ?? 0;
+        return deepFreeze(binding.ammunitionIds.map((ammunitionId) => ({
+          ammunitionId,
+          ready: stock3(binding.readyLocationId, ammunitionId),
+          reserve: stock3(binding.reserveLocationId, ammunitionId)
+        })));
+      },
+      advance(request) {
+        exact4(request, ["missionSeconds"], "Reloj");
+        if (current3.phase !== "active") throw Error("La sesión de combate terminó");
+        const next2 = advance(current3, request.missionSeconds);
+        current3 = next2;
+        return current3;
+      },
+      fire(request) {
+        exact4(request, ["requestId", "missionSeconds", "unitId", "ammunitionId", "quantity"], "Disparo");
+        const binding = bindingOf(request.unitId);
+        roundOf(binding, request.ammunitionId);
+        return execute(request, "outcome", { outcome: {
+          kind: "expend",
+          fromId: binding.readyLocationId,
+          ammunitionId: request.ammunitionId,
+          quantity: integer(request.quantity, "cantidad", 1)
+        } });
+      },
+      reload(request) {
+        exact4(request, ["requestId", "missionSeconds", "unitId", "ammunitionId", "quantity"], "Recarga");
+        const binding = bindingOf(request.unitId);
+        roundOf(binding, request.ammunitionId);
+        if (binding.reloadServiceId === null) throw Error("Unidad sin servicio de recarga declarado");
+        return execute(request, "transfer", {
+          jobId: request.requestId,
+          serviceId: binding.reloadServiceId,
+          ammunitionId: request.ammunitionId,
+          quantity: integer(request.quantity, "cantidad", 1)
+        });
+      },
+      damage(request) {
+        exact4(request, ["requestId", "missionSeconds", "componentId", "condition"], "Daño");
+        return execute(request, "outcome", { outcome: { kind: "condition", componentId: id(request.componentId), condition: request.condition } });
+      },
+      loseStock(request) {
+        exact4(request, ["requestId", "missionSeconds", "locationId", "ammunitionId", "quantity"], "Pérdida");
+        return execute(request, "outcome", { outcome: {
+          kind: "loss",
+          fromId: id(request.locationId),
+          ammunitionId: id(request.ammunitionId),
+          quantity: integer(request.quantity, "cantidad", 1)
+        } });
+      },
+      repair(request) {
+        exact4(request, ["requestId", "missionSeconds", "serviceId", "componentId"], "Reparación");
+        return execute(request, "repair", { jobId: request.requestId, serviceId: id(request.serviceId), componentId: id(request.componentId) });
+      },
+      order(request) {
+        exact4(request, ["requestId", "missionSeconds", "quoteId", "quantity"], "Pedido");
+        return execute(request, "order", { jobId: request.requestId, quoteId: id(request.quoteId), quantity: integer(request.quantity, "cantidad", 1) });
+      },
+      cancel(request) {
+        exact4(request, ["requestId", "missionSeconds", "jobId"], "Cancelación");
+        return execute(request, "cancel", { jobId: id(request.jobId) });
+      },
+      finish(request) {
+        exact4(request, ["requestId", "missionSeconds"], "Fin");
+        return execute(request, "finish", {});
+      },
+      save() {
+        const text3 = JSON.stringify({
+          format: "cielo-cerrado/mission-resource-session",
+          version: 1,
+          sideId,
+          bindings,
+          campaign: JSON.parse(saveCampaign(current3))
+        });
+        if (text3.length > 10 * 1024 * 1024) throw Error("Sesión demasiado grande");
+        return text3;
+      }
+    };
+    return Object.freeze(adapter);
+  }
+
+  // experimentos/catalogo-presupuesto/lib/port-combat.mjs
+  var active2 = null;
+  function startPortCombat(operation2, seed = 1) {
+    if (active2) throw Error("Ya hay un combate experimental activo");
+    integer(seed, "semilla", 1);
+    const mission = operationMission(operation2);
+    if (mission.role !== "defence" || operation2.resources.sideId !== "ua" || !SCENARIOS[mission.scenarioKey]) throw Error("Configuración de combate no admitida");
+    const scenario = SCENARIOS[mission.scenarioKey];
+    if (scenario.map !== mission.mapKey) throw Error("Mapa de campaña no corresponde");
+    for (const asset of mission.assets) if (asset.mapKey !== mission.mapKey) throw Error("Falta traslado geográfico del activo");
+    operation2 = activateOperationMission(operation2, `start-${mission.id}`);
+    setMap(builtinMap(mission.mapKey));
+    resetState();
+    S.setup = { objs: [], defs: [], salvos: [], jams: [] };
+    S.c2 = "coordinada";
+    S.doctrine = "salva";
+    S.weather = "despejado";
+    S.tod = "noche";
+    S.wxPlan = [];
+    S.gateways = [];
+    S.wind = { v: 0, from: 0 };
+    S.ignoreDecoys = false;
+    S.fireRange = 1;
+    applyScenario(scenario);
+    S.setup.defs = [];
+    for (const a of mission.assets.filter((a2) => a2.kind === "unit" && a2.hp > 0)) {
+      if (!DEFENSES[a.engineType]) throw Error("Tipo de defensa desconocido");
+      addDef(a.engineType, a.x, a.y, { name: a.engineName, owner: "UA", az: a.az, reserve: 0 });
+    }
+    const names = new Set(S.setup.defs.map((u) => u.name));
+    S.scen = { ...S.scen, goals: S.scen.goals.filter((g) => g.kind !== "keepUnit" || names.has(g.target)) };
+    const rng = seeded(seed);
+    try {
+      setRandom(rng);
+      startSim();
+    } finally {
+      setRandom(null);
+    }
+    S.running = false;
+    const assetsByUnit = new Map(S.units.map((u) => [u, mission.assets.find((a) => a.kind === "unit" && a.engineName === u.name)]));
+    for (const [u, a] of assetsByUnit) u.hp = a.hp;
+    for (const g of S.objs) {
+      const a = mission.assets.find((a2) => a2.kind === "objective" && a2.engineName === g.name);
+      if (!a) throw Error("Objetivo físico fuera del contrato de misión");
+      g.hp = a.hp;
+      g.maxHp = a.maxHp;
+      g.status = targetStatus(g.hp, g.maxHp);
+    }
+    const bindings = [...assetsByUnit].filter(([u]) => DEFENSES[u.type].sam).map(([u, a]) => ({
+      unitId: u.id,
+      readyLocationId: `${a.id}-ready`,
+      reserveLocationId: "depot",
+      ammunitionIds: [`legacy-${a.id}`],
+      reloadServiceId: `${a.id}-reload`
+    }));
+    const session = attachMission(operation2.resources, { sideId: "ua", bindings });
+    const origin = operation2.resources.clockSeconds;
+    const fired = /* @__PURE__ */ new Set(), muted = /* @__PURE__ */ new Set();
+    let serial2 = 0, finished = false;
+    const requestId = () => `battle-${mission.id}-${++serial2}`;
+    const functional = (campaign, id2) => campaign.inventory.components.some((c) => c.id === id2 && ["operational", "degraded"].includes(c.condition));
+    const currentCondition = (id2) => session.getCampaign().inventory.components.find((c) => c.id === id2)?.condition;
+    const ended2 = () => !S.pending.length && S.threats.every((th) => !th.alive) && S.ints.every((it) => it.done) && S.hoj.every((it) => it.done);
+    function prepareCounters() {
+      const campaign = session.getCampaign();
+      for (const [u, a] of assetsByUnit) {
+        const sm = DEFENSES[u.type].sam;
+        const sensor = a.componentIds.find((id2) => id2.endsWith("-sensor"));
+        u.dmgRadar = !!sensor && ["degraded", "disabled", "destroyed"].includes(currentCondition(sensor));
+        if (sensor && !functional(campaign, sensor)) {
+          u.nextScan = Infinity;
+          muted.add(u);
+        } else if (muted.delete(u)) u.nextScan = S.t;
+        if (!sm) continue;
+        u.dmgLauncher = ["disabled", "destroyed"].includes(currentCondition(`${a.id}-launcher`));
+        const ready = session.ammunition(u.id)[0].ready;
+        u.magLeft = a.componentIds.every((id2) => functional(campaign, id2)) ? ready : 0;
+        u.reserveLeft = 0;
+        u.reloadUntil = null;
+      }
+    }
+    function recordEffects() {
+      for (const it of [...S.ints, ...S.hoj]) if (!fired.has(it)) {
+        const a = assetsByUnit.get(it.u);
+        if (!a) throw Error("Disparo de unidad no asignada");
+        session.fire({ requestId: requestId(), missionSeconds: S.t, unitId: it.u.id, ammunitionId: `legacy-${a.id}`, quantity: 1 });
+        fired.add(it);
+      }
+      for (const [u, a] of assetsByUnit) {
+        for (const id2 of a.componentIds) {
+          const next2 = !u.alive ? "destroyed" : id2.endsWith("-launcher") && u.dmgLauncher ? "disabled" : id2.endsWith("-sensor") && u.dmgRadar ? "degraded" : null;
+          const previous = currentCondition(id2);
+          if (next2 && previous !== next2 && previous !== "destroyed" && !(previous === "disabled" && next2 === "degraded")) {
+            session.damage({ requestId: requestId(), missionSeconds: S.t, componentId: id2, condition: next2 });
+          }
+        }
+        const sm = DEFENSES[u.type].sam;
+        if (!sm || !u.alive || u.active > 0 || !functional(session.getCampaign(), `${a.id}-launcher`)) continue;
+        const stock3 = session.ammunition(u.id)[0];
+        const busy = session.getCampaign().jobs.some((j) => j.serviceId === `${a.id}-reload` && ["pending", "interrupted"].includes(j.status));
+        if (!busy && stock3.ready === 0 && stock3.reserve > 0) session.reload({
+          requestId: requestId(),
+          missionSeconds: S.t,
+          unitId: u.id,
+          ammunitionId: stock3.ammunitionId,
+          quantity: Math.min(sm.mag, stock3.reserve)
+        });
+      }
+    }
+    function finalize() {
+      session.finish({ requestId: requestId(), missionSeconds: S.t });
+      const result = evaluateGoals(S.scen, S).outcome.result;
+      const assetOutcomes = mission.assets.map((a) => {
+        const obj = a.kind === "unit" ? S.units.find((u) => u.name === a.engineName) : S.objs.find((o) => o.name === a.engineName);
+        return {
+          id: a.id,
+          hp: obj ? Math.max(0, a.kind === "unit" && !obj.alive ? 0 : obj.hp) : a.hp,
+          x: obj?.x ?? a.x,
+          y: obj?.y ?? a.y,
+          mapKey: mission.mapKey,
+          restoredByJobId: null
+        };
+      });
+      operation2 = completeOperationMission(operation2, {
+        requestId: `debrief-${mission.id}`,
+        resources: session.getCampaign(),
+        result,
+        assetOutcomes,
+        intelligence: [{
+          id: `inspection-${mission.id}`,
+          text: "Inspección de la infraestructura y medios propios al terminar la guardia.",
+          confidence: "confirmed",
+          sourceLabel: "Parte propio de cierre",
+          observedAtSeconds: origin + S.t,
+          receivedAtSeconds: origin + S.t
+        }],
+        summary: "La guardia terminó. El estado de los medios e infraestructura propios y la munición restante pasan a la siguiente misión."
+      });
+      finished = true;
+      active2 = null;
+    }
+    const bridge = {
+      step() {
+        if (finished) return false;
+        const next2 = S.t + 0.25;
+        const due = session.getCampaign().jobs.some((j) => j.status === "pending" && j.dueAtSeconds <= origin + next2);
+        if (due || Math.floor(next2 / 30) > Math.floor(S.t / 30)) session.advance({ missionSeconds: next2 });
+        prepareCounters();
+        try {
+          setRandom(rng);
+          step(0.25);
+        } finally {
+          setRandom(null);
+        }
+        recordEffects();
+        if (ended2()) finalize();
+        return !finished;
+      },
+      getOperation() {
+        if (!finished && session.getCampaign() !== operation2.resources) operation2 = syncOperationResources(operation2, session.getCampaign(), `checkpoint-${mission.id}-${++serial2}`);
+        return operation2;
+      },
+      view() {
+        const contacts = [];
+        for (const th of S.threats) {
+          const s = th.seen;
+          if (!s) continue;
+          const age = S.t - s.t;
+          if (age < 0 || age > 90) continue;
+          const q = th.seenPrev, dt = q ? s.t - q.t : 0;
+          const lost = age > 12, k = lost ? 0 : age;
+          contacts.push({
+            id: th.id,
+            x: s.x + (dt > 0 ? (s.x - q.x) / dt : 0) * k,
+            y: s.y + (dt > 0 ? (s.y - q.y) / dt : 0) * k,
+            age,
+            lost,
+            classification: th.clsAs ?? null
+          });
+        }
+        return deepFreeze({
+          finished,
+          seconds: S.t,
+          contacts,
+          shots: session.getCampaign().inventory.totals.reduce((n2, t) => n2 + t.expended, 0),
+          units: [...assetsByUnit].map(([u, a]) => ({
+            id: a.id,
+            name: u.name,
+            x: u.x,
+            y: u.y,
+            hp: Math.max(0, u.alive ? u.hp : 0),
+            ready: DEFENSES[u.type].sam ? session.ammunition(u.id)[0].ready : null
+          })),
+          objectives: S.objs.map((g) => ({ name: g.name, x: g.x, y: g.y, hp: Math.max(0, g.hp), maxHp: g.maxHp }))
+        });
+      },
+      map: () => MAP,
+      release() {
+        if (!finished) throw Error("Terminar la guardia antes de liberar el motor");
+      }
+    };
+    active2 = bridge;
+    return bridge;
   }
 
   // src/sim/pace.js
@@ -6818,7 +8343,7 @@ table.t.mc td.pc{white-space:nowrap}
             el.querySelector("#aAngV").textContent = deg + "°";
             el.querySelector("#aOut").innerHTML = `RCS en ${r.band}: <b>${rcsTxt(s)} m²</b> (de frente ${rcsTxt(s0)}) · alcance por señal <b>${n(r.R1 * Math.pow(s, 0.25))} km</b> (de frente ${n(r.R1 * Math.pow(s0, 0.25))} km)`;
           };
-          for (const id of ["#aThr", "#aRad"]) el.querySelector(id).onchange = upd;
+          for (const id2 of ["#aThr", "#aRad"]) el.querySelector(id2).onchange = upd;
           el.querySelector("#aAng").oninput = upd;
           upd();
         }
@@ -7044,13 +8569,13 @@ table.t.mc td.pc{white-space:nowrap}
       engine: () => `<p>El modo <b>Auto</b> comprime el tiempo según la fase: ${Object.values(AUTO_PHASES).map((p) => p.speed + "× " + esc(p.text)).join(", ")}. La simulación avanza en pasos de 0,25 s simulados cualquiera sea la velocidad, así que el resultado no depende de la velocidad elegida.</p>`
     }
   ];
-  var conceptById = (id) => CONCEPTS.find((c) => c.id === id);
+  var conceptById = (id2) => CONCEPTS.find((c) => c.id === id2);
 
   // src/ui/academy.js
-  var infoBtn = (id, title) => `<button class="cinfo" data-concept="${id}" title="${esc(title || "Qué es: " + (conceptById(id)?.title || id))}" aria-label="Explicación">ⓘ</button>`;
+  var infoBtn = (id2, title) => `<button class="cinfo" data-concept="${id2}" title="${esc(title || "Qué es: " + (conceptById(id2)?.title || id2))}" aria-label="Explicación">ⓘ</button>`;
   var bandChip = (b) => `<button class="chip" data-concept="band:${b}" title="${esc(BANDS[b].name + " · " + BANDS[b].freq)}">${esc(b)}</button>`;
-  function showConcept(id) {
-    const c = conceptById(id);
+  function showConcept(id2) {
+    const c = conceptById(id2);
     if (!c) return;
     const related = CONCEPTS.filter((x) => x.group === c.group && x.id !== c.id && !x.id.startsWith("band:")).map((x) => `<button class="chip" data-concept="${x.id}">${esc(x.title)}</button>`).join(" ");
     openModal(`<header><div><span class="chip">Academia · ${esc(c.group)}</span><h2>${esc(c.title)}</h2></div><button class="btn x">Cerrar</button></header>
@@ -7058,11 +8583,11 @@ table.t.mc td.pc{white-space:nowrap}
       ${c.widget ? `<div><h3>Probalo</h3>${c.widget.html()}</div>` : ""}
       <div class="engine"><h3>En el simulador</h3>${c.engine()}</div>
       ${related ? `<div><h3>Relacionado</h3><div class="row">${related}</div></div>` : ""}
-    </div>`, () => showConcept(id));
+    </div>`, () => showConcept(id2));
     if (c.widget) c.widget.mount($("#sheet"));
   }
-  function openConcept(id) {
-    pushModalFn(() => showConcept(id));
+  function openConcept(id2) {
+    pushModalFn(() => showConcept(id2));
   }
   function initAcademy() {
     document.addEventListener("click", (e) => {
@@ -7080,21 +8605,21 @@ table.t.mc td.pc{white-space:nowrap}
 
   // src/ui/fichas.js
   var REF_RADARS = ["ewr", "p18", "patriot", "irist", "nasams", "gepard", "s400", "pantsir", "aew_s340"];
-  var current = null;
+  var current2 = null;
   var history = [];
   function openModal(html, reopen = null) {
     $("#sheet").innerHTML = html;
     $("#modal").hidden = false;
     $("#sheet").scrollTop = 0;
-    current = reopen;
+    current2 = reopen;
     const x = $("#sheet .x");
     if (x) x.onclick = closeModal;
     const bk = $("#sheet .back");
     if (bk) bk.onclick = goBack;
   }
   function pushModalFn(open) {
-    if (!$("#modal").hidden && current) {
-      const prev = current;
+    if (!$("#modal").hidden && current2) {
+      const prev = current2;
       open();
       history.push(prev);
       addBack();
@@ -7115,7 +8640,7 @@ table.t.mc td.pc{white-space:nowrap}
   function closeModal() {
     $("#modal").hidden = true;
     history.length = 0;
-    current = null;
+    current2 = null;
   }
   function initModal() {
     $("#modal").onclick = (e) => {
@@ -7123,7 +8648,7 @@ table.t.mc td.pc{white-space:nowrap}
     };
   }
   var spec = (k, v) => `<div class="spec"><small>${k}</small><b>${v}</b></div>`;
-  var srcs = (list) => `<div class="src"><h3>Fuentes</h3><ul>${list.map((s) => `<li><a href="${s[1]}" target="_blank" rel="noopener">${esc(s[0])}</a></li>`).join("")}</ul></div>`;
+  var srcs = (list4) => `<div class="src"><h3>Fuentes</h3><ul>${list4.map((s) => `<li><a href="${s[1]}" target="_blank" rel="noopener">${esc(s[0])}</a></li>`).join("")}</ul></div>`;
   var CONF_CLS = { alta: "ok", media: "mid", baja: "low" };
   function fmtU(v, unit) {
     if (v == null || Number.isNaN(v)) return "—";
@@ -7137,10 +8662,10 @@ table.t.mc td.pc{white-space:nowrap}
     const P = UNC[kind] && UNC[kind][k];
     if (!P) return "";
     const used = [];
-    const ref = (id) => {
-      let i = used.indexOf(id);
+    const ref = (id2) => {
+      let i = used.indexOf(id2);
       if (i < 0) {
-        used.push(id);
+        used.push(id2);
         i = used.length - 1;
       }
       return i + 1;
@@ -7150,8 +8675,8 @@ table.t.mc td.pc{white-space:nowrap}
       const sr = u.src.length ? `<sup>[${u.src.map(ref).join(",")}]</sup>` : "";
       return `<tr><td>${esc(lab)}${unit && unit !== "M US$" && !(unit === "") ? ' <span class="dim">(' + esc(unit) + ")</span>" : ""}</td><td>${fmtU(u.min, unit)}</td><td><b>${fmtU(u.p, unit)}</b></td><td>${fmtU(u.max, unit)}</td><td><span class="conf ${CONF_CLS[u.c]}">${u.c}</span></td><td class="nt">${sr}${u.nota ? " " + esc(u.nota) : u.src.length ? "" : "—"}</td></tr>`;
     }).join("");
-    const refs = used.map((id, i) => {
-      const s = SRC_REF(id);
+    const refs = used.map((id2, i) => {
+      const s = SRC_REF(id2);
       return `<li value="${i + 1}">${s[1] ? `<a href="${s[1]}" target="_blank" rel="noopener">${esc(s[0])}</a>` : esc(s[0])}</li>`;
     }).join("");
     return `<div class="conf-sec"><h3>Confianza de los datos</h3><p class="hint">El valor <b>probable</b> es el que usa la simulación; mínimo y máximo son el rango para el modo Monte Carlo. "est" = estimación propia (física o sistemas análogos) donde no hay dato público.</p><div class="tblwrap"><table class="t ct"><thead><tr><th>Parámetro</th><th>Mín</th><th>Probable</th><th>Máx</th><th>Confianza</th><th>Fuente / razonamiento</th></tr></thead><tbody>${rows}</tbody></table></div>${refs ? `<ol class="refs">${refs}</ol>` : ""}</div>`;
@@ -7259,6 +8784,94 @@ table.t.mc td.pc{white-space:nowrap}
     }
     return `<div><h3>Qué le hace a cada radar ${infoBtn("eccm")} ${infoBtn("noise")}</h3><p class="hint">Alcance contra 1 m² con este jammer a ${JAM_TABLE_KM} km, sin relieve. Es la distancia de <b>quemado</b>: más cerca de eso, el eco del blanco le gana al ruido. "De frente": el jammer está alineado con los blancos (lóbulo principal); "de costado": entra por los primeros lóbulos laterales, donde pesan los lóbulos bajos y los canceladores (SLC).</p>
     <div class="tblwrap"><table class="t"><thead><tr><th>Radar</th><th>ECCM</th><th>Sin jammer</th><th>Barrera, de frente</th><th>Barrera, de costado</th><th>Puntual, de frente</th></tr></thead><tbody>${rows.join("")}</tbody></table></div></div>`;
+  }
+
+  // src/sim/debrief.js
+  var sum = (a, f) => a.reduce((s, x) => s + f(x), 0);
+  var LOST_M = 2e3;
+  function buildDebrief(S2) {
+    const st = S2.stats, real = S2.threats.filter((t) => !t.isDecoy), decoys = S2.threats.filter((t) => t.isDecoy);
+    const arrivals = S2.arrivals;
+    const { goals, outcome } = evaluateGoals(S2.scen, S2);
+    const byType = {};
+    for (const t of S2.threats) {
+      const k = t.isDecoyChild ? t.T.short + " (señuelo)" : t.T.short;
+      const b = byType[k] || (byType[k] = { launched: 0, killed: 0, arrived: 0, shotsAt: 0 });
+      b.launched++;
+      if (t.killed) b.killed++;
+      else if (t.done) b.arrived++;
+      b.shotsAt += (t.fly || []).length;
+    }
+    const objectives = S2.objs.map((o) => ({ name: o.name, type: o.type, status: o.status, dmg: o.maxHp - o.hp, maxHp: o.maxHp, hits: o.hits, dmgBy: o.dmgBy }));
+    const dmgSorted = Object.entries(st.dmgByWeapon).sort((a, b) => b[1] - a[1]);
+    const magTotal = sum(S2.units, (u) => u.mag || 0), magLeft = sum(S2.units, (u) => DEFENSES[u.type].sam ? u.magLeft : 0);
+    const lost = S2.units.filter((u) => !u.alive).map((u) => u.name);
+    const detected = real.filter((t) => t.firstDet !== null && t.detKm != null);
+    const attack = {
+      launched: st.launched,
+      real: real.length,
+      decoys: st.decoys,
+      intercepted: st.killed - st.decoysKilled,
+      decoysKilled: st.decoysKilled,
+      impacts: st.hits,
+      misses: st.misses,
+      lostLocally: arrivals.filter((a) => a.nav > LOST_M).length,
+      byType
+    };
+    const damage = {
+      total: st.damage,
+      byWeapon: dmgSorted,
+      top: dmgSorted[0] || null,
+      avgMiss: st.missN ? st.missSum / st.missN : null,
+      objsDestroyed: st.objsDestroyed,
+      objsSurviving: S2.objs.filter((o) => o.status !== "destroyed").length
+    };
+    const defense = {
+      shots: st.shots,
+      magLeft,
+      magTotal,
+      defCost: st.defCost,
+      atkCost: st.atkCost,
+      lost,
+      byUnit: st.byUnit,
+      perKill: st.killed ? st.shots / st.killed : null,
+      avgDetKm: detected.length ? sum(detected, (t) => t.detKm) / detected.length : null
+    };
+    const timeline = [...S2.events].sort((a, b) => a.t - b.t);
+    return { scen: S2.scen, t: S2.t, goals, outcome, objectives, attack, damage, defense, timeline, why: explain(S2, arrivals, decoys) };
+  }
+  function explain(S2, arrivals, decoys) {
+    const out = [], st = S2.stats, list4 = (a) => [...new Set(a.map((x) => THREATS[x.type].short))].join(", ");
+    const real = arrivals;
+    if (!S2.threats.length) return ["No hubo ataques: agregá salvas en la pestaña Ataque."];
+    if (!real.length) out.push("Ninguna arma real llegó a su blanco: todas fueron derribadas o eran señuelos. La defensa por capas cubrió las rutas de ataque.");
+    const never = real.filter((a) => a.det === null);
+    if (never.length) out.push(`${never.length} arma(s) llegaron sin haber sido detectadas nunca (${list4(never)}). Típico de blancos rasantes: el horizonte de radar y el relieve los ocultan. Probá subir mástiles, sumar un AEW o ubicar sensores sobre cotas altas (capa "Puntos altos").`);
+    const unengaged = real.filter((a) => a.det !== null && a.shots === 0);
+    if (unengaged.length) {
+      const lead = unengaged.reduce((s, a) => s + (a.t - a.det), 0) / unengaged.length;
+      out.push(`${unengaged.length} arma(s) fueron detectadas pero nadie les disparó (${list4(unengaged)}), en promedio ${Math.round(lead)} s antes de llegar. Causas posibles: fuera del alcance o de la envolvente de altura, tiempo de reacción mayor que la ventana, clase no enfrentable (p. ej. IRIS-T o NASAMS contra balísticos), canales ocupados o sin munición.`);
+    }
+    const survived = real.filter((a) => a.shots > 0);
+    if (survived.length) out.push(`${survived.length} arma(s) sobrevivieron a ${survived.reduce((s, a) => s + a.shots, 0)} interceptor(es) disparados contra ellas (${list4(survived)}): la Pk por disparo nunca es 100% y baja con maniobra terminal, baja firma, bengalas o interferencia.`);
+    const decoyShots = decoys.reduce((s, t) => s + (t.fly || []).length, 0);
+    const clsDecoys = decoys.filter((t) => t.clsAs === "señuelo").length, wrong = S2.threats.filter((t) => !t.isDecoy && t.clsAs === "señuelo");
+    if (clsDecoys) out.push(`Los radares de tiro reconocieron ${clsDecoys} de ${decoys.length} señuelo(s)${S2.ignoreDecoys ? " y dejaron de tirarles" : '; con la doctrina "no tirarle a pistas clasificadas como señuelo" se habrían ahorrado interceptores'}.`);
+    if (wrong.length) out.push(`${wrong.length} arma(s) real(es) se clasificaron por error como señuelo (${wrong.map((t) => t.T.short).join(", ")})${S2.ignoreDecoys ? " y no se les tiró" : ""}.`);
+    if (S2.stats.reloads) out.push(`Hubo ${S2.stats.reloads} recarga(s) de baterías durante el ataque.`);
+    if (decoyShots) out.push(`Los señuelos consumieron ${decoyShots} interceptor(es) que no se usaron contra armas reales. La "vista del defensor" muestra cómo los ve el operador: iguales a las armas.`);
+    const empty = S2.events.filter((e) => e.key && e.key.startsWith("empty:"));
+    if (empty.length) out.push(`Se quedaron sin munición: ${empty.map((e) => e.text.replace(" se queda sin munición", "")).join(", ")}. Mientras recargan (o sin reserva), la saturación agota los cargadores antes de que llegue lo más peligroso.`);
+    const sat = Object.entries(st.satChannels).sort((a, b) => b[1] - a[1]);
+    if (sat.length) out.push(`Saturación de canales de tiro: ${sat.slice(0, 3).map(([k, v]) => `${k} (${v} s)`).join(", ")} tuvo más blancos que canales simultáneos.`);
+    const gnss = real.filter((a) => a.nav > 150 && a.nav <= LOST_M), lostL = real.filter((a) => a.nav > LOST_M);
+    if (gnss.length) out.push(`${gnss.length} arma(s) fueron desviadas por interferencia GNSS (${list4(gnss)}).`);
+    if (lostL.length) out.push(`${lostL.length} arma(s) quedaron "perdidas localmente": el engaño GNSS las desvió más de ${LOST_M / 1e3} km (${list4(lostL)}). Ojo al comparar con las cifras oficiales ucranianas: esa categoría real también incluye señuelos y fallas.`);
+    const hurt = S2.units.filter((u) => u.alive && (u.dmgRadar || u.dmgLauncher));
+    if (hurt.length) out.push(`Unidades dañadas por explosiones cercanas: ${hurt.map((u) => u.name + " (" + [u.dmgRadar ? "radar" : "", u.dmgLauncher ? "lanzador" : ""].filter(Boolean).join(" y ") + ")").join(", ")}. Un radar dañado ve menos y reacciona más lento; un lanzador dañado no dispara aunque le queden misiles.`);
+    if (S2.units.some((u) => !u.alive)) out.push(`Unidades perdidas: ${S2.units.filter((u) => !u.alive).map((u) => u.name).join(", ")}. Una batería destruida deja un hueco de cobertura para lo que viene después.`);
+    if (st.killed) out.push(`Economía: la defensa gastó US$${st.defCost.toFixed(1)} M y el ataque US$${st.atkCost.toFixed(1)} M. ${st.defCost > st.atkCost ? "Defender costó más que atacar: es la lógica de los drones baratos y los señuelos." : "Defender costó menos que atacar."}`);
+    return out;
   }
 
   // src/ui/montecarlo.js
@@ -7517,36 +9130,248 @@ table.t.mc td.pc{white-space:nowrap}
     $("#log").innerHTML = logFor(S.log, viewNow()).slice(0, 150).map((l) => `<div class="${l.cls}"><time>${fmtT(l.t)}</time>${esc(l.text)}</div>`).join("") || "<div>Sin eventos todavía. Apretá ▶ Iniciar.</div>";
   }
 
-  // src/ui/number-input.js
-  function bindNumber(input, get, set, { integer = false } = {}) {
-    if (!input) return;
-    let message;
-    if (integer) {
-      input.step = "1";
-      message = document.createElement("p");
-      message.id = input.id + "-error";
-      message.className = "hint";
-      message.style.color = "var(--red)";
-      message.style.gridColumn = "1 / -1";
-      message.hidden = true;
-      message.setAttribute("role", "status");
-      input.insertAdjacentElement("afterend", message);
-      input.setAttribute("aria-describedby", [input.getAttribute("aria-describedby"), message.id].filter(Boolean).join(" "));
+  // src/ui/campaign.js
+  var operation = null;
+  var combat = null;
+  var serial = 0;
+  var message = "";
+  var nextId2 = (p) => `${p}-${Date.now()}-${++serial}`;
+  var hms = (n2) => `${Math.floor(n2 / 3600)} h ${String(Math.floor(n2 % 3600 / 60)).padStart(2, "0")} min`;
+  var PHASE = { planning: "Preparación", active: "Guardia en curso", debrief: "Parte de cierre", finished: "Campaña terminada" };
+  var RESULT = { exito: "Éxito", parcial: "Éxito parcial", fracaso: "Fracaso" };
+  var ES = { operational: "operativo", degraded: "degradado", disabled: "fuera de servicio", destroyed: "destruido", pending: "en curso", interrupted: "interrumpido", completed: "terminado", cancelled: "cancelado", delivery: "Entrega", transfer: "Carga", repair: "Reparación", return: "Devolución", sensor: "sensor", launcher: "lanzador", control: "control" };
+  var es = (k) => ES[k] || k;
+  var campaignBattle = () => !!combat && operation?.phase === "active";
+  function campaignStep() {
+    if (!combat) return false;
+    let more = false;
+    try {
+      more = combat.step();
+      operation = combat.getOperation();
+    } catch (e) {
+      S.running = false;
+      message = "La guardia se detuvo: " + (e instanceof Error ? e.message : String(e));
+      updatePlay();
+      openCampaign();
+      return false;
     }
-    const valid = () => input.value !== "" && Number.isFinite(input.valueAsNumber) && (!integer || Number.isInteger(input.valueAsNumber)) && input.validity.valid;
+    if (!more) {
+      S.running = false;
+      combat = null;
+      updatePlay();
+      openCampaign();
+    }
+    return more;
+  }
+  var stock2 = (loc, ammo) => operation.resources.inventory.stock.find((s) => s.locationId === loc && s.ammunitionId === ammo)?.quantity ?? 0;
+  function command(kind, extra, atSeconds = operation.resources.clockSeconds) {
+    operation = applyOperationResourceCommand(operation, { commandId: nextId2(kind), sideId: "ua", atSeconds, kind, ...extra });
+  }
+  function act(fn) {
+    try {
+      fn();
+      message = "";
+    } catch (e) {
+      message = e instanceof Error ? e.message : String(e);
+    }
+    if (!campaignBattle()) openCampaign();
+  }
+  function positiveInt(v) {
+    const n2 = Number(String(v).trim());
+    if (!Number.isSafeInteger(n2) || n2 <= 0) throw Error("La cantidad debe ser un entero positivo; no se redondea.");
+    return n2;
+  }
+  function openCampaign() {
+    const head = `<header><div><span class="chip">Campaña experimental</span><h2>Odesa: sostener los puertos</h2></div><button class="btn x">Cerrar</button></header>`;
+    const note = '<p class="hint">Campaña hipotética. Los créditos, la disponibilidad y los plazos son reglas del escenario, no precios ni contratos reales; las capacidades son las del catálogo actual. Lógica de recursos y continuidad: Codex (experimentos/catalogo-presupuesto).</p>';
+    const err = message ? `<p class="warn" role="status">${esc(message)}</p>` : "";
+    if (!operation) {
+      const def = ["radar", "vhf", "s125", "buk", "mobile"];
+      openModal(`${head}<div class="bd">${note}${err}<h3>Asignación inicial · ${PORT_BUDGET} créditos</h3>
+      <div class="cchoices">${PORT_CHOICES.map((c) => `<label class="check"><input type="checkbox" value="${esc(c.id)}" ${def.includes(c.id) ? "checked" : ""}> ${esc(c.name)} · ${c.cost} créditos${c.later ? " · disponible desde la segunda guardia" : ""}</label>`).join("")}</div>
+      <p id="cTotal" class="hint"></p><div class="row"><button class="btn pri" id="cCreate">Asignar medios y empezar</button><label class="btn" for="cLoad">Cargar partida</label><input id="cLoad" type="file" accept=".json,application/json" hidden></div></div>`, openCampaign);
+      const sel = () => [...document.querySelectorAll(".cchoices input:checked")].map((i) => (
+        /** @type {HTMLInputElement} */
+        i.value
+      ));
+      const total = () => {
+        const spent = PORT_CHOICES.filter((c) => sel().includes(c.id)).reduce((n2, c) => n2 + c.cost, 0);
+        $("#cTotal").textContent = `Asignados ${spent}; quedan ${PORT_BUDGET - spent} créditos para munición y servicios.`;
+        $("#cCreate").disabled = !sel().length || spent > PORT_BUDGET;
+      };
+      document.querySelectorAll(".cchoices input").forEach((i) => {
+        i.onchange = total;
+      });
+      total();
+      $("#cCreate").onclick = () => act(() => {
+        operation = createOperations(portCampaignDefinition(sel()));
+      });
+      bindLoad();
+      return;
+    }
+    const v = operationView(operation);
+    const goals = v.briefing.objectives.map((g) => `<li>${esc(g.text)}</li>`).join("");
+    let body = `<p><b>${esc(v.title)}</b> · ${PHASE[v.phase] || v.phase} · Fondos: <b>${v.resources.balance}</b> créditos · Tiempo de campaña: ${hms(v.atSeconds)}</p><ul>${goals}</ul>`;
+    if (v.phase === "planning") body += planning(v);
+    if (v.debrief) body += `<h3>Parte de cierre</h3><p><b>${RESULT[v.debrief.result] || esc(v.debrief.result)}</b>. ${esc(v.debrief.summary || "")}</p><ul>${v.assets.map((a) => `<li>${esc(a.engineName)}: ${a.hp}/${a.maxHp} HP</li>`).join("")}</ul>`;
+    const btns = [];
+    if (v.phase === "planning") btns.push('<button class="btn pri" id="cStart">Iniciar guardia en el mapa</button>');
+    if (v.phase === "debrief") btns.push('<button class="btn pri" id="cNext">Continuar campaña</button>');
+    if (v.phase !== "active") btns.push('<button class="btn" id="cSave">Descargar partida</button><label class="btn" for="cLoad">Cargar partida</label><input id="cLoad" type="file" accept=".json,application/json" hidden><button class="btn danger" id="cQuit">Abandonar campaña</button>');
+    openModal(`${head}<div class="bd">${note}${err}${body}<div class="row">${btns.join("")}</div></div>`, openCampaign);
+    if ($("#cStart")) $("#cStart").onclick = () => act(startBattle);
+    if ($("#cNext")) $("#cNext").onclick = () => act(() => {
+      operation = continueOperations(operation, nextId2("continue"));
+    });
+    if ($("#cSave")) $("#cSave").onclick = () => act(() => {
+      const url = URL.createObjectURL(new Blob([saveOperations(operation)], { type: "application/json" })), a = document.createElement("a");
+      a.href = url;
+      a.download = "cielo-campana-odesa.json";
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1e3);
+    });
+    if ($("#cQuit")) $("#cQuit").onclick = () => {
+      if (window.confirm("¿Abandonar la campaña? Lo que no hayas descargado se pierde.")) {
+        operation = null;
+        message = "";
+        openCampaign();
+      }
+    };
+    bindLoad();
+    bindPlanning(v);
+  }
+  function bindLoad() {
+    const inp = (
+      /** @type {HTMLInputElement | null} */
+      $("#cLoad")
+    );
+    if (!inp) return;
+    inp.onchange = async () => {
+      const f = inp.files?.[0];
+      if (!f) return;
+      const txt = await f.text();
+      act(() => {
+        const r = loadOperations(txt, "ua");
+        if (r.phase === "active") throw Error("Esta pantalla no restaura una guardia en curso: guardá en preparación o en el parte.");
+        if (r.definition.id !== "odessa-resource-campaign") throw Error("Esta pantalla admite la campaña de Odesa.");
+        operation = r;
+      });
+    };
+  }
+  function planning(v) {
+    let h = '<h3>Preparar la guardia</h3><p class="hint">Pedí munición, esperá la entrega y cargá los medios. Pedir, recibir y cargar son pasos distintos y tardan; la ventana de preparación es limitada.</p><table class="ctab"><tr><th>Medio</th><th>Precio</th><th>Disp.</th><th>Depósito</th><th>Listos</th><th>Cantidad</th><th></th></tr>';
+    for (const q of v.resources.quotes) {
+      const id2 = q.id.replace(/-supply$/, ""), a = v.assets.find((x) => x.id === id2);
+      if (!a) continue;
+      h += `<tr><td>${esc(a.engineName)}</td><td>${q.price}</td><td>${q.remaining}</td><td>${stock2("depot", q.ammunitionId)}</td><td>${stock2(`${id2}-ready`, q.ammunitionId)}</td><td><input class="inp" style="width:70px" type="number" min="1" step="1" value="4" id="cq-${esc(id2)}"></td><td><button class="btn sm" data-order="${esc(id2)}" ${q.remaining === 0 || a.hp === 0 ? "disabled" : ""}>Pedir</button> <button class="btn sm" data-load="${esc(id2)}" ${a.hp === 0 ? "disabled" : ""}>Cargar</button></td></tr>`;
+    }
+    h += "</table><h3>Componentes</h3><ul>";
+    for (const a of v.assets.filter((x) => x.kind === "unit")) for (const cid of a.componentIds) {
+      const c = operation.resources.inventory.components.find((x) => x.id === cid);
+      h += `<li>${esc(a.engineName)} · ${esc(es(c.kind))}: ${esc(es(c.condition))}${["degraded", "disabled"].includes(c.condition) ? ` <button class="btn sm" data-repair="${esc(a.id)}|${esc(cid)}">Reparar (50 créditos + 1 repuesto)</button>` : ""}</li>`;
+    }
+    h += "</ul><h3>Trabajos en curso</h3><ul>";
+    const jobs = v.resources.jobs.filter((j) => ["pending", "interrupted"].includes(j.status));
+    for (const j of jobs) h += `<li>${esc(es(j.kind))}: ${esc(es(j.status))} · termina a las ${hms(j.dueAtSeconds)} <button class="btn sm" data-cancel="${esc(j.id)}">Cancelar / devolver</button></li>`;
+    h += `${jobs.length ? "" : '<li class="dim">Ninguno.</li>'}</ul><button class="btn" id="cWait" ${v.resources.jobs.some((j) => j.status === "pending" && j.dueAtSeconds <= v.preparationEndsAtSeconds) ? "" : "disabled"}>Esperar al próximo trabajo</button>`;
+    return h;
+  }
+  function bindPlanning(v) {
+    if (v.phase !== "planning") return;
+    const qty = (id2) => positiveInt(
+      /** @type {HTMLInputElement} */
+      $("#cq-" + id2).value
+    );
+    document.querySelectorAll("[data-order]").forEach((b) => {
+      b.onclick = () => act(() => {
+        const id2 = (
+          /** @type {HTMLElement} */
+          b.dataset.order
+        );
+        command("order", { jobId: nextId2("delivery"), quoteId: `${id2}-supply`, quantity: qty(id2) });
+      });
+    });
+    document.querySelectorAll("[data-load]").forEach((b) => {
+      b.onclick = () => act(() => {
+        const id2 = (
+          /** @type {HTMLElement} */
+          b.dataset.load
+        );
+        command("transfer", { jobId: nextId2("load"), serviceId: `${id2}-reload`, ammunitionId: `legacy-${id2}`, quantity: qty(id2) });
+      });
+    });
+    document.querySelectorAll("[data-repair]").forEach((b) => {
+      b.onclick = () => act(() => {
+        const [aid, cid] = String(
+          /** @type {HTMLElement} */
+          b.dataset.repair
+        ).split("|");
+        command("repair", { jobId: nextId2("repair"), serviceId: `${aid}-repair`, componentId: cid });
+      });
+    });
+    document.querySelectorAll("[data-cancel]").forEach((b) => {
+      b.onclick = () => act(() => command("cancel", { jobId: (
+        /** @type {HTMLElement} */
+        b.dataset.cancel
+      ) }));
+    });
+    if ($("#cWait")) $("#cWait").onclick = () => act(() => {
+      const due = Math.min(...operationView(operation).resources.jobs.filter((j) => j.status === "pending").map((j) => j.dueAtSeconds));
+      if (!Number.isFinite(due)) throw Error("No hay trabajos pendientes.");
+      command("advance", {}, due);
+    });
+  }
+  function startBattle() {
+    const key2 = operationMission(operation).mapKey;
+    if (MAP?.key !== key2) applyMap(builtinMap(key2));
+    combat = startPortCombat(operation, operation.history.length + 1);
+    operation = combat.getOperation();
+    if (MAP) applyMap(MAP);
+    const view = (
+      /** @type {HTMLSelectElement} */
+      $("#view")
+    );
+    view.value = "def";
+    S.sel = null;
+    S.multi = [];
+    S.running = true;
+    S.auto = true;
+    markLogDirty();
+    renderAll();
+    updatePlay();
+    closeModal();
+  }
+
+  // src/ui/number-input.js
+  function bindNumber(input, get, set, { integer: integer2 = false } = {}) {
+    if (!input) return;
+    let message2;
+    if (integer2) {
+      input.step = "1";
+      message2 = document.createElement("p");
+      message2.id = input.id + "-error";
+      message2.className = "hint";
+      message2.style.color = "var(--red)";
+      message2.style.gridColumn = "1 / -1";
+      message2.hidden = true;
+      message2.setAttribute("role", "status");
+      input.insertAdjacentElement("afterend", message2);
+      input.setAttribute("aria-describedby", [input.getAttribute("aria-describedby"), message2.id].filter(Boolean).join(" "));
+    }
+    const valid = () => input.value !== "" && Number.isFinite(input.valueAsNumber) && (!integer2 || Number.isInteger(input.valueAsNumber)) && input.validity.valid;
     const error = (restored) => {
-      if (!message) return;
+      if (!message2) return;
       const value = input.valueAsNumber;
       const why = input.value === "" || !Number.isFinite(value) ? "Ingresá un número entero." : !Number.isInteger(value) ? "Ingresá un número entero, sin decimales." : `Ingresá un entero entre ${input.min} y ${input.max}.`;
-      message.textContent = why + (restored ? ` Se conservó el último valor válido: ${get()}.` : " El valor anterior se conserva.");
-      message.hidden = false;
+      message2.textContent = why + (restored ? ` Se conservó el último valor válido: ${get()}.` : " El valor anterior se conserva.");
+      message2.hidden = false;
       input.setAttribute("aria-invalid", String(!restored));
     };
     const commit = () => {
       if (valid()) {
         set(input.valueAsNumber);
-        if (message) {
-          message.hidden = true;
+        if (message2) {
+          message2.hidden = true;
           input.removeAttribute("aria-invalid");
         }
       } else error(false);
@@ -7603,7 +9428,7 @@ table.t.mc td.pc{white-space:nowrap}
       renderAtk();
     };
     $("#aInfo").onclick = () => openFicha("thr", a.type);
-    const num2 = (id, k) => bindNumber($(id), () => a[k], (value) => {
+    const num2 = (id2, k) => bindNumber($(id2), () => a[k], (value) => {
       a[k] = value;
     }, { integer: k === "count" });
     num2("#aCount", "count");
@@ -7694,10 +9519,10 @@ table.t.mc td.pc{white-space:nowrap}
     const T = THREATS[type];
     return { type, count: prev ? prev.count : T.cls === "dron" ? 8 : 2, interval: T.cls === "dron" ? 20 : 10, tStart: 0, sync: prev ? prev.sync : false, tArrive: prev ? prev.tArrive : 900, agl: T.agl ?? 0, launchDist: T.launchDist, maneuver: !!T.maneuver, decoys: !!T.decoys, link: false, crpa: prev && THREATS[prev.type].gnss < 1 ? prev.crpa ?? 0 : 0 };
   }
-  function removeObj(id) {
-    S.setup.objs = S.setup.objs.filter((g) => g.id !== id);
-    for (const sv of S.setup.salvos) if (sv.targetObj === id) sv.targetObj = null;
-    if (S.sel && S.sel.kind === "obj" && S.sel.id === id) S.sel = null;
+  function removeObj(id2) {
+    S.setup.objs = S.setup.objs.filter((g) => g.id !== id2);
+    for (const sv of S.setup.salvos) if (sv.targetObj === id2) sv.targetObj = null;
+    if (S.sel && S.sel.kind === "obj" && S.sel.id === id2) S.sel = null;
     renderAtk();
     renderSel();
     schedCov();
@@ -7775,14 +9600,14 @@ table.t.mc td.pc{white-space:nowrap}
     }
     if (!S.sel) return false;
     renderSel();
-    const id = { def: "#sDel", jam: "#jDel", salvo: "#vDel", obj: "#oDel" }[S.sel?.kind];
-    const button = id && $(id);
+    const id2 = { def: "#sDel", jam: "#jDel", salvo: "#vDel", obj: "#oDel" }[S.sel?.kind];
+    const button = id2 && $(id2);
     if (!button || button.disabled) return false;
     button.click();
     return true;
   }
   function renderMulti(el) {
-    const us = S.multi.map((id) => S.setup.defs.find((v) => v.id === id)).filter(Boolean);
+    const us = S.multi.map((id2) => S.setup.defs.find((v) => v.id === id2)).filter(Boolean);
     if (us.length < 2) {
       S.multi = [];
       return false;
@@ -7792,7 +9617,7 @@ table.t.mc td.pc{white-space:nowrap}
       return v.every((x) => x === v[0]) ? v[0] : void 0;
     };
     const sams = us.filter((u) => D(u).sam);
-    const opt = (id, label2, cur, opts) => `<div class="field"><label for="${id}">${label2}</label><select id="${id}" class="sel">${cur === void 0 ? '<option value="__mix" selected>(mezcla)</option>' : ""}${opts.map(([k, n2]) => `<option value="${k}" ${cur === k ? "selected" : ""}>${n2}</option>`).join("")}</select></div>`;
+    const opt = (id2, label2, cur, opts) => `<div class="field"><label for="${id2}">${label2}</label><select id="${id2}" class="sel">${cur === void 0 ? '<option value="__mix" selected>(mezcla)</option>' : ""}${opts.map(([k, n2]) => `<option value="${k}" ${cur === k ? "selected" : ""}>${n2}</option>`).join("")}</select></div>`;
     let h = `<h3>Selección</h3><b style="font-size:15px">${us.length} defensas</b><p class="hint">${us.map((u) => esc(u.name)).join(", ")}</p><p class="hint">Shift + click suma o saca una unidad; Esc limpia el grupo. Solo se cambian los valores que elijas.</p>`;
     h += opt("mOwn", "Operada por", same((u) => u.owner || ""), [["", "Según el equipo"], ["UA", "Ucrania / OTAN"], ["RU", "Rusia"]]);
     h += opt("mC2", "Coordinación C2", same((u) => u.c2 || ""), [["", "Igual que la red"], ...C2_ORDER.slice(0, C2_ORDER.indexOf(S.c2)).map((k) => [k, C2_LEVELS[k].name])]);
@@ -7805,8 +9630,8 @@ table.t.mc td.pc{white-space:nowrap}
     }
     h += `<div class="row"><button class="btn sm danger" id="mDel">Eliminar las ${us.length} unidades</button></div>`;
     el.innerHTML = h;
-    const bind = (id, apply) => {
-      const s = $(id);
+    const bind = (id2, apply) => {
+      const s = $(id2);
       if (s) s.onchange = (e) => {
         const v = e.target.value;
         if (v === "__mix") return;
@@ -7917,8 +9742,8 @@ table.t.mc td.pc{white-space:nowrap}
       el.innerHTML = html;
       $("#sInfo").onclick = () => openFicha("def", u.type);
       if (ed) {
-        const bind = (id, k, cov) => {
-          const i = $(id);
+        const bind = (id2, k, cov) => {
+          const i = $(id2);
           bindNumber(i, () => u[k], (value) => {
             u[k] = value;
             const v = i.parentElement.querySelector(".val");
@@ -8230,6 +10055,10 @@ table.t.mc td.pc{white-space:nowrap}
     };
     $("#play").onclick = togglePlay;
     $("#reset").onclick = () => {
+      if (campaignBattle()) {
+        toast("Hay una guardia de campaña en curso: terminala primero.");
+        return;
+      }
       resetSim();
       renderAll();
     };
@@ -8437,8 +10266,8 @@ table.t.mc td.pc{white-space:nowrap}
   // src/ui/panels/defense.js
   var WIND_DIRS = [["Norte", 0], ["Noreste", 45], ["Este", 90], ["Sudeste", 135], ["Sur", 180], ["Sudoeste", 225], ["Oeste", 270], ["Noroeste", 315]];
   var windTxt = () => S.wind.v ? `${S.wind.v} m/s (${Math.round(S.wind.v * 3.6)} km/h) desde ${String((WIND_DIRS.find(([, a]) => a === S.wind.from) || [S.wind.from + "°"])[0]).toLowerCase()}` : "calma";
-  function unitBtn(key, def, act, cls) {
-    return `<button class="ub ${cls} ${act ? "act" : ""}" data-k="${key}" title="${esc(def.name)}"><span>${esc(def.short)}</span><i data-info="${key}" role="button" aria-label="Ficha">i</i></button>`;
+  function unitBtn(key2, def, act2, cls) {
+    return `<button class="ub ${cls} ${act2 ? "act" : ""}" data-k="${key2}" title="${esc(def.name)}"><span>${esc(def.short)}</span><i data-info="${key2}" role="button" aria-label="Ficha">i</i></button>`;
   }
   function renderDef() {
     const el = $("#tab-def");
@@ -8634,9 +10463,9 @@ table.t.mc td.pc{white-space:nowrap}
     schedCov();
     renderSel();
   }
-  function loadScenario(key) {
+  function loadScenario(key2) {
     resetSim();
-    const sc2 = SCENARIOS[key];
+    const sc2 = SCENARIOS[key2];
     if (MAP?.key !== sc2.map) applyMap(builtinMap(sc2.map));
     S.setup = { objs: [], defs: [], salvos: [], jams: [] };
     S.sel = null;
@@ -8938,6 +10767,7 @@ table.t.mc td.pc{white-space:nowrap}
     <li><b>Ataque:</b> elegí el arma, cantidad, horario (o "sincronizar llegada" para saturar), altura y maniobra; después "Trazar ruta". Los balísticos y supersónicos se lanzan desde fuera del mapa en la dirección que marques.</li>
     <li><b>Guerra electrónica:</b> jammers de ruido (aéreo o Krasukha) y supresor GNSS. Las líneas violeta muestran qué radar está siendo interferido.</li>
     <li><b>Cobertura:</b> el mapa sombrea en turquesa dónde tus sensores ven un blanco de referencia a cierta altura sobre el terreno, considerando relieve real, curvatura terrestre, RCS en la banda de cada radar e interferencia. Bajá la altura y vas a ver aparecer los huecos de los valles.</li>
+    <li><b>Campaña:</b> el botón Campaña abre la campaña experimental de Odesa: con un presupuesto elegís los medios, pedís y cargás munición (tardan), jugás cada guardia en el mapa y el daño y la munición que quedan pasan a la siguiente. Se puede descargar la partida entre guardias.</li>
     <li><b>Simulación:</b> ▶ Iniciar, velocidades 1×–60×. El selector de vista cambia qué se muestra: "Vista del defensor" oculta lo que no fue detectado y muestra los señuelos igual que las armas reales; "Vista del atacante" muestra sus armas y solo las defensas que conoce (las de radar, por su emisión; las demás, desde que disparan), sin su estado, su munición ni los interceptores.</li>
     <li><b>Guardar y cargar:</b> "Guardar" descarga lo que armaste (objetivos, defensas, ataques, jammers, reglas y metas) como archivo .json; "Cargar" lo vuelve a abrir, también en otra computadora. Al cargar se revisa que el mapa exista y que las armas y defensas estén en el catálogo; si algo falla, no se toca lo que tenías. Un escenario sobre un relieve .hgt necesita que cargues ese relieve antes.</li>
     <li><b>Relieve propio:</b> "Cargar relieve .hgt" acepta tiles SRTM descomprimidos (por ejemplo N50E030.hgt para Kyiv), de 1201×1201 o 3601×3601 muestras.</li>
@@ -8989,9 +10819,9 @@ table.t.mc td.pc{white-space:nowrap}
   var SIDES = ["ataque", "defensa"];
   var GOAL_KINDS = ["destroy", "damage", "protect", "survive", "killUnit", "keepUnit"];
   var DOCTRINES = ["salva", "sls"];
-  var pick = (o, keys) => {
+  var pick = (o, keys2) => {
     const r = {};
-    for (const k of keys) if (o[k] !== void 0) r[k] = structuredClone(o[k]);
+    for (const k of keys2) if (o[k] !== void 0) r[k] = structuredClone(o[k]);
     return r;
   };
   var OBJ_KEYS = ["id", "type", "x", "y", "name", "short", "maxHp", "desc", "cp", "hpNow"];
@@ -9092,7 +10922,7 @@ table.t.mc td.pc{white-space:nowrap}
       if (!ok) err(`${where}: la posición (${JSON.stringify(x)}, ${JSON.stringify(y)}) está fuera del mapa (${wKm.toFixed(0)} × ${hKm.toFixed(0)} km).`);
       return ok;
     };
-    const list = (name, v) => {
+    const list4 = (name, v) => {
       if (v === void 0) return [];
       if (!Array.isArray(v)) {
         err(`setup.${name} tiene que ser una lista.`);
@@ -9111,7 +10941,7 @@ table.t.mc td.pc{white-space:nowrap}
       });
     };
     const ids = /* @__PURE__ */ new Set();
-    const id = (where, v) => {
+    const id2 = (where, v) => {
       if (!Number.isInteger(v) || ids.has(v)) {
         err(`${where}: "id" ausente o repetido.`);
         return null;
@@ -9121,24 +10951,24 @@ table.t.mc td.pc{white-space:nowrap}
     };
     const setup = raw.setup;
     if (!setup || typeof setup !== "object") return { ok: false, errors: ['Falta la sección "setup" con objetivos, defensas, salvas y jammers.'], warnings };
-    const objs = list("objs", setup.objs).map((g, i) => {
+    const objs = list4("objs", setup.objs).map((g, i) => {
       const w = `Objetivo ${i + 1}${typeof g.name === "string" ? " (" + g.name + ")" : ""}`;
       if (!TARGET_TYPES[g.type]) {
         err(`${w}: tipo de objetivo desconocido "${String(g.type)}". Válidos: ${Object.keys(TARGET_TYPES).join(", ")}.`);
-        return { id: id(w, g.id) };
+        return { id: id2(w, g.id) };
       }
       pos(w, g.x, g.y);
-      return { id: id(w, g.id), type: g.type, x: g.x, y: g.y, name: str(w + " · name", g.name, 120, false), short: str(w + " · short", g.short, 60), maxHp: num2(w + " · maxHp", g.maxHp, 1, 1e5, { opt: true }), desc: str(w + " · desc", g.desc, 1e3), cp: str(w + " · cp", g.cp, 20) || void 0, hpNow: num2(w + " · hpNow", g.hpNow, 0, 1e5, { opt: true }) };
+      return { id: id2(w, g.id), type: g.type, x: g.x, y: g.y, name: str(w + " · name", g.name, 120, false), short: str(w + " · short", g.short, 60), maxHp: num2(w + " · maxHp", g.maxHp, 1, 1e5, { opt: true }), desc: str(w + " · desc", g.desc, 1e3), cp: str(w + " · cp", g.cp, 20) || void 0, hpNow: num2(w + " · hpNow", g.hpNow, 0, 1e5, { opt: true }) };
     });
-    const defs = list("defs", setup.defs).map((u, i) => {
+    const defs = list4("defs", setup.defs).map((u, i) => {
       const w = `Defensa ${i + 1}${typeof u.name === "string" ? " (" + u.name + ")" : ""}`;
       if (!DEFENSES[u.type]) {
         err(`${w}: tipo de defensa desconocido "${String(u.type)}". Mirá la pestaña Catálogo para ver los disponibles.`);
-        return { id: id(w, u.id) };
+        return { id: id2(w, u.id) };
       }
       pos(w, u.x, u.y);
       return {
-        id: id(w, u.id),
+        id: id2(w, u.id),
         type: u.type,
         x: u.x,
         y: u.y,
@@ -9162,7 +10992,7 @@ table.t.mc td.pc{white-space:nowrap}
       };
     });
     const objIds = new Set(objs.filter(Boolean).map((g) => g.id)), defIds = new Set(defs.filter(Boolean).map((u) => u.id));
-    const salvos = list("salvos", setup.salvos).map((sv, i) => {
+    const salvos = list4("salvos", setup.salvos).map((sv, i) => {
       const w = `Salva ${i + 1}${typeof sv.type === "string" ? " (" + sv.type + ")" : ""}`;
       if (!THREATS[sv.type]) {
         err(`${w}: arma desconocida "${String(sv.type)}". Mirá la pestaña Catálogo para ver las disponibles.`);
@@ -9177,7 +11007,7 @@ table.t.mc td.pc{white-space:nowrap}
       if (sv.targetObj != null && !objIds.has(sv.targetObj)) err(`${w}: apunta al objetivo con id ${JSON.stringify(sv.targetObj)}, que no está en el archivo.`);
       const T = 36e3;
       return {
-        id: id(w, sv.id),
+        id: id2(w, sv.id),
         type: sv.type,
         pts,
         targetUnit: sv.targetUnit ?? null,
@@ -9195,7 +11025,7 @@ table.t.mc td.pc{white-space:nowrap}
         crpa: CRPA_SIZES.includes(sv.crpa ?? 0) ? sv.crpa : (err(`${w} · crpa: ${JSON.stringify(sv.crpa)} no es una antena válida (${CRPA_SIZES.join(", ")} elementos).`), void 0)
       };
     });
-    const jams = list("jams", setup.jams).map((j, i) => {
+    const jams = list4("jams", setup.jams).map((j, i) => {
       const w = `Interferidor ${i + 1}`;
       if (!JAMMERS[j.type]) {
         err(`${w}: tipo desconocido "${String(j.type)}". Válidos: ${Object.keys(JAMMERS).join(", ")}.`);
@@ -9204,7 +11034,7 @@ table.t.mc td.pc{white-space:nowrap}
       pos(w, j.x, j.y);
       if (j.mode !== void 0 && !JAM_MODES[j.mode]) err(`${w} · mode: "${String(j.mode)}" no es un modo válido (${Object.keys(JAM_MODES).join(", ")}).`);
       if (j.target != null && !defIds.has(j.target)) err(`${w}: apunta su ruido puntual a la defensa con id ${JSON.stringify(j.target)}, que no está en el archivo.`);
-      return { id: id(w, j.id), type: j.type, x: j.x, y: j.y, alt: num2(w + " · alt", j.alt, 0, 2e4, { opt: true }), on: bool(w + " · on", j.on), mode: j.mode, target: j.target ?? void 0 };
+      return { id: id2(w, j.id), type: j.type, x: j.x, y: j.y, alt: num2(w + " · alt", j.alt, 0, 2e4, { opt: true }), on: bool(w + " · on", j.on), mode: j.mode, target: j.target ?? void 0 };
     });
     const r = raw.rules || {};
     const net = bool("rules.net", r.net);
@@ -9439,6 +11269,7 @@ table.t.mc td.pc{white-space:nowrap}
     if (S.running) {
       if (S.auto) updateAutoPhase(now);
       clock.advance(dtr * currentSpeed(), (dt) => {
+        if (campaignBattle()) return campaignStep();
         step(dt);
         return S.running;
       });
@@ -9447,7 +11278,7 @@ table.t.mc td.pc{white-space:nowrap}
     if (S.replay) tickReplay(dtr);
     draw();
     if (++uiTick % 10 === 0) {
-      const free = (id) => !(pressedBtn && document.querySelector(id)?.contains(pressedBtn));
+      const free = (id2) => !(pressedBtn && document.querySelector(id2)?.contains(pressedBtn));
       if (free("#stats")) renderStats();
       renderLogIfDirty();
       if (S.sel && S.started && free("#selCard")) renderSel(true);
@@ -9480,7 +11311,7 @@ table.t.mc td.pc{white-space:nowrap}
   hooks.onEnd = () => {
     updatePlay();
     renderStats();
-    openDebrief();
+    if (!campaignBattle()) openDebrief();
   };
   hooks.onUnitLost = schedCov;
   hooks.defenderView = isDefenderView;
@@ -9499,6 +11330,11 @@ table.t.mc td.pc{white-space:nowrap}
   var sc = $("#scenario");
   sc.innerHTML = Object.entries(SCENARIOS).map(([k, s]) => `<option value="${k}">${esc(s.name)}</option>`).join("");
   sc.onchange = (e) => {
+    if (campaignBattle()) {
+      e.target.value = "";
+      openCampaign();
+      return;
+    }
     if (SCENARIOS[e.target.value]) {
       loadScenario(e.target.value);
       openBriefing();
@@ -9517,6 +11353,7 @@ table.t.mc td.pc{white-space:nowrap}
     watchDpr();
   }, { once: true });
   watchDpr();
+  $("#campBtn").onclick = openCampaign;
   loadScenario("mb_noche");
   resize();
   fitView();
@@ -9528,7 +11365,7 @@ table.t.mc td.pc{white-space:nowrap}
     MAP.max = 0;
     MAP.min = 0;
     buildBase();
-  }, computeCov, draw, addDef, addSalvo, addJam, startSim, step, resetSim, loadScenario, renderAll, openDebrief, openMonteCarlo, loadFromObject, saveScenario };
+  }, computeCov, draw, addDef, addSalvo, addJam, startSim, step, resetSim, loadScenario, renderAll, openDebrief, openMonteCarlo, loadFromObject, saveScenario, openCampaign, campaignStep };
 })();
 </script>
 </body>
