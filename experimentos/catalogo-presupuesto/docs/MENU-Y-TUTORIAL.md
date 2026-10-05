@@ -19,9 +19,9 @@ protección criptográfica contra modificación local.
 La biblioteca distingue familias y presenta identidad/evidencia, con prestaciones
 y precios todavía pendientes. No habilita variantes nuevas. El enlace Escenarios
 abre el simulador para elegir el escenario allí; no promete preselección por URL.
-La página Campaña identifica que el combate entre misiones sigue pendiente de
-integración y ofrece practicar la continuidad. No presenta el ejercicio contable
-como una campaña táctica terminada.
+La página Campaña enlaza al juego y explica cómo abrir su campaña nativa de dos
+guardias, integrada en main por #68. También ofrece practicar la continuidad con
+el tutorial contable, que mantiene su identidad y recursos separados.
 
 ## Ejecutar
 
@@ -41,11 +41,11 @@ filtro de biblioteca, ajustes de texto, anchura móvil y ausencia de red externa
 ## Integración pendiente
 
 Claude conserva los archivos activos de simulación/render/UI según #62. Para
-llevar el menú al producto: acordar el punto de entrada, usar el briefing y
-perspectiva propios del motor, integrar el adaptador de misión #61 y sustituir
-el ejercicio por objetivos y escenarios persistentes. No copiar el libro
+llevar este menú y tutorial al producto: acordar el punto de entrada y usar el
+briefing y perspectiva propios del motor. El adaptador de misión #61 y la
+campaña de dos guardias ya están integrados en #68. No copiar el libro
 contable de entrenamiento como segundo inventario físico de campaña.
 
 Faltan tutoriales del mapa, sensores/C2/EW y combate observados, biblioteca
-completa del catálogo activo y campaña jugable. Esta entrega implementa la
+completa del catálogo activo y selección de campaña desde este menú. Esta entrega implementa la
 navegación experimental y un tutorial de recursos, no esas otras funciones.

@@ -14,7 +14,8 @@ try {
   });
   await page.goto(url); await page.waitForFunction(() => window.__tutorialMenu);
   const select = async name => { await page.locator(`[data-page="${name}"]`).click(); await page.locator(`#page-${name}`).waitFor({ state: 'visible' }); };
-  await select('campaign'); assert.match(await page.locator('#page-campaign').textContent(), /pendientes de integración/);
+  await select('campaign'); assert.match(await page.locator('#page-campaign').textContent(), /dos guardias/);
+  assert.equal(await page.locator('#open-campaign').getAttribute('href'), '../../../index.html');
   await select('tutorial');
   assert.equal(await page.locator('#training-balance').textContent(), '100');
   assert.equal(await page.locator('[data-action="consume"]').isDisabled(), true);
