@@ -19,6 +19,10 @@ Propuesta detallada, con orden, dificultad, datos y pruebas: [docs/investigacion
 - **ECM/ECCM, tercera parte.** Ya están el engaño DRFM con blanqueo de lóbulos laterales, la capacidad de seguimiento por radar, la triangulación de jammers y el home-on-jam contra jammers aéreos (docs/FISICA.md §4). Falta: arrastre de distancia o velocidad (RGPO/VGPO) con un jammer a bordo del blanco, disparos desperdiciados contra falsos blancos, ubicar por sus emisiones a un jammer DRFM (hoy solo se triangula el ruido) y atacar jammers terrestres (misiles antirradiación o artillería). *Espera datos* (handoff a Codex, tema 2): qué jammers tienen DRFM, potencias y qué misiles tienen home-on-jam.
 - **Clima, segunda parte** (día y noche para sensores IR, nieve, clima que cambia durante la noche, viento según la altura). Se puede hacer, pero rinde poco con los sensores actuales y no hay datos para cuantificar el día y la noche en las cámaras térmicas. Ya están los estados base y el viento sobre drones y crucero.
 
+## Dudas abiertas (para decidir con el usuario)
+
+- **CRPA y enlace de datos (4G/mesh) de los Shahed y otras armas.** Hoy son opciones de cada salva y vienen **apagadas** por defecto (`crpa: 0`, `link: false`); solo las KAB de Járkov usan CRPA de 12. Qué hacen en el motor: la **CRPA** de N elementos anula hasta N − 1 anti-GNSS que llegan desde direcciones distintas (con más, el arma pierde el satélite); el **enlace** le permite descartar el engaño GNSS (el operador ve dónde está de verdad) y seguir solo con el error inercial, y un antidrón como Bukovel se lo corta. No se modela que el operador cambie de blanco ni el video. Pregunta: ¿activarlos por defecto según la fecha del escenario? Según la investigación (`docs/investigacion/guerra-electronica-ucraniana.md`): Kometa de 4 elementos desde 2022, de 12 en Shahed y UMPK desde 2025, CRPA chinas de 16 desde mar-2025; módems 4G/mesh en Shahed desde 2024–25. Eso cambiaría resultados de los escenarios de esas fechas (**[sim]**).
+
 ## Juego
 
 - Niebla de guerra más estricta: ver **Perspectivas por bando**.
