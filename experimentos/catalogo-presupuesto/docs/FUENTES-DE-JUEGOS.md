@@ -20,6 +20,9 @@ El archivo moderno `DB3K_*.db3`/`DB3000_*.db3` permitiría consultar directament
 las configuraciones modernas. No hace falta enviar imágenes, sonidos o el
 ejecutable del juego para investigar estas tablas.
 
+**Actualización:** llegaron bases modernas comprimidas y se pudieron consultar
+496/512/514/515. Ver [configuraciones y comparación por versión](BASES-DB3K-RECIBIDAS.md).
+
 ## Datos revisados disponibles
 
 [game-source-review.mjs](../data/game-source-review.mjs) conserva trece fichas,

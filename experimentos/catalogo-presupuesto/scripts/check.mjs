@@ -5,6 +5,8 @@ import { GAME_INDEX_REVIEW } from '../data/game-index-review.mjs';
 import { validateGameSources } from '../lib/game-sources-validation.mjs';
 import { VARIANT_RESEARCH } from '../data/variant-configurations.mjs';
 import { validateVariantResearch } from '../lib/variant-validation.mjs';
+import { readFileSync } from 'node:fs';
+import { validateDatabaseReview } from '../lib/database-review-validation.mjs';
 
 const result = validateCatalog(CATALOG);
 const variants = validateVariantResearch(VARIANT_RESEARCH);
@@ -22,6 +24,9 @@ if (!result.ok) {
 }
 
 const games = validateGameSources(GAME_SOURCE_REVIEW, GAME_INDEX_REVIEW);
+const database = validateDatabaseReview(JSON.parse(readFileSync(new URL('../data/db3k-versions-review.json', import.meta.url), 'utf8')));
+games.errors.push(...database.errors);
+games.ok = games.ok && database.ok;
 if (!games.ok) {
   for (const error of games.errors) console.error(error);
   process.exitCode = 1;
