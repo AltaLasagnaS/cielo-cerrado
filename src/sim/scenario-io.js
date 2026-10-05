@@ -25,7 +25,7 @@ const DOCTRINES = ['salva', 'sls'];
 
 const pick = (o, keys) => { const r = {}; for (const k of keys) if (o[k] !== undefined) r[k] = structuredClone(o[k]); return r; };
 const OBJ_KEYS = ['id', 'type', 'x', 'y', 'name', 'short', 'maxHp', 'desc', 'cp'];
-const DEF_KEYS = ['id', 'type', 'x', 'y', 'name', 'az', 'mast', 'alt', 'mag', 'salvo', 'noDrones', 'link', 'reserve', 'c2', 'cp'];
+const DEF_KEYS = ['id', 'type', 'x', 'y', 'name', 'az', 'mast', 'alt', 'mag', 'salvo', 'noDrones', 'link', 'reserve', 'c2', 'cp', 'decoyDoc'];
 const SALVO_KEYS = ['id', 'type', 'count', 'interval', 'tStart', 'sync', 'tArrive', 'agl', 'launchDist', 'maneuver', 'decoys', 'link', 'crpa', 'pts', 'targetUnit', 'targetObj'];
 const JAM_KEYS = ['id', 'type', 'x', 'y', 'alt', 'on', 'mode', 'target'];
 const META_KEYS = ['name', 'player', 'time', 'description', 'forces', 'conditions', 'rulesText', 'goals', 'success', 'failure'];
@@ -140,6 +140,7 @@ export function validateScenario(raw) {
       mag: num(w + ' · mag', u.mag, 0, 1000, { int: true, opt: true }), salvo: num(w + ' · salvo', u.salvo, 0, 10, { int: true, opt: true }), noDrones: bool(w + ' · noDrones', u.noDrones), link: bool(w + ' · link', u.link),
       reserve: num(w + ' · reserve', u.reserve, 0, 1000, { int: true, opt: true }),
       cp: str(w + ' · cp', u.cp, 20) || undefined,
+      decoyDoc: u.decoyDoc === undefined ? undefined : (['ignorar', 'tirar'].includes(u.decoyDoc) ? u.decoyDoc : (err(`${w} · decoyDoc: "${String(u.decoyDoc)}" no es "ignorar" ni "tirar".`), undefined)),
       c2: u.c2 === undefined ? undefined : (C2_LEVELS[u.c2] ? u.c2 : (err(`${w} · c2: "${String(u.c2)}" no es un nivel de C2 válido (${Object.keys(C2_LEVELS).join(', ')}).`), undefined))
     };
   });
@@ -248,7 +249,7 @@ export function loadScenarioData(data) {
   for (const g of data.setup.objs) objId.set(g.id, addObj(g.type, g.x, g.y, { name: g.name, short: g.short, hp: g.maxHp, desc: g.desc, cp: g.cp }).id);
   for (const d of data.setup.defs) {
     const u = addDef(d.type, d.x, d.y, { name: d.name, az: d.az });
-    for (const k of ['mast', 'alt', 'mag', 'salvo', 'noDrones', 'link', 'reserve', 'c2', 'cp']) if (d[k] !== undefined) u[k] = d[k];
+    for (const k of ['mast', 'alt', 'mag', 'salvo', 'noDrones', 'link', 'reserve', 'c2', 'cp', 'decoyDoc']) if (d[k] !== undefined) u[k] = d[k];
     defId.set(d.id, u.id);
   }
   for (const sv of data.setup.salvos) {

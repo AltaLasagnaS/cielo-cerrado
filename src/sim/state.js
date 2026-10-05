@@ -19,7 +19,7 @@ export const S = {
   // eventos clave para la línea de tiempo del debrief y detalle de cada arma que llegó al blanco
   events: [], arrivals: [],
   // interfaz: selección, modo de edición, ruta en trazado y salva en preparación
-  sel: null, mode: 'select', placeType: null, route: null, atk: null,
+  sel: null, mode: 'select', placeType: null, route: null, atk: null, measure: null,
   // última cobertura calculada (grilla y % del mapa cubierto)
   _cov: null, covStat: null
 };

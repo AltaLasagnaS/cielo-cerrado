@@ -44,6 +44,11 @@ function click(g) {
     if (S.started) { toast('Reiniciá la simulación para editar el escenario.'); return; }
     proposePlacement(wx, wy); return;
   }
+  if (S.mode === 'measure') {   // regla: primer punto, segundo punto; un tercero empieza otra medición
+    const p = [+wx.toFixed(3), +wy.toFixed(3)], m = S.measure || (S.measure = { a: null, b: null });
+    if (!m.a || m.b) { m.a = p; m.b = null; } else m.b = p;
+    updateModebar(); return;
+  }
   if (S.mode === 'route') {
     const T = THREATS[S.atk.type];
     if (isOffmap(T) && S.route.pts.length >= 2) return;   // esperando confirmación
@@ -85,6 +90,7 @@ cv.addEventListener('pointermove', e => {
     }
     return;
   }
+  if (S.mode === 'measure' && S.measure?.a && !S.measure.b) S.measure.cur = toW(sx, sy);
   showTip(sx, sy);
 });
 const endPtr = e => {
@@ -101,6 +107,7 @@ cv.addEventListener('dblclick', e => { if (S.mode === 'route' && !isOffmap(THREA
 $('#zin').onclick = () => { V.s = clamp(V.s * 1.3, 1, 80); };
 $('#zout').onclick = () => { V.s = clamp(V.s / 1.3, 1, 80); };
 $('#zfit').onclick = fitView;
+$('#zrule').onclick = () => setMode(S.mode === 'measure' ? 'select' : 'measure');
 document.addEventListener('keydown', e => {
   if (!$('#modal').hidden) { if (e.key === 'Escape') { e.preventDefault(); closeModal(); } return; }
   if (e.target.closest?.('input,select,textarea,[contenteditable]:not([contenteditable="false"]),[role="textbox"]')) return;
@@ -108,6 +115,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { if (S.preview) cancelPlacement(); else setMode('select'); }
   if (e.key === 'Enter') { if (S.preview) confirmPlacement(); else if (S.mode === 'route') finishRoute(); }
   if (e.key === ' ') { e.preventDefault(); togglePlay(); }
+  if (e.key === 'm' || e.key === 'M') setMode(S.mode === 'measure' ? 'select' : 'measure');
 });
 }
 

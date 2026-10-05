@@ -359,6 +359,7 @@ h3{font-family:var(--f-disp);font-weight:600;font-size:15px;letter-spacing:.08em
 .ub span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ub i{font-style:normal;font-family:var(--f-mono);font-size:11px;color:var(--muted);border:1px solid var(--line2);border-radius:50%;width:18px;height:18px;display:inline-grid;place-items:center;flex:none}
 .ub i:hover{color:var(--accent);border-color:var(--accent)}
+small.side{font-family:var(--f-mono);font-size:10px;color:var(--muted);white-space:nowrap;flex:none}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .field{display:grid;grid-template-columns:1fr auto;gap:4px 8px;align-items:center}
 .field label{color:var(--muted)}
@@ -547,7 +548,7 @@ table.t.mc td.pc{white-space:nowrap}
       </div>
       <div class="replaybar" id="replayBar" role="group" aria-label="Repetición de la corrida" hidden></div>
       <div class="relief" id="relief" role="group" aria-label="Lectura del relieve"><span>Relieve</span></div>
-      <div class="zoom"><button id="zin" aria-label="Acercar">+</button><button id="zout" aria-label="Alejar">−</button><button id="zfit" aria-label="Encuadrar" style="font-size:12px">⤢</button></div>
+      <div class="zoom"><button id="zin" aria-label="Acercar">+</button><button id="zout" aria-label="Alejar">−</button><button id="zfit" aria-label="Encuadrar" style="font-size:12px">⤢</button><button id="zrule" aria-label="Regla para medir distancias (M)" title="Regla para medir distancias (M)" style="font-size:12px">📏</button></div>
       <div class="legend" id="legend">
         <span><i class="sw" style="background:#62b6ff"></i>Defensa (Ucrania/OTAN)</span>
         <span><i class="sw" style="background:#ff9f5a"></i>Defensa (Rusia)</span>
@@ -3367,6 +3368,7 @@ table.t.mc td.pc{white-space:nowrap}
     placeType: null,
     route: null,
     atk: null,
+    measure: null,
     // última cobertura calculada (grilla y % del mapa cubierto)
     _cov: null,
     covStat: null
@@ -4905,7 +4907,8 @@ table.t.mc td.pc{white-space:nowrap}
     if (t - av < sm.react * (u.dmgRadar ? UNIT_DAMAGE.react : 1)) return null;
     const flying = (th.fly || []).filter((i) => !i.done);
     if (C2_LEVELS[c2].deconf ? flying.some((i) => cpOf(i.u) === cpOf(u)) : flying.some((i) => i.u === u)) return null;
-    if (S.ignoreDecoys && th.clsAs === "señuelo") return null;
+    const ign = u.decoyDoc === "ignorar" ? true : u.decoyDoc === "tirar" ? false : S.ignoreDecoys;
+    if (ign && th.clsAs === "señuelo") return null;
     return { pre: true };
   }
   function solveFor(u, th, t) {
@@ -5140,6 +5143,7 @@ table.t.mc td.pc{white-space:nowrap}
     const u = { id: nextId(), type, x, y, az: o.az ?? defaultAz(x, y), mast: d.radar ? d.kind === "aew" ? 0 : d.radar.mast : 2, alt: d.alt, mag: d.sam ? d.sam.mag : 0, reserve: d.sam ? o.reserve ?? d.sam.reserve ?? 0 : 0, salvo: d.sam ? d.sam.salvo : 0, noDrones: d.sam ? !!d.sam.noDrones : false, link: o.link ?? true, name: o.name || nextName(type) };
     if (o.c2) u.c2 = o.c2;
     if (o.cp) u.cp = o.cp;
+    if (o.decoyDoc === "ignorar" || o.decoyDoc === "tirar") u.decoyDoc = o.decoyDoc;
     S.setup.defs.push(u);
     return u;
   }
@@ -5717,6 +5721,31 @@ table.t.mc td.pc{white-space:nowrap}
       ctx.stroke();
       ctx.globalAlpha = 1;
     }
+    if (S.mode === "measure" && S.measure?.a) drawMeasure(S.measure);
+  }
+  function measureOf(a, b) {
+    const dx = b[0] - a[0], dy = b[1] - a[1];
+    return { km: Math.hypot(dx, dy), az: (Math.atan2(dx, -dy) * 180 / Math.PI + 360) % 360 };
+  }
+  function drawMeasure(m) {
+    const b = m.b || m.cur;
+    if (!b) return;
+    const [x1, y1] = toS(...m.a), [x2, y2] = toS(...b), r = measureOf(m.a, b);
+    ctx.strokeStyle = "#ffd36b";
+    ctx.lineWidth = 1.6;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    for (const [x, y] of [[x1, y1], [x2, y2]]) {
+      ctx.fillStyle = "#ffd36b";
+      ctx.beginPath();
+      ctx.arc(x, y, 3, 0, 7);
+      ctx.fill();
+    }
+    labelAt((x1 + x2) / 2 - 10, (y1 + y2) / 2 - 12, r.km.toFixed(r.km < 10 ? 2 : 1) + " km · " + Math.round(r.az) + "°", "#ffd36b");
   }
   function labelAt(sx, sy, txt, c) {
     ctx.font = '500 11px "IBM Plex Sans", sans-serif';
@@ -6523,7 +6552,7 @@ table.t.mc td.pc{white-space:nowrap}
       <p>En Ucrania conviven niveles muy distintos: sistemas occidentales con enlace Link 16 (Patriot, NASAMS), sistemas soviéticos que entran a la imagen aérea nacional mediante "cajas negras" de conversión y unidades que reciben la situación aérea en tabletas (Virazh-Planshet). Del lado ruso, puestos automatizados como Polyana-D4M1 integran brigadas de S-300, Buk, Tor y Pantsir.</p>`,
       engine: () => `<p>El nivel se elige en la pestaña Defensa (${code("S.c2")}) y lo usan ${code("trackOK()")} y ${code("reactionStart()")}:</p>
       <div class="tblwrap"><table class="t"><thead><tr><th>Nivel</th><th>Demora de la red</th><th>Tira con pista ajena</th><th>Reparto de blancos</th></tr></thead><tbody>${Object.values(C2_LEVELS).map((L) => `<tr><td>${esc(L.name)}</td><td>${L.share === "none" ? "—" : L.lag + " s"}</td><td>${{ none: "no", cue: "no (solo alerta)", track: "activos/IR e interceptores", fire: "también guiados por radar" }[L.share]}</td><td>${L.deconf ? "sí" : "no"}</td></tr>`).join("")}</tbody></table></div>
-      <p>Además: un disparo con pista ajena pierde un poco de Pk en coordinada (×${C2_LEVELS.coordinada.remotePk}, error de posición de la pista); cada unidad puede tener o no <b>enlace de datos</b> (casilla en el panel de selección); en integrada, cada blanco va al <b>mejor tirador</b> y los drones se dejan a la capa más barata que los espera más adelante; y si el atacante destruye un <b>puesto de mando</b> la defensa queda desconectada (cada sitio de comunicaciones destruido la baja un nivel). Las pistas de red viajan por <b>familias de enlace</b> (${Object.values(DATALINKS).map((l) => esc(l.name)).join(", ")}): una unidad recibe la pista de un sensor solo si comparten alguna (la ficha muestra la de cada sistema). La casilla de enlace apaga esos transportes, pero no la coordinación de C2: las alertas pueden seguir llegando. No hay todavía pasarelas entre familias ni un control de pertenencia a la red de mando por unidad: ver ROADMAP.</p>`
+      <p>Además: un disparo con pista ajena pierde un poco de Pk en coordinada (×${C2_LEVELS.coordinada.remotePk}, error de posición de la pista); cada unidad puede tener o no <b>enlace de datos</b> (casilla en el panel de selección); en integrada, cada blanco va al <b>mejor tirador</b> y los drones se dejan a la capa más barata que los espera más adelante; y si el atacante destruye un <b>puesto de mando</b> la defensa queda desconectada (cada sitio de comunicaciones destruido la baja un nivel). Las pistas de red viajan por <b>familias de enlace</b> (${Object.values(DATALINKS).map((l) => esc(l.name)).join(", ")}): una unidad recibe la pista de un sensor solo si comparten alguna (la ficha muestra la de cada sistema). La casilla de enlace apaga esos transportes, pero no la coordinación de C2: las alertas pueden seguir llegando. Una <b>pasarela</b> entre familias (${Object.values(GATEWAYS).map((g) => esc(g.name)).join(", ")}) pasa pistas con demora y algo menos de Pk, pero viene apagada: no hay fuente de que esas pistas sirvan para disparar (se habilita en Defensa). Cada unidad puede tener <b>menos coordinación que la red</b> (${code("u.c2")}) y pertenecer a un <b>puesto de mando</b> (${code("u.cp")}): pistas, alertas y reparto solo circulan dentro de cada puesto, y un puesto de mando destruido degrada solo a sus unidades.</p>`
     },
     {
       id: "clima",
@@ -6791,12 +6820,18 @@ table.t.mc td.pc{white-space:nowrap}
   }
 
   // src/ui/panels/ew.js
+  function roleTag(J) {
+    const who = J.side === "RU" ? "ruso" : J.side === "UA" ? "ucraniano" : "ambos bandos";
+    const role = J.gnssJam ? "anti-GNSS: desvía armas del atacante" : "contra radares de la defensa";
+    return `${J.gnssJam ? "Defensor" : "Atacante"} · ${who} · ${role}`;
+  }
+  var roleShort = (J) => (J.gnssJam ? "Def." : "Atac.") + " " + (J.side === "both" ? "ambos" : J.side);
   function renderEW() {
     const el = $("#tab-ew");
     el.innerHTML = `
-    <p class="hint">El efecto depende del <b>rol</b>, no de la bandera: los interferidores de radar degradan los radares de la defensa (herramienta del atacante) y los anti-GNSS desvían las armas del atacante (herramienta del defensor).</p><div class="grp"><h3>Interferidores y contramedidas</h3><div class="unitgrid">${Object.entries(JAMMERS).map(([k, j]) => `<button class="ub ew ${S.mode === "placeJam" && S.placeType === k ? "act" : ""}" data-k="${k}" title="${esc(j.name)}"><span>${esc(j.short)}</span><i data-info="${k}" role="button" aria-label="Ficha">i</i></button>`).join("")}</div></div>
+    <p class="hint">El efecto depende del <b>rol</b>, no de la bandera: los interferidores de radar degradan los radares de la defensa (herramienta del atacante) y los anti-GNSS desvían las armas del atacante (herramienta del defensor).</p><div class="grp"><h3>Interferidores y contramedidas</h3><div class="unitgrid">${Object.entries(JAMMERS).map(([k, j]) => `<button class="ub ew ${S.mode === "placeJam" && S.placeType === k ? "act" : ""}" data-k="${k}" title="${esc(j.name)} — ${roleTag(j)}"><span>${esc(j.short)}</span><small class="side">${roleShort(j)}</small><i data-info="${k}" role="button" aria-label="Ficha">i</i></button>`).join("")}</div></div>
     <label class="check"><input type="checkbox" id="optStr" ${S.strobes ? "checked" : ""}> Mostrar "strobes" de interferencia (líneas violeta radar → jammer)</label>
-    <div class="grp"><h3>Desplegados</h3><div class="list" id="jList">${S.setup.jams.map((j) => `<div class="item vio"><span class="t">${esc(JAMMERS[j.type].name)}</span><span class="s">${j.x.toFixed(1)}, ${j.y.toFixed(1)} km${JAMMERS[j.type].air ? " · " + j.alt + " m" : ""}</span><span class="a"><button class="btn sm ${j.on ? "on" : ""}" data-tog="${j.id}">${j.on ? "Activo" : "Apagado"}</button><button class="btn sm danger" data-del="${j.id}" aria-label="Borrar">✕</button></span></div>`).join("") || '<p class="hint">Ninguno.</p>'}</div></div>
+    <div class="grp"><h3>Desplegados</h3><div class="list" id="jList">${S.setup.jams.map((j) => `<div class="item vio"><span class="t">${esc(JAMMERS[j.type].name)} <small class="side">${roleTag(JAMMERS[j.type])}</small></span><span class="s">${j.x.toFixed(1)}, ${j.y.toFixed(1)} km${JAMMERS[j.type].air ? " · " + j.alt + " m" : ""}</span><span class="a"><button class="btn sm ${j.on ? "on" : ""}" data-tog="${j.id}">${j.on ? "Activo" : "Apagado"}</button><button class="btn sm danger" data-del="${j.id}" aria-label="Borrar">✕</button></span></div>`).join("") || '<p class="hint">Ninguno.</p>'}</div></div>
     <div class="grp"><h3>Modelo ${infoBtn("noise")} ${infoBtn("lobes")} ${infoBtn("eccm")} ${infoBtn("gnss")}</h3><p class="hint">Jammer de ruido: reduce el alcance de detección como <b>R' = R·(1/(1+J/N))<sup>¼</sup></b>. J/N cae con la distancia al cuadrado, solo afecta radares de la misma banda, necesita línea de vista y es ~25 dB más débil fuera del lóbulo principal. Elegí barrera o ruido puntual (contra un radar) en el panel de selección del jammer. Cada radar tiene sus ECCM: agilidad de frecuencia (anula el puntual), lóbulos bajos y canceladores de los lóbulos laterales (no pueden con un jammer alineado con los blancos). La ficha del jammer muestra la distancia de quemado de cada radar. El anti-GNSS no toca radares: desvía armas que navegan por satélite.</p></div>`;
     el.onclick = (e) => {
       const inf = e.target.closest("[data-info]");
@@ -6942,6 +6977,7 @@ table.t.mc td.pc{white-space:nowrap}
         if (datalinksOf(d).length) html += `<label class="check"><input type="checkbox" id="sLink" ${u.link !== false ? "checked" : ""}> Datalink activo (${esc(links)})</label><p class="hint">Al apagarlo, esta unidad deja de publicar y recibir pistas de tiro por enlaces compatibles. Conserva su sensor propio y puede recibir alertas C2 si la coordinación general lo permite.</p>`;
         else if (d.sam || r) html += `<p class="hint">Sin enlace técnico compatible: las alertas C2 no son una pista de tiro ni permiten guiar un misil con un sensor ajeno.</p>`;
         if (d.sam || r) html += `<h3>Coordinación C2</h3><p class="hint">Red: ${esc(C2_LEVELS[S.c2].name)} (se cambia en Defensa). En Desconectada no hay alertas compartidas, pistas de red ni reparto de blancos; las unidades conservan sus sensores y disparos propios.</p><div class="field"><label for="sC2">Esta unidad</label><select id="sC2" class="sel">${["", ...C2_ORDER.slice(0, C2_ORDER.indexOf(S.c2))].map((k) => `<option value="${k}" ${(u.c2 || "") === k ? "selected" : ""}>${k ? esc(C2_LEVELS[k].name) : "Igual que la red"}</option>`).join("")}</select></div><p class="hint">Una unidad puede quedar con menos coordinación que la red (por ejemplo, una batería aislada). Desconectada: ni avisa ni recibe.</p><div class="field"><label for="sCp">Puesto de mando</label><select id="sCp" class="sel">${CPS.map(([k, n2]) => `<option value="${k}" ${(u.cp || "") === k ? "selected" : ""}>${n2}</option>`).join("")}</select></div><p class="hint">Las pistas, alertas, el reparto de blancos y la triangulación de jammers solo circulan entre unidades del mismo puesto.</p>`;
+        if (d.sam) html += `<div class="field" title="Los radares de tiro aprenden a distinguir señuelos con el tiempo de seguimiento; la decisión usa esa clasificación, que a veces se equivoca."><label for="sDec">Pistas clasificadas como señuelo</label><select id="sDec" class="sel"><option value="" ${!u.decoyDoc ? "selected" : ""}>Como la regla general (${S.ignoreDecoys ? "no tirarles" : "tirarles"})</option><option value="ignorar" ${u.decoyDoc === "ignorar" ? "selected" : ""}>No tirarles</option><option value="tirar" ${u.decoyDoc === "tirar" ? "selected" : ""}>Tirarles igual</option></select></div>`;
         if (d.sam) html += `<label class="check"><input type="checkbox" id="sNoD" ${u.noDrones ? "checked" : ""}> No gastar en drones (reservar para misiles)</label><div class="field"><label for="sMag">Munición disponible</label><input id="sMag" class="inp" type="number" min="1" max="200" value="${u.mag}"></div><div class="field"><label for="sRes">Reserva para recargar (${Math.round(d.sam.reloadS / 60)} min por recarga)</label><input id="sRes" class="inp" type="number" min="0" max="500" value="${u.reserve ?? 0}"></div><div class="field"><label for="sSal">Interceptores por blanco</label><input id="sSal" class="inp" type="number" min="1" max="4" value="${u.salvo}"></div>`;
       }
       html += `<div class="row"><button class="btn sm" id="sInfo">Ficha</button>${ed ? '<button class="btn sm danger" id="sDel">Eliminar</button>' : ""}</div>`;
@@ -6972,6 +7008,10 @@ table.t.mc td.pc{white-space:nowrap}
         if ($("#sC2")) $("#sC2").onchange = (e) => {
           if (e.target.value) u.c2 = e.target.value;
           else delete u.c2;
+        };
+        if ($("#sDec")) $("#sDec").onchange = (e) => {
+          if (e.target.value) u.decoyDoc = e.target.value;
+          else delete u.decoyDoc;
         };
         if ($("#sCp")) $("#sCp").onchange = (e) => {
           if (e.target.value) u.cp = e.target.value;
@@ -7753,6 +7793,7 @@ table.t.mc td.pc{white-space:nowrap}
     S.placeType = type || null;
     S.preview = null;
     if (m !== "route") S.route = null;
+    if (m !== "measure") S.measure = null;
     updateModebar();
     renderTabs();
     draw();
@@ -7797,6 +7838,12 @@ table.t.mc td.pc{white-space:nowrap}
       cancelTxt = "Cancelar";
     } else if (P) {
       html = `Tocá el mapa donde quieras ubicar <b>${esc(P.name(S.placeType))}</b>; vas a poder confirmar o cancelar.`;
+    } else if (S.mode === "measure") {
+      const m = S.measure;
+      if (m?.a && m.b) {
+        const r = measureOf(m.a, m.b);
+        html = `Distancia horizontal: <b>${r.km.toFixed(r.km < 10 ? 2 : 1)} km</b> · rumbo ${Math.round(r.az)}°. Tocá otro punto para medir de nuevo.`;
+      } else html = m?.a ? "Tocá el <b>segundo punto</b>." : "Regla: tocá el <b>primer punto</b> (tecla M o Esc para salir).";
     } else if (S.mode === "route") {
       const T = THREATS[S.atk.type], off = isOffmap(T), n2 = S.route.pts.length;
       if (off) {
@@ -8100,6 +8147,15 @@ table.t.mc td.pc{white-space:nowrap}
       proposePlacement(wx, wy);
       return;
     }
+    if (S.mode === "measure") {
+      const p = [+wx.toFixed(3), +wy.toFixed(3)], m = S.measure || (S.measure = { a: null, b: null });
+      if (!m.a || m.b) {
+        m.a = p;
+        m.b = null;
+      } else m.b = p;
+      updateModebar();
+      return;
+    }
     if (S.mode === "route") {
       const T = THREATS[S.atk.type];
       if (isOffmap(T) && S.route.pts.length >= 2) return;
@@ -8169,6 +8225,7 @@ table.t.mc td.pc{white-space:nowrap}
         }
         return;
       }
+      if (S.mode === "measure" && S.measure?.a && !S.measure.b) S.measure.cur = toW(sx, sy);
       showTip(sx, sy);
     });
     const endPtr = (e) => {
@@ -8210,6 +8267,7 @@ table.t.mc td.pc{white-space:nowrap}
       V.s = clamp(V.s / 1.3, 1, 80);
     };
     $("#zfit").onclick = fitView;
+    $("#zrule").onclick = () => setMode(S.mode === "measure" ? "select" : "measure");
     document.addEventListener("keydown", (e) => {
       if (!$("#modal").hidden) {
         if (e.key === "Escape") {
@@ -8235,6 +8293,7 @@ table.t.mc td.pc{white-space:nowrap}
         e.preventDefault();
         togglePlay();
       }
+      if (e.key === "m" || e.key === "M") setMode(S.mode === "measure" ? "select" : "measure");
     });
   }
   function showTip(sx, sy) {
@@ -8342,7 +8401,7 @@ table.t.mc td.pc{white-space:nowrap}
     return r;
   };
   var OBJ_KEYS = ["id", "type", "x", "y", "name", "short", "maxHp", "desc", "cp"];
-  var DEF_KEYS = ["id", "type", "x", "y", "name", "az", "mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2", "cp"];
+  var DEF_KEYS = ["id", "type", "x", "y", "name", "az", "mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2", "cp", "decoyDoc"];
   var SALVO_KEYS = ["id", "type", "count", "interval", "tStart", "sync", "tArrive", "agl", "launchDist", "maneuver", "decoys", "link", "crpa", "pts", "targetUnit", "targetObj"];
   var JAM_KEYS = ["id", "type", "x", "y", "alt", "on", "mode", "target"];
   var META_KEYS = ["name", "player", "time", "description", "forces", "conditions", "rulesText", "goals", "success", "failure"];
@@ -8499,6 +8558,7 @@ table.t.mc td.pc{white-space:nowrap}
         link: bool(w + " · link", u.link),
         reserve: num2(w + " · reserve", u.reserve, 0, 1e3, { int: true, opt: true }),
         cp: str(w + " · cp", u.cp, 20) || void 0,
+        decoyDoc: u.decoyDoc === void 0 ? void 0 : ["ignorar", "tirar"].includes(u.decoyDoc) ? u.decoyDoc : (err(`${w} · decoyDoc: "${String(u.decoyDoc)}" no es "ignorar" ni "tirar".`), void 0),
         c2: u.c2 === void 0 ? void 0 : C2_LEVELS[u.c2] ? u.c2 : (err(`${w} · c2: "${String(u.c2)}" no es un nivel de C2 válido (${Object.keys(C2_LEVELS).join(", ")}).`), void 0)
       };
     });
@@ -8631,7 +8691,7 @@ table.t.mc td.pc{white-space:nowrap}
     for (const g of data.setup.objs) objId.set(g.id, addObj(g.type, g.x, g.y, { name: g.name, short: g.short, hp: g.maxHp, desc: g.desc, cp: g.cp }).id);
     for (const d of data.setup.defs) {
       const u = addDef(d.type, d.x, d.y, { name: d.name, az: d.az });
-      for (const k of ["mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2", "cp"]) if (d[k] !== void 0) u[k] = d[k];
+      for (const k of ["mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2", "cp", "decoyDoc"]) if (d[k] !== void 0) u[k] = d[k];
       defId.set(d.id, u.id);
     }
     for (const sv of data.setup.salvos) {

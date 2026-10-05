@@ -61,6 +61,7 @@ h3{font-family:var(--f-disp);font-weight:600;font-size:15px;letter-spacing:.08em
 .ub span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ub i{font-style:normal;font-family:var(--f-mono);font-size:11px;color:var(--muted);border:1px solid var(--line2);border-radius:50%;width:18px;height:18px;display:inline-grid;place-items:center;flex:none}
 .ub i:hover{color:var(--accent);border-color:var(--accent)}
+small.side{font-family:var(--f-mono);font-size:10px;color:var(--muted);white-space:nowrap;flex:none}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .field{display:grid;grid-template-columns:1fr auto;gap:4px 8px;align-items:center}
 .field label{color:var(--muted)}

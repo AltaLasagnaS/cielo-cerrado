@@ -91,6 +91,15 @@ try {
   await page.locator('#pulseDistance').press('Escape');
   await page.locator('#modal').waitFor({ state: 'hidden' });
   assert.equal(await page.evaluate(() => JSON.stringify(window.__S.setup)), setup, 'el ejemplo no altera el escenario');
+  // regla de distancias (UX06): mide entre dos toques, no mueve nada y Escape sale
+  const before = await page.evaluate(() => JSON.stringify(window.__S.setup));
+  await page.locator('#zrule').click();
+  const cb = await page.locator('canvas').first().boundingBox();
+  await page.mouse.click(cb.x + 300, cb.y + 300); await page.mouse.click(cb.x + 600, cb.y + 300);
+  assert.match(await page.locator('#modebar').innerText(), /Distancia horizontal:\s+[\d.]+ km/);
+  assert.equal(await page.evaluate(() => JSON.stringify(window.__S.setup)), before, 'medir no cambia el escenario');
+  await page.keyboard.press('Escape');
+  assert.equal(await page.evaluate(() => window.__S.mode), 'select');
   assert.deepEqual(errors, []);
-  console.log('Interfaz: valores numéricos, atajos, Monte Carlo y Academia de pulsos OK');
+  console.log('Interfaz: valores numéricos, atajos, Monte Carlo, Academia de pulsos y regla OK');
 } finally { await browser.close(); }

@@ -138,6 +138,23 @@ export function draw() {
   const now = performance.now();
   S.fx = S.fx.filter(f => now - f.rt < 1400);
   for (const f of S.fx) { const k = (now - f.rt) / 1400, [sx, sy] = toS(f.x, f.y); ctx.strokeStyle = f.c; ctx.globalAlpha = 1 - k; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(sx, sy, (f.big ? 6 : 3) + k * (f.big ? 26 : 14), 0, 7); ctx.stroke(); ctx.globalAlpha = 1; }
+  // regla de medición (modo 'measure', ui/input.js): solo puntos que tocó el usuario, nada oculto
+  if (S.mode === 'measure' && S.measure?.a) drawMeasure(S.measure);
+}
+
+/** Distancia horizontal (km) y rumbo (°, desde el norte) entre dos puntos del mapa. */
+export function measureOf(a, b) {
+  const dx = b[0] - a[0], dy = b[1] - a[1];
+  return { km: Math.hypot(dx, dy), az: (Math.atan2(dx, -dy) * 180 / Math.PI + 360) % 360 };
+}
+
+/** Línea de la regla con su distancia y rumbo en el medio. */
+function drawMeasure(m) {
+  const b = m.b || m.cur; if (!b) return;
+  const [x1, y1] = toS(...m.a), [x2, y2] = toS(...b), r = measureOf(m.a, b);
+  ctx.strokeStyle = '#ffd36b'; ctx.lineWidth = 1.6; ctx.setLineDash([6, 4]); ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.setLineDash([]);
+  for (const [x, y] of [[x1, y1], [x2, y2]]) { ctx.fillStyle = '#ffd36b'; ctx.beginPath(); ctx.arc(x, y, 3, 0, 7); ctx.fill(); }
+  labelAt((x1 + x2) / 2 - 10, (y1 + y2) / 2 - 12, r.km.toFixed(r.km < 10 ? 2 : 1) + ' km · ' + Math.round(r.az) + '°', '#ffd36b');
 }
 
 /** Etiqueta con fondo oscuro a la derecha de un símbolo. */

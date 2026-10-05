@@ -149,3 +149,16 @@ test('puestos de mando: un puesto de mando destruido solo desconecta a sus unida
   assert.equal(effectiveC2('integrada', objs, ''), 'integrada');
   assert.equal(effectiveC2('integrada', [{ type: 'command', status: 'destroyed' }], 'B'), 'desconectada', 'un nodo sin puesto afecta a todos');
 });
+
+test('doctrina de señuelos por unidad: se guarda, se valida y se recupera', async () => {
+  const { exportScenario, validateScenario, loadScenarioData } = await import('../src/sim/scenario-io.js');
+  useMap('monterey'); clearSetup();
+  addDef('patriot', 40, 40, { name: 'P', decoyDoc: 'ignorar', cp: 'A' }); addDef('nasams', 42, 40, { name: 'N', decoyDoc: 'xx' });
+  assert.equal(S.setup.defs[1].decoyDoc, undefined, 'un valor desconocido no se asigna');
+  const v = validateScenario(JSON.parse(JSON.stringify(exportScenario())));
+  assert.ok(v.ok, v.errors.join('; '));
+  clearSetup(); loadScenarioData(v.data);
+  assert.equal(S.setup.defs[0].decoyDoc, 'ignorar'); assert.equal(S.setup.defs[0].cp, 'A');
+  const bad = JSON.parse(JSON.stringify(exportScenario())); bad.setup.defs[0].decoyDoc = 'nunca';
+  assert.match(validateScenario(bad).errors.join('\n'), /decoyDoc/);
+});

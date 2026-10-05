@@ -217,7 +217,10 @@ function canEngage(u, th, t, c2, probe) {
   if (t - av < sm.react * (u.dmgRadar ? UNIT_DAMAGE.react : 1)) return null;   // radar de tiro dañado: reacción más lenta
   const flying = (th.fly || []).filter(i => !i.done);
   if (C2_LEVELS[c2].deconf ? flying.some(i => cpOf(i.u) === cpOf(u)) : flying.some(i => i.u === u)) return null;   // la coordinación es dentro del puesto de mando
-  if (S.ignoreDecoys && th.clsAs === 'señuelo') return null;   // doctrina: no gastar en pistas clasificadas como señuelo
+  // doctrina de señuelos: la de la unidad (u.decoyDoc) o, si hereda, la general; decide con la clasificación
+  // conocida (th.clsAs), no con la identidad real
+  const ign = u.decoyDoc === 'ignorar' ? true : u.decoyDoc === 'tirar' ? false : S.ignoreDecoys;
+  if (ign && th.clsAs === 'señuelo') return null;
   return { pre: true };
 }
 
