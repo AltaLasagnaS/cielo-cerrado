@@ -11,7 +11,7 @@ import { resetSim } from './app.js';
 import { schedCov } from './coverage.js';
 import { setMode, toast } from './modes.js';
 import { renderAll } from './panels/index.js';
-import { campaignBattle } from './campaign.js';
+import { campaignBattle, campaignBlocks } from './campaign.js';
 import { renderStats, renderLog } from './panels/results.js';
 import { renderScenario } from './panels/scenario.js';
 import { AUTO_PHASES } from '../sim/pace.js';
@@ -23,13 +23,18 @@ export function initControls() {
   $('#speeds').innerHTML = `<button data-s="auto" title="Rápido cuando no pasa nada, lento cuando hay combate">Auto</button>` + SPEEDS.map(s => `<button data-s="${s}">${s}×</button>`).join('');
   $('#speeds').onclick = e => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.s === 'auto') S.auto = true; else { S.auto = false; S.speed = +b.dataset.s; } updatePlay(); };
   $('#play').onclick = togglePlay;
-  $('#reset').onclick = () => { if (campaignBattle()) { toast('Hay una guardia de campaña en curso: terminala primero.'); return; } resetSim(); renderAll(); };
-  $('#view').onchange = () => { renderAll(); renderStats(); renderLog(); renderScenario(); draw(); };
+  $('#reset').onclick = () => { if (campaignBlocks('reiniciar')) return; resetSim(); renderAll(); };
+  $('#view').onchange = e => {
+    // en la guardia se juega como el defensor: sin vista de la verdad ni del atacante
+    if (campaignBattle() && e.target.value !== 'def') { e.target.value = 'def'; campaignBlocks('cambiar de vista'); }
+    renderAll(); renderStats(); renderLog(); renderScenario(); draw(); };
 }
 
 /** Iniciar → pausar → seguir; al terminar, "nueva corrida" vuelve al modo edición. */
 export function togglePlay() {
   if (isMonteCarloRunning()) return;
+  // en una guardia, el botón solo pausa y sigue: la corrida la arma y la cierra la campaña
+  if (campaignBattle()) { S.running = !S.running; updatePlay(); return; }
   if (!S.started) { if (!S.setup.salvos.length) { toast('Agregá al menos un ataque en la pestaña Ataque.'); return; } setMode('select'); startSim(); S.running = true; schedCov(); }
   else if (!S.pending.length && S.threats.every(t => !t.alive)) { resetSim(); return; }
   else S.running = !S.running;

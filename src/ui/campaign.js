@@ -19,6 +19,7 @@ import { applyMap } from './app.js';
 import { renderAll } from './panels/index.js';
 import { markLogDirty } from './panels/results.js';
 import { updatePlay } from './controls.js';
+import { toast } from './modes.js';
 
 /** @type {any} */ let operation = null;
 /** @type {any} */ let combat = null;
@@ -33,6 +34,16 @@ const es = k => ES[k] || k;
 
 /** ¿Hay una guardia de campaña corriendo en el mapa? (el bucle la avanza con campaignStep). */
 export const campaignBattle = () => !!combat && operation?.phase === 'active';
+
+/**
+ * Freno para las acciones que cambiarían el mapa, la vista o la corrida en medio de una guardia
+ * (cargar escenario o relieve, Monte Carlo, ver la verdad, nueva corrida). → true si hay que frenar.
+ */
+export function campaignBlocks(what = 'eso') {
+  if (!campaignBattle()) return false;
+  toast(`Hay una guardia de campaña en curso: ${what} queda bloqueado hasta terminarla.`);
+  return true;
+}
 
 /**
  * Un paso de 0,25 s de la guardia (lo llama ui/loop.js en lugar de engine.step). Al terminar, cierra la

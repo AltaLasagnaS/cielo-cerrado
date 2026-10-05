@@ -143,6 +143,22 @@ try {
   while (await page.$('#cWait:not([disabled])')) await page.click('#cWait');
   await page.click('#cStart');
   assert.equal(await page.locator('#view').inputValue(), 'def', 'la guardia se juega en vista del defensor');
+  // durante la guardia no se puede ver la verdad, cambiar de escenario o de relieve, ni correr Monte Carlo;
+  // el botón principal solo pausa y sigue
+  await page.selectOption('#view', 'all');
+  assert.equal(await page.locator('#view').inputValue(), 'def', 'la vista completa queda bloqueada en la guardia');
+  await page.click('#mcBtn');
+  assert.equal(await page.locator('#modal').isHidden(), true, 'Monte Carlo no se abre en la guardia');
+  const scenName = await page.evaluate(() => window.__S.scen?.name);
+  await page.setInputFiles('#loadScen', { name: 'otro.json', mimeType: 'application/json', buffer: Buffer.from('{}') });
+  assert.equal(await page.evaluate(() => window.__S.scen?.name), scenName, 'no se carga otro escenario');
+  assert.equal(await page.locator('#modal').isHidden(), true, 'ni se abre la ventana de errores');
+  await page.setInputFiles('#hgt', { name: 'N46E030.hgt', mimeType: 'application/octet-stream', buffer: Buffer.alloc(8) });
+  assert.equal(await page.evaluate(() => window.__S.scen?.name), scenName, 'no se carga otro relieve');
+  const run0 = await page.evaluate(() => window.__S.running);
+  await page.click('#play');
+  assert.deepEqual(await page.evaluate(() => [window.__S.running, window.__S.started]), [!run0, true], 'el botón pausa sin reiniciar');
+  await page.click('#play');
   await page.evaluate(() => { let k = 0; while (window.__dbg.campaignStep() && k < 40000) k++; });
   assert.match(await page.locator('#sheet').innerText(), /Parte de cierre/i);
   await page.click('#cNext');

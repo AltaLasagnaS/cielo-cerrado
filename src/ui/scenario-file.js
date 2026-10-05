@@ -14,6 +14,7 @@ import { openModal } from './fichas.js';
 import { toast } from './modes.js';
 import { renderAll } from './panels/index.js';
 import { renderLog } from './panels/results.js';
+import { campaignBlocks } from './campaign.js';
 
 /** Tamaño máximo del archivo (los escenarios ocupan unos pocos KB). */
 const MAX_BYTES = 2 * 1024 * 1024;
@@ -22,6 +23,7 @@ export function initScenarioFile() {
   $('#saveScen').onclick = saveScenario;
   $('#loadScen').onchange = async e => {
     const f = e.target.files[0]; if (!f) return; e.target.value = '';
+    if (campaignBlocks('cargar un escenario')) return;
     if (f.size > MAX_BYTES) { showErrors(f.name, ['El archivo pesa más de 2 MB: no parece un escenario.']); return; }
     let raw;
     try { raw = JSON.parse(await f.text()); } catch (x) { showErrors(f.name, ['No es un JSON válido: ' + x.message]); return; }
