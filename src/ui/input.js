@@ -68,6 +68,14 @@ function click(g) {
     S.route.pts.push(p); updateModebar();
     return;
   }
+  // Shift + click sobre defensas (antes de iniciar): selección múltiple para editar en grupo (F03)
+  if (g.shift && g.hit?.kind === 'def' && !S.started) {
+    if (!S.multi.length && S.sel?.kind === 'def') S.multi = [S.sel.id];
+    S.multi = S.multi.includes(g.hit.id) ? S.multi.filter(i => i !== g.hit.id) : [...S.multi, g.hit.id];
+    S.sel = S.multi.length === 1 ? { kind: 'def', id: S.multi[0] } : null; if (S.multi.length === 1) S.multi = [];
+    renderSel(); return;
+  }
+  S.multi = [];
   if (g.hit) { S.sel = g.hit; renderSel(); }
 }
 
@@ -77,7 +85,7 @@ cv.addEventListener('pointerdown', e => {
   if (pointers.size === 2) { const [p1, p2] = [...pointers.values()]; pinch = { d: Math.hypot(p1[0] - p2[0], p1[1] - p2[1]), s: V.s }; gesture = null; return; }
   if (pointers.size > 2) return;
   const [sx, sy] = evPos(e);
-  gesture = { sx, sy, cx: V.cx, cy: V.cy, kind: null, hit: hitTest(sx, sy) };
+  gesture = { sx, sy, cx: V.cx, cy: V.cy, kind: null, hit: hitTest(sx, sy), shift: e.shiftKey };
 });
 cv.addEventListener('pointermove', e => {
   if (pointers.has(e.pointerId)) pointers.set(e.pointerId, evPos(e));
@@ -121,7 +129,7 @@ document.addEventListener('keydown', e => {
   if (!$('#modal').hidden) { if (e.key === 'Escape') { e.preventDefault(); closeModal(); } return; }
   if (/** @type {HTMLElement} */ (e.target).closest?.('input,select,textarea,[contenteditable]:not([contenteditable="false"]),[role="textbox"]')) return;
   if (e.key === 'Delete') { if (deleteSelected()) e.preventDefault(); return; }
-  if (e.key === 'Escape') { if (S.preview) cancelPlacement(); else setMode('select'); }
+  if (e.key === 'Escape') { if (S.preview) cancelPlacement(); else { if (S.multi.length) { S.multi = []; renderSel(); } setMode('select'); } }
   if (e.key === 'Enter') { if (S.preview) confirmPlacement(); else if (S.mode === 'route') finishRoute(); }
   if (e.key === ' ') { e.preventDefault(); togglePlay(); }
   if (e.key === 'm' || e.key === 'M') setMode(S.mode === 'measure' ? 'select' : 'measure');

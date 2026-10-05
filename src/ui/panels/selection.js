@@ -26,7 +26,9 @@ const CPS = [['', 'Principal'], ['A', 'Puesto A'], ['B', 'Puesto B'], ['C', 'Pue
 
 /** Reutiliza los botones de borrado de la selección; nunca edita una corrida ni una serie. */
 export function deleteSelected() {
-  if (S.started || isMonteCarloRunning() || !S.sel) return false;
+  if (S.started || isMonteCarloRunning()) return false;
+  if (S.multi.length > 1) { renderSel(); const b = $('#mDel'); if (b) { b.click(); return true; } }
+  if (!S.sel) return false;
   renderSel();
   const id = { def: '#sDel', jam: '#jDel', salvo: '#vDel', obj: '#oDel' }[S.sel?.kind];
   const button = id && $(id);
@@ -35,8 +37,48 @@ export function deleteSelected() {
 }
 
 /** live = refresco periódico durante la corrida (no pisa un campo que el jugador está editando). */
+/**
+ * Panel de un grupo de defensas (Shift + click, pedido F03): muestra cuántas y cuáles, y deja cambiar a la
+ * vez las propiedades que tienen todas. Si los valores difieren, el control lo dice ("mezcla") y no toca
+ * nada hasta que se elige uno. Borrar el grupo pide confirmación.
+ */
+function renderMulti(el) {
+  const us = S.multi.map(id => S.setup.defs.find(v => v.id === id)).filter(Boolean);
+  if (us.length < 2) { S.multi = []; return false; }
+  const same = f => { const v = us.map(f); return v.every(x => x === v[0]) ? v[0] : undefined; };
+  const sams = us.filter(u => D(u).sam);
+  const opt = (id, label, cur, opts) => `<div class="field"><label for="${id}">${label}</label><select id="${id}" class="sel">${cur === undefined ? '<option value="__mix" selected>(mezcla)</option>' : ''}${opts.map(([k, n]) => `<option value="${k}" ${cur === k ? 'selected' : ''}>${n}</option>`).join('')}</select></div>`;
+  let h = `<h3>Selección</h3><b style="font-size:15px">${us.length} defensas</b><p class="hint">${us.map(u => esc(u.name)).join(', ')}</p><p class="hint">Shift + click suma o saca una unidad; Esc limpia el grupo. Solo se cambian los valores que elijas.</p>`;
+  h += opt('mOwn', 'Operada por', same(u => u.owner || ''), [['', 'Según el equipo'], ['UA', 'Ucrania / OTAN'], ['RU', 'Rusia']]);
+  h += opt('mC2', 'Coordinación C2', same(u => u.c2 || ''), [['', 'Igual que la red'], ...C2_ORDER.slice(0, C2_ORDER.indexOf(S.c2)).map(k => [k, C2_LEVELS[k].name])]);
+  h += opt('mCp', 'Puesto de mando', same(u => u.cp || ''), CPS);
+  h += opt('mLink', 'Datalink', same(u => u.link !== false ? 'on' : 'off'), [['on', 'Activo'], ['off', 'Apagado']]);
+  if (sams.length === us.length) {
+    h += opt('mDec', 'Pistas clasificadas como señuelo', same(u => u.decoyDoc || ''), [['', 'Como la regla general'], ['ignorar', 'No tirarles'], ['tirar', 'Tirarles igual']]);
+    h += opt('mNoD', 'Drones', same(u => u.noDrones ? 'no' : 'si'), [['si', 'Les tira'], ['no', 'No gastar en drones']]);
+  }
+  h += `<div class="row"><button class="btn sm danger" id="mDel">Eliminar las ${us.length} unidades</button></div>`;
+  el.innerHTML = h;
+  const bind = (id, apply) => { const s = $(id); if (s) s.onchange = e => { const v = e.target.value; if (v === '__mix') return; for (const u of us) apply(u, v); draw(); renderMulti(el); }; };
+  bind('#mOwn', (u, v) => { if (v) u.owner = v; else delete u.owner; });
+  bind('#mC2', (u, v) => { if (v) u.c2 = v; else delete u.c2; });
+  bind('#mCp', (u, v) => { if (v) u.cp = v; else delete u.cp; });
+  bind('#mLink', (u, v) => { u.link = v === 'on'; });
+  bind('#mDec', (u, v) => { if (v) u.decoyDoc = v; else delete u.decoyDoc; });
+  bind('#mNoD', (u, v) => { u.noDrones = v === 'no'; });
+  $('#mDel').onclick = () => {
+    if (!confirm(`¿Eliminar las ${us.length} unidades seleccionadas?`)) return;
+    const ids = new Set(us.map(u => u.id));
+    S.setup.defs = S.setup.defs.filter(v => !ids.has(v.id));
+    for (const sv of S.setup.salvos) if (ids.has(sv.targetUnit)) sv.targetUnit = null;
+    S.multi = []; S.sel = null; renderSel(); schedCov(); draw();
+  };
+  return true;
+}
+
 export function renderSel(live) {
   const el = $('#selCard'); const sel = S.sel;
+  if (S.multi.length && !S.started && renderMulti(el)) return;
   if (!sel) { el.innerHTML = '<h3>Selección</h3><p class="hint">Tocá una unidad, jammer o ruta en el mapa para ver y ajustar sus parámetros. Arrastrá unidades para moverlas (antes de iniciar).</p>'; return; }
   if (live && document.activeElement && el.contains(document.activeElement) && document.activeElement.tagName === 'INPUT') return;
   if (sel.kind === 'def') {

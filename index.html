@@ -3414,6 +3414,7 @@ table.t.mc td.pc{white-space:nowrap}
     arrivals: [],
     // interfaz: selección, modo de edición, ruta en trazado y salva en preparación
     sel: null,
+    multi: [],
     mode: "select",
     placeType: null,
     route: null,
@@ -5650,7 +5651,7 @@ table.t.mc td.pc{white-space:nowrap}
     }
     for (const u of units) {
       const d = D(u), [sx, sy] = toS(u.x, u.y), dead = S.started && !u.alive;
-      const isSel = S.sel && S.sel.kind === "def" && S.sel.id === u.id;
+      const isSel = S.sel && S.sel.kind === "def" && S.sel.id === u.id || S.multi.includes(u.id);
       const c = sideOf(u) === "RU" ? "#ff9f5a" : "#62b6ff";
       ctx.lineWidth = isSel ? 2.2 : 1.2;
       ctx.strokeStyle = isSel ? "#e6a53c" : "#08101a";
@@ -7034,7 +7035,16 @@ table.t.mc td.pc{white-space:nowrap}
   // src/ui/panels/selection.js
   var CPS = [["", "Principal"], ["A", "Puesto A"], ["B", "Puesto B"], ["C", "Puesto C"]];
   function deleteSelected() {
-    if (S.started || isMonteCarloRunning() || !S.sel) return false;
+    if (S.started || isMonteCarloRunning()) return false;
+    if (S.multi.length > 1) {
+      renderSel();
+      const b = $("#mDel");
+      if (b) {
+        b.click();
+        return true;
+      }
+    }
+    if (!S.sel) return false;
     renderSel();
     const id = { def: "#sDel", jam: "#jDel", salvo: "#vDel", obj: "#oDel" }[S.sel?.kind];
     const button = id && $(id);
@@ -7042,9 +7052,78 @@ table.t.mc td.pc{white-space:nowrap}
     button.click();
     return true;
   }
+  function renderMulti(el) {
+    const us = S.multi.map((id) => S.setup.defs.find((v) => v.id === id)).filter(Boolean);
+    if (us.length < 2) {
+      S.multi = [];
+      return false;
+    }
+    const same = (f) => {
+      const v = us.map(f);
+      return v.every((x) => x === v[0]) ? v[0] : void 0;
+    };
+    const sams = us.filter((u) => D(u).sam);
+    const opt = (id, label2, cur, opts) => `<div class="field"><label for="${id}">${label2}</label><select id="${id}" class="sel">${cur === void 0 ? '<option value="__mix" selected>(mezcla)</option>' : ""}${opts.map(([k, n2]) => `<option value="${k}" ${cur === k ? "selected" : ""}>${n2}</option>`).join("")}</select></div>`;
+    let h = `<h3>Selección</h3><b style="font-size:15px">${us.length} defensas</b><p class="hint">${us.map((u) => esc(u.name)).join(", ")}</p><p class="hint">Shift + click suma o saca una unidad; Esc limpia el grupo. Solo se cambian los valores que elijas.</p>`;
+    h += opt("mOwn", "Operada por", same((u) => u.owner || ""), [["", "Según el equipo"], ["UA", "Ucrania / OTAN"], ["RU", "Rusia"]]);
+    h += opt("mC2", "Coordinación C2", same((u) => u.c2 || ""), [["", "Igual que la red"], ...C2_ORDER.slice(0, C2_ORDER.indexOf(S.c2)).map((k) => [k, C2_LEVELS[k].name])]);
+    h += opt("mCp", "Puesto de mando", same((u) => u.cp || ""), CPS);
+    h += opt("mLink", "Datalink", same((u) => u.link !== false ? "on" : "off"), [["on", "Activo"], ["off", "Apagado"]]);
+    if (sams.length === us.length) {
+      h += opt("mDec", "Pistas clasificadas como señuelo", same((u) => u.decoyDoc || ""), [["", "Como la regla general"], ["ignorar", "No tirarles"], ["tirar", "Tirarles igual"]]);
+      h += opt("mNoD", "Drones", same((u) => u.noDrones ? "no" : "si"), [["si", "Les tira"], ["no", "No gastar en drones"]]);
+    }
+    h += `<div class="row"><button class="btn sm danger" id="mDel">Eliminar las ${us.length} unidades</button></div>`;
+    el.innerHTML = h;
+    const bind = (id, apply) => {
+      const s = $(id);
+      if (s) s.onchange = (e) => {
+        const v = e.target.value;
+        if (v === "__mix") return;
+        for (const u of us) apply(u, v);
+        draw();
+        renderMulti(el);
+      };
+    };
+    bind("#mOwn", (u, v) => {
+      if (v) u.owner = v;
+      else delete u.owner;
+    });
+    bind("#mC2", (u, v) => {
+      if (v) u.c2 = v;
+      else delete u.c2;
+    });
+    bind("#mCp", (u, v) => {
+      if (v) u.cp = v;
+      else delete u.cp;
+    });
+    bind("#mLink", (u, v) => {
+      u.link = v === "on";
+    });
+    bind("#mDec", (u, v) => {
+      if (v) u.decoyDoc = v;
+      else delete u.decoyDoc;
+    });
+    bind("#mNoD", (u, v) => {
+      u.noDrones = v === "no";
+    });
+    $("#mDel").onclick = () => {
+      if (!confirm(`¿Eliminar las ${us.length} unidades seleccionadas?`)) return;
+      const ids = new Set(us.map((u) => u.id));
+      S.setup.defs = S.setup.defs.filter((v) => !ids.has(v.id));
+      for (const sv of S.setup.salvos) if (ids.has(sv.targetUnit)) sv.targetUnit = null;
+      S.multi = [];
+      S.sel = null;
+      renderSel();
+      schedCov();
+      draw();
+    };
+    return true;
+  }
   function renderSel(live) {
     const el = $("#selCard");
     const sel = S.sel;
+    if (S.multi.length && !S.started && renderMulti(el)) return;
     if (!sel) {
       el.innerHTML = '<h3>Selección</h3><p class="hint">Tocá una unidad, jammer o ruta en el mapa para ver y ajustar sus parámetros. Arrastrá unidades para moverlas (antes de iniciar).</p>';
       return;
@@ -8307,6 +8386,15 @@ table.t.mc td.pc{white-space:nowrap}
       updateModebar();
       return;
     }
+    if (g.shift && g.hit?.kind === "def" && !S.started) {
+      if (!S.multi.length && S.sel?.kind === "def") S.multi = [S.sel.id];
+      S.multi = S.multi.includes(g.hit.id) ? S.multi.filter((i) => i !== g.hit.id) : [...S.multi, g.hit.id];
+      S.sel = S.multi.length === 1 ? { kind: "def", id: S.multi[0] } : null;
+      if (S.multi.length === 1) S.multi = [];
+      renderSel();
+      return;
+    }
+    S.multi = [];
     if (g.hit) {
       S.sel = g.hit;
       renderSel();
@@ -8324,7 +8412,7 @@ table.t.mc td.pc{white-space:nowrap}
       }
       if (pointers.size > 2) return;
       const [sx, sy] = evPos(e);
-      gesture = { sx, sy, cx: V.cx, cy: V.cy, kind: null, hit: hitTest(sx, sy) };
+      gesture = { sx, sy, cx: V.cx, cy: V.cy, kind: null, hit: hitTest(sx, sy), shift: e.shiftKey };
     });
     cv.addEventListener("pointermove", (e) => {
       if (pointers.has(e.pointerId)) pointers.set(e.pointerId, evPos(e));
@@ -8419,7 +8507,13 @@ table.t.mc td.pc{white-space:nowrap}
       }
       if (e.key === "Escape") {
         if (S.preview) cancelPlacement();
-        else setMode("select");
+        else {
+          if (S.multi.length) {
+            S.multi = [];
+            renderSel();
+          }
+          setMode("select");
+        }
       }
       if (e.key === "Enter") {
         if (S.preview) confirmPlacement();

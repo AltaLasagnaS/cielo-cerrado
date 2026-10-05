@@ -100,6 +100,23 @@ try {
   assert.equal(await page.evaluate(() => JSON.stringify(window.__S.setup)), before, 'medir no cambia el escenario');
   await page.keyboard.press('Escape');
   assert.equal(await page.evaluate(() => window.__S.mode), 'select');
+  // selección múltiple (F03): click + Shift-click, edición en grupo y Delete con confirmación
+  await page.evaluate(() => { window.__dbg.loadScenario('mb_noche'); window.__S.sel = null; window.__S.multi = []; });
+  const pos = await page.evaluate(async () => {
+    const { toS } = await import('/render/view.js'); const r = document.querySelector('canvas').getBoundingClientRect();
+    return window.__S.setup.defs.slice(0, 2).map(u => { const [x, y] = toS(u.x, u.y); return [r.left + x, r.top + y, u.id]; });
+  });
+  await page.mouse.click(pos[0][0], pos[0][1]);
+  await page.keyboard.down('Shift'); await page.mouse.click(pos[1][0], pos[1][1]); await page.keyboard.up('Shift');
+  assert.deepEqual(await page.evaluate(() => window.__S.multi.length), 2);
+  assert.match(await page.locator('#selCard').innerText(), /2 defensas/);
+  await page.locator('#mCp').selectOption('A');
+  assert.deepEqual(await page.evaluate(ids => ids.map(id => window.__S.setup.defs.find(u => u.id === id).cp), [pos[0][2], pos[1][2]]), ['A', 'A']);
+  const nDefs = await page.evaluate(() => window.__S.setup.defs.length);
+  page.once('dialog', d => d.accept());
+  await page.locator('canvas').first().focus().catch(() => {});
+  await page.keyboard.press('Delete');
+  assert.equal(await page.evaluate(() => window.__S.setup.defs.length), nDefs - 2, 'Delete borra el grupo después de confirmar');
   assert.deepEqual(errors, []);
-  console.log('Interfaz: valores numéricos, atajos, Monte Carlo, Academia de pulsos y regla OK');
+  console.log('Interfaz: valores numéricos, atajos, Monte Carlo, Academia de pulsos, regla y selección múltiple OK');
 } finally { await browser.close(); }

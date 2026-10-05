@@ -86,7 +86,7 @@ export function draw() {
   // unidades
   for (const u of units) {
     const d = D(u), [sx, sy] = toS(u.x, u.y), dead = S.started && !u.alive;
-    const isSel = S.sel && S.sel.kind === 'def' && S.sel.id === u.id;
+    const isSel = (S.sel && S.sel.kind === 'def' && S.sel.id === u.id) || S.multi.includes(u.id);
     const c = sideOf(u) === 'RU' ? '#ff9f5a' : '#62b6ff';
     ctx.lineWidth = isSel ? 2.2 : 1.2; ctx.strokeStyle = isSel ? '#e6a53c' : '#08101a'; ctx.fillStyle = dead ? '#3a4452' : c;
     ctx.beginPath();
