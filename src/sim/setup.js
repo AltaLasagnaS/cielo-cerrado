@@ -11,6 +11,7 @@ export function addDef(type, x, y, o = {}) {
   const d = DEFENSES[type];
   const u = { id: nextId(), type, x, y, az: o.az ?? defaultAz(x, y), mast: d.radar ? (d.kind === 'aew' ? 0 : d.radar.mast) : 2, alt: d.alt, mag: d.sam ? d.sam.mag : 0, reserve: d.sam ? (o.reserve ?? d.sam.reserve ?? 0) : 0, salvo: d.sam ? d.sam.salvo : 0, noDrones: d.sam ? !!d.sam.noDrones : false, link: o.link ?? true, name: o.name || nextName(type) };
   if (o.c2) u.c2 = o.c2;
+  if (o.cp) u.cp = o.cp;   // puesto de mando (physics/engagement.js#cpOf); sin dato, el principal
   S.setup.defs.push(u); return u;
 }
 
@@ -36,11 +37,12 @@ export function addSalvo(o) {
   S.setup.salvos.push(sv); return sv;
 }
 
-/** Ubica un objetivo. o = { name?, short?, hp?, desc? }. */
+/** Ubica un objetivo. o = { name?, short?, hp?, desc?, cp? (puesto de mando de un nodo de C2) }. */
 export function addObj(type, x, y, o = {}) {
   const tt = TARGET_TYPES[type];
   const n = S.setup.objs.filter(g => g.type === type).length + 1;
   const g = { id: nextId(), type, x, y, name: o.name || tt.name + ' ' + n, short: o.short || '', maxHp: o.hp || tt.hp, desc: o.desc || '' };
+  if (o.cp) g.cp = o.cp;   // nodo de C2 de un puesto de mando (solo afecta a sus unidades)
   S.setup.objs.push(g); return g;
 }
 

@@ -24,8 +24,8 @@ const GOAL_KINDS = ['destroy', 'damage', 'protect', 'survive', 'killUnit', 'keep
 const DOCTRINES = ['salva', 'sls'];
 
 const pick = (o, keys) => { const r = {}; for (const k of keys) if (o[k] !== undefined) r[k] = structuredClone(o[k]); return r; };
-const OBJ_KEYS = ['id', 'type', 'x', 'y', 'name', 'short', 'maxHp', 'desc'];
-const DEF_KEYS = ['id', 'type', 'x', 'y', 'name', 'az', 'mast', 'alt', 'mag', 'salvo', 'noDrones', 'link', 'reserve', 'c2'];
+const OBJ_KEYS = ['id', 'type', 'x', 'y', 'name', 'short', 'maxHp', 'desc', 'cp'];
+const DEF_KEYS = ['id', 'type', 'x', 'y', 'name', 'az', 'mast', 'alt', 'mag', 'salvo', 'noDrones', 'link', 'reserve', 'c2', 'cp'];
 const SALVO_KEYS = ['id', 'type', 'count', 'interval', 'tStart', 'sync', 'tArrive', 'agl', 'launchDist', 'maneuver', 'decoys', 'link', 'crpa', 'pts', 'targetUnit', 'targetObj'];
 const JAM_KEYS = ['id', 'type', 'x', 'y', 'alt', 'on', 'mode', 'target'];
 const META_KEYS = ['name', 'player', 'time', 'description', 'forces', 'conditions', 'rulesText', 'goals', 'success', 'failure'];
@@ -127,7 +127,7 @@ export function validateScenario(raw) {
     const w = `Objetivo ${i + 1}${typeof g.name === 'string' ? ' (' + g.name + ')' : ''}`;
     if (!TARGET_TYPES[g.type]) { err(`${w}: tipo de objetivo desconocido "${String(g.type)}". Válidos: ${Object.keys(TARGET_TYPES).join(', ')}.`); return { id: id(w, g.id) }; }   // el id sigue contando para no sumar errores en cascada
     pos(w, g.x, g.y);
-    return { id: id(w, g.id), type: g.type, x: g.x, y: g.y, name: str(w + ' · name', g.name, 120, false), short: str(w + ' · short', g.short, 60), maxHp: num(w + ' · maxHp', g.maxHp, 1, 100000, { opt: true }), desc: str(w + ' · desc', g.desc, 1000) };
+    return { id: id(w, g.id), type: g.type, x: g.x, y: g.y, name: str(w + ' · name', g.name, 120, false), short: str(w + ' · short', g.short, 60), maxHp: num(w + ' · maxHp', g.maxHp, 1, 100000, { opt: true }), desc: str(w + ' · desc', g.desc, 1000), cp: str(w + ' · cp', g.cp, 20) || undefined };
   });
   // defensas
   const defs = list('defs', setup.defs).map((u, i) => {
@@ -139,6 +139,7 @@ export function validateScenario(raw) {
       az: num(w + ' · az', u.az, 0, 360, { opt: true }), mast: inLimits(w + ' · mast', num(w + ' · mast', u.mast, 0, 200, { opt: true }), DEFENSES[u.type].radar?.mastRange, 'la altura real de su antena'), alt: num(w + ' · alt', u.alt, 0, 20000, { opt: true }),
       mag: num(w + ' · mag', u.mag, 0, 1000, { int: true, opt: true }), salvo: num(w + ' · salvo', u.salvo, 0, 10, { int: true, opt: true }), noDrones: bool(w + ' · noDrones', u.noDrones), link: bool(w + ' · link', u.link),
       reserve: num(w + ' · reserve', u.reserve, 0, 1000, { int: true, opt: true }),
+      cp: str(w + ' · cp', u.cp, 20) || undefined,
       c2: u.c2 === undefined ? undefined : (C2_LEVELS[u.c2] ? u.c2 : (err(`${w} · c2: "${String(u.c2)}" no es un nivel de C2 válido (${Object.keys(C2_LEVELS).join(', ')}).`), undefined))
     };
   });
@@ -244,10 +245,10 @@ export function loadScenarioData(data) {
   if (MAP?.key !== data.map.key) throw new Error(`loadScenarioData: el mapa activo es ${MAP?.key}, el escenario es de ${data.map.key}`);
   S.setup = { objs: [], defs: [], salvos: [], jams: [] }; S.sel = null; S.mode = 'select';
   const objId = new Map(), defId = new Map();
-  for (const g of data.setup.objs) objId.set(g.id, addObj(g.type, g.x, g.y, { name: g.name, short: g.short, hp: g.maxHp, desc: g.desc }).id);
+  for (const g of data.setup.objs) objId.set(g.id, addObj(g.type, g.x, g.y, { name: g.name, short: g.short, hp: g.maxHp, desc: g.desc, cp: g.cp }).id);
   for (const d of data.setup.defs) {
     const u = addDef(d.type, d.x, d.y, { name: d.name, az: d.az });
-    for (const k of ['mast', 'alt', 'mag', 'salvo', 'noDrones', 'link', 'reserve', 'c2']) if (d[k] !== undefined) u[k] = d[k];
+    for (const k of ['mast', 'alt', 'mag', 'salvo', 'noDrones', 'link', 'reserve', 'c2', 'cp']) if (d[k] !== undefined) u[k] = d[k];
     defId.set(d.id, u.id);
   }
   for (const sv of data.setup.salvos) {
@@ -267,7 +268,7 @@ export function loadScenarioData(data) {
   S.scen = data.scenario ? {
     ...data.scenario, map: data.map.key,
     // el briefing lista los objetivos del escenario: son los del archivo
-    objectives: S.setup.objs.map(g => ({ type: g.type, name: g.name, short: g.short, x: g.x, y: g.y, hp: g.maxHp, desc: g.desc })),
+    objectives: S.setup.objs.map(g => ({ type: g.type, name: g.name, short: g.short, x: g.x, y: g.y, hp: g.maxHp, desc: g.desc, cp: g.cp })),
     defs: [], salvos: [], jams: []
   } : null;
 }

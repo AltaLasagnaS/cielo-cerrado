@@ -128,3 +128,24 @@ test('C2 integrada: defensa por capas, el NASAMS le deja los drones al Gepard qu
   assert.ok((it.N || 0) < co.N && it.G > (co.G || 0), JSON.stringify({ co, it }));
   assert.ok(it.cost < co.cost / 2, JSON.stringify({ co, it }));
 });
+
+test('puestos de mando: una pista publicada en un puesto no llega a otro', () => {
+  const run = cpS => {
+    useMap('monterey', { flat: true }); clearSetup();
+    addDef('ewr', 50, 20, { name: 'R' }); addDef('s300', 50, 60, { name: 'S', cp: cpS });
+    addSalvo({ type: 'kh22', count: 1, pts: [[50, 0], [50, 59]] });
+    runCurrent(2); return S.threats[0];
+  };
+  const same = run(undefined);
+  assert.ok(same.net.ua_c2?.first != null, 'mismo puesto: la pista del EWR está en la red principal');
+  const other = run('B');
+  assert.equal(other.net['ua_c2@B'], undefined, 'el puesto B no recibe la pista del EWR');
+  assert.equal(netPk({ id: 9, type: 's300', link: true, cp: 'B' }, same, same.net.ua_c2.first + 5, 'coordinada'), 0, 'otro puesto: sin pista de red');
+});
+
+test('puestos de mando: un puesto de mando destruido solo desconecta a sus unidades', () => {
+  const objs = [{ type: 'command', status: 'destroyed', cp: 'A' }];
+  assert.equal(effectiveC2('integrada', objs, 'A'), 'desconectada');
+  assert.equal(effectiveC2('integrada', objs, ''), 'integrada');
+  assert.equal(effectiveC2('integrada', [{ type: 'command', status: 'destroyed' }], 'B'), 'desconectada', 'un nodo sin puesto afecta a todos');
+});

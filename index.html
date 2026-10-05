@@ -4322,22 +4322,28 @@ table.t.mc td.pc{white-space:nowrap}
     const L = C2_LEVELS[c2];
     let best = 0;
     const fresh = (n2, lag) => n2 && n2.first != null && t - n2.first >= L.lag + lag && t - n2.last <= L.window;
+    const cp = cpOf(u);
     for (const key of datalinksOf(D(u))) {
-      if (fresh(th.net?.[key], 0)) return 1;
-      for (const { from, G, id } of gatewaysInto(key)) if (gws.includes(id) && fresh(th.net?.[from], G.gwLag)) best = Math.max(best, G.gwPk);
+      if (fresh(th.net?.[netKey(key, cp)], 0)) return 1;
+      for (const { from, G, id } of gatewaysInto(key)) if (gws.includes(id) && fresh(th.net?.[netKey(from, cp)], G.gwLag)) best = Math.max(best, G.gwPk);
     }
     return best;
   }
+  var cpOf = (u) => u?.cp || "";
+  var netKey = (key, cp) => cp ? key + "@" + cp : key;
+  var cueOf = (th, cp) => cp ? th.cueCp?.[cp] ?? null : th.cueFirst;
   var unitC2 = (u, c2) => u.c2 && C2_ORDER.indexOf(u.c2) >= 0 && C2_ORDER.indexOf(u.c2) < C2_ORDER.indexOf(c2) ? u.c2 : c2;
   function reactionStart(th, t, c2, u = null) {
     const L = C2_LEVELS[c2];
-    if ((L.share === "cue" || L.share === "fire") && th.cueFirst != null) return Math.min(t, th.cueFirst + L.lag);
-    if ((L.share === "cue" || L.share === "fire") && th.cueFirst == null && th.netFirst != null && u?.link !== false) return Math.min(t, th.netFirst + L.lag);
+    const cue = cueOf(th, cpOf(u));
+    if ((L.share === "cue" || L.share === "fire") && cue != null) return Math.min(t, cue + L.lag);
+    if ((L.share === "cue" || L.share === "fire") && cue == null && !cpOf(u) && th.netFirst != null && u?.link !== false) return Math.min(t, th.netFirst + L.lag);
     return t;
   }
-  function effectiveC2(c2, objs) {
+  function effectiveC2(c2, objs, cp = "") {
     let i = C2_ORDER.indexOf(c2);
     for (const g of objs) {
+      if (g.cp && g.cp !== (cp || "")) continue;
       const n2 = g.status === "destroyed" && C2_NODES[g.type];
       if (!n2) continue;
       i = n2 === "all" ? 0 : i - n2;
@@ -4549,7 +4555,7 @@ table.t.mc td.pc{white-space:nowrap}
     }
     if (t < S.ewNext) return;
     S.ewNext = t + EW_DT;
-    const c2g = effectiveC2(S.c2, S.objs), inNet = (s) => C2_LEVELS[unitC2(s.u, c2g)].share !== "none";
+    const inNet = (s) => C2_LEVELS[unitC2(s.u, effectiveC2(S.c2, S.objs, cpOf(s.u)))].share !== "none";
     for (const j of S.jamsLive) {
       const JJ = JAMMERS[j.type];
       if (JJ.gnssJam || !j.on || j.dead) continue;
@@ -4559,6 +4565,7 @@ table.t.mc td.pc{white-space:nowrap}
       if (net.length >= 2) {
         let best = Infinity, pair = null;
         for (let a = 0; a < net.length; a++) for (let b = a + 1; b < net.length; b++) {
+          if (cpOf(net[a].u) !== cpOf(net[b].u)) continue;
           const e = fixError(net[a], net[b], j.x, j.y);
           if (e < best) {
             best = e;
@@ -4786,9 +4793,17 @@ table.t.mc td.pc{white-space:nowrap}
             }
           }
           const inNet = u.c2 !== "desconectada";
-          if (th.cueFirst === null && inNet) th.cueFirst = t;
+          const cp = cpOf(u);
+          if (inNet) {
+            if (!cp) {
+              if (th.cueFirst === null) th.cueFirst = t;
+            } else {
+              const m = th.cueCp || (th.cueCp = {});
+              if (m[cp] == null) m[cp] = t;
+            }
+          }
           if (u.link !== false && inNet) for (const key of datalinksOf(D(u))) {
-            const n2 = th.net[key] || (th.net[key] = { first: null, last: -1e9 });
+            const nk = netKey(key, cp), n2 = th.net[nk] || (th.net[nk] = { first: null, last: -1e9 });
             if (n2.first === null) n2.first = t;
             n2.last = t;
             th.lastNet = t;
@@ -4889,7 +4904,7 @@ table.t.mc td.pc{white-space:nowrap}
     }
     if (t - av < sm.react * (u.dmgRadar ? UNIT_DAMAGE.react : 1)) return null;
     const flying = (th.fly || []).filter((i) => !i.done);
-    if (C2_LEVELS[c2].deconf ? flying.length : flying.some((i) => i.u === u)) return null;
+    if (C2_LEVELS[c2].deconf ? flying.some((i) => cpOf(i.u) === cpOf(u)) : flying.some((i) => i.u === u)) return null;
     if (S.ignoreDecoys && th.clsAs === "señuelo") return null;
     return { pre: true };
   }
@@ -4932,7 +4947,7 @@ table.t.mc td.pc{white-space:nowrap}
     const d = D(u), sm = d.sam;
     const ch = sm.ch;
     if (u.active >= ch) return;
-    const c2net = effectiveC2(S.c2, S.objs), c2 = unitC2(u, c2net), L = C2_LEVELS[c2];
+    const cp = cpOf(u), c2net = effectiveC2(S.c2, S.objs, cp), c2 = unitC2(u, c2net), L = C2_LEVELS[c2];
     const cand = [];
     for (const th of S.threats) if (canEngage(u, th, t, c2, false)) cand.push([th, th.p.rem / Math.max(1, th.T.v)]);
     cand.sort((a, b) => a[1] - b[1]);
@@ -4949,14 +4964,14 @@ table.t.mc td.pc{white-space:nowrap}
       if (L.best && u.link !== false) {
         const mine = shooterScore(u, th, t, f.sol.f);
         const better = S.units.some((v) => {
-          if (v === u || v.link === false || !canEngage(v, th, t, unitC2(v, c2net), true)) return false;
+          if (v === u || v.link === false || cpOf(v) !== cp || !canEngage(v, th, t, unitC2(v, c2net), true)) return false;
           const fv = solveFor(v, th, t);
           return !!fv && shooterScore(v, th, t, fv.sol.f) > mine * (th.cls === "dron" ? 0.999 : 1.001);
         });
         if (better) continue;
         if (th.cls === "dron") {
           const cpk = costPerKill(u, th, t);
-          const layer = S.units.some((v) => v !== u && v.alive && v.link !== false && D(v).sam && v.magLeft > 0 && !v.noDrones && D(v).sam.maxR > 0 && costPerKill(v, th, t) * 2 <= cpk && reaches(v, th, t));
+          const layer = S.units.some((v) => v !== u && v.alive && v.link !== false && cpOf(v) === cp && D(v).sam && v.magLeft > 0 && !v.noDrones && D(v).sam.maxR > 0 && costPerKill(v, th, t) * 2 <= cpk && reaches(v, th, t));
           if (layer) continue;
         }
       }
@@ -5124,6 +5139,7 @@ table.t.mc td.pc{white-space:nowrap}
     const d = DEFENSES[type];
     const u = { id: nextId(), type, x, y, az: o.az ?? defaultAz(x, y), mast: d.radar ? d.kind === "aew" ? 0 : d.radar.mast : 2, alt: d.alt, mag: d.sam ? d.sam.mag : 0, reserve: d.sam ? o.reserve ?? d.sam.reserve ?? 0 : 0, salvo: d.sam ? d.sam.salvo : 0, noDrones: d.sam ? !!d.sam.noDrones : false, link: o.link ?? true, name: o.name || nextName(type) };
     if (o.c2) u.c2 = o.c2;
+    if (o.cp) u.cp = o.cp;
     S.setup.defs.push(u);
     return u;
   }
@@ -5163,6 +5179,7 @@ table.t.mc td.pc{white-space:nowrap}
     const tt = TARGET_TYPES[type];
     const n2 = S.setup.objs.filter((g2) => g2.type === type).length + 1;
     const g = { id: nextId(), type, x, y, name: o.name || tt.name + " " + n2, short: o.short || "", maxHp: o.hp || tt.hp, desc: o.desc || "" };
+    if (o.cp) g.cp = o.cp;
     S.setup.objs.push(g);
     return g;
   }
@@ -6870,6 +6887,7 @@ table.t.mc td.pc{white-space:nowrap}
   }
 
   // src/ui/panels/selection.js
+  var CPS = [["", "Principal"], ["A", "Puesto A"], ["B", "Puesto B"], ["C", "Puesto C"]];
   function deleteSelected() {
     if (S.started || isMonteCarloRunning() || !S.sel) return false;
     renderSel();
@@ -6923,7 +6941,7 @@ table.t.mc td.pc{white-space:nowrap}
         if (d.sam || r) html += `<h3>Enlace técnico de pistas</h3>`;
         if (datalinksOf(d).length) html += `<label class="check"><input type="checkbox" id="sLink" ${u.link !== false ? "checked" : ""}> Datalink activo (${esc(links)})</label><p class="hint">Al apagarlo, esta unidad deja de publicar y recibir pistas de tiro por enlaces compatibles. Conserva su sensor propio y puede recibir alertas C2 si la coordinación general lo permite.</p>`;
         else if (d.sam || r) html += `<p class="hint">Sin enlace técnico compatible: las alertas C2 no son una pista de tiro ni permiten guiar un misil con un sensor ajeno.</p>`;
-        if (d.sam || r) html += `<h3>Coordinación C2</h3><p class="hint">Red: ${esc(C2_LEVELS[S.c2].name)} (se cambia en Defensa). En Desconectada no hay alertas compartidas, pistas de red ni reparto de blancos; las unidades conservan sus sensores y disparos propios.</p><div class="field"><label for="sC2">Esta unidad</label><select id="sC2" class="sel">${["", ...C2_ORDER.slice(0, C2_ORDER.indexOf(S.c2))].map((k) => `<option value="${k}" ${(u.c2 || "") === k ? "selected" : ""}>${k ? esc(C2_LEVELS[k].name) : "Igual que la red"}</option>`).join("")}</select></div><p class="hint">Una unidad puede quedar con menos coordinación que la red (por ejemplo, una batería aislada o que no está en el mismo puesto de mando). Desconectada: ni avisa ni recibe.</p>`;
+        if (d.sam || r) html += `<h3>Coordinación C2</h3><p class="hint">Red: ${esc(C2_LEVELS[S.c2].name)} (se cambia en Defensa). En Desconectada no hay alertas compartidas, pistas de red ni reparto de blancos; las unidades conservan sus sensores y disparos propios.</p><div class="field"><label for="sC2">Esta unidad</label><select id="sC2" class="sel">${["", ...C2_ORDER.slice(0, C2_ORDER.indexOf(S.c2))].map((k) => `<option value="${k}" ${(u.c2 || "") === k ? "selected" : ""}>${k ? esc(C2_LEVELS[k].name) : "Igual que la red"}</option>`).join("")}</select></div><p class="hint">Una unidad puede quedar con menos coordinación que la red (por ejemplo, una batería aislada). Desconectada: ni avisa ni recibe.</p><div class="field"><label for="sCp">Puesto de mando</label><select id="sCp" class="sel">${CPS.map(([k, n2]) => `<option value="${k}" ${(u.cp || "") === k ? "selected" : ""}>${n2}</option>`).join("")}</select></div><p class="hint">Las pistas, alertas, el reparto de blancos y la triangulación de jammers solo circulan entre unidades del mismo puesto.</p>`;
         if (d.sam) html += `<label class="check"><input type="checkbox" id="sNoD" ${u.noDrones ? "checked" : ""}> No gastar en drones (reservar para misiles)</label><div class="field"><label for="sMag">Munición disponible</label><input id="sMag" class="inp" type="number" min="1" max="200" value="${u.mag}"></div><div class="field"><label for="sRes">Reserva para recargar (${Math.round(d.sam.reloadS / 60)} min por recarga)</label><input id="sRes" class="inp" type="number" min="0" max="500" value="${u.reserve ?? 0}"></div><div class="field"><label for="sSal">Interceptores por blanco</label><input id="sSal" class="inp" type="number" min="1" max="4" value="${u.salvo}"></div>`;
       }
       html += `<div class="row"><button class="btn sm" id="sInfo">Ficha</button>${ed ? '<button class="btn sm danger" id="sDel">Eliminar</button>' : ""}</div>`;
@@ -6954,6 +6972,10 @@ table.t.mc td.pc{white-space:nowrap}
         if ($("#sC2")) $("#sC2").onchange = (e) => {
           if (e.target.value) u.c2 = e.target.value;
           else delete u.c2;
+        };
+        if ($("#sCp")) $("#sCp").onchange = (e) => {
+          if (e.target.value) u.cp = e.target.value;
+          else delete u.cp;
         };
         $("#sDel").onclick = () => {
           S.setup.defs = S.setup.defs.filter((v) => v.id !== u.id);
@@ -7029,6 +7051,13 @@ table.t.mc td.pc{white-space:nowrap}
       <dl class="kv"><dt>HP</dt><dd>${hp} / ${g.maxHp}</dd><dt>Tipo</dt><dd>${esc(tt.name)}</dd><dt>Posición</dt><dd>${g.x.toFixed(1)}, ${g.y.toFixed(1)} km</dd><dt>Lat/Lon</dt><dd>${ll[0].toFixed(3)}°, ${ll[1].toFixed(3)}°</dd><dt>Huella</dt><dd>${tt.radius} m de radio</dd><dt>Vulnerabilidad</dt><dd>×${tt.vuln}</dd>${S.started ? `<dt>Impactos con daño</dt><dd>${g.hits}</dd>${dmgBy ? `<dt>Daño por arma</dt><dd>${dmgBy}</dd>` : ""}` : ""}</dl>
       <p class="hint">${esc(g.desc || tt.desc)}</p>
       ${!S.started ? `<div class="field"><label for="oHp">Vida máxima</label><input id="oHp" class="inp" type="number" min="50" max="20000" step="50" value="${g.maxHp}"></div><div class="row"><button class="btn sm danger" id="oDel">Eliminar</button></div>` : ""}`;
+      if (!S.started && C2_NODES[g.type]) {
+        $("#oHp").parentElement.insertAdjacentHTML("afterend", `<div class="field"><label for="oCp">Nodo de mando de</label><select id="oCp" class="sel">${CPS.map(([k, n2]) => `<option value="${k}" ${(g.cp || "") === k ? "selected" : ""}>${k ? n2 : "Todos los puestos"}</option>`).join("")}</select></div>`);
+        $("#oCp").onchange = (e) => {
+          if (e.target.value) g.cp = e.target.value;
+          else delete g.cp;
+        };
+      }
       bindNumber($("#oHp"), () => g.maxHp, (value) => {
         g.maxHp = value;
       });
@@ -8312,8 +8341,8 @@ table.t.mc td.pc{white-space:nowrap}
     for (const k of keys) if (o[k] !== void 0) r[k] = structuredClone(o[k]);
     return r;
   };
-  var OBJ_KEYS = ["id", "type", "x", "y", "name", "short", "maxHp", "desc"];
-  var DEF_KEYS = ["id", "type", "x", "y", "name", "az", "mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2"];
+  var OBJ_KEYS = ["id", "type", "x", "y", "name", "short", "maxHp", "desc", "cp"];
+  var DEF_KEYS = ["id", "type", "x", "y", "name", "az", "mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2", "cp"];
   var SALVO_KEYS = ["id", "type", "count", "interval", "tStart", "sync", "tArrive", "agl", "launchDist", "maneuver", "decoys", "link", "crpa", "pts", "targetUnit", "targetObj"];
   var JAM_KEYS = ["id", "type", "x", "y", "alt", "on", "mode", "target"];
   var META_KEYS = ["name", "player", "time", "description", "forces", "conditions", "rulesText", "goals", "success", "failure"];
@@ -8446,7 +8475,7 @@ table.t.mc td.pc{white-space:nowrap}
         return { id: id(w, g.id) };
       }
       pos(w, g.x, g.y);
-      return { id: id(w, g.id), type: g.type, x: g.x, y: g.y, name: str(w + " · name", g.name, 120, false), short: str(w + " · short", g.short, 60), maxHp: num2(w + " · maxHp", g.maxHp, 1, 1e5, { opt: true }), desc: str(w + " · desc", g.desc, 1e3) };
+      return { id: id(w, g.id), type: g.type, x: g.x, y: g.y, name: str(w + " · name", g.name, 120, false), short: str(w + " · short", g.short, 60), maxHp: num2(w + " · maxHp", g.maxHp, 1, 1e5, { opt: true }), desc: str(w + " · desc", g.desc, 1e3), cp: str(w + " · cp", g.cp, 20) || void 0 };
     });
     const defs = list("defs", setup.defs).map((u, i) => {
       const w = `Defensa ${i + 1}${typeof u.name === "string" ? " (" + u.name + ")" : ""}`;
@@ -8469,6 +8498,7 @@ table.t.mc td.pc{white-space:nowrap}
         noDrones: bool(w + " · noDrones", u.noDrones),
         link: bool(w + " · link", u.link),
         reserve: num2(w + " · reserve", u.reserve, 0, 1e3, { int: true, opt: true }),
+        cp: str(w + " · cp", u.cp, 20) || void 0,
         c2: u.c2 === void 0 ? void 0 : C2_LEVELS[u.c2] ? u.c2 : (err(`${w} · c2: "${String(u.c2)}" no es un nivel de C2 válido (${Object.keys(C2_LEVELS).join(", ")}).`), void 0)
       };
     });
@@ -8598,10 +8628,10 @@ table.t.mc td.pc{white-space:nowrap}
     S.sel = null;
     S.mode = "select";
     const objId = /* @__PURE__ */ new Map(), defId = /* @__PURE__ */ new Map();
-    for (const g of data.setup.objs) objId.set(g.id, addObj(g.type, g.x, g.y, { name: g.name, short: g.short, hp: g.maxHp, desc: g.desc }).id);
+    for (const g of data.setup.objs) objId.set(g.id, addObj(g.type, g.x, g.y, { name: g.name, short: g.short, hp: g.maxHp, desc: g.desc, cp: g.cp }).id);
     for (const d of data.setup.defs) {
       const u = addDef(d.type, d.x, d.y, { name: d.name, az: d.az });
-      for (const k of ["mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2"]) if (d[k] !== void 0) u[k] = d[k];
+      for (const k of ["mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2", "cp"]) if (d[k] !== void 0) u[k] = d[k];
       defId.set(d.id, u.id);
     }
     for (const sv of data.setup.salvos) {
@@ -8626,7 +8656,7 @@ table.t.mc td.pc{white-space:nowrap}
       ...data.scenario,
       map: data.map.key,
       // el briefing lista los objetivos del escenario: son los del archivo
-      objectives: S.setup.objs.map((g) => ({ type: g.type, name: g.name, short: g.short, x: g.x, y: g.y, hp: g.maxHp, desc: g.desc })),
+      objectives: S.setup.objs.map((g) => ({ type: g.type, name: g.name, short: g.short, x: g.x, y: g.y, hp: g.maxHp, desc: g.desc, cp: g.cp })),
       defs: [],
       salvos: [],
       jams: []

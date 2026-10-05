@@ -47,12 +47,23 @@ export function trackOK(u, th, t, c2, gws = []) {
 export function netPk(u, th, t, c2, gws = []) {
   const L = C2_LEVELS[c2]; let best = 0;
   const fresh = (n, lag) => n && n.first != null && t - n.first >= L.lag + lag && t - n.last <= L.window;
+  const cp = cpOf(u);
   for (const key of datalinksOf(D(u))) {
-    if (fresh(th.net?.[key], 0)) return 1;
-    for (const { from, G, id } of gatewaysInto(key)) if (gws.includes(id) && fresh(th.net?.[from], G.gwLag)) best = Math.max(best, G.gwPk);
+    if (fresh(th.net?.[netKey(key, cp)], 0)) return 1;
+    for (const { from, G, id } of gatewaysInto(key)) if (gws.includes(id) && fresh(th.net?.[netKey(from, cp)], G.gwLag)) best = Math.max(best, G.gwPk);
   }
   return best;
 }
+
+/**
+ * Puestos de mando (docs/FISICA.md §6): cada unidad pertenece a uno (u.cp; '' = el principal). Las pistas,
+ * las alertas, el reparto de blancos y la triangulación solo circulan dentro de un puesto.
+ */
+export const cpOf = u => (u?.cp || '');
+/** Clave de red de una familia de enlace dentro de un puesto de mando. */
+export const netKey = (key, cp) => (cp ? key + '@' + cp : key);
+/** Primera alerta que tuvo el puesto cp sobre th (null si ninguna). */
+export const cueOf = (th, cp) => (cp ? (th.cueCp?.[cp] ?? null) : th.cueFirst);
 
 /** Nivel de C2 de una unidad: el de la red (c2), salvo que la unidad esté asignada a uno menor (u.c2). */
 export const unitC2 = (u, c2) => (u.c2 && C2_ORDER.indexOf(u.c2) >= 0 && C2_ORDER.indexOf(u.c2) < C2_ORDER.indexOf(c2) ? u.c2 : c2);
@@ -64,20 +75,23 @@ export const unitC2 = (u, c2) => (u.c2 && C2_ORDER.indexOf(u.c2) >= 0 && C2_ORDE
  */
 export function reactionStart(th, t, c2, u = null) {
   const L = C2_LEVELS[c2];
-  if ((L.share === 'cue' || L.share === 'fire') && th.cueFirst != null) return Math.min(t, th.cueFirst + L.lag);
+  const cue = cueOf(th, cpOf(u));
+  if ((L.share === 'cue' || L.share === 'fire') && cue != null) return Math.min(t, cue + L.lag);
   // Compatibilidad con objetos de pruebas y escenarios guardados anteriores.
-  if ((L.share === 'cue' || L.share === 'fire') && th.cueFirst == null && th.netFirst != null && u?.link !== false) return Math.min(t, th.netFirst + L.lag);
+  if ((L.share === 'cue' || L.share === 'fire') && cue == null && !cpOf(u) && th.netFirst != null && u?.link !== false) return Math.min(t, th.netFirst + L.lag);
   return t;
 }
 
 /**
  * Nivel de C2 efectivo: el elegido (c2) menos lo que se perdió con los objetivos de C2 destruidos
  * (data/c2.js#C2_NODES): un puesto de mando destruido deja la defensa desconectada y cada sitio de
- * comunicaciones destruido la baja un nivel.
+ * comunicaciones destruido la baja un nivel. Con varios puestos de mando (u.cp), un nodo con g.cp solo afecta
+ * a las unidades de ese puesto; uno sin cp, a todas.
  */
-export function effectiveC2(c2, objs) {
+export function effectiveC2(c2, objs, cp = '') {
   let i = C2_ORDER.indexOf(c2);
   for (const g of objs) {
+    if (g.cp && g.cp !== (cp || '')) continue;   // nodo de otro puesto de mando
     const n = g.status === 'destroyed' && C2_NODES[g.type]; if (!n) continue;
     i = n === 'all' ? 0 : i - n;
   }

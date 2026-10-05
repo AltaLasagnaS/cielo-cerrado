@@ -1,6 +1,6 @@
 // Tarjeta "Selección": detalle y parámetros editables de lo que esté seleccionado en el mapa
 // (defensa, jammer, salva o amenaza en vuelo).
-import { THREATS, JAMMERS, JAM_MODES, TARGET_TYPES, TARGET_STATUS, D, DATALINKS, datalinksOf, UNIT_TARGET, C2_LEVELS, C2_ORDER } from '../../data/index.js';
+import { THREATS, JAMMERS, JAM_MODES, TARGET_TYPES, TARGET_STATUS, D, DATALINKS, datalinksOf, UNIT_TARGET, C2_LEVELS, C2_ORDER, C2_NODES } from '../../data/index.js';
 import { esc, fmtT, kmh, money } from '../../util/format.js';
 import { releaseId } from '../../util/ids.js';
 import { surf, latlon } from '../../physics/terrain.js';
@@ -17,6 +17,9 @@ import { renderAtk, removeObj } from './attack.js';
 import { renderEW } from './ew.js';
 import { bindNumber } from '../number-input.js';
 import { isMonteCarloRunning } from '../../sim/montecarlo.js';
+
+/** Puestos de mando que se pueden asignar ('' = el principal). */
+const CPS = [['', 'Principal'], ['A', 'Puesto A'], ['B', 'Puesto B'], ['C', 'Puesto C']];
 
 /** Reutiliza los botones de borrado de la selección; nunca edita una corrida ni una serie. */
 export function deleteSelected() {
@@ -60,7 +63,7 @@ export function renderSel(live) {
       if (d.sam || r) html += `<h3>Enlace técnico de pistas</h3>`;
       if (datalinksOf(d).length) html += `<label class="check"><input type="checkbox" id="sLink" ${u.link !== false ? 'checked' : ''}> Datalink activo (${esc(links)})</label><p class="hint">Al apagarlo, esta unidad deja de publicar y recibir pistas de tiro por enlaces compatibles. Conserva su sensor propio y puede recibir alertas C2 si la coordinación general lo permite.</p>`;
       else if (d.sam || r) html += `<p class="hint">Sin enlace técnico compatible: las alertas C2 no son una pista de tiro ni permiten guiar un misil con un sensor ajeno.</p>`;
-      if (d.sam || r) html += `<h3>Coordinación C2</h3><p class="hint">Red: ${esc(C2_LEVELS[S.c2].name)} (se cambia en Defensa). En Desconectada no hay alertas compartidas, pistas de red ni reparto de blancos; las unidades conservan sus sensores y disparos propios.</p><div class="field"><label for="sC2">Esta unidad</label><select id="sC2" class="sel">${['', ...C2_ORDER.slice(0, C2_ORDER.indexOf(S.c2))].map(k => `<option value="${k}" ${(u.c2 || '') === k ? 'selected' : ''}>${k ? esc(C2_LEVELS[k].name) : 'Igual que la red'}</option>`).join('')}</select></div><p class="hint">Una unidad puede quedar con menos coordinación que la red (por ejemplo, una batería aislada o que no está en el mismo puesto de mando). Desconectada: ni avisa ni recibe.</p>`;
+      if (d.sam || r) html += `<h3>Coordinación C2</h3><p class="hint">Red: ${esc(C2_LEVELS[S.c2].name)} (se cambia en Defensa). En Desconectada no hay alertas compartidas, pistas de red ni reparto de blancos; las unidades conservan sus sensores y disparos propios.</p><div class="field"><label for="sC2">Esta unidad</label><select id="sC2" class="sel">${['', ...C2_ORDER.slice(0, C2_ORDER.indexOf(S.c2))].map(k => `<option value="${k}" ${(u.c2 || '') === k ? 'selected' : ''}>${k ? esc(C2_LEVELS[k].name) : 'Igual que la red'}</option>`).join('')}</select></div><p class="hint">Una unidad puede quedar con menos coordinación que la red (por ejemplo, una batería aislada). Desconectada: ni avisa ni recibe.</p><div class="field"><label for="sCp">Puesto de mando</label><select id="sCp" class="sel">${CPS.map(([k, n]) => `<option value="${k}" ${(u.cp || '') === k ? 'selected' : ''}>${n}</option>`).join('')}</select></div><p class="hint">Las pistas, alertas, el reparto de blancos y la triangulación de jammers solo circulan entre unidades del mismo puesto.</p>`;
       if (d.sam) html += `<label class="check"><input type="checkbox" id="sNoD" ${u.noDrones ? 'checked' : ''}> No gastar en drones (reservar para misiles)</label><div class="field"><label for="sMag">Munición disponible</label><input id="sMag" class="inp" type="number" min="1" max="200" value="${u.mag}"></div><div class="field"><label for="sRes">Reserva para recargar (${Math.round(d.sam.reloadS / 60)} min por recarga)</label><input id="sRes" class="inp" type="number" min="0" max="500" value="${u.reserve ?? 0}"></div><div class="field"><label for="sSal">Interceptores por blanco</label><input id="sSal" class="inp" type="number" min="1" max="4" value="${u.salvo}"></div>`;
     }
     html += `<div class="row"><button class="btn sm" id="sInfo">Ficha</button>${ed ? '<button class="btn sm danger" id="sDel">Eliminar</button>' : ''}</div>`;
@@ -72,6 +75,7 @@ export function renderSel(live) {
       if ($('#sNoD')) $('#sNoD').onchange = e => { u.noDrones = e.target.checked; };
       if ($('#sLink')) $('#sLink').onchange = e => { u.link = e.target.checked; };
       if ($('#sC2')) $('#sC2').onchange = e => { if (e.target.value) u.c2 = e.target.value; else delete u.c2; };
+      if ($('#sCp')) $('#sCp').onchange = e => { if (e.target.value) u.cp = e.target.value; else delete u.cp; };
       $('#sDel').onclick = () => { S.setup.defs = S.setup.defs.filter(v => v.id !== u.id); S.sel = null; renderSel(); schedCov(); };
     }
   } else if (sel.kind === 'jam') {
@@ -102,6 +106,7 @@ export function renderSel(live) {
       <dl class="kv"><dt>HP</dt><dd>${hp} / ${g.maxHp}</dd><dt>Tipo</dt><dd>${esc(tt.name)}</dd><dt>Posición</dt><dd>${g.x.toFixed(1)}, ${g.y.toFixed(1)} km</dd><dt>Lat/Lon</dt><dd>${ll[0].toFixed(3)}°, ${ll[1].toFixed(3)}°</dd><dt>Huella</dt><dd>${tt.radius} m de radio</dd><dt>Vulnerabilidad</dt><dd>×${tt.vuln}</dd>${S.started ? `<dt>Impactos con daño</dt><dd>${g.hits}</dd>${dmgBy ? `<dt>Daño por arma</dt><dd>${dmgBy}</dd>` : ''}` : ''}</dl>
       <p class="hint">${esc(g.desc || tt.desc)}</p>
       ${!S.started ? `<div class="field"><label for="oHp">Vida máxima</label><input id="oHp" class="inp" type="number" min="50" max="20000" step="50" value="${g.maxHp}"></div><div class="row"><button class="btn sm danger" id="oDel">Eliminar</button></div>` : ''}`;
+    if (!S.started && C2_NODES[g.type]) { $('#oHp').parentElement.insertAdjacentHTML('afterend', `<div class="field"><label for="oCp">Nodo de mando de</label><select id="oCp" class="sel">${CPS.map(([k, n]) => `<option value="${k}" ${(g.cp || '') === k ? 'selected' : ''}>${k ? n : 'Todos los puestos'}</option>`).join('')}</select></div>`); $('#oCp').onchange = e => { if (e.target.value) g.cp = e.target.value; else delete g.cp; }; }
     bindNumber($('#oHp'), () => g.maxHp, value => { g.maxHp = value; });
     if ($('#oDel')) $('#oDel').onclick = () => removeObj(g.id);
   } else if (sel.kind === 'thr') {

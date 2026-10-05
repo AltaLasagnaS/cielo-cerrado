@@ -13,7 +13,7 @@ import { antZ, aspectCos, belowCeiling, detR, inSector, jamJ, pdScan, PD_CUTOFF,
 import { buildThreat, posAt, speedAt } from '../physics/kinematics.js';
 import { gnssNavError, crpaOverwhelmed } from '../physics/navigation.js';
 import { profileOf, timeTo } from '../physics/interceptor.js';
-import { RADAR_GUID, isTBM, trackOK, reactionStart, solve, calcPk, effectiveC2, unitC2, netPk } from '../physics/engagement.js';
+import { RADAR_GUID, isTBM, trackOK, reactionStart, solve, calcPk, effectiveC2, unitC2, netPk, cpOf, netKey } from '../physics/engagement.js';
 import { C2_LEVELS } from '../data/index.js';
 import { damageAt, targetStatus } from '../physics/damage.js';
 import { azOf } from '../util/math.js';
@@ -137,10 +137,11 @@ export function step(dt) {
         // La coordinación C2 puede repartir una alerta aun cuando el datalink de tiro esté apagado; una
         // unidad asignada a "desconectada" (u.c2) no avisa ni publica.
         const inNet = u.c2 !== 'desconectada';
-        if (th.cueFirst === null && inNet) th.cueFirst = t;
+        const cp = cpOf(u);
+        if (inNet) { if (!cp) { if (th.cueFirst === null) th.cueFirst = t; } else { const m = th.cueCp || (th.cueCp = {}); if (m[cp] == null) m[cp] = t; } }
         // Una pista de tiro solo entra a la red por un transporte compatible y encendido.
         if (u.link !== false && inNet) for (const key of datalinksOf(D(u))) {
-          const n = th.net[key] || (th.net[key] = { first: null, last: -1e9 });
+          const nk = netKey(key, cp), n = th.net[nk] || (th.net[nk] = { first: null, last: -1e9 });
           if (n.first === null) n.first = t;
           n.last = t;
           th.lastNet = t; if (th.netFirst === null) th.netFirst = t;
@@ -215,7 +216,7 @@ function canEngage(u, th, t, c2, probe) {
   if (av === undefined) { av = reactionStart(th, t, c2, u); if (!probe) u.avail[th.id] = av; }
   if (t - av < sm.react * (u.dmgRadar ? UNIT_DAMAGE.react : 1)) return null;   // radar de tiro dañado: reacción más lenta
   const flying = (th.fly || []).filter(i => !i.done);
-  if (C2_LEVELS[c2].deconf ? flying.length : flying.some(i => i.u === u)) return null;
+  if (C2_LEVELS[c2].deconf ? flying.some(i => cpOf(i.u) === cpOf(u)) : flying.some(i => i.u === u)) return null;   // la coordinación es dentro del puesto de mando
   if (S.ignoreDecoys && th.clsAs === 'señuelo') return null;   // doctrina: no gastar en pistas clasificadas como señuelo
   return { pre: true };
 }
@@ -284,7 +285,7 @@ function reaches(v, th, t) {
 export function engage(u, t) {
   const d = D(u), sm = d.sam; const ch = sm.ch;
   if (u.active >= ch) return;
-  const c2net = effectiveC2(S.c2, S.objs), c2 = unitC2(u, c2net), L = C2_LEVELS[c2];
+  const cp = cpOf(u), c2net = effectiveC2(S.c2, S.objs, cp), c2 = unitC2(u, c2net), L = C2_LEVELS[c2];
   const cand = [];
   for (const th of S.threats) if (canEngage(u, th, t, c2, false)) cand.push([th, th.p.rem / Math.max(1, th.T.v)]);
   cand.sort((a, b) => a[1] - b[1]);
@@ -298,13 +299,13 @@ export function engage(u, t) {
     if (L.best && u.link !== false) {
       // mejor tirador ahora: otra batería con enlace que también puede tirar ya y es mejor
       const mine = shooterScore(u, th, t, f.sol.f);
-      const better = S.units.some(v => { if (v === u || v.link === false || !canEngage(v, th, t, unitC2(v, c2net), true)) return false; const fv = solveFor(v, th, t); return !!fv && shooterScore(v, th, t, fv.sol.f) > mine * (th.cls === 'dron' ? 0.999 : 1.001); });
+      const better = S.units.some(v => { if (v === u || v.link === false || cpOf(v) !== cp || !canEngage(v, th, t, unitC2(v, c2net), true)) return false; const fv = solveFor(v, th, t); return !!fv && shooterScore(v, th, t, fv.sol.f) > mine * (th.cls === 'dron' ? 0.999 : 1.001); });
       if (better) continue;
       // defensa por capas: un dron se le deja a una capa al menos 2 veces más barata por derribo que
       // tenga munición y por cuya envolvente vaya a pasar antes de llegar
       if (th.cls === 'dron') {
         const cpk = costPerKill(u, th, t);
-        const layer = S.units.some(v => v !== u && v.alive && v.link !== false && D(v).sam && v.magLeft > 0 && !v.noDrones && D(v).sam.maxR > 0 && costPerKill(v, th, t) * 2 <= cpk && reaches(v, th, t));
+        const layer = S.units.some(v => v !== u && v.alive && v.link !== false && cpOf(v) === cp && D(v).sam && v.magLeft > 0 && !v.noDrones && D(v).sam.maxR > 0 && costPerKill(v, th, t) * 2 <= cpk && reaches(v, th, t));
         if (layer) continue;
       }
     }

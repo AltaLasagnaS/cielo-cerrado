@@ -364,6 +364,8 @@ La dirección del blanco sale de su posición 0,5 s antes del punto evaluado (3D
 
 **Nivel de C2 por unidad** (`u.c2`, selector "Esta unidad" en el panel de selección; `physics/engagement.js#unitC2`): una unidad puede quedar con **menos** coordinación que la red (una batería aislada, o que depende de otro puesto de mando), nunca con más. Si queda "desconectada" no avisa, no publica ni recibe pistas y no participa en la triangulación de jammers (§4).
 
+**Puestos de mando** (`u.cp`, selector "Puesto de mando" en el panel; `defs[].cp` en archivos; `physics/engagement.js#cpOf`): cada unidad pertenece a un puesto (el principal por defecto, o A, B, C). Las pistas de red, las alertas, el reparto de blancos (no repetir un blanco ya enfrentado, mejor tirador, capas) y la triangulación de jammers solo circulan **dentro** del puesto. Un nodo de C2 (puesto de mando o comunicaciones) puede pertenecer a un puesto (`objectives[].cp`): destruirlo degrada solo a sus unidades; sin puesto, a todas.
+
 **Mejor tirador y defensa por capas** (`best`, solo en integrada): antes de disparar, una batería con enlace cede el blanco si (1) otra batería con enlace también puede tirarle ahora y es mejor (contra drones, menor costo esperado por derribo = costo/Pk; contra el resto, mayor Pk), o (2) es un dron y su ruta pasa más adelante por la envolvente de una capa con munición al menos 2 veces más barata por derribo. Así un NASAMS le deja los Shahed al Gepard que los espera junto al objetivo.
 
 **Nodos de C2** (`effectiveC2`, `data/c2.js#C2_NODES`): si un objetivo **puesto de mando** de la defensa es destruido, el C2 efectivo cae a desconectada; cada **sitio de comunicaciones** destruido lo baja un nivel. El registro avisa cuando pasa.
