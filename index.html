@@ -6776,6 +6776,30 @@ table.t.mc td.pc{white-space:nowrap}
     };
   }
 
+  // experimentos/catalogo-presupuesto/data/port-campaign-extended.mjs
+  function extendedPortCampaignDefinition(selection) {
+    const definition = portCampaignDefinition(selection);
+    const first = definition.missions[0], second = definition.missions[1];
+    second.next = { exito: "third-watch", parcial: "third-watch", fracaso: "third-watch" };
+    definition.missions.push({
+      ...structuredClone(first),
+      id: "third-watch",
+      title: "Tercera guardia: volver a los puertos con los recursos restantes",
+      delayBeforeSeconds: 86400,
+      // Equipment assigned for the second watch remains available, with its actual condition/stock.
+      allowedAssetIds: [.../* @__PURE__ */ new Set([
+        ...second.allowedAssetIds.filter((id2) => definition.assets.find((a) => a.id === id2)?.kind === "unit"),
+        ...first.allowedAssetIds.filter((id2) => definition.assets.find((a) => a.id === id2)?.kind === "objective")
+      ])],
+      allowedQuoteIds: [...second.allowedQuoteIds],
+      objectives: first.objectives.map((g, i) => ({ ...g, id: `third-watch-goal-${i + 1}` })),
+      next: { exito: null, parcial: null, fracaso: null }
+    });
+    definition.title = "Odesa: tres guardias con recursos persistentes";
+    definition.basis += " Continuación opcional: tercera guardia 24 horas después del cierre de la segunda, reutilizando od_puertos sin modificar su ataque. Continuar incluso tras fracaso es una regla del ejercicio, no una afirmación histórica. No hay presupuesto, munición, reparación ni repuestos extra.";
+    return definition;
+  }
+
   // experimentos/catalogo-presupuesto/lib/common.mjs
   function deepFreeze(value) {
     if (value && typeof value === "object" && !Object.isFrozen(value)) {
@@ -9189,7 +9213,7 @@ table.t.mc td.pc{white-space:nowrap}
       const def = ["radar", "vhf", "s125", "buk", "mobile"];
       openModal(`${head}<div class="bd">${note}${err}<h3>Asignación inicial · ${PORT_BUDGET} créditos</h3>
       <div class="cchoices">${PORT_CHOICES.map((c) => `<label class="check"><input type="checkbox" value="${esc(c.id)}" ${def.includes(c.id) ? "checked" : ""}> ${esc(c.name)} · ${c.cost} créditos${c.later ? " · disponible desde la segunda guardia" : ""}</label>`).join("")}</div>
-      <p id="cTotal" class="hint"></p><div class="row"><button class="btn pri" id="cCreate">Asignar medios y empezar</button><label class="btn" for="cLoad">Cargar partida</label><input id="cLoad" type="file" accept=".json,application/json" hidden></div></div>`, openCampaign);
+      <p id="cTotal" class="hint"></p><div class="field"><label for="cLen">Duración</label><select id="cLen" class="sel"><option value="2">Dos guardias</option><option value="3">Tres guardias (la tercera, 24 h después, con lo que quede; sin refuerzos)</option></select></div><div class="row"><button class="btn pri" id="cCreate">Asignar medios y empezar</button><label class="btn" for="cLoad">Cargar partida</label><input id="cLoad" type="file" accept=".json,application/json" hidden></div></div>`, openCampaign);
       const sel = () => [...document.querySelectorAll(".cchoices input:checked")].map((i) => (
         /** @type {HTMLInputElement} */
         i.value
@@ -9204,7 +9228,11 @@ table.t.mc td.pc{white-space:nowrap}
       });
       total();
       $("#cCreate").onclick = () => act(() => {
-        operation = createOperations(portCampaignDefinition(sel()));
+        const long = (
+          /** @type {HTMLSelectElement} */
+          $("#cLen").value === "3"
+        );
+        operation = createOperations((long ? extendedPortCampaignDefinition : portCampaignDefinition)(sel()));
       });
       bindLoad();
       return;
@@ -10767,7 +10795,7 @@ table.t.mc td.pc{white-space:nowrap}
     <li><b>Ataque:</b> elegí el arma, cantidad, horario (o "sincronizar llegada" para saturar), altura y maniobra; después "Trazar ruta". Los balísticos y supersónicos se lanzan desde fuera del mapa en la dirección que marques.</li>
     <li><b>Guerra electrónica:</b> jammers de ruido (aéreo o Krasukha) y supresor GNSS. Las líneas violeta muestran qué radar está siendo interferido.</li>
     <li><b>Cobertura:</b> el mapa sombrea en turquesa dónde tus sensores ven un blanco de referencia a cierta altura sobre el terreno, considerando relieve real, curvatura terrestre, RCS en la banda de cada radar e interferencia. Bajá la altura y vas a ver aparecer los huecos de los valles.</li>
-    <li><b>Campaña:</b> el botón Campaña abre la campaña experimental de Odesa: con un presupuesto elegís los medios, pedís y cargás munición (tardan), jugás cada guardia en el mapa y el daño y la munición que quedan pasan a la siguiente. Se puede descargar la partida entre guardias.</li>
+    <li><b>Campaña:</b> el botón Campaña abre la campaña experimental de Odesa: con un presupuesto elegís los medios, pedís y cargás munición (tardan), jugás cada guardia en el mapa (dos o tres, a elección) y el daño y la munición que quedan pasan a la siguiente. Se puede descargar la partida entre guardias.</li>
     <li><b>Simulación:</b> ▶ Iniciar, velocidades 1×–60×. El selector de vista cambia qué se muestra: "Vista del defensor" oculta lo que no fue detectado y muestra los señuelos igual que las armas reales; "Vista del atacante" muestra sus armas y solo las defensas que conoce (las de radar, por su emisión; las demás, desde que disparan), sin su estado, su munición ni los interceptores.</li>
     <li><b>Guardar y cargar:</b> "Guardar" descarga lo que armaste (objetivos, defensas, ataques, jammers, reglas y metas) como archivo .json; "Cargar" lo vuelve a abrir, también en otra computadora. Al cargar se revisa que el mapa exista y que las armas y defensas estén en el catálogo; si algo falla, no se toca lo que tenías. Un escenario sobre un relieve .hgt necesita que cargues ese relieve antes.</li>
     <li><b>Relieve propio:</b> "Cargar relieve .hgt" acepta tiles SRTM descomprimidos (por ejemplo N50E030.hgt para Kyiv), de 1201×1201 o 3601×3601 muestras.</li>

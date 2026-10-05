@@ -10,6 +10,7 @@ import { esc } from '../util/format.js';
 import { S } from '../sim/state.js';
 import { builtinMap, MAP } from '../physics/terrain.js';
 import { PORT_CHOICES, PORT_BUDGET, portCampaignDefinition } from '../../experimentos/catalogo-presupuesto/data/port-campaign.mjs';
+import { extendedPortCampaignDefinition } from '../../experimentos/catalogo-presupuesto/data/port-campaign-extended.mjs';
 import { createOperations, operationView, operationMission, applyOperationResourceCommand, continueOperations, saveOperations, loadOperations } from '../../experimentos/catalogo-presupuesto/lib/operations.mjs';
 import { startPortCombat } from '../../experimentos/catalogo-presupuesto/lib/port-combat.mjs';
 import { $ } from './dom.js';
@@ -69,11 +70,12 @@ export function openCampaign() {
     const def = ['radar', 'vhf', 's125', 'buk', 'mobile'];
     openModal(`${head}<div class="bd">${note}${err}<h3>Asignación inicial · ${PORT_BUDGET} créditos</h3>
       <div class="cchoices">${PORT_CHOICES.map(c => `<label class="check"><input type="checkbox" value="${esc(c.id)}" ${def.includes(c.id) ? 'checked' : ''}> ${esc(c.name)} · ${c.cost} créditos${c.later ? ' · disponible desde la segunda guardia' : ''}</label>`).join('')}</div>
-      <p id="cTotal" class="hint"></p><div class="row"><button class="btn pri" id="cCreate">Asignar medios y empezar</button><label class="btn" for="cLoad">Cargar partida</label><input id="cLoad" type="file" accept=".json,application/json" hidden></div></div>`, openCampaign);
+      <p id="cTotal" class="hint"></p><div class="field"><label for="cLen">Duración</label><select id="cLen" class="sel"><option value="2">Dos guardias</option><option value="3">Tres guardias (la tercera, 24 h después, con lo que quede; sin refuerzos)</option></select></div><div class="row"><button class="btn pri" id="cCreate">Asignar medios y empezar</button><label class="btn" for="cLoad">Cargar partida</label><input id="cLoad" type="file" accept=".json,application/json" hidden></div></div>`, openCampaign);
     const sel = () => [...document.querySelectorAll('.cchoices input:checked')].map(i => /** @type {HTMLInputElement} */ (i).value);
     const total = () => { const spent = PORT_CHOICES.filter(c => sel().includes(c.id)).reduce((n, c) => n + c.cost, 0); $('#cTotal').textContent = `Asignados ${spent}; quedan ${PORT_BUDGET - spent} créditos para munición y servicios.`; $('#cCreate').disabled = !sel().length || spent > PORT_BUDGET; };
     document.querySelectorAll('.cchoices input').forEach(i => { /** @type {HTMLInputElement} */ (i).onchange = total; }); total();
-    $('#cCreate').onclick = () => act(() => { operation = createOperations(portCampaignDefinition(sel())); });
+    // tres guardias: la continuación opcional de Codex (data/port-campaign-extended.mjs), mismo formato y guardado
+    $('#cCreate').onclick = () => act(() => { const long = /** @type {HTMLSelectElement} */ ($('#cLen')).value === '3'; operation = createOperations((long ? extendedPortCampaignDefinition : portCampaignDefinition)(sel())); });
     bindLoad();
     return;
   }

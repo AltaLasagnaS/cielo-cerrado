@@ -134,7 +134,7 @@ try {
   // campaña (lógica de Codex, experimentos/catalogo-presupuesto): asignar, pedir y cargar munición, jugar la
   // guardia en el mapa y llegar al parte de cierre y a la guardia siguiente
   page.on('dialog', d => d.accept());
-  await page.click('#campBtn'); await page.click('#cCreate');
+  await page.click('#campBtn'); await page.selectOption('#cLen', '3'); await page.click('#cCreate');
   assert.match(await page.locator('#sheet').innerText(), /Preparar la guardia/i);
   const camp = await page.$$eval('[data-order]', bs => bs.map(b => /** @type {HTMLElement} */ (b).dataset.order));
   for (const id of camp) { await page.fill('#cq-' + id, '2'); await page.click(`[data-order="${id}"]`); }
@@ -147,6 +147,11 @@ try {
   assert.match(await page.locator('#sheet').innerText(), /Parte de cierre/i);
   await page.click('#cNext');
   assert.match(await page.locator('#sheet').innerText(), /Segunda guardia/i, 'la campaña sigue con la guardia siguiente');
+  // la tercera guardia (opcional, de Codex): se juega con lo que quedó, sin recargar
+  await page.click('#cStart');
+  await page.evaluate(() => { let k = 0; while (window.__dbg.campaignStep() && k < 40000) k++; });
+  await page.click('#cNext');
+  assert.match(await page.locator('#sheet').innerText(), /Tercera guardia/i, 'con "Tres guardias" llega a la tercera');
   assert.deepEqual(errors, []);
   console.log('Interfaz: valores numéricos, atajos, Monte Carlo, Academia de pulsos, regla, selección múltiple y por rectángulo, campaña OK');
 } finally { await browser.close(); }
