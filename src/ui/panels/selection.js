@@ -13,7 +13,7 @@ import { targetName } from '../../sim/setup.js';
 import { warheadKg, directDamage } from '../../physics/damage.js';
 import { $, isDefenderView, isAttackerView } from '../dom.js';
 import { draw } from '../../render/draw.js';
-import { contactOf, attackerKnows } from '../../sim/contacts.js';
+import { contactOf, attackerKnows, isEmitter, EMCON } from '../../sim/contacts.js';
 import { schedCov } from '../coverage.js';
 import { openFicha } from '../fichas.js';
 import { renderAtk, removeObj } from './attack.js';
@@ -53,6 +53,7 @@ function renderMulti(el) {
   h += opt('mC2', 'Coordinación C2', same(u => u.c2 || ''), [['', 'Igual que la red'], ...C2_ORDER.slice(0, C2_ORDER.indexOf(S.c2)).map(k => [k, C2_LEVELS[k].name])]);
   h += opt('mCp', 'Puesto de mando', same(u => u.cp || ''), CPS);
   h += opt('mLink', 'Datalink', same(u => u.link !== false ? 'on' : 'off'), [['on', 'Activo'], ['off', 'Apagado']]);
+  if (us.every(u => isEmitter(D(u).radar))) h += opt('mEm', 'Emisión del radar', same(u => u.emcon || 'siempre'), Object.entries(EMCON));
   if (sams.length === us.length) {
     h += opt('mDec', 'Pistas clasificadas como señuelo', same(u => u.decoyDoc || ''), [['', 'Como la regla general'], ['ignorar', 'No tirarles'], ['tirar', 'Tirarles igual']]);
     h += opt('mNoD', 'Drones', same(u => u.noDrones ? 'no' : 'si'), [['si', 'Les tira'], ['no', 'No gastar en drones']]);
@@ -64,6 +65,7 @@ function renderMulti(el) {
   bind('#mC2', (u, v) => { if (v) u.c2 = v; else delete u.c2; });
   bind('#mCp', (u, v) => { if (v) u.cp = v; else delete u.cp; });
   bind('#mLink', (u, v) => { u.link = v === 'on'; });
+  bind('#mEm', (u, v) => { if (v !== 'siempre') u.emcon = v; else delete u.emcon; });
   bind('#mDec', (u, v) => { if (v) u.decoyDoc = v; else delete u.decoyDoc; });
   bind('#mNoD', (u, v) => { u.noDrones = v === 'no'; });
   $('#mDel').onclick = () => {
@@ -88,7 +90,7 @@ export function renderSel(live) {
     if (S.started && !S.replay && isAttackerView()) {
       if (!attackerKnows(u, S.t)) { S.sel = null; return renderSel(); }   // una selección previa no la delata
       // vista del atacante: dónde está y qué es (catálogo), no su estado, munición ni enlaces
-      el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(d.short)}</b><dl class="kv"><dt>Posición</dt><dd>${u.x.toFixed(1)}, ${u.y.toFixed(1)} km</dd>${r && r.band !== 'ACU' && r.band !== 'OPT' ? `<dt>Radar</dt><dd>${esc(r.name)} · ${r.band}</dd>` : ''}${d.sam ? `<dt>Alcance (catálogo)</dt><dd>${d.sam.maxR} km</dd>` : ''}<dt>Estado</dt><dd>desconocido</dd></dl><p class="hint">Vista del atacante: ${r && r.band !== 'ACU' && r.band !== 'OPT' ? 'ubicada por su emisión de radar' : 'ubicada al disparar'}. No se sabe si está dañada ni cuánta munición le queda.</p>`;
+      el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(d.short)}</b><dl class="kv"><dt>Posición</dt><dd>${u.x.toFixed(1)}, ${u.y.toFixed(1)} km</dd>${r && r.band !== 'ACU' && r.band !== 'OPT' ? `<dt>Radar</dt><dd>${esc(r.name)} · ${r.band}</dd>` : ''}${d.sam ? `<dt>Alcance (catálogo)</dt><dd>${d.sam.maxR} km</dd>` : ''}<dt>Estado</dt><dd>desconocido</dd></dl><p class="hint">Vista del atacante: ${u.emitFrom != null && u.emitFrom <= S.t ? 'ubicada por su emisión de radar' : 'ubicada al disparar'}. No se sabe si está dañada ni cuánta munición le queda.</p>`;
       return;
     }
     let html = `<h3>Selección</h3><div class="row" style="justify-content:space-between"><b style="font-size:15px">${esc(u.name)}</b><span class="chip ${d.side === 'RU' ? 'ru' : 'ua'}">${esc(d.short)}</span></div>
@@ -112,6 +114,7 @@ export function renderSel(live) {
       if (d.kind === 'aew') html += `<div class="field"><label for="sAlt">Altitud de vuelo</label><span class="val">${u.alt} m</span><input id="sAlt" type="range" min="2000" max="11000" step="250" value="${u.alt}"></div>`;
       if (r && (r.sector < 360)) html += `<div class="field"><label for="sAz">${r.side ? 'Rumbo de vuelo' : 'Orientación del sector'}</label><span class="val">${u.az}°</span><input id="sAz" type="range" min="0" max="359" value="${u.az}"></div>`;
       html += `<div class="field" title="Quién opera la unidad. El país que fabricó el equipo no decide de qué lado pelea: un Buk o un radar 36D6 puede ser ucraniano o ruso. Decide qué interferidores la afectan y su color en el mapa."><label for="sOwn">Operada por</label><select id="sOwn" class="sel"><option value="" ${!u.owner ? 'selected' : ''}>Según el equipo (${d.side === 'both' ? 'ambos bandos' : d.side === 'RU' ? 'Rusia' : 'Ucrania / OTAN'})</option><option value="UA" ${u.owner === 'UA' ? 'selected' : ''}>Ucrania / OTAN</option><option value="RU" ${u.owner === 'RU' ? 'selected' : ''}>Rusia</option></select></div>`;
+      if (isEmitter(r)) html += `<div class="field" title="Un radar que emite puede ser ubicado por el enemigo (inteligencia de señales) y atacado. Apagarlo lo esconde, pero deja de ver: depende de las pistas de la red."><label for="sEm">Emisión del radar</label><select id="sEm" class="sel">${Object.entries(EMCON).map(([k, n]) => `<option value="${k}" ${(u.emcon || 'siempre') === k ? 'selected' : ''}>${n}</option>`).join('')}</select></div>`;
       if (d.sam || r) html += `<h3>Enlace técnico de pistas</h3>`;
       if (datalinksOf(d).length) html += `<label class="check"><input type="checkbox" id="sLink" ${u.link !== false ? 'checked' : ''}> Datalink activo (${esc(links)})</label><p class="hint">Al apagarlo, esta unidad deja de publicar y recibir pistas de tiro por enlaces compatibles. Conserva su sensor propio y puede recibir alertas C2 si la coordinación general lo permite.</p>`;
       else if (d.sam || r) html += `<p class="hint">Sin enlace técnico compatible: las alertas C2 no son una pista de tiro ni permiten guiar un misil con un sensor ajeno.</p>`;
@@ -130,6 +133,7 @@ export function renderSel(live) {
       if ($('#sC2')) $('#sC2').onchange = e => { if (e.target.value) u.c2 = e.target.value; else delete u.c2; };
       if ($('#sOwn')) $('#sOwn').onchange = e => { if (e.target.value) u.owner = e.target.value; else delete u.owner; draw(); };
       if ($('#sDec')) $('#sDec').onchange = e => { if (e.target.value) u.decoyDoc = e.target.value; else delete u.decoyDoc; };
+      if ($('#sEm')) $('#sEm').onchange = e => { if (e.target.value !== 'siempre') u.emcon = e.target.value; else delete u.emcon; };
       if ($('#sCp')) $('#sCp').onchange = e => { if (e.target.value) u.cp = e.target.value; else delete u.cp; };
       $('#sDel').onclick = () => { S.setup.defs = S.setup.defs.filter(v => v.id !== u.id); S.sel = null; renderSel(); schedCov(); };
     }

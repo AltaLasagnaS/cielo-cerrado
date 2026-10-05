@@ -4861,9 +4861,21 @@ table.t.mc td.pc{white-space:nowrap}
     return { x: s.x + vx * k, y: s.y + vy * k, z: s.z + vz * k, vx, vy, v: Math.hypot(vx, vy) * 1e3, age, lost, by: s.by };
   }
   function attackerKnows(u, t) {
-    const r = D(u).radar;
-    if (r && r.band !== "ACU" && r.band !== "OPT") return true;
+    if (u.emitFrom != null && u.emitFrom <= t) return true;
     return u.revealed != null && u.revealed <= t;
+  }
+  var isEmitter = (r) => !!r && r.band !== "ACU" && r.band !== "OPT";
+  var EMCON = { siempre: "Emite siempre", alerta: "Se enciende con la primera alerta de la red", silencio: "En silencio (solo pistas de la red)" };
+  function emitting(u, t) {
+    const m = u.emcon;
+    if (!m || m === "siempre" || !isEmitter(D(u).radar)) return true;
+    if (m === "silencio") return false;
+    if (u.c2 === "desconectada") return false;
+    const cp = u.cp || "";
+    return S.threats.some((th) => {
+      const c = cp ? th.cueCp?.[cp] : th.cueFirst;
+      return c != null && c <= t;
+    });
   }
 
   // src/sim/engine.js
@@ -4986,8 +4998,10 @@ table.t.mc td.pc{white-space:nowrap}
       if (!u.alive) continue;
       const d = D(u);
       if (!d.radar) continue;
+      if (!emitting(u, t)) continue;
       if (t < u.nextScan) continue;
       u.nextScan = t + d.radar.scan;
+      if (isEmitter(d.radar)) u.emitFrom ?? (u.emitFrom = t);
       const r = d.radar, uz = antZ(u), wx = wxNow();
       const keep = r.scan * 2 + 0.6, cap = r.tracks ?? Infinity, fake = falseTracks(u, S.jamsLive);
       u.fake = fake;
@@ -5417,6 +5431,7 @@ table.t.mc td.pc{white-space:nowrap}
     if (o.cp) u.cp = o.cp;
     if (o.owner === "UA" || o.owner === "RU") u.owner = o.owner;
     if (o.decoyDoc === "ignorar" || o.decoyDoc === "tirar") u.decoyDoc = o.decoyDoc;
+    if (o.emcon === "alerta" || o.emcon === "silencio") u.emcon = o.emcon;
     S.setup.defs.push(u);
     return u;
   }
@@ -7724,6 +7739,7 @@ table.t.mc td.pc{white-space:nowrap}
     h += opt("mC2", "Coordinación C2", same((u) => u.c2 || ""), [["", "Igual que la red"], ...C2_ORDER.slice(0, C2_ORDER.indexOf(S.c2)).map((k) => [k, C2_LEVELS[k].name])]);
     h += opt("mCp", "Puesto de mando", same((u) => u.cp || ""), CPS);
     h += opt("mLink", "Datalink", same((u) => u.link !== false ? "on" : "off"), [["on", "Activo"], ["off", "Apagado"]]);
+    if (us.every((u) => isEmitter(D(u).radar))) h += opt("mEm", "Emisión del radar", same((u) => u.emcon || "siempre"), Object.entries(EMCON));
     if (sams.length === us.length) {
       h += opt("mDec", "Pistas clasificadas como señuelo", same((u) => u.decoyDoc || ""), [["", "Como la regla general"], ["ignorar", "No tirarles"], ["tirar", "Tirarles igual"]]);
       h += opt("mNoD", "Drones", same((u) => u.noDrones ? "no" : "si"), [["si", "Les tira"], ["no", "No gastar en drones"]]);
@@ -7754,6 +7770,10 @@ table.t.mc td.pc{white-space:nowrap}
     });
     bind("#mLink", (u, v) => {
       u.link = v === "on";
+    });
+    bind("#mEm", (u, v) => {
+      if (v !== "siempre") u.emcon = v;
+      else delete u.emcon;
     });
     bind("#mDec", (u, v) => {
       if (v) u.decoyDoc = v;
@@ -7799,7 +7819,7 @@ table.t.mc td.pc{white-space:nowrap}
           S.sel = null;
           return renderSel();
         }
-        el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(d.short)}</b><dl class="kv"><dt>Posición</dt><dd>${u.x.toFixed(1)}, ${u.y.toFixed(1)} km</dd>${r && r.band !== "ACU" && r.band !== "OPT" ? `<dt>Radar</dt><dd>${esc(r.name)} · ${r.band}</dd>` : ""}${d.sam ? `<dt>Alcance (catálogo)</dt><dd>${d.sam.maxR} km</dd>` : ""}<dt>Estado</dt><dd>desconocido</dd></dl><p class="hint">Vista del atacante: ${r && r.band !== "ACU" && r.band !== "OPT" ? "ubicada por su emisión de radar" : "ubicada al disparar"}. No se sabe si está dañada ni cuánta munición le queda.</p>`;
+        el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(d.short)}</b><dl class="kv"><dt>Posición</dt><dd>${u.x.toFixed(1)}, ${u.y.toFixed(1)} km</dd>${r && r.band !== "ACU" && r.band !== "OPT" ? `<dt>Radar</dt><dd>${esc(r.name)} · ${r.band}</dd>` : ""}${d.sam ? `<dt>Alcance (catálogo)</dt><dd>${d.sam.maxR} km</dd>` : ""}<dt>Estado</dt><dd>desconocido</dd></dl><p class="hint">Vista del atacante: ${u.emitFrom != null && u.emitFrom <= S.t ? "ubicada por su emisión de radar" : "ubicada al disparar"}. No se sabe si está dañada ni cuánta munición le queda.</p>`;
         return;
       }
       let html = `<h3>Selección</h3><div class="row" style="justify-content:space-between"><b style="font-size:15px">${esc(u.name)}</b><span class="chip ${d.side === "RU" ? "ru" : "ua"}">${esc(d.short)}</span></div>
@@ -7826,6 +7846,7 @@ table.t.mc td.pc{white-space:nowrap}
         if (d.kind === "aew") html += `<div class="field"><label for="sAlt">Altitud de vuelo</label><span class="val">${u.alt} m</span><input id="sAlt" type="range" min="2000" max="11000" step="250" value="${u.alt}"></div>`;
         if (r && r.sector < 360) html += `<div class="field"><label for="sAz">${r.side ? "Rumbo de vuelo" : "Orientación del sector"}</label><span class="val">${u.az}°</span><input id="sAz" type="range" min="0" max="359" value="${u.az}"></div>`;
         html += `<div class="field" title="Quién opera la unidad. El país que fabricó el equipo no decide de qué lado pelea: un Buk o un radar 36D6 puede ser ucraniano o ruso. Decide qué interferidores la afectan y su color en el mapa."><label for="sOwn">Operada por</label><select id="sOwn" class="sel"><option value="" ${!u.owner ? "selected" : ""}>Según el equipo (${d.side === "both" ? "ambos bandos" : d.side === "RU" ? "Rusia" : "Ucrania / OTAN"})</option><option value="UA" ${u.owner === "UA" ? "selected" : ""}>Ucrania / OTAN</option><option value="RU" ${u.owner === "RU" ? "selected" : ""}>Rusia</option></select></div>`;
+        if (isEmitter(r)) html += `<div class="field" title="Un radar que emite puede ser ubicado por el enemigo (inteligencia de señales) y atacado. Apagarlo lo esconde, pero deja de ver: depende de las pistas de la red."><label for="sEm">Emisión del radar</label><select id="sEm" class="sel">${Object.entries(EMCON).map(([k, n2]) => `<option value="${k}" ${(u.emcon || "siempre") === k ? "selected" : ""}>${n2}</option>`).join("")}</select></div>`;
         if (d.sam || r) html += `<h3>Enlace técnico de pistas</h3>`;
         if (datalinksOf(d).length) html += `<label class="check"><input type="checkbox" id="sLink" ${u.link !== false ? "checked" : ""}> Datalink activo (${esc(links)})</label><p class="hint">Al apagarlo, esta unidad deja de publicar y recibir pistas de tiro por enlaces compatibles. Conserva su sensor propio y puede recibir alertas C2 si la coordinación general lo permite.</p>`;
         else if (d.sam || r) html += `<p class="hint">Sin enlace técnico compatible: las alertas C2 no son una pista de tiro ni permiten guiar un misil con un sensor ajeno.</p>`;
@@ -7870,6 +7891,10 @@ table.t.mc td.pc{white-space:nowrap}
         if ($("#sDec")) $("#sDec").onchange = (e) => {
           if (e.target.value) u.decoyDoc = e.target.value;
           else delete u.decoyDoc;
+        };
+        if ($("#sEm")) $("#sEm").onchange = (e) => {
+          if (e.target.value !== "siempre") u.emcon = e.target.value;
+          else delete u.emcon;
         };
         if ($("#sCp")) $("#sCp").onchange = (e) => {
           if (e.target.value) u.cp = e.target.value;
@@ -8893,7 +8918,7 @@ table.t.mc td.pc{white-space:nowrap}
     return r;
   };
   var OBJ_KEYS = ["id", "type", "x", "y", "name", "short", "maxHp", "desc", "cp"];
-  var DEF_KEYS = ["id", "type", "x", "y", "name", "az", "mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2", "cp", "decoyDoc", "owner"];
+  var DEF_KEYS = ["id", "type", "x", "y", "name", "az", "mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2", "cp", "decoyDoc", "owner", "emcon"];
   var SALVO_KEYS = ["id", "type", "count", "interval", "tStart", "sync", "tArrive", "agl", "launchDist", "maneuver", "decoys", "link", "crpa", "pts", "targetUnit", "targetObj"];
   var JAM_KEYS = ["id", "type", "x", "y", "alt", "on", "mode", "target"];
   var META_KEYS = ["name", "player", "time", "description", "forces", "conditions", "rulesText", "goals", "success", "failure"];
@@ -9052,6 +9077,7 @@ table.t.mc td.pc{white-space:nowrap}
         cp: str(w + " · cp", u.cp, 20) || void 0,
         owner: u.owner === void 0 ? void 0 : ["UA", "RU"].includes(u.owner) ? u.owner : (err(`${w} · owner: "${String(u.owner)}" no es "UA" ni "RU".`), void 0),
         decoyDoc: u.decoyDoc === void 0 ? void 0 : ["ignorar", "tirar"].includes(u.decoyDoc) ? u.decoyDoc : (err(`${w} · decoyDoc: "${String(u.decoyDoc)}" no es "ignorar" ni "tirar".`), void 0),
+        emcon: u.emcon === void 0 ? void 0 : ["siempre", "alerta", "silencio"].includes(u.emcon) ? u.emcon : (err(`${w} · emcon: "${String(u.emcon)}" no es "siempre", "alerta" ni "silencio".`), void 0),
         c2: u.c2 === void 0 ? void 0 : C2_LEVELS[u.c2] ? u.c2 : (err(`${w} · c2: "${String(u.c2)}" no es un nivel de C2 válido (${Object.keys(C2_LEVELS).join(", ")}).`), void 0)
       };
     });
@@ -9184,7 +9210,7 @@ table.t.mc td.pc{white-space:nowrap}
     for (const g of data.setup.objs) objId.set(g.id, addObj(g.type, g.x, g.y, { name: g.name, short: g.short, hp: g.maxHp, desc: g.desc, cp: g.cp }).id);
     for (const d of data.setup.defs) {
       const u = addDef(d.type, d.x, d.y, { name: d.name, az: d.az });
-      for (const k of ["mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2", "cp", "decoyDoc", "owner"]) if (d[k] !== void 0) u[k] = d[k];
+      for (const k of ["mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2", "cp", "decoyDoc", "owner", "emcon"]) if (d[k] !== void 0) u[k] = d[k];
       defId.set(d.id, u.id);
     }
     for (const sv of data.setup.salvos) {

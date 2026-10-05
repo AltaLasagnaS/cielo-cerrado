@@ -6,7 +6,7 @@ Son ideas ordenadas por prioridad, no promesas. Cada ítem que cambie resultados
 
 ## Próximo
 
-- **Perspectivas por bando, segunda parte** (etapa 1 del plan de Codex, [`PLAN-MAESTRO.md`](experimentos/catalogo-presupuesto/docs/PLAN-MAESTRO.md)). Ya están el dueño explícito de cada unidad (`u.owner`) y la vista del defensor con contactos (posición estimada, edad, último reporte; ficha de pista sin la verdad). Ya está también el **tiro sin omnisciencia** (la defensa apunta con su pista; CHANGELOG). Ya están también la **vista del atacante** y el registro, los resultados y los objetivos por bando; el debrief muestra la verdad a propósito (análisis posterior). Falta: el control de emisiones (radares que se apagan para no delatarse).
+- **Perspectivas por bando, segunda parte** (etapa 1 del plan de Codex, [`PLAN-MAESTRO.md`](experimentos/catalogo-presupuesto/docs/PLAN-MAESTRO.md)). Ya están el dueño explícito de cada unidad (`u.owner`) y la vista del defensor con contactos (posición estimada, edad, último reporte; ficha de pista sin la verdad). Ya está también el **tiro sin omnisciencia** (la defensa apunta con su pista; CHANGELOG). Ya están también la **vista del atacante** y el registro, los resultados y los objetivos por bando; el debrief muestra la verdad a propósito (análisis posterior). Ya está también el control de emisiones (radares que emiten siempre, con la primera alerta o nunca). Falta: el tiempo de encendido de cada radar y la doctrina real de emisiones (datos pedidos a Codex).
 
 ## Física (cada ítem es **[sim]**)
 

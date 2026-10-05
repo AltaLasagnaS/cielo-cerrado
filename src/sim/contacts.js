@@ -5,6 +5,7 @@
 // fechado cuando se pierde. Nunca mira la posición real ni la ruta futura. Anotar no consume azar.
 // Del lado del atacante, attackerKnows dice qué unidades de la defensa conoce.
 import { D } from '../data/index.js';
+import { S } from './state.js';
 
 /** Edad máxima (s) de una pista que se sigue dibujando como viva (la misma ventana de la red). */
 export const TRACK_AGE = 12;
@@ -43,14 +44,33 @@ export function contactOf(th, t) {
 
 /**
  * ¿Sabe el atacante dónde está la unidad u en t? (vista del atacante, docs/ARQUITECTURA.md)
- *   - con radar que emite (no acústico ni óptico, también el AEW): sí, lo ubica la inteligencia de
- *     señales (ELINT) por su emisión; no se modela el control de emisiones;
- *   - sin radar emisor (cañones y MANPADS sin radar propio, sensores pasivos): solo desde su primer
- *     disparo (u.revealed, lo anota el motor), por el destello y la estela del lanzamiento.
+ *   - desde que su radar emitió por primera vez (u.emitFrom, lo anota el motor; también el AEW): lo
+ *     ubica la inteligencia de señales (ELINT); con control de emisiones (u.emcon) puede no emitir nunca;
+ *   - si no emitió (sin radar, sensor pasivo o radar en silencio): solo desde su primer disparo
+ *     (u.revealed), por el destello y la estela del lanzamiento.
  * No dice si está viva, dañada ni cuánta munición le queda.
  */
 export function attackerKnows(u, t) {
-  const r = D(u).radar;
-  if (r && r.band !== 'ACU' && r.band !== 'OPT') return true;
+  if (u.emitFrom != null && u.emitFrom <= t) return true;
   return u.revealed != null && u.revealed <= t;
+}
+
+/** ¿El sensor r emite? (los acústicos y ópticos escuchan o miran: son pasivos). */
+export const isEmitter = r => !!r && r.band !== 'ACU' && r.band !== 'OPT';
+
+/** Modos de control de emisiones de un radar (u.emcon): sin dato, emite siempre. */
+export const EMCON = { siempre: 'Emite siempre', alerta: 'Se enciende con la primera alerta de la red', silencio: 'En silencio (solo pistas de la red)' };
+
+/**
+ * ¿Está emitiendo el radar de u en t? (control de emisiones, docs/FISICA.md §6). 'siempre' (o sin dato): sí.
+ * 'silencio': nunca; la unidad depende de las pistas de la red. 'alerta': desde la primera alerta que
+ * recibe su puesto de mando (la de un sensor de la red; si ninguno avisa, no se enciende). Los sensores
+ * pasivos (acústicos, ópticos) no emiten y no se apagan.
+ */
+export function emitting(u, t) {
+  const m = u.emcon; if (!m || m === 'siempre' || !isEmitter(D(u).radar)) return true;
+  if (m === 'silencio') return false;
+  if (u.c2 === 'desconectada') return false;   // aislada: no le llegan alertas
+  const cp = u.cp || '';
+  return S.threats.some(th => { const c = cp ? th.cueCp?.[cp] : th.cueFirst; return c != null && c <= t; });
 }

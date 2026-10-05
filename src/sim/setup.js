@@ -13,7 +13,8 @@ export function addDef(type, x, y, o = {}) {
   if (o.c2) u.c2 = o.c2;
   if (o.cp) u.cp = o.cp;
   if (o.owner === 'UA' || o.owner === 'RU') u.owner = o.owner;   // quién la opera (data/index.js#sideOf)
-  if (o.decoyDoc === 'ignorar' || o.decoyDoc === 'tirar') u.decoyDoc = o.decoyDoc;   // doctrina de señuelos propia; sin dato, la general   // puesto de mando (physics/engagement.js#cpOf); sin dato, el principal
+  if (o.decoyDoc === 'ignorar' || o.decoyDoc === 'tirar') u.decoyDoc = o.decoyDoc;
+  if (o.emcon === 'alerta' || o.emcon === 'silencio') u.emcon = o.emcon;   // control de emisiones (sim/contacts.js#emitting); sin dato, emite siempre   // doctrina de señuelos propia; sin dato, la general   // puesto de mando (physics/engagement.js#cpOf); sin dato, el principal
   S.setup.defs.push(u); return u;
 }
 

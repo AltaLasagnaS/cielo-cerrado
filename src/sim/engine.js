@@ -24,7 +24,7 @@ import { log, event, label, uLabel, pista } from './log.js';
 import { recReset, recUnit, recObj } from './replay.js';
 import { ewStep } from './ew.js';
 import { wxNow, wxReset, wxStep } from './weather-now.js';
-import { noteSeen, noteObs } from './contacts.js';
+import { noteSeen, noteObs, emitting, isEmitter } from './contacts.js';
 
 /** Arma la corrida a partir de S.setup: copia unidades y jammers y programa todos los lanzamientos. */
 export function startSim() {
@@ -94,7 +94,9 @@ export function step(dt) {
   // sensores
   for (const u of S.units) {
     if (!u.alive) continue; const d = D(u); if (!d.radar) continue;
+    if (!emitting(u, t)) continue;   // control de emisiones: un radar apagado no ve (ni se delata)
     if (t < u.nextScan) continue; u.nextScan = t + d.radar.scan;
+    if (isEmitter(d.radar)) u.emitFrom ??= t;   // desde acá el atacante lo puede ubicar por su emisión
     const r = d.radar, uz = antZ(u), wx = wxNow();
     // capacidad de seguimiento (radar.tracks): pistas abiertas + falsos blancos DRFM; una pista nueva no
     // entra si está lleno (las abiertas se mantienen)
