@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- CONTROLES DE SIMULACIÓN ----------------
 // Barra sobre el mapa: iniciar/pausar, reiniciar, velocidad y vista del defensor.
 import { fmtT } from '../util/format.js';

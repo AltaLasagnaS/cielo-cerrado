@@ -1,12 +1,12 @@
 // @ts-check
 // Guerra electrónica de la defensa durante la corrida: ubicar interferidores por triangulación y
 // dispararles con misiles que se guían a su ruido (home-on-jam). Ver docs/FISICA.md §4.
-import { D, JAMMERS, BANDS, C2_LEVELS } from '../data/index.js';
+import { D, JAMMERS, BANDS, C2_LEVELS, sideOf } from '../data/index.js';
 import { rnd } from '../util/rng.js';
 import { azOf } from '../util/math.js';
-import { jamJ, jamPos, antZ } from '../physics/radar.js';
+import { jamJ, jamPos, antZ, drfmJ } from '../physics/radar.js';
 import { STROBE_J, FIX_MAX_KM, bearingSigma, fixError } from '../physics/jamloc.js';
-import { effectiveC2 } from '../physics/engagement.js';
+import { effectiveC2, unitC2, cpOf } from '../physics/engagement.js';
 import { profileOf, timeTo } from '../physics/interceptor.js';
 import { S } from './state.js';
 import { log, uLabel } from './log.js';
@@ -20,8 +20,9 @@ function strobes(j) {
   const JJ = JAMMERS[j.type], out = [];
   for (const u of S.units) {
     const r = D(u).radar; if (!u.alive || !r || r.band === 'ACU' || r.band === 'OPT') continue;
-    if (JJ.side !== 'both' && D(u).side === JJ.side) continue;
-    const p = jamPos(j), J = jamJ(u, azOf(p[0] - u.x, p[1] - u.y), [j]);
+    if (JJ.side !== 'both' && sideOf(u) === JJ.side) continue;
+    // un DRFM no mete ruido, pero emite cuando el haz lo ilumina: se lo marca por su copia (lóbulo principal)
+    const p = jamPos(j), J = j.mode === 'drfm' ? (JJ.bands.includes(r.band) ? Math.max(0, drfmJ(u, j) ?? 0) : 0) : jamJ(u, azOf(p[0] - u.x, p[1] - u.y), [j]);
     if (J >= STROBE_J) out.push({ u, x: u.x, y: u.y, sigma: bearingSigma(BANDS[r.band].bw, J), J });
   }
   return out;
@@ -39,15 +40,17 @@ export function ewStep(t) {
     else log('x', 'El misil home-on-jam de ' + uLabel(h.u) + ' falla contra el ' + JJ.short + '.');
   }
   if (t < S.ewNext) return; S.ewNext = t + EW_DT;
-  const share = C2_LEVELS[effectiveC2(S.c2, S.objs)].share;
+  const inNet = s => C2_LEVELS[unitC2(s.u, effectiveC2(S.c2, S.objs, cpOf(s.u)))].share !== 'none';
   for (const j of S.jamsLive) {
     const JJ = JAMMERS[j.type]; if (JJ.gnssJam || !j.on || j.dead) continue;
     const st = strobes(j); if (!st.length) continue;
     // triangulación: hace falta compartir marcaciones entre unidades (cualquier C2 menos "desconectada")
-    if (share !== 'none' && st.length >= 2) {
+    const net = st.filter(inNet);
+    if (net.length >= 2) {
       let best = Infinity, pair = null;
-      for (let a = 0; a < st.length; a++) for (let b = a + 1; b < st.length; b++) { const e = fixError(st[a], st[b], j.x, j.y); if (e < best) { best = e; pair = [st[a].u, st[b].u]; } }
-      if (best <= FIX_MAX_KM && (!j.fix || best < j.fix.err)) {
+      // las marcaciones se cruzan solo entre unidades del mismo puesto de mando
+      for (let a = 0; a < net.length; a++) for (let b = a + 1; b < net.length; b++) { if (cpOf(net[a].u) !== cpOf(net[b].u)) continue; const e = fixError(net[a], net[b], j.x, j.y); if (e < best) { best = e; pair = [net[a].u, net[b].u]; } }
+      if (pair && best <= FIX_MAX_KM && (!j.fix || best < j.fix.err)) {
         if (!j.fix) log('l', JJ.short + ' ubicado por triangulación entre ' + uLabel(pair[0]) + ' y ' + uLabel(pair[1]) + ': error ≈ ' + best.toFixed(1) + ' km.');
         j.fix = { t, err: best };
       }

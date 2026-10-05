@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- MONTE CARLO (ventanas) ----------------
 // Configuración, progreso y debrief de una serie Monte Carlo (la lógica está en sim/montecarlo.js).
 // La serie corre en tramos de ~40 ms entre cuadros para que la página no se congele; cerrar la

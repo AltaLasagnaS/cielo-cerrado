@@ -1,8 +1,8 @@
 // Niveles de integración del mando y control (data/c2.js, physics/engagement.js#trackOK y reactionStart).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { C2_LEVELS } from '../src/data/index.js';
-import { trackOK, reactionStart, effectiveC2 } from '../src/physics/engagement.js';
+import { C2_LEVELS, GATEWAYS } from '../src/data/index.js';
+import { trackOK, reactionStart, effectiveC2, netPk, unitC2 } from '../src/physics/engagement.js';
 import { S } from '../src/sim/state.js';
 import { addDef, addSalvo } from '../src/sim/setup.js';
 import { useMap, clearSetup, runCurrent } from './helpers.js';
@@ -72,14 +72,39 @@ test('datalink: una detección sin transporte no alimenta la red compatible', ()
   assert.ok(th2.netFirst === null || th2.netFirst > th2.firstDet);   // el S-300 no recibe la pista del EWR si el sensor no publica
 });
 
-test('datalink: Link 16 une NASAMS y Patriot, no S-300', () => {
+test('datalink: Link 16 une NASAMS y Patriot; al S-300 ucraniano le llega solo con la pasarela habilitada, más tarde y con menos Pk', () => {
+  const G = GATEWAYS.ua_l16;
   const remote = { det: {}, net: { l16: { first: 100, last: 150 } }, netFirst: 100, lastNet: 150 };
   assert.equal(trackOK({ id: 1, type: 'patriot', link: true }, remote, 155, 'coordinada'), true);
   assert.equal(trackOK({ id: 2, type: 'nasams', link: true }, remote, 155, 'coordinada'), true);
-  assert.equal(trackOK({ id: 3, type: 's300', link: true }, remote, 155, 'coordinada'), false);
-  const soviet = { det: {}, net: { ua_c2: { first: 100, last: 150 } } };
-  assert.equal(trackOK({ id: 3, type: 's300', link: true }, soviet, 155, 'integrada'), true);
-  assert.equal(trackOK({ id: 4, type: 'patriot', link: true }, soviet, 155, 'coordinada'), false);
+  assert.equal(netPk({ id: 2, type: 'nasams', link: true }, remote, 155, 'coordinada'), 1, 'red propia');
+  assert.equal(trackOK({ id: 3, type: 's300', link: true }, remote, 155, 'integrada'), false, 'pasarela apagada por defecto');
+  assert.equal(trackOK({ id: 3, type: 's300', link: true }, remote, 155, 'integrada', ['ua_l16']), true, 'por la pasarela');
+  assert.equal(netPk({ id: 3, type: 's300', link: true }, remote, 155, 'integrada', ['ua_l16']), G.gwPk);
+  const fresh = { det: {}, net: { l16: { first: 150, last: 152 } } };
+  assert.equal(trackOK({ id: 3, type: 's300', link: true }, fresh, 150 + C2_LEVELS.integrada.lag + G.gwLag - 1, 'integrada', ['ua_l16']), false, 'todavía no cruzó la pasarela');
+  assert.equal(trackOK({ id: 3, type: 's300', link: true }, fresh, 150 + C2_LEVELS.integrada.lag + G.gwLag, 'integrada', ['ua_l16']), true);
+  const russian = { det: {}, net: { ru_c2: { first: 100, last: 150 } } };
+  assert.equal(trackOK({ id: 4, type: 'patriot', link: true }, russian, 155, 'coordinada', ['ua_l16']), false, 'no hay pasarela con la red rusa');
+});
+
+test('C2 por unidad: una unidad puede quedar con menos coordinación que la red, nunca más', () => {
+  assert.equal(unitC2({}, 'integrada'), 'integrada');
+  assert.equal(unitC2({ c2: 'desconectada' }, 'integrada'), 'desconectada');
+  assert.equal(unitC2({ c2: 'integrada' }, 'coordinada'), 'coordinada');
+  assert.equal(unitC2({ c2: 'xx' }, 'coordinada'), 'coordinada');
+});
+
+test('C2 por unidad: una batería desconectada no usa ni publica pistas de la red', () => {
+  const run = c2u => {
+    useMap('monterey', { flat: true }); clearSetup();
+    addDef('ewr', 50, 20, { name: 'R', c2: c2u }); addDef('s300', 50, 60, { name: 'S' });
+    addSalvo({ type: 'kh22', count: 1, pts: [[50, 0], [50, 59]] });
+    runCurrent(2); return S.threats[0];
+  };
+  assert.ok(run(undefined).netFirst !== null);
+  const th = run('desconectada'); assert.ok(th.firstDet !== null);
+  assert.ok(th.netFirst === null || th.netFirst > th.firstDet, 'el radar desconectado no publica');
 });
 
 test('C2: el puesto de mando y las comunicaciones destruidos bajan el nivel efectivo', () => {
@@ -102,4 +127,38 @@ test('C2 integrada: defensa por capas, el NASAMS le deja los drones al Gepard qu
   assert.ok(co.N > 0, 'coordinada: el NASAMS tira primero ' + JSON.stringify(co));
   assert.ok((it.N || 0) < co.N && it.G > (co.G || 0), JSON.stringify({ co, it }));
   assert.ok(it.cost < co.cost / 2, JSON.stringify({ co, it }));
+});
+
+test('puestos de mando: una pista publicada en un puesto no llega a otro', () => {
+  const run = cpS => {
+    useMap('monterey', { flat: true }); clearSetup();
+    addDef('ewr', 50, 20, { name: 'R' }); addDef('s300', 50, 60, { name: 'S', cp: cpS });
+    addSalvo({ type: 'kh22', count: 1, pts: [[50, 0], [50, 59]] });
+    runCurrent(2); return S.threats[0];
+  };
+  const same = run(undefined);
+  assert.ok(same.net.ua_c2?.first != null, 'mismo puesto: la pista del EWR está en la red principal');
+  const other = run('B');
+  assert.equal(other.net['ua_c2@B'], undefined, 'el puesto B no recibe la pista del EWR');
+  assert.equal(netPk({ id: 9, type: 's300', link: true, cp: 'B' }, same, same.net.ua_c2.first + 5, 'coordinada'), 0, 'otro puesto: sin pista de red');
+});
+
+test('puestos de mando: un puesto de mando destruido solo desconecta a sus unidades', () => {
+  const objs = [{ type: 'command', status: 'destroyed', cp: 'A' }];
+  assert.equal(effectiveC2('integrada', objs, 'A'), 'desconectada');
+  assert.equal(effectiveC2('integrada', objs, ''), 'integrada');
+  assert.equal(effectiveC2('integrada', [{ type: 'command', status: 'destroyed' }], 'B'), 'desconectada', 'un nodo sin puesto afecta a todos');
+});
+
+test('doctrina de señuelos por unidad: se guarda, se valida y se recupera', async () => {
+  const { exportScenario, validateScenario, loadScenarioData } = await import('../src/sim/scenario-io.js');
+  useMap('monterey'); clearSetup();
+  addDef('patriot', 40, 40, { name: 'P', decoyDoc: 'ignorar', cp: 'A' }); addDef('nasams', 42, 40, { name: 'N', decoyDoc: 'xx' });
+  assert.equal(S.setup.defs[1].decoyDoc, undefined, 'un valor desconocido no se asigna');
+  const v = validateScenario(JSON.parse(JSON.stringify(exportScenario())));
+  assert.ok(v.ok, v.errors.join('; '));
+  clearSetup(); loadScenarioData(v.data);
+  assert.equal(S.setup.defs[0].decoyDoc, 'ignorar'); assert.equal(S.setup.defs[0].cp, 'A');
+  const bad = JSON.parse(JSON.stringify(exportScenario())); bad.setup.defs[0].decoyDoc = 'nunca';
+  assert.match(validateScenario(bad).errors.join('\n'), /decoyDoc/);
 });

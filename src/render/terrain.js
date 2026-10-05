@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- RELIEVE ----------------
 // Dibujo del terreno en cuatro modos de lectura (S.relief):
 //   normal    tintas hipsométricas + sombreado suave + curvas maestras discretas
@@ -27,6 +28,7 @@ export function buildBase() {
   analysis();
 }
 
+/** @type {Array<[number, number[]]>} */
 const STOPS = [[0, [64, 78, 62]], [0.15, [86, 98, 70]], [0.35, [118, 112, 80]], [0.6, [140, 122, 96]], [0.85, [160, 150, 136]], [1, [196, 196, 192]]];
 const tint = t => { for (let i = 1; i < STOPS.length; i++) if (t <= STOPS[i][0]) { const a = STOPS[i - 1], b = STOPS[i], f = (t - a[0]) / (b[0] - a[0]); return a[1].map((v, k) => v + (b[1][k] - v) * f); } return STOPS[STOPS.length - 1][1]; };
 
@@ -56,7 +58,7 @@ function buildRaster(mode) {
   }
   // 2) color + sombreado
   const cv = document.createElement('canvas'); cv.width = RW; cv.height = RH;
-  const cx = cv.getContext('2d'), img = cx.createImageData(RW, RH), px = img.data;
+  const cx = /** @type {CanvasRenderingContext2D} */ (cv.getContext('2d')), img = cx.createImageData(RW, RH), px = img.data;
   // escala de tintas desde la tierra más baja del mapa (en mapas sin mar, como Kiev, todo está a
   // 80–200 m: sin esto saldría casi de un solo color). Con mar, la base es 0 m como siempre.
   const base = Math.max(0, MAP.min), maxE = Math.max(base + 50, MAP.max), step = MAP.cell / k, zf = mode === 'shade' ? 3 : 2;

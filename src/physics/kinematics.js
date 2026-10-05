@@ -18,6 +18,7 @@ import { clamp } from '../util/math.js';
 import { nextId } from '../util/ids.js';
 import { rnd } from '../util/rng.js';
 import { surf } from './terrain.js';
+import { windAt } from './weather.js';
 
 /** Perfiles que se lanzan desde fuera del mapa: la ruta es solo dirección + blanco. */
 export const OFFMAP_PROFILES = ['ballistic', 'highdive', 'hilo', 'glide'];
@@ -46,6 +47,7 @@ export function groundSpeed(v, ux, uy, wind) {
  * respecto del aire y el viento cambia su velocidad sobre el suelo en cada tramo (groundSpeed). Las que
  * se lanzan desde fuera del mapa (balísticos, picada, planeadoras) no se modifican.
  */
+/** @param {{ v: number, from: number } | null} [wind] */
 export function buildThreat(sv, k, tLaunch, wind = null) {
   const T = THREATS[sv.type];
   let pts = sv.pts.map(p => [p[0], p[1]]);
@@ -59,7 +61,9 @@ export function buildThreat(sv, k, tLaunch, wind = null) {
   if (T.prof === 'highdive') ph = [[0, Math.max(0, L - T.diveDist), T.v], [Math.max(0, L - T.diveDist), L, T.vDive]];
   else if (T.prof === 'hilo') ph = [[0, Math.max(0, L - 60), T.v], [Math.max(0, L - 60), L, T.vLow]];
   else ph = [[0, L, T.v]];
-  if (wind?.v > 0 && !offmap) {
+  if (wind && wind.v > 0 && !offmap) {
+    // el viento crece con la altura (physics/weather.js#windAt): se toma el de la altura de vuelo
+    wind = { from: wind.from, v: windAt(wind.v, sv.agl ?? T.agl ?? T.cruiseAlt ?? 100) };
     // partir cada fase en los tramos de la ruta: cada tramo tiene su propio rumbo y su velocidad sobre el suelo
     const out = [];
     for (const [s0, s1, v] of ph) for (let i = 1; i < pts.length; i++) {

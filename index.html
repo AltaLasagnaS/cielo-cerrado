@@ -359,6 +359,7 @@ h3{font-family:var(--f-disp);font-weight:600;font-size:15px;letter-spacing:.08em
 .ub span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ub i{font-style:normal;font-family:var(--f-mono);font-size:11px;color:var(--muted);border:1px solid var(--line2);border-radius:50%;width:18px;height:18px;display:inline-grid;place-items:center;flex:none}
 .ub i:hover{color:var(--accent);border-color:var(--accent)}
+small.side{font-family:var(--f-mono);font-size:10px;color:var(--muted);white-space:nowrap;flex:none}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .field{display:grid;grid-template-columns:1fr auto;gap:4px 8px;align-items:center}
 .field label{color:var(--muted)}
@@ -547,7 +548,7 @@ table.t.mc td.pc{white-space:nowrap}
       </div>
       <div class="replaybar" id="replayBar" role="group" aria-label="Repetición de la corrida" hidden></div>
       <div class="relief" id="relief" role="group" aria-label="Lectura del relieve"><span>Relieve</span></div>
-      <div class="zoom"><button id="zin" aria-label="Acercar">+</button><button id="zout" aria-label="Alejar">−</button><button id="zfit" aria-label="Encuadrar" style="font-size:12px">⤢</button></div>
+      <div class="zoom"><button id="zin" aria-label="Acercar">+</button><button id="zout" aria-label="Alejar">−</button><button id="zfit" aria-label="Encuadrar" style="font-size:12px">⤢</button><button id="zrule" aria-label="Regla para medir distancias (M)" title="Regla para medir distancias (M)" style="font-size:12px">📏</button></div>
       <div class="legend" id="legend">
         <span><i class="sw" style="background:#62b6ff"></i>Defensa (Ucrania/OTAN)</span>
         <span><i class="sw" style="background:#ff9f5a"></i>Defensa (Rusia)</span>
@@ -714,6 +715,9 @@ table.t.mc td.pc{white-space:nowrap}
     rusi_storm: ["RUSI: Stormbreak (2023)", "https://static.rusi.org/Stormbreak-Special-Report-web-final_0.pdf"],
     rt_9s18m: ["Radartutorial: 9S18M (radar de búsqueda del Buk)", "https://www.radartutorial.eu/19.kartei/02.surv/karte093.en.html"],
     rt_arabel: ["Radartutorial: Arabel (SAMP/T)", "https://www.radartutorial.eu/19.kartei/04.battle/karte035.en.html"],
+    ms_lessons: ["MissileStrikes: Lessons from Ukraine air defense (integración de radares soviéticos con la imagen común; fuente secundaria)", "https://missilestrikes.com/guide/lessons-from-ukraine-air-defense/"],
+    nv_l16: ["NV: Ucrania se integra al sistema de aviación de la OTAN (licencia Link 16, 2025)", "https://english.nv.ua/nation/ukraine-integrates-into-nato-s-aviation-system-defense-ministry-says-50518462.html"],
+    fm30185: ["US Army, FM 3-01.85, Patriot Battalion and Battery Operations (2002): §5-31 triangulación de jammers, glosario SOJC (MIM-104B)", "https://archive.org/download/Fm301.85PatriotBattalionAndBatteryOperations/fm%203-01.85%20Patriot%20Battalion%20and%20Battery%20Operations.pdf"],
     // clutter (physics/clutter.js)
     skolnik_mti: ['Shrader y Gregers-Hansen, "MTI Radar", cap. 15 del Radar Handbook (Skolnik, 2.ª ed., 1990): tabla 15.1 (espectro del clutter), tabla 15.2 (reflectividad, de Barton) y ec. 15.9–15.11 (factor de mejora)', "https://helitavia.com/skolnik/Skolnik_chapter_15.pdf"],
     nrl_sea: ['Gregers-Hansen y Mital, "An Improved Empirical Model for Radar Sea Clutter Reflectivity", NRL/MR/5310--12-9346 (2012); coeficientes en la implementación pública de scivision', "https://github.com/scivision/nrl-radar-sea-clutter/blob/main/NRL_SigmaSea.m"],
@@ -1228,7 +1232,7 @@ table.t.mc td.pc{white-space:nowrap}
       color: "#62b6ff",
       datalinks: ["l16"],
       radar: { name: "AN/MPQ-65", agile: true, slb: true, slc: 1, discrim: 4, band: "C", mti: "pd", R1: 100, mast: 4, mastRange: [4, 4], mastNote: "Fija: la antena va sobre el semirremolque M860, inclinada a 67,5°. El mástil de ≈30 m de la batería (AMG) es de comunicaciones, no del radar (FM 3-01.85).", sector: 90, eccm: 10, tracks: 100, scan: 2 },
-      sam: { maxR: 100, maxRtbm: 40, minR: 3, altMin: 50, altMax: 36e3, vInt: 1300, vmax: 1700, tb: 10, vmaxT: 3e3, react: 9, ch: 8, mag: 16, reserve: 16, reloadS: 2400, salvo: 2, guid: "activo", shot: "PAC-3 MSE", noDrones: true, cost: 4.2, pk: { dron: 0.9, crucero: 0.9, supersonico: 0.6, balistico: 0.7, hiper: 0.5 } },
+      sam: { dthrust: true, maxR: 100, maxRtbm: 40, minR: 3, altMin: 50, altMax: 36e3, vInt: 1300, vmax: 1700, tb: 10, vmaxT: 3e3, react: 9, ch: 8, mag: 16, reserve: 16, reloadS: 2400, salvo: 2, guid: "activo", shot: "PAC-3 MSE", noDrones: true, cost: 4.2, pk: { dron: 0.9, crucero: 0.9, supersonico: 0.6, balistico: 0.7, hiper: 0.5 } },
       range: "≈40 km vs balísticos (estimado), ≈100 km vs aeronaves",
       interceptor: "PAC-3 MSE: hit-to-kill, buscador activo, motor de doble pulso, techo ≈36 km",
       notes: ["El AN/MPQ-65 busca en un sector de ~90° (sigue en ~120°): hay que orientarlo hacia la amenaza. El LTAMDS nuevo tiene 3 paneles y 360°.", "El radar guía hasta ~9 misiles a la vez.", "Lanzador M903: hasta 12 MSE (o 16 CRI); una batería tiene 6–8 lanzadores.", "Costo: US$4,19 M por misil en el presupuesto FY2025; el contrato plurianual de 2025 da ≈4,97 M con costos asociados."],
@@ -1242,7 +1246,7 @@ table.t.mc td.pc{white-space:nowrap}
       color: "#62b6ff",
       datalinks: ["l16"],
       radar: { name: "AN/MPQ-65", agile: true, slb: true, slc: 1, discrim: 4, band: "C", mti: "pd", R1: 100, mast: 4, mastRange: [4, 4], mastNote: "Fija: la antena va sobre el semirremolque M860. El mástil de ≈30 m (AMG) es de comunicaciones, no del radar.", sector: 90, eccm: 10, tracks: 100, scan: 2 },
-      sam: { hoj: true, pkHoj: 0.5, maxR: 160, maxRtbm: 20, minR: 3, altMin: 60, altMax: 24e3, vInt: 900, vmax: 1500, tb: 12, vmaxT: 2500, react: 9, ch: 8, mag: 16, reserve: 16, reloadS: 2400, salvo: 2, guid: "TVM", shot: "PAC-2 GEM-T", noDrones: true, cost: 3, pk: { dron: 0.8, crucero: 0.85, supersonico: 0.55, balistico: 0.4, hiper: 0.25 } },
+      sam: { hFull: 15e3, maxR: 160, maxRtbm: 20, minR: 3, altMin: 60, altMax: 24e3, vInt: 900, vmax: 1500, tb: 12, vmaxT: 2500, react: 9, ch: 8, mag: 16, reserve: 16, reloadS: 2400, salvo: 2, guid: "TVM", shot: "PAC-2 GEM-T", noDrones: true, cost: 3, pk: { dron: 0.8, crucero: 0.85, supersonico: 0.55, balistico: 0.4, hiper: 0.25 } },
       range: "≈160 km vs aeronaves, ≈20 km vs balísticos",
       interceptor: "GEM-T: fragmentación, guiado TVM (necesita que el radar propio vea el blanco), Mach ≈3,5",
       notes: ["Mayor alcance contra aviones y misiles de crucero que el MSE, pero peor contra balísticos.", "4 misiles por lanzador M901/M903.", "Precio unitario no publicado: US$2–4 M según estimaciones de prensa."],
@@ -1256,7 +1260,7 @@ table.t.mc td.pc{white-space:nowrap}
       color: "#62b6ff",
       datalinks: [],
       radar: { name: "Arabel", agile: true, lowSL: true, slb: true, slc: 1, band: "X", mti: "pd", R1: 80, mast: 5, mastRange: [5, 5], mastNote: "Fija: Arabel montado sobre camión (altura estimada).", sector: 360, eccm: 10, tracks: 100, scan: 1 },
-      sam: { maxR: 100, maxRtbm: 25, minR: 3, altMin: 50, altMax: 2e4, vInt: 1050, vmax: 1400, tb: 6, vmaxT: 2500, react: 8, ch: 10, mag: 32, reserve: 16, reloadS: 2400, salvo: 2, guid: "activo", shot: "Aster 30", noDrones: true, cost: 2, pk: { dron: 0.85, crucero: 0.88, supersonico: 0.6, balistico: 0.6, hiper: 0.4 } },
+      sam: { dthrust: true, maxR: 100, maxRtbm: 25, minR: 3, altMin: 50, altMax: 2e4, vInt: 1050, vmax: 1400, tb: 6, vmaxT: 2500, react: 8, ch: 10, mag: 32, reserve: 16, reloadS: 2400, salvo: 2, guid: "activo", shot: "Aster 30", noDrones: true, cost: 2, pk: { dron: 0.85, crucero: 0.88, supersonico: 0.6, balistico: 0.6, hiper: 0.4 } },
       range: "≈100 km vs aeronaves (50 km por debajo de 3 km de altura), 20–35 km vs balísticos",
       interceptor: 'Aster 30: 1,4 km/s, buscador activo, control "PIF-PAF" (toberas laterales para maniobra final)',
       notes: ["Radar Arabel en banda X, giratorio a 60 rpm (refresco 1 s), ~100 km de alcance.", "8 misiles por lanzador vertical, 4–6 lanzadores por batería; 10 blancos simultáneos.", "En Ucrania tuvo problemas de software contra algunos balísticos y escasez de misiles (2025). La afirmación de que superó al Patriot contra Iskander es de baja confianza."],
@@ -1270,7 +1274,7 @@ table.t.mc td.pc{white-space:nowrap}
       color: "#62b6ff",
       datalinks: ["l16"],
       radar: { name: "Hensoldt TRML-4D", agile: true, lowSL: true, slb: true, slc: 2, band: "C", mti: "pd", R1: 100, mast: 6, mastRange: [4, 12], mastNote: "Mástil hidráulico sobre el camión: la antena llega hasta 12 m (Hensoldt). Retraído ≈4 m (estimado).", sector: 360, eccm: 10, tracks: 1500, scan: 1 },
-      sam: { maxR: 40, maxRtbm: 0, minR: 1, altMin: 10, altMax: 2e4, vInt: 750, vmax: 1e3, tb: 6, vmaxT: 1200, react: 6, ch: 8, mag: 24, reserve: 8, reloadS: 1200, salvo: 1, guid: "IR", shot: "IRIS-T SL", cost: 0.5, pk: { dron: 0.9, crucero: 0.88, supersonico: 0.2, balistico: 0, hiper: 0 } },
+      sam: { hFull: 1e4, maxR: 40, maxRtbm: 0, minR: 1, altMin: 10, altMax: 2e4, vInt: 750, vmax: 1e3, tb: 6, vmaxT: 1200, react: 6, ch: 8, mag: 24, reserve: 8, reloadS: 1200, salvo: 1, guid: "IR", shot: "IRIS-T SL", cost: 0.5, pk: { dron: 0.9, crucero: 0.88, supersonico: 0.2, balistico: 0, hiper: 0 } },
       range: "40 km, techo 20 km (SLX: 80 km)",
       interceptor: "IRIS-T SL: guiado inercial + datalink, buscador IR de imagen terminal, ≈Mach 3",
       notes: ["El TRML-4D es banda C (G OTAN): 250 km instrumentados, cazas a más de 120 km, misiles supersónicos a más de 60 km, 1.500 pistas.", 'Diehl y operadores ucranianos reclaman "casi 100%" (≈240 derribos a jun-2024), sobre todo contra crucero y drones. No hay datos contra balísticos.', "Al ser IR, puede atacar con pista de la red sin que el radar propio vea el blanco en el último tramo; las bengalas del Kh-101 son justamente contra este tipo de buscador."],
@@ -1284,7 +1288,7 @@ table.t.mc td.pc{white-space:nowrap}
       color: "#62b6ff",
       datalinks: ["l16"],
       radar: { name: "AN/MPQ-64 Sentinel", agile: true, lowSL: true, band: "X", mti: "pd", R1: 60, mast: 4, mastRange: [4, 4], mastNote: "Fija: Sentinel sobre remolque (altura estimada).", sector: 360, eccm: 8, tracks: 60, scan: 2 },
-      sam: { hoj: true, pkHoj: 0.5, maxR: 35, maxRtbm: 0, minR: 1, altMin: 30, altMax: 15e3, vInt: 900, vmax: 1370, tb: 8, vmaxT: 1e3, react: 6, ch: 6, mag: 18, reserve: 12, reloadS: 1800, salvo: 1, guid: "activo", shot: "AIM-120", cost: 1.07, pk: { dron: 0.85, crucero: 0.88, supersonico: 0.4, balistico: 0, hiper: 0 } },
+      sam: { hFull: 1e4, hoj: true, pkHoj: 0.5, maxR: 35, maxRtbm: 0, minR: 1, altMin: 30, altMax: 15e3, vInt: 900, vmax: 1370, tb: 8, vmaxT: 1e3, react: 6, ch: 6, mag: 18, reserve: 12, reloadS: 1800, salvo: 1, guid: "activo", shot: "AIM-120", cost: 1.07, pk: { dron: 0.85, crucero: 0.88, supersonico: 0.4, balistico: 0, hiper: 0 } },
       range: "≈35–40 km (AMRAAM-ER: 50–60 km)",
       interceptor: "AIM-120: misil aire-aire adaptado, buscador radar activo",
       notes: ["Noruega reclamó 94% de éxito en Ucrania (feb-2025, ~900 AMRAAM); no se aclara si es por disparo o por blanco y ~60% de los blancos eran crucero.", "Sentinel: banda X, 30 rpm (refresco 2 s); 40 km el modelo básico, 120 km el F1.", "3 lanzadores de 6 misiles por unidad de fuego. No sirve contra balísticos."],
@@ -1298,7 +1302,7 @@ table.t.mc td.pc{white-space:nowrap}
       color: "#62b6ff",
       datalinks: ["ua_c2"],
       radar: { name: "30N6 Flap Lid (en torre 40V6)", agile: true, lowSL: true, band: "X", mti: "pd", R1: 100, mast: 25, mastRange: [7, 39], mastNote: "Sin torre, la antena queda a ≈7 m sobre su vehículo (estimado); en la torre 40V6M a ≈25 m y en la 40V6MD a ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h, no se cambia durante el combate.", sector: 90, eccm: 3, tracks: 24, scan: 2 },
-      sam: { maxR: 75, maxRtbm: 25, minR: 5, altMin: 25, altMax: 27e3, vInt: 1300, vmax: 2e3, tb: 11, vmaxT: 1300, react: 12, ch: 4, mag: 16, reserve: 12, reloadS: 2400, salvo: 2, guid: "TVM", shot: "5V55R", cost: 0.5, pk: { dron: 0.5, crucero: 0.5, supersonico: 0.1, balistico: 0.15, hiper: 0.05 } },
+      sam: { hFull: 15e3, maxR: 75, maxRtbm: 25, minR: 5, altMin: 25, altMax: 27e3, vInt: 1300, vmax: 2e3, tb: 11, vmaxT: 1300, react: 12, ch: 4, mag: 16, reserve: 12, reloadS: 2400, salvo: 2, guid: "TVM", shot: "5V55R", cost: 0.5, pk: { dron: 0.5, crucero: 0.5, supersonico: 0.1, balistico: 0.15, hiper: 0.05 } },
       range: "47 km (5V55K) / 75 km (5V55R), techo 27 km",
       interceptor: "5V55: hasta 2.000 m/s, guiado por mando (K) o TVM (R)",
       notes: ["Ucrania tenía 35 batallones S-300PS/PT en feb-2022 (RUSI), ~250 lanzadores: fue la columna vertebral de su defensa en 2022.", "El 30N6 puede ir sobre la torre 40V6M (antena a ~24 m) o 40V6MD (~39 m): con 24 m ve un blanco a 25 m de altura a ~41 km.", "Misiles soviéticos escasos: no hay producción nueva."],
@@ -1311,8 +1315,8 @@ table.t.mc td.pc{white-space:nowrap}
       kind: "sam",
       color: "#62b6ff",
       datalinks: ["ua_c2", "ru_c2"],
-      radar: { name: "9S35 Fire Dome (+9S18M1 Snow Drift)", band: "X", mti: "mti", R1: 50, mast: 4, mastRange: [4, 4], mastNote: "Fija: radar sobre el vehículo de orugas (altura estimada).", sector: 360, eccm: 3, tracks: 50, scan: 2 },
-      sam: { maxR: 35, maxRtbm: 10, minR: 3.3, altMin: 15, altMax: 22e3, vInt: 650, vmax: 850, tb: 15, vmaxT: 830, react: 22, ch: 3, mag: 12, reserve: 12, reloadS: 780, salvo: 2, guid: "SARH", shot: "9M38", cost: 0.5, pk: { dron: 0.55, crucero: 0.5, supersonico: 0.35, balistico: 0.05, hiper: 0 } },
+      radar: { name: "9S35 Fire Dome (+9S18M1 Snow Drift)", band: "X", mti: "mti", bwEl: 1.3, R1: 50, mast: 4, mastRange: [4, 4], mastNote: "Fija: radar sobre el vehículo de orugas (altura estimada).", sector: 360, eccm: 3, tracks: 50, scan: 2 },
+      sam: { hFull: 1e4, maxR: 35, maxRtbm: 10, minR: 3.3, altMin: 15, altMax: 22e3, vInt: 650, vmax: 850, tb: 15, vmaxT: 830, react: 22, ch: 3, mag: 12, reserve: 12, reloadS: 780, salvo: 2, guid: "SARH", shot: "9M38", cost: 0.5, pk: { dron: 0.55, crucero: 0.5, supersonico: 0.35, balistico: 0.05, hiper: 0 } },
       range: "3,3–35 km, techo 22 km",
       interceptor: "9M38: ≈Mach 3, semiactivo: el radar del lanzador tiene que iluminar el blanco hasta el impacto",
       notes: ["Lo usan ambos bandos (Rusia con versiones M2/M3). Ucrania tenía 15 divisiones en 2022.", "El 9S18M1 (banda centimétrica) detecta a ~85 km a altura; a 100 m de altura solo ~35 km.", 'Ucrania adaptó lanzadores Buk para disparar RIM-7 Sea Sparrow ("FrankenSAM").'],
@@ -1354,7 +1358,7 @@ table.t.mc td.pc{white-space:nowrap}
       color: "#62b6ff",
       datalinks: [],
       radar: { name: "Visual / IR", band: "OPT", R1: 7, mast: 2, mastRange: [2, 2], mastNote: "Fija: el tirador.", sector: 360, eccm: 99, scan: 1 },
-      sam: { maxR: 4.8, maxRtbm: 0, minR: 0.2, altMin: 10, altMax: 3800, vInt: 550, vmaxT: 400, react: 6, ch: 1, mag: 4, reserve: 4, reloadS: 60, salvo: 1, guid: "IR", shot: "FIM-92 Stinger", cost: 0.45, pk: { dron: 0.5, crucero: 0.4, supersonico: 0.05, balistico: 0, hiper: 0 } },
+      sam: { hFull: 2e3, maxR: 4.8, maxRtbm: 0, minR: 0.2, altMin: 10, altMax: 3800, vInt: 550, vmaxT: 400, react: 6, ch: 1, mag: 4, reserve: 4, reloadS: 60, salvo: 1, guid: "IR", shot: "FIM-92 Stinger", cost: 0.45, pk: { dron: 0.5, crucero: 0.4, supersonico: 0.05, balistico: 0, hiper: 0 } },
       range: "≈4,8 km, techo ≈3,8 km",
       interceptor: "Misil portátil con buscador infrarrojo (Stinger Mach 2,2; Igla ≈570 m/s)",
       notes: ["Stinger: más de US$400k; Igla: ~US$60–80k (dato viejo).", "Se usan en grupos móviles y contra helicópteros. Las bengalas los degradan."],
@@ -1382,7 +1386,7 @@ table.t.mc td.pc{white-space:nowrap}
       color: "#62b6ff",
       datalinks: [],
       radar: { name: "AN/MPQ-61 HPIR (+ AN/MPQ-50 PAR, AN/MPQ-62 CWAR)", band: "X", mti: "pd", R1: 70, mast: 4, mastRange: [4, 4], mastNote: "Fija: radares sobre remolques (altura estimada).", sector: 360, eccm: 5, tracks: 25, scan: 2 },
-      sam: { hoj: true, pkHoj: 0.3, maxR: 40, maxRtbm: 0, minR: 1.5, altMin: 60, altMax: 17700, vInt: 700, vmaxT: 820, react: 15, ch: 2, mag: 9, reserve: 9, reloadS: 1200, salvo: 2, guid: "SARH", shot: "MIM-23B", cost: 0.3, pk: { dron: 0.6, crucero: 0.7, supersonico: 0.4, balistico: 0, hiper: 0 } },
+      sam: { hFull: 8e3, maxR: 40, maxRtbm: 0, minR: 1.5, altMin: 60, altMax: 17700, vInt: 700, vmaxT: 820, react: 15, ch: 2, mag: 9, reserve: 9, reloadS: 1200, salvo: 2, guid: "SARH", shot: "MIM-23B", cost: 0.3, pk: { dron: 0.6, crucero: 0.7, supersonico: 0.4, balistico: 0, hiper: 0 } },
       range: "1,5–40 km, techo ≈17 km",
       interceptor: "MIM-23B: ≈Mach 2,5, semiactivo: el HPIR ilumina el blanco hasta el impacto",
       notes: ["España entregó baterías Fase III desde fines de 2022 (21 lanzadores, radares MPQ-61 y MPQ-62) y más lanzadores en 2023–24; EE. UU. aportó misiles.", "Una sola unidad ucraniana reclamó 14 misiles de crucero y 40 Shahed derribados.", "Cada HPIR guía contra un blanco a la vez: dos secciones de fuego = dos canales."],
@@ -1395,8 +1399,8 @@ table.t.mc td.pc{white-space:nowrap}
       kind: "sam",
       color: "#62b6ff",
       datalinks: ["ua_c2"],
-      radar: { name: 'SNR-125 "Low Blow" (+ P-18/P-19 de búsqueda)', band: "X", mti: "none", R1: 40, mast: 4, mastRange: [4, 6], mastNote: "Cabina de radar sobre remolque; la versión polaca Newa-SC va sobre chasis MAZ-543 (≈4–6 m, estimado).", sector: 360, eccm: 3, tracks: 10, scan: 2 },
-      sam: { maxR: 25, maxRtbm: 0, minR: 2.5, altMin: 25, altMax: 18e3, vInt: 600, vmax: 1e3, tb: 3, vmaxT: 700, react: 25, ch: 1, mag: 8, reserve: 8, reloadS: 1500, salvo: 2, guid: "mando", shot: "5V27", cost: 0.15, pk: { dron: 0.45, crucero: 0.55, supersonico: 0.3, balistico: 0, hiper: 0 } },
+      radar: { name: 'SNR-125 "Low Blow" (+ P-18/P-19 de búsqueda)', band: "X", mti: "mti", prf: 2600, R1: 40, mast: 4, mastRange: [4, 6], mastNote: "Cabina de radar sobre remolque; la versión polaca Newa-SC va sobre chasis MAZ-543 (≈4–6 m, estimado).", sector: 360, eccm: 3, tracks: 10, scan: 2 },
+      sam: { hFull: 1e4, maxR: 25, maxRtbm: 0, minR: 2.5, altMin: 25, altMax: 18e3, vInt: 600, vmax: 1e3, tb: 3, vmaxT: 700, react: 25, ch: 1, mag: 8, reserve: 8, reloadS: 1500, salvo: 2, guid: "mando", shot: "5V27", cost: 0.15, pk: { dron: 0.45, crucero: 0.55, supersonico: 0.3, balistico: 0, hiper: 0 } },
       range: "2,5–25 km, techo 18 km",
       interceptor: "5V27: guiado por radiocomando desde el SNR-125 (un blanco a la vez)",
       notes: ["Sistema de los años 60, modernizado en Ucrania y en Polonia (Newa-SC, digital y sobre chasis con orugas o ruedas).", "En su primer combate un S-125 ucraniano derribó un Kalibr; muy bueno a baja altura para su edad.", "Un solo canal: se satura enseguida con oleadas."],
@@ -1410,7 +1414,7 @@ table.t.mc td.pc{white-space:nowrap}
       color: "#62b6ff",
       datalinks: ["ua_c2"],
       radar: { name: '5N62 "Square Pair" (iluminación; búsqueda con P-14/radar de la red)', band: "C", mti: "pd", R1: 250, mast: 8, mastRange: [8, 8], mastNote: "Fija: antena del 5N62 sobre su base (altura estimada).", sector: 120, eccm: 3, tracks: 10, scan: 4 },
-      sam: { maxR: 250, maxRtbm: 0, minR: 17, altMin: 300, altMax: 4e4, vInt: 1100, vmaxT: 1180, react: 60, ch: 1, mag: 6, reserve: 6, reloadS: 3600, salvo: 2, guid: "SARH", shot: "5V28", cost: 0.6, pk: { dron: 0.2, crucero: 0.25, supersonico: 0.2, balistico: 0, hiper: 0 } },
+      sam: { hFull: 18e3, maxR: 250, maxRtbm: 0, minR: 17, altMin: 300, altMax: 4e4, vInt: 1100, vmaxT: 1180, react: 60, ch: 1, mag: 6, reserve: 6, reloadS: 3600, salvo: 2, guid: "SARH", shot: "5V28", cost: 0.6, pk: { dron: 0.2, crucero: 0.25, supersonico: 0.2, balistico: 0, hiper: 0 } },
       range: "17–250 km, techo ≈40 km; no baja de 300 m",
       interceptor: "5V28: misil de 7 t con cohetes aceleradores, semiactivo (el 5N62 ilumina hasta el impacto)",
       notes: ["Ucrania lo reactivó en 2022 (con aporte polaco) para cazar aviones: se le atribuyen un A-50 y un Tu-22M3 a ≈300 km. También se adaptó como misil de ataque a tierra.", "Contra drones y misiles de crucero es un desperdicio: lento para reaccionar, un solo canal y piso de 300 m.", "El juego todavía no tiene aviones como blanco: acá solo puede enfrentar drones altos, planeadoras y misiles."],
@@ -1424,7 +1428,7 @@ table.t.mc td.pc{white-space:nowrap}
       color: "#ff9f5a",
       datalinks: ["ru_c2"],
       radar: { name: "1RS1 búsqueda (S) + 1RS2 seguimiento (Ku)", agile: true, band: "S", mti: "pd", R1: 30, mast: 6, mastRange: [6, 6], mastNote: "Fija: radares sobre el camión (altura estimada).", sector: 360, eccm: 5, tracks: 20, scan: 1 },
-      sam: { maxR: 18, maxRtbm: 5, minR: 1, altMin: 5, altMax: 15e3, vInt: 900, vmax: 1300, tb: 2, vmaxT: 1e3, react: 5, ch: 3, mag: 12, reserve: 12, reloadS: 1800, salvo: 2, guid: "mando", shot: "57E6", cost: 0.15, pk: { dron: 0.65, crucero: 0.6, supersonico: 0.3, balistico: 0.1, hiper: 0 } },
+      sam: { hFull: 5e3, maxR: 18, maxRtbm: 5, minR: 1, altMin: 5, altMax: 15e3, vInt: 900, vmax: 1300, tb: 2, vmaxT: 1e3, react: 5, ch: 3, mag: 12, reserve: 12, reloadS: 1800, salvo: 2, guid: "mando", shot: "57E6", cost: 0.15, pk: { dron: 0.65, crucero: 0.6, supersonico: 0.3, balistico: 0.1, hiper: 0 } },
       range: "18–20 km misil, 4 km cañones",
       interceptor: "57E6: 1.300 m/s al apagar el motor, ≈900 m/s promedio a 12 km; guiado por mando radio, ojiva de varillas",
       notes: ["Radar de búsqueda: 36 km contra 2 m², 20 km contra un misil de crucero de 0,1 m².", "Defensa de punto de las baterías S-400.", "Recibió parches de software para HIMARS y Storm Shadow; aun así se registraron muchas pérdidas."],
@@ -1438,7 +1442,7 @@ table.t.mc td.pc{white-space:nowrap}
       color: "#ff9f5a",
       datalinks: ["ru_c2"],
       radar: { name: "Búsqueda (banda F ≈ S) + seguimiento (G/H y Ku)", agile: true, band: "S", mti: "pd", R1: 25, mast: 4, mastRange: [4, 4], mastNote: "Fija: radar sobre el vehículo de orugas (altura estimada).", sector: 360, eccm: 5, tracks: 48, scan: 1 },
-      sam: { maxR: 15, maxRtbm: 5, minR: 1, altMin: 10, altMax: 1e4, vInt: 700, vmax: 1e3, tb: 4, vmaxT: 700, react: 6, ch: 4, mag: 16, reserve: 8, reloadS: 1080, salvo: 1, guid: "mando", shot: "9M338", cost: 0.3, pk: { dron: 0.75, crucero: 0.7, supersonico: 0.35, balistico: 0.1, hiper: 0 } },
+      sam: { hFull: 5e3, maxR: 15, maxRtbm: 5, minR: 1, altMin: 10, altMax: 1e4, vInt: 700, vmax: 1e3, tb: 4, vmaxT: 700, react: 6, ch: 4, mag: 16, reserve: 8, reloadS: 1080, salvo: 1, guid: "mando", shot: "9M338", cost: 0.3, pk: { dron: 0.75, crucero: 0.7, supersonico: 0.35, balistico: 0.1, hiper: 0 } },
       range: "15–16 km, techo 10 km",
       interceptor: "9M338: lanzamiento vertical, guiado por mando",
       notes: ["Defensa de punto contra drones, bombas planeadoras y misiles de crucero.", "4 blancos y 8 misiles simultáneos; 16 misiles en el M2 (8 en el M2E)."],
@@ -1452,7 +1456,7 @@ table.t.mc td.pc{white-space:nowrap}
       color: "#ff9f5a",
       datalinks: ["ru_c2"],
       radar: { name: "92N6 Grave Stone (en torre 40V6M)", agile: true, lowSL: true, slb: true, slc: 1, band: "X", mti: "pd", R1: 200, mast: 25, mastRange: [7, 39], mastNote: "Sin torre, la antena queda a ≈7 m sobre su vehículo (estimado); en la torre 40V6M a ≈25 m y en la 40V6MD a ≈39 m (Air Power Australia). Armar la torre lleva 1–2 h, no se cambia durante el combate.", sector: 120, eccm: 8, tracks: 100, scan: 2 },
-      sam: { maxR: 250, maxRtbm: 60, minR: 3, altMin: 10, altMax: 27e3, vInt: 1500, vmax: 2e3, tb: 12, vmaxT: 4800, react: 9, ch: 10, mag: 32, reserve: 16, reloadS: 2400, salvo: 2, guid: "TVM", shot: "48N6", noDrones: true, cost: 1.5, pk: { dron: 0.75, crucero: 0.7, supersonico: 0.6, balistico: 0.5, hiper: 0.3 } },
+      sam: { hFull: 15e3, maxR: 250, maxRtbm: 60, minR: 3, altMin: 10, altMax: 27e3, vInt: 1500, vmax: 2e3, tb: 12, vmaxT: 4800, react: 9, ch: 10, mag: 32, reserve: 16, reloadS: 2400, salvo: 2, guid: "TVM", shot: "48N6", noDrones: true, cost: 1.5, pk: { dron: 0.75, crucero: 0.7, supersonico: 0.6, balistico: 0.5, hiper: 0.3 } },
       range: "48N6DM: 240–250 km; 40N6: hasta 380–400 km",
       interceptor: "48N6: ≈2.000 m/s, guiado TVM; 9M96E2 (activo) para corto/medio alcance",
       notes: ["Ucrania destruyó varios radares (92N6, 96L6, 91N6) y lanzadores con ATACMS, Neptune y drones.", "Contra blancos rasantes su alcance real lo pone el horizonte de radar, no el misil.", "Precio por misil no publicado: estimación US$1–2 M."],
@@ -1618,7 +1622,7 @@ table.t.mc td.pc{white-space:nowrap}
   var JAM_MODES = {
     barrage: { name: "Barrera (toda la banda)", gain: 1 },
     spot: { name: "Puntual (contra un radar)", gain: 10, agileGain: 0.1 },
-    drfm: { name: "Engaño DRFM (falsos blancos)", gain: 0, coherent: true, falseTargets: 20 }
+    drfm: { name: "Engaño DRFM (falsos blancos)", gain: 0, coherent: true, falseTargets: 20, fooled: 0.3 }
   };
 
   // src/data/uncertainty.js
@@ -1649,6 +1653,7 @@ table.t.mc td.pc{white-space:nowrap}
     "radar.discrim": ["Radar: discriminación de señuelos (×, divide el τ de su banda)", "×"],
     "radar.tracks": ["Radar: blancos que puede seguir a la vez", ""],
     "sam.pkHoj": ["Pk de un disparo home-on-jam contra un jammer aéreo", ""],
+    "sam.hFull": ["Altura hasta la que maniobra con toda su aceleración a velocidad máxima", "m"],
     "sam.maxR": ["Alcance vs aeronaves/crucero", "km"],
     "sam.maxRtbm": ["Alcance vs balísticos", "km"],
     "sam.altMax": ["Techo", "m"],
@@ -1677,6 +1682,11 @@ table.t.mc td.pc{white-space:nowrap}
     landSv: ["Dispersión de velocidad del clutter de suelo", "m/s"],
     seaSv: ["Dispersión de velocidad del clutter de mar", "m/s"],
     rainSv: ["Dispersión de velocidad del clutter de lluvia", "m/s"],
+    windAlpha: ["Exponente del viento con la altura (ley de potencia)", ""],
+    windTop: ["Altura hasta la que crece el viento", "m"],
+    optDay: ["Alcance óptico de día respecto de la noche", "×"],
+    gwLag: ["Demora agregada por la pasarela", "s"],
+    gwPk: ["Pk de un disparo con pista que pasó por la pasarela (factor)", "×"],
     alt: ["Altitud de patrulla", "m"],
     remotePk: ["Pk de un disparo con pista de red (factor)", "×"],
     radius: ["Radio de efecto", "km"],
@@ -1932,7 +1942,7 @@ table.t.mc td.pc{white-space:nowrap}
         "sam.pk.hiper": U(0.3, 0.5, 0.7, "baja", S_("nv_zircon"), PK_NOTE)
       },
       patriot2: {
-        "sam.pkHoj": U(0.2, 0.5, 0.7, "baja", S_("wp:Active_radar_homing"), "la variante MIM-104B (ASOJ) se diseñó contra jammers stand-off con home-on-jam; Pk est: guiado solo angular, sin distancia"),
+        "sam.hFull": U(1e4, 15e3, 2e4, "baja", [], "est: misil de gran altura (techo 24 km); sin dato publicado de g por altura"),
         "radar.tracks": U(50, 100, 150, "media", S_("wp:MIM-104_Patriot"), "mismo radar AN/MPQ-65"),
         "radar.R1": U(90, 100, 120, "baja", S_("rt_mpq53"), "mismo radar que el MSE"),
         "radar.discrim": U(1, 4, 8, "baja", [], "est: mismo radar que el MSE"),
@@ -1967,6 +1977,7 @@ table.t.mc td.pc{white-space:nowrap}
         "sam.pk.hiper": U(0.2, 0.4, 0.6, "baja", S_("nv_zircon"), PK_NOTE)
       },
       irist: {
+        "sam.hFull": U(6e3, 1e4, 14e3, "baja", [], "est: IR de alta maniobra; su versión aire-aire declara 60 g a baja altura"),
         "radar.tracks": U(500, 1500, 1500, "media", S_("wp:TRML"), "TRML-4D: unos 1.500 blancos hasta 250 km (Hensoldt)"),
         "sam.reloadS": U(600, 1200, 2400, "baja", [], "est: sin dato público firme"),
         "radar.R1": U(80, 100, 150, "media", S_("hensoldt"), "cazas a más de 120 km, misiles supersónicos a más de 60 km"),
@@ -1985,7 +1996,8 @@ table.t.mc td.pc{white-space:nowrap}
         "sam.pk.supersonico": U(0.1, 0.2, 0.35, "baja", S_("syrskyi"), "est: sin datos contra Mach 2–4; Oniks 5,7% a nivel nacional")
       },
       nasams: {
-        "sam.pkHoj": U(0.2, 0.5, 0.7, "baja", S_("wp:Active_radar_homing", "wp:AIM-120_AMRAAM"), "el AIM-120 tiene modo home-on-jam; Pk est: guiado solo angular, sin distancia"),
+        "sam.hFull": U(6e3, 1e4, 14e3, "baja", [], "est: AIM-120 lanzado desde tierra"),
+        "sam.pkHoj": U(0.2, 0.5, 0.7, "baja", S_("wp:Active_radar_homing", "wp:AIM-120_AMRAAM"), "el AIM-120 tiene modo home-on-jam; Pk est: guiado solo angular, sin distancia. El PAC-2 GEM-T y el I-Hawk quedan sin HOJ: lo documentado es del MIM-104B/SOJC y no se generaliza (docs/investigacion/datos-fisica-guerra-electronica.md)"),
         "radar.tracks": U(50, 60, 100, "media", S_("wp:AN/MPQ-64_Sentinel"), "Sentinel: más de 50 blancos simultáneos"),
         "sam.reloadS": U(900, 1800, 3600, "baja", [], "est: lanzador de 6 AMRAAM recargado con grúa; sin dato público firme"),
         "radar.R1": U(40, 60, 90, "media", S_("wp:AN/MPQ-64_Sentinel"), "40 km el básico, 120 km el F1/A3"),
@@ -2001,6 +2013,7 @@ table.t.mc td.pc{white-space:nowrap}
         "sam.pk.supersonico": U(0.25, 0.4, 0.6, "baja", [], "est")
       },
       s300: {
+        "sam.hFull": U(1e4, 15e3, 2e4, "baja", [], "est: techo 27 km; sin dato publicado de g por altura"),
         "radar.tracks": U(12, 24, 50, "baja", S_("apa_fc"), "30N6 Flap Lid A: hasta 24 blancos en seguimiento; la batería suma el radar de búsqueda de la red"),
         "radar.R1": U(80, 100, 130, "baja", S_("apa_fc"), "est"),
         "radar.sector": U(90, 90, 90, "alta", S_("apa_fc"), ""),
@@ -2015,6 +2028,7 @@ table.t.mc td.pc{white-space:nowrap}
         "sam.pk.balistico": U(0.05, 0.15, 0.3, "baja", S_("syrskyi"), PK_NOTE)
       },
       buk: {
+        "sam.hFull": U(6e3, 1e4, 14e3, "baja", [], "est: techo 22 km pero diseñado para alturas medias"),
         "radar.tracks": U(50, 50, 100, "media", S_("rt_9s18m"), "9S18M: hasta 50 blancos y designación a 6"),
         "radar.R1": U(35, 50, 85, "baja", S_("wp:Buk_missile_system"), "9S18M1 85 km a altura; 9S35 est 40–50 km"),
         "sam.maxR": U(33, 35, 42, "media", S_("missilery_buk"), ""),
@@ -2041,6 +2055,7 @@ table.t.mc td.pc{white-space:nowrap}
         "sam.pk.dron": U(0.05, 0.2, 0.3, "baja", [], PK_NOTE)
       },
       manpads: {
+        "sam.hFull": U(1e3, 2e3, 3e3, "baja", [], "est: misil chico de baja altura"),
         "sam.maxR": U(4.5, 4.8, 6, "alta", S_("wp:FIM-92_Stinger", "wp:9K38_Igla"), ""),
         "sam.vInt": U(450, 550, 650, "baja", [], "est: modelo legado de velocidad constante, sin perfil de motor por falta de datos (docs/FISICA.md §6). Una sola entrada para Stinger, Igla y RBS 70: no implica que sean equivalentes"),
         "sam.cost": U(0.06, 0.45, 0.5, "media", S_("wp:FIM-92_Stinger", "wp:9K38_Igla"), "Igla 60–80k; Stinger >400k"),
@@ -2055,7 +2070,7 @@ table.t.mc td.pc{white-space:nowrap}
         "sam.pk.dron": U(0.4, 0.6, 0.75, "media", S_("dn_interceptors"), ">60% de éxito por salida")
       },
       hawk: {
-        "sam.pkHoj": U(0.1, 0.3, 0.5, "baja", S_("wp:MIM-23_Hawk"), 'el I-Hawk tenía un modo home-on-jam "potencial"; Pk est, menor que en misiles modernos'),
+        "sam.hFull": U(5e3, 8e3, 12e3, "baja", [], "est"),
         "radar.tracks": U(10, 25, 50, "baja", [], "est: radares de búsqueda PAR y CWAR con seguimiento automático; sin cifra pública"),
         "radar.R1": U(50, 70, 100, "baja", S_("cmo_db3k_sam"), "CMO: HPIR 45 nmi (83 km) y PAR 54 nmi (100 km) de alcance instrumentado; est contra 1 m²"),
         "sam.maxR": U(35, 40, 50, "media", S_("cmo_db3k_sam", "db_hawk"), "CMO 22 nmi ≈ 40 km; OSINT 35–50 km"),
@@ -2067,6 +2082,7 @@ table.t.mc td.pc{white-space:nowrap}
         "sam.pk.dron": U(0.4, 0.6, 0.8, "baja", S_("db_hawk"), PK_NOTE)
       },
       s125: {
+        "sam.hFull": U(6e3, 1e4, 14e3, "baja", [], "est"),
         "radar.tracks": U(5, 10, 20, "baja", [], "est: la imagen sale del P-18/P-19 con ploteo; el SNR-125 sigue un blanco a la vez"),
         "radar.R1": U(30, 40, 60, "baja", S_("cmo_db3k_sam"), "CMO: SNR-125 32 nmi (59 km) instrumentado; est contra 1 m²"),
         "sam.maxR": U(18, 25, 30, "media", S_("mil_newa", "cmo_db3k_sam"), "Newa-SC con 5V27: 25 km; CMO 10–16 nmi"),
@@ -2078,6 +2094,7 @@ table.t.mc td.pc{white-space:nowrap}
         "sam.pk.crucero": U(0.35, 0.55, 0.7, "baja", S_("kp_s125"), PK_NOTE)
       },
       s200: {
+        "sam.hFull": U(12e3, 18e3, 24e3, "baja", [], "est: misil grande para blancos muy altos (techo 40 km)"),
         "radar.tracks": U(5, 10, 20, "baja", [], "est: el 5N62 ilumina un blanco; la imagen viene de la red"),
         "radar.R1": U(150, 250, 400, "baja", S_("cmo_db3k_sam"), "CMO: 5N62 220 nmi (≈400 km) contra blancos grandes; est contra 1 m²"),
         "sam.maxR": U(150, 250, 300, "media", S_("cmo_db3k_sam", "dua_s200"), "5V28 ≈250 km, 5V28M ≈300 km; derribo a ≈308 km reclamado"),
@@ -2088,6 +2105,7 @@ table.t.mc td.pc{white-space:nowrap}
         "sam.pk.crucero": U(0.1, 0.25, 0.4, "baja", [], "est: pensado contra aviones grandes. " + PK_NOTE)
       },
       pantsir: {
+        "sam.hFull": U(3e3, 5e3, 8e3, "baja", [], "est: defensa de punto de baja altura"),
         "radar.tracks": U(10, 20, 40, "baja", S_("wp:Pantsir_missile_system"), "est: el Pantsir-SM declara 40 con radar nuevo; el S1, menos"),
         "radar.R1": U(25, 30, 36, "media", S_("apa_pantsir"), "36 km vs 2 m²"),
         "sam.maxR": U(18, 18, 20, "media", S_("gs_57e6"), ""),
@@ -2099,6 +2117,7 @@ table.t.mc td.pc{white-space:nowrap}
         "sam.pk.crucero": U(0.4, 0.6, 0.75, "baja", [], "est")
       },
       tor: {
+        "sam.hFull": U(3e3, 5e3, 8e3, "baja", [], "est: defensa de punto de baja altura"),
         "radar.tracks": U(10, 48, 48, "media", S_("wp:Tor_missile_system"), "Tor-M2: procesa 48 blancos y sigue 10 para tiro"),
         "radar.R1": U(20, 25, 32, "media", S_("ar_tor", "wp:Tor_missile_system"), ">30 km contra cazas"),
         "sam.maxR": U(15, 15, 16, "media", S_("gs_9m338", "ar_tor"), ""),
@@ -2109,6 +2128,7 @@ table.t.mc td.pc{white-space:nowrap}
         "sam.pk.crucero": U(0.5, 0.7, 0.8, "baja", [], "est")
       },
       s400: {
+        "sam.hFull": U(1e4, 15e3, 2e4, "baja", [], "est: techo 27 km; sin dato publicado de g por altura"),
         "radar.tracks": U(100, 100, 300, "media", S_("wp:S-400_missile_system"), "92N6: hasta 100 blancos en seguimiento"),
         "radar.R1": U(150, 200, 250, "baja", S_("ar_92n6"), "92N6: 250–340 km contra blancos grandes"),
         "sam.maxR": U(240, 250, 250, "alta", S_("wp:S-400_missile_system"), ""),
@@ -2163,6 +2183,21 @@ table.t.mc td.pc{white-space:nowrap}
       f16ecm: {
         P: U(1e4, 3e4, 1e5, "baja", S_("ng_alq131", "fas_alq131"), "parámetro de juego: potencia y bandas del pod no son públicas. Un orden de magnitud menos que el Il-22PP (3e5): un pod de caza tiene menos potencia y antenas mucho más chicas; est"),
         alt: U(300, 4e3, 8e3, "baja", [], "est: los F-16 ucranianos vuelan bajo para sobrevivir y suben para lanzar; altura de patrulla de juego")
+      }
+    },
+    // ambiente (data/environment.js)
+    env: {
+      modelo: {
+        windAlpha: U(0.1, 0.143, 0.4, "media", S_("wp:Wind_profile_power_law"), "1/7 con atmósfera neutra; de noche, con inversión estable, el exponente sube a 0,3–0,4"),
+        windTop: U(500, 1e3, 2e3, "media", S_("wp:Planetary_boundary_layer"), "tope típico de la capa límite: cientos de metros de noche, 1–2 km de día"),
+        optDay: U(1, 1.3, 2, "baja", [], "est: de día se suma la vista al visor térmico; sin dato público de alcances por hora")
+      }
+    },
+    // pasarelas entre familias de enlaces (data/datalinks.js#GATEWAYS)
+    gw: {
+      ua_l16: {
+        gwLag: U(3, 10, 30, "baja", S_("ms_lessons"), "est: conversión de formato y retransmisión; sin cifra pública"),
+        gwPk: U(0.85, 0.95, 1, "baja", S_("ms_lessons"), "est: la demora y la conversión agregan error de posición a la pista")
       }
     },
     // modelo de clutter (data/clutter.js, physics/clutter.js); valores por clase de radar, no por sistema
@@ -2246,6 +2281,68 @@ table.t.mc td.pc{white-space:nowrap}
       rainSv: 2
     }
   };
+
+  // src/data/datalinks.js
+  var DATALINKS = {
+    l16: {
+      name: "Link 16 / MIDS",
+      capability: "track",
+      confidence: "media",
+      note: "Familia de intercambio táctico occidental; el acceso y la capacidad de engage-on-remote dependen de la integración concreta.",
+      sources: ["crs_nasams", "kongsberg"]
+    },
+    ua_c2: {
+      name: "Red C2 nacional ucraniana",
+      capability: "track",
+      confidence: "media",
+      note: "Gateway nacional para sistemas soviéticos y occidentales; no se presume interoperabilidad de calidad de tiro entre todos los usuarios.",
+      sources: ["ua_mix"]
+    },
+    ru_c2: {
+      name: "Red automatizada rusa",
+      capability: "track",
+      confidence: "media",
+      note: "Familia Polyana/Baikal/Senezh; el comportamiento real de cada despliegue no es público.",
+      sources: ["ru_polyana"]
+    }
+  };
+  var GATEWAYS = {
+    ua_l16: {
+      name: "Pasarela Link 16 ↔ red C2 ucraniana",
+      a: "l16",
+      b: "ua_c2",
+      gwLag: 10,
+      gwPk: 0.95,
+      note: 'Ucrania convirtió la salida de sus radares soviéticos a su imagen aérea común con los sistemas occidentales ("cajas negras" de conversión, 2022–24) y firmó la licencia de Link 16 en 2025. Demora y pérdida: estimación. Sin fuente primaria de que la pista sirva para disparar: apagada por defecto.',
+      sources: ["ms_lessons", "nv_l16"]
+    }
+  };
+  function gatewaysInto(key) {
+    const out = [];
+    for (const [id, G] of Object.entries(GATEWAYS)) {
+      if (G.a === key) out.push({ from: G.b, G, id });
+      else if (G.b === key) out.push({ from: G.a, G, id });
+    }
+    return out;
+  }
+  var datalinksOf = (u) => {
+    const links = u?.datalinks ?? u?.links ?? [];
+    return Array.isArray(links) ? links.filter((k) => DATALINKS[k]) : [];
+  };
+
+  // src/data/environment.js
+  var ENV = {
+    modelo: {
+      windAlpha: 0.143,
+      windTop: 1e3,
+      optDay: 1.3
+    }
+  };
+  var TIMES_OF_DAY = {
+    noche: { name: "Noche", desc: "Los grupos móviles y los MANPADS buscan con visor térmico y reflectores: los alcances del catálogo." },
+    dia: { name: "Día", desc: "Se suma la vista: los sensores ópticos llegan algo más lejos (estimado). Los radares no cambian." }
+  };
+  var TOD_DEFAULT = "noche";
 
   // src/data/bands.js
   var BANDS = {
@@ -2399,9 +2496,9 @@ table.t.mc td.pc{white-space:nowrap}
       "caso": "20 Kalibr (cada 3 s) contra S-300PS + Buk-M1 + radar 3D",
       "real": "67% para crucero a nivel nacional (feb-22 → ago-24), con defensa mayormente soviética.",
       "obj": "60–85%",
-      "sim": 0.736,
-      "lo": 0.608,
-      "hi": 0.963,
+      "sim": 0.751,
+      "lo": 0.605,
+      "hi": 0.984,
       "ok": true
     },
     {
@@ -2409,7 +2506,7 @@ table.t.mc td.pc{white-space:nowrap}
       "caso": "60 Shahed + 30 Gerbera contra 2 Gepard, 3 grupos móviles, 2 equipos de interceptores, red acústica",
       "real": "Derribo cinético 52% (mar–may 25) a 63% (2022–24); el resto de la neutralización es guerra electrónica, que el juego no modela como pérdida.",
       "obj": "50–70%",
-      "sim": 0.641,
+      "sim": 0.642,
       "lo": 0.448,
       "hi": 0.781,
       "ok": true
@@ -2459,9 +2556,9 @@ table.t.mc td.pc{white-space:nowrap}
       "caso": "6 Kh-22 contra S-300PS + radar 3D, sin Patriot",
       "real": "3 de más de 400 derribados antes de feb-2026 por la defensa sin Patriot, que incluía S-300 sobre las ciudades atacadas (IC95% 0–2%).",
       "obj": "0–10%",
-      "sim": 0.05,
-      "lo": 0.021,
-      "hi": 0.104,
+      "sim": 0.017,
+      "lo": 0,
+      "hi": 0.021,
       "ok": true
     },
     {
@@ -2507,8 +2604,8 @@ table.t.mc td.pc{white-space:nowrap}
         { type: "airbase", name: "Aeródromo de Marina", short: "Aeródromo Marina", x: 51.5, y: 55.5, desc: "Base de la aviación de defensa. No está atacada al comienzo: protegela si agregás ataques." }
       ],
       defs: [
-        { type: "ewr", x: 85.4, y: 53.2, name: "Radar 3D (cerro Gabilan)" },
-        { type: "p18", x: 70, y: 40, name: "Radar VHF" },
+        { type: "ewr", owner: "UA", x: 85.4, y: 53.2, name: "Radar 3D (cerro Gabilan)" },
+        { type: "p18", owner: "UA", x: 70, y: 40, name: "Radar VHF" },
         { type: "patriot", x: 58, y: 58, az: 320, name: "Patriot-1" },
         { type: "irist", x: 44, y: 67, name: "IRIS-T-1" },
         { type: "nasams", x: 56, y: 62, name: "NASAMS-1" },
@@ -2566,8 +2663,8 @@ table.t.mc td.pc{white-space:nowrap}
         { type: "pantsir", x: 54, y: 30, name: "Pantsir-1" },
         { type: "pantsir", x: 55, y: 22, name: "Pantsir-2" },
         { type: "tor", x: 56, y: 38, name: "Tor-M2" },
-        { type: "buk", x: 48, y: 20, name: "Buk-M1" },
-        { type: "p18", x: 58, y: 14, name: "Radar VHF" }
+        { type: "buk", owner: "RU", x: 48, y: 20, name: "Buk-M1" },
+        { type: "p18", owner: "RU", x: 58, y: 14, name: "Radar VHF" }
       ],
       salvos: [
         { type: "storm", count: 16, interval: 6, sync: true, tArrive: 1480, agl: 35, pts: [[0, 60], [30, 46], [44, 38], [57.8, 32.5]], targetObj: "Depósito de munición" },
@@ -2607,13 +2704,13 @@ table.t.mc td.pc{white-space:nowrap}
         { type: "infra", name: "Puerto de Gotemburgo", short: "Puerto", x: 55.6, y: 33.9, desc: "Terminales de contenedores: blanco de los Kinzhal." }
       ],
       defs: [
-        { type: "ewr", x: 53, y: 29.5, name: "Radar 3D (Hisingen)" },
+        { type: "ewr", owner: "UA", x: 53, y: 29.5, name: "Radar 3D (Hisingen)" },
         { type: "aew_s340", x: 30, y: 50, az: 0, name: "Saab AEW" },
         { type: "patriot", x: 55, y: 32, az: 260, name: "Patriot-1" },
         { type: "irist", x: 49.5, y: 33, name: "IRIS-T-1" },
         { type: "nasams", x: 48, y: 32.5, name: "NASAMS-1" },
-        { type: "manpads", x: 50.6, y: 34, name: "RBS 70-1" },
-        { type: "manpads", x: 54.4, y: 33.6, name: "RBS 70-2" },
+        { type: "manpads", owner: "UA", x: 50.6, y: 34, name: "RBS 70-1" },
+        { type: "manpads", owner: "UA", x: 54.4, y: 33.6, name: "RBS 70-2" },
         { type: "mfg", x: 47, y: 31, name: "Grupo móvil 1" },
         { type: "mfg", x: 52.5, y: 35.2, name: "Grupo móvil 2" },
         { type: "acoustic", x: 46, y: 33, name: "Acústico 1" },
@@ -2665,9 +2762,9 @@ table.t.mc td.pc{white-space:nowrap}
         { type: "pantsir", x: 52.8, y: 41.3, name: "Pantsir-1" },
         { type: "pantsir", x: 51, y: 39.5, name: "Pantsir-2" },
         { type: "tor", x: 53.5, y: 40, name: "Tor-M2" },
-        { type: "buk", x: 56, y: 44, name: "Buk-M1" },
-        { type: "ewr", x: 61, y: 40, name: "Radar 3D" },
-        { type: "p18", x: 58, y: 40, name: "Radar VHF" }
+        { type: "buk", owner: "RU", x: 56, y: 44, name: "Buk-M1" },
+        { type: "ewr", owner: "RU", x: 61, y: 40, name: "Radar 3D" },
+        { type: "p18", owner: "RU", x: 58, y: 40, name: "Radar VHF" }
       ],
       salvos: [
         { type: "storm", count: 10, interval: 5, sync: true, tArrive: 1500, agl: 35, pts: [[0, 58], [30, 52], [44, 45], [51.8, 40.9]], targetObj: "Puente de la autopista 1" },
@@ -2693,7 +2790,7 @@ table.t.mc td.pc{white-space:nowrap}
       name: "Kiev · noche contra la energía (defensa ucraniana)",
       player: "defensa",
       time: "01:30 hora local · invierno",
-      description: "Una noche típica de la campaña rusa contra la energía ucraniana: oleadas de Shahed desde el norte y el este, señuelos Gerbera para gastar munición, misiles de crucero Kh-101 y Kalibr, y balísticos Iskander-M y Kinzhal al final, todo para llegar casi junto. Los blancos son las centrales de cogeneración que dan luz y calefacción a la ciudad y la represa de Kiev. Las posiciones de la defensa son ilustrativas, no las reales.",
+      description: "Una noche típica de la campaña rusa contra la energía ucraniana: oleadas de Shahed desde el norte y el este, señuelos Gerbera para gastar munición, misiles de crucero Kh-101 y Kalibr, y balísticos Iskander-M y Kinzhal al final, todo para llegar casi junto. Los blancos son las centrales de cogeneración que dan luz y calefacción a la ciudad y la represa de Kiev. Época: invierno 2024–25, así que los drones traen antenas CRPA Kometa de 8 elementos y todavía no módems mesh (docs/investigacion/guerra-electronica-ucraniana.md). Las posiciones de la defensa son ilustrativas, no las reales.",
       forces: {
         defensa: "Defensa por capas de la capital: radar 3D y radar VHF de alerta, Patriot (sector hacia el noreste), NASAMS, IRIS-T, dos Gepard junto a las centrales, tres grupos móviles, red acústica, drones interceptores y la red anti-GNSS Pokrova sobre la ciudad. Red de mando integrada.",
         ataque: "24 Shahed en dos oleadas, 10 Gerbera, 7 Kh-101, 6 Kalibr, 3 Iskander-M con señuelos y 2 Kinzhal."
@@ -2707,8 +2804,8 @@ table.t.mc td.pc{white-space:nowrap}
         { type: "infra", name: "Represa de Kiev", short: "Represa", x: 36.3, y: 45.7, hp: 2500, desc: "Central hidroeléctrica de Vyshhorod, al pie del embalse de Kiev." }
       ],
       defs: [
-        { type: "ewr", x: 30, y: 72, name: "Radar 3D" },
-        { type: "p18", x: 52, y: 60, name: "Radar VHF" },
+        { type: "ewr", owner: "UA", x: 30, y: 72, name: "Radar 3D" },
+        { type: "p18", owner: "UA", x: 52, y: 60, name: "Radar VHF" },
         { type: "patriot", x: 33, y: 60, az: 40, name: "Patriot-1" },
         { type: "nasams", x: 44, y: 58, name: "NASAMS-1" },
         { type: "irist", x: 34, y: 67, name: "IRIS-T-1" },
@@ -2723,9 +2820,9 @@ table.t.mc td.pc{white-space:nowrap}
         { type: "intdrone", x: 44, y: 63, name: "Interceptores-1" }
       ],
       salvos: [
-        { type: "shahed", count: 18, interval: 20, tStart: 0, agl: 1500, pts: [[40, 0], [42, 30], [46.9, 52]], targetObj: "Central CHP-6" },
+        { type: "shahed", count: 18, crpa: 8, interval: 20, tStart: 0, agl: 1500, pts: [[40, 0], [42, 30], [46.9, 52]], targetObj: "Central CHP-6" },
         { type: "gerbera", count: 10, interval: 25, tStart: 60, agl: 900, pts: [[70, 5], [50, 30], [44, 55]] },
-        { type: "shahed", count: 6, interval: 30, tStart: 120, agl: 2e3, pts: [[70, 40], [55, 55], [40.3, 67.4]], targetObj: "Central CHP-5" },
+        { type: "shahed", count: 6, crpa: 8, interval: 30, tStart: 120, agl: 2e3, pts: [[70, 40], [55, 55], [40.3, 67.4]], targetObj: "Central CHP-5" },
         { type: "kh101", count: 7, interval: 10, sync: true, tArrive: 1500, agl: 40, pts: [[0, 30], [20, 50], [40.3, 67.4]], targetObj: "Central CHP-5" },
         { type: "kalibr", count: 6, interval: 8, sync: true, tArrive: 1490, agl: 50, pts: [[45, 111], [42, 90], [40.3, 67.4]], targetObj: "Central CHP-5" },
         { type: "isk_m", count: 3, interval: 15, sync: true, tArrive: 1520, launchDist: 400, maneuver: true, decoys: true, pts: [[70, 0], [46.9, 52]], targetObj: "Central CHP-6" },
@@ -2751,7 +2848,7 @@ table.t.mc td.pc{white-space:nowrap}
       name: "Járkov · bombas planeadoras (defensa ucraniana)",
       player: "defensa",
       time: "06:10 hora local · madrugada",
-      description: "Járkov está a 30 km de la frontera rusa: los Su-34 sueltan bombas FAB-500 con kit UMPK desde Belgorod, a 9–12 km de altura y a 50–70 km del blanco, sin entrar al alcance de casi ninguna defensa. Las bombas planean sin motor, casi no tienen firma infrarroja y llegan muchas juntas. Esta mañana van contra la central CHP-5 de Podvirky (ya dañada en marzo de 2024) y el centro de la ciudad, mezcladas con Shahed para gastar munición. Las bombas traen antenas CRPA Kometa de 12 elementos: las dos estaciones Lima de la ciudad no les alcanzan. Las posiciones de las defensas son ilustrativas.",
+      description: "Járkov está a 30 km de la frontera rusa: los Su-34 sueltan bombas FAB-500 con kit UMPK desde Belgorod, a 9–12 km de altura y a 50–70 km del blanco, sin entrar al alcance de casi ninguna defensa. Las bombas planean sin motor, casi no tienen firma infrarroja y llegan muchas juntas. Esta mañana van contra la central CHP-5 de Podvirky (ya dañada en marzo de 2024) y el centro de la ciudad, mezcladas con Shahed para gastar munición. Las bombas traen antenas CRPA Kometa de 12 elementos (desde abril de 2025) y los Shahed, CRPA de 16 y módem mesh/LTE: las dos estaciones Lima de la ciudad no les alcanzan. Las posiciones de las defensas son ilustrativas.",
       forces: {
         defensa: "Radar 3D y radar VHF de alerta, una batería Patriot al sur de la ciudad (sector hacia el norte), IRIS-T junto a la CHP-5, NASAMS, un Gepard, dos grupos móviles, red acústica y dos estaciones anti-GNSS Lima. Red de mando coordinada.",
         ataque: "30 bombas UMPK en tres oleadas de 10 (CRPA Kometa de 12 elementos) y 12 Shahed."
@@ -2765,8 +2862,8 @@ table.t.mc td.pc{white-space:nowrap}
         { type: "infra", name: "Central de Zmiiv", short: "Zmiiv", x: 38, y: 101.3, hp: 2e3, desc: "Central térmica de Zmiiv (Slobozhanske), al sur. Destruida en marzo de 2024; acá está en pie y no la atacan esta mañana." }
       ],
       defs: [
-        { type: "ewr", x: 22, y: 66, name: "Radar 3D" },
-        { type: "p18", x: 30, y: 60, name: "Radar VHF" },
+        { type: "ewr", owner: "UA", x: 22, y: 66, name: "Radar 3D" },
+        { type: "p18", owner: "UA", x: 30, y: 60, name: "Radar VHF" },
         { type: "patriot", x: 14, y: 68, az: 0, name: "Patriot-1" },
         { type: "irist", x: 9, y: 61, name: "IRIS-T-1" },
         { type: "nasams", x: 19, y: 59, name: "NASAMS-1" },
@@ -2777,7 +2874,7 @@ table.t.mc td.pc{white-space:nowrap}
         { type: "acoustic", x: 34, y: 45, name: "Acústico 2" }
       ],
       salvos: [
-        { type: "shahed", count: 12, interval: 25, tStart: 0, agl: 1500, pts: [[60, 0], [40, 30], [16.5, 56.3]], targetObj: "Centro de Járkov" },
+        { type: "shahed", count: 12, crpa: 16, link: true, interval: 25, tStart: 0, agl: 1500, pts: [[60, 0], [40, 30], [16.5, 56.3]], targetObj: "Centro de Járkov" },
         { type: "kab", count: 10, interval: 4, sync: true, tArrive: 600, crpa: 12, pts: [[8, 0], [7.2, 58.7]], targetObj: "Central CHP-5" },
         { type: "kab", count: 10, interval: 4, sync: true, tArrive: 900, crpa: 12, pts: [[20, 0], [16.5, 56.3]], targetObj: "Centro de Járkov" },
         { type: "kab", count: 10, interval: 4, sync: true, tArrive: 1200, crpa: 12, pts: [[12, 0], [7.2, 58.7]], targetObj: "Central CHP-5" }
@@ -2815,8 +2912,8 @@ table.t.mc td.pc{white-space:nowrap}
         { type: "infra", name: "Centro de Odesa", short: "Centro", x: 56.1, y: 58, hp: 2500, desc: "Centro histórico y administrativo de la ciudad." }
       ],
       defs: [
-        { type: "ewr", x: 49, y: 81, name: "Radar 3D" },
-        { type: "p18", x: 40, y: 60, name: "Radar VHF" },
+        { type: "ewr", owner: "UA", x: 49, y: 81, name: "Radar 3D" },
+        { type: "p18", owner: "UA", x: 40, y: 60, name: "Radar VHF" },
         { type: "s300", x: 49.5, y: 78, az: 135, name: "S-300-1" },
         { type: "irist", x: 48.5, y: 82, name: "IRIS-T-1" },
         { type: "gepard", x: 55, y: 56.5, name: "Gepard-1" },
@@ -2847,40 +2944,59 @@ table.t.mc td.pc{white-space:nowrap}
       success: "Defensa: la terminal de granos de Chornomorsk sigue operativa al terminar el ataque.",
       failure: "Defensa: la terminal de granos queda dañada o destruida."
     },
+    od_corredor: {
+      map: "odesa",
+      name: "Odesa · el corredor de granos bajo misiles balísticos (defensa ucraniana)",
+      player: "defensa",
+      time: "21:00 hora local · otoño",
+      description: "Inspirado en los ataques de octubre de 2024 contra barcos civiles en los puertos de la región de Odesa, en el corredor que Ucrania abrió después de que Rusia dejó el acuerdo de granos: el 6 de octubre un misil balístico dañó al Paresa, cargado con unas 6.000 t de maíz; el 7 y el 14 de octubre fueron alcanzados el Optima y el NS Moon en el puerto de Odesa (Kyiv Independent, Maritime Executive). En tres meses se dañaron 22 buques civiles. Acá hay dos barcos en el puerto de Odesa y uno en Chornomorsk. Contra un Iskander-M la defensa de esta región casi no tiene con qué (con esta defensa, la defensa gana 0 de 40 noches: los balísticos alcanzan a los barcos, como pasó). Probá agregar un Patriot. La composición es ilustrativa, la real no es pública.",
+      forces: {
+        defensa: "Radar 3D y radar VHF, una batería S-300PS, un IRIS-T sobre la ciudad, dos Gepard en los puertos y grupos móviles en la costa. Red coordinada. Sin Patriot.",
+        ataque: "5 Iskander-M desde el este (Crimea y Jersón) contra los barcos y 10 Shahed que entran desde el mar contra el puerto de Odesa."
+      },
+      conditions: "Noche de otoño despejada, sin viento.",
+      rules: { c2: "coordinada", doctrine: "salva", weather: "despejado" },
+      rulesText: ["Red coordinada y doctrina de salva.", "Los Iskander-M bajan casi en vertical a más de Mach 5: el S-300PS tiene poca Pk contra ellos y el IRIS-T no puede enfrentarlos.", "Los Shahed llegan primero, los misiles a los 15 minutos."],
+      objectives: [
+        { type: "ship", name: "Granelero en el puerto de Odesa", short: "Granelero Odesa", x: 57.2, y: 55.2, desc: "Granelero amarrado en el puerto de Odesa (como el Optima, oct-2024)." },
+        { type: "ship", name: "Carguero en el puerto de Odesa", short: "Carguero Odesa", x: 57.4, y: 54.6, desc: "Carguero en el puerto de Odesa (como el NS Moon, oct-2024)." },
+        { type: "ship", name: "Granelero en Chornomorsk", short: "Granelero Chornomorsk", x: 52.5, y: 76.5, desc: "Granelero cargando maíz frente a la terminal de granos de Chornomorsk." },
+        { type: "infra", name: "Puerto de Odesa", short: "Puerto Odesa", x: 56.6, y: 55.4, desc: "Terminales y muelles del puerto de Odesa." }
+      ],
+      defs: [
+        { type: "ewr", owner: "UA", x: 49, y: 81, name: "Radar 3D" },
+        { type: "p18", owner: "UA", x: 40, y: 60, name: "Radar VHF" },
+        { type: "s300", x: 49.5, y: 78, az: 90, name: "S-300-1" },
+        { type: "irist", x: 48.5, y: 82, name: "IRIS-T-1" },
+        { type: "gepard", x: 55, y: 56.5, name: "Gepard-1" },
+        { type: "gepard", x: 49.5, y: 73.5, name: "Gepard-2" },
+        { type: "mfg", x: 54.5, y: 62, name: "Grupo móvil 1" },
+        { type: "mfg", x: 51, y: 70, name: "Grupo móvil 2" },
+        { type: "acoustic", x: 55, y: 66, name: "Acústico 1" },
+        { type: "acoustic", x: 53, y: 45, name: "Acústico 2" }
+      ],
+      salvos: [
+        { type: "shahed", count: 10, interval: 30, tStart: 0, agl: 1500, pts: [[76.5, 70], [56.6, 55.4]], targetObj: "Puerto de Odesa" },
+        { type: "isk_m", count: 2, interval: 20, sync: true, tArrive: 900, pts: [[76.5, 50], [57.2, 55.2]], targetObj: "Granelero en el puerto de Odesa" },
+        { type: "isk_m", count: 1, interval: 20, sync: true, tArrive: 930, pts: [[76.5, 50], [57.4, 54.6]], targetObj: "Carguero en el puerto de Odesa" },
+        { type: "isk_m", count: 2, interval: 20, sync: true, tArrive: 960, pts: [[76.5, 60], [52.5, 76.5]], targetObj: "Granelero en Chornomorsk" }
+      ],
+      jams: [],
+      goals: [
+        { side: "ataque", primary: true, kind: "damage", target: "Granelero en el puerto de Odesa", min: 0.3, text: "Dañar el granelero del puerto de Odesa (≥ 30%)" },
+        { side: "ataque", primary: false, kind: "damage", target: "Granelero en Chornomorsk", min: 0.3, text: "Dañar el granelero de Chornomorsk (≥ 30%)" },
+        { side: "defensa", primary: true, kind: "protect", target: "Granelero en el puerto de Odesa", text: "Mantener operativo el granelero del puerto de Odesa" },
+        { side: "defensa", primary: true, kind: "protect", target: "Granelero en Chornomorsk", text: "Mantener operativo el granelero de Chornomorsk" },
+        { side: "defensa", primary: false, kind: "survive", target: "Carguero en el puerto de Odesa", text: "Que el carguero no sea destruido" }
+      ],
+      success: "Defensa: los dos graneleros siguen operativos al terminar el ataque.",
+      failure: "Defensa: algún granelero queda dañado."
+    },
     od_vacio: { map: "odesa", name: "Odesa · vacío", player: "defensa", description: "Mapa libre sobre el relieve real de Odesa y la costa del mar Negro (SRTM): ubicá objetivos, defensas, ataques y guerra electrónica.", objectives: [], defs: [], salvos: [], jams: [], goals: [] },
     kh_vacio: { map: "kharkiv", name: "Járkov · vacío", player: "defensa", description: "Mapa libre sobre el relieve real de Járkov (SRTM): ubicá objetivos, defensas, ataques y guerra electrónica.", objectives: [], defs: [], salvos: [], jams: [], goals: [] },
     kv_vacio: { map: "kyiv", name: "Kiev · vacío", player: "defensa", description: "Mapa libre sobre el relieve real de Kiev (SRTM): ubicá objetivos, defensas, ataques y guerra electrónica.", objectives: [], defs: [], salvos: [], jams: [], goals: [] },
     mb_vacio: { map: "monterey", name: "Monterey · vacío", player: "defensa", description: "Mapa libre para armar tu propio escenario: ubicá objetivos, defensas, ataques y guerra electrónica.", objectives: [], defs: [], salvos: [], jams: [], goals: [] },
     gb_vacio: { map: "goteborg", name: "Gotemburgo · vacío", player: "defensa", description: "Mapa libre para armar tu propio escenario: ubicá objetivos, defensas, ataques y guerra electrónica.", objectives: [], defs: [], salvos: [], jams: [], goals: [] }
-  };
-
-  // src/data/datalinks.js
-  var DATALINKS = {
-    l16: {
-      name: "Link 16 / MIDS",
-      capability: "track",
-      confidence: "media",
-      note: "Familia de intercambio táctico occidental; el acceso y la capacidad de engage-on-remote dependen de la integración concreta.",
-      sources: ["crs_nasams", "kongsberg"]
-    },
-    ua_c2: {
-      name: "Red C2 nacional ucraniana",
-      capability: "track",
-      confidence: "media",
-      note: "Gateway nacional para sistemas soviéticos y occidentales; no se presume interoperabilidad de calidad de tiro entre todos los usuarios.",
-      sources: ["ua_mix"]
-    },
-    ru_c2: {
-      name: "Red automatizada rusa",
-      capability: "track",
-      confidence: "media",
-      note: "Familia Polyana/Baikal/Senezh; el comportamiento real de cada despliegue no es público.",
-      sources: ["ru_polyana"]
-    }
-  };
-  var datalinksOf = (u) => {
-    const links = u?.datalinks ?? u?.links ?? [];
-    return Array.isArray(links) ? links.filter((k) => DATALINKS[k]) : [];
   };
 
   // src/data/weather.js
@@ -2925,15 +3041,28 @@ table.t.mc td.pc{white-space:nowrap}
       sea: 5,
       desc: "Lluvia fuerte en celdas de unos 15 km: los radares de banda X y Ku pierden bastante alcance, la óptica casi no sirve y la red acústica oye poco."
     },
+    nieve: {
+      name: "Nevada moderada (≈2 mm/h de agua)",
+      rain: 0,
+      snow: 2,
+      rainKm: 0,
+      opt: 0.2,
+      ceiling: 600,
+      acu: 0.8,
+      sea: 3,
+      desc: "Nieve que tapa la vista a cerca de un kilómetro: lo óptico y el infrarrojo caen mucho y las nubes cortan arriba de 600 m. Los radares casi no pierden alcance, pero el eco de los copos se suma al clutter (más en banda X y Ku). La red acústica oye algo menos."
+    },
     niebla: {
       name: "Niebla",
       rain: 0,
       rainKm: 0,
+      lwc: 0.05,
+      fogKm: 10,
       opt: 0.1,
       ceiling: 200,
       acu: 1,
       sea: 1,
-      desc: "Visibilidad de unos cientos de metros: los sensores ópticos casi no sirven y no ven nada por encima de 200 m. Los radares no se enteran (la niebla casi no atenúa microondas) y el sonido viaja bien."
+      desc: "Visibilidad de unos cientos de metros: los sensores ópticos casi no sirven y no ven nada por encima de 200 m. Los radares casi no se enteran (la niebla atenúa las microondas centésimas de dB por km) y el sonido viaja bien."
     }
   };
   var WEATHER_DEFAULT = "despejado";
@@ -2947,7 +3076,8 @@ table.t.mc td.pc{white-space:nowrap}
     command: { name: "Puesto de mando", icon: "C", hp: 900, radius: 20, vuln: 0.8, desc: "Estructura reforzada o semienterrada." },
     ammo: { name: "Depósito de munición", icon: "M", hp: 900, radius: 40, vuln: 1.4, desc: "Las explosiones secundarias amplifican el daño de cada impacto." },
     comms: { name: "Sitio de comunicaciones", icon: "T", hp: 500, radius: 15, vuln: 1.1, desc: "Torres y equipos de enlace: blancos chicos y frágiles." },
-    infra: { name: "Infraestructura", icon: "I", hp: 1500, radius: 60, vuln: 0.9, desc: "Puerto, puente, subestación eléctrica o similar." }
+    infra: { name: "Infraestructura", icon: "I", hp: 1500, radius: 60, vuln: 0.9, desc: "Puerto, puente, subestación eléctrica o similar." },
+    ship: { name: "Buque mercante", icon: "B", hp: 1200, radius: 90, vuln: 0.8, desc: "Granelero o carguero amarrado o fondeado (≈180 m de eslora): casco de acero compartimentado, difícil de hundir, pero un impacto incendia la carga y lo deja fuera de servicio." }
   };
   var TARGET_STATUS = { operational: "Operativo", damaged: "Dañado", destroyed: "Destruido" };
   var DAMAGED_AT = 0.2;
@@ -3094,6 +3224,7 @@ table.t.mc td.pc{white-space:nowrap}
 
   // src/data/index.js
   var D = (u) => DEFENSES[u.type];
+  var sideOf = (u) => u?.owner || DEFENSES[u.type]?.side;
   function setPath(o, path, v) {
     const ks = path.split(".");
     let a = o;
@@ -3103,7 +3234,7 @@ table.t.mc td.pc{white-space:nowrap}
     }
     a[ks[ks.length - 1]] = v;
   }
-  var CAT_OF = { thr: THREATS, def: DEFENSES, jam: JAMMERS, c2: C2_LEVELS, clu: CLUTTER };
+  var CAT_OF = { thr: THREATS, def: DEFENSES, jam: JAMMERS, c2: C2_LEVELS, clu: CLUTTER, gw: GATEWAYS, env: ENV };
   function applyProbable() {
     for (const [kind, set] of Object.entries(UNC)) for (const [k, params] of Object.entries(set)) {
       const obj = CAT_OF[kind][k];
@@ -3154,7 +3285,10 @@ table.t.mc td.pc{white-space:nowrap}
   var HORIZON_K = 4.12;
 
   // src/physics/terrain.js
-  var MAP = null;
+  var MAP = (
+    /** @type {any} */
+    null
+  );
   function decodeB64(b64) {
     const bin = atob(b64);
     const u8 = new Uint8Array(bin.length);
@@ -3194,8 +3328,8 @@ table.t.mc td.pc{white-space:nowrap}
   function elev(x, y) {
     const c = MAP.cellKm, fx = x / c - 0.5, fy = y / c - 0.5;
     if (fx < 0 || fy < 0 || fx >= MAP.W - 1 || fy >= MAP.H - 1) return -10;
-    const j = fx | 0, i = fy | 0, tx = fx - j, ty = fy - i, W = MAP.W, d = MAP.data, k = i * W + j;
-    return (d[k] * (1 - tx) + d[k + 1] * tx) * (1 - ty) + (d[k + W] * (1 - tx) + d[k + W + 1] * tx) * ty;
+    const j = fx | 0, i = fy | 0, tx = fx - j, ty = fy - i, W2 = MAP.W, d = MAP.data, k = i * W2 + j;
+    return (d[k] * (1 - tx) + d[k + 1] * tx) * (1 - ty) + (d[k + W2] * (1 - tx) + d[k + W2 + 1] * tx) * ty;
   }
   var surf = (x, y) => Math.max(0, elev(x, y));
   function los(ax, ay, az, bx, by, bz) {
@@ -3222,30 +3356,54 @@ table.t.mc td.pc{white-space:nowrap}
     const dv = new DataView(buf);
     const { lat0, lon0 } = tile;
     const latc = lat0 + 0.5, kmx = 111.32 * Math.cos(latc * Math.PI / 180), kmy = 111;
-    const cell = 200, W = Math.round(kmx * 1e3 / cell), H = Math.round(kmy * 1e3 / cell);
-    const data = new Int16Array(W * H);
-    for (let i = 0; i < H; i++) for (let j = 0; j < W; j++) {
-      const sy = (i + 0.5) / H * (n2 - 1), sx = (j + 0.5) / W * (n2 - 1);
+    const cell = 200, W2 = Math.round(kmx * 1e3 / cell), H = Math.round(kmy * 1e3 / cell);
+    const data = new Int16Array(W2 * H);
+    for (let i = 0; i < H; i++) for (let j = 0; j < W2; j++) {
+      const sy = (i + 0.5) / H * (n2 - 1), sx = (j + 0.5) / W2 * (n2 - 1);
       const a = Math.floor(sy), b = Math.floor(sx);
       let v = dv.getInt16((a * n2 + b) * 2, false);
       if (v < -1e3) v = 0;
-      data[i * W + j] = v <= 0 ? -5 : v;
+      data[i * W2 + j] = v <= 0 ? -5 : v;
     }
-    return { map: { key: "hgt", name: fileName, W, H, cell, latN: lat0 + 1, lonW: lon0, dlat: 1 / H, dlon: 1 / W, places: [], data }, kmx, kmy };
+    return { map: { key: "hgt", name: fileName, W: W2, H, cell, latN: lat0 + 1, lonW: lon0, dlat: 1 / H, dlon: 1 / W2, places: [], data }, kmx, kmy };
   }
 
   // src/sim/state.js
   var S = {
     // escenario armado por el jugador
-    setup: { objs: [], defs: [], salvos: [], jams: [] },
+    setup: { objs: (
+      /** @type {any[]} */
+      []
+    ), defs: (
+      /** @type {any[]} */
+      []
+    ), salvos: (
+      /** @type {any[]} */
+      []
+    ), jams: (
+      /** @type {any[]} */
+      []
+    ) },
     // escenario cargado (data/scenarios.js) o null si es un relieve importado
-    scen: null,
+    scen: (
+      /** @type {any} */
+      null
+    ),
     // opciones de mando (c2 = nivel de integración, ver data/c2.js; fireRange = disparar dentro de esa
     // fracción del alcance efectivo), clima (data/weather.js) y de visualización
     c2: "coordinada",
     doctrine: "salva",
     fireRange: 1,
     weather: "despejado",
+    tod: "noche",
+    wxPlan: (
+      /** @type {any[]} */
+      []
+    ),
+    gateways: (
+      /** @type {any[]} */
+      []
+    ),
     wind: { v: 0, from: 0 },
     ignoreDecoys: false,
     showCov: true,
@@ -3261,30 +3419,100 @@ table.t.mc td.pc{white-space:nowrap}
     auto: true,
     autoPhase: "calm",
     // corrida en curso
-    units: [],
-    jamsLive: [],
-    hoj: [],
+    units: (
+      /** @type {any[]} */
+      []
+    ),
+    jamsLive: (
+      /** @type {any[]} */
+      []
+    ),
+    hoj: (
+      /** @type {any[]} */
+      []
+    ),
     ewNext: 0,
-    objs: [],
-    pending: [],
-    threats: [],
-    ints: [],
-    fx: [],
-    impacts: [],
-    log: [],
-    stats: null,
+    wxLive: (
+      /** @type {any} */
+      null
+    ),
+    wxIdx: 0,
+    objs: (
+      /** @type {any[]} */
+      []
+    ),
+    pending: (
+      /** @type {any[]} */
+      []
+    ),
+    threats: (
+      /** @type {any[]} */
+      []
+    ),
+    ints: (
+      /** @type {any[]} */
+      []
+    ),
+    fx: (
+      /** @type {any[]} */
+      []
+    ),
+    impacts: (
+      /** @type {any[]} */
+      []
+    ),
+    log: (
+      /** @type {any[]} */
+      []
+    ),
+    stats: (
+      /** @type {any} */
+      null
+    ),
     // eventos clave para la línea de tiempo del debrief y detalle de cada arma que llegó al blanco
-    events: [],
-    arrivals: [],
+    events: (
+      /** @type {any[]} */
+      []
+    ),
+    arrivals: (
+      /** @type {any[]} */
+      []
+    ),
     // interfaz: selección, modo de edición, ruta en trazado y salva en preparación
-    sel: null,
+    sel: (
+      /** @type {any} */
+      null
+    ),
+    multi: (
+      /** @type {any[]} */
+      []
+    ),
     mode: "select",
-    placeType: null,
-    route: null,
-    atk: null,
+    placeType: (
+      /** @type {any} */
+      null
+    ),
+    route: (
+      /** @type {any} */
+      null
+    ),
+    atk: (
+      /** @type {any} */
+      null
+    ),
+    measure: (
+      /** @type {any} */
+      null
+    ),
     // última cobertura calculada (grilla y % del mapa cubierto)
-    _cov: null,
-    covStat: null
+    _cov: (
+      /** @type {any} */
+      null
+    ),
+    covStat: (
+      /** @type {any} */
+      null
+    )
   };
   function newStats() {
     return {
@@ -3405,6 +3633,34 @@ table.t.mc td.pc{white-space:nowrap}
     for (let i = 0; i < 8; i++) R -= (Math.log(R) + c * R - l0) / (1 / R + c);
     return R;
   }
+  var ALOFT = [[1e3, 1], [3e3, 4.753 / 2.519], [5e3, 6.669 / 2.519], [1e4, 10.9 / 2.519]];
+  var aloft = (h) => {
+    if (h <= ALOFT[0][0]) return 1;
+    for (let i = 1; i < ALOFT.length; i++) if (h <= ALOFT[i][0]) {
+      const [h0, r0] = ALOFT[i - 1], [h1, r1] = ALOFT[i];
+      return r0 + (r1 - r0) * (h - h0) / (h1 - h0);
+    }
+    return ALOFT[ALOFT.length - 1][1];
+  };
+  function windAt(v10, h) {
+    const M = ENV.modelo, top = M.windTop;
+    const bl = v10 * Math.pow(Math.min(Math.max(h, 10), top) / 10, M.windAlpha);
+    return h <= top ? bl : bl * aloft(h) / aloft(top);
+  }
+  function cloudKl(f, T = 273.15) {
+    const th = 300 / T - 1, e0 = 77.66 + 103.3 * th, e1 = 0.0671 * e0, e2 = 3.52;
+    const fp = 20.2 - 146 * th + 316 * th * th, fs = 39.8 * fp;
+    const re = (e0 - e1) / (1 + (f / fp) ** 2) + (e1 - e2) / (1 + (f / fs) ** 2) + e2;
+    const im = f * (e0 - e1) / (fp * (1 + (f / fp) ** 2)) + f * (e1 - e2) / (fs * (1 + (f / fs) ** 2));
+    const eta = (2 + re) / im;
+    return 0.819 * f / (im * (1 + eta * eta));
+  }
+  function fogGamma(band, lwc) {
+    const f = BANDS[band]?.ghz;
+    if (!lwc || !f || f < 1) return 0;
+    return cloudKl(f) * lwc;
+  }
+  var snowEta = (s, lambda) => s > 0 ? Math.pow(Math.PI, 5) * 0.93 * 1780 * Math.pow(s, 2.23) * Math.pow(10, -0.65) * 1e-18 / Math.pow(lambda, 4) : 0;
 
   // src/physics/pulse-integration.js
   var PFA = 1e-6;
@@ -3505,28 +3761,28 @@ table.t.mc td.pc{white-space:nowrap}
     return a;
   }
   function analyze(map) {
-    const { W, H, data } = map;
-    const I = new Float64Array((W + 1) * (H + 1));
+    const { W: W2, H, data } = map;
+    const I = new Float64Array((W2 + 1) * (H + 1));
     for (let i = 0; i < H; i++) {
       let row = 0;
-      for (let j = 0; j < W; j++) {
-        row += Math.max(0, data[i * W + j]);
-        I[(i + 1) * (W + 1) + j + 1] = I[i * (W + 1) + j + 1] + row;
+      for (let j = 0; j < W2; j++) {
+        row += Math.max(0, data[i * W2 + j]);
+        I[(i + 1) * (W2 + 1) + j + 1] = I[i * (W2 + 1) + j + 1] + row;
       }
     }
     const R = Math.max(1, Math.round(RELIEF_RADIUS_KM / map.cellKm));
-    const mean = new Float32Array(W * H);
-    for (let i = 0; i < H; i++) for (let j = 0; j < W; j++) {
-      const i0 = Math.max(0, i - R), i1 = Math.min(H, i + R + 1), j0 = Math.max(0, j - R), j1 = Math.min(W, j + R + 1);
-      const s = I[i1 * (W + 1) + j1] - I[i0 * (W + 1) + j1] - I[i1 * (W + 1) + j0] + I[i0 * (W + 1) + j0];
-      mean[i * W + j] = s / ((i1 - i0) * (j1 - j0));
+    const mean = new Float32Array(W2 * H);
+    for (let i = 0; i < H; i++) for (let j = 0; j < W2; j++) {
+      const i0 = Math.max(0, i - R), i1 = Math.min(H, i + R + 1), j0 = Math.max(0, j - R), j1 = Math.min(W2, j + R + 1);
+      const s = I[i1 * (W2 + 1) + j1] - I[i0 * (W2 + 1) + j1] - I[i1 * (W2 + 1) + j0] + I[i0 * (W2 + 1) + j0];
+      mean[i * W2 + j] = s / ((i1 - i0) * (j1 - j0));
     }
     return { data: map.data, mean, peaks: findPeaks(map), contours: null };
   }
   function sampleGrid(map, g, x, y) {
     const c = map.cellKm, fx = clamp(x / c - 0.5, 0, map.W - 1.001), fy = clamp(y / c - 0.5, 0, map.H - 1.001);
-    const j = fx | 0, i = fy | 0, tx = fx - j, ty = fy - i, W = map.W, k = i * W + j;
-    return (g[k] * (1 - tx) + g[k + 1] * tx) * (1 - ty) + (g[k + W] * (1 - tx) + g[k + W + 1] * tx) * ty;
+    const j = fx | 0, i = fy | 0, tx = fx - j, ty = fy - i, W2 = map.W, k = i * W2 + j;
+    return (g[k] * (1 - tx) + g[k + 1] * tx) * (1 - ty) + (g[k + W2] * (1 - tx) + g[k + W2 + 1] * tx) * ty;
   }
   function relativeRelief(x, y) {
     return surf(x, y) - sampleGrid(MAP, analysis().mean, x, y);
@@ -3545,19 +3801,19 @@ table.t.mc td.pc{white-space:nowrap}
     return Math.abs(rel) > 25 ? "Terreno ondulado" : "Llano";
   }
   function findPeaks(map) {
-    const { W, H, data, cellKm: c } = map;
+    const { W: W2, H, data, cellKm: c } = map;
     let maxE = 0;
     for (let k = 0; k < data.length; k++) if (data[k] > maxE) maxE = data[k];
     const minRelief = Math.max(25, 0.04 * maxE);
     const rMax = Math.max(1, Math.round(1 / c)), rMin = Math.max(2, Math.round(3 / c));
     const cand = [];
-    for (let i = 1; i < H - 1; i++) for (let j = 1; j < W - 1; j++) {
-      const k = i * W + j, e = data[k];
+    for (let i = 1; i < H - 1; i++) for (let j = 1; j < W2 - 1; j++) {
+      const k = i * W2 + j, e = data[k];
       if (e <= 0) continue;
       let ok = true;
       for (let di = -1; di <= 1 && ok; di++) for (let dj = -1; dj <= 1; dj++) {
         if (!di && !dj) continue;
-        const n2 = data[k + di * W + dj];
+        const n2 = data[k + di * W2 + dj];
         if (n2 > e || n2 === e && (di < 0 || di === 0 && dj < 0)) {
           ok = false;
           break;
@@ -3567,12 +3823,12 @@ table.t.mc td.pc{white-space:nowrap}
     }
     const peaks = [];
     for (const k of cand) {
-      const i = k / W | 0, j = k - i * W, e = data[k];
+      const i = k / W2 | 0, j = k - i * W2, e = data[k];
       let dom = true;
       for (let di = -rMax; di <= rMax && dom; di++) for (let dj = -rMax; dj <= rMax; dj++) {
         const ii = i + di, jj = j + dj;
-        if (ii < 0 || jj < 0 || ii >= H || jj >= W) continue;
-        if (data[ii * W + jj] > e) {
+        if (ii < 0 || jj < 0 || ii >= H || jj >= W2) continue;
+        if (data[ii * W2 + jj] > e) {
           dom = false;
           break;
         }
@@ -3581,8 +3837,8 @@ table.t.mc td.pc{white-space:nowrap}
       let lo = e;
       for (let di = -rMin; di <= rMin; di++) for (let dj = -rMin; dj <= rMin; dj++) {
         const ii = i + di, jj = j + dj;
-        if (ii < 0 || jj < 0 || ii >= H || jj >= W) continue;
-        const v = Math.max(0, data[ii * W + jj]);
+        if (ii < 0 || jj < 0 || ii >= H || jj >= W2) continue;
+        const v = Math.max(0, data[ii * W2 + jj]);
         if (v < lo) lo = v;
       }
       if (e - lo >= minRelief) peaks.push({ x: (j + 0.5) * c, y: (i + 0.5) * c, e, relief: e - lo });
@@ -3599,7 +3855,7 @@ table.t.mc td.pc{white-space:nowrap}
   function contourLines(map = MAP) {
     const a = analysis(map);
     if (a.contours) return a.contours;
-    const { W, H, data, cellKm: c } = map;
+    const { W: W2, H, data, cellKm: c } = map;
     let maxE = 0;
     for (let k = 0; k < data.length; k++) if (data[k] > maxE) maxE = data[k];
     const interval = contourInterval(Math.max(50, maxE));
@@ -3608,9 +3864,9 @@ table.t.mc td.pc{white-space:nowrap}
     for (let L = interval; L < maxE; L += interval) levels.push(L);
     for (const L of levels) {
       const out = L === 0.5 ? res.coast : Math.round(L / interval) % 5 === 0 ? res.index : res.minor;
-      for (let i = 0; i < H - 1; i++) for (let j = 0; j < W - 1; j++) {
-        const k = i * W + j;
-        const v0 = data[k], v1 = data[k + 1], v2 = data[k + W + 1], v3 = data[k + W];
+      for (let i = 0; i < H - 1; i++) for (let j = 0; j < W2 - 1; j++) {
+        const k = i * W2 + j;
+        const v0 = data[k], v1 = data[k + 1], v2 = data[k + W2 + 1], v3 = data[k + W2];
         const idx = (v0 > L ? 8 : 0) | (v1 > L ? 4 : 0) | (v2 > L ? 2 : 0) | (v3 > L ? 1 : 0);
         if (idx === 0 || idx === 15) continue;
         const x0 = (j + 0.5) * c, y0 = (i + 0.5) * c;
@@ -3728,7 +3984,7 @@ table.t.mc td.pc{white-space:nowrap}
         const g2 = Math.exp(-8 * Math.LN2 * (delta / thEl) ** 2);
         const A = AZ_INT * dR * R * thAz / Math.cos(Math.min(Math.abs(psi), 1.2));
         let s0;
-        if (sea) s0 = Math.pow(10, seaSigma0Db(B.ghz, Math.max(psi, 1e-4) / DEG, wx?.sea ?? 2, r.pol || "H") / 10);
+        if (sea) s0 = Math.pow(10, seaSigma0Db(Math.min(35, Math.max(0.5, B.ghz)), Math.max(psi, 1e-4) / DEG, wx?.sea ?? 2, r.pol || "H") / 10);
         else {
           const rough = clamp(0.5 + slopeAt(x, y) / 10, 0.5, 1.5);
           s0 = Math.pow(10, (M.landDb + 2 * M.reliefDb * (rough - 1)) / 10);
@@ -3736,10 +3992,10 @@ table.t.mc td.pc{white-space:nowrap}
         out.surface = s0 * A * g2 / improvement(r, sea ? M.seaSv : M.landSv);
       }
     }
-    const rain = wx?.rain || 0, zt = Math.max(0, surf(x, y)) + Math.max(0, agl);
-    if (rain > 0 && zt < RAIN_TOP) {
+    const rain = wx?.rain || 0, snow = wx?.snow || 0, zt = Math.max(0, surf(x, y)) + Math.max(0, agl);
+    if ((rain > 0 || snow > 0) && zt < RAIN_TOP) {
       const fill = Math.min(1, RAIN_TOP / Math.max(1, R * thEl));
-      out.rain = rainEta(rain, lambda) * VOL_INT * dR * R * R * thAz * thEl * fill / improvement(r, M.rainSv);
+      out.rain = (rainEta(rain, lambda) + snowEta(snow, lambda)) * VOL_INT * dR * R * R * thAz * thEl * fill / improvement(r, M.rainSv);
     }
     return out;
   }
@@ -3808,11 +4064,14 @@ table.t.mc td.pc{white-space:nowrap}
     const r = D(u).radar;
     if (!r || r.band === "ACU" || r.band === "OPT") return 0;
     let J = 0;
-    const bw = BANDS[r.band].bw, uz = antZ(u), sl = r.lowSL ? LOW_SIDELOBES : SIDELOBES, side = r.slc ? [] : null;
+    const bw = BANDS[r.band].bw, uz = antZ(u), sl = r.lowSL ? LOW_SIDELOBES : SIDELOBES, side = (
+      /** @type {number[] | null} */
+      r.slc ? [] : null
+    );
     for (const j of list) {
       const JJ = JAMMERS[j.type];
       if (!j.on || j.dead || JJ.gnssJam || !JJ.bands.includes(r.band) || JAM_MODES[j.mode]?.coherent) continue;
-      if (JJ.side !== "both" && D(u).side !== "both" && JJ.side === D(u).side) continue;
+      if (JJ.side !== "both" && sideOf(u) !== "both" && JJ.side === sideOf(u)) continue;
       const key = u.id + "|" + u.x.toFixed(2) + "|" + u.y.toFixed(2) + "|" + j.x.toFixed(2) + "|" + j.y.toFixed(2) + "|" + (u.mast || 0) + "|" + (u.alt || 0) + "|" + (j.alt || 0);
       j._losMap = j._losMap || {};
       if (j._losMap[key] === void 0) {
@@ -3838,6 +4097,12 @@ table.t.mc td.pc{white-space:nowrap}
     }
     return J * Math.pow(10, -(r.eccm || 0) / 10);
   }
+  function drfmJ(u, j, uz = antZ(u)) {
+    const p = jamPos(j);
+    if (!los(p[0], p[1], p[2], u.x, u.y, uz)) return null;
+    const d = Math.hypot(p[0] - u.x, p[1] - u.y, (p[2] - uz) / 1e3) + 1, J = JAMMERS[j.type].P / (d * d);
+    return inSector(u, azOf(p[0] - u.x, p[1] - u.y)) ? J : -J;
+  }
   function falseTracks(u, list) {
     const r = D(u).radar;
     if (!r || r.band === "ACU" || r.band === "OPT") return 0;
@@ -3846,12 +4111,11 @@ table.t.mc td.pc{white-space:nowrap}
     for (const j of list) {
       const JJ = JAMMERS[j.type];
       if (j.mode !== "drfm" || !j.on || j.dead || JJ.gnssJam || !JJ.bands.includes(r.band)) continue;
-      if (JJ.side !== "both" && D(u).side !== "both" && JJ.side === D(u).side) continue;
-      const p = jamPos(j);
-      if (!los(p[0], p[1], p[2], u.x, u.y, uz)) continue;
-      const d = Math.hypot(p[0] - u.x, p[1] - u.y, (p[2] - uz) / 1e3) + 1, base = JJ.P / (d * d);
-      const main = inSector(u, azOf(p[0] - u.x, p[1] - u.y)) && base >= SNR50;
-      const side = !r.slb && base * sl.near >= SNR50;
+      if (JJ.side !== "both" && sideOf(u) !== "both" && JJ.side === sideOf(u)) continue;
+      const base = drfmJ(u, j, uz);
+      if (base === null) continue;
+      const main = base > 0 && base >= SNR50;
+      const side = !r.slb && Math.abs(base) * sl.near >= SNR50;
       if (main || side) n2 += M.falseTargets;
     }
     return n2;
@@ -3861,7 +4125,8 @@ table.t.mc td.pc{white-space:nowrap}
     if (r.band === "ACU") return r.R1 * (wx ? wx.acu : 1) * dmg;
     if (r.band === "OPT") return r.R1 * (wx ? wx.opt : 1) * dmg;
     const R = r.R1 * Math.pow(rcsAt(th.T || th, r.band, ca), 0.25) * Math.pow(1 / (1 + J), 0.25) * dmg;
-    return wx && wx.rain ? rainRange(R, rainGamma(r.band, wx.rain), wx.rainKm) : R;
+    const Rr = wx && wx.rain ? rainRange(R, rainGamma(r.band, wx.rain), wx.rainKm) : R;
+    return wx && wx.lwc ? rainRange(Rr, fogGamma(r.band, wx.lwc), wx.fogKm) : Rr;
   }
   var belowCeiling = (r, wx, agl) => !(r.band === "OPT" && wx && wx.ceiling != null && agl > wx.ceiling);
   var SNR50 = Math.log(PFA) / Math.log(0.5) - 1;
@@ -3954,7 +4219,8 @@ table.t.mc td.pc{white-space:nowrap}
     if (T.prof === "highdive") ph = [[0, Math.max(0, L - T.diveDist), T.v], [Math.max(0, L - T.diveDist), L, T.vDive]];
     else if (T.prof === "hilo") ph = [[0, Math.max(0, L - 60), T.v], [Math.max(0, L - 60), L, T.vLow]];
     else ph = [[0, L, T.v]];
-    if (wind?.v > 0 && !offmap) {
+    if (wind && wind.v > 0 && !offmap) {
+      wind = { from: wind.from, v: windAt(wind.v, sv.agl ?? T.agl ?? T.cruiseAlt ?? 100) };
       const out = [];
       for (const [s0, s1, v] of ph) for (let i = 1; i < pts.length; i++) {
         const a0 = Math.max(s0, cum[i - 1]), a1 = Math.min(s1, cum[i]);
@@ -4176,15 +4442,21 @@ table.t.mc td.pc{white-space:nowrap}
     return k * k;
   }
 
+  // src/physics/atmosphere.js
+  var S11 = Math.pow(1 - 225577e-10 * 11e3, 4.2559);
+  var S20 = S11 * Math.exp(-9e3 / 6341.6);
+  function isaSigma(h) {
+    if (h <= 11e3) return Math.pow(1 - 225577e-10 * Math.max(h, -500), 4.2559);
+    if (h <= 2e4) return S11 * Math.exp(-(h - 11e3) / 6341.6);
+    return S20 * Math.pow(1 + (h - 2e4) / 216650, -35.1632);
+  }
+
   // src/physics/engagement.js
   var RADAR_GUID = ["TVM", "SARH", "mando", "cañón"];
   var isTBM = (th) => th.cls === "balistico" || th.cls === "hiper";
-  function trackOK(u, th, t, c2) {
+  function trackOK(u, th, t, c2, gws = []) {
     const d = D(u), L = C2_LEVELS[c2], own = d.radar ? t - (th.det[u.id] ?? -1e9) <= d.radar.scan * 2 + 0.6 : false;
-    const compatible = datalinksOf(d).some((key) => {
-      const n2 = th.net?.[key];
-      return n2 && n2.first != null && t - n2.first >= L.lag && t - n2.last <= L.window;
-    });
+    const compatible = netPk(u, th, t, c2, gws) > 0;
     const legacy = !th.net && th.netFirst != null && t - th.netFirst >= L.lag && t - th.lastNet <= L.window;
     const netT = u.link !== false && (L.share === "track" || L.share === "fire") && (compatible || legacy);
     if (d.sam.guid === "cañón") return own;
@@ -4192,15 +4464,32 @@ table.t.mc td.pc{white-space:nowrap}
     if (d.sam.guid === "operador") return netT;
     return own || netT;
   }
+  function netPk(u, th, t, c2, gws = []) {
+    const L = C2_LEVELS[c2];
+    let best = 0;
+    const fresh = (n2, lag) => n2 && n2.first != null && t - n2.first >= L.lag + lag && t - n2.last <= L.window;
+    const cp = cpOf(u);
+    for (const key of datalinksOf(D(u))) {
+      if (fresh(th.net?.[netKey(key, cp)], 0)) return 1;
+      for (const { from, G, id } of gatewaysInto(key)) if (gws.includes(id) && fresh(th.net?.[netKey(from, cp)], G.gwLag)) best = Math.max(best, G.gwPk);
+    }
+    return best;
+  }
+  var cpOf = (u) => u?.cp || "";
+  var netKey = (key, cp) => cp ? key + "@" + cp : key;
+  var cueOf = (th, cp) => cp ? th.cueCp?.[cp] ?? null : th.cueFirst;
+  var unitC2 = (u, c2) => u.c2 && C2_ORDER.indexOf(u.c2) >= 0 && C2_ORDER.indexOf(u.c2) < C2_ORDER.indexOf(c2) ? u.c2 : c2;
   function reactionStart(th, t, c2, u = null) {
     const L = C2_LEVELS[c2];
-    if ((L.share === "cue" || L.share === "fire") && th.cueFirst != null) return Math.min(t, th.cueFirst + L.lag);
-    if ((L.share === "cue" || L.share === "fire") && th.cueFirst == null && th.netFirst != null && u?.link !== false) return Math.min(t, th.netFirst + L.lag);
+    const cue = cueOf(th, cpOf(u));
+    if ((L.share === "cue" || L.share === "fire") && cue != null) return Math.min(t, cue + L.lag);
+    if ((L.share === "cue" || L.share === "fire") && cue == null && !cpOf(u) && th.netFirst != null && u?.link !== false) return Math.min(t, th.netFirst + L.lag);
     return t;
   }
-  function effectiveC2(c2, objs) {
+  function effectiveC2(c2, objs, cp = "") {
     let i = C2_ORDER.indexOf(c2);
     for (const g of objs) {
+      if (g.cp && g.cp !== (cp || "")) continue;
       const n2 = g.status === "destroyed" && C2_NODES[g.type];
       if (!n2) continue;
       i = n2 === "all" ? 0 : i - n2;
@@ -4214,6 +4503,14 @@ table.t.mc td.pc{white-space:nowrap}
     if (!hasProfile(sm)) return Math.min(1.25, energy(f) / energy(ENERGY_REF));
     const P = profileOf(sm), R = (tbm ? sm.maxRtbm : sm.maxR) * 1e3;
     return Math.min(1.25, energyAt(P, f * R) / energyAt(P, ENERGY_REF * R));
+  }
+  var NEED_MAN = 1;
+  var NEED_STRAIGHT = 1 / 3;
+  function altitudePk(sm, f, tbm, z, maneuvering) {
+    if (!sm.hFull || sm.dthrust || !usesEnergy(sm.guid)) return 1;
+    const E = hasProfile(sm) ? energyAt(profileOf(sm), f * (tbm ? sm.maxRtbm : sm.maxR) * 1e3) : energy(f);
+    const n2 = maneuvering ? NEED_MAN : NEED_STRAIGHT, k = isaSigma(z) / isaSigma(sm.hFull);
+    return Math.min(1, Math.min(1, k * E / n2) / Math.min(1, E / n2));
   }
   var usesEnergy = (guid) => guid !== "cañón" && guid !== "operador";
   function closingCos(th, tt, p, x, y, z) {
@@ -4263,7 +4560,8 @@ table.t.mc td.pc{white-space:nowrap}
     let pk = sm.pk[th.cls] || 0;
     const p = th.p;
     if (!p) return 0;
-    if (th.maneuver && p.rem < termZone(th)) pk *= sm.guid === "cañón" ? 0.85 : th.T.manPk ?? 0.7;
+    const man = !!th.maneuver && p.rem < termZone(th);
+    if (man) pk *= sm.guid === "cañón" ? 0.85 : th.T.manPk ?? 0.7;
     if (th.T.ir && sm.guid === "IR") pk *= 0.85;
     if (th.T.cold && sm.guid === "IR") pk *= 0.3;
     if (th.T.lo && sm.guid !== "IR" && sm.guid !== "cañón") pk *= sm.guid === "activo" ? 0.85 : 0.75;
@@ -4273,7 +4571,7 @@ table.t.mc td.pc{white-space:nowrap}
     }
     const v = speedAt(th, t);
     if (v > 0.8 * sm.vmaxT) pk *= 0.8;
-    if (f !== null && usesEnergy(sm.guid)) pk *= energyPk(sm, f, isTBM(th));
+    if (f !== null && usesEnergy(sm.guid)) pk *= energyPk(sm, f, isTBM(th)) * altitudePk(sm, f, isTBM(th), p.z, man);
     return clamp(pk, 0, 0.98);
   }
 
@@ -4282,8 +4580,8 @@ table.t.mc td.pc{white-space:nowrap}
   var directDamage = (T) => DAMAGE.K * Math.pow(warheadKg(T), DAMAGE.EXP) * (T.dmgMult ?? 1);
   var radius50 = (T) => DAMAGE.R50K * Math.cbrt(warheadKg(T));
   function damageAt(T, type, dist) {
-    const tt = typeof type === "string" ? TARGET_TYPES[type] : type, W = warheadKg(T);
-    if (!W || !tt) return { dmg: 0, factor: 0, edge: dist };
+    const tt = typeof type === "string" ? TARGET_TYPES[type] : type, W2 = warheadKg(T);
+    if (!W2 || !tt) return { dmg: 0, factor: 0, edge: dist };
     const edge = Math.max(0, dist - tt.radius);
     const factor = 1 / (1 + (edge / radius50(T)) ** 2);
     if (factor < DAMAGE.CUTOFF) return { dmg: 0, factor: 0, edge };
@@ -4382,8 +4680,8 @@ table.t.mc td.pc{white-space:nowrap}
     for (const u of S.units) {
       const r = D(u).radar;
       if (!u.alive || !r || r.band === "ACU" || r.band === "OPT") continue;
-      if (JJ.side !== "both" && D(u).side === JJ.side) continue;
-      const p = jamPos(j), J = jamJ(u, azOf(p[0] - u.x, p[1] - u.y), [j]);
+      if (JJ.side !== "both" && sideOf(u) === JJ.side) continue;
+      const p = jamPos(j), J = j.mode === "drfm" ? JJ.bands.includes(r.band) ? Math.max(0, drfmJ(u, j) ?? 0) : 0 : jamJ(u, azOf(p[0] - u.x, p[1] - u.y), [j]);
       if (J >= STROBE_J) out.push({ u, x: u.x, y: u.y, sigma: bearingSigma(BANDS[r.band].bw, J), J });
     }
     return out;
@@ -4403,22 +4701,24 @@ table.t.mc td.pc{white-space:nowrap}
     }
     if (t < S.ewNext) return;
     S.ewNext = t + EW_DT;
-    const share = C2_LEVELS[effectiveC2(S.c2, S.objs)].share;
+    const inNet = (s) => C2_LEVELS[unitC2(s.u, effectiveC2(S.c2, S.objs, cpOf(s.u)))].share !== "none";
     for (const j of S.jamsLive) {
       const JJ = JAMMERS[j.type];
       if (JJ.gnssJam || !j.on || j.dead) continue;
       const st = strobes(j);
       if (!st.length) continue;
-      if (share !== "none" && st.length >= 2) {
+      const net = st.filter(inNet);
+      if (net.length >= 2) {
         let best = Infinity, pair = null;
-        for (let a = 0; a < st.length; a++) for (let b = a + 1; b < st.length; b++) {
-          const e = fixError(st[a], st[b], j.x, j.y);
+        for (let a = 0; a < net.length; a++) for (let b = a + 1; b < net.length; b++) {
+          if (cpOf(net[a].u) !== cpOf(net[b].u)) continue;
+          const e = fixError(net[a], net[b], j.x, j.y);
           if (e < best) {
             best = e;
-            pair = [st[a].u, st[b].u];
+            pair = [net[a].u, net[b].u];
           }
         }
-        if (best <= FIX_MAX_KM && (!j.fix || best < j.fix.err)) {
+        if (pair && best <= FIX_MAX_KM && (!j.fix || best < j.fix.err)) {
           if (!j.fix) log("l", JJ.short + " ubicado por triangulación entre " + uLabel(pair[0]) + " y " + uLabel(pair[1]) + ": error ≈ " + best.toFixed(1) + " km.");
           j.fix = { t, err: best };
         }
@@ -4442,12 +4742,53 @@ table.t.mc td.pc{white-space:nowrap}
     }
   }
 
+  // src/sim/weather-now.js
+  function wxNow() {
+    const W2 = WEATHER[S.wxLive ?? S.weather] || WEATHER.despejado;
+    return S.tod === "dia" ? { ...W2, opt: W2.opt * ENV.modelo.optDay } : W2;
+  }
+  function wxReset() {
+    S.wxLive = S.weather;
+    S.wxIdx = 0;
+  }
+  function wxStep(t) {
+    const plan = S.wxPlan || [];
+    while (S.wxIdx < plan.length && t >= plan[S.wxIdx].t) {
+      const c = plan[S.wxIdx++];
+      if (!WEATHER[c.weather] || c.weather === S.wxLive) continue;
+      S.wxLive = c.weather;
+      log("w", "Cambia el tiempo: " + WEATHER[c.weather].name + ".");
+    }
+  }
+
+  // src/sim/contacts.js
+  var TRACK_AGE = 12;
+  var LOST_AGE = 90;
+  function noteSeen(th, t, by) {
+    const p = th.p;
+    if (!p) return;
+    if (th.seen && t - th.seen.t > 0.5) th.seenPrev = th.seen;
+    th.seen = { x: p.x, y: p.y, z: p.z, t, by };
+  }
+  function contactOf(th, t) {
+    const s = th.seen;
+    if (!s) return null;
+    const age = t - s.t;
+    if (age < 0 || age > LOST_AGE) return null;
+    const q = th.seenPrev, dt = q ? s.t - q.t : 0;
+    const vx = dt > 0 ? (s.x - q.x) / dt : 0, vy = dt > 0 ? (s.y - q.y) / dt : 0, vz = dt > 0 ? (s.z - q.z) / dt : 0;
+    const lost = age > TRACK_AGE || !th.alive;
+    const k = lost ? 0 : age;
+    return { x: s.x + vx * k, y: s.y + vy * k, z: s.z + vz * k, vx, vy, v: Math.hypot(vx, vy) * 1e3, age, lost, by: s.by };
+  }
+
   // src/sim/engine.js
   function startSim() {
     S.units = S.setup.defs.map((d) => ({ ...d, alive: true, hp: UNIT_TARGET.hp, dmgRadar: false, dmgLauncher: false, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
     S.jamsLive = S.setup.jams.map((j) => ({ ...j, _losMap: {} }));
     S.hoj = [];
     S.ewNext = 0;
+    wxReset();
     S.objs = S.setup.objs.map((g) => ({ ...g, hp: g.maxHp, status: "operational", hits: 0, dmgBy: {} }));
     S.threats = [];
     S.ints = [];
@@ -4483,6 +4824,8 @@ table.t.mc td.pc{white-space:nowrap}
     S.jamsLive = [];
     S.hoj = [];
     S.ewNext = 0;
+    S.wxLive = null;
+    S.wxIdx = 0;
     S.objs = [];
     S.events = [];
     S.arrivals = [];
@@ -4497,6 +4840,7 @@ table.t.mc td.pc{white-space:nowrap}
   function step(dt) {
     const t = S.t + dt;
     S.t = t;
+    wxStep(t);
     while (S.pending.length && S.pending[0].tLaunch <= t) {
       const th = S.pending.shift();
       th.alive = true;
@@ -4560,8 +4904,9 @@ table.t.mc td.pc{white-space:nowrap}
       if (!d.radar) continue;
       if (t < u.nextScan) continue;
       u.nextScan = t + d.radar.scan;
-      const r = d.radar, uz = antZ(u), wx = WEATHER[S.weather];
-      const keep = r.scan * 2 + 0.6, cap = r.tracks ?? Infinity, fake = cap < Infinity ? falseTracks(u, S.jamsLive) : 0;
+      const r = d.radar, uz = antZ(u), wx = wxNow();
+      const keep = r.scan * 2 + 0.6, cap = r.tracks ?? Infinity, fake = falseTracks(u, S.jamsLive);
+      u.fake = fake;
       let held = 0;
       if (cap < Infinity) {
         for (const th of S.threats) if (th.alive && t - (th.det[u.id] ?? -1e9) <= keep) held++;
@@ -4604,6 +4949,7 @@ table.t.mc td.pc{white-space:nowrap}
         }
         if (ok) {
           th.det[u.id] = t;
+          noteSeen(th, t, u.id);
           const g = classifyGain(r);
           if (g) {
             th.clsT = (th.clsT || 0) + g;
@@ -4614,9 +4960,18 @@ table.t.mc td.pc{white-space:nowrap}
               if (c === "señuelo" && S.ignoreDecoys) log("d", "Pista #" + th.id + " clasificada como señuelo por " + uLabel(u) + (th.isDecoy ? "." : " (¡error: era " + th.T.short + "!)."));
             }
           }
-          if (th.cueFirst === null) th.cueFirst = t;
-          if (u.link !== false) for (const key of datalinksOf(D(u))) {
-            const n2 = th.net[key] || (th.net[key] = { first: null, last: -1e9 });
+          const inNet = u.c2 !== "desconectada";
+          const cp = cpOf(u);
+          if (inNet) {
+            if (!cp) {
+              if (th.cueFirst === null) th.cueFirst = t;
+            } else {
+              const m = th.cueCp || (th.cueCp = {});
+              if (m[cp] == null) m[cp] = t;
+            }
+          }
+          if (u.link !== false && inNet) for (const key of datalinksOf(D(u))) {
+            const nk = netKey(key, cp), n2 = th.net[nk] || (th.net[nk] = { first: null, last: -1e9 });
             if (n2.first === null) n2.first = t;
             n2.last = t;
             th.lastNet = t;
@@ -4658,6 +5013,10 @@ table.t.mc td.pc{white-space:nowrap}
       it.done = true;
       const u = it.u;
       u.active = Math.max(0, u.active - 1);
+      if (it.phantom) {
+        log("x", it.shot + " de " + uLabel(u) + " no encuentra nada: era un falso blanco.");
+        continue;
+      }
       const th = it.th;
       if (!th.alive) {
         log("d", it.shot + " de " + uLabel(u) + ": blanco ya destruido, autodestrucción.");
@@ -4667,7 +5026,7 @@ table.t.mc td.pc{white-space:nowrap}
         log("x", it.shot + " de " + uLabel(u) + " pierde la guía: su batería fue destruida.");
         continue;
       }
-      const pk = calcPk(u, th, t, S.jamsLive, it.f ?? null) * (it.remote ? C2_LEVELS[it.c2].remotePk : 1);
+      const pk = calcPk(u, th, t, S.jamsLive, it.f ?? null) * (it.remote ? C2_LEVELS[it.c2].remotePk * (it.gw ?? 1) : 1);
       if (rnd() < pk) {
         th.alive = false;
         th.killed = true;
@@ -4702,7 +5061,7 @@ table.t.mc td.pc{white-space:nowrap}
     if (!maxR) return null;
     if (u.noDrones && th.cls === "dron") return null;
     if (Math.hypot(th.p.x - u.x, th.p.y - u.y) > maxR + 120) return null;
-    if (!trackOK(u, th, t, c2)) {
+    if (!trackOK(u, th, t, c2, S.gateways)) {
       if (!probe) delete u.avail[th.id];
       return null;
     }
@@ -4713,8 +5072,9 @@ table.t.mc td.pc{white-space:nowrap}
     }
     if (t - av < sm.react * (u.dmgRadar ? UNIT_DAMAGE.react : 1)) return null;
     const flying = (th.fly || []).filter((i) => !i.done);
-    if (C2_LEVELS[c2].deconf ? flying.length : flying.some((i) => i.u === u)) return null;
-    if (S.ignoreDecoys && th.clsAs === "señuelo") return null;
+    if (C2_LEVELS[c2].deconf ? flying.some((i) => cpOf(i.u) === cpOf(u)) : flying.some((i) => i.u === u)) return null;
+    const ign = u.decoyDoc === "ignorar" ? true : u.decoyDoc === "tirar" ? false : S.ignoreDecoys;
+    if (ign && th.clsAs === "señuelo") return null;
     return { pre: true };
   }
   function solveFor(u, th, t) {
@@ -4727,7 +5087,7 @@ table.t.mc td.pc{white-space:nowrap}
       if (!los(u.x, u.y, antZ(u), sol.p.x, sol.p.y, sol.p.z)) return null;
       if (remote) {
         const az = azOf(sol.p.x - u.x, sol.p.y - u.y), dk = Math.hypot(sol.p.x - u.x, sol.p.y - u.y, (sol.p.z - antZ(u)) / 1e3);
-        if (!inSector(u, az) || dk > detR(u, th, jamJ(u, az, S.jamsLive), 1, WEATHER[S.weather])) return null;
+        if (!inSector(u, az) || dk > detR(u, th, jamJ(u, az, S.jamsLive), 1, wxNow())) return null;
       }
     }
     return { sol, remote };
@@ -4756,10 +5116,12 @@ table.t.mc td.pc{white-space:nowrap}
     const d = D(u), sm = d.sam;
     const ch = sm.ch;
     if (u.active >= ch) return;
-    const c2 = effectiveC2(S.c2, S.objs), L = C2_LEVELS[c2];
+    const cp = cpOf(u), c2net = effectiveC2(S.c2, S.objs, cp), c2 = unitC2(u, c2net), L = C2_LEVELS[c2];
     const cand = [];
     for (const th of S.threats) if (canEngage(u, th, t, c2, false)) cand.push([th, th.p.rem / Math.max(1, th.T.v)]);
     cand.sort((a, b) => a[1] - b[1]);
+    const ph = Math.round((u.fake || 0) * JAM_MODES.drfm.fooled);
+    if (ph > 0 && u.active < ch && u.magLeft > 0 && rnd() < ph / (ph + cand.length)) phantomShot(u, t);
     for (const [th] of cand) {
       if (u.active >= ch || u.magLeft <= 0) {
         const k = uLabel(u), sat = u.magLeft <= 0 ? S.stats.satMag : S.stats.satChannels;
@@ -4771,21 +5133,21 @@ table.t.mc td.pc{white-space:nowrap}
       if (L.best && u.link !== false) {
         const mine = shooterScore(u, th, t, f.sol.f);
         const better = S.units.some((v) => {
-          if (v === u || v.link === false || !canEngage(v, th, t, c2, true)) return false;
+          if (v === u || v.link === false || cpOf(v) !== cp || !canEngage(v, th, t, unitC2(v, c2net), true)) return false;
           const fv = solveFor(v, th, t);
           return !!fv && shooterScore(v, th, t, fv.sol.f) > mine * (th.cls === "dron" ? 0.999 : 1.001);
         });
         if (better) continue;
         if (th.cls === "dron") {
           const cpk = costPerKill(u, th, t);
-          const layer = S.units.some((v) => v !== u && v.alive && v.link !== false && D(v).sam && v.magLeft > 0 && !v.noDrones && D(v).sam.maxR > 0 && costPerKill(v, th, t) * 2 <= cpk && reaches(v, th, t));
+          const layer = S.units.some((v) => v !== u && v.alive && v.link !== false && cpOf(v) === cp && D(v).sam && v.magLeft > 0 && !v.noDrones && D(v).sam.maxR > 0 && costPerKill(v, th, t) * 2 <= cpk && reaches(v, th, t));
           if (layer) continue;
         }
       }
       const { sol, remote } = f;
       const n2 = Math.min(S.doctrine === "salva" ? u.salvo || sm.salvo : 1, u.magLeft, ch - u.active);
       for (let k = 0; k < n2; k++) {
-        const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f };
+        const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f, gw: remote ? netPk(u, th, t, c2, S.gateways) || 1 : 1 };
         S.ints.push(it);
         (th.fly = th.fly || []).push(it);
         S.rec?.ints.push(it);
@@ -4803,6 +5165,22 @@ table.t.mc td.pc{white-space:nowrap}
       }
       log("l", uLabel(u) + " dispara " + n2 + "× " + sm.shot + " contra " + (th.isDecoy && hooks.defenderView() ? "pista #" + th.id : label(th)) + " — intercepción a " + sol.r.toFixed(1) + " km en " + sol.tau.toFixed(0) + " s" + (remote ? " (con pista de la red)" : "") + ".");
     }
+  }
+  function phantomShot(u, t) {
+    const sm = D(u).sam, n2 = Math.min(S.doctrine === "salva" ? u.salvo || sm.salvo : 1, u.magLeft, sm.ch - u.active);
+    const a = (u.az || 0) * Math.PI / 180, r = sm.maxR * 0.6, tau = timeTo(profileOf(sm), r * 1e3);
+    for (let k = 0; k < n2; k++) {
+      const it = { u, th: null, phantom: true, x0: u.x, y0: u.y, px: u.x + Math.sin(a) * r, py: u.y - Math.cos(a) * r, tL: t + k * 0.6, tH: t + tau + k * 0.6, shot: sm.shot, done: false };
+      S.ints.push(it);
+      S.rec?.ints.push(it);
+      u.magLeft--;
+      u.active++;
+      S.stats.shots++;
+      S.stats.defCost += sm.cost;
+      recUnit(u);
+    }
+    log("w", uLabel(u) + " dispara " + n2 + "× " + sm.shot + " contra un falso blanco (engaño DRFM).");
+    if (u.magLeft === 0) log("w", uLabel(u) + " se queda sin munición.");
   }
   function impact(th) {
     th.alive = false;
@@ -4929,6 +5307,10 @@ table.t.mc td.pc{white-space:nowrap}
   function addDef(type, x, y, o = {}) {
     const d = DEFENSES[type];
     const u = { id: nextId(), type, x, y, az: o.az ?? defaultAz(x, y), mast: d.radar ? d.kind === "aew" ? 0 : d.radar.mast : 2, alt: d.alt, mag: d.sam ? d.sam.mag : 0, reserve: d.sam ? o.reserve ?? d.sam.reserve ?? 0 : 0, salvo: d.sam ? d.sam.salvo : 0, noDrones: d.sam ? !!d.sam.noDrones : false, link: o.link ?? true, name: o.name || nextName(type) };
+    if (o.c2) u.c2 = o.c2;
+    if (o.cp) u.cp = o.cp;
+    if (o.owner === "UA" || o.owner === "RU") u.owner = o.owner;
+    if (o.decoyDoc === "ignorar" || o.decoyDoc === "tirar") u.decoyDoc = o.decoyDoc;
     S.setup.defs.push(u);
     return u;
   }
@@ -4968,6 +5350,7 @@ table.t.mc td.pc{white-space:nowrap}
     const tt = TARGET_TYPES[type];
     const n2 = S.setup.objs.filter((g2) => g2.type === type).length + 1;
     const g = { id: nextId(), type, x, y, name: o.name || tt.name + " " + n2, short: o.short || "", maxHp: o.hp || tt.hp, desc: o.desc || "" };
+    if (o.cp) g.cp = o.cp;
     S.setup.objs.push(g);
     return g;
   }
@@ -4976,7 +5359,7 @@ table.t.mc td.pc{white-space:nowrap}
     const J = JAMMERS[type], u = o.target != null ? S.setup.defs.find((v) => v.name === o.target || v.id === o.target) : null;
     const j = { id: nextId(), type, x, y, alt: o.alt ?? J.alt, on: true };
     if (J.bands) {
-      j.mode = o.mode === "spot" ? "spot" : "barrage";
+      j.mode = JAM_MODES[o.mode] ? o.mode : "barrage";
       j.target = u ? u.id : null;
     }
     S.setup.jams.push(j);
@@ -4995,6 +5378,9 @@ table.t.mc td.pc{white-space:nowrap}
     }
     S.weather = WEATHER[sc2.rules?.weather] ? sc2.rules.weather : WEATHER_DEFAULT;
     S.wind = { v: sc2.rules?.wind?.v ?? 0, from: sc2.rules?.wind?.from ?? 0 };
+    S.gateways = (sc2.rules?.gateways || []).filter((k) => GATEWAYS[k]);
+    S.tod = TIMES_OF_DAY[sc2.rules?.tod] ? sc2.rules.tod : TOD_DEFAULT;
+    S.wxPlan = (sc2.rules?.wxPlan || []).filter((c) => WEATHER[c.weather]).map((c) => ({ t: c.t, weather: c.weather }));
     S.ignoreDecoys = !!sc2.rules?.ignoreDecoys;
     S.fireRange = sc2.rules?.fireRange ?? 1;
     S.scen = sc2;
@@ -5025,26 +5411,29 @@ table.t.mc td.pc{white-space:nowrap}
     return Math.max(0, (nx * lx + ny * ly + lz) / n2);
   }
   function buildRaster(mode) {
-    const { W, H, data } = MAP;
-    const k = clamp(Math.floor(Math.sqrt(MAX_PX / (W * H))), 1, 4), RW = W * k, RH = H * k;
+    const { W: W2, H, data } = MAP;
+    const k = clamp(Math.floor(Math.sqrt(MAX_PX / (W2 * H))), 1, 4), RW = W2 * k, RH = H * k;
     const E = new Float32Array(RW * RH);
     for (let py = 0; py < RH; py++) {
       const fy = clamp((py + 0.5) / k - 0.5, 0, H - 1.001), i = fy | 0, ty = fy - i;
       for (let px2 = 0; px2 < RW; px2++) {
-        const fx = clamp((px2 + 0.5) / k - 0.5, 0, W - 1.001), j = fx | 0, tx = fx - j, q = i * W + j;
-        E[py * RW + px2] = (data[q] * (1 - tx) + data[q + 1] * tx) * (1 - ty) + (data[q + W] * (1 - tx) + data[q + W + 1] * tx) * ty;
+        const fx = clamp((px2 + 0.5) / k - 0.5, 0, W2 - 1.001), j = fx | 0, tx = fx - j, q = i * W2 + j;
+        E[py * RW + px2] = (data[q] * (1 - tx) + data[q + 1] * tx) * (1 - ty) + (data[q + W2] * (1 - tx) + data[q + W2 + 1] * tx) * ty;
       }
     }
     const cv2 = document.createElement("canvas");
     cv2.width = RW;
     cv2.height = RH;
-    const cx = cv2.getContext("2d"), img = cx.createImageData(RW, RH), px = img.data;
+    const cx = (
+      /** @type {CanvasRenderingContext2D} */
+      cv2.getContext("2d")
+    ), img = cx.createImageData(RW, RH), px = img.data;
     const base = Math.max(0, MAP.min), maxE = Math.max(base + 50, MAP.max), step2 = MAP.cell / k, zf = mode === "shade" ? 3 : 2;
     const water = MAP.water;
     for (let y = 0; y < RH; y++) for (let x = 0; x < RW; x++) {
       const o = y * RW + x, e = E[o];
       let r, g, b;
-      const wet = water && water[Math.min(H - 1, y / k | 0) * W + Math.min(W - 1, x / k | 0)] === 1;
+      const wet = water && water[Math.min(H - 1, y / k | 0) * W2 + Math.min(W2 - 1, x / k | 0)] === 1;
       if (e <= 0 || wet) {
         const t = wet ? 0.05 : clamp(-e / 2500, 0, 1);
         r = 22 - 12 * t;
@@ -5176,20 +5565,23 @@ table.t.mc td.pc{white-space:nowrap}
     const t = clamp((f - 0.35) / 0.3, 0, 1);
     return t * t * (3 - 2 * t);
   };
-  function paintCoverage(cov, W, H) {
-    const k = clamp(Math.floor(Math.sqrt(MAX_PX2 / (W * H))), 1, 3), RW = W * k, RH = H * k;
+  function paintCoverage(cov, W2, H) {
+    const k = clamp(Math.floor(Math.sqrt(MAX_PX2 / (W2 * H))), 1, 3), RW = W2 * k, RH = H * k;
     covCanvas.width = RW;
     covCanvas.height = RH;
-    const cx = covCanvas.getContext("2d"), img = cx.createImageData(RW, RH), px = img.data;
+    const cx = (
+      /** @type {CanvasRenderingContext2D} */
+      covCanvas.getContext("2d")
+    ), img = cx.createImageData(RW, RH), px = img.data;
     const at = (g, fx, fy) => {
-      const j = fx | 0, i = fy | 0, tx = fx - j, ty = fy - i, q = i * W + j;
-      return (g(q) * (1 - tx) + g(q + 1) * tx) * (1 - ty) + (g(q + W) * (1 - tx) + g(q + W + 1) * tx) * ty;
+      const j = fx | 0, i = fy | 0, tx = fx - j, ty = fy - i, q = i * W2 + j;
+      return (g(q) * (1 - tx) + g(q + 1) * tx) * (1 - ty) + (g(q + W2) * (1 - tx) + g(q + W2 + 1) * tx) * ty;
     };
     const one = (q) => cov[q] > 0 ? 1 : 0, two = (q) => cov[q] > 1 ? 1 : 0;
     for (let y = 0; y < RH; y++) {
       const fy = clamp((y + 0.5) / k - 0.5, 0, H - 1.001);
       for (let x = 0; x < RW; x++) {
-        const fx = clamp((x + 0.5) / k - 0.5, 0, W - 1.001);
+        const fx = clamp((x + 0.5) / k - 0.5, 0, W2 - 1.001);
         const a1 = smooth(at(one, fx, fy)), a2 = smooth(at(two, fx, fy)), o = (y * RW + x) * 4;
         const aCov = 62 + 43 * a2;
         px[o] = 10 + 69 * a1;
@@ -5259,7 +5651,7 @@ table.t.mc td.pc{white-space:nowrap}
       const isSel = S.sel && S.sel.kind === "def" && S.sel.id === u.id;
       if (d.sam) {
         ctx.setLineDash([5, 5]);
-        ctx.strokeStyle = isSel ? "rgba(230,165,60,.9)" : d.side === "RU" ? "rgba(255,159,90,.45)" : "rgba(98,182,255,.45)";
+        ctx.strokeStyle = isSel ? "rgba(230,165,60,.9)" : sideOf(u) === "RU" ? "rgba(255,159,90,.45)" : "rgba(98,182,255,.45)";
         ctx.lineWidth = isSel ? 1.6 : 1;
         ctx.beginPath();
         ctx.arc(sx, sy, d.sam.maxR * V.s, 0, 7);
@@ -5358,8 +5750,8 @@ table.t.mc td.pc{white-space:nowrap}
     }
     for (const u of units) {
       const d = D(u), [sx, sy] = toS(u.x, u.y), dead = S.started && !u.alive;
-      const isSel = S.sel && S.sel.kind === "def" && S.sel.id === u.id;
-      const c = d.side === "RU" ? "#ff9f5a" : "#62b6ff";
+      const isSel = S.sel && S.sel.kind === "def" && S.sel.id === u.id || S.multi.includes(u.id);
+      const c = sideOf(u) === "RU" ? "#ff9f5a" : "#62b6ff";
       ctx.lineWidth = isSel ? 2.2 : 1.2;
       ctx.strokeStyle = isSel ? "#e6a53c" : "#08101a";
       ctx.fillStyle = dead ? "#3a4452" : c;
@@ -5421,59 +5813,62 @@ table.t.mc td.pc{white-space:nowrap}
       ctx.stroke();
     }
     const dv = hooks.defenderView();
-    for (const th of R ? R.threats : S.threats) {
-      if (!th.alive || !th.p) continue;
-      const tracked = tNow - th.lastNet <= 12;
-      if (dv && !tracked) continue;
-      const decoyLook = th.isDecoy && !dv;
-      const col = tracked ? "#ff5b4d" : "rgba(255,91,77,.55)";
-      ctx.strokeStyle = "rgba(255,91,77,.35)";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      for (const p of th.trail) {
-        const [a, b] = toS(p[0], p[1]);
-        ctx.lineTo(a, b);
+    if (dv && !R) {
+      drawContacts(tNow);
+    } else
+      for (const th of R ? R.threats : S.threats) {
+        if (!th.alive || !th.p) continue;
+        const tracked = tNow - th.lastNet <= 12;
+        if (dv && !tracked) continue;
+        const decoyLook = th.isDecoy && !dv;
+        const col = tracked ? "#ff5b4d" : "rgba(255,91,77,.55)";
+        ctx.strokeStyle = "rgba(255,91,77,.35)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (const p of th.trail) {
+          const [a, b] = toS(p[0], p[1]);
+          ctx.lineTo(a, b);
+        }
+        {
+          const [a, b] = toS(th.p.x, th.p.y);
+          ctx.lineTo(a, b);
+        }
+        ctx.stroke();
+        const [sx, sy] = toS(th.p.x, th.p.y);
+        const nx = posAt(th, tNow + 2);
+        const hd = nx ? Math.atan2(nx.y - th.p.y, nx.x - th.p.x) : 0;
+        ctx.save();
+        ctx.translate(sx, sy);
+        ctx.rotate(hd);
+        ctx.fillStyle = decoyLook ? "transparent" : col;
+        ctx.strokeStyle = decoyLook ? "#e6a53c" : tracked ? "#2a0806" : col;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        if (th.cls === "dron") {
+          ctx.moveTo(6, 0);
+          ctx.lineTo(-4, -5);
+          ctx.lineTo(-2, 0);
+          ctx.lineTo(-4, 5);
+        } else if (th.cls === "balistico" || th.cls === "hiper") {
+          ctx.moveTo(7, 0);
+          ctx.lineTo(0, -4);
+          ctx.lineTo(-7, 0);
+          ctx.lineTo(0, 4);
+        } else {
+          ctx.moveTo(8, 0);
+          ctx.lineTo(-6, -3);
+          ctx.lineTo(-6, 3);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+        if (V.s > 9) {
+          ctx.font = '10px "IBM Plex Mono", monospace';
+          ctx.fillStyle = "rgba(255,190,180,.9)";
+          ctx.fillText(dv ? "#" + th.id : th.T.short, sx + 7, sy - 6);
+        }
       }
-      {
-        const [a, b] = toS(th.p.x, th.p.y);
-        ctx.lineTo(a, b);
-      }
-      ctx.stroke();
-      const [sx, sy] = toS(th.p.x, th.p.y);
-      const nx = posAt(th, tNow + 2);
-      const hd = nx ? Math.atan2(nx.y - th.p.y, nx.x - th.p.x) : 0;
-      ctx.save();
-      ctx.translate(sx, sy);
-      ctx.rotate(hd);
-      ctx.fillStyle = decoyLook ? "transparent" : col;
-      ctx.strokeStyle = decoyLook ? "#e6a53c" : tracked ? "#2a0806" : col;
-      ctx.lineWidth = 1.2;
-      ctx.beginPath();
-      if (th.cls === "dron") {
-        ctx.moveTo(6, 0);
-        ctx.lineTo(-4, -5);
-        ctx.lineTo(-2, 0);
-        ctx.lineTo(-4, 5);
-      } else if (th.cls === "balistico" || th.cls === "hiper") {
-        ctx.moveTo(7, 0);
-        ctx.lineTo(0, -4);
-        ctx.lineTo(-7, 0);
-        ctx.lineTo(0, 4);
-      } else {
-        ctx.moveTo(8, 0);
-        ctx.lineTo(-6, -3);
-        ctx.lineTo(-6, 3);
-      }
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-      ctx.restore();
-      if (V.s > 9) {
-        ctx.font = '10px "IBM Plex Mono", monospace';
-        ctx.fillStyle = "rgba(255,190,180,.9)";
-        ctx.fillText(dv ? "#" + th.id : th.T.short, sx + 7, sy - 6);
-      }
-    }
     for (const it of R ? R.ints : S.ints) {
       if (it.done || tNow < it.tL) continue;
       const P = profileOf(D(it.u).sam), fl = Math.max(0.1, it.tH - it.tL);
@@ -5501,6 +5896,60 @@ table.t.mc td.pc{white-space:nowrap}
       ctx.arc(sx, sy, (f.big ? 6 : 3) + k * (f.big ? 26 : 14), 0, 7);
       ctx.stroke();
       ctx.globalAlpha = 1;
+    }
+    if (S.mode === "measure" && S.measure?.a) drawMeasure(S.measure);
+  }
+  function measureOf(a, b) {
+    const dx = b[0] - a[0], dy = b[1] - a[1];
+    return { km: Math.hypot(dx, dy), az: (Math.atan2(dx, -dy) * 180 / Math.PI + 360) % 360 };
+  }
+  function drawMeasure(m) {
+    const b = m.b || m.cur;
+    if (!b) return;
+    const [x1, y1] = toS(...m.a), [x2, y2] = toS(...b), r = measureOf(m.a, b);
+    ctx.strokeStyle = "#ffd36b";
+    ctx.lineWidth = 1.6;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    for (const [x, y] of [[x1, y1], [x2, y2]]) {
+      ctx.fillStyle = "#ffd36b";
+      ctx.beginPath();
+      ctx.arc(x, y, 3, 0, 7);
+      ctx.fill();
+    }
+    labelAt((x1 + x2) / 2 - 10, (y1 + y2) / 2 - 12, r.km.toFixed(r.km < 10 ? 2 : 1) + " km · " + Math.round(r.az) + "°", "#ffd36b");
+  }
+  function drawContacts(tNow) {
+    for (const th of S.threats) {
+      if (th.isDecoyChild && !th.seen) continue;
+      const c = contactOf(th, tNow);
+      if (!c) continue;
+      const [sx, sy] = toS(c.x, c.y), hd = Math.atan2(c.vy, c.vx);
+      ctx.save();
+      ctx.translate(sx, sy);
+      ctx.rotate(hd);
+      ctx.fillStyle = c.lost ? "transparent" : "#ff5b4d";
+      ctx.strokeStyle = c.lost ? "rgba(255,91,77,.6)" : "#2a0806";
+      ctx.lineWidth = 1.2;
+      if (c.lost) ctx.setLineDash([2, 2]);
+      ctx.beginPath();
+      ctx.moveTo(8, 0);
+      ctx.lineTo(-6, -4);
+      ctx.lineTo(-6, 4);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+      if (V.s > 9 || c.lost) {
+        ctx.font = '10px "IBM Plex Mono", monospace';
+        ctx.fillStyle = c.lost ? "rgba(255,190,180,.6)" : "rgba(255,190,180,.9)";
+        ctx.fillText("#" + th.id + (c.lost ? " · hace " + Math.round(c.age) + " s" : ""), sx + 7, sy - 6);
+      }
     }
   }
   function labelAt(sx, sy, txt, c) {
@@ -5671,13 +6120,22 @@ table.t.mc td.pc{white-space:nowrap}
   }
 
   // src/render/view.js
-  var cv = null;
-  var ctx = null;
+  var cv = (
+    /** @type {HTMLCanvasElement} */
+    /** @type {unknown} */
+    null
+  );
+  var ctx = (
+    /** @type {CanvasRenderingContext2D} */
+    /** @type {unknown} */
+    null
+  );
   var dpr = 1;
   var V = { cx: 50, cy: 50, s: 6 };
   function initView(canvas) {
     cv = canvas;
-    ctx = cv.getContext("2d");
+    ctx = /** @type {CanvasRenderingContext2D} */
+    cv.getContext("2d");
   }
   function resize() {
     const r = cv.getBoundingClientRect();
@@ -5703,8 +6161,8 @@ table.t.mc td.pc{white-space:nowrap}
 
   // src/physics/coverage.js
   function coverageGrid(units, jams, ref, agl, wx = null) {
-    const W = MAP.W, H = MAP.H, c = MAP.cellKm, data = MAP.data;
-    const cov = new Uint8Array(W * H), stamp = new Int32Array(W * H).fill(-1);
+    const W2 = MAP.W, H = MAP.H, c = MAP.cellKm, data = MAP.data;
+    const cov = new Uint8Array(W2 * H), stamp = new Int32Array(W2 * H).fill(-1);
     let ri = 0;
     for (const u of units) {
       const d = D(u), r = d.radar;
@@ -5712,9 +6170,9 @@ table.t.mc td.pc{white-space:nowrap}
       ri++;
       if (r.band === "ACU") {
         if (ref.cls !== "dron" || agl > (r.altMax || 3e3)) continue;
-        const R = detR(u, ref, 0, 1, wx), i0 = Math.max(0, (u.y - R) / c | 0), i1 = Math.min(H - 1, (u.y + R) / c | 0), j0 = Math.max(0, (u.x - R) / c | 0), j1 = Math.min(W - 1, (u.x + R) / c | 0);
+        const R = detR(u, ref, 0, 1, wx), i0 = Math.max(0, (u.y - R) / c | 0), i1 = Math.min(H - 1, (u.y + R) / c | 0), j0 = Math.max(0, (u.x - R) / c | 0), j1 = Math.min(W2 - 1, (u.x + R) / c | 0);
         for (let i = i0; i <= i1; i++) for (let j = j0; j <= j1; j++) {
-          const k = i * W + j;
+          const k = i * W2 + j;
           if (stamp[k] !== ri && Math.hypot((j + 0.5) * c - u.x, (i + 0.5) * c - u.y) <= R) {
             stamp[k] = ri;
             cov[k]++;
@@ -5752,8 +6210,8 @@ table.t.mc td.pc{white-space:nowrap}
           let e = 0, k = -1;
           if (dist >= tmin) {
             const j = x / c | 0, i = y / c | 0;
-            if (j >= 0 && i >= 0 && j < W && i < H) {
-              k = i * W + j;
+            if (j >= 0 && i >= 0 && j < W2 && i < H) {
+              k = i * W2 + j;
               e = Math.max(0, data[k]);
             }
           }
@@ -5852,7 +6310,10 @@ table.t.mc td.pc{white-space:nowrap}
   }
   function createMonteCarlo({ runs = 20, seed = 1, sample = true } = {}) {
     if (active) throw new Error("Ya hay una serie Monte Carlo en curso.");
-    const mc = { runs, seed, sample, results: [], done: false, cancelled: false, current: -1 };
+    const mc = { runs, seed, sample, results: (
+      /** @type {any[]} */
+      []
+    ), done: false, cancelled: false, current: -1 };
     active = mc;
     let rng = null, deadline = 0;
     const saved = { ...hooks }, quiet = { onLog() {
@@ -6053,7 +6514,8 @@ table.t.mc td.pc{white-space:nowrap}
   var CONCEPT_GROUPS = ["Radar y bandas", "Detección y terreno", "Guerra electrónica", "Enfrentamiento"];
   var code = (s) => `<code>${esc(s)}</code>`;
   var n = (v, d = 0) => (+v).toLocaleString("es-AR", { maximumFractionDigits: d, minimumFractionDigits: d });
-  var lambdaTxt = ([a, b]) => {
+  var lambdaTxt = (l) => {
+    const [a, b] = l;
     const f = (v) => v >= 1 ? n(v, 1) + " m" : v >= 0.01 ? n(v * 100, 1) + " cm" : v >= 1e-3 ? n(v * 1e3, 1) + " mm" : n(v * 1e6, 1) + " µm";
     return f(a) + " – " + f(b);
   };
@@ -6126,7 +6588,7 @@ table.t.mc td.pc{white-space:nowrap}
       <p>Ejemplo, Shahed: frente <b>${THREATS.shahed.rcs}</b>, costado <b>${THREATS.shahed.rcsSide}</b> y cola <b>${THREATS.shahed.rcsRear}</b> m². Son la media geométrica entre el modelado de Járkov y la base de CMO, que difieren mucho; el rango completo está en su ficha.</p>`,
       widget: {
         html: () => `<div class="widget"><div class="field"><label for="aThr">Amenaza</label><select id="aThr" class="sel">${Object.entries(THREATS).map(([k, t]) => `<option value="${k}" ${k === "shahed" ? "selected" : ""}>${esc(t.short)}</option>`).join("")}</select></div>
-        <div class="field"><label for="aRad">Radar</label><select id="aRad" class="sel">${Object.entries(DEFENSES).filter(([, d]) => d.radar && radarBands.includes(d.radar.band)).map(([k, d]) => `<option value="${k}" ${k === "pantsir" ? "selected" : ""}>${esc(d.short)} (${d.radar.band})</option>`).join("")}</select></div>
+        <div class="field"><label for="aRad">Radar</label><select id="aRad" class="sel">${Object.entries(DEFENSES).filter(([, d]) => d.radar && radarBands.includes(d.radar.band)).map(([k, d]) => `<option value="${k}" ${k === "pantsir" ? "selected" : ""}>${esc(d.short)} (${d.radar?.band})</option>`).join("")}</select></div>
         <div class="field"><label for="aAng">Ángulo de aspecto (0° = de frente, 90° = de costado, 180° = de cola)</label><span class="val" id="aAngV"></span><input id="aAng" type="range" min="0" max="180" step="5" value="90"></div>
         <p class="wout" id="aOut"></p></div>`,
         mount: (el) => {
@@ -6151,7 +6613,7 @@ table.t.mc td.pc{white-space:nowrap}
       <p>Hace falta <b>16 veces más RCS para duplicar el alcance</b>; con una RCS 10 veces menor, el alcance cae a 0,56 veces. Por eso la furtividad ayuda, pero no hace invisible: acorta la distancia de detección.</p>`,
       engine: () => `<p>${code("detR(u, th, J) = R1 · σ_banda^¼ · (1/(1+J))^¼")}, donde ${code("R1")} es el alcance del radar contra 1 m² (dato del catálogo, con rango y fuentes) y J la interferencia. Ese alcance es el de 50% por barrido: más cerca la probabilidad sube rápido (75% al 80% del alcance, 96% a la mitad) y más lejos baja (26% a 1,2 veces). Un eco suelto no abre una pista: hacen falta 2 en los últimos 3 barridos ("2 de 3"). Sale de la relación señal/ruido con fluctuación Swerling 1 (drones y misiles de crucero: muchos reflectores parecidos, la RCS titila mucho) o Swerling 3 (balísticos: un reflector dominante; titila menos, así que de cerca se ven más seguido, 83% al 80% del alcance, y de lejos algo menos, 18% a 1,2 veces). Los blancos rasantes compiten con el eco del suelo o del mar de su misma celda, y en lluvia con el de las gotas (clutter: Billingsley, modelo NRL y Barton); el filtro lo baja poco en un radar sin MTI, unos 35 dB en un MTI contra el suelo (menos contra mar y lluvia) y 55 dB en un pulso-Doppler, y un radar Doppler no ve en ese barrido a un blanco que le pasa exactamente de costado (notch).</p>`,
       widget: {
-        html: () => `<div class="widget"><div class="field"><label for="wRad">Radar</label><select id="wRad" class="sel">${Object.entries(DEFENSES).filter(([, d]) => d.radar && radarBands.includes(d.radar.band)).map(([k, d]) => `<option value="${k}" ${k === "ewr" ? "selected" : ""}>${esc(d.short)} (${d.radar.band}, ${d.radar.R1} km vs 1 m²)</option>`).join("")}</select></div>
+        html: () => `<div class="widget"><div class="field"><label for="wRad">Radar</label><select id="wRad" class="sel">${Object.entries(DEFENSES).filter(([, d]) => d.radar && radarBands.includes(d.radar.band)).map(([k, d]) => `<option value="${k}" ${k === "ewr" ? "selected" : ""}>${esc(d.short)} (${d.radar?.band}, ${d.radar?.R1} km vs 1 m²)</option>`).join("")}</select></div>
         <div class="field"><label for="wSig">RCS del blanco en la banda del radar</label><span class="val" id="wSigV"></span><input id="wSig" type="range" min="-3" max="1" step="0.05" value="-1"></div>
         <p class="wout" id="wOut"></p><div class="tblwrap"><table class="t" id="wTbl"></table></div></div>`,
         mount: (el) => {
@@ -6308,7 +6770,7 @@ table.t.mc td.pc{white-space:nowrap}
       <p>En Ucrania conviven niveles muy distintos: sistemas occidentales con enlace Link 16 (Patriot, NASAMS), sistemas soviéticos que entran a la imagen aérea nacional mediante "cajas negras" de conversión y unidades que reciben la situación aérea en tabletas (Virazh-Planshet). Del lado ruso, puestos automatizados como Polyana-D4M1 integran brigadas de S-300, Buk, Tor y Pantsir.</p>`,
       engine: () => `<p>El nivel se elige en la pestaña Defensa (${code("S.c2")}) y lo usan ${code("trackOK()")} y ${code("reactionStart()")}:</p>
       <div class="tblwrap"><table class="t"><thead><tr><th>Nivel</th><th>Demora de la red</th><th>Tira con pista ajena</th><th>Reparto de blancos</th></tr></thead><tbody>${Object.values(C2_LEVELS).map((L) => `<tr><td>${esc(L.name)}</td><td>${L.share === "none" ? "—" : L.lag + " s"}</td><td>${{ none: "no", cue: "no (solo alerta)", track: "activos/IR e interceptores", fire: "también guiados por radar" }[L.share]}</td><td>${L.deconf ? "sí" : "no"}</td></tr>`).join("")}</tbody></table></div>
-      <p>Además: un disparo con pista ajena pierde un poco de Pk en coordinada (×${C2_LEVELS.coordinada.remotePk}, error de posición de la pista); cada unidad puede tener o no <b>enlace de datos</b> (casilla en el panel de selección); en integrada, cada blanco va al <b>mejor tirador</b> y los drones se dejan a la capa más barata que los espera más adelante; y si el atacante destruye un <b>puesto de mando</b> la defensa queda desconectada (cada sitio de comunicaciones destruido la baja un nivel). Las pistas de red viajan por <b>familias de enlace</b> (${Object.values(DATALINKS).map((l) => esc(l.name)).join(", ")}): una unidad recibe la pista de un sensor solo si comparten alguna (la ficha muestra la de cada sistema). La casilla de enlace apaga esos transportes, pero no la coordinación de C2: las alertas pueden seguir llegando. No hay todavía pasarelas entre familias ni un control de pertenencia a la red de mando por unidad: ver ROADMAP.</p>`
+      <p>Además: un disparo con pista ajena pierde un poco de Pk en coordinada (×${C2_LEVELS.coordinada.remotePk}, error de posición de la pista); cada unidad puede tener o no <b>enlace de datos</b> (casilla en el panel de selección); en integrada, cada blanco va al <b>mejor tirador</b> y los drones se dejan a la capa más barata que los espera más adelante; y si el atacante destruye un <b>puesto de mando</b> la defensa queda desconectada (cada sitio de comunicaciones destruido la baja un nivel). Las pistas de red viajan por <b>familias de enlace</b> (${Object.values(DATALINKS).map((l) => esc(l.name)).join(", ")}): una unidad recibe la pista de un sensor solo si comparten alguna (la ficha muestra la de cada sistema). La casilla de enlace apaga esos transportes, pero no la coordinación de C2: las alertas pueden seguir llegando. Una <b>pasarela</b> entre familias (${Object.values(GATEWAYS).map((g) => esc(g.name)).join(", ")}) pasa pistas con demora y algo menos de Pk, pero viene apagada: no hay fuente de que esas pistas sirvan para disparar (se habilita en Defensa). Cada unidad puede tener <b>menos coordinación que la red</b> (${code("u.c2")}) y pertenecer a un <b>puesto de mando</b> (${code("u.cp")}): pistas, alertas y reparto solo circulan dentro de cada puesto, y un puesto de mando destruido degrada solo a sus unidades.</p>`
     },
     {
       id: "clima",
@@ -6316,7 +6778,7 @@ table.t.mc td.pc{white-space:nowrap}
       title: "Clima: lluvia, nubes y niebla",
       body: () => `<p>El tiempo no afecta igual a todos los sensores. La <b>lluvia</b> absorbe y dispersa las microondas, tanto más cuanto más alta es la frecuencia: un radar en banda S o L casi no la nota, uno en X la siente y uno en Ku pierde mucho alcance en una tormenta. Por eso los radares de alerta usan bandas bajas y los de guiado (X, Ku) sufren más.</p><p>Los sensores <b>ópticos e infrarrojos</b> (los grupos móviles con ametralladoras y cámaras térmicas, los MANPADS) son los más castigados: la lluvia o la niebla les achican el alcance a una fracción y las <b>nubes</b> les tapan todo lo que vuela por encima, aunque se escuche el motor. La red <b>acústica</b> oye menos con lluvia y viento.</p>`,
       engine: () => `<p>El clima se elige en la pestaña Defensa (${code("S.weather")}) y queda fijo todo el escenario. La atenuación del radar sale de la Rec. ITU-R P.838-3: ${code("γ = k · R^α")} dB/km, con k y α según la frecuencia de cada banda (${code("BANDS[b].ghz")}), sobre un camino de lluvia de hasta ${code("rainKm")}. El alcance resuelve ${code("R = R0 · 10^(−γ·min(R, L)/20)")}. Con lluvia de 4 mm/h, γ por banda: ${["S", "C", "X", "Ku"].map((b) => b + " " + rainGamma(b, 4).toFixed(3)).join(" · ")} dB/km.</p>
-      <div class="tblwrap"><table class="t"><thead><tr><th>Clima</th><th>Lluvia</th><th>Óptico/IR</th><th>Techo para ópticos</th><th>Acústico</th></tr></thead><tbody>${Object.values(WEATHER).map((W) => `<tr><td>${esc(W.name)}</td><td>${W.rain ? W.rain + " mm/h en " + W.rainKm + " km" : "—"}</td><td>×${W.opt}</td><td>${W.ceiling != null ? W.ceiling + " m" : "—"}</td><td>×${W.acu}</td></tr>`).join("")}</tbody></table></div>
+      <div class="tblwrap"><table class="t"><thead><tr><th>Clima</th><th>Lluvia</th><th>Óptico/IR</th><th>Techo para ópticos</th><th>Acústico</th></tr></thead><tbody>${Object.values(WEATHER).map((W2) => `<tr><td>${esc(W2.name)}</td><td>${W2.rain ? W2.rain + " mm/h en " + W2.rainKm + " km" : "—"}</td><td>×${W2.opt}</td><td>${W2.ceiling != null ? W2.ceiling + " m" : "—"}</td><td>×${W2.acu}</td></tr>`).join("")}</tbody></table></div>
       <p>Los factores ópticos y acústicos son estimaciones de juego (el manual de CMO dice que la lluvia deja lo visual en 1–5% y degrada mucho el IR). El <b>viento</b> (${code("S.wind")}) cambia la velocidad sobre el suelo de drones y misiles de crucero en cada tramo de su ruta: ${code("Vg = W·u + √(v² − (W×u)²)")} (corrigen la deriva). Con 10 m/s de frente, un Shahed tarda un 24% más y un Kalibr un 4%. No se modela el día y la noche. La lluvia y el mar también devuelven eco (clutter): ver Detección.</p>`
     },
     {
@@ -6384,7 +6846,11 @@ table.t.mc td.pc{white-space:nowrap}
   }
   function initAcademy() {
     document.addEventListener("click", (e) => {
-      const el = e.target.closest("[data-concept]");
+      const el = (
+        /** @type {HTMLElement | null} */
+        /** @type {HTMLElement} */
+        e.target.closest("[data-concept]")
+      );
       if (!el) return;
       e.preventDefault();
       e.stopPropagation();
@@ -6576,12 +7042,18 @@ table.t.mc td.pc{white-space:nowrap}
   }
 
   // src/ui/panels/ew.js
+  function roleTag(J) {
+    const who = J.side === "RU" ? "ruso" : J.side === "UA" ? "ucraniano" : "ambos bandos";
+    const role = J.gnssJam ? "anti-GNSS: desvía armas del atacante" : "contra radares de la defensa";
+    return `${J.gnssJam ? "Defensor" : "Atacante"} · ${who} · ${role}`;
+  }
+  var roleShort = (J) => (J.gnssJam ? "Def." : "Atac.") + " " + (J.side === "both" ? "ambos" : J.side);
   function renderEW() {
     const el = $("#tab-ew");
     el.innerHTML = `
-    <p class="hint">El efecto depende del <b>rol</b>, no de la bandera: los interferidores de radar degradan los radares de la defensa (herramienta del atacante) y los anti-GNSS desvían las armas del atacante (herramienta del defensor).</p><div class="grp"><h3>Interferidores y contramedidas</h3><div class="unitgrid">${Object.entries(JAMMERS).map(([k, j]) => `<button class="ub ew ${S.mode === "placeJam" && S.placeType === k ? "act" : ""}" data-k="${k}" title="${esc(j.name)}"><span>${esc(j.short)}</span><i data-info="${k}" role="button" aria-label="Ficha">i</i></button>`).join("")}</div></div>
+    <p class="hint">El efecto depende del <b>rol</b>, no de la bandera: los interferidores de radar degradan los radares de la defensa (herramienta del atacante) y los anti-GNSS desvían las armas del atacante (herramienta del defensor).</p><div class="grp"><h3>Interferidores y contramedidas</h3><div class="unitgrid">${Object.entries(JAMMERS).map(([k, j]) => `<button class="ub ew ${S.mode === "placeJam" && S.placeType === k ? "act" : ""}" data-k="${k}" title="${esc(j.name)} — ${roleTag(j)}"><span>${esc(j.short)}</span><small class="side">${roleShort(j)}</small><i data-info="${k}" role="button" aria-label="Ficha">i</i></button>`).join("")}</div></div>
     <label class="check"><input type="checkbox" id="optStr" ${S.strobes ? "checked" : ""}> Mostrar "strobes" de interferencia (líneas violeta radar → jammer)</label>
-    <div class="grp"><h3>Desplegados</h3><div class="list" id="jList">${S.setup.jams.map((j) => `<div class="item vio"><span class="t">${esc(JAMMERS[j.type].name)}</span><span class="s">${j.x.toFixed(1)}, ${j.y.toFixed(1)} km${JAMMERS[j.type].air ? " · " + j.alt + " m" : ""}</span><span class="a"><button class="btn sm ${j.on ? "on" : ""}" data-tog="${j.id}">${j.on ? "Activo" : "Apagado"}</button><button class="btn sm danger" data-del="${j.id}" aria-label="Borrar">✕</button></span></div>`).join("") || '<p class="hint">Ninguno.</p>'}</div></div>
+    <div class="grp"><h3>Desplegados</h3><div class="list" id="jList">${S.setup.jams.map((j) => `<div class="item vio"><span class="t">${esc(JAMMERS[j.type].name)} <small class="side">${roleTag(JAMMERS[j.type])}</small></span><span class="s">${j.x.toFixed(1)}, ${j.y.toFixed(1)} km${JAMMERS[j.type].air ? " · " + j.alt + " m" : ""}</span><span class="a"><button class="btn sm ${j.on ? "on" : ""}" data-tog="${j.id}">${j.on ? "Activo" : "Apagado"}</button><button class="btn sm danger" data-del="${j.id}" aria-label="Borrar">✕</button></span></div>`).join("") || '<p class="hint">Ninguno.</p>'}</div></div>
     <div class="grp"><h3>Modelo ${infoBtn("noise")} ${infoBtn("lobes")} ${infoBtn("eccm")} ${infoBtn("gnss")}</h3><p class="hint">Jammer de ruido: reduce el alcance de detección como <b>R' = R·(1/(1+J/N))<sup>¼</sup></b>. J/N cae con la distancia al cuadrado, solo afecta radares de la misma banda, necesita línea de vista y es ~25 dB más débil fuera del lóbulo principal. Elegí barrera o ruido puntual (contra un radar) en el panel de selección del jammer. Cada radar tiene sus ECCM: agilidad de frecuencia (anula el puntual), lóbulos bajos y canceladores de los lóbulos laterales (no pueden con un jammer alineado con los blancos). La ficha del jammer muestra la distancia de quemado de cada radar. El anti-GNSS no toca radares: desvía armas que navegan por satélite.</p></div>`;
     el.onclick = (e) => {
       const inf = e.target.closest("[data-info]");
@@ -6672,8 +7144,18 @@ table.t.mc td.pc{white-space:nowrap}
   }
 
   // src/ui/panels/selection.js
+  var CPS = [["", "Principal"], ["A", "Puesto A"], ["B", "Puesto B"], ["C", "Puesto C"]];
   function deleteSelected() {
-    if (S.started || isMonteCarloRunning() || !S.sel) return false;
+    if (S.started || isMonteCarloRunning()) return false;
+    if (S.multi.length > 1) {
+      renderSel();
+      const b = $("#mDel");
+      if (b) {
+        b.click();
+        return true;
+      }
+    }
+    if (!S.sel) return false;
     renderSel();
     const id = { def: "#sDel", jam: "#jDel", salvo: "#vDel", obj: "#oDel" }[S.sel?.kind];
     const button = id && $(id);
@@ -6681,9 +7163,78 @@ table.t.mc td.pc{white-space:nowrap}
     button.click();
     return true;
   }
+  function renderMulti(el) {
+    const us = S.multi.map((id) => S.setup.defs.find((v) => v.id === id)).filter(Boolean);
+    if (us.length < 2) {
+      S.multi = [];
+      return false;
+    }
+    const same = (f) => {
+      const v = us.map(f);
+      return v.every((x) => x === v[0]) ? v[0] : void 0;
+    };
+    const sams = us.filter((u) => D(u).sam);
+    const opt = (id, label2, cur, opts) => `<div class="field"><label for="${id}">${label2}</label><select id="${id}" class="sel">${cur === void 0 ? '<option value="__mix" selected>(mezcla)</option>' : ""}${opts.map(([k, n2]) => `<option value="${k}" ${cur === k ? "selected" : ""}>${n2}</option>`).join("")}</select></div>`;
+    let h = `<h3>Selección</h3><b style="font-size:15px">${us.length} defensas</b><p class="hint">${us.map((u) => esc(u.name)).join(", ")}</p><p class="hint">Shift + click suma o saca una unidad; Esc limpia el grupo. Solo se cambian los valores que elijas.</p>`;
+    h += opt("mOwn", "Operada por", same((u) => u.owner || ""), [["", "Según el equipo"], ["UA", "Ucrania / OTAN"], ["RU", "Rusia"]]);
+    h += opt("mC2", "Coordinación C2", same((u) => u.c2 || ""), [["", "Igual que la red"], ...C2_ORDER.slice(0, C2_ORDER.indexOf(S.c2)).map((k) => [k, C2_LEVELS[k].name])]);
+    h += opt("mCp", "Puesto de mando", same((u) => u.cp || ""), CPS);
+    h += opt("mLink", "Datalink", same((u) => u.link !== false ? "on" : "off"), [["on", "Activo"], ["off", "Apagado"]]);
+    if (sams.length === us.length) {
+      h += opt("mDec", "Pistas clasificadas como señuelo", same((u) => u.decoyDoc || ""), [["", "Como la regla general"], ["ignorar", "No tirarles"], ["tirar", "Tirarles igual"]]);
+      h += opt("mNoD", "Drones", same((u) => u.noDrones ? "no" : "si"), [["si", "Les tira"], ["no", "No gastar en drones"]]);
+    }
+    h += `<div class="row"><button class="btn sm danger" id="mDel">Eliminar las ${us.length} unidades</button></div>`;
+    el.innerHTML = h;
+    const bind = (id, apply) => {
+      const s = $(id);
+      if (s) s.onchange = (e) => {
+        const v = e.target.value;
+        if (v === "__mix") return;
+        for (const u of us) apply(u, v);
+        draw();
+        renderMulti(el);
+      };
+    };
+    bind("#mOwn", (u, v) => {
+      if (v) u.owner = v;
+      else delete u.owner;
+    });
+    bind("#mC2", (u, v) => {
+      if (v) u.c2 = v;
+      else delete u.c2;
+    });
+    bind("#mCp", (u, v) => {
+      if (v) u.cp = v;
+      else delete u.cp;
+    });
+    bind("#mLink", (u, v) => {
+      u.link = v === "on";
+    });
+    bind("#mDec", (u, v) => {
+      if (v) u.decoyDoc = v;
+      else delete u.decoyDoc;
+    });
+    bind("#mNoD", (u, v) => {
+      u.noDrones = v === "no";
+    });
+    $("#mDel").onclick = () => {
+      if (!window.confirm(`¿Eliminar las ${us.length} unidades seleccionadas?`)) return;
+      const ids = new Set(us.map((u) => u.id));
+      S.setup.defs = S.setup.defs.filter((v) => !ids.has(v.id));
+      for (const sv of S.setup.salvos) if (ids.has(sv.targetUnit)) sv.targetUnit = null;
+      S.multi = [];
+      S.sel = null;
+      renderSel();
+      schedCov();
+      draw();
+    };
+    return true;
+  }
   function renderSel(live) {
     const el = $("#selCard");
     const sel = S.sel;
+    if (S.multi.length && !S.started && renderMulti(el)) return;
     if (!sel) {
       el.innerHTML = '<h3>Selección</h3><p class="hint">Tocá una unidad, jammer o ruta en el mapa para ver y ajustar sus parámetros. Arrastrá unidades para moverlas (antes de iniciar).</p>';
       return;
@@ -6722,10 +7273,12 @@ table.t.mc td.pc{white-space:nowrap}
         }
         if (d.kind === "aew") html += `<div class="field"><label for="sAlt">Altitud de vuelo</label><span class="val">${u.alt} m</span><input id="sAlt" type="range" min="2000" max="11000" step="250" value="${u.alt}"></div>`;
         if (r && r.sector < 360) html += `<div class="field"><label for="sAz">${r.side ? "Rumbo de vuelo" : "Orientación del sector"}</label><span class="val">${u.az}°</span><input id="sAz" type="range" min="0" max="359" value="${u.az}"></div>`;
+        html += `<div class="field" title="Quién opera la unidad. El país que fabricó el equipo no decide de qué lado pelea: un Buk o un radar 36D6 puede ser ucraniano o ruso. Decide qué interferidores la afectan y su color en el mapa."><label for="sOwn">Operada por</label><select id="sOwn" class="sel"><option value="" ${!u.owner ? "selected" : ""}>Según el equipo (${d.side === "both" ? "ambos bandos" : d.side === "RU" ? "Rusia" : "Ucrania / OTAN"})</option><option value="UA" ${u.owner === "UA" ? "selected" : ""}>Ucrania / OTAN</option><option value="RU" ${u.owner === "RU" ? "selected" : ""}>Rusia</option></select></div>`;
         if (d.sam || r) html += `<h3>Enlace técnico de pistas</h3>`;
         if (datalinksOf(d).length) html += `<label class="check"><input type="checkbox" id="sLink" ${u.link !== false ? "checked" : ""}> Datalink activo (${esc(links)})</label><p class="hint">Al apagarlo, esta unidad deja de publicar y recibir pistas de tiro por enlaces compatibles. Conserva su sensor propio y puede recibir alertas C2 si la coordinación general lo permite.</p>`;
         else if (d.sam || r) html += `<p class="hint">Sin enlace técnico compatible: las alertas C2 no son una pista de tiro ni permiten guiar un misil con un sensor ajeno.</p>`;
-        if (d.sam || r) html += `<h3>Coordinación C2 (general)</h3><p class="hint">${esc(C2_LEVELS[S.c2].name)}. Se cambia en Defensa para toda la red. En Desconectada no hay alertas compartidas, pistas de red ni reparto de blancos; las unidades conservan sus sensores y disparos propios. El datalink de esta unidad no cambia ese nivel general.</p>`;
+        if (d.sam || r) html += `<h3>Coordinación C2</h3><p class="hint">Red: ${esc(C2_LEVELS[S.c2].name)} (se cambia en Defensa). En Desconectada no hay alertas compartidas, pistas de red ni reparto de blancos; las unidades conservan sus sensores y disparos propios.</p><div class="field"><label for="sC2">Esta unidad</label><select id="sC2" class="sel">${["", ...C2_ORDER.slice(0, C2_ORDER.indexOf(S.c2))].map((k) => `<option value="${k}" ${(u.c2 || "") === k ? "selected" : ""}>${k ? esc(C2_LEVELS[k].name) : "Igual que la red"}</option>`).join("")}</select></div><p class="hint">Una unidad puede quedar con menos coordinación que la red (por ejemplo, una batería aislada). Desconectada: ni avisa ni recibe.</p><div class="field"><label for="sCp">Puesto de mando</label><select id="sCp" class="sel">${CPS.map(([k, n2]) => `<option value="${k}" ${(u.cp || "") === k ? "selected" : ""}>${n2}</option>`).join("")}</select></div><p class="hint">Las pistas, alertas, el reparto de blancos y la triangulación de jammers solo circulan entre unidades del mismo puesto.</p>`;
+        if (d.sam) html += `<div class="field" title="Los radares de tiro aprenden a distinguir señuelos con el tiempo de seguimiento; la decisión usa esa clasificación, que a veces se equivoca."><label for="sDec">Pistas clasificadas como señuelo</label><select id="sDec" class="sel"><option value="" ${!u.decoyDoc ? "selected" : ""}>Como la regla general (${S.ignoreDecoys ? "no tirarles" : "tirarles"})</option><option value="ignorar" ${u.decoyDoc === "ignorar" ? "selected" : ""}>No tirarles</option><option value="tirar" ${u.decoyDoc === "tirar" ? "selected" : ""}>Tirarles igual</option></select></div>`;
         if (d.sam) html += `<label class="check"><input type="checkbox" id="sNoD" ${u.noDrones ? "checked" : ""}> No gastar en drones (reservar para misiles)</label><div class="field"><label for="sMag">Munición disponible</label><input id="sMag" class="inp" type="number" min="1" max="200" value="${u.mag}"></div><div class="field"><label for="sRes">Reserva para recargar (${Math.round(d.sam.reloadS / 60)} min por recarga)</label><input id="sRes" class="inp" type="number" min="0" max="500" value="${u.reserve ?? 0}"></div><div class="field"><label for="sSal">Interceptores por blanco</label><input id="sSal" class="inp" type="number" min="1" max="4" value="${u.salvo}"></div>`;
       }
       html += `<div class="row"><button class="btn sm" id="sInfo">Ficha</button>${ed ? '<button class="btn sm danger" id="sDel">Eliminar</button>' : ""}</div>`;
@@ -6752,6 +7305,23 @@ table.t.mc td.pc{white-space:nowrap}
         };
         if ($("#sLink")) $("#sLink").onchange = (e) => {
           u.link = e.target.checked;
+        };
+        if ($("#sC2")) $("#sC2").onchange = (e) => {
+          if (e.target.value) u.c2 = e.target.value;
+          else delete u.c2;
+        };
+        if ($("#sOwn")) $("#sOwn").onchange = (e) => {
+          if (e.target.value) u.owner = e.target.value;
+          else delete u.owner;
+          draw();
+        };
+        if ($("#sDec")) $("#sDec").onchange = (e) => {
+          if (e.target.value) u.decoyDoc = e.target.value;
+          else delete u.decoyDoc;
+        };
+        if ($("#sCp")) $("#sCp").onchange = (e) => {
+          if (e.target.value) u.cp = e.target.value;
+          else delete u.cp;
         };
         $("#sDel").onclick = () => {
           S.setup.defs = S.setup.defs.filter((v) => v.id !== u.id);
@@ -6827,12 +7397,29 @@ table.t.mc td.pc{white-space:nowrap}
       <dl class="kv"><dt>HP</dt><dd>${hp} / ${g.maxHp}</dd><dt>Tipo</dt><dd>${esc(tt.name)}</dd><dt>Posición</dt><dd>${g.x.toFixed(1)}, ${g.y.toFixed(1)} km</dd><dt>Lat/Lon</dt><dd>${ll[0].toFixed(3)}°, ${ll[1].toFixed(3)}°</dd><dt>Huella</dt><dd>${tt.radius} m de radio</dd><dt>Vulnerabilidad</dt><dd>×${tt.vuln}</dd>${S.started ? `<dt>Impactos con daño</dt><dd>${g.hits}</dd>${dmgBy ? `<dt>Daño por arma</dt><dd>${dmgBy}</dd>` : ""}` : ""}</dl>
       <p class="hint">${esc(g.desc || tt.desc)}</p>
       ${!S.started ? `<div class="field"><label for="oHp">Vida máxima</label><input id="oHp" class="inp" type="number" min="50" max="20000" step="50" value="${g.maxHp}"></div><div class="row"><button class="btn sm danger" id="oDel">Eliminar</button></div>` : ""}`;
+      if (!S.started && C2_NODES[g.type]) {
+        $("#oHp").parentElement.insertAdjacentHTML("afterend", `<div class="field"><label for="oCp">Nodo de mando de</label><select id="oCp" class="sel">${CPS.map(([k, n2]) => `<option value="${k}" ${(g.cp || "") === k ? "selected" : ""}>${k ? n2 : "Todos los puestos"}</option>`).join("")}</select></div>`);
+        $("#oCp").onchange = (e) => {
+          if (e.target.value) g.cp = e.target.value;
+          else delete g.cp;
+        };
+      }
       bindNumber($("#oHp"), () => g.maxHp, (value) => {
         g.maxHp = value;
       });
       if ($("#oDel")) $("#oDel").onclick = () => removeObj(g.id);
     } else if (sel.kind === "thr") {
       const th = S.threats.find((t) => t.id === sel.id);
+      if (th && isDefenderView() && !S.replay) {
+        const c = contactOf(th, S.t);
+        if (!c) {
+          el.innerHTML = `<h3>Selección</h3><p class="hint">Pista #${th.id}: sin reportes recientes.</p>`;
+          return;
+        }
+        const by = c.by != null ? uLabel(S.units.find((u) => u.id == c.by)) : "—";
+        el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">Pista #${th.id}</b> <span class="chip">${c.lost ? "perdida" : "en seguimiento"}</span><dl class="kv"><dt>Último reporte</dt><dd>hace ${Math.round(c.age)} s, de ${esc(by)}</dd><dt>Posición${c.lost ? "" : " estimada"}</dt><dd>${c.x.toFixed(1)}, ${c.y.toFixed(1)} km</dd><dt>Altitud</dt><dd>${Math.round(c.z)} m (${Math.round(c.z - surf(c.x, c.y))} AGL)</dd><dt>Velocidad estimada</dt><dd>${kmh(c.v)}</dd><dt>Clasificación</dt><dd>${esc(th.clsAs || "sin clasificar")}</dd><dt>Primera detección</dt><dd>${th.firstDet === null ? "—" : fmtT(th.firstDet)}</dd></dl><p class="hint">Vista del defensor: no se muestra el tipo de arma, su blanco ni su posición real.</p>`;
+        return;
+      }
       if (!th || !th.p) {
         el.innerHTML = '<h3>Selección</h3><p class="hint">La amenaza ya no está en vuelo.</p>';
         return;
@@ -7504,7 +8091,10 @@ table.t.mc td.pc{white-space:nowrap}
   }
   function initTabs() {
     document.querySelector(".tabs").onclick = (e) => {
-      const b = e.target.closest("button");
+      const b = (
+        /** @type {HTMLElement} */
+        e.target.closest("button")
+      );
       if (!b) return;
       for (const x of document.querySelectorAll(".tabs button")) x.classList.toggle("act", x === b);
       for (const t of ["def", "atk", "ew", "cat", "edu"]) $("#tab-" + t).hidden = t !== b.dataset.tab;
@@ -7522,6 +8112,7 @@ table.t.mc td.pc{white-space:nowrap}
     S.placeType = type || null;
     S.preview = null;
     if (m !== "route") S.route = null;
+    if (m !== "measure") S.measure = null;
     updateModebar();
     renderTabs();
     draw();
@@ -7566,6 +8157,12 @@ table.t.mc td.pc{white-space:nowrap}
       cancelTxt = "Cancelar";
     } else if (P) {
       html = `Tocá el mapa donde quieras ubicar <b>${esc(P.name(S.placeType))}</b>; vas a poder confirmar o cancelar.`;
+    } else if (S.mode === "measure") {
+      const m = S.measure;
+      if (m?.a && m.b) {
+        const r = measureOf(m.a, m.b);
+        html = `Distancia horizontal: <b>${r.km.toFixed(r.km < 10 ? 2 : 1)} km</b> · rumbo ${Math.round(r.az)}°. Tocá otro punto para medir de nuevo.`;
+      } else html = m?.a ? "Tocá el <b>segundo punto</b>." : "Regla: tocá el <b>primer punto</b> (tecla M o Esc para salir).";
     } else if (S.mode === "route") {
       const T = THREATS[S.atk.type], off = isOffmap(T), n2 = S.route.pts.length;
       if (off) {
@@ -7612,7 +8209,7 @@ table.t.mc td.pc{white-space:nowrap}
 
   // src/ui/panels/defense.js
   var WIND_DIRS = [["Norte", 0], ["Noreste", 45], ["Este", 90], ["Sudeste", 135], ["Sur", 180], ["Sudoeste", 225], ["Oeste", 270], ["Noroeste", 315]];
-  var windTxt = () => S.wind.v ? `${S.wind.v} m/s (${Math.round(S.wind.v * 3.6)} km/h) desde ${(WIND_DIRS.find(([, a]) => a === S.wind.from) || [S.wind.from + "°"])[0].toLowerCase()}` : "calma";
+  var windTxt = () => S.wind.v ? `${S.wind.v} m/s (${Math.round(S.wind.v * 3.6)} km/h) desde ${String((WIND_DIRS.find(([, a]) => a === S.wind.from) || [S.wind.from + "°"])[0]).toLowerCase()}` : "calma";
   function unitBtn(key, def, act, cls) {
     return `<button class="ub ${cls} ${act ? "act" : ""}" data-k="${key}" title="${esc(def.name)}"><span>${esc(def.short)}</span><i data-info="${key}" role="button" aria-label="Ficha">i</i></button>`;
   }
@@ -7630,14 +8227,20 @@ table.t.mc td.pc{white-space:nowrap}
       <div class="field"><label for="optC2">Coordinación C2 (general) ${infoBtn("c2")}</label><select id="optC2" class="sel">${Object.entries(C2_LEVELS).map(([k, L]) => `<option value="${k}" ${S.c2 === k ? "selected" : ""}>${esc(L.name)}</option>`).join("")}</select></div>
       <p class="hint" id="c2Info">${esc(C2_LEVELS[S.c2].desc)}</p>
       <p class="hint">Desconectada desactiva alertas, pistas de red y reparto de blancos. El enlace técnico de cada unidad se configura aparte en Selección y solo intercambia pistas con sistemas compatibles.</p>
+      ${Object.entries(GATEWAYS).map(([k, G]) => `<label class="check" title="${esc(G.note)}"><input type="checkbox" class="optGw" data-gw="${k}" ${S.gateways.includes(k) ? "checked" : ""}> ${esc(G.name)}: pistas de tiro entre las dos redes (+${G.gwLag} s, Pk ×${G.gwPk})</label>`).join("")}
+      <p class="hint">Apagada por defecto: no hay fuente de que esas pistas sirvan para disparar (sí hay imagen común y alertas, que se comparten igual).</p>
       <div class="field"><label for="optDoc">Doctrina de tiro</label><select id="optDoc" class="sel"><option value="salva" ${S.doctrine === "salva" ? "selected" : ""}>Salva (según unidad)</option><option value="sls" ${S.doctrine === "sls" ? "selected" : ""}>Disparar-observar-disparar</option></select></div>
       <label class="check" title="Los radares de tiro (S, C, X, Ku) aprenden a distinguir señuelos con el tiempo de seguimiento. Con esta opción no se dispara a pistas clasificadas como señuelo: ahorra munición, pero a veces un arma real se clasifica mal."><input type="checkbox" id="optDecoy" ${S.ignoreDecoys ? "checked" : ""}> No tirarle a pistas clasificadas como señuelo</label>
       <div class="field" title="Alcance efectivo = alcance máximo × geometría (menos contra un blanco que se aleja). Esperar a que el blanco se acerque deja menos tiempo para un segundo tiro, pero el misil llega con más energía y la Pk sube."><label for="optFR">Disparar dentro del ${'<span id="frVal">' + Math.round(S.fireRange * 100) + "%</span>"} del alcance ${infoBtn("energia")}</label><input type="range" id="optFR" min="50" max="100" step="5" value="${Math.round(S.fireRange * 100)}"></div>
     </div>
     <div class="grp"><h3>Clima ${infoBtn("clima")}</h3>
-      <div class="field"><label for="optWx">Tiempo</label><select id="optWx" class="sel">${Object.entries(WEATHER).map(([k, W]) => `<option value="${k}" ${S.weather === k ? "selected" : ""}>${esc(W.name)}</option>`).join("")}</select></div>
+      <div class="field"><label for="optWx">Tiempo</label><select id="optWx" class="sel">${Object.entries(WEATHER).map(([k, W2]) => `<option value="${k}" ${S.weather === k ? "selected" : ""}>${esc(W2.name)}</option>`).join("")}</select></div>
       <p class="hint" id="wxInfo">${esc(WEATHER[S.weather].desc)}</p>
-      <div class="field" title="Viento a la altura de vuelo, igual en todo el mapa. Los drones y misiles de crucero vuelan a su velocidad respecto del aire: con viento de frente tardan más y con viento de cola llegan antes. A un Shahed (≈185 km/h) le pesa mucho; a un misil de crucero, poco. No afecta a balísticos ni planeadoras."><label for="optWind">Viento ${infoBtn("clima")}</label><span class="val" id="windVal">${windTxt()}</span><input type="range" id="optWind" min="0" max="30" step="1" value="${S.wind.v}"></div>
+      <div class="field"><label for="optTod">Momento</label><select id="optTod" class="sel">${Object.entries(TIMES_OF_DAY).map(([k, D2]) => `<option value="${k}" ${S.tod === k ? "selected" : ""}>${esc(D2.name)}</option>`).join("")}</select></div>
+      <p class="hint" id="todInfo">${esc(TIMES_OF_DAY[S.tod].desc)}</p>
+      <div class="field" title="El tiempo puede cambiar durante la noche: a los minutos indicados pasa al estado elegido (por ejemplo, entra una tormenta)."><label for="optWx2">Después cambia a</label><select id="optWx2" class="sel"><option value="">(no cambia)</option>${Object.entries(WEATHER).map(([k, W2]) => `<option value="${k}" ${S.wxPlan[0]?.weather === k ? "selected" : ""}>${esc(W2.name)}</option>`).join("")}</select></div>
+      <div class="field"><label for="optWxT">A los (minutos)</label><input id="optWxT" class="inp" type="number" min="1" max="600" value="${Math.round((S.wxPlan[0]?.t ?? 1800) / 60)}"></div>
+      <div class="field" title="Viento en superficie (a 10 m), igual en todo el mapa; arriba sopla más (≈1,9 veces a 1.000 m). Los drones y misiles de crucero vuelan a su velocidad respecto del aire: con viento de frente tardan más y con viento de cola llegan antes. A un Shahed (≈185 km/h) le pesa mucho; a un misil de crucero, poco. No afecta a balísticos ni planeadoras."><label for="optWind">Viento ${infoBtn("clima")}</label><span class="val" id="windVal">${windTxt()}</span><input type="range" id="optWind" min="0" max="30" step="1" value="${S.wind.v}"></div>
       <div class="field"><label for="optWindFrom">Sopla desde</label><select id="optWindFrom" class="sel">${WIND_DIRS.map(([n2, a]) => `<option value="${a}" ${S.wind.from === a ? "selected" : ""}>${n2} (${a}°)</option>`).join("")}</select></div>
     </div>
     <div class="grp"><h3>Cobertura de radar ${infoBtn("horizon")} ${infoBtn("los")}</h3>
@@ -7672,6 +8275,15 @@ table.t.mc td.pc{white-space:nowrap}
       $("#c2Info").textContent = C2_LEVELS[S.c2].desc;
       renderSel();
     };
+    for (const c of el.querySelectorAll(".optGw")) c.onchange = (e) => {
+      if (S.started) {
+        toast("Reiniciá para cambiar las pasarelas.");
+        e.target.checked = !e.target.checked;
+        return;
+      }
+      const k = e.target.dataset.gw;
+      S.gateways = e.target.checked ? [.../* @__PURE__ */ new Set([...S.gateways, k])] : S.gateways.filter((x) => x !== k);
+    };
     $("#optDoc").onchange = (e) => {
       S.doctrine = e.target.value;
     };
@@ -7691,6 +8303,35 @@ table.t.mc td.pc{white-space:nowrap}
       S.weather = e.target.value;
       $("#wxInfo").textContent = WEATHER[S.weather].desc;
       schedCov();
+    };
+    $("#optTod").onchange = (e) => {
+      if (S.started) {
+        toast("Reiniciá para cambiar el momento del día.");
+        e.target.value = S.tod;
+        return;
+      }
+      S.tod = e.target.value;
+      $("#todInfo").textContent = TIMES_OF_DAY[S.tod].desc;
+      schedCov();
+    };
+    const setPlan = () => {
+      const w = $("#optWx2").value, m = +$("#optWxT").value;
+      S.wxPlan = w && Number.isFinite(m) && m >= 1 && m <= 600 ? [{ t: Math.round(m * 60), weather: w }] : [];
+    };
+    $("#optWx2").onchange = (e) => {
+      if (S.started) {
+        toast("Reiniciá para cambiar el clima.");
+        e.target.value = S.wxPlan[0]?.weather ?? "";
+        return;
+      }
+      setPlan();
+    };
+    $("#optWxT").onchange = (e) => {
+      if (S.started) {
+        toast("Reiniciá para cambiar el clima.");
+        return;
+      }
+      setPlan();
     };
     const windLock = (e, v) => {
       if (!S.started) return false;
@@ -7744,10 +8385,10 @@ table.t.mc td.pc{white-space:nowrap}
     if (!MAP) return;
     const units = S.started ? S.units.filter((u) => u.alive) : S.setup.defs;
     const jams = S.started ? S.jamsLive : S.setup.jams;
-    const cov = coverageGrid(units, jams, THREATS[S.covRef], S.covAgl, WEATHER[S.weather]);
+    const cov = coverageGrid(units, jams, THREATS[S.covRef], S.covAgl, wxNow());
     paintCoverage(cov, MAP.W, MAP.H);
     S._cov = cov;
-    S.covStat = { pct: Math.round(100 * cov.reduce((a, v) => a + (v > 0), 0) / (MAP.W * MAP.H)) };
+    S.covStat = { pct: Math.round(100 * cov.reduce((a, v) => a + (v > 0 ? 1 : 0), 0) / (MAP.W * MAP.H)) };
     draw();
     renderCovInfo();
   }
@@ -7782,10 +8423,14 @@ table.t.mc td.pc{white-space:nowrap}
   var DRAG_PX = 6;
   function hitTest(sx, sy) {
     const units = S.started ? S.units : S.setup.defs, jams = S.started ? S.jamsLive : S.setup.jams, objs = S.started ? S.objs : S.setup.objs;
-    if (S.started) for (const th of S.threats) {
-      if (!th.alive || !th.p) continue;
-      const [a, b] = toS(th.p.x, th.p.y);
-      if (Math.hypot(a - sx, b - sy) < 9) return { kind: "thr", id: th.id };
+    if (S.started && !S.replay) {
+      const dv = isDefenderView();
+      for (const th of S.threats) {
+        const c = dv ? contactOf(th, S.t) : th.alive && th.p ? th.p : null;
+        if (!c) continue;
+        const [a, b] = toS(c.x, c.y);
+        if (Math.hypot(a - sx, b - sy) < 9) return { kind: "thr", id: th.id };
+      }
     }
     for (const u of units) {
       const [a, b] = toS(u.x, u.y);
@@ -7825,6 +8470,15 @@ table.t.mc td.pc{white-space:nowrap}
       proposePlacement(wx, wy);
       return;
     }
+    if (S.mode === "measure") {
+      const p = [+wx.toFixed(3), +wy.toFixed(3)], m = S.measure || (S.measure = { a: null, b: null });
+      if (!m.a || m.b) {
+        m.a = p;
+        m.b = null;
+      } else m.b = p;
+      updateModebar();
+      return;
+    }
     if (S.mode === "route") {
       const T = THREATS[S.atk.type];
       if (isOffmap(T) && S.route.pts.length >= 2) return;
@@ -7843,6 +8497,15 @@ table.t.mc td.pc{white-space:nowrap}
       updateModebar();
       return;
     }
+    if (g.shift && g.hit?.kind === "def" && !S.started) {
+      if (!S.multi.length && S.sel?.kind === "def") S.multi = [S.sel.id];
+      S.multi = S.multi.includes(g.hit.id) ? S.multi.filter((i) => i !== g.hit.id) : [...S.multi, g.hit.id];
+      S.sel = S.multi.length === 1 ? { kind: "def", id: S.multi[0] } : null;
+      if (S.multi.length === 1) S.multi = [];
+      renderSel();
+      return;
+    }
+    S.multi = [];
     if (g.hit) {
       S.sel = g.hit;
       renderSel();
@@ -7860,7 +8523,7 @@ table.t.mc td.pc{white-space:nowrap}
       }
       if (pointers.size > 2) return;
       const [sx, sy] = evPos(e);
-      gesture = { sx, sy, cx: V.cx, cy: V.cy, kind: null, hit: hitTest(sx, sy) };
+      gesture = { sx, sy, cx: V.cx, cy: V.cy, kind: null, hit: hitTest(sx, sy), shift: e.shiftKey };
     });
     cv.addEventListener("pointermove", (e) => {
       if (pointers.has(e.pointerId)) pointers.set(e.pointerId, evPos(e));
@@ -7894,6 +8557,7 @@ table.t.mc td.pc{white-space:nowrap}
         }
         return;
       }
+      if (S.mode === "measure" && S.measure?.a && !S.measure.b) S.measure.cur = toW(sx, sy);
       showTip(sx, sy);
     });
     const endPtr = (e) => {
@@ -7935,6 +8599,7 @@ table.t.mc td.pc{white-space:nowrap}
       V.s = clamp(V.s / 1.3, 1, 80);
     };
     $("#zfit").onclick = fitView;
+    $("#zrule").onclick = () => setMode(S.mode === "measure" ? "select" : "measure");
     document.addEventListener("keydown", (e) => {
       if (!$("#modal").hidden) {
         if (e.key === "Escape") {
@@ -7943,14 +8608,23 @@ table.t.mc td.pc{white-space:nowrap}
         }
         return;
       }
-      if (e.target.closest?.('input,select,textarea,[contenteditable]:not([contenteditable="false"]),[role="textbox"]')) return;
+      if (
+        /** @type {HTMLElement} */
+        e.target.closest?.('input,select,textarea,[contenteditable]:not([contenteditable="false"]),[role="textbox"]')
+      ) return;
       if (e.key === "Delete") {
         if (deleteSelected()) e.preventDefault();
         return;
       }
       if (e.key === "Escape") {
         if (S.preview) cancelPlacement();
-        else setMode("select");
+        else {
+          if (S.multi.length) {
+            S.multi = [];
+            renderSel();
+          }
+          setMode("select");
+        }
       }
       if (e.key === "Enter") {
         if (S.preview) confirmPlacement();
@@ -7960,6 +8634,7 @@ table.t.mc td.pc{white-space:nowrap}
         e.preventDefault();
         togglePlay();
       }
+      if (e.key === "m" || e.key === "M") setMode(S.mode === "measure" ? "select" : "measure");
     });
   }
   function showTip(sx, sy) {
@@ -7969,10 +8644,16 @@ table.t.mc td.pc{white-space:nowrap}
     const [wx, wy] = toW(sx, sy);
     if (h && h.kind === "thr") {
       const th = S.threats.find((t) => t.id === h.id);
-      const p = th.p;
       const dv = isDefenderView();
-      const v = speedAt(th, S.t);
-      txt = (dv ? "Pista #" + th.id + (th.cls === "dron" ? " (dron?)" : "") : label(th)) + "\nAlt: " + Math.round(p.z) + " m (" + Math.round(p.z - surf(p.x, p.y)) + " AGL)\nVel: " + kmh(v) + " · " + mach(v) + "\nA " + p.rem.toFixed(1) + " km del blanco\nDetectada por: " + (Object.keys(th.det).filter((k) => S.t - th.det[k] < 12).map((k) => uLabel(S.units.find((u) => u.id == k))).join(", ") || "nadie");
+      const by = Object.keys(th.det).filter((k) => S.t - th.det[k] < 12).map((k) => uLabel(S.units.find((u) => u.id == k))).join(", ") || "nadie";
+      if (dv) {
+        const c = contactOf(th, S.t);
+        if (!c) return;
+        txt = "Pista #" + th.id + (c.lost ? " · perdida hace " + Math.round(c.age) + " s" : "") + "\nAlt: " + Math.round(c.z) + " m (" + Math.round(c.z - surf(c.x, c.y)) + " AGL)\nVel: " + kmh(c.v) + " · " + mach(c.v) + " (estimada)\nDetectada por: " + by;
+      } else {
+        const p = th.p, v = speedAt(th, S.t);
+        txt = label(th) + "\nAlt: " + Math.round(p.z) + " m (" + Math.round(p.z - surf(p.x, p.y)) + " AGL)\nVel: " + kmh(v) + " · " + mach(v) + "\nA " + p.rem.toFixed(1) + " km del blanco\nDetectada por: " + by;
+      }
     } else if (h && h.kind === "def") {
       const u = (S.started ? S.units : S.setup.defs).find((u2) => u2.id === h.id);
       txt = (u.name || D(u).short) + "\n" + D(u).name;
@@ -8066,8 +8747,8 @@ table.t.mc td.pc{white-space:nowrap}
     for (const k of keys) if (o[k] !== void 0) r[k] = structuredClone(o[k]);
     return r;
   };
-  var OBJ_KEYS = ["id", "type", "x", "y", "name", "short", "maxHp", "desc"];
-  var DEF_KEYS = ["id", "type", "x", "y", "name", "az", "mast", "alt", "mag", "salvo", "noDrones", "link", "reserve"];
+  var OBJ_KEYS = ["id", "type", "x", "y", "name", "short", "maxHp", "desc", "cp"];
+  var DEF_KEYS = ["id", "type", "x", "y", "name", "az", "mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2", "cp", "decoyDoc", "owner"];
   var SALVO_KEYS = ["id", "type", "count", "interval", "tStart", "sync", "tArrive", "agl", "launchDist", "maneuver", "decoys", "link", "crpa", "pts", "targetUnit", "targetObj"];
   var JAM_KEYS = ["id", "type", "x", "y", "alt", "on", "mode", "target"];
   var META_KEYS = ["name", "player", "time", "description", "forces", "conditions", "rulesText", "goals", "success", "failure"];
@@ -8083,7 +8764,7 @@ table.t.mc td.pc{white-space:nowrap}
       version: VERSION,
       saved: now.toISOString(),
       map: mapRef(),
-      rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather, wind: { ...S.wind }, ignoreDecoys: S.ignoreDecoys, fireRange: S.fireRange },
+      rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather, tod: S.tod, wxPlan: S.wxPlan.map((c) => ({ ...c })), gateways: [...S.gateways], wind: { ...S.wind }, ignoreDecoys: S.ignoreDecoys, fireRange: S.fireRange },
       scenario: S.scen ? { base: baseKey(S.scen), ...pick(S.scen, META_KEYS) } : null,
       setup: {
         objs: s.objs.map((g) => pick(g, OBJ_KEYS)),
@@ -8200,7 +8881,7 @@ table.t.mc td.pc{white-space:nowrap}
         return { id: id(w, g.id) };
       }
       pos(w, g.x, g.y);
-      return { id: id(w, g.id), type: g.type, x: g.x, y: g.y, name: str(w + " · name", g.name, 120, false), short: str(w + " · short", g.short, 60), maxHp: num2(w + " · maxHp", g.maxHp, 1, 1e5, { opt: true }), desc: str(w + " · desc", g.desc, 1e3) };
+      return { id: id(w, g.id), type: g.type, x: g.x, y: g.y, name: str(w + " · name", g.name, 120, false), short: str(w + " · short", g.short, 60), maxHp: num2(w + " · maxHp", g.maxHp, 1, 1e5, { opt: true }), desc: str(w + " · desc", g.desc, 1e3), cp: str(w + " · cp", g.cp, 20) || void 0 };
     });
     const defs = list("defs", setup.defs).map((u, i) => {
       const w = `Defensa ${i + 1}${typeof u.name === "string" ? " (" + u.name + ")" : ""}`;
@@ -8222,7 +8903,11 @@ table.t.mc td.pc{white-space:nowrap}
         salvo: num2(w + " · salvo", u.salvo, 0, 10, { int: true, opt: true }),
         noDrones: bool(w + " · noDrones", u.noDrones),
         link: bool(w + " · link", u.link),
-        reserve: num2(w + " · reserve", u.reserve, 0, 1e3, { int: true, opt: true })
+        reserve: num2(w + " · reserve", u.reserve, 0, 1e3, { int: true, opt: true }),
+        cp: str(w + " · cp", u.cp, 20) || void 0,
+        owner: u.owner === void 0 ? void 0 : ["UA", "RU"].includes(u.owner) ? u.owner : (err(`${w} · owner: "${String(u.owner)}" no es "UA" ni "RU".`), void 0),
+        decoyDoc: u.decoyDoc === void 0 ? void 0 : ["ignorar", "tirar"].includes(u.decoyDoc) ? u.decoyDoc : (err(`${w} · decoyDoc: "${String(u.decoyDoc)}" no es "ignorar" ni "tirar".`), void 0),
+        c2: u.c2 === void 0 ? void 0 : C2_LEVELS[u.c2] ? u.c2 : (err(`${w} · c2: "${String(u.c2)}" no es un nivel de C2 válido (${Object.keys(C2_LEVELS).join(", ")}).`), void 0)
       };
     });
     const objIds = new Set(objs.filter(Boolean).map((g) => g.id)), defIds = new Set(defs.filter(Boolean).map((u) => u.id));
@@ -8277,6 +8962,29 @@ table.t.mc td.pc{white-space:nowrap}
       if (r.wind === null || typeof r.wind !== "object") err("rules.wind: tiene que ser { v, from } (m/s y grados de donde sopla).");
       else rules.wind = { v: num2("rules.wind.v", r.wind.v, 0, 40), from: num2("rules.wind.from", r.wind.from, 0, 360) };
     }
+    if (r.gateways !== void 0) {
+      if (!Array.isArray(r.gateways)) err("rules.gateways: tiene que ser una lista de pasarelas (" + Object.keys(GATEWAYS).join(", ") + ").");
+      else {
+        for (const k of r.gateways) if (!GATEWAYS[k]) err(`rules.gateways: "${String(k)}" no es una pasarela conocida (${Object.keys(GATEWAYS).join(", ")}).`);
+        rules.gateways = r.gateways.filter((k) => GATEWAYS[k]);
+      }
+    }
+    if (r.tod !== void 0) {
+      if (!TIMES_OF_DAY[r.tod]) err(`rules.tod: "${String(r.tod)}" no es un momento del día válido (${Object.keys(TIMES_OF_DAY).join(", ")}).`);
+      else rules.tod = r.tod;
+    }
+    if (r.wxPlan !== void 0) {
+      if (!Array.isArray(r.wxPlan) || r.wxPlan.length > 10) err("rules.wxPlan: tiene que ser una lista de hasta 10 cambios { t, weather } (segundos y clima).");
+      else rules.wxPlan = r.wxPlan.map((c, i) => {
+        const w = `rules.wxPlan[${i}]`;
+        if (!c || typeof c !== "object") {
+          err(w + ": tiene que ser { t, weather }.");
+          return null;
+        }
+        if (!WEATHER[c.weather]) err(`${w}.weather: "${String(c.weather)}" no es un clima válido (${Object.keys(WEATHER).join(", ")}).`);
+        return { t: num2(w + ".t", c.t, 0, 86400), weather: c.weather };
+      }).filter(Boolean).sort((a, b) => a.t - b.t);
+    }
     if (r.weather !== void 0 && !WEATHER[r.weather]) err(`rules.weather: "${String(r.weather)}" no es un clima válido (${Object.keys(WEATHER).join(", ")}).`);
     if (r.c2 !== void 0 && !C2_LEVELS[r.c2]) err(`rules.c2: "${String(r.c2)}" no es un nivel de mando y control válido (${Object.keys(C2_LEVELS).join(", ")}).`);
     if (r.doctrine !== void 0 && !DOCTRINES.includes(r.doctrine)) err(`rules.doctrine: "${String(r.doctrine)}" no es ${DOCTRINES.join(" ni ")}.`);
@@ -8328,10 +9036,10 @@ table.t.mc td.pc{white-space:nowrap}
     S.sel = null;
     S.mode = "select";
     const objId = /* @__PURE__ */ new Map(), defId = /* @__PURE__ */ new Map();
-    for (const g of data.setup.objs) objId.set(g.id, addObj(g.type, g.x, g.y, { name: g.name, short: g.short, hp: g.maxHp, desc: g.desc }).id);
+    for (const g of data.setup.objs) objId.set(g.id, addObj(g.type, g.x, g.y, { name: g.name, short: g.short, hp: g.maxHp, desc: g.desc, cp: g.cp }).id);
     for (const d of data.setup.defs) {
       const u = addDef(d.type, d.x, d.y, { name: d.name, az: d.az });
-      for (const k of ["mast", "alt", "mag", "salvo", "noDrones", "link", "reserve"]) if (d[k] !== void 0) u[k] = d[k];
+      for (const k of ["mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2", "cp", "decoyDoc", "owner"]) if (d[k] !== void 0) u[k] = d[k];
       defId.set(d.id, u.id);
     }
     for (const sv of data.setup.salvos) {
@@ -8346,6 +9054,9 @@ table.t.mc td.pc{white-space:nowrap}
     if (data.rules.c2) S.c2 = data.rules.c2;
     S.weather = data.rules.weather || "despejado";
     S.wind = { v: data.rules.wind?.v ?? 0, from: data.rules.wind?.from ?? 0 };
+    S.tod = data.rules.tod || "noche";
+    S.gateways = data.rules.gateways || [];
+    S.wxPlan = data.rules.wxPlan || [];
     S.ignoreDecoys = !!data.rules.ignoreDecoys;
     S.fireRange = data.rules.fireRange ?? 1;
     if (data.rules.doctrine) S.doctrine = data.rules.doctrine;
@@ -8353,7 +9064,7 @@ table.t.mc td.pc{white-space:nowrap}
       ...data.scenario,
       map: data.map.key,
       // el briefing lista los objetivos del escenario: son los del archivo
-      objectives: S.setup.objs.map((g) => ({ type: g.type, name: g.name, short: g.short, x: g.x, y: g.y, hp: g.maxHp, desc: g.desc })),
+      objectives: S.setup.objs.map((g) => ({ type: g.type, name: g.name, short: g.short, x: g.x, y: g.y, hp: g.maxHp, desc: g.desc, cp: g.cp })),
       defs: [],
       salvos: [],
       jams: []
@@ -8400,6 +9111,7 @@ table.t.mc td.pc{white-space:nowrap}
       return res;
     }
     const { data } = res;
+    if (!data || !data.map) return res;
     resetSim();
     if (data.map.builtin && MAP?.key !== data.map.key) applyMap(builtinMap(data.map.key));
     loadScenarioData(data);
@@ -8498,7 +9210,8 @@ table.t.mc td.pc{white-space:nowrap}
   }, 0);
   function startLoop() {
     document.addEventListener("pointerdown", (e) => {
-      pressedBtn = e.target.closest?.("button") || null;
+      pressedBtn = /** @type {HTMLElement} */
+      e.target.closest?.("button") || null;
     }, true);
     document.addEventListener("pointerup", release, true);
     document.addEventListener("pointercancel", release, true);
@@ -8506,8 +9219,12 @@ table.t.mc td.pc{white-space:nowrap}
   }
 
   // src/main.js
-  window.DEFENSES_REF = DEFENSES;
-  window.CC_DATA = { SRC, UNC, OBS, CAL, PL, applyProbable, applySample, sampleU };
+  var W = (
+    /** @type {any} */
+    window
+  );
+  W.DEFENSES_REF = DEFENSES;
+  W.CC_DATA = { SRC, UNC, OBS, CAL, PL, applyProbable, applySample, sampleU };
   hooks.onLog = markLogDirty;
   hooks.onEnd = () => {
     updatePlay();
@@ -8552,8 +9269,8 @@ table.t.mc td.pc{white-space:nowrap}
   resize();
   fitView();
   startLoop();
-  window.__S = S;
-  window.__dbg = { flat: () => {
+  W.__S = S;
+  W.__dbg = { flat: () => {
     MAP.data = new Int16Array(MAP.data.length);
     MAP.key = "flat";
     MAP.max = 0;

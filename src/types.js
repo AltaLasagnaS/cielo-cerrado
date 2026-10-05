@@ -78,6 +78,8 @@
  * Arma de una defensa.
  * @typedef {Object} Sam
  * @property {number} maxR     Alcance contra aeronaves y crucero (km)
+ * @property {number} [hFull] Altura (m) hasta la que, a velocidad máxima, todavía maniobra con toda su aceleración (physics/engagement.js#altitudePk)
+ * @property {boolean} [dthrust] Empuje lateral directo (PAC-3, Aster): maniobra con cohetes, no depende del aire
  * @property {boolean} [hoj] Modo home-on-jam: puede guiarse al ruido de un jammer aéreo ya ubicado (sim/ew.js)
  * @property {number} [pkHoj] Pk de ese disparo (sin distancia al blanco: menor que la normal)
  * @property {number} maxRtbm  Alcance contra balísticos (km; 0 = no puede)

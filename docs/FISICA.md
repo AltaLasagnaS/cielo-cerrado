@@ -82,7 +82,7 @@ lluvia      C = η · V / I               V = 0,567 · ΔR · R² · θaz · θe
 - **Factor de mejora I** (`radar.mti`): sin filtro 1. MTI: cancelador doble contra un espectro gaussiano, I = 2·(PRF/(2π·σf))⁴ con σf = 2σv/λ (Radar Handbook, ec. 15.10), con techo de 35 dB; la dispersión σv es 0,1 m/s en tierra, 0,9 en el mar y 2 en la lluvia (tabla 15.1). La PRF, sin dato, es la de alcance sin ambigüedad hasta 2·R1. Pulso-Doppler: 55 dB. Con eso un MTI rinde 35 dB contra el suelo pero solo 26–28 dB contra el mar y 12–14 dB contra la lluvia en S y X (el 36D6 y el Buk); un pulso-Doppler mantiene 55 dB.
 - **Resolución ΔR:** 150 m por defecto (`radar.res` la pisa); ancho de haz en elevación = el de la banda (`radar.bwEl`).
 
-Todos son valores **por clase**, con rango en `UNC.clu` (Monte Carlo los sortea) y confianza baja o media: faltan la mejora sub-clutter, la PRF y la resolución publicadas de cada radar ([handoff de datos](investigacion/clutter-y-pulsos-datos.md)). El S-125 sigue `'none'` (ver ROADMAP).
+Todos son valores **por clase**, con rango en `UNC.clu` (Monte Carlo los sortea) y confianza baja o media: faltan la mejora sub-clutter, la PRF y la resolución publicadas de cada radar ([handoff de datos](investigacion/clutter-y-pulsos-datos.md)). El S-125 tiene MTI desde la integración de los datos de Codex (dos fuentes técnicas secundarias; falta un manual primario de la variante) con PRF 2.600 Hz, y el Buk usa el haz de seguimiento del 9S35 (1,3° en elevación). El modelo NRL se evalúa dentro de su dominio (0,5–35 GHz): para el P-18 en VHF se usa el borde, porque extrapolar la curva no está respaldado.
 
 **Notch Doppler:** los radares con filtro Doppler (`'mti'`, `'pd'`) borran lo que no se acerca ni se aleja: si la velocidad radial del blanco (|v|·cos del aspecto) es menor que 15 m/s (MTI) u 8 m/s (pulso-Doppler), ese barrido no lo ve. Choca de lleno con el aspecto (§3): de costado la RCS es máxima, pero un radar Doppler lo puede perder. Los sensores ópticos y acústicos no tienen clutter ni notch.
 
@@ -105,7 +105,15 @@ L (`rainKm`) es el largo máximo del camino dentro de la lluvia: las celdas de l
 
 **Ópticos, IR y acústicos.** Los sensores `OPT` multiplican su alcance por `wx.opt` y no ven blancos por encima del techo de nubes o niebla (`wx.ceiling`, m sobre el terreno). Los acústicos multiplican por `wx.acu`. Son estimaciones de juego apoyadas en el manual de CMO (la lluvia deja lo visual en 1–5% y degrada mucho el IR; las nubes cortan la línea de vista).
 
-**No se modela:** día y noche, el viento sobre los drones, ni el efecto del clima sobre los buscadores IR de los misiles.
+**Día y noche** (`S.tod`, pestaña Defensa → Clima, `rules.tod`; por defecto noche): los alcances del catálogo de los sensores ópticos (grupos móviles, MANPADS) están estimados para la noche, con visor térmico y reflectores. De día se suma la vista y llegan ×`ENV.modelo.optDay` = 1,3 más lejos (estimado, rango 1–2 en UNC: no hay alcances públicos por hora). Los radares no cambian.
+
+**Niebla** (`lwc` = 0,05 g/m³ en 10 km): atenuación ITU-R P.840 (`physics/weather.js#cloudKl`, verificada contra la tabla calculada de Codex): ≈0,005 dB/km en X, casi nada. Lo que la niebla sí tapa es lo óptico.
+
+**Nieve** (estado "Nevada moderada", `snow` = 2 mm/h de agua equivalente): la nieve seca casi no atenúa microondas, así que no suma atenuación (estimado: Codex no encontró un coeficiente primario por banda para nieve); sí devuelve eco de volumen, que se suma al clutter de lluvia (§2, "Clutter") con la reflectividad de Sekhon y Srivastava (1970), la que usa el servicio meteorológico de Canadá: `Zes = 1780·s^2,23` (hielo), `Ze = Zes − 6,5 dB` (convención del agua), `η = π⁵·0,93·Ze·10⁻¹⁸/λ⁴`. Lo óptico cae a 0,2 y las nubes cortan arriba de 600 m (estimados).
+
+**Cambios de tiempo durante la noche** (`S.wxPlan`, "Después cambia a…" en Defensa → Clima, `rules.wxPlan` = hasta 10 cambios `{ t (s), weather }`): a la hora indicada el clima vigente pasa al nuevo estado y el registro lo anota (`sim/weather-now.js`). El clima elegido del escenario no se pisa.
+
+**No se modela:** el efecto del clima sobre los buscadores IR de los misiles, ni nieve húmeda (que sí atenúa).
 
 ### Sensores no radar
 
@@ -202,7 +210,9 @@ El **blanqueo de lóbulos laterales** (SLB) compara cada pulso con una antena au
 
 **Capacidad de seguimiento** (`radar.tracks`, con rango y fuente en `UNC.def`): blancos que el radar puede seguir a la vez. Patriot 100, Arabel 100, TRML-4D 1.500, Sentinel más de 50, 30N6 24, 9S18M 50, Tor 48, 92N6 100; el resto es estimación. En cada barrido, las pistas abiertas más los falsos blancos ocupan esa capacidad. Si está llena, el radar **no abre pistas nuevas** (las abiertas se mantienen) y el registro lo avisa. También pasa sin engaño: en el puente de Monterey, un Pantsir con capacidad 20 se llena con el enjambre.
 
-No se modela todavía: arrastre de la ventana de distancia o velocidad contra un seguimiento (RGPO/VGPO, hace falta un jammer a bordo del blanco), disparos desperdiciados contra falsos blancos ni chequeos de coherencia distancia-Doppler de cada radar.
+**Disparos contra falsos blancos:** una fracción `JAM_MODES.drfm.fooled` = 0,3 de los falsos blancos (valor de juego: no hay dato público de cuántos pasan la clasificación) compite con las pistas reales por los disparos de cada evaluación de la batería: con probabilidad `falsos / (falsos + pistas reales)` dispara una salva hacia su sector, que no encuentra nada y ocupa canales y munición. Un DRFM no mete ruido, pero emite cuando el haz lo ilumina: también se lo puede **ubicar por triangulación** (abajo) por su copia en el lóbulo principal.
+
+No se modela todavía: arrastre de la ventana de distancia o velocidad contra un seguimiento (RGPO/VGPO, hace falta un jammer a bordo del blanco) ni chequeos de coherencia distancia-Doppler de cada radar.
 
 ### Triangulación y home-on-jam
 
@@ -214,7 +224,7 @@ error = √((d1·σ1)² + (d2·σ2)²) / sin Δ     Δ = ángulo entre las marca
 ubicado si error ≤ 5 km
 ```
 
-Con el jammer ubicado, una batería con modo **home-on-jam** (`sam.hoj`: PAC-2 GEM-T, por la variante MIM-104B pensada contra jammers stand-off; AIM-120 del NASAMS; I-Hawk), cuyo radar oye ese ruido y que lo tiene dentro de su alcance y techo, le dispara un misil que se guía a la emisión. Pk `sam.pkHoj` (0,5 en PAC-2 y AIM-120, 0,3 en el Hawk; estimadas, con rango en UNC: el guiado solo angular no sabe la distancia y la espoleta trabaja peor). Un jammer derribado deja de interferir. Solo contra jammers aéreos: los terrestres quedan para cuando haya artillería o misiles antirradiación. El mapa muestra el círculo de error del jammer ubicado y una cruz si cae.
+Con el jammer ubicado, una batería con modo **home-on-jam** (`sam.hoj`: por ahora solo el AIM-120 del NASAMS. El manual del Patriot describe un misil contra jammers stand-off, el MIM-104B/SOJC, y la triangulación de jammers de la batería (FM 3-01.85 §5-31), pero eso no se generaliza al PAC-2 GEM-T; del I-Hawk solo hay un modo "potencial". Ver docs/investigacion/datos-fisica-guerra-electronica.md), cuyo radar oye ese ruido y que lo tiene dentro de su alcance y techo, le dispara un misil que se guía a la emisión. Pk `sam.pkHoj` (0,5; estimada, con rango en UNC: el guiado solo angular no sabe la distancia y la espoleta trabaja peor). Un jammer derribado deja de interferir. Solo contra jammers aéreos: los terrestres quedan para cuando haya artillería o misiles antirradiación. El mapa muestra el círculo de error del jammer ubicado y una cruz si cae.
 
 ### GNSS
 
@@ -267,7 +277,7 @@ Es un modelo **cinemático guiado por datos**: la amenaza recorre una ruta polig
 - **Salvas:** dispersión lateral de 0,25 km entre misiles, para que no se apilen.
 - **Señuelos:** se liberan a 40 km del blanco; se abren hasta 1–3,5 km del misil padre y suben hasta 300 m.
 - **Velocidad instantánea:** diferencia centrada de ±0,5 s (`speedAt`).
-- **Viento** (`S.wind = { v, from }`, pestaña Defensa → Clima, `rules.wind` en los archivos; por defecto calma): uniforme en todo el mapa y en altura, fijo toda la noche. Las armas con ruta en el mapa (drones y crucero) vuelan a su velocidad del catálogo **respecto del aire**: en cada tramo de la ruta, con rumbo `u` y viento `W` (hacia dónde sopla), corrigen la deriva y avanzan sobre el suelo a
+- **Viento** (`S.wind = { v, from }`, pestaña Defensa → Clima, `rules.wind` en los archivos; por defecto calma): uniforme en todo el mapa y fijo toda la noche. Es el viento **en superficie** (a 10 m, el de los partes) y crece con la altura según la ley de potencia `v(h) = v10·(h/10)^α` con α = 1/7 (atmósfera neutra) hasta el tope de la capa límite (1.000 m); más arriba sigue creciendo con la forma del perfil de radiosondeos de Kiev (NOAA IGRA 1991–2020: 3 km ×1,9, 5 km ×2,6 y 10 km ×4,3 respecto de 1 km; es la forma, no el valor) y desde 10 km queda constante: a 1.000 m sopla ≈1,9 veces más (`physics/weather.js#windAt`, parámetros con rango en `UNC.env`). Cada arma usa el viento de su altura de vuelo. Las armas con ruta en el mapa (drones y crucero) vuelan a su velocidad del catálogo **respecto del aire**: en cada tramo de la ruta, con rumbo `u` y viento `W` (hacia dónde sopla), corrigen la deriva y avanzan sobre el suelo a
   ```
   Vg = W·u + √(v² − (W×u)²)          (triángulo de velocidades; si el viento cruzado supera v, se acota a 0,1·v)
   ```
@@ -350,6 +360,12 @@ La dirección del blanco sale de su posición 0,5 s antes del punto evaluado (3D
 
 **Enlace de datos por unidad** (`u.link`, casilla en el panel de selección): una unidad sin enlace no alimenta la red (sus detecciones no cuentan para `th.lastNet` ni `th.netFirst`) y no recibe pistas ni alertas de otros sensores. Pelea sola con su radar.
 
+**Familias de enlace y pasarelas** (`data/datalinks.js`, `physics/engagement.js#netPk`): una pista viaja por la familia de enlace de quien la detectó (Link 16, red C2 ucraniana, red rusa) y solo la usan las unidades de esa familia. Una **pasarela** une dos familias: la pista llega del otro lado con `gwLag` segundos más de demora y un disparo con ella rinde ×`gwPk` (la conversión y la demora agregan error de posición), además del `remotePk` del nivel de C2. Hoy hay una, **Link 16 ↔ red C2 ucraniana** (10 s, ×0,95; estimados, con rango en `UNC.gw`), **apagada por defecto**: se habilita por escenario (`rules.gateways`, casilla en Defensa). Hay fuentes de una imagen aérea común y de la licencia de Link 16 (2025), pero no de que esas pistas sirvan para disparar (docs/investigacion/datos-fisica-enlaces.md); las alertas ya se comparten entre familias sin pasarela. Con la red rusa no hay pasarela.
+
+**Nivel de C2 por unidad** (`u.c2`, selector "Esta unidad" en el panel de selección; `physics/engagement.js#unitC2`): una unidad puede quedar con **menos** coordinación que la red (una batería aislada, o que depende de otro puesto de mando), nunca con más. Si queda "desconectada" no avisa, no publica ni recibe pistas y no participa en la triangulación de jammers (§4).
+
+**Puestos de mando** (`u.cp`, selector "Puesto de mando" en el panel; `defs[].cp` en archivos; `physics/engagement.js#cpOf`): cada unidad pertenece a un puesto (el principal por defecto, o A, B, C). Las pistas de red, las alertas, el reparto de blancos (no repetir un blanco ya enfrentado, mejor tirador, capas) y la triangulación de jammers solo circulan **dentro** del puesto. Un nodo de C2 (puesto de mando o comunicaciones) puede pertenecer a un puesto (`objectives[].cp`): destruirlo degrada solo a sus unidades; sin puesto, a todas.
+
 **Mejor tirador y defensa por capas** (`best`, solo en integrada): antes de disparar, una batería con enlace cede el blanco si (1) otra batería con enlace también puede tirarle ahora y es mejor (contra drones, menor costo esperado por derribo = costo/Pk; contra el resto, mayor Pk), o (2) es un dron y su ruta pasa más adelante por la envolvente de una capa con munición al menos 2 veces más barata por derribo. Así un NASAMS le deja los Shahed al Gepard que los espera junto al objetivo.
 
 **Nodos de C2** (`effectiveC2`, `data/c2.js#C2_NODES`): si un objetivo **puesto de mando** de la defensa es destruido, el C2 efectivo cae a desconectada; cada **sitio de comunicaciones** destruido lo baja un nivel. El registro avisa cuando pasa.
@@ -379,6 +395,7 @@ Pk = sam.pk[clase] × modificadores, acotada a [0; 0,98]           (physics/enga
 | Interferencia sobre el radar de la batería (J > 1) | 1/(1 + 0,08·J), mínimo 0,5 |
 | Blanco a más del 80% de `vmaxT` | 0,8 |
 | Energía del misil en el encuentro (no cañones ni drones interceptores) | `energyPk(f)`, hasta 1,25 |
+| Maniobra en el aire fino de la altura (misma condición) | `altitudePk`, hasta 1 (abajo) |
 
 **Energía** (`energyPk`): con `f = r / (maxR × rangeFactor)` (fracción del alcance cinemático, **sin** la doctrina: la energía depende de la física, no de la regla de tiro).
 
@@ -397,6 +414,16 @@ energía(f) = 1                       si f ≤ 0,75
            = 1 − 2·(f − 0,75)        hasta 0,5 en f = 1
 energyPk(f) = min(1,25; energía(f) / energía(0,9))
 ```
+
+**Maniobra según la altura** (`altitudePk`, `physics/atmosphere.js`). La aceleración lateral que logra un misil con sus aletas es proporcional a la presión dinámica ½ρv², y el aire se afina con la altura: según la Atmósfera Estándar Internacional (ISO 2533, igual a la US Standard Atmosphere 1976 hasta 32 km), la densidad relativa σ es 0,60 a 5 km, 0,34 a 10 km, 0,16 a 15 km, 0,072 a 20 km y 0,032 a 25 km (prueba contra la tabla, ±0,5%). Cada misil tiene `sam.hFull`: la altura hasta la que, a velocidad máxima, todavía llega a su límite estructural de aceleración. Medido en fracciones de ese límite:
+
+```
+disponible  a/gmax = min(1, σ(h)/σ(hFull) · E)        E = (v/vmax)², la energía de arriba
+necesario   n = 1 contra un blanco que maniobra en su fase terminal, 1/3 si no maniobra (est)
+altitudePk = min(1, min(1, σ/σF·E/n) / min(1, E/n))   (lo que agrega la altura; energyPk ya cuenta la velocidad)
+```
+
+Abajo de `hFull` el factor vale 1, así que las Pk calibradas a baja altura no cambian. Arriba baja: un S-300 que alcanza a un blanco que maniobra a 25 km conserva menos de la mitad. Los misiles con **empuje lateral directo** (`sam.dthrust`: PAC-3 con sus motores de control, Aster con PIF-PAF) maniobran con cohetes y no dependen del aire (×1). `hFull` es una estimación por clase, con rango en UNC (largo alcance 15 km, alcance medio 10 km, defensa de punto 5 km): la aceleración máxima por altura de cada misil no es pública (handoff de datos, tema 4). No se modela todavía que las amenazas también maniobren menos arriba.
 
 Es **relativa al tiro típico** (f = 0,9 → ×1) porque las Pk base ya están calibradas con episodios reales de tiros cerca del alcance máximo: aplicarla en absoluto contaría dos veces la pérdida de energía (una versión así bajaba Kiev de ≈70% a ≈25% de noches defendidas). Un tiro corto vale hasta ×1,25 (todavía acotado por el tope de 0,98). En el borde, con perfil, ×0,85–0,93 según el misil; sin perfil, ×0,71. Los valores 0,75, 0,5 y 0,9 son estimaciones de juego; la forma sigue los pasos A y B de `docs/investigacion/mejoras-fisica.md` §8. Todavía no cuenta la altura (aire menos denso arriba, menos maniobra).
 

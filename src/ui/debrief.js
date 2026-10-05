@@ -1,3 +1,4 @@
+// @ts-check
 // Ventana de Debrief al terminar una corrida (datos de sim/debrief.js).
 import { TARGET_TYPES, TARGET_STATUS } from '../data/index.js';
 import { esc, fmtT, money } from '../util/format.js';

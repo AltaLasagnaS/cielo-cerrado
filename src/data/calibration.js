@@ -19,9 +19,9 @@ export const CAL = [
   "caso": "20 Kalibr (cada 3 s) contra S-300PS + Buk-M1 + radar 3D",
   "real": "67% para crucero a nivel nacional (feb-22 → ago-24), con defensa mayormente soviética.",
   "obj": "60–85%",
-  "sim": 0.736,
-  "lo": 0.608,
-  "hi": 0.963,
+  "sim": 0.751,
+  "lo": 0.605,
+  "hi": 0.984,
   "ok": true
  },
  {
@@ -29,7 +29,7 @@ export const CAL = [
   "caso": "60 Shahed + 30 Gerbera contra 2 Gepard, 3 grupos móviles, 2 equipos de interceptores, red acústica",
   "real": "Derribo cinético 52% (mar–may 25) a 63% (2022–24); el resto de la neutralización es guerra electrónica, que el juego no modela como pérdida.",
   "obj": "50–70%",
-  "sim": 0.641,
+  "sim": 0.642,
   "lo": 0.448,
   "hi": 0.781,
   "ok": true
@@ -79,9 +79,9 @@ export const CAL = [
   "caso": "6 Kh-22 contra S-300PS + radar 3D, sin Patriot",
   "real": "3 de más de 400 derribados antes de feb-2026 por la defensa sin Patriot, que incluía S-300 sobre las ciudades atacadas (IC95% 0–2%).",
   "obj": "0–10%",
-  "sim": 0.05,
-  "lo": 0.021,
-  "hi": 0.104,
+  "sim": 0.017,
+  "lo": 0,
+  "hi": 0.021,
   "ok": true
  },
  {

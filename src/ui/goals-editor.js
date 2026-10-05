@@ -1,3 +1,4 @@
+// @ts-check
 // Editor de metas del escenario (ventana desde la tarjeta "Escenario"). Las metas viven en S.scen.goals
 // con el mismo formato que data/scenarios.js y los archivos guardados (sim/scenario-io.js las valida);
 // las evalúa sim/goals.js al terminar. Nunca modifica el escenario incluido: trabaja sobre una copia.

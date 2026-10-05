@@ -10,7 +10,8 @@ import { TERRAIN } from '../data/index.js';
  * Campos: key, name, W, H (celdas), cell (m), cellKm, wKm, hKm, latN, lonW, dlat, dlon,
  * places, data (Int16Array W×H), min, max.
  */
-export let MAP = null;
+/** Mapa activo (grilla de elevaciones y metadatos); null hasta que setMap carga uno. */
+export let MAP = /** @type {any} */ (null);
 
 /** Decodifica la grilla base64 (int16 little-endian) de los mapas incluidos. */
 export function decodeB64(b64) { const bin = atob(b64); const u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i); return new Int16Array(u8.buffer); }

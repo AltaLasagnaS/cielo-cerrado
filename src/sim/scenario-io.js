@@ -8,7 +8,7 @@
 // objetivos que existan en el catálogo, mapa conocido, posiciones dentro del mapa, números
 // finitos y en rango, y blancos de las salvas que existan. Solo se copian los campos conocidos.
 // Formato: ver docs/ARQUITECTURA.md § "Archivo de escenario".
-import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES, TERRAIN, SCENARIOS, C2_LEVELS, c2FromNet, WEATHER, CRPA_SIZES, JAM_MODES } from '../data/index.js';
+import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES, TERRAIN, SCENARIOS, C2_LEVELS, c2FromNet, WEATHER, CRPA_SIZES, JAM_MODES, TIMES_OF_DAY, GATEWAYS } from '../data/index.js';
 import { MAP } from '../physics/terrain.js';
 import { S } from './state.js';
 import { addObj, addDef, addSalvo, addJam } from './setup.js';
@@ -24,8 +24,8 @@ const GOAL_KINDS = ['destroy', 'damage', 'protect', 'survive', 'killUnit', 'keep
 const DOCTRINES = ['salva', 'sls'];
 
 const pick = (o, keys) => { const r = {}; for (const k of keys) if (o[k] !== undefined) r[k] = structuredClone(o[k]); return r; };
-const OBJ_KEYS = ['id', 'type', 'x', 'y', 'name', 'short', 'maxHp', 'desc'];
-const DEF_KEYS = ['id', 'type', 'x', 'y', 'name', 'az', 'mast', 'alt', 'mag', 'salvo', 'noDrones', 'link', 'reserve'];
+const OBJ_KEYS = ['id', 'type', 'x', 'y', 'name', 'short', 'maxHp', 'desc', 'cp'];
+const DEF_KEYS = ['id', 'type', 'x', 'y', 'name', 'az', 'mast', 'alt', 'mag', 'salvo', 'noDrones', 'link', 'reserve', 'c2', 'cp', 'decoyDoc', 'owner'];
 const SALVO_KEYS = ['id', 'type', 'count', 'interval', 'tStart', 'sync', 'tArrive', 'agl', 'launchDist', 'maneuver', 'decoys', 'link', 'crpa', 'pts', 'targetUnit', 'targetObj'];
 const JAM_KEYS = ['id', 'type', 'x', 'y', 'alt', 'on', 'mode', 'target'];
 const META_KEYS = ['name', 'player', 'time', 'description', 'forces', 'conditions', 'rulesText', 'goals', 'success', 'failure'];
@@ -45,7 +45,7 @@ export function exportScenario(now = new Date()) {
   return {
     format: FORMAT, version: VERSION, saved: now.toISOString(),
     map: mapRef(),
-    rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather, wind: { ...S.wind }, ignoreDecoys: S.ignoreDecoys, fireRange: S.fireRange },
+    rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather, tod: S.tod, wxPlan: S.wxPlan.map(c => ({ ...c })), gateways: [...S.gateways], wind: { ...S.wind }, ignoreDecoys: S.ignoreDecoys, fireRange: S.fireRange },
     scenario: S.scen ? { base: baseKey(S.scen), ...pick(S.scen, META_KEYS) } : null,
     setup: {
       objs: s.objs.map(g => pick(g, OBJ_KEYS)),
@@ -127,7 +127,7 @@ export function validateScenario(raw) {
     const w = `Objetivo ${i + 1}${typeof g.name === 'string' ? ' (' + g.name + ')' : ''}`;
     if (!TARGET_TYPES[g.type]) { err(`${w}: tipo de objetivo desconocido "${String(g.type)}". Válidos: ${Object.keys(TARGET_TYPES).join(', ')}.`); return { id: id(w, g.id) }; }   // el id sigue contando para no sumar errores en cascada
     pos(w, g.x, g.y);
-    return { id: id(w, g.id), type: g.type, x: g.x, y: g.y, name: str(w + ' · name', g.name, 120, false), short: str(w + ' · short', g.short, 60), maxHp: num(w + ' · maxHp', g.maxHp, 1, 100000, { opt: true }), desc: str(w + ' · desc', g.desc, 1000) };
+    return { id: id(w, g.id), type: g.type, x: g.x, y: g.y, name: str(w + ' · name', g.name, 120, false), short: str(w + ' · short', g.short, 60), maxHp: num(w + ' · maxHp', g.maxHp, 1, 100000, { opt: true }), desc: str(w + ' · desc', g.desc, 1000), cp: str(w + ' · cp', g.cp, 20) || undefined };
   });
   // defensas
   const defs = list('defs', setup.defs).map((u, i) => {
@@ -138,7 +138,11 @@ export function validateScenario(raw) {
       id: id(w, u.id), type: u.type, x: u.x, y: u.y, name: str(w + ' · name', u.name, 120),
       az: num(w + ' · az', u.az, 0, 360, { opt: true }), mast: inLimits(w + ' · mast', num(w + ' · mast', u.mast, 0, 200, { opt: true }), DEFENSES[u.type].radar?.mastRange, 'la altura real de su antena'), alt: num(w + ' · alt', u.alt, 0, 20000, { opt: true }),
       mag: num(w + ' · mag', u.mag, 0, 1000, { int: true, opt: true }), salvo: num(w + ' · salvo', u.salvo, 0, 10, { int: true, opt: true }), noDrones: bool(w + ' · noDrones', u.noDrones), link: bool(w + ' · link', u.link),
-      reserve: num(w + ' · reserve', u.reserve, 0, 1000, { int: true, opt: true })
+      reserve: num(w + ' · reserve', u.reserve, 0, 1000, { int: true, opt: true }),
+      cp: str(w + ' · cp', u.cp, 20) || undefined,
+      owner: u.owner === undefined ? undefined : (['UA', 'RU'].includes(u.owner) ? u.owner : (err(`${w} · owner: "${String(u.owner)}" no es "UA" ni "RU".`), undefined)),
+      decoyDoc: u.decoyDoc === undefined ? undefined : (['ignorar', 'tirar'].includes(u.decoyDoc) ? u.decoyDoc : (err(`${w} · decoyDoc: "${String(u.decoyDoc)}" no es "ignorar" ni "tirar".`), undefined)),
+      c2: u.c2 === undefined ? undefined : (C2_LEVELS[u.c2] ? u.c2 : (err(`${w} · c2: "${String(u.c2)}" no es un nivel de C2 válido (${Object.keys(C2_LEVELS).join(', ')}).`), undefined))
     };
   });
   const objIds = new Set(objs.filter(Boolean).map(g => g.id)), defIds = new Set(defs.filter(Boolean).map(u => u.id));
@@ -178,6 +182,20 @@ export function validateScenario(raw) {
   if (r.wind !== undefined) {
     if (r.wind === null || typeof r.wind !== 'object') err('rules.wind: tiene que ser { v, from } (m/s y grados de donde sopla).');
     else rules.wind = { v: num('rules.wind.v', r.wind.v, 0, 40), from: num('rules.wind.from', r.wind.from, 0, 360) };
+  }
+  if (r.gateways !== undefined) {
+    if (!Array.isArray(r.gateways)) err('rules.gateways: tiene que ser una lista de pasarelas (' + Object.keys(GATEWAYS).join(', ') + ').');
+    else { for (const k of r.gateways) if (!GATEWAYS[k]) err(`rules.gateways: "${String(k)}" no es una pasarela conocida (${Object.keys(GATEWAYS).join(', ')}).`); rules.gateways = r.gateways.filter(k => GATEWAYS[k]); }
+  }
+  if (r.tod !== undefined) { if (!TIMES_OF_DAY[r.tod]) err(`rules.tod: "${String(r.tod)}" no es un momento del día válido (${Object.keys(TIMES_OF_DAY).join(', ')}).`); else rules.tod = r.tod; }
+  if (r.wxPlan !== undefined) {
+    if (!Array.isArray(r.wxPlan) || r.wxPlan.length > 10) err('rules.wxPlan: tiene que ser una lista de hasta 10 cambios { t, weather } (segundos y clima).');
+    else rules.wxPlan = r.wxPlan.map((c, i) => {
+      const w = `rules.wxPlan[${i}]`;
+      if (!c || typeof c !== 'object') { err(w + ': tiene que ser { t, weather }.'); return null; }
+      if (!WEATHER[c.weather]) err(`${w}.weather: "${String(c.weather)}" no es un clima válido (${Object.keys(WEATHER).join(', ')}).`);
+      return { t: num(w + '.t', c.t, 0, 86400), weather: c.weather };
+    }).filter(Boolean).sort((a, b) => a.t - b.t);
   }
   if (r.weather !== undefined && !WEATHER[r.weather]) err(`rules.weather: "${String(r.weather)}" no es un clima válido (${Object.keys(WEATHER).join(', ')}).`);
   if (r.c2 !== undefined && !C2_LEVELS[r.c2]) err(`rules.c2: "${String(r.c2)}" no es un nivel de mando y control válido (${Object.keys(C2_LEVELS).join(', ')}).`);
@@ -229,10 +247,10 @@ export function loadScenarioData(data) {
   if (MAP?.key !== data.map.key) throw new Error(`loadScenarioData: el mapa activo es ${MAP?.key}, el escenario es de ${data.map.key}`);
   S.setup = { objs: [], defs: [], salvos: [], jams: [] }; S.sel = null; S.mode = 'select';
   const objId = new Map(), defId = new Map();
-  for (const g of data.setup.objs) objId.set(g.id, addObj(g.type, g.x, g.y, { name: g.name, short: g.short, hp: g.maxHp, desc: g.desc }).id);
+  for (const g of data.setup.objs) objId.set(g.id, addObj(g.type, g.x, g.y, { name: g.name, short: g.short, hp: g.maxHp, desc: g.desc, cp: g.cp }).id);
   for (const d of data.setup.defs) {
     const u = addDef(d.type, d.x, d.y, { name: d.name, az: d.az });
-    for (const k of ['mast', 'alt', 'mag', 'salvo', 'noDrones', 'link', 'reserve']) if (d[k] !== undefined) u[k] = d[k];
+    for (const k of ['mast', 'alt', 'mag', 'salvo', 'noDrones', 'link', 'reserve', 'c2', 'cp', 'decoyDoc', 'owner']) if (d[k] !== undefined) u[k] = d[k];
     defId.set(d.id, u.id);
   }
   for (const sv of data.setup.salvos) {
@@ -243,13 +261,16 @@ export function loadScenarioData(data) {
   if (data.rules.c2) S.c2 = data.rules.c2;
   S.weather = data.rules.weather || 'despejado';
   S.wind = { v: data.rules.wind?.v ?? 0, from: data.rules.wind?.from ?? 0 };
+  S.tod = data.rules.tod || 'noche';
+  S.gateways = data.rules.gateways || [];
+  S.wxPlan = data.rules.wxPlan || [];
   S.ignoreDecoys = !!data.rules.ignoreDecoys;
   S.fireRange = data.rules.fireRange ?? 1;
   if (data.rules.doctrine) S.doctrine = data.rules.doctrine;
   S.scen = data.scenario ? {
     ...data.scenario, map: data.map.key,
     // el briefing lista los objetivos del escenario: son los del archivo
-    objectives: S.setup.objs.map(g => ({ type: g.type, name: g.name, short: g.short, x: g.x, y: g.y, hp: g.maxHp, desc: g.desc })),
+    objectives: S.setup.objs.map(g => ({ type: g.type, name: g.name, short: g.short, x: g.x, y: g.y, hp: g.maxHp, desc: g.desc, cp: g.cp })),
     defs: [], salvos: [], jams: []
   } : null;
 }

@@ -1,3 +1,4 @@
+// @ts-check
 // Modos de edición del mapa y la barra de avisos/confirmación.
 //   select   seleccionar y mover lo ya ubicado
 //   placeDef ubicar una defensa · placeJam un interferidor · placeObj un objetivo
@@ -11,7 +12,7 @@ import { surf } from '../physics/terrain.js';
 import { terrainClass } from '../physics/terrain-analysis.js';
 import { S } from '../sim/state.js';
 import { addDef, addJam, addObj, addSalvo } from '../sim/setup.js';
-import { draw } from '../render/draw.js';
+import { draw, measureOf } from '../render/draw.js';
 import { $ } from './dom.js';
 import { schedCov } from './coverage.js';
 import { renderTabs } from './panels/index.js';
@@ -26,7 +27,7 @@ const PLACE = {
 
 /** Cambia de modo. type = clave de lo que se ubica. Siempre descarta la propuesta pendiente. */
 export function setMode(m, type) {
-  S.mode = m; S.placeType = type || null; S.preview = null; if (m !== 'route') S.route = null; updateModebar(); renderTabs(); draw();
+  S.mode = m; S.placeType = type || null; S.preview = null; if (m !== 'route') S.route = null; if (m !== 'measure') S.measure = null; updateModebar(); renderTabs(); draw();
 }
 
 /** Click corto sobre el mapa en un modo de ubicación: propone la posición (no crea nada). */
@@ -58,6 +59,10 @@ export function updateModebar() {
     ok = confirmPlacement; cancel = cancelPlacement; cancelTxt = 'Cancelar';
   } else if (P) {
     html = `Tocá el mapa donde quieras ubicar <b>${esc(P.name(S.placeType))}</b>; vas a poder confirmar o cancelar.`;
+  } else if (S.mode === 'measure') {
+    const m = S.measure;
+    if (m?.a && m.b) { const r = measureOf(m.a, m.b); html = `Distancia horizontal: <b>${r.km.toFixed(r.km < 10 ? 2 : 1)} km</b> · rumbo ${Math.round(r.az)}°. Tocá otro punto para medir de nuevo.`; }
+    else html = m?.a ? 'Tocá el <b>segundo punto</b>.' : 'Regla: tocá el <b>primer punto</b> (tecla M o Esc para salir).';
   } else if (S.mode === 'route') {
     const T = THREATS[S.atk.type], off = isOffmap(T), n = S.route.pts.length;
     if (off) {

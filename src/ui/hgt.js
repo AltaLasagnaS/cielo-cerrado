@@ -1,3 +1,4 @@
+// @ts-check
 // ---------------- IMPORTAR RELIEVE .HGT ----------------
 // Carga un tile SRTM descomprimido elegido por el jugador y arranca un escenario vacío sobre él.
 import { esc } from '../util/format.js';

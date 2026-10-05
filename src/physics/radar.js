@@ -2,11 +2,11 @@
 // ---------------- RADAR / DETECCIÓN ----------------
 // Ecuación del radar simplificada (R ∝ σ^¼), sectores de antena, horizonte e interferencia de ruido.
 // Ver docs/FISICA.md §2–§4.
-import { BANDS, JAMMERS, JAM_MODES, D, UNIT_DAMAGE } from '../data/index.js';
+import { BANDS, JAMMERS, JAM_MODES, D, UNIT_DAMAGE, sideOf } from '../data/index.js';
 import { angDiff, azOf } from '../util/math.js';
 import { HORIZON_K } from './constants.js';
 import { surf, los } from './terrain.js';
-import { rainGamma, rainRange } from './weather.js';
+import { rainGamma, rainRange, fogGamma } from './weather.js';
 import { PFA, noncoherentPd, integratedSnr50 } from './pulse-integration.js';
 import { clutterRcs } from './clutter.js';
 
@@ -117,12 +117,12 @@ export function modeGain(j, u, r) {
  */
 export function jamJ(u, az, list) {
   const r = D(u).radar; if (!r || r.band === 'ACU' || r.band === 'OPT') return 0;
-  let J = 0; const bw = BANDS[r.band].bw, uz = antZ(u), sl = r.lowSL ? LOW_SIDELOBES : SIDELOBES, side = r.slc ? [] : null;
+  let J = 0; const bw = BANDS[r.band].bw, uz = antZ(u), sl = r.lowSL ? LOW_SIDELOBES : SIDELOBES, side = /** @type {number[] | null} */ (r.slc ? [] : null);
   for (const j of list) {
     const JJ = JAMMERS[j.type]; if (!j.on || j.dead || JJ.gnssJam || !JJ.bands.includes(r.band) || JAM_MODES[j.mode]?.coherent) continue;
     // Un interferidor de un bando no degrada sus propios radares. `both` queda reservado para
     // equipos cuyo rol puede cambiar; no asumimos fratricidio como efecto normal.
-    if (JJ.side !== 'both' && D(u).side !== 'both' && JJ.side === D(u).side) continue;
+    if (JJ.side !== 'both' && sideOf(u) !== 'both' && JJ.side === sideOf(u)) continue;
     const key = u.id + '|' + u.x.toFixed(2) + '|' + u.y.toFixed(2) + '|' + j.x.toFixed(2) + '|' + j.y.toFixed(2) + '|' + (u.mast || 0) + '|' + (u.alt || 0) + '|' + (j.alt || 0);
     j._losMap = j._losMap || {};
     if (j._losMap[key] === undefined) { const p = jamPos(j); j._losMap[key] = los(p[0], p[1], p[2], u.x, u.y, uz); }
@@ -140,6 +140,17 @@ export function jamJ(u, az, list) {
 }
 
 /**
+ * Relación de una copia DRFM del jammer j con el ruido del radar de u (sin eccm): P / d². Positiva si el
+ * jammer está en el sector del radar (le entra por el lóbulo principal al barrer), negativa si está fuera
+ * (solo podría entrar por los laterales), null sin línea de vista. uz: altura de la antena.
+ */
+export function drfmJ(u, j, uz = antZ(u)) {
+  const p = jamPos(j); if (!los(p[0], p[1], p[2], u.x, u.y, uz)) return null;
+  const d = Math.hypot(p[0] - u.x, p[1] - u.y, (p[2] - uz) / 1000) + 1, J = JAMMERS[j.type].P / (d * d);
+  return inSector(u, azOf(p[0] - u.x, p[1] - u.y)) ? J : -J;
+}
+
+/**
  * Falsos blancos que los interferidores DRFM (modo 'drfm', data/jammers.js#JAM_MODES) le meten por barrido
  * al radar de u. Una copia coherente recibe toda la ganancia de procesamiento, así que su relación con el
  * ruido es J = P · G / d² sin el descuento de eccm, y el radar la toma por un blanco si J ≥ SNR50:
@@ -153,11 +164,10 @@ export function falseTracks(u, list) {
   const M = JAM_MODES.drfm, uz = antZ(u), sl = r.lowSL ? LOW_SIDELOBES : SIDELOBES; let n = 0;
   for (const j of list) {
     const JJ = JAMMERS[j.type]; if (j.mode !== 'drfm' || !j.on || j.dead || JJ.gnssJam || !JJ.bands.includes(r.band)) continue;
-    if (JJ.side !== 'both' && D(u).side !== 'both' && JJ.side === D(u).side) continue;
-    const p = jamPos(j); if (!los(p[0], p[1], p[2], u.x, u.y, uz)) continue;
-    const d = Math.hypot(p[0] - u.x, p[1] - u.y, (p[2] - uz) / 1000) + 1, base = JJ.P / (d * d);
-    const main = inSector(u, azOf(p[0] - u.x, p[1] - u.y)) && base >= SNR50;
-    const side = !r.slb && base * sl.near >= SNR50;
+    if (JJ.side !== 'both' && sideOf(u) !== 'both' && JJ.side === sideOf(u)) continue;
+    const base = drfmJ(u, j, uz); if (base === null) continue;
+    const main = base > 0 && base >= SNR50;
+    const side = !r.slb && Math.abs(base) * sl.near >= SNR50;
     if (main || side) n += M.falseTargets;
   }
   return n;
@@ -168,17 +178,19 @@ export function falseTracks(u, list) {
  * con aspecto ca (1 = de frente, el peor caso, que usan la cobertura y las fichas):
  *   R = R1 · σ(banda, aspecto)^¼ · (1 / (1 + J))^¼
  * R1 es el alcance contra 1 m². Sensores acústicos y ópticos usan R1 fijo (no dependen del RCS).
- * wx (data/weather.js, opcional): la lluvia atenúa el radar (physics/weather.js#rainRange) y el
+ * wx (data/weather.js, opcional): la lluvia y la niebla atenúan el radar (physics/weather.js#rainRange) y el
  * clima achica los alcances ópticos (wx.opt) y acústicos (wx.acu). El techo de nubes (wx.ceiling)
  * lo aplican quienes conocen la altura del blanco (sim/engine.js, physics/coverage.js).
  * Un sensor dañado durante la corrida (u.dmgRadar, daño funcional) ve ×UNIT_DAMAGE.radarR.
  */
+/** @param {any} [wx] clima (data/weather.js) o null */
 export function detR(u, th, J, ca = 1, wx = null) {
   const r = D(u).radar, dmg = u.dmgRadar ? UNIT_DAMAGE.radarR : 1;
   if (r.band === 'ACU') return r.R1 * (wx ? wx.acu : 1) * dmg;
   if (r.band === 'OPT') return r.R1 * (wx ? wx.opt : 1) * dmg;
   const R = r.R1 * Math.pow(rcsAt(th.T || th, r.band, ca), 0.25) * Math.pow(1 / (1 + J), 0.25) * dmg;
-  return wx && wx.rain ? rainRange(R, rainGamma(r.band, wx.rain), wx.rainKm) : R;
+  const Rr = wx && wx.rain ? rainRange(R, rainGamma(r.band, wx.rain), wx.rainKm) : R;
+  return wx && wx.lwc ? rainRange(Rr, fogGamma(r.band, wx.lwc), wx.fogKm) : Rr;   // niebla (ITU-R P.840): casi nada
 }
 
 /** ¿El techo de nubes o niebla de wx le tapa a un sensor óptico en tierra un blanco a agl m? */

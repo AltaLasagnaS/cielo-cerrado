@@ -55,7 +55,7 @@ export function summarizeRun(S, seed) {
  */
 export function createMonteCarlo({ runs = 20, seed = 1, sample = true } = {}) {
   if (active) throw new Error('Ya hay una serie Monte Carlo en curso.');
-  const mc = { runs, seed, sample, results: [], done: false, cancelled: false, current: -1 };
+  const mc = { runs, seed, sample, results: /** @type {any[]} */ ([]), done: false, cancelled: false, current: -1 };
   active = mc;
   let rng = null, deadline = 0;
   const saved = { ...hooks }, quiet = { onLog() {}, onEnd() {}, onUnitLost() {}, defenderView: () => false };
