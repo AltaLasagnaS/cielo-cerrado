@@ -2790,7 +2790,7 @@ table.t.mc td.pc{white-space:nowrap}
       name: "Kiev · noche contra la energía (defensa ucraniana)",
       player: "defensa",
       time: "01:30 hora local · invierno",
-      description: "Una noche típica de la campaña rusa contra la energía ucraniana: oleadas de Shahed desde el norte y el este, señuelos Gerbera para gastar munición, misiles de crucero Kh-101 y Kalibr, y balísticos Iskander-M y Kinzhal al final, todo para llegar casi junto. Los blancos son las centrales de cogeneración que dan luz y calefacción a la ciudad y la represa de Kiev. Las posiciones de la defensa son ilustrativas, no las reales.",
+      description: "Una noche típica de la campaña rusa contra la energía ucraniana: oleadas de Shahed desde el norte y el este, señuelos Gerbera para gastar munición, misiles de crucero Kh-101 y Kalibr, y balísticos Iskander-M y Kinzhal al final, todo para llegar casi junto. Los blancos son las centrales de cogeneración que dan luz y calefacción a la ciudad y la represa de Kiev. Época: invierno 2024–25, así que los drones traen antenas CRPA Kometa de 8 elementos y todavía no módems mesh (docs/investigacion/guerra-electronica-ucraniana.md). Las posiciones de la defensa son ilustrativas, no las reales.",
       forces: {
         defensa: "Defensa por capas de la capital: radar 3D y radar VHF de alerta, Patriot (sector hacia el noreste), NASAMS, IRIS-T, dos Gepard junto a las centrales, tres grupos móviles, red acústica, drones interceptores y la red anti-GNSS Pokrova sobre la ciudad. Red de mando integrada.",
         ataque: "24 Shahed en dos oleadas, 10 Gerbera, 7 Kh-101, 6 Kalibr, 3 Iskander-M con señuelos y 2 Kinzhal."
@@ -2820,9 +2820,9 @@ table.t.mc td.pc{white-space:nowrap}
         { type: "intdrone", x: 44, y: 63, name: "Interceptores-1" }
       ],
       salvos: [
-        { type: "shahed", count: 18, interval: 20, tStart: 0, agl: 1500, pts: [[40, 0], [42, 30], [46.9, 52]], targetObj: "Central CHP-6" },
+        { type: "shahed", count: 18, crpa: 8, interval: 20, tStart: 0, agl: 1500, pts: [[40, 0], [42, 30], [46.9, 52]], targetObj: "Central CHP-6" },
         { type: "gerbera", count: 10, interval: 25, tStart: 60, agl: 900, pts: [[70, 5], [50, 30], [44, 55]] },
-        { type: "shahed", count: 6, interval: 30, tStart: 120, agl: 2e3, pts: [[70, 40], [55, 55], [40.3, 67.4]], targetObj: "Central CHP-5" },
+        { type: "shahed", count: 6, crpa: 8, interval: 30, tStart: 120, agl: 2e3, pts: [[70, 40], [55, 55], [40.3, 67.4]], targetObj: "Central CHP-5" },
         { type: "kh101", count: 7, interval: 10, sync: true, tArrive: 1500, agl: 40, pts: [[0, 30], [20, 50], [40.3, 67.4]], targetObj: "Central CHP-5" },
         { type: "kalibr", count: 6, interval: 8, sync: true, tArrive: 1490, agl: 50, pts: [[45, 111], [42, 90], [40.3, 67.4]], targetObj: "Central CHP-5" },
         { type: "isk_m", count: 3, interval: 15, sync: true, tArrive: 1520, launchDist: 400, maneuver: true, decoys: true, pts: [[70, 0], [46.9, 52]], targetObj: "Central CHP-6" },
@@ -2848,7 +2848,7 @@ table.t.mc td.pc{white-space:nowrap}
       name: "Járkov · bombas planeadoras (defensa ucraniana)",
       player: "defensa",
       time: "06:10 hora local · madrugada",
-      description: "Járkov está a 30 km de la frontera rusa: los Su-34 sueltan bombas FAB-500 con kit UMPK desde Belgorod, a 9–12 km de altura y a 50–70 km del blanco, sin entrar al alcance de casi ninguna defensa. Las bombas planean sin motor, casi no tienen firma infrarroja y llegan muchas juntas. Esta mañana van contra la central CHP-5 de Podvirky (ya dañada en marzo de 2024) y el centro de la ciudad, mezcladas con Shahed para gastar munición. Las bombas traen antenas CRPA Kometa de 12 elementos: las dos estaciones Lima de la ciudad no les alcanzan. Las posiciones de las defensas son ilustrativas.",
+      description: "Járkov está a 30 km de la frontera rusa: los Su-34 sueltan bombas FAB-500 con kit UMPK desde Belgorod, a 9–12 km de altura y a 50–70 km del blanco, sin entrar al alcance de casi ninguna defensa. Las bombas planean sin motor, casi no tienen firma infrarroja y llegan muchas juntas. Esta mañana van contra la central CHP-5 de Podvirky (ya dañada en marzo de 2024) y el centro de la ciudad, mezcladas con Shahed para gastar munición. Las bombas traen antenas CRPA Kometa de 12 elementos (desde abril de 2025) y los Shahed, CRPA de 16 y módem mesh/LTE: las dos estaciones Lima de la ciudad no les alcanzan. Las posiciones de las defensas son ilustrativas.",
       forces: {
         defensa: "Radar 3D y radar VHF de alerta, una batería Patriot al sur de la ciudad (sector hacia el norte), IRIS-T junto a la CHP-5, NASAMS, un Gepard, dos grupos móviles, red acústica y dos estaciones anti-GNSS Lima. Red de mando coordinada.",
         ataque: "30 bombas UMPK en tres oleadas de 10 (CRPA Kometa de 12 elementos) y 12 Shahed."
@@ -2874,7 +2874,7 @@ table.t.mc td.pc{white-space:nowrap}
         { type: "acoustic", x: 34, y: 45, name: "Acústico 2" }
       ],
       salvos: [
-        { type: "shahed", count: 12, interval: 25, tStart: 0, agl: 1500, pts: [[60, 0], [40, 30], [16.5, 56.3]], targetObj: "Centro de Járkov" },
+        { type: "shahed", count: 12, crpa: 16, link: true, interval: 25, tStart: 0, agl: 1500, pts: [[60, 0], [40, 30], [16.5, 56.3]], targetObj: "Centro de Járkov" },
         { type: "kab", count: 10, interval: 4, sync: true, tArrive: 600, crpa: 12, pts: [[8, 0], [7.2, 58.7]], targetObj: "Central CHP-5" },
         { type: "kab", count: 10, interval: 4, sync: true, tArrive: 900, crpa: 12, pts: [[20, 0], [16.5, 56.3]], targetObj: "Centro de Járkov" },
         { type: "kab", count: 10, interval: 4, sync: true, tArrive: 1200, crpa: 12, pts: [[12, 0], [7.2, 58.7]], targetObj: "Central CHP-5" }
