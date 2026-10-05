@@ -20,7 +20,8 @@
     .stats { display:flex; gap:20px; flex-wrap:wrap; font-variant-numeric:tabular-nums; }
     ol li { margin:8px 0; } li[aria-current=step] { color:#f2bd63; font-weight:700; }
     input[type=number] { width:100px; } textarea { display:block; width:100%; min-height:130px; margin:12px 0; }
-    table { width:100%; border-collapse:collapse; } th,td { padding:10px 5px; text-align:left; border-bottom:1px solid #3a5061; }
+    table { width:100%; table-layout:fixed; border-collapse:collapse; } th,td { padding:10px 5px; text-align:left; border-bottom:1px solid #3a5061; overflow-wrap:anywhere; }
+    .controls>* { max-width:100%; } section,.card { min-width:0; overflow-wrap:anywhere; }
     #reference-list { padding-left:22px; } #reference-list li { margin:16px 0; }
     body.large-text { font-size:1.15rem; } body.high-contrast { color:#fff; } body.high-contrast .muted { color:#e7edf3; }
     @media(max-width:500px) { body{padding:14px 10px;} section,.card{padding:16px;} nav button{flex:1 0 42%;} }
