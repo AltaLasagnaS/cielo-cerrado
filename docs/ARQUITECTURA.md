@@ -19,6 +19,7 @@ El juego es una página web estática hecha con **JavaScript moderno (módulos E
 | `onEnd` | Actualiza los controles y abre el debrief |
 | `onUnitLost` | Recalcula la cobertura |
 | `defenderView` | Consulta la vista del defensor (cambia el texto del registro) |
+| `attackerView` | Consulta la vista del atacante (cambia el dibujo y lo que se puede tocar) |
 
 ## Mapa de archivos
 
@@ -37,7 +38,8 @@ El juego es una página web estática hecha con **JavaScript moderno (módulos E
 - `terrain-analysis.js`: puntos altos, relieve relativo, curvas (solo visual).
 - `radar.js`: RCS por banda, alcance, sectores, interferencia, horizonte.
 - `kinematics.js`: trayectorias de las amenazas.
-- `engagement.js`: pistas, solución de tiro, Pk.
+- `engagement.js`: pistas, solución de tiro (`solve`, `trackKeys`, `arrivalReach`), Pk.
+- `track.js`: pista observada: velocidad medida y posición prevista en línea recta (tiro sin omnisciencia).
 - `coverage.js`: viewshed de cobertura.
 - `damage.js`: daño a objetivos.
 - `constants.js`: KR (Tierra 4/3), margen de LOS, coeficiente del horizonte.
@@ -50,7 +52,7 @@ El juego es una página web estática hecha con **JavaScript moderno (módulos E
 - `engine.js`: `startSim`, `step(dt)`, `engage`, `impact`.
 - `log.js`: registro y eventos de la línea de tiempo.
 - `replay.js`: repetición de la corrida (anota los cambios y reconstruye el mapa en cualquier instante).
-- `contacts.js`: lo que sabe la defensa de cada amenaza (última detección, posición estimada, edad); lo usa la vista del defensor.
+- `contacts.js`: lo que sabe cada bando: la defensa de cada amenaza (última detección, posición estimada, edad; pistas por radar y por red en `th.obs`) y el atacante de cada defensa (`attackerKnows`). Lo usan las vistas y la solución de tiro.
 - `ew.js`: guerra electrónica de la defensa (triangulación de jammers, home-on-jam). `weather-now.js`: clima vigente (plan de cambios, día y noche).
 - `goals.js`, `debrief.js`: evaluación de metas y análisis final.
 - `pace.js`: fases del modo de velocidad Auto.

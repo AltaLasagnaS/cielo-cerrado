@@ -300,7 +300,10 @@ export function engage(u, t) {
   if (u.active >= ch) return;
   const cp = cpOf(u), c2net = effectiveC2(S.c2, S.objs, cp), c2 = unitC2(u, c2net), L = C2_LEVELS[c2];
   const cand = [];
-  for (const th of S.threats) if (canEngage(u, th, t, c2, false)) cand.push([th, th.p.rem / Math.max(1, th.T.v)]);
+  // prioridad: el contacto que antes llega a la batería, según lo que ve la defensa (última posición y
+  // velocidad medida); no el tiempo que le falta al arma hasta su blanco, que la defensa no conoce
+  const eta = th => { const s = th.seen, v = trackVel(th); return s ? Math.hypot(s.x - u.x, s.y - u.y) * 1000 / Math.max(1, v ? v.v : 1) : Infinity; };
+  for (const th of S.threats) if (canEngage(u, th, t, c2, false)) cand.push([th, eta(th)]);
   cand.sort((a, b) => a[1] - b[1]);
   // falsos blancos DRFM que pasan la clasificación (JAM_MODES.drfm.fooled): compiten con las pistas reales
   // por los disparos de esta evaluación; si sale uno, la batería gasta una salva en la nada

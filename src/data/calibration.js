@@ -19,9 +19,9 @@ export const CAL = [
   "caso": "20 Kalibr (cada 3 s) contra S-300PS + Buk-M1 + radar 3D",
   "real": "67% para crucero a nivel nacional (feb-22 → ago-24), con defensa mayormente soviética.",
   "obj": "60–85%",
-  "sim": 0.751,
-  "lo": 0.605,
-  "hi": 0.984,
+  "sim": 0.741,
+  "lo": 0.621,
+  "hi": 0.978,
   "ok": true
  },
  {
@@ -29,9 +29,9 @@ export const CAL = [
   "caso": "60 Shahed + 30 Gerbera contra 2 Gepard, 3 grupos móviles, 2 equipos de interceptores, red acústica",
   "real": "Derribo cinético 52% (mar–may 25) a 63% (2022–24); el resto de la neutralización es guerra electrónica, que el juego no modela como pérdida.",
   "obj": "50–70%",
-  "sim": 0.642,
-  "lo": 0.448,
-  "hi": 0.781,
+  "sim": 0.627,
+  "lo": 0.464,
+  "hi": 0.758,
   "ok": true
  },
  {
@@ -39,9 +39,9 @@ export const CAL = [
   "caso": "8 Iskander-M con maniobra 2025 y señuelos contra una batería Patriot de 3 lanzadores (36 PAC-3 MSE)",
   "real": "37% nacional en jun–sep 25 (IC95% 31–45%), cota inferior de lo que pasa dentro de cobertura; 6–17% en otoño 2025.",
   "obj": "35–65%",
-  "sim": 0.525,
-  "lo": 0.344,
-  "hi": 0.559,
+  "sim": 0.509,
+  "lo": 0.375,
+  "hi": 0.575,
   "ok": true
  },
  {
@@ -59,9 +59,9 @@ export const CAL = [
   "caso": "12 Kh-22 (cada 5 s) contra 1 Patriot MSE (16 misiles)",
   "real": "9 de 12 sobre Kyiv el 2/2/2026 (IC95% 47–91%).",
   "obj": "47–91%",
-  "sim": 0.615,
-  "lo": 0.481,
-  "hi": 0.667,
+  "sim": 0.621,
+  "lo": 0.492,
+  "hi": 0.665,
   "ok": true
  },
  {
@@ -79,9 +79,9 @@ export const CAL = [
   "caso": "6 Kh-22 contra S-300PS + radar 3D, sin Patriot",
   "real": "3 de más de 400 derribados antes de feb-2026 por la defensa sin Patriot, que incluía S-300 sobre las ciudades atacadas (IC95% 0–2%).",
   "obj": "0–10%",
-  "sim": 0.017,
+  "sim": 0.008,
   "lo": 0,
-  "hi": 0.021,
+  "hi": 0.017,
   "ok": true
  },
  {
@@ -89,9 +89,9 @@ export const CAL = [
   "caso": "6 Oniks (perfil hi-lo) contra IRIS-T + NASAMS ubicados en el blanco",
   "real": "5,7% a nivel nacional (12 de 211). No hay datos dentro de cobertura: caso de control, sin objetivo.",
   "obj": "—",
-  "sim": 0.575,
-  "lo": 0.375,
-  "hi": 0.858,
+  "sim": 0.488,
+  "lo": 0.288,
+  "hi": 0.717,
   "ok": null
  },
  {
