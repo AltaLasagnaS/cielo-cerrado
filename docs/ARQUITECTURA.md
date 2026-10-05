@@ -50,6 +50,8 @@ El juego es una página web estática hecha con **JavaScript moderno (módulos E
 - `engine.js`: `startSim`, `step(dt)`, `engage`, `impact`.
 - `log.js`: registro y eventos de la línea de tiempo.
 - `replay.js`: repetición de la corrida (anota los cambios y reconstruye el mapa en cualquier instante).
+- `contacts.js`: lo que sabe la defensa de cada amenaza (última detección, posición estimada, edad); lo usa la vista del defensor.
+- `ew.js`: guerra electrónica de la defensa (triangulación de jammers, home-on-jam). `weather-now.js`: clima vigente (plan de cambios, día y noche).
 - `goals.js`, `debrief.js`: evaluación de metas y análisis final.
 - `pace.js`: fases del modo de velocidad Auto.
 - `hooks.js`: enganches hacia la interfaz.
@@ -124,6 +126,12 @@ El botón **Guardar** descarga `S.setup` más las reglas y las metas como JSON (
 ## Repetición (`sim/replay.js`)
 
 El debrief tiene un botón **Ver repetición**: el mapa vuelve a mostrar la corrida con una línea de tiempo (reproducir, pausar, arrastrar y tres velocidades) y las últimas líneas del registro de ese instante. No se graban fotos del estado: las trayectorias de las amenazas son deterministas (`posAt`), así que durante la corrida solo se anota **cuándo** cambia cada cosa: fin de cada amenaza (`th.tEnd`) y nacimiento de cada señuelo (`th.tBorn`), todos los interceptores (`S.rec.ints`; `S.ints` se poda), el estado de unidades y objetivos después de cada cambio (`S.rec.units`, `S.rec.objs`), el registro completo (`S.rec.log`) y el instante de cada caída. `frameAt(T)` reconstruye el cuadro y `render/draw.js` lo dibuja en lugar del estado vivo; el panel de objetivos también sigue el instante elegido. Anotar no consume azar: las golden no cambian. `tests/replay.test.js` compara el cuadro reconstruido con el estado real de la simulación en seis instantes (posiciones, interceptores, unidades, objetivos, impactos y registro). Se muestra la verdad (como el debrief), no solo lo que veía la defensa.
+
+## Vista del defensor (`sim/contacts.js`)
+
+Con la casilla **Vista del defensor**, el mapa, la ayuda emergente y la ficha de una pista muestran **contactos**, no la verdad. Cada detección de la defensa anota la posición vista (`th.seen`, y la anterior en `th.seenPrev`); `contactOf(th, t)` da la posición estimada por estima (última posición + velocidad de las dos últimas detecciones × edad) mientras la pista vive (12 s, la ventana de la red), y el último reporte fechado cuando se pierde (hasta 90 s). No muestra el tipo de arma, su blanco, su ruta ni la distancia que le falta; tocar el mapa selecciona el contacto donde se lo ve. Anotar no consume azar (las golden no cambian; `tests/contacts.test.js`). La repetición sigue mostrando la verdad.
+
+Lo que falta de las **perspectivas por bando** (etapa 1 del plan de Codex): vista del atacante, dueño explícito de cada unidad separado del país del equipo y **tiro sin omnisciencia** (hoy la solución de tiro predice el punto de encuentro con la ruta real del arma; pasar a predecir con la pista observada cambia resultados y calibración, así que queda para decidir con el usuario).
 
 ## Modo Monte Carlo (`sim/montecarlo.js`)
 

@@ -7,6 +7,7 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 ## [Sin publicar]
 
 ### Agregado
+- **Vista del defensor con contactos** (perspectivas por bando, primera parte; docs/ARQUITECTURA.md): con la casilla "Vista del defensor", las amenazas se ven donde la defensa las estima (última detección + velocidad de la pista), con su edad; una pista perdida queda como último reporte fechado. La ayuda y la ficha de la pista (fijar una pista, pedido UX07) muestran solo lo que se sabe: posición, altura y velocidad estimadas, quién la vio y la clasificación, sin el tipo de arma, el blanco ni la posición real. No cambia resultados.
 - **Regla para medir distancias** (botón 📏 junto al zoom o tecla M): dos toques en el mapa dan la distancia horizontal en km y el rumbo; un tercero empieza otra medición y Escape sale. No mueve ni crea nada y no consulta lo que no se ve (pedido UX06 de Codex). Prueba de navegador.
 - **Doctrina de señuelos por unidad** (selector "Pistas clasificadas como señuelo" en el panel de cada batería; `defs[].decoyDoc` en archivos): como la regla general, no tirarles o tirarles igual. Decide con la clasificación conocida, no con la identidad real (pedido F02).
 - **Rol y bando en texto en Guerra Electrónica**: cada interferidor dice si es del atacante o del defensor y de qué bando, además del color (pedido UX05).

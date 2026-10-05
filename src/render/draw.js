@@ -9,6 +9,7 @@ import { surf } from '../physics/terrain.js';
 import { isOffmap, posAt } from '../physics/kinematics.js';
 import { profileOf, distAt } from '../physics/interceptor.js';
 import { S } from '../sim/state.js';
+import { contactOf } from '../sim/contacts.js';
 import { hooks } from '../sim/hooks.js';
 import { frameAt } from '../sim/replay.js';
 import { cv, ctx, dpr, V, toS } from './view.js';
@@ -105,6 +106,8 @@ export function draw() {
   for (const im of R ? R.impacts : S.impacts) { const [sx, sy] = toS(im.x, im.y); ctx.strokeStyle = im.k === 'hit' ? '#ff5b4d' : im.k === 'miss' ? '#e6a53c' : '#6b7888'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(sx - 5, sy - 5); ctx.lineTo(sx + 5, sy + 5); ctx.moveTo(sx + 5, sy - 5); ctx.lineTo(sx - 5, sy + 5); ctx.stroke(); }
   // amenazas
   const dv = hooks.defenderView();
+  // vista del defensor (no en la repetición, que muestra la verdad): solo contactos, con su edad
+  if (dv && !R) { drawContacts(tNow); } else
   for (const th of R ? R.threats : S.threats) {
     if (!th.alive || !th.p) continue;
     const tracked = tNow - th.lastNet <= 12;
@@ -155,6 +158,23 @@ function drawMeasure(m) {
   ctx.strokeStyle = '#ffd36b'; ctx.lineWidth = 1.6; ctx.setLineDash([6, 4]); ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.setLineDash([]);
   for (const [x, y] of [[x1, y1], [x2, y2]]) { ctx.fillStyle = '#ffd36b'; ctx.beginPath(); ctx.arc(x, y, 3, 0, 7); ctx.fill(); }
   labelAt((x1 + x2) / 2 - 10, (y1 + y2) / 2 - 12, r.km.toFixed(r.km < 10 ? 2 : 1) + ' km · ' + Math.round(r.az) + '°', '#ffd36b');
+}
+
+/**
+ * Contactos de la defensa (sim/contacts.js): pistas vivas en su posición estimada y pistas perdidas como
+ * último reporte fechado. No usa la posición real, la ruta ni la identidad del arma.
+ */
+function drawContacts(tNow) {
+  for (const th of S.threats) {
+    if (th.isDecoyChild && !th.seen) continue;
+    const c = contactOf(th, tNow); if (!c) continue;
+    const [sx, sy] = toS(c.x, c.y), hd = Math.atan2(c.vy, c.vx);
+    ctx.save(); ctx.translate(sx, sy); ctx.rotate(hd);
+    ctx.fillStyle = c.lost ? 'transparent' : '#ff5b4d'; ctx.strokeStyle = c.lost ? 'rgba(255,91,77,.6)' : '#2a0806'; ctx.lineWidth = 1.2;
+    if (c.lost) ctx.setLineDash([2, 2]);
+    ctx.beginPath(); ctx.moveTo(8, 0); ctx.lineTo(-6, -4); ctx.lineTo(-6, 4); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.setLineDash([]); ctx.restore();
+    if (V.s > 9 || c.lost) { ctx.font = '10px "IBM Plex Mono", monospace'; ctx.fillStyle = c.lost ? 'rgba(255,190,180,.6)' : 'rgba(255,190,180,.9)'; ctx.fillText('#' + th.id + (c.lost ? ' · hace ' + Math.round(c.age) + ' s' : ''), sx + 7, sy - 6); }
+  }
 }
 
 /** Etiqueta con fondo oscuro a la derecha de un símbolo. */

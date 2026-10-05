@@ -23,6 +23,7 @@ import { log, event, label, uLabel } from './log.js';
 import { recReset, recUnit, recObj } from './replay.js';
 import { ewStep } from './ew.js';
 import { wxNow, wxReset, wxStep } from './weather-now.js';
+import { noteSeen } from './contacts.js';
 
 /** Arma la corrida a partir de S.setup: copia unidades y jammers y programa todos los lanzamientos. */
 export function startSim() {
@@ -131,7 +132,7 @@ export function step(dt) {
         }
       }
       if (ok) {
-        th.det[u.id] = t;
+        th.det[u.id] = t; noteSeen(th, t, u.id);
         const g = classifyGain(r);   // seguimiento con radar de tiro: aprende a distinguir señuelos
         if (g) { th.clsT = (th.clsT || 0) + g; th.clsTau = Math.min(th.clsTau ?? Infinity, classifyTau(r)); const c = classify(th); if (c && !th.clsAs) { th.clsAs = c; if (c === 'señuelo' && S.ignoreDecoys) log('d', 'Pista #' + th.id + ' clasificada como señuelo por ' + uLabel(u) + (th.isDecoy ? '.' : ' (¡error: era ' + th.T.short + '!).')); } }
         // La coordinación C2 puede repartir una alerta aun cuando el datalink de tiro esté apagado; una

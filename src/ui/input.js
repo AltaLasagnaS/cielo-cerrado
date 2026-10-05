@@ -9,6 +9,7 @@ import { isOffmap, speedAt } from '../physics/kinematics.js';
 import { relativeRelief, slopeAt, terrainClass, RELIEF_RADIUS_KM } from '../physics/terrain-analysis.js';
 import { S } from '../sim/state.js';
 import { label, uLabel } from '../sim/log.js';
+import { contactOf } from '../sim/contacts.js';
 import { cv, V, toS, toW, fitView } from '../render/view.js';
 import { $, isDefenderView } from './dom.js';
 import { schedCov } from './coverage.js';
@@ -23,7 +24,14 @@ const DRAG_PX = 6;
 /** ¿Qué hay bajo el punto de pantalla (sx, sy)? → { kind: thr|def|jam|obj|salvo, id } o null. */
 export function hitTest(sx, sy) {
   const units = S.started ? S.units : S.setup.defs, jams = S.started ? S.jamsLive : S.setup.jams, objs = S.started ? S.objs : S.setup.objs;
-  if (S.started) for (const th of S.threats) { if (!th.alive || !th.p) continue; const [a, b] = toS(th.p.x, th.p.y); if (Math.hypot(a - sx, b - sy) < 9) return { kind: 'thr', id: th.id }; }
+  if (S.started && !S.replay) {
+    const dv = isDefenderView();
+    for (const th of S.threats) {
+      // vista del defensor: se toca el contacto donde se lo muestra, no la amenaza real
+      const c = dv ? contactOf(th, S.t) : (th.alive && th.p ? th.p : null); if (!c) continue;
+      const [a, b] = toS(c.x, c.y); if (Math.hypot(a - sx, b - sy) < 9) return { kind: 'thr', id: th.id };
+    }
+  }
   for (const u of units) { const [a, b] = toS(u.x, u.y); if (Math.hypot(a - sx, b - sy) < 11) return { kind: 'def', id: u.id }; }
   for (const j of jams) { const [a, b] = toS(j.x, j.y); if (Math.hypot(a - sx, b - sy) < 11) return { kind: 'jam', id: j.id }; }
   for (const g of objs) { const [a, b] = toS(g.x, g.y); if (Math.hypot(a - sx, b - sy) < 11) return { kind: 'obj', id: g.id }; }
@@ -124,9 +132,16 @@ function showTip(sx, sy) {
   const tip = $('#tip'); const h = hitTest(sx, sy); let txt = '';
   const [wx, wy] = toW(sx, sy);
   if (h && h.kind === 'thr') {
-    const th = S.threats.find(t => t.id === h.id); const p = th.p; const dv = isDefenderView();
-    const v = speedAt(th, S.t);
-    txt = (dv ? 'Pista #' + th.id + (th.cls === 'dron' ? ' (dron?)' : '') : label(th)) + '\nAlt: ' + Math.round(p.z) + ' m (' + Math.round(p.z - surf(p.x, p.y)) + ' AGL)\nVel: ' + kmh(v) + ' · ' + mach(v) + '\nA ' + p.rem.toFixed(1) + ' km del blanco\nDetectada por: ' + (Object.keys(th.det).filter(k => S.t - th.det[k] < 12).map(k => uLabel(S.units.find(u => u.id == k))).join(', ') || 'nadie');
+    const th = S.threats.find(t => t.id === h.id); const dv = isDefenderView();
+    const by = Object.keys(th.det).filter(k => S.t - th.det[k] < 12).map(k => uLabel(S.units.find(u => u.id == k))).join(', ') || 'nadie';
+    if (dv) {
+      // solo lo que sabe la defensa: posición y velocidad estimadas por la pista, edad del último reporte
+      const c = contactOf(th, S.t);
+      txt = 'Pista #' + th.id + (c.lost ? ' · perdida hace ' + Math.round(c.age) + ' s' : '') + '\nAlt: ' + Math.round(c.z) + ' m (' + Math.round(c.z - surf(c.x, c.y)) + ' AGL)\nVel: ' + kmh(c.v) + ' · ' + mach(c.v) + ' (estimada)\nDetectada por: ' + by;
+    } else {
+      const p = th.p, v = speedAt(th, S.t);
+      txt = label(th) + '\nAlt: ' + Math.round(p.z) + ' m (' + Math.round(p.z - surf(p.x, p.y)) + ' AGL)\nVel: ' + kmh(v) + ' · ' + mach(v) + '\nA ' + p.rem.toFixed(1) + ' km del blanco\nDetectada por: ' + by;
+    }
   } else if (h && h.kind === 'def') {
     const u = (S.started ? S.units : S.setup.defs).find(u => u.id === h.id); txt = (u.name || D(u).short) + '\n' + D(u).name;
   } else if (h && h.kind === 'obj') {

@@ -4617,6 +4617,27 @@ table.t.mc td.pc{white-space:nowrap}
     }
   }
 
+  // src/sim/contacts.js
+  var TRACK_AGE = 12;
+  var LOST_AGE = 90;
+  function noteSeen(th, t, by) {
+    const p = th.p;
+    if (!p) return;
+    if (th.seen && t - th.seen.t > 0.5) th.seenPrev = th.seen;
+    th.seen = { x: p.x, y: p.y, z: p.z, t, by };
+  }
+  function contactOf(th, t) {
+    const s = th.seen;
+    if (!s) return null;
+    const age = t - s.t;
+    if (age < 0 || age > LOST_AGE) return null;
+    const q = th.seenPrev, dt = q ? s.t - q.t : 0;
+    const vx = dt > 0 ? (s.x - q.x) / dt : 0, vy = dt > 0 ? (s.y - q.y) / dt : 0, vz = dt > 0 ? (s.z - q.z) / dt : 0;
+    const lost = age > TRACK_AGE || !th.alive;
+    const k = lost ? 0 : age;
+    return { x: s.x + vx * k, y: s.y + vy * k, z: s.z + vz * k, vx, vy, v: Math.hypot(vx, vy) * 1e3, age, lost, by: s.by };
+  }
+
   // src/sim/engine.js
   function startSim() {
     S.units = S.setup.defs.map((d) => ({ ...d, alive: true, hp: UNIT_TARGET.hp, dmgRadar: false, dmgLauncher: false, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
@@ -4784,6 +4805,7 @@ table.t.mc td.pc{white-space:nowrap}
         }
         if (ok) {
           th.det[u.id] = t;
+          noteSeen(th, t, u.id);
           const g = classifyGain(r);
           if (g) {
             th.clsT = (th.clsT || 0) + g;
@@ -5640,59 +5662,62 @@ table.t.mc td.pc{white-space:nowrap}
       ctx.stroke();
     }
     const dv = hooks.defenderView();
-    for (const th of R ? R.threats : S.threats) {
-      if (!th.alive || !th.p) continue;
-      const tracked = tNow - th.lastNet <= 12;
-      if (dv && !tracked) continue;
-      const decoyLook = th.isDecoy && !dv;
-      const col = tracked ? "#ff5b4d" : "rgba(255,91,77,.55)";
-      ctx.strokeStyle = "rgba(255,91,77,.35)";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      for (const p of th.trail) {
-        const [a, b] = toS(p[0], p[1]);
-        ctx.lineTo(a, b);
+    if (dv && !R) {
+      drawContacts(tNow);
+    } else
+      for (const th of R ? R.threats : S.threats) {
+        if (!th.alive || !th.p) continue;
+        const tracked = tNow - th.lastNet <= 12;
+        if (dv && !tracked) continue;
+        const decoyLook = th.isDecoy && !dv;
+        const col = tracked ? "#ff5b4d" : "rgba(255,91,77,.55)";
+        ctx.strokeStyle = "rgba(255,91,77,.35)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (const p of th.trail) {
+          const [a, b] = toS(p[0], p[1]);
+          ctx.lineTo(a, b);
+        }
+        {
+          const [a, b] = toS(th.p.x, th.p.y);
+          ctx.lineTo(a, b);
+        }
+        ctx.stroke();
+        const [sx, sy] = toS(th.p.x, th.p.y);
+        const nx = posAt(th, tNow + 2);
+        const hd = nx ? Math.atan2(nx.y - th.p.y, nx.x - th.p.x) : 0;
+        ctx.save();
+        ctx.translate(sx, sy);
+        ctx.rotate(hd);
+        ctx.fillStyle = decoyLook ? "transparent" : col;
+        ctx.strokeStyle = decoyLook ? "#e6a53c" : tracked ? "#2a0806" : col;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        if (th.cls === "dron") {
+          ctx.moveTo(6, 0);
+          ctx.lineTo(-4, -5);
+          ctx.lineTo(-2, 0);
+          ctx.lineTo(-4, 5);
+        } else if (th.cls === "balistico" || th.cls === "hiper") {
+          ctx.moveTo(7, 0);
+          ctx.lineTo(0, -4);
+          ctx.lineTo(-7, 0);
+          ctx.lineTo(0, 4);
+        } else {
+          ctx.moveTo(8, 0);
+          ctx.lineTo(-6, -3);
+          ctx.lineTo(-6, 3);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+        if (V.s > 9) {
+          ctx.font = '10px "IBM Plex Mono", monospace';
+          ctx.fillStyle = "rgba(255,190,180,.9)";
+          ctx.fillText(dv ? "#" + th.id : th.T.short, sx + 7, sy - 6);
+        }
       }
-      {
-        const [a, b] = toS(th.p.x, th.p.y);
-        ctx.lineTo(a, b);
-      }
-      ctx.stroke();
-      const [sx, sy] = toS(th.p.x, th.p.y);
-      const nx = posAt(th, tNow + 2);
-      const hd = nx ? Math.atan2(nx.y - th.p.y, nx.x - th.p.x) : 0;
-      ctx.save();
-      ctx.translate(sx, sy);
-      ctx.rotate(hd);
-      ctx.fillStyle = decoyLook ? "transparent" : col;
-      ctx.strokeStyle = decoyLook ? "#e6a53c" : tracked ? "#2a0806" : col;
-      ctx.lineWidth = 1.2;
-      ctx.beginPath();
-      if (th.cls === "dron") {
-        ctx.moveTo(6, 0);
-        ctx.lineTo(-4, -5);
-        ctx.lineTo(-2, 0);
-        ctx.lineTo(-4, 5);
-      } else if (th.cls === "balistico" || th.cls === "hiper") {
-        ctx.moveTo(7, 0);
-        ctx.lineTo(0, -4);
-        ctx.lineTo(-7, 0);
-        ctx.lineTo(0, 4);
-      } else {
-        ctx.moveTo(8, 0);
-        ctx.lineTo(-6, -3);
-        ctx.lineTo(-6, 3);
-      }
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-      ctx.restore();
-      if (V.s > 9) {
-        ctx.font = '10px "IBM Plex Mono", monospace';
-        ctx.fillStyle = "rgba(255,190,180,.9)";
-        ctx.fillText(dv ? "#" + th.id : th.T.short, sx + 7, sy - 6);
-      }
-    }
     for (const it of R ? R.ints : S.ints) {
       if (it.done || tNow < it.tL) continue;
       const P = profileOf(D(it.u).sam), fl = Math.max(0.1, it.tH - it.tL);
@@ -5746,6 +5771,35 @@ table.t.mc td.pc{white-space:nowrap}
       ctx.fill();
     }
     labelAt((x1 + x2) / 2 - 10, (y1 + y2) / 2 - 12, r.km.toFixed(r.km < 10 ? 2 : 1) + " km · " + Math.round(r.az) + "°", "#ffd36b");
+  }
+  function drawContacts(tNow) {
+    for (const th of S.threats) {
+      if (th.isDecoyChild && !th.seen) continue;
+      const c = contactOf(th, tNow);
+      if (!c) continue;
+      const [sx, sy] = toS(c.x, c.y), hd = Math.atan2(c.vy, c.vx);
+      ctx.save();
+      ctx.translate(sx, sy);
+      ctx.rotate(hd);
+      ctx.fillStyle = c.lost ? "transparent" : "#ff5b4d";
+      ctx.strokeStyle = c.lost ? "rgba(255,91,77,.6)" : "#2a0806";
+      ctx.lineWidth = 1.2;
+      if (c.lost) ctx.setLineDash([2, 2]);
+      ctx.beginPath();
+      ctx.moveTo(8, 0);
+      ctx.lineTo(-6, -4);
+      ctx.lineTo(-6, 4);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+      if (V.s > 9 || c.lost) {
+        ctx.font = '10px "IBM Plex Mono", monospace';
+        ctx.fillStyle = c.lost ? "rgba(255,190,180,.6)" : "rgba(255,190,180,.9)";
+        ctx.fillText("#" + th.id + (c.lost ? " · hace " + Math.round(c.age) + " s" : ""), sx + 7, sy - 6);
+      }
+    }
   }
   function labelAt(sx, sy, txt, c) {
     ctx.font = '500 11px "IBM Plex Sans", sans-serif';
@@ -7104,6 +7158,16 @@ table.t.mc td.pc{white-space:nowrap}
       if ($("#oDel")) $("#oDel").onclick = () => removeObj(g.id);
     } else if (sel.kind === "thr") {
       const th = S.threats.find((t) => t.id === sel.id);
+      if (th && isDefenderView() && !S.replay) {
+        const c = contactOf(th, S.t);
+        if (!c) {
+          el.innerHTML = `<h3>Selección</h3><p class="hint">Pista #${th.id}: sin reportes recientes.</p>`;
+          return;
+        }
+        const by = c.by != null ? uLabel(S.units.find((u) => u.id == c.by)) : "—";
+        el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">Pista #${th.id}</b> <span class="chip">${c.lost ? "perdida" : "en seguimiento"}</span><dl class="kv"><dt>Último reporte</dt><dd>hace ${Math.round(c.age)} s, de ${esc(by)}</dd><dt>Posición${c.lost ? "" : " estimada"}</dt><dd>${c.x.toFixed(1)}, ${c.y.toFixed(1)} km</dd><dt>Altitud</dt><dd>${Math.round(c.z)} m (${Math.round(c.z - surf(c.x, c.y))} AGL)</dd><dt>Velocidad estimada</dt><dd>${kmh(c.v)}</dd><dt>Clasificación</dt><dd>${esc(th.clsAs || "sin clasificar")}</dd><dt>Primera detección</dt><dd>${th.firstDet === null ? "—" : fmtT(th.firstDet)}</dd></dl><p class="hint">Vista del defensor: no se muestra el tipo de arma, su blanco ni su posición real.</p>`;
+        return;
+      }
       if (!th || !th.p) {
         el.innerHTML = '<h3>Selección</h3><p class="hint">La amenaza ya no está en vuelo.</p>';
         return;
@@ -8104,10 +8168,14 @@ table.t.mc td.pc{white-space:nowrap}
   var DRAG_PX = 6;
   function hitTest(sx, sy) {
     const units = S.started ? S.units : S.setup.defs, jams = S.started ? S.jamsLive : S.setup.jams, objs = S.started ? S.objs : S.setup.objs;
-    if (S.started) for (const th of S.threats) {
-      if (!th.alive || !th.p) continue;
-      const [a, b] = toS(th.p.x, th.p.y);
-      if (Math.hypot(a - sx, b - sy) < 9) return { kind: "thr", id: th.id };
+    if (S.started && !S.replay) {
+      const dv = isDefenderView();
+      for (const th of S.threats) {
+        const c = dv ? contactOf(th, S.t) : th.alive && th.p ? th.p : null;
+        if (!c) continue;
+        const [a, b] = toS(c.x, c.y);
+        if (Math.hypot(a - sx, b - sy) < 9) return { kind: "thr", id: th.id };
+      }
     }
     for (const u of units) {
       const [a, b] = toS(u.x, u.y);
@@ -8303,10 +8371,15 @@ table.t.mc td.pc{white-space:nowrap}
     const [wx, wy] = toW(sx, sy);
     if (h && h.kind === "thr") {
       const th = S.threats.find((t) => t.id === h.id);
-      const p = th.p;
       const dv = isDefenderView();
-      const v = speedAt(th, S.t);
-      txt = (dv ? "Pista #" + th.id + (th.cls === "dron" ? " (dron?)" : "") : label(th)) + "\nAlt: " + Math.round(p.z) + " m (" + Math.round(p.z - surf(p.x, p.y)) + " AGL)\nVel: " + kmh(v) + " · " + mach(v) + "\nA " + p.rem.toFixed(1) + " km del blanco\nDetectada por: " + (Object.keys(th.det).filter((k) => S.t - th.det[k] < 12).map((k) => uLabel(S.units.find((u) => u.id == k))).join(", ") || "nadie");
+      const by = Object.keys(th.det).filter((k) => S.t - th.det[k] < 12).map((k) => uLabel(S.units.find((u) => u.id == k))).join(", ") || "nadie";
+      if (dv) {
+        const c = contactOf(th, S.t);
+        txt = "Pista #" + th.id + (c.lost ? " · perdida hace " + Math.round(c.age) + " s" : "") + "\nAlt: " + Math.round(c.z) + " m (" + Math.round(c.z - surf(c.x, c.y)) + " AGL)\nVel: " + kmh(c.v) + " · " + mach(c.v) + " (estimada)\nDetectada por: " + by;
+      } else {
+        const p = th.p, v = speedAt(th, S.t);
+        txt = label(th) + "\nAlt: " + Math.round(p.z) + " m (" + Math.round(p.z - surf(p.x, p.y)) + " AGL)\nVel: " + kmh(v) + " · " + mach(v) + "\nA " + p.rem.toFixed(1) + " km del blanco\nDetectada por: " + by;
+      }
     } else if (h && h.kind === "def") {
       const u = (S.started ? S.units : S.setup.defs).find((u2) => u2.id === h.id);
       txt = (u.name || D(u).short) + "\n" + D(u).name;

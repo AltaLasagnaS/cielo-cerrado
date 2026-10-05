@@ -7,10 +7,11 @@ import { surf, latlon } from '../../physics/terrain.js';
 import { antZ, horizon } from '../../physics/radar.js';
 import { buildThreat, speedAt } from '../../physics/kinematics.js';
 import { S } from '../../sim/state.js';
-import { label } from '../../sim/log.js';
+import { label, uLabel } from '../../sim/log.js';
 import { targetName } from '../../sim/setup.js';
 import { warheadKg, directDamage } from '../../physics/damage.js';
-import { $ } from '../dom.js';
+import { $, isDefenderView } from '../dom.js';
+import { contactOf } from '../../sim/contacts.js';
 import { schedCov } from '../coverage.js';
 import { openFicha } from '../fichas.js';
 import { renderAtk, removeObj } from './attack.js';
@@ -112,7 +113,16 @@ export function renderSel(live) {
     bindNumber($('#oHp'), () => g.maxHp, value => { g.maxHp = value; });
     if ($('#oDel')) $('#oDel').onclick = () => removeObj(g.id);
   } else if (sel.kind === 'thr') {
-    const th = S.threats.find(t => t.id === sel.id); if (!th || !th.p) { el.innerHTML = '<h3>Selección</h3><p class="hint">La amenaza ya no está en vuelo.</p>'; return; }
+    const th = S.threats.find(t => t.id === sel.id);
+    if (th && isDefenderView() && !S.replay) {
+      // pista fijada (UX07): solo lo que sabe la defensa; si se pierde, queda el último reporte fechado
+      const c = contactOf(th, S.t);
+      if (!c) { el.innerHTML = `<h3>Selección</h3><p class="hint">Pista #${th.id}: sin reportes recientes.</p>`; return; }
+      const by = c.by != null ? uLabel(S.units.find(u => u.id == c.by)) : '—';
+      el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">Pista #${th.id}</b> <span class="chip">${c.lost ? 'perdida' : 'en seguimiento'}</span><dl class="kv"><dt>Último reporte</dt><dd>hace ${Math.round(c.age)} s, de ${esc(by)}</dd><dt>Posición${c.lost ? '' : ' estimada'}</dt><dd>${c.x.toFixed(1)}, ${c.y.toFixed(1)} km</dd><dt>Altitud</dt><dd>${Math.round(c.z)} m (${Math.round(c.z - surf(c.x, c.y))} AGL)</dd><dt>Velocidad estimada</dt><dd>${kmh(c.v)}</dd><dt>Clasificación</dt><dd>${esc(th.clsAs || 'sin clasificar')}</dd><dt>Primera detección</dt><dd>${th.firstDet === null ? '—' : fmtT(th.firstDet)}</dd></dl><p class="hint">Vista del defensor: no se muestra el tipo de arma, su blanco ni su posición real.</p>`;
+      return;
+    }
+    if (!th || !th.p) { el.innerHTML = '<h3>Selección</h3><p class="hint">La amenaza ya no está en vuelo.</p>'; return; }
     const p = th.p, v = speedAt(th, S.t);
     el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(label(th))}</b><dl class="kv"><dt>Altitud</dt><dd>${Math.round(p.z)} m (${Math.round(p.z - surf(p.x, p.y))} AGL)</dd><dt>Velocidad</dt><dd>${kmh(v)}</dd><dt>Al blanco</dt><dd>${p.rem.toFixed(1)} km</dd><dt>Primera detección</dt><dd>${th.firstDet === null ? '—' : fmtT(th.firstDet)}</dd></dl><div class="row"><button class="btn sm" id="tInfo">Ficha</button></div>`;
     $('#tInfo').onclick = () => openFicha('thr', th.type);
