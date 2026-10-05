@@ -12,7 +12,7 @@ su procedencia; una contradicción sigue pendiente aunque la fuente sea útil.
 | `CWDB_442.txt` | Índice de la base de Guerra Fría | Identificación; no se cruza por ID con DB3K. |
 | `Descriptions.7z` | Fichas de texto de DB3000 y CWDB | Prestaciones reportadas y citas bibliográficas. No se pudo identificar el build. |
 | `database.7z` de Fleet Command | Siete tablas binarias; se reconocen nombres en las cadenas | Identificación preliminar. Unidades y estructura numérica todavía no verificadas. |
-| `DBInfo.dat` | Texto Base64 que decodifica a 44.692 bytes sin cabecera de formato reconocida | Conservado; contenido y versión no interpretados. |
+| `DBInfo.dat` | Contenedor Base64 legado, descifrado a XML `DBFiles` con 207 entradas | Recuperación completada con extractor independiente: nombres/archivos/SHA-1. El manifiesto sólo llega a DB3K478/CWDB477; no verifica las bases modernas recibidas. Ver [recuperación y límites](AMPLIACION-VARIANTES-Y-RADARES.md#dbinfodat-recuperación-completada). |
 | `DB.7z` | La descarga fue rechazada por superar 32 MiB | Sin inspeccionar. Requiere archivos extraídos o partes menores al límite. |
 | `CWDB_512.db3` | SQLite legible, con tablas y asociaciones de componentes | Permite consultas precisas. `512` procede del nombre suministrado; no de metadatos internos verificados. |
 
