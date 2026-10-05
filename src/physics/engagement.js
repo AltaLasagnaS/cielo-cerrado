@@ -280,19 +280,21 @@ export function arrivalReach(u, th, t) {
  * radar de la batería (×1/(1+0,08·J), mín. ×0,5), blanco a más del 80% de vmaxT (×0,8) y energía
  * del misil en el punto de encuentro (×energyPk, solo si se pasa f = r / alcance cinemático de solve) y
  * maniobra en el aire fino de la altura (×altitudePk, misma condición).
- * jams = interferidores activos de la corrida.
+ * jams = interferidores activos de la corrida. est = estimación de la defensa antes de disparar (reparto de
+ * blancos): usa la última posición vista y la velocidad medida, y no sabe si el blanco va a estar en su
+ * maniobra terminal (depende de la distancia a su blanco, que no conoce).
  */
-/** @param {number | null} [f] */
-export function calcPk(u, th, t, jams, f = null) {
+/** @param {number | null} [f] @param {boolean} [est] */
+export function calcPk(u, th, t, jams, f = null, est = false) {
   const sm = D(u).sam; let pk = sm.pk[th.cls] || 0;
-  const p = th.p; if (!p) return 0;
-  const man = !!th.maneuver && p.rem < termZone(th);
+  const p = est ? (th.seen ?? th.p) : th.p; if (!p) return 0;
+  const man = !est && !!th.maneuver && th.p.rem < termZone(th);
   if (man) pk *= sm.guid === 'cañón' ? 0.85 : (th.T.manPk ?? 0.7);
   if (th.T.ir && (sm.guid === 'IR')) pk *= 0.85;
   if (th.T.cold && sm.guid === 'IR') pk *= 0.3;   // sin motor (planeadora): casi no hay calor para el buscador IR
   if (th.T.lo && sm.guid !== 'IR' && sm.guid !== 'cañón') pk *= sm.guid === 'activo' ? 0.85 : 0.75;
   if (RADAR_GUID.includes(sm.guid) || sm.guid === 'activo') { const J = jamJ(u, azOf(p.x - u.x, p.y - u.y), jams); if (J > 1) pk *= Math.max(0.5, 1 / (1 + 0.08 * J)); }
-  const v = speedAt(th, t); if (v > 0.8 * sm.vmaxT) pk *= 0.8;
+  const v = est ? (trackVel(th)?.v ?? speedAt(th, t)) : speedAt(th, t); if (v > 0.8 * sm.vmaxT) pk *= 0.8;
   if (f !== null && usesEnergy(sm.guid)) pk *= energyPk(sm, f, isTBM(th)) * altitudePk(sm, f, isTBM(th), p.z, man);
   return clamp(pk, 0, 0.98);
 }

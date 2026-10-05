@@ -36,8 +36,8 @@ export function ewStep(t) {
     h.done = true; h.j.hojBusy = false; h.u.active = Math.max(0, h.u.active - 1);
     const sm = D(h.u).sam, JJ = JAMMERS[h.j.type];
     if (h.j.dead) continue;
-    if (rnd() < sm.pkHoj) { h.j.dead = true; log('k', uLabel(h.u) + ' derriba al ' + JJ.short + ' guiándose a su ruido (home-on-jam) — Pk ' + Math.round(sm.pkHoj * 100) + '%.'); }
-    else log('x', 'El misil home-on-jam de ' + uLabel(h.u) + ' falla contra el ' + JJ.short + '.');
+    if (rnd() < sm.pkHoj) { h.j.dead = true; log('k', uLabel(h.u) + ' derriba al ' + JJ.short + ' guiándose a su ruido (home-on-jam) — Pk ' + Math.round(sm.pkHoj * 100) + '%.', 'def'); }
+    else log('x', 'El misil home-on-jam de ' + uLabel(h.u) + ' falla contra el ' + JJ.short + '.', 'def');
   }
   if (t < S.ewNext) return; S.ewNext = t + EW_DT;
   const inNet = s => C2_LEVELS[unitC2(s.u, effectiveC2(S.c2, S.objs, cpOf(s.u)))].share !== 'none';
@@ -51,7 +51,7 @@ export function ewStep(t) {
       // las marcaciones se cruzan solo entre unidades del mismo puesto de mando
       for (let a = 0; a < net.length; a++) for (let b = a + 1; b < net.length; b++) { if (cpOf(net[a].u) !== cpOf(net[b].u)) continue; const e = fixError(net[a], net[b], j.x, j.y); if (e < best) { best = e; pair = [net[a].u, net[b].u]; } }
       if (pair && best <= FIX_MAX_KM && (!j.fix || best < j.fix.err)) {
-        if (!j.fix) log('l', JJ.short + ' ubicado por triangulación entre ' + uLabel(pair[0]) + ' y ' + uLabel(pair[1]) + ': error ≈ ' + best.toFixed(1) + ' km.');
+        if (!j.fix) log('l', JJ.short + ' ubicado por triangulación entre ' + uLabel(pair[0]) + ' y ' + uLabel(pair[1]) + ': error ≈ ' + best.toFixed(1) + ' km.', 'def');
         j.fix = { t, err: best };
       }
     }
@@ -65,7 +65,7 @@ export function ewStep(t) {
       u.magLeft--; u.active++; recUnit(u); S.stats.shots++; S.stats.defCost += sm.cost; u.revealed ??= t;
       S.hoj.push({ u, j, tH: t + timeTo(profileOf(sm), d * 1000) });
       j.hojBusy = true;
-      log('l', uLabel(u) + ' dispara un misil home-on-jam contra el ' + JJ.short + ' a ' + d.toFixed(0) + ' km.');
+      log('l', uLabel(u) + ' dispara un misil home-on-jam contra el ' + JJ.short + ' a ' + d.toFixed(0) + ' km.', 'def');
       break;
     }
   }
