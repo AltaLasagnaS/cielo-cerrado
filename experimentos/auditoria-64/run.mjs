@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
+import { createWindowProbe } from './windows.mjs';
 
 const args = process.argv.slice(2);
 const option = (name, fallback) => args.find(a => a.startsWith(`--${name}=`))?.split('=').slice(1).join('=') ?? fallback;
@@ -12,10 +13,11 @@ const output = option('out', '/tmp/auditoria64.json');
 const runs = Number(option('runs', '40'));
 const seed0 = Number(option('seed', '1'));
 const captureArrivals = option('arrivals', '0') === '1';
+const captureWindows = option('windows', '0') === '1';
 const keys = args.filter(a => !a.startsWith('--'));
 if (!Number.isSafeInteger(runs) || runs < 1 || !Number.isSafeInteger(seed0) || seed0 < 1 || !keys.length) throw Error('Corridas, semilla o escenarios inválidos');
 const load = p => import(pathToFileURL(resolve(repo, p)).href);
-const { D, SCENARIOS, applyProbable } = await load('src/data/index.js');
+const { D, SCENARIOS, applyProbable, C2_LEVELS, UNIT_DAMAGE } = await load('src/data/index.js');
 const { useMap, clearSetup } = await load('tests/helpers.js');
 const { applyScenario } = await load('src/sim/setup.js');
 const { S } = await load('src/sim/state.js');
@@ -33,6 +35,7 @@ const result = { commit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repo,
 const ended = () => !S.pending.length && S.threats.every(th => !th.alive) && S.ints.every(it => it.done);
 let currentSeed;
 const metadata = new WeakMap();
+const windows = captureWindows ? createWindowProbe({ S, D, eng, C2_LEVELS, UNIT_DAMAGE, speedAt }) : null;
 
 function geometry(it) {
   const { u, th } = it, sm = D(u).sam, p = th.p, t = S.t;
@@ -59,7 +62,7 @@ function geometry(it) {
 
 for (const key of keys) {
   const sc = SCENARIOS[key]; if (!sc) throw Error(`Escenario desconocido: ${key}`);
-  const rec = { results: [], units: {}, failures: [], arrivals: [] };
+  const rec = { results: [], units: {}, failures: [], arrivals: [], windows: [] };
   result.scenarios[key] = rec;
   for (let seed = seed0; seed < seed0 + runs; seed++) {
     applyProbable(); useMap(sc.map); clearSetup(); applyScenario(sc); currentSeed = seed;
@@ -74,6 +77,13 @@ for (const key of keys) {
         const th = S.threats.find(th => e.msg.startsWith(uLabel(u) + ' derriba ' + label(th) + ' '));
         if (!th) throw Error('Derribo sin amenaza identificada');
         ur.killsByThreat[th.type] = (ur.killsByThreat[th.type] || 0) + 1;
+      }
+      if (windows && (e?.cls === 'k' || e?.msg.includes(' falla contra ') || e?.msg.includes(' no alcanza a '))) {
+        const it = S.ints.find(i => i.done && i.th && !arrived.has(i) && S.t - i.tH >= 0 && S.t - i.tH < 0.250001 &&
+          (e.msg.startsWith(uLabel(i.u) + ' derriba ' + label(i.th) + ' ') || e.msg.startsWith(i.shot + ' de ' + uLabel(i.u) + ' falla contra ' + label(i.th) + ' ') || e.msg.startsWith(i.shot + ' de ' + uLabel(i.u) + ' no alcanza a ' + label(i.th))));
+        if (!it) throw Error('La sonda no pudo asociar la llegada');
+        windows.arrival(it, e.cls === 'k' ? 'kill' : e.msg.includes(' no alcanza a ') ? 'noReach' : 'pkMiss');
+        if (!captureArrivals) arrived.add(it);
       }
       if (captureArrivals && eng.arrivalReach && (e?.cls === 'k' || e?.msg.includes(' falla contra '))) {
         const it = S.ints.find(i => i.done && i.th && !arrived.has(i) && S.t - i.tH >= 0 && S.t - i.tH < 0.250001 &&
@@ -96,11 +106,13 @@ for (const key of keys) {
     setRandom(seeded(seed));
     try {
       startSim(); S.running = false;
+      windows?.begin(key, seed);
       for (const u of S.units) unitRecord(u);
       const deadline = S.pending.reduce((end, th) => Math.max(end, th.tLaunch + th.ft), 0) + 401;
       while (!ended()) {
         if (S.t >= deadline) throw Error(`No terminó ${key}/${seed}`);
         step(0.25);
+        windows?.observe();
         for (const it of S.ints) if (!launched.has(it)) {
           launched.add(it); const ur = unitRecord(it.u); ur.shots++; if (it.phantom) ur.phantom++;
           const target = it.th?.type ?? 'phantom'; ur.shotsByThreat[target] = (ur.shotsByThreat[target] || 0) + 1;
@@ -118,6 +130,7 @@ for (const key of keys) {
         }
       }
       const summary = summarizeRun(S, seed); rec.results.push(summary);
+      if (windows) rec.windows.push(windows.finish());
       if ([...launched].length !== summary.shots) throw Error('Conteo de disparos distinto del motor');
       for (const u of S.units) { const ur = unitRecord(u); ur.magLeft += u.magLeft || 0; ur.reserveLeft += u.reserveLeft || 0; }
       console.log(`${key} seed=${seed} result=${summary.result} shots=${summary.shots} killed=${summary.intercepted}`);

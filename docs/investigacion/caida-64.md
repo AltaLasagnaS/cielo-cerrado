@@ -108,6 +108,24 @@ disparo previo. Un tiro que apunta sobre el piso pero luego falla puede ocupar l
 MANPADS. El código confirma la regla y los contadores confirman la redistribución, pero esta
 auditoría no mide el contrafactual sin ese bloqueo. No atribuirle una cantidad exacta de victorias.
 
+**Seguimiento posterior: mecanismo observado.** La sonda externa de ventanas confirma casos
+donde RBS 70-1 tiene pista, reacción, munición/canal y solución según el modelo, pero hay otro
+interceptor del puesto pendiente. Muestreo de un segundo después del paso, 40 semillas:
+
+| Revisión | Muestras bloqueadas RBS/Kalibr | Episodios | Noches con bloqueo | Episodios cuyo bloqueador termina en `noReach` |
+|---|---:|---:|---:|---:|
+| #59 | 0 | 0 | 0 | 0 |
+| Pista | 118 | 91 | 33 | 51 |
+| Redes | 175 | 136 | 38 | 81 |
+| Prioridad | 175 | 136 | 38 | 81 |
+
+[Contadores y episodios](../../experimentos/auditoria-64/data/ventanas.json). Semilla 1:
+a t=1498 RBS 70-1 podría obtener solución de 1,5 s contra Kalibr 1, pero lo reserva un
+NASAMS lanzado a t=1492,25; éste es rechazado por piso a t=1498,75. Esto demuestra el
+conflicto entre condiciones del programa y reserva de blanco, **no** que liberar ese instante
+hubiera evitado el impacto. No se cambió deconf ni se calculó su efecto causal en las victorias.
+Los 320 replays con sonda conservan todos los resúmenes por semilla del control.
+
 Además hay **Saab AEW en Link 16**. La restricción de redes no significa que todas las baterías
 occidentales se hayan quedado sin pistas. El MANPADS sin datalink pierde también el acceso a
 la velocidad global que usaba después de una detección propia: la segunda caída no es exclusivamente
@@ -137,6 +155,13 @@ NASAMS sigue gastando prácticamente toda su munición en Shahed.
 Por eso contar sólo el fallo del dron o la probabilidad de un misil no explica las metas de
 infraestructura. Hay redistribución de recursos, horarios y blancos. Los efectos separados de
 coordinación, extrapolación, piso y RNG quedan pendientes de ablaciones controladas.
+
+La misma sonda no encuentra ventanas IRIS-T/Kh-101 bloqueadas por otra unidad en las revisiones
+Pista/Redes/Prioridad. Sí registra munición agotada: 5.892 de 28.898 muestras en #59 frente
+a 27.053 de 39.888 en Prioridad. Esas muestras son correlacionadas y la cantidad cambia con
+la supervivencia de amenazas; no representan probabilidades de fallo independientes.
+El resultado respalda revisar la distribución/agotamiento de munición en Kiev y evita
+extrapolarle el bloqueo observado en Gotemburgo. No se ha medido un reparto alternativo.
 
 ### Monterey
 

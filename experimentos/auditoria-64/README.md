@@ -63,3 +63,28 @@ Semillas iguales hacen comparables los experimentos, pero las ramas consumen RNG
 órdenes diferentes después de cambiar decisiones/rechazos. No son resultados emparejados
 misil por misil con idéntico azar ni ablaciones de una sola fórmula. Ninguna cifra es una
 calibración del porcentaje real de victorias en Ucrania.
+
+## Ventanas bloqueadas: observación sin ablación
+
+```sh
+for version in base59 pista64 red64 prioridad64; do
+  node experimentos/auditoria-64/run.mjs --repo=/tmp/audit-$version --out=/tmp/caida-windows-$version.json --runs=40 --windows=1 gb_refineria kv_energia
+done
+node experimentos/auditoria-64/window-summary.mjs /tmp experimentos/auditoria-64/data/ventanas.json
+```
+
+La sonda examina cada segundo, **después del paso**, RBS 70-1 contra Kalibr e IRIS-T-1
+contra Kh-101. Son configuraciones IR; si cambia su guiado, rechaza la medición antes de
+omitir una restricción propia del radar. Comprueba unidad/lanzador, munición, canales,
+pista, reacción ya acumulada, doctrina, solución y velocidad. Sólo después distingue
+interceptor propio pendiente o bloqueo por otra unidad del mismo puesto.
+
+No modifica `u.avail`, reservas de blancos ni el orden de evaluación. Los instantes
+muestreados no son necesariamente los de decisión de cada batería. Una solución de
+tiro según el modelo no certifica que el blanco sobreviva hasta ella ni un derribo.
+Un episodio reúne muestras consecutivas con los mismos interceptores bloqueadores;
+puede terminar porque cambia la pista, llega un misil, se agota munición o muere el
+blanco. `noReach`, `kill` y `pkMiss` vienen del evento de llegada; `other` conserva
+las otras terminaciones sin atribuirles una causa no registrada. No sumar episodios
+o muestras como tiros/victorias recuperables. El resumen exige resultados completos
+por semilla idénticos al control anterior.
