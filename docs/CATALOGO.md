@@ -1953,12 +1953,12 @@ Casos corridos con el motor (Monte Carlo) para ajustar las Pk contra episodios r
 | Caso | Dato real | Objetivo | Simulado | Con Pk mín–máx |
 |---|---|---|---:|---|
 | 16 Kh-101 (cada 5 s) contra IRIS-T + NASAMS + radar 3D | NASAMS: 94% reclamado; IRIS-T: "casi 100%" (≈240 derribos). Datos de operador/fabricante, sesgados hacia arriba. | 85–100% | 100% | 100–100% |
-| 20 Kalibr (cada 3 s) contra S-300PS + Buk-M1 + radar 3D | 67% para crucero a nivel nacional (feb-22 → ago-24), con defensa mayormente soviética. | 60–85% | 75% | 61–98% |
-| 60 Shahed + 30 Gerbera contra 2 Gepard, 3 grupos móviles, 2 equipos de interceptores, red acústica | Derribo cinético 52% (mar–may 25) a 63% (2022–24); el resto de la neutralización es guerra electrónica, que el juego no modela como pérdida. | 50–70% | 64% | 45–78% |
-| 8 Iskander-M con maniobra 2025 y señuelos contra una batería Patriot de 3 lanzadores (36 PAC-3 MSE) | 37% nacional en jun–sep 25 (IC95% 31–45%), cota inferior de lo que pasa dentro de cobertura; 6–17% en otoño 2025. | 35–65% | 53% | 34–56% |
+| 20 Kalibr (cada 3 s) contra S-300PS + Buk-M1 + radar 3D | 67% para crucero a nivel nacional (feb-22 → ago-24), con defensa mayormente soviética. | 60–85% | 74% | 62–98% |
+| 60 Shahed + 30 Gerbera contra 2 Gepard, 3 grupos móviles, 2 equipos de interceptores, red acústica | Derribo cinético 52% (mar–may 25) a 63% (2022–24); el resto de la neutralización es guerra electrónica, que el juego no modela como pérdida. | 50–70% | 63% | 46–76% |
+| 8 Iskander-M con maniobra 2025 y señuelos contra una batería Patriot de 3 lanzadores (36 PAC-3 MSE) | 37% nacional en jun–sep 25 (IC95% 31–45%), cota inferior de lo que pasa dentro de cobertura; 6–17% en otoño 2025. | 35–65% | 51% | 38–57% |
 | 6 Kinzhal contra 1 Patriot MSE | 6 de 6 sobre Kyiv el 16/5/2023 (IC95% 61–100%); 25% a nivel nacional. | 61–100% | 98% | 80–100% |
-| 12 Kh-22 (cada 5 s) contra 1 Patriot MSE (16 misiles) | 9 de 12 sobre Kyiv el 2/2/2026 (IC95% 47–91%). | 47–91% | 62% | 48–67% |
+| 12 Kh-22 (cada 5 s) contra 1 Patriot MSE (16 misiles) | 9 de 12 sobre Kyiv el 2/2/2026 (IC95% 47–91%). | 47–91% | 62% | 49–67% |
 | 6 Kh-22 contra IRIS-T + NASAMS, sin Patriot | 3 de más de 400 derribados antes de feb-2026 (IC95% 0–2%). | 0–10% | 0% | 0–0% |
-| 6 Kh-22 contra S-300PS + radar 3D, sin Patriot | 3 de más de 400 derribados antes de feb-2026 por la defensa sin Patriot, que incluía S-300 sobre las ciudades atacadas (IC95% 0–2%). | 0–10% | 2% | 0–2% |
-| 6 Oniks (perfil hi-lo) contra IRIS-T + NASAMS ubicados en el blanco | 5,7% a nivel nacional (12 de 211). No hay datos dentro de cobertura: caso de control, sin objetivo. | — | 57% | 38–86% |
+| 6 Kh-22 contra S-300PS + radar 3D, sin Patriot | 3 de más de 400 derribados antes de feb-2026 por la defensa sin Patriot, que incluía S-300 sobre las ciudades atacadas (IC95% 0–2%). | 0–10% | 1% | 0–2% |
+| 6 Oniks (perfil hi-lo) contra IRIS-T + NASAMS ubicados en el blanco | 5,7% a nivel nacional (12 de 211). No hay datos dentro de cobertura: caso de control, sin objetivo. | — | 49% | 28–71% |
 | 4 Zircon contra Patriot + SAMP/T | 2 de 2 sobre Kyiv el 25/3/2024 (IC95% 34–100%); 33% nacional hasta ago-24. | 34–100% | 99% | 79–100% |

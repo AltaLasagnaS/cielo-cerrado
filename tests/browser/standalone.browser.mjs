@@ -146,7 +146,7 @@ try {
   });
 
   await check('ayuda, cobertura y vista del defensor sin errores JavaScript', async () => {
-    await page.locator('#defView').check(); await page.locator('#defView').uncheck();
+    await page.locator('#view').selectOption('def'); await page.locator('#view').selectOption('atk'); await page.locator('#view').selectOption('all');
     await page.locator('#helpBtn').click(); assert.match(await page.locator('#sheet h2').innerText(), /Cómo se usa/);
     await page.keyboard.press('Escape'); assert.equal(await page.locator('#modal').isVisible(), false);
     await page.evaluate(() => window.__dbg.computeCov());

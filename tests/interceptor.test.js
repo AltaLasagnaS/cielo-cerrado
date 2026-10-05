@@ -1,5 +1,6 @@
 // Perfil de velocidad del interceptor (physics/interceptor.js, docs/FISICA.md §6): motor y planeo.
 import { test } from 'node:test';
+import { seeTrack } from './helpers.js';
 import assert from 'node:assert/strict';
 import { DEFENSES, UNC } from '../src/data/index.js';
 import { distAt, velAt, timeTo, solveTd, profileOf, hasProfile, energyAt } from '../src/physics/interceptor.js';
@@ -67,7 +68,7 @@ test('solve: contra un blanco que se aleja el encuentro queda más cerca que con
   setMap(flatMap(400, 400, 200));
   const u = { id: 1, type: 'nasams', x: 40, y: 40, az: 0, mast: 2 };
   const kal = (a, b) => buildThreat({ id: 9, type: 'kalibr', count: 1, pts: [a, b], agl: 50 }, 0, 0);
-  const first = th => { for (let t = 0; t < th.ft; t++) { const s = solve(u, th, t); if (s) return s; } return null; };
+  const first = th => { for (let t = 0; t < th.ft; t++) { const s = solve(u, seeTrack(th, t), t); if (s) return s; } return null; };
   const head = first(kal([0, 40], [40, 40])), tail = first(kal([39, 40], [79, 40]));
   assert.ok(head && tail);
   assert.ok(tail.r < head.r, `de cola ${tail.r} km, de frente ${head.r} km`);

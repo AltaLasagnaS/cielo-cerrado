@@ -47,8 +47,23 @@ python research/read-db3k.py --profile expansion \
 
 Lectura SQLite `mode=ro`, `query_only`, `trusted_schema=OFF`, sin extensiones ni ejecución del contenido. La selección y campos son explícitos, no búsquedas difusas que elijan el primer nombre parecido. No se adivinan unidades ni se calcula Pk. `--profile initial` reproduce exactamente el archivo anterior. Las pruebas distinguen ausencia, carga mixta, identidad y códigos duplicados; no certifican fidelidad militar por validar un JSON.
 
-## DBInfo.dat: estado de recuperación
+## DBInfo.dat: recuperación completada
 
-El usuario pidió descifrar el archivo. [`dbinfo-envelope-review.json`](../data/dbinfo-envelope-review.json) y `research/inspect-dbinfo.py` preservan el diagnóstico reproducible: **59.592 bytes ASCII Base64**, **44.692 bytes decodificados**, longitud inicial little-endian **16**, carga **44.672 bytes**, múltiplo de 16 y entropía **7,9962 bits/byte**. Compatible con un contenedor .NET de IV+cifrado en bloques, pero **no confirma algoritmo/derivación ni recupera el texto**. Base64 no es descifrado.
+El archivo se descifró y validó como XML **DBFiles**, con **207 entradas**: DBID 1 (DB3K) 140, DBID 2 (CWDB) 65 y DBID 3 (WW2DB) 2. Contiene DBID, nombre, archivo, hash SHA-1 y marca Supported. La marca Supported pertenece al registro de la aplicación; no acredita compatibilidad de armas ni una prestación militar.
 
-No se encontró el lector/clave en las bases SQLite ni en los archivos adjuntos inspeccionados. La siguiente dependencia es la biblioteca o ejecutable que lee el archivo (por ejemplo `Command_Core.dll`/`Command.exe`, si forman parte de esa instalación), o una exportación legible desde la aplicación. No se ha ejecutado ningún binario ni adivinado una clave. Mientras no se pueda verificar el contenido, no usar DBInfo para afirmar hashes/versiones internas ni llenar `verifiedInternalBuild`.
+La inspección independiente sigue en [`dbinfo-envelope-review.json`](../data/dbinfo-envelope-review.json): 59.592 bytes ASCII Base64, 44.692 bytes decodificados, longitud inicial little-endian 16, carga 44.672 bytes y entropía 7,9962 bits/byte. Ese diagnóstico por sí solo no identificaba la clave. Después se localizó un **lector público no oficial** y se verificó su formato contra el archivo recibido: AES-256-CBC, PKCS7, PBKDF2-HMAC-SHA1, 1000 iteraciones, constantes del formato legado. El texto obtenido mide **44.671 bytes** y cumple el esquema esperado. No fue fuerza bruta ni ejecución de un binario del juego.
+
+Referencia del lector: repositorio público MoZi, commit `238ddefb44298ca3f22dcd8be061ae435279b908`, [DBCryptoService](https://github.com/xunlongwang/MoZi/blob/238ddefb44298ca3f22dcd8be061ae435279b908/Source%202.0/CommandX/ns3/DBCryptoService.cs) y [DBOps](https://github.com/xunlongwang/MoZi/blob/238ddefb44298ca3f22dcd8be061ae435279b908/Source%202.0/CommandX/Command_Core/DBOps.cs). No es documentación oficial del fabricante ni se redistribuye su fuente. El extractor Python es una implementación independiente de los algoritmos estándar y del formato verificado; sólo necesita `cryptography` para esta tarea opcional. No lee licencias ni exporta fichas de armas.
+
+**Este registro es anterior a las bases modernas enviadas.** DB3K va de 390 a **478** (incluye betas/sufijos); CWDB de 390 a **477**; WW2DB 1/2. Se contrastaron los SHA-1 de DB3K 496/512/514/515 y CWDB 512: **ninguna coincide ni aparece por nombre en este registro**. No implica que las bases estén mal: el manifiesto no las incluye. `verifiedInternalBuild` sigue `null`; no marcar una base verificada por tener sólo un nombre similar. Se preservan mayúsculas/minúsculas y sufijos (por ejemplo DB3k_474 y versiones beta), sin fusionarlos por número.
+
+Resultado compacto: [`dbinfo-recovery-review.json`](../data/dbinfo-recovery-review.json), con huellas de entrada/salida y comparaciones por base. El XML completo transformado del archivo del usuario se entrega como artefacto de sesión; no se publica en el repo ni se añade una dependencia de archivos comerciales para CI.
+
+```bash
+python research/decrypt-dbinfo.py --input /ruta/DBInfo.dat \
+  --xml-output /ruta/dbinfo-descifrado.xml \
+  --review-output /ruta/dbinfo-recovery-review.json \
+  --database /ruta/DB3K_515.db3
+```
+
+El script valida Base64, cabecera, padding, UTF-8 y esquema; rechaza declaraciones DTD/ENTITY, entradas incompatibles y sobrescribir el archivo original. Sólo lee bases pasadas explícitamente, sin seguir rutas del XML. La lectura del archivo recibido y la comparación con cinco bases se ejecutaron; el resultado de recuperación no afirma que el mismo formato funcione para cualquier versión futura.

@@ -117,6 +117,20 @@ try {
   await page.locator('canvas').first().focus().catch(() => {});
   await page.keyboard.press('Delete');
   assert.equal(await page.evaluate(() => window.__S.setup.defs.length), nDefs - 2, 'Delete borra el grupo después de confirmar');
+  // rectángulo de selección: Shift + arrastrar sobre el mapa vacío suma las defensas de adentro
+  await page.evaluate(() => { window.__dbg.loadScenario('mb_noche'); window.__S.sel = null; window.__S.multi = []; });
+  const box = await page.evaluate(async () => {
+    const { toS, toW } = await import('/render/view.js'); const r = document.querySelector('canvas').getBoundingClientRect();
+    const pts = window.__S.setup.defs.map(u => toS(u.x, u.y));
+    const x0 = Math.min(...pts.map(p => p[0])) - 25, y0 = Math.min(...pts.map(p => p[1])) - 25, x1 = x0 + (Math.max(...pts.map(p => p[0])) - x0) * 0.6, y1 = Math.max(...pts.map(p => p[1])) + 25;
+    const [ax, ay] = toW(x0, y0), [bx, by] = toW(x1, y1);
+    const want = window.__S.setup.defs.filter(u => u.x >= Math.min(ax, bx) && u.x <= Math.max(ax, bx) && u.y >= Math.min(ay, by) && u.y <= Math.max(ay, by)).length;
+    return { a: [r.left + x0, r.top + y0], b: [r.left + x1, r.top + y1], want };
+  });
+  await page.keyboard.down('Shift'); await page.mouse.move(...box.a); await page.mouse.down(); await page.mouse.move(box.b[0], box.b[1], { steps: 8 }); await page.mouse.up(); await page.keyboard.up('Shift');
+  assert.ok(box.want >= 2, 'el rectángulo de prueba abarca varias defensas: ' + box.want);
+  assert.equal(await page.evaluate(() => window.__S.multi.length), box.want, 'selecciona las defensas de adentro');
+  assert.equal(await page.evaluate(() => window.__S.box), null, 'y borra el rectángulo');
   assert.deepEqual(errors, []);
-  console.log('Interfaz: valores numéricos, atajos, Monte Carlo, Academia de pulsos, regla y selección múltiple OK');
+  console.log('Interfaz: valores numéricos, atajos, Monte Carlo, Academia de pulsos, regla, selección múltiple y por rectángulo OK');
 } finally { await browser.close(); }

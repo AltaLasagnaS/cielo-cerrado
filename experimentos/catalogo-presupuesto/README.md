@@ -4,7 +4,7 @@ Trabajo original en una carpeta experimental independiente. No cambia `src/`, es
 
 ## Qué está implementado
 
-La [ampliación de variantes y radares](docs/AMPLIACION-VARIANTES-Y-RADARES.md) añade una selección comparada de 20 armas, 21 montajes y 17 sensores en cuatro builds DB3K. Conserva datos crudos y contradicciones (Pantsir incluye cañones; RBS 70 no hereda el seeker SALH del juego). Incluye diagnóstico de `DBInfo.dat`, todavía sin texto recuperado.
+La [ampliación de variantes y radares](docs/AMPLIACION-VARIANTES-Y-RADARES.md) añade una selección comparada de 20 armas, 21 montajes y 17 sensores en cuatro builds DB3K. Conserva datos crudos y contradicciones (Pantsir incluye cañones; RBS 70 no hereda el seeker SALH del juego). Incluye recuperación de `DBInfo.dat` (207 entradas XML) y contraste de hashes; el registro es anterior a las bases modernas enviadas.
 
 - Catálogo de referencia normalizado: tres familias, diez entradas de munición (una es un marcador legado sin variante identificada), nueve componentes y diez candidatos de configuración.
 - Registro de evidencia y fuentes. Diferencia documentación primaria/secundaria, índices de juego, estimación legada y desconocimiento. No atribuye evidencia a páginas bloqueadas.

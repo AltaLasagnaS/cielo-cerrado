@@ -8,28 +8,29 @@ import { classify, classifyGain, classifyTau } from '../physics/decoys.js';
 import { money } from '../util/format.js';
 import { nextId } from '../util/ids.js';
 import { rnd } from '../util/rng.js';
-import { surf, los } from '../physics/terrain.js';
+import { surf, los, MAP } from '../physics/terrain.js';
 import { antZ, aspectCos, belowCeiling, detR, inSector, jamJ, pdScan, PD_CUTOFF, confirms, scanHistory, falseTracks } from '../physics/radar.js';
 import { buildThreat, posAt, speedAt } from '../physics/kinematics.js';
+import { trackVel, predictAt, lastSeen } from '../physics/track.js';
 import { gnssNavError, crpaOverwhelmed } from '../physics/navigation.js';
 import { profileOf, timeTo } from '../physics/interceptor.js';
-import { RADAR_GUID, isTBM, trackOK, reactionStart, solve, calcPk, effectiveC2, unitC2, netPk, cpOf, netKey } from '../physics/engagement.js';
+import { RADAR_GUID, isTBM, trackOK, reactionStart, solve, arrivalReach, trackKeys, ownKey, calcPk, effectiveC2, unitC2, netPk, cpOf, netKey } from '../physics/engagement.js';
 import { C2_LEVELS } from '../data/index.js';
 import { damageAt, targetStatus } from '../physics/damage.js';
 import { azOf } from '../util/math.js';
 import { S, newStats } from './state.js';
 import { hooks } from './hooks.js';
-import { log, event, label, uLabel } from './log.js';
+import { log, event, label, uLabel, pista } from './log.js';
 import { recReset, recUnit, recObj } from './replay.js';
 import { ewStep } from './ew.js';
 import { wxNow, wxReset, wxStep } from './weather-now.js';
-import { noteSeen } from './contacts.js';
+import { noteSeen, noteObs, emitting, isEmitter } from './contacts.js';
 
 /** Arma la corrida a partir de S.setup: copia unidades y jammers y programa todos los lanzamientos. */
 export function startSim() {
-  S.units = S.setup.defs.map(d => ({ ...d, alive: true, hp: UNIT_TARGET.hp, dmgRadar: false, dmgLauncher: false, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
-  S.jamsLive = S.setup.jams.map(j => ({ ...j, _losMap: {} })); S.hoj = []; S.ewNext = 0; wxReset();
-  S.objs = S.setup.objs.map(g => ({ ...g, hp: g.maxHp, status: 'operational', hits: 0, dmgBy: {} }));
+  S.units = S.setup.defs.map(d => ({ ...d, alive: true, hp: d.hp ?? UNIT_TARGET.hp, dmgRadar: !!d.dmgRadar, dmgLauncher: !!d.dmgLauncher, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
+  S.jamsLive = S.setup.jams.map(j => ({ ...j, _losMap: {}, hp: UNIT_TARGET.hp })); S.hoj = []; S.ewNext = 0; wxReset();
+  S.objs = S.setup.objs.map(g => { const hp = g.hpNow ?? g.maxHp; return { ...g, hp, status: targetStatus(hp, g.maxHp), hits: 0, dmgBy: {} }; });
   S.threats = []; S.ints = []; S.fx = []; S.impacts = []; S.stats = newStats(); S.log = []; S.events = []; S.arrivals = [];
   S.pending = []; recReset();
   for (const sv of S.setup.salvos) {
@@ -68,24 +69,24 @@ export function step(dt) {
       th.released = true;
       for (let k = 0; k < th.decoyRel; k++) {
         const ang = rnd() * 6.28, dist = 1 + rnd() * 2.5;
-        const dc = { ...th, fly: [], id: nextId(), parent: th, tBorn: t, isDecoy: true, isDecoyChild: true, decoyRel: 0, sRel: p.s, off: [Math.cos(ang) * dist, Math.sin(ang) * dist], det: {}, mn: {}, mnT: {}, net: {}, trail: [], lastNet: -1e9, firstDet: null, cueFirst: null, netFirst: null, clsT: 0, clsTau: null, clsAs: null, phase: th.phase + (k + 1) * 1.6180339, alive: true, targetUnit: null };
+        const dc = { ...th, fly: [], id: nextId(), parent: th, tBorn: t, isDecoy: true, isDecoyChild: true, decoyRel: 0, sRel: p.s, off: [Math.cos(ang) * dist, Math.sin(ang) * dist], det: {}, mn: {}, mnT: {}, net: {}, obs: {}, seen: null, seenPrev: null, trail: [], lastNet: -1e9, firstDet: null, cueFirst: null, netFirst: null, clsT: 0, clsTau: null, clsAs: null, phase: th.phase + (k + 1) * 1.6180339, alive: true, targetUnit: null };
         S.threats.push(dc); S.stats.decoys++; S.stats.launched++;
       }
-      log('w', label(th) + ' libera ' + th.decoyRel + ' señuelos a ' + p.rem.toFixed(0) + ' km del blanco.');
+      log('w', label(th) + ' libera ' + th.decoyRel + ' señuelos a ' + p.rem.toFixed(0) + ' km del blanco.', 'atk');
       event(label(th) + ' libera señuelos', 'decoys');
     }
     if (!th.gnssHit && th.T.gnss < 1) {
       // fuentes anti-GNSS que cubren el punto; una antena CRPA de N elementos anula hasta N − 1 (por dirección)
-      const srcs = S.jamsLive.filter(j => JAMMERS[j.type].gnssJam && j.on && Math.hypot(p.x - j.x, p.y - j.y) <= JAMMERS[j.type].radius);
+      const srcs = S.jamsLive.filter(j => JAMMERS[j.type].gnssJam && j.on && !j.dead && Math.hypot(p.x - j.x, p.y - j.y) <= JAMMERS[j.type].radius);
       const held = th.crpa > 0 && srcs.length > 0 && !crpaOverwhelmed(th.crpa, p.x, p.y, srcs);
-      if (held && !th.crpaHeld) { th.crpaHeld = true; log('d', label(th) + ': su antena CRPA de ' + th.crpa + ' elementos anula la interferencia GNSS (' + srcs.length + ' fuente' + (srcs.length > 1 ? 's' : '') + ').'); }
+      if (held && !th.crpaHeld) { th.crpaHeld = true; log('d', label(th) + ': su antena CRPA de ' + th.crpa + ' elementos anula la interferencia GNSS (' + srcs.length + ' fuente' + (srcs.length > 1 ? 's' : '') + ').', 'atk'); }
       for (const j of held ? [] : srcs) {
         const J = JAMMERS[j.type];
         if (J.side !== 'both' && th.T.side !== 'both' && J.side === th.T.side) continue;
-        const link = th.link && !S.jamsLive.some(k => JAMMERS[k.type].linkJam && k.on && Math.hypot(p.x - k.x, p.y - k.y) <= JAMMERS[k.type].radius);   // un antidrón le corta el enlace
+        const link = th.link && !S.jamsLive.some(k => JAMMERS[k.type].linkJam && k.on && !k.dead && Math.hypot(p.x - k.x, p.y - k.y) <= JAMMERS[k.type].radius);   // un antidrón le corta el enlace
         const n = gnssNavError(th.T, J, link); th.gnssHit = true; th.navErr = n.err;
-        if (n.corrected) log('w', label(th) + ' pierde el GNSS en la zona de ' + J.short + (n.rejected ? ' y descarta el engaño' : '') + ', pero su buscador terminal encuentra el blanco.');
-        else if (th.navErr > 150) { log('w', label(th) + (n.spoofed ? ' es engañada por ' + J.short + ' (spoofing GNSS): desvío ≈' + (th.navErr / 1000).toFixed(1) + ' km.' : (n.rejected ? ' descarta el engaño de ' + J.short + (link && !th.T.navFix ? ' gracias a su enlace de datos' : ' con su corrección de terreno') + '; sigue con inercial: error ≈' : ' entra en zona anti-GNSS: error de navegación ≈') + Math.round(th.navErr) + ' m.')); event('Primera arma desviada por interferencia GNSS', 'gnss'); }
+        if (n.corrected) log('w', label(th) + ' pierde el GNSS en la zona de ' + J.short + (n.rejected ? ' y descarta el engaño' : '') + ', pero su buscador terminal encuentra el blanco.', 'atk');
+        else if (th.navErr > 150) { log('w', label(th) + (n.spoofed ? ' es engañada por ' + J.short + ' (spoofing GNSS): desvío ≈' + (th.navErr / 1000).toFixed(1) + ' km.' : (n.rejected ? ' descarta el engaño de ' + J.short + (link && !th.T.navFix ? ' gracias a su enlace de datos' : ' con su corrección de terreno') + '; sigue con inercial: error ≈' : ' entra en zona anti-GNSS: error de navegación ≈') + Math.round(th.navErr) + ' m.'), 'atk'); event('Primera arma desviada por interferencia GNSS', 'gnss'); }
         break;
       }
     }
@@ -93,7 +94,9 @@ export function step(dt) {
   // sensores
   for (const u of S.units) {
     if (!u.alive) continue; const d = D(u); if (!d.radar) continue;
+    if (!emitting(u, t)) continue;   // control de emisiones: un radar apagado no ve (ni se delata)
     if (t < u.nextScan) continue; u.nextScan = t + d.radar.scan;
+    if (isEmitter(d.radar)) u.emitFrom ??= t;   // desde acá el atacante lo puede ubicar por su emisión
     const r = d.radar, uz = antZ(u), wx = wxNow();
     // capacidad de seguimiento (radar.tracks): pistas abiertas + falsos blancos DRFM; una pista nueva no
     // entra si está lleno (las abiertas se mantienen)
@@ -126,15 +129,15 @@ export function step(dt) {
           const open = t - (th.det[u.id] ?? -1e9) <= keep;
           ok = hit && (open || confirms(bits));
           if (ok && !open && cap < Infinity) {
-            if (held + fake >= cap) { ok = false; if (!u.satLog) { u.satLog = true; log('w', uLabel(u) + ' no puede abrir más pistas: ' + held + ' reales' + (fake ? ' y ' + fake + ' falsas (engaño DRFM)' : '') + ' llenan su capacidad de ' + cap + '.'); } }
+            if (held + fake >= cap) { ok = false; if (!u.satLog) { u.satLog = true; log('w', uLabel(u) + ' no puede abrir más pistas: ' + held + ' reales' + (fake ? ' y ' + fake + ' falsas (engaño DRFM)' : '') + ' llenan su capacidad de ' + cap + '.', 'def', uLabel(u) + ' no puede abrir más pistas: ' + (held + fake) + ' llenan su capacidad de ' + cap + '.'); } }
             else held++;
           }
         }
       }
       if (ok) {
-        th.det[u.id] = t; noteSeen(th, t, u.id);
+        th.det[u.id] = t; noteSeen(th, t, u.id); noteObs(th, ownKey(u), t);
         const g = classifyGain(r);   // seguimiento con radar de tiro: aprende a distinguir señuelos
-        if (g) { th.clsT = (th.clsT || 0) + g; th.clsTau = Math.min(th.clsTau ?? Infinity, classifyTau(r)); const c = classify(th); if (c && !th.clsAs) { th.clsAs = c; if (c === 'señuelo' && S.ignoreDecoys) log('d', 'Pista #' + th.id + ' clasificada como señuelo por ' + uLabel(u) + (th.isDecoy ? '.' : ' (¡error: era ' + th.T.short + '!).')); } }
+        if (g) { th.clsT = (th.clsT || 0) + g; th.clsTau = Math.min(th.clsTau ?? Infinity, classifyTau(r)); const c = classify(th); if (c && !th.clsAs) { th.clsAs = c; if (c === 'señuelo' && S.ignoreDecoys) log('d', 'Pista #' + th.id + ' clasificada como señuelo por ' + uLabel(u) + (th.isDecoy ? '.' : ' (¡error: era ' + th.T.short + '!).'), 'def', 'Pista #' + th.id + ' clasificada como señuelo por ' + uLabel(u) + '.'); } }
         // La coordinación C2 puede repartir una alerta aun cuando el datalink de tiro esté apagado; una
         // unidad asignada a "desconectada" (u.c2) no avisa ni publica.
         const inNet = u.c2 !== 'desconectada';
@@ -144,10 +147,10 @@ export function step(dt) {
         if (u.link !== false && inNet) for (const key of datalinksOf(D(u))) {
           const nk = netKey(key, cp), n = th.net[nk] || (th.net[nk] = { first: null, last: -1e9 });
           if (n.first === null) n.first = t;
-          n.last = t;
+          n.last = t; noteObs(th, nk, t);
           th.lastNet = t; if (th.netFirst === null) th.netFirst = t;
         }
-        if (th.firstDet === null) { th.firstDet = t; th.detKm = p.rem; log('l', 'Primera detección: ' + label(th) + ' por ' + uLabel(u) + ' a ' + Math.hypot(p.x - u.x, p.y - u.y).toFixed(1) + ' km, ' + Math.round(p.z - surf(p.x, p.y)) + ' m AGL.'); event('Primera detección: ' + label(th) + ' por ' + uLabel(u), 'firstDet'); }
+        if (th.firstDet === null) { th.firstDet = t; th.detKm = p.rem; { const where = ' por ' + uLabel(u) + ' a ' + Math.hypot(p.x - u.x, p.y - u.y).toFixed(1) + ' km, ' + Math.round(p.z - surf(p.x, p.y)) + ' m AGL.'; log('l', 'Primera detección: ' + label(th) + where, 'def', 'Primera detección: pista #' + th.id + where); } event('Primera detección: ' + label(th) + ' por ' + uLabel(u), 'firstDet'); }
       }
     }
   }
@@ -157,14 +160,24 @@ export function step(dt) {
     if (!u.alive || !D(u).sam) continue;
     if (u.reloadUntil !== null && t >= u.reloadUntil) {
       const n = Math.min(u.mag, u.reserveLeft); u.magLeft += n; u.reserveLeft -= n; u.reloadUntil = null; S.stats.reloads++; recUnit(u);
-      log('l', uLabel(u) + ' termina de recargar: ' + n + ' listos, quedan ' + u.reserveLeft + ' en reserva.');
+      log('l', uLabel(u) + ' termina de recargar: ' + n + ' listos, quedan ' + u.reserveLeft + ' en reserva.', 'def');
     } else if (u.reloadUntil === null && u.magLeft === 0 && u.active === 0 && u.reserveLeft > 0 && canResupply(u)) {
       u.reloadUntil = t + D(u).sam.reloadS;
-      log('w', uLabel(u) + ' empieza a recargar (' + Math.round(D(u).sam.reloadS / 60) + ' min).');
+      log('w', uLabel(u) + ' empieza a recargar (' + Math.round(D(u).sam.reloadS / 60) + ' min).', 'def');
     }
   }
   // guerra electrónica de la defensa: triangulación de jammers y disparos home-on-jam
   ewStep(t);
+  // la batería sigue al blanco mientras su misil vuela: si su pista lo muestra por debajo de su piso de
+  // enfrentamiento (sam.altMin), sabe que no va a llegar, aborta y libera el blanco para otra unidad
+  for (const it of S.ints) {
+    if (it.done || it.phantom || t < it.tL || !it.th.alive || !it.u.alive) continue;
+    const sm = D(it.u).sam; if (sm.guid === 'cañón' || !sm.altMin) continue;
+    const s = lastSeen(it.th, trackKeys(it.u, it.th, t, it.c2, S.gateways)); if (!s || s.t <= it.tL) continue;
+    if (s.z - surf(s.x, s.y) >= sm.altMin) continue;
+    it.done = true; it.u.active = Math.max(0, it.u.active - 1); it.aborted = t; it.tH = t;   // la repetición lo deja de dibujar acá
+    log('x', it.shot + ' de ' + uLabel(it.u) + ' aborta: ' + label(it.th) + ' bajó de su piso de enfrentamiento.', 'def', it.shot + ' de ' + uLabel(it.u) + ' aborta: la ' + pista(it.th) + ' bajó de su piso de enfrentamiento.');
+  }
   // enfrentamientos (cada 1 s simulado por unidad)
   for (const u of S.units) {
     if (!u.alive || !D(u).sam || u.dmgLauncher || u.magLeft <= 0) continue;
@@ -175,19 +188,22 @@ export function step(dt) {
   for (const it of S.ints) {
     if (it.done || t < it.tH) continue;
     it.done = true; const u = it.u; u.active = Math.max(0, u.active - 1);
-    if (it.phantom) { log('x', it.shot + ' de ' + uLabel(u) + ' no encuentra nada: era un falso blanco.'); continue; }
+    if (it.phantom) { log('x', it.shot + ' de ' + uLabel(u) + ' no encuentra nada: era un falso blanco.', 'def'); continue; }
     const th = it.th;
-    if (!th.alive) { log('d', it.shot + ' de ' + uLabel(u) + ': blanco ya destruido, autodestrucción.'); continue; }
+    if (!th.alive) { log('d', it.shot + ' de ' + uLabel(u) + ': blanco ya destruido, autodestrucción.', 'def'); continue; }
     // guiado por el radar de la batería (SARH, TVM, mando): si la batería cayó, el misil queda sin guía
-    if (!u.alive && RADAR_GUID.includes(D(u).sam.guid)) { log('x', it.shot + ' de ' + uLabel(u) + ' pierde la guía: su batería fue destruida.'); continue; }
-    const pk = calcPk(u, th, t, S.jamsLive, it.f ?? null) * (it.remote ? C2_LEVELS[it.c2].remotePk * (it.gw ?? 1) : 1);   // error de posición de la pista de red (y de la pasarela)
+    if (!u.alive && RADAR_GUID.includes(D(u).sam.guid)) { log('x', it.shot + ' de ' + uLabel(u) + ' pierde la guía: su batería fue destruida.', 'def'); continue; }
+    // salió hacia el punto previsto: si el blanco cambió de rumbo o de altura más de lo que cubre su energía, no llega
+    const reach = arrivalReach(u, th, t, it.kin ?? null);
+    if (!reach.ok) { log('x', it.shot + ' de ' + uLabel(u) + ' no alcanza a ' + label(th) + ': el blanco no estaba donde se lo esperaba.', 'def', it.shot + ' de ' + uLabel(u) + ' no alcanza a la ' + pista(th) + ': no estaba donde se la esperaba.'); S.fx.push({ x: it.px, y: it.py, rt: performance.now(), c: '#8a9aac' }); continue; }
+    const pk = calcPk(u, th, t, S.jamsLive, it.f == null ? null : reach.f) * (it.remote ? C2_LEVELS[it.c2].remotePk * (it.gw ?? 1) : 1);   // error de posición de la pista de red (y de la pasarela)
     if (rnd() < pk) {
       th.alive = false; th.killed = true; th.tEnd = t; S.stats.killed++; if (th.isDecoy) S.stats.decoysKilled++;
       const p = th.p || it; S.fx.push({ x: p.x, y: p.y, rt: performance.now(), c: '#6fd08c' });
-      log('k', uLabel(u) + ' derriba ' + label(th) + (th.isDecoy ? ' (era señuelo)' : '') + ' — Pk ' + Math.round(pk * 100) + '%.');
+      log('k', uLabel(u) + ' derriba ' + label(th) + (th.isDecoy ? ' (era señuelo)' : '') + ' — Pk ' + Math.round(pk * 100) + '%.', 'def', uLabel(u) + ' derriba la ' + pista(th) + ' — Pk ' + Math.round(pk * 100) + '%.');
       event('Primer derribo: ' + uLabel(u) + ' derriba ' + label(th), 'firstKill');
     } else {
-      log('x', it.shot + ' de ' + uLabel(u) + ' falla contra ' + label(th) + ' (Pk ' + Math.round(pk * 100) + '%).');
+      log('x', it.shot + ' de ' + uLabel(u) + ' falla contra ' + label(th) + ' (Pk ' + Math.round(pk * 100) + '%).', 'def', it.shot + ' de ' + uLabel(u) + ' falla contra la ' + pista(th) + ' (Pk ' + Math.round(pk * 100) + '%).');
       S.fx.push({ x: it.px, y: it.py, rt: performance.now(), c: '#8a9aac' });
     }
   }
@@ -211,7 +227,7 @@ function canEngage(u, th, t, c2, probe) {
   if (!th.alive || !th.p || th.firstDet === null) return null;
   const maxR = isTBM(th) ? sm.maxRtbm : sm.maxR; if (!maxR) return null;
   if (u.noDrones && th.cls === 'dron') return null;
-  if (Math.hypot(th.p.x - u.x, th.p.y - u.y) > maxR + 120) return null;
+  const sn = th.seen ?? th.p; if (Math.hypot(sn.x - u.x, sn.y - u.y) > maxR + 120) return null;   // filtro grueso con la última posición vista
   if (!trackOK(u, th, t, c2, S.gateways)) { if (!probe) delete u.avail[th.id]; return null; }
   let av = u.avail[th.id];
   if (av === undefined) { av = reactionStart(th, t, c2, u); if (!probe) u.avail[th.id] = av; }
@@ -226,10 +242,10 @@ function canEngage(u, th, t, c2, probe) {
 }
 
 /** Segunda mitad de canEngage (lo caro): solución de tiro y cobertura del punto de encuentro. */
-function solveFor(u, th, t) {
+function solveFor(u, th, t, c2) {
   const sm = D(u).sam, r = D(u).radar;
-  const sol = solve(u, th, t, S.fireRange ?? 1); if (!sol) return null;
-  if (speedAt(th, t + sol.tau) > sm.vmaxT) return null;
+  const sol = solve(u, th, t, S.fireRange ?? 1, trackKeys(u, th, t, c2, S.gateways)); if (!sol) return null;
+  if ((sol.v ?? speedAt(th, t + sol.tau)) > sm.vmaxT) return null;   // velocidad medida (la verdadera solo en balísticos)
   const remote = !(r && t - (th.det[u.id] ?? -1e9) <= r.scan * 2 + 0.6);
   if (RADAR_GUID.includes(sm.guid) && sm.guid !== 'cañón') {
     if (!los(u.x, u.y, antZ(u), sol.p.x, sol.p.y, sol.p.z)) return null;
@@ -249,7 +265,7 @@ function solveFor(u, th, t) {
  */
 /** @param {number | null} [f] */
 function shooterScore(u, th, t, f = null) {
-  const pk = Math.max(0.01, calcPk(u, th, t, S.jamsLive, f));
+  const pk = Math.max(0.01, calcPk(u, th, t, S.jamsLive, f, true));   // lo que estima la defensa, no la verdad
   return th.cls === 'dron' ? -D(u).sam.cost / pk : pk;
 }
 
@@ -266,16 +282,20 @@ export function canResupply(u) {
 }
 
 /** Costo esperado por derribo de u contra th (costo del disparo / Pk). */
-const costPerKill = (u, th, t) => D(u).sam.cost / Math.max(0.01, calcPk(u, th, t, S.jamsLive));
+const costPerKill = (u, th, t) => D(u).sam.cost / Math.max(0.01, calcPk(u, th, t, S.jamsLive, null, true));
 
 /**
- * ¿La ruta que le queda a th pasa por la envolvente de v (90% del alcance, entre su piso y su techo)
- * antes de llegar? Muestrea cada 2 s. Sirve para dejarle un dron a una capa más barata.
+ * ¿La trayectoria prevista de th (con las pistas de quien decide; hasta que sale del mapa) pasa por la envolvente de v (90% del
+ * alcance, entre su piso y su techo)? Muestrea cada 2 s. Sirve para dejarle un dron a una capa más barata.
  */
-function reaches(v, th, t) {
-  const sm = D(v).sam, lz = surf(v.x, v.y) + 2, tEnd = th.tLaunch + th.ft - 1;
+/** @param {string[]} keys pistas de quien decide (trackKeys) */
+function reaches(v, th, t, keys) {
+  // con la trayectoria que se puede prever con esas pistas (la verdadera solo en balísticos), no con la ruta real
+  const sm = D(v).sam, lz = surf(v.x, v.y) + 2, tbm = isTBM(th), vel = tbm ? null : trackVel(th, keys);
+  if (!tbm && !vel) return false;
+  const tEnd = tbm ? th.tLaunch + th.ft - 1 : t + 3600;
   for (let tt = t + 2; tt < tEnd; tt += 2) {
-    const p = posAt(th, tt); if (!p) break;
+    const p = tbm ? posAt(th, tt) : predictAt(vel, tt); if (!p || p.x < 0 || p.y < 0 || p.x > MAP.wKm || p.y > MAP.hKm) break;   // la línea prevista hasta que sale del mapa
     if (Math.hypot(p.x - v.x, p.y - v.y) <= sm.maxR * 0.9 && p.z - lz <= sm.altMax && p.z - surf(p.x, p.y) >= sm.altMin) return true;
   }
   return false;
@@ -292,7 +312,10 @@ export function engage(u, t) {
   if (u.active >= ch) return;
   const cp = cpOf(u), c2net = effectiveC2(S.c2, S.objs, cp), c2 = unitC2(u, c2net), L = C2_LEVELS[c2];
   const cand = [];
-  for (const th of S.threats) if (canEngage(u, th, t, c2, false)) cand.push([th, th.p.rem / Math.max(1, th.T.v)]);
+  // prioridad: el contacto que antes llega a la batería, según lo que ve la defensa (última posición y
+  // velocidad medida); no el tiempo que le falta al arma hasta su blanco, que la defensa no conoce
+  const eta = th => { const s = th.seen, v = trackVel(th); return s ? Math.hypot(s.x - u.x, s.y - u.y) * 1000 / Math.max(1, v ? v.v : 1) : Infinity; };
+  for (const th of S.threats) if (canEngage(u, th, t, c2, false)) cand.push([th, eta(th)]);
   cand.sort((a, b) => a[1] - b[1]);
   // falsos blancos DRFM que pasan la clasificación (JAM_MODES.drfm.fooled): compiten con las pistas reales
   // por los disparos de esta evaluación; si sale uno, la batería gasta una salva en la nada
@@ -300,31 +323,32 @@ export function engage(u, t) {
   if (ph > 0 && u.active < ch && u.magLeft > 0 && rnd() < ph / (ph + cand.length)) phantomShot(u, t);
   for (const [th] of cand) {
     if (u.active >= ch || u.magLeft <= 0) { const k = uLabel(u), sat = u.magLeft <= 0 ? S.stats.satMag : S.stats.satChannels; sat[k] = (sat[k] || 0) + 1; break; }
-    const f = solveFor(u, th, t); if (!f) continue;
+    const f = solveFor(u, th, t, c2); if (!f) continue;
     if (L.best && u.link !== false) {
       // mejor tirador ahora: otra batería con enlace que también puede tirar ya y es mejor
       const mine = shooterScore(u, th, t, f.sol.f);
-      const better = S.units.some(v => { if (v === u || v.link === false || cpOf(v) !== cp || !canEngage(v, th, t, unitC2(v, c2net), true)) return false; const fv = solveFor(v, th, t); return !!fv && shooterScore(v, th, t, fv.sol.f) > mine * (th.cls === 'dron' ? 0.999 : 1.001); });
+      const better = S.units.some(v => { if (v === u || v.link === false || cpOf(v) !== cp || !canEngage(v, th, t, unitC2(v, c2net), true)) return false; const fv = solveFor(v, th, t, unitC2(v, c2net)); return !!fv && shooterScore(v, th, t, fv.sol.f) > mine * (th.cls === 'dron' ? 0.999 : 1.001); });
       if (better) continue;
       // defensa por capas: un dron se le deja a una capa al menos 2 veces más barata por derribo que
       // tenga munición y por cuya envolvente vaya a pasar antes de llegar
       if (th.cls === 'dron') {
-        const cpk = costPerKill(u, th, t);
-        const layer = S.units.some(v => v !== u && v.alive && v.link !== false && cpOf(v) === cp && D(v).sam && v.magLeft > 0 && !v.noDrones && D(v).sam.maxR > 0 && costPerKill(v, th, t) * 2 <= cpk && reaches(v, th, t));
+        const cpk = costPerKill(u, th, t), keys = trackKeys(u, th, t, c2, S.gateways);   // la prevé quien decide, con sus pistas
+        const layer = S.units.some(v => v !== u && v.alive && v.link !== false && cpOf(v) === cp && D(v).sam && v.magLeft > 0 && !v.noDrones && D(v).sam.maxR > 0 && costPerKill(v, th, t) * 2 <= cpk && reaches(v, th, t, keys));
         if (layer) continue;
       }
     }
     const { sol, remote } = f;
     const n = Math.min(S.doctrine === 'salva' ? (u.salvo || sm.salvo) : 1, u.magLeft, ch - u.active);
     for (let k = 0; k < n; k++) {
-      const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f, gw: remote ? (netPk(u, th, t, c2, S.gateways) || 1) : 1 };
+      const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f, kin: sol.f > 0 ? sol.r / sol.f : null, gw: remote ? (netPk(u, th, t, c2, S.gateways) || 1) : 1 };
       S.ints.push(it); (th.fly = th.fly || []).push(it);
-      S.rec?.ints.push(it); u.magLeft--; u.active++; S.stats.shots++; S.stats.defCost += sm.cost; recUnit(u);
+      S.rec?.ints.push(it); u.magLeft--; u.active++; S.stats.shots++; S.stats.defCost += sm.cost; recUnit(u); u.revealed ??= t;   // el lanzamiento la delata (vista del atacante)
       S.stats.byUnit[uLabel(u)] = (S.stats.byUnit[uLabel(u)] || 0) + 1;
     }
     event('Primer interceptor lanzado: ' + uLabel(u) + ' contra ' + label(th), 'firstShot');
-    if (u.magLeft === 0) { log('w', uLabel(u) + ' se queda sin munición.'); event(uLabel(u) + ' se queda sin munición', 'empty:' + u.id); }
-    log('l', uLabel(u) + ' dispara ' + n + '× ' + sm.shot + ' contra ' + (th.isDecoy && hooks.defenderView() ? 'pista #' + th.id : label(th)) + ' — intercepción a ' + sol.r.toFixed(1) + ' km en ' + sol.tau.toFixed(0) + ' s' + (remote ? ' (con pista de la red)' : '') + '.');
+    if (u.magLeft === 0) { log('w', uLabel(u) + ' se queda sin munición.', 'def'); event(uLabel(u) + ' se queda sin munición', 'empty:' + u.id); }
+    const how = ' — intercepción a ' + sol.r.toFixed(1) + ' km en ' + sol.tau.toFixed(0) + ' s' + (remote ? ' (con pista de la red)' : '') + '.';
+    log('l', uLabel(u) + ' dispara ' + n + '× ' + sm.shot + ' contra ' + label(th) + how, 'def', uLabel(u) + ' dispara ' + n + '× ' + sm.shot + ' contra la ' + pista(th) + how);
   }
 }
 
@@ -334,10 +358,10 @@ function phantomShot(u, t) {
   const a = (u.az || 0) * Math.PI / 180, r = sm.maxR * 0.6, tau = timeTo(profileOf(sm), r * 1000);
   for (let k = 0; k < n; k++) {
     const it = { u, th: null, phantom: true, x0: u.x, y0: u.y, px: u.x + Math.sin(a) * r, py: u.y - Math.cos(a) * r, tL: t + k * 0.6, tH: t + tau + k * 0.6, shot: sm.shot, done: false };
-    S.ints.push(it); S.rec?.ints.push(it); u.magLeft--; u.active++; S.stats.shots++; S.stats.defCost += sm.cost; recUnit(u);
+    S.ints.push(it); S.rec?.ints.push(it); u.magLeft--; u.active++; S.stats.shots++; S.stats.defCost += sm.cost; recUnit(u); u.revealed ??= t;
   }
-  log('w', uLabel(u) + ' dispara ' + n + '× ' + sm.shot + ' contra un falso blanco (engaño DRFM).');
-  if (u.magLeft === 0) log('w', uLabel(u) + ' se queda sin munición.');
+  log('w', uLabel(u) + ' dispara ' + n + '× ' + sm.shot + ' contra un falso blanco (engaño DRFM).', 'def', uLabel(u) + ' dispara ' + n + '× ' + sm.shot + ' contra una pista.');
+  if (u.magLeft === 0) log('w', uLabel(u) + ' se queda sin munición.', 'def');
 }
 
 /**
@@ -354,26 +378,26 @@ export function impact(th) {
   const sig = (th.T.cep || 10) / 1.1774; const ang = rnd() * 6.28;
   const r = sig * Math.sqrt(-2 * Math.log(1 - rnd() * 0.999)) + th.navErr;
   x += Math.cos(ang) * r / 1000; y += Math.sin(ang) * r / 1000;
-  if (th.isDecoy) { S.impacts.push({ x, y, k: 'decoy', t: S.t }); log('d', label(th) + ' cae sin efecto.'); return; }
+  if (th.isDecoy) { S.impacts.push({ x, y, k: 'decoy', t: S.t }); log('d', label(th) + ' cae sin efecto.', 'def', 'La ' + pista(th) + ' cae sin efecto.'); return; }
   const hit = r <= (th.T.hitR || (th.cls === 'dron' ? 20 : 50));
   const c2Before = effectiveC2(S.c2, S.objs);
   const dmg = applyDamage(th, x, y), total = dmg.reduce((a, d) => a + d.dmg, 0);
   const c2After = effectiveC2(S.c2, S.objs);
-  if (c2After !== c2Before) { log('x', `La defensa pierde un nodo de mando y control: el C2 cae a "${C2_LEVELS[c2After].name}".`); event('C2 degradado a ' + C2_LEVELS[c2After].name, 'c2:' + c2After); }
+  if (c2After !== c2Before) { log('x', `La defensa pierde un nodo de mando y control: el C2 cae a "${C2_LEVELS[c2After].name}".`, 'def'); event('C2 degradado a ' + C2_LEVELS[c2After].name, 'c2:' + c2After); }
   S.stats.missSum += r; S.stats.missN++;
   S.arrivals.push({ t: S.t, id: th.id, type: th.type, name: label(th), cls: th.cls, det: th.firstDet, detKm: th.detKm ?? null, shots: (th.fly || []).length, miss: r, hit, dmg: total, nav: th.navErr, target: dmg[0]?.g.name ?? null });
   const dtxt = dmg.map(d => ` · −${d.dmg} HP a ${d.g.name} (${Math.max(0, d.g.hp)}/${d.g.maxHp})`).join('');
   if (hit) {
     S.stats.hits++; S.impacts.push({ x, y, k: 'hit', t: S.t });
     S.fx.push({ x, y, rt: performance.now(), c: '#ff5b4d', big: true });
-    let msg = label(th) + ' impacta en el blanco';
-    if (th.targetUnit) { const u = S.units.find(v => v.id === th.targetUnit && v.alive); if (u) { u.alive = false; recUnit(u); S.stats.lost++; msg += ' y destruye ' + uLabel(u); hooks.onUnitLost(); event(uLabel(u) + ' destruida por ' + label(th), 'lost:' + u.id); } }
-    log('x', msg + dtxt + '.');
+    let msg = label(th) + ' impacta en el blanco', alt = 'Impacto' + (th.firstDet === null ? ' de un arma no detectada' : ' de la ' + pista(th));
+    if (th.targetUnit) { const u = S.units.find(v => v.id === th.targetUnit && v.alive); if (u) { u.alive = false; recUnit(u); S.stats.lost++; msg += ' y destruye ' + uLabel(u); alt += ': ' + uLabel(u) + ' destruida'; hooks.onUnitLost(); event(uLabel(u) + ' destruida por ' + label(th), 'lost:' + u.id); } }
+    log('x', msg + dtxt + '.', 'def', alt + dtxt + '.');
   } else {
     S.stats.misses++; S.impacts.push({ x, y, k: 'miss', t: S.t });
-    log('w', label(th) + ' cae a ' + Math.round(r) + ' m del blanco' + (th.navErr > 150 ? ' (desviado por interferencia GNSS)' : '') + dtxt + '.');
+    log('w', label(th) + ' cae a ' + Math.round(r) + ' m del blanco' + (th.navErr > 150 ? ' (desviado por interferencia GNSS)' : '') + dtxt + '.', 'def', 'Cae ' + (th.firstDet === null ? 'un arma no detectada' : 'la ' + pista(th)) + ' sin dar en un objetivo' + dtxt + '.');
   }
-  damageUnits(th.T, x, y);
+  damageUnits(th.T, x, y); damageJammers(th.T, x, y);
   for (const d of dmg) {
     event('Primer impacto con daño: ' + label(th) + ' sobre ' + d.g.name, 'firstDmg');
     if (d.g.status !== d.before) {
@@ -401,6 +425,25 @@ function applyDamage(th, x, y) {
 }
 
 /**
+ * Jammers terrestres alcanzados por una caída en (x, y) km (docs/FISICA.md §10): pierden vida como una
+ * unidad (UNIT_TARGET) y a 0 dejan de interferir. Los aéreos no (los derriba el home-on-jam, sim/ew.js).
+ * Sin daño parcial: un jammer con vida sigue funcionando entero. Se puede apuntar una salva a un jammer.
+ */
+export function damageJammers(T, x, y) {
+  for (const j of S.jamsLive) {
+    if (j.dead || JAMMERS[j.type].air) continue;
+    const res = damageAt(T, UNIT_TARGET, Math.hypot(x - j.x, y - j.y) * 1000); if (!res.dmg) continue;
+    j.hp = (j.hp ?? UNIT_TARGET.hp) - Math.round(res.dmg);
+    if (j.hp <= 0) {
+      j.dead = true; S.stats.jamsLost = (S.stats.jamsLost || 0) + 1;
+      // lo sabe quien lo opera; un jammer terrestre suele ser de la defensa (el atacante interfiere desde el aire)
+      log('x', JAMMERS[j.type].short + ' queda destruido por la explosión de ' + T.short + ' a ' + Math.round(res.edge + UNIT_TARGET.radius) + ' m: deja de interferir.', 'def');
+      event(JAMMERS[j.type].short + ' destruido por ' + T.short, 'jamLost:' + j.id);
+    }
+  }
+}
+
+/**
  * Daño funcional (docs/FISICA.md §10): cada unidad en tierra cerca de la caída (x, y) km pierde vida
  * como un objetivo UNIT_TARGET. A 0 queda destruida; al cruzar cada umbral de UNIT_COMP_AT pierde un
  * componente: el radar (alcance ×UNIT_DAMAGE.radarR, reacción ×UNIT_DAMAGE.react) o el lanzador (no
@@ -413,7 +456,7 @@ export function damageUnits(T, x, y) {
     u.hp -= Math.round(res.dmg);
     if (u.hp <= 0) {
       u.alive = false; recUnit(u); S.stats.lost++; hooks.onUnitLost();
-      log('x', uLabel(u) + ' queda destruida por la explosión de ' + T.short + ' a ' + Math.round(res.edge + UNIT_TARGET.radius) + ' m.');
+      log('x', uLabel(u) + ' queda destruida por la explosión de ' + T.short + ' a ' + Math.round(res.edge + UNIT_TARGET.radius) + ' m.', 'def');
       event(uLabel(u) + ' destruida por ' + T.short, 'lost:' + u.id);
       continue;
     }
@@ -424,8 +467,8 @@ export function damageUnits(T, x, y) {
       if (d.sam && !u.dmgLauncher) comps.push('launcher');
       if (!comps.length) break;
       const c = comps.length > 1 ? comps[rnd() < 0.5 ? 0 : 1] : comps[0];
-      if (c === 'radar') { u.dmgRadar = true; log('w', uLabel(u) + ' dañada: el radar pierde alcance (×' + UNIT_DAMAGE.radarR + ') y reacciona más lento.'); }
-      else { u.dmgLauncher = true; log('w', uLabel(u) + ' dañada: el lanzador queda fuera de servicio.'); }
+      if (c === 'radar') { u.dmgRadar = true; log('w', uLabel(u) + ' dañada: el radar pierde alcance (×' + UNIT_DAMAGE.radarR + ') y reacciona más lento.', 'def'); }
+      else { u.dmgLauncher = true; log('w', uLabel(u) + ' dañada: el lanzador queda fuera de servicio.', 'def'); }
       S.stats.unitsDamaged++; event(uLabel(u) + ' dañada por ' + T.short, 'dmgUnit:' + u.id + ':' + c); recUnit(u);
     }
   }
