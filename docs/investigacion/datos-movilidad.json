@@ -1,0 +1,1342 @@
+{
+  "schemaVersion": 1,
+  "consultedDateBuenosAires": "2026-10-05",
+  "catalogBase": "7de9e70",
+  "runtimeEnabled": false,
+  "scope": "Investigación, no entrada al motor ni rangos UNC completos. null es desconocido, no cero/falso.",
+  "rangeSemantics": "Intervalo/límite declarado; probable solo con respaldo publicado. Valores nominales se conservan fuera del rango, sin inventar extremos.",
+  "sources": [
+    {
+      "id": "hensoldt",
+      "requestedUrl": "https://www.hensoldt.net/products/trml-4d-air-surveillance-and-target-acquisition-radar",
+      "finalUrl": "https://www.hensoldt.net/products/trml-4d-air-surveillance-and-target-acquisition-radar",
+      "bytes": 151210,
+      "mime": "text/html; charset=utf-8",
+      "sha256": "de7ea87f478075484eb00cd48cd9a3c613ac61bb3568add6bdcb23b7ecffda2d",
+      "retrievedUtc": "2026-10-06T01:08:48.382107+00:00",
+      "status": "ok",
+      "kind": "primary-manufacturer",
+      "locator": "sección citada en datos-movilidad.md",
+      "referenceId": "M01",
+      "contentReviewed": true,
+      "claimScope": "Ver localizador y límites en datos-movilidad.md; no valida toda la familia."
+    },
+    {
+      "id": "saab",
+      "requestedUrl": "https://www.saab.com/products/rbs-70-ng",
+      "finalUrl": "https://www.saab.com/products/rbs-70-ng",
+      "bytes": 204703,
+      "mime": "text/html; charset=utf-8",
+      "sha256": "84e9d1c9d8c75d506b6ca0272196ff44d68212b383b137939c4f074d178decd1",
+      "retrievedUtc": "2026-10-06T01:08:49.679154+00:00",
+      "status": "ok",
+      "kind": "primary-manufacturer",
+      "locator": "sección citada en datos-movilidad.md",
+      "referenceId": "M02",
+      "contentReviewed": true,
+      "claimScope": "Ver localizador y límites en datos-movilidad.md; no valida toda la familia."
+    },
+    {
+      "id": "stinger-fm",
+      "title": "US Army FM 44-18-1, 31 diciembre 1984",
+      "requestedUrl": "https://archive.org/download/FM_44_18_1_S_T_O_1984/FM%2044-18-1%20Stinger%20Team%20Operations%20%281984%29.pdf",
+      "finalUrl": "https://archive.org/download/FM_44_18_1_S_T_O_1984/FM%2044-18-1%20Stinger%20Team%20Operations%20%281984%29.pdf",
+      "kind": "primary-historical-mirror",
+      "locator": "cap. 3 Firing the Stinger; cap. 7 Protecting a Convoy",
+      "status": "ok",
+      "sha256": "43a14668e20a31102645f1cb2a876816692c6f82ead67871ffea7b4985890265",
+      "retrievedUtc": null,
+      "reusedVerifiedCache": true,
+      "referenceId": "M03",
+      "contentReviewed": true,
+      "claimScope": "Ver localizador y límites en datos-movilidad.md; no valida toda la familia."
+    },
+    {
+      "id": "missilery-s300",
+      "requestedUrl": "https://en.missilery.info/missile/c300ps",
+      "finalUrl": "https://en.missilery.info/missile/c300ps",
+      "bytes": 38742,
+      "mime": "text/html; charset=utf-8",
+      "sha256": "6edb99ab7ab34335690c713f27d37fc199ce3e9bebee3818014af68d0a455fc2",
+      "retrievedUtc": "2026-10-06T01:10:43.284374+00:00",
+      "status": "ok",
+      "kind": "secondary-technical",
+      "locator": "sección citada en datos-movilidad.md",
+      "referenceId": "M04",
+      "contentReviewed": true,
+      "claimScope": "Ver localizador y límites en datos-movilidad.md; no valida toda la familia."
+    },
+    {
+      "id": "apa-sams",
+      "title": "Carlo Kopp, S-300P/S-400 family, Air Power Australia",
+      "requestedUrl": "https://www.ausairpower.net/APA-Grumble-Gargoyle.html",
+      "finalUrl": "https://www.ausairpower.net/APA-Grumble-Gargoyle.html",
+      "kind": "secondary-technical",
+      "locator": "S-300PS section",
+      "status": "ok",
+      "sha256": "a5c9419fa7677123d202292e3c2fc9798d13352474281957ebe08f486cb47062",
+      "retrievedUtc": "2026-10-06",
+      "reusedVerifiedCache": false,
+      "referenceId": "M05",
+      "contentReviewed": true,
+      "claimScope": "Ver localizador y límites en datos-movilidad.md; no valida toda la familia."
+    },
+    {
+      "id": "missilery-bukm1-exact",
+      "requestedUrl": "https://en.missilery.info/missile/bukm1",
+      "finalUrl": "https://en.missilery.info/missile/bukm1",
+      "bytes": 26742,
+      "mime": "text/html; charset=utf-8",
+      "sha256": "8dee6207ba3ba9cd8ed528b6b00f69179770ebdafd29963ba1087f968755438b",
+      "retrievedUtc": "2026-10-06T01:12:26.053321+00:00",
+      "status": "ok",
+      "kind": "secondary-technical",
+      "locator": "sección citada en datos-movilidad.md",
+      "referenceId": "M06",
+      "contentReviewed": true,
+      "claimScope": "Ver localizador y límites en datos-movilidad.md; no valida toda la familia."
+    },
+    {
+      "id": "missilery-bukm1",
+      "requestedUrl": "https://en.missilery.info/missile/buk",
+      "finalUrl": "https://en.missilery.info/missile/buk",
+      "bytes": 31990,
+      "mime": "text/html; charset=utf-8",
+      "sha256": "0049b167c7cdcea550b6cb3c3f86727c8508bbf21b8afa8a0f927d2567ce9385",
+      "retrievedUtc": "2026-10-06T01:10:42.326075+00:00",
+      "status": "ok",
+      "kind": "secondary-technical",
+      "locator": "sección citada en datos-movilidad.md",
+      "referenceId": "M07",
+      "contentReviewed": true,
+      "claimScope": "Ver localizador y límites en datos-movilidad.md; no valida toda la familia."
+    },
+    {
+      "id": "apa-mast",
+      "requestedUrl": "https://www.ausairpower.net/APA-40V6M-Mast-System.html",
+      "finalUrl": "https://www.ausairpower.net/APA-40V6M-Mast-System.html",
+      "bytes": 74370,
+      "mime": "text/html",
+      "sha256": "c375c068259f6c14214dfdf18b15c9d823c91d274f386b99875812e2fcce1579",
+      "retrievedUtc": "2026-10-06T01:08:47.954450+00:00",
+      "status": "ok",
+      "kind": "secondary-technical",
+      "locator": "sección citada en datos-movilidad.md",
+      "referenceId": "M08",
+      "contentReviewed": true,
+      "claimScope": "Ver localizador y límites en datos-movilidad.md; no valida toda la familia."
+    },
+    {
+      "id": "patriot-fm",
+      "title": "US Army FM 3-01.85, mayo 2002",
+      "requestedUrl": "https://archive.org/download/Fm301.85PatriotBattalionAndBatteryOperations/fm%203-01.85%20Patriot%20Battalion%20and%20Battery%20Operations.pdf",
+      "finalUrl": "https://archive.org/download/Fm301.85PatriotBattalionAndBatteryOperations/fm%203-01.85%20Patriot%20Battalion%20and%20Battery%20Operations.pdf",
+      "kind": "primary-historical-mirror",
+      "locator": "B-20–B-22, PDF 119–120; G, PDF 208",
+      "status": "ok",
+      "sha256": "13dcf60253b5cca4f743c0b70b61fe7cd9ed07719e7ebb36d3a47a4162f59d53",
+      "retrievedUtc": "2026-10-06",
+      "reusedVerifiedCache": false,
+      "referenceId": "M09",
+      "contentReviewed": true,
+      "claimScope": "Ver localizador y límites en datos-movilidad.md; no valida toda la familia."
+    },
+    {
+      "id": "csis-sampt",
+      "requestedUrl": "https://missilethreat.csis.org/defsys/samp-t/",
+      "finalUrl": "https://missilethreat.csis.org/defsys/samp-t/",
+      "bytes": 255951,
+      "mime": "text/html; charset=UTF-8",
+      "sha256": "19c95c34b88fe1db6469d188a4b1730609cd26defe771721276ad3d0447444a3",
+      "retrievedUtc": "2026-10-06T01:08:49.922778+00:00",
+      "status": "ok",
+      "kind": "secondary-technical",
+      "locator": "sección citada en datos-movilidad.md",
+      "referenceId": "M10",
+      "contentReviewed": true,
+      "claimScope": "Ver localizador y límites en datos-movilidad.md; no valida toda la familia."
+    },
+    {
+      "id": "diehl-slm",
+      "requestedUrl": "https://new.diehl.com/defence/en/products/air-defence-systems/iris-t-slm2",
+      "finalUrl": "https://new.diehl.com/defence/en/products/air-defence-systems/iris-t-slm2",
+      "bytes": 84314,
+      "mime": "text/html; charset=UTF-8",
+      "sha256": "ff14481d5f72505c2291eb5123050fa97b9b0f5f00e1e1ddf895218d1da56bab",
+      "retrievedUtc": "2026-10-06T01:12:27.977872+00:00",
+      "status": "ok",
+      "kind": "primary-manufacturer",
+      "locator": "sección citada en datos-movilidad.md",
+      "referenceId": "M11",
+      "contentReviewed": true,
+      "claimScope": "Ver localizador y límites en datos-movilidad.md; no valida toda la familia."
+    },
+    {
+      "id": "iris-ar",
+      "requestedUrl": "https://www.armyrecognition.com/military-products/army/air-defense-systems/air-defense-vehicles/iris-t-slm-medium-range-air-defense-missile-system-technical-data",
+      "finalUrl": "https://www.armyrecognition.com/military-products/army/air-defense-systems/air-defense-vehicles/iris-t-slm-medium-range-air-defense-missile-system-technical-data",
+      "bytes": 128478,
+      "mime": "text/html; charset=utf-8",
+      "sha256": "2c278d58b1c2b423ede202e1a68640a1204f536aa82bc24d12a0cedf28a79478",
+      "retrievedUtc": "2026-10-06T01:11:42.637753+00:00",
+      "status": "ok",
+      "kind": "secondary-technical",
+      "locator": "sección citada en datos-movilidad.md",
+      "referenceId": "M12",
+      "contentReviewed": true,
+      "claimScope": "Ver localizador y límites en datos-movilidad.md; no valida toda la familia."
+    },
+    {
+      "id": "kongsberg",
+      "requestedUrl": "https://www.kongsberg.com/kda/what-we-do/defence-and-security/integrated-air-and-missile-defence/nasams-air-defence-system/",
+      "finalUrl": "https://www.kongsberg.com/what-we-do/defence-and-security/integrated-air-and-missile-defence/nasams-air-defence-system/",
+      "bytes": 200151,
+      "mime": "text/html; charset=utf-8",
+      "sha256": "537a9de678ce3357d062d9e48a395b935b05d0fa3f7ee765c86c2fa3dcbe47c0",
+      "retrievedUtc": "2026-10-06T01:08:52.861410+00:00",
+      "status": "ok",
+      "kind": "primary-manufacturer",
+      "locator": "sección citada en datos-movilidad.md",
+      "referenceId": "M13",
+      "contentReviewed": true,
+      "claimScope": "Ver localizador y límites en datos-movilidad.md; no valida toda la familia."
+    },
+    {
+      "id": "sentinel-raytheon",
+      "title": "ThalesRaytheonSystems AN/MPQ-64, mayo 2003",
+      "requestedUrl": "https://www.mobileradar.org/Documents/MPQ_64.pdf",
+      "finalUrl": "https://www.mobileradar.org/Documents/MPQ_64.pdf",
+      "kind": "primary-historical-mirror",
+      "locator": "PDF p. 2",
+      "status": "ok",
+      "sha256": "3d8f3cdf9af8af91d5e93208f51e90640923ecd17df18b53a5d04adaf64727e6",
+      "retrievedUtc": "2026-10-06",
+      "reusedVerifiedCache": false,
+      "referenceId": "M14",
+      "contentReviewed": true,
+      "claimScope": "Ver localizador y límites en datos-movilidad.md; no valida toda la familia."
+    },
+    {
+      "id": "gepard-ws",
+      "requestedUrl": "https://weaponsystems.net/system/69-Gepard",
+      "finalUrl": "https://weaponsystems.net/system/69-Gepard",
+      "bytes": 52516,
+      "mime": "text/html; charset=UTF-8",
+      "sha256": "0def0f693a4496396a421cb770f3ca28df12f63b05279314759a03516473b797",
+      "retrievedUtc": "2026-10-06T01:11:41.182369+00:00",
+      "status": "ok",
+      "kind": "secondary-technical",
+      "locator": "sección citada en datos-movilidad.md",
+      "referenceId": "M15",
+      "contentReviewed": true,
+      "claimScope": "Ver localizador y límites en datos-movilidad.md; no valida toda la familia."
+    },
+    {
+      "id": "missilery-s125",
+      "requestedUrl": "https://en.missilery.info/missile/c125",
+      "finalUrl": "https://en.missilery.info/missile/c125",
+      "bytes": 33757,
+      "mime": "text/html; charset=utf-8",
+      "sha256": "f272b42d1295d8f7515f829811a5449e68ebf616fe6d17f8f8aef6b7e542a93f",
+      "retrievedUtc": "2026-10-06T01:10:43.181995+00:00",
+      "status": "ok",
+      "kind": "secondary-technical",
+      "locator": "sección citada en datos-movilidad.md",
+      "referenceId": "M16",
+      "contentReviewed": true,
+      "claimScope": "Ver localizador y límites en datos-movilidad.md; no valida toda la familia."
+    },
+    {
+      "id": "missilery-s200",
+      "requestedUrl": "https://en.missilery.info/missile/c200",
+      "finalUrl": "https://en.missilery.info/missile/c200",
+      "bytes": 35091,
+      "mime": "text/html; charset=utf-8",
+      "sha256": "fa4712b0e2320c80bc83ffc703be4a40b23d56f989c7c2f5bc07498e2e6985d7",
+      "retrievedUtc": "2026-10-06T01:10:43.321066+00:00",
+      "status": "ok",
+      "kind": "secondary-technical",
+      "locator": "sección citada en datos-movilidad.md",
+      "referenceId": "M17",
+      "contentReviewed": true,
+      "claimScope": "Ver localizador y límites en datos-movilidad.md; no valida toda la familia."
+    },
+    {
+      "id": "apa-pantsir",
+      "requestedUrl": "https://www.ausairpower.net/APA-96K6-Pantsir-2K22-Tunguska.html",
+      "finalUrl": "https://www.ausairpower.net/APA-96K6-Pantsir-2K22-Tunguska.html",
+      "bytes": 138007,
+      "mime": "text/html",
+      "sha256": "fa9b7f7fecc973135f64fad662d2c305e4db719f1fd926f7961008e2263f995f",
+      "retrievedUtc": "2026-10-06T01:08:47.894356+00:00",
+      "status": "ok",
+      "kind": "secondary-technical",
+      "locator": "sección citada en datos-movilidad.md",
+      "referenceId": "M18",
+      "contentReviewed": true,
+      "claimScope": "Ver localizador y límites en datos-movilidad.md; no valida toda la familia."
+    },
+    {
+      "id": "apa-tor",
+      "requestedUrl": "https://www.ausairpower.net/APA-9K331-Tor.html",
+      "finalUrl": "https://www.ausairpower.net/APA-9K331-Tor.html",
+      "bytes": 113422,
+      "mime": "text/html",
+      "sha256": "7c0e44e376ccf768ea4e0a3c2fce5b75a40f4b743034dd83df9c064ce357fa7c",
+      "retrievedUtc": "2026-10-06T01:08:47.968431+00:00",
+      "status": "ok",
+      "kind": "secondary-technical",
+      "locator": "sección citada en datos-movilidad.md",
+      "referenceId": "M19",
+      "contentReviewed": true,
+      "claimScope": "Ver localizador y límites en datos-movilidad.md; no valida toda la familia."
+    },
+    {
+      "id": "tor-ar",
+      "requestedUrl": "https://www.armyrecognition.com/military-products/army/air-defense-systems/air-defense-vehicles/tor-m2e",
+      "finalUrl": "https://www.armyrecognition.com/military-products/army/air-defense-systems/air-defense-vehicles/tor-m2e",
+      "bytes": 176248,
+      "mime": "text/html; charset=utf-8",
+      "sha256": "ed992df64e14587837d71ad2a023ed1174f03280741cfb67033c0b662a7e7cd6",
+      "retrievedUtc": "2026-10-06T01:14:06.054555+00:00",
+      "status": "ok",
+      "referenceId": "M20",
+      "kind": "secondary-technical",
+      "contentReviewed": true,
+      "claimScope": "Ver localizador y límites en datos-movilidad.md; no valida toda la familia."
+    },
+    {
+      "id": "s400-apa",
+      "requestedUrl": "https://www.ausairpower.net/APA-S-400-Triumf.html",
+      "finalUrl": "https://www.ausairpower.net/APA-S-400-Triumf.html",
+      "bytes": 156014,
+      "mime": "text/html",
+      "sha256": "0a71d9d0c08ae37da443e511870a03125d2ac33afdc216ca91ed39b808b8b8ea",
+      "retrievedUtc": "2026-10-06T01:14:05.413338+00:00",
+      "status": "ok",
+      "referenceId": "M21",
+      "kind": "secondary-technical",
+      "contentReviewed": true,
+      "claimScope": "Ver localizador y límites en datos-movilidad.md; no valida toda la familia."
+    },
+    {
+      "id": "p18-dx",
+      "requestedUrl": "https://en.defence-ua.com/weapon_and_tech/closing_air_coverage_gaps-1670.html",
+      "finalUrl": "https://en.defence-ua.com/weapon_and_tech/closing_air_coverage_gaps-1670.html",
+      "bytes": 48228,
+      "mime": "text/html; charset=UTF-8",
+      "sha256": "4fc1a79d7629ee596e3c6d411ec13296d022e8185fd54b998b5297359a2f660b",
+      "retrievedUtc": "2026-10-06T01:11:39.999630+00:00",
+      "status": "ok",
+      "kind": "secondary-technical",
+      "locator": "sección citada en datos-movilidad.md",
+      "referenceId": "M22",
+      "contentReviewed": true,
+      "claimScope": "Ver localizador y límites en datos-movilidad.md; no valida toda la familia."
+    }
+  ],
+  "quantitativeClaims": [
+    {
+      "id": "trml4d-setup-decamp",
+      "variant": "TRML-4D",
+      "component": "radar",
+      "metric": "setupAndDecampSeconds",
+      "relation": "published-interval",
+      "publishedValue": null,
+      "unit": "s",
+      "range": {
+        "min": 600,
+        "probable": null,
+        "max": 900
+      },
+      "sourceRefs": [
+        "M01"
+      ],
+      "shortQuote": "Set up and decamp in 10–15 minutes",
+      "confidence": "alta-fuente-primaria",
+      "conditions": "No sumar ni asignar a batería entera; probable no publicado.",
+      "runtimeEnabled": false
+    },
+    {
+      "id": "rbs70ng-deployment",
+      "variant": "RBS 70 NG",
+      "component": "puesto de tiro",
+      "metric": "deploymentSeconds",
+      "relation": "published-nominal",
+      "publishedValue": 45,
+      "unit": "s",
+      "range": {
+        "min": null,
+        "probable": null,
+        "max": null
+      },
+      "sourceRefs": [
+        "M02"
+      ],
+      "shortQuote": "Deployment time 45 sec",
+      "confidence": "alta-fuente-primaria",
+      "conditions": "Candidato futuro; no aplicar a MANPADS genérico.",
+      "runtimeEnabled": false
+    },
+    {
+      "id": "stinger-weapon-warmup",
+      "variant": "Stinger descrito por FM 44-18-1 (1984)",
+      "component": "arma",
+      "metric": "weaponWarmupSeconds",
+      "relation": "published-interval",
+      "publishedValue": null,
+      "unit": "s",
+      "range": {
+        "min": 3,
+        "probable": null,
+        "max": 5
+      },
+      "sourceRefs": [
+        "M03"
+      ],
+      "shortQuote": "Weapon warmup occurs within a period of 3 to 5 seconds",
+      "confidence": "alta-historica",
+      "conditions": "No radar ni arranque de toda unidad; revisión histórica.",
+      "runtimeEnabled": false
+    },
+    {
+      "id": "s300ps-stow-deploy",
+      "variant": "S-300PS autopropulsado sin torre",
+      "component": "conjunto descrito",
+      "metric": "stowAndDeploySeconds",
+      "relation": "published-nominal",
+      "publishedValue": 300,
+      "unit": "s",
+      "range": {
+        "min": null,
+        "probable": null,
+        "max": null
+      },
+      "sourceRefs": [
+        "M04",
+        "M05"
+      ],
+      "shortQuote": "Deployment/cooling time, mines 5/5",
+      "confidence": "media",
+      "conditions": "300 s por fase según tabla; traducción automática defectuosa. No PT ni 40V6.",
+      "runtimeEnabled": false
+    },
+    {
+      "id": "bukm1-stow-deploy",
+      "variant": "Buk-M1",
+      "component": "conjunto de ficha, sin desglose",
+      "metric": "stowAndDeploySeconds",
+      "relation": "published-nominal",
+      "publishedValue": 300,
+      "unit": "s",
+      "range": {
+        "min": null,
+        "probable": null,
+        "max": null
+      },
+      "sourceRefs": [
+        "M06"
+      ],
+      "shortQuote": "Deployment time (closures), mines 5",
+      "confidence": "media",
+      "conditions": "No plazo separado de radar/TELAR/control; tabla específica M1.",
+      "runtimeEnabled": false
+    },
+    {
+      "id": "buk-original-deploy",
+      "variant": "Buk 9K37 original",
+      "component": "9S18 / 9A310",
+      "metric": "deploymentSeconds",
+      "relation": "published-upper-bound",
+      "publishedValue": 300,
+      "unit": "s",
+      "range": {
+        "min": null,
+        "probable": null,
+        "max": 300
+      },
+      "sourceRefs": [
+        "M07"
+      ],
+      "shortQuote": "not more than 5 minutes",
+      "confidence": "media",
+      "conditions": "No M1; depende del estado inicial descrito.",
+      "runtimeEnabled": false
+    },
+    {
+      "id": "buk-original-standby",
+      "variant": "Buk 9K37 original",
+      "component": "9S18 / 9A310",
+      "metric": "standbyToOperationalSeconds",
+      "relation": "published-upper-bound",
+      "publishedValue": 20,
+      "unit": "s",
+      "range": {
+        "min": null,
+        "probable": null,
+        "max": 20
+      },
+      "sourceRefs": [
+        "M07"
+      ],
+      "shortQuote": "after changing the position with the equipment on",
+      "confidence": "media",
+      "conditions": "No arranque frío; no transferir a Buk-M1.",
+      "runtimeEnabled": false
+    },
+    {
+      "id": "40v6-relocation-cycle",
+      "variant": "40V6M/MD",
+      "component": "radar sobre torre",
+      "metric": "redeploymentCycleSeconds",
+      "relation": "published-interval",
+      "publishedValue": null,
+      "unit": "s",
+      "range": {
+        "min": 3600,
+        "probable": null,
+        "max": 7200
+      },
+      "sourceRefs": [
+        "M08"
+      ],
+      "shortQuote": "relocate a mast equipped radar in 1-2 hours",
+      "confidence": "media",
+      "conditions": "Ciclo, no 1–2 h independientes por fase; medios de izado y transporte.",
+      "runtimeEnabled": false
+    },
+    {
+      "id": "iris-sx45-max-road",
+      "variant": "MAN SX45 en descripción IRIS-T SLM",
+      "component": "chasis",
+      "metric": "maximumRoadSpeedKph",
+      "relation": "published-upper-bound",
+      "publishedValue": 90,
+      "unit": "km/h",
+      "range": {
+        "min": null,
+        "probable": null,
+        "max": 90
+      },
+      "sourceRefs": [
+        "M12"
+      ],
+      "shortQuote": "Maximum road speed is electronically limited to 90 km/h",
+      "confidence": "media-baja",
+      "conditions": "No velocidad media de batería; plataforma exacta.",
+      "runtimeEnabled": false
+    },
+    {
+      "id": "gepard-stated-speed",
+      "variant": "Gepard en ficha sin versión de modernización",
+      "component": "vehículo",
+      "metric": "statedVehicleSpeedKph",
+      "relation": "published-value",
+      "publishedValue": 65,
+      "unit": "km/h",
+      "range": {
+        "min": null,
+        "probable": null,
+        "max": null
+      },
+      "sourceRefs": [
+        "M15"
+      ],
+      "shortQuote": "Mobility Speed 65 km/h",
+      "confidence": "media-baja",
+      "conditions": "No media de marcha ni velocidad fuera de ruta; falta contraste primario.",
+      "runtimeEnabled": false
+    },
+    {
+      "id": "s200-description-deploy",
+      "variant": "S-200, posición descrita en ficha",
+      "component": "posición de combate descrita",
+      "metric": "deploymentSeconds",
+      "relation": "published-nominal",
+      "publishedValue": 86400,
+      "unit": "s",
+      "range": {
+        "min": null,
+        "probable": null,
+        "max": null
+      },
+      "sourceRefs": [
+        "M17"
+      ],
+      "shortQuote": "Deployment time - from march 24 hours",
+      "confidence": "baja-no-transferible",
+      "conditions": "Alcance por versión y obra civil no resuelto; no activar S-200V con esta cifra.",
+      "runtimeEnabled": false
+    },
+    {
+      "id": "tor-m2e-max-road",
+      "variant": "Tor-M2E MZKT-69222, 8 misiles 9M331",
+      "component": "chasis",
+      "metric": "maximumRoadSpeedKph",
+      "relation": "published-upper-bound",
+      "publishedValue": 80,
+      "unit": "km/h",
+      "range": {
+        "min": null,
+        "probable": null,
+        "max": 80
+      },
+      "sourceRefs": [
+        "M20"
+      ],
+      "shortQuote": "maximum road speed of 80 km/h",
+      "confidence": "media-baja-no-transferible",
+      "conditions": "No Tor-M2/16x9M338; tabla con inconsistencia de tripulación.",
+      "runtimeEnabled": false
+    },
+    {
+      "id": "tor-m2e-deploy",
+      "variant": "Tor-M2E MZKT-69222, 8 misiles 9M331",
+      "component": "vehículo descrito",
+      "metric": "deploymentSeconds",
+      "relation": "published-approximate",
+      "publishedValue": 180,
+      "unit": "s",
+      "range": {
+        "min": null,
+        "probable": null,
+        "max": null
+      },
+      "sourceRefs": [
+        "M20"
+      ],
+      "shortQuote": "Deployment Time Approximately 3 minutes",
+      "confidence": "media-baja-no-transferible",
+      "conditions": "Requiere contraste primario; no Tor-M2/16x9M338.",
+      "runtimeEnabled": false
+    },
+    {
+      "id": "36d6m-stow-deploy",
+      "variant": "36D6M modernizado",
+      "component": "radar de dos vehículos descrito",
+      "metric": "stowAndDeploySeconds",
+      "relation": "published-nominal",
+      "publishedValue": 1800,
+      "unit": "s",
+      "range": {
+        "min": null,
+        "probable": null,
+        "max": null
+      },
+      "sourceRefs": [
+        "M22"
+      ],
+      "shortQuote": "Deployment/stow time, min 30",
+      "confidence": "media-baja",
+      "conditions": "No 36D6/ST-68UM genérico, no torre; tabla posterior de P-18MR mal rotulada.",
+      "runtimeEnabled": false
+    }
+  ],
+  "capabilityClaims": [
+    {
+      "id": "stinger-convoy",
+      "variant": "Stinger FM 44-18-1 (1984)",
+      "claim": "Equipo transportado desmonta y ocupa posición de tiro durante defensa del convoy.",
+      "sourceRefs": [
+        "M03"
+      ],
+      "shortQuote": "moves its vehicles off the road, dismounts",
+      "impliesFireWhileMoving": false,
+      "doesNotProve": "Todas las plataformas montadas con Stinger ni cualquier Igla."
+    },
+    {
+      "id": "patriot-historical-emplacement",
+      "variant": "Lanzador Patriot descrito en FM 3-01.85 (2002)",
+      "claim": "Debe estar precisamente emplazado y alineado antes del lanzamiento.",
+      "sourceRefs": [
+        "M09"
+      ],
+      "shortQuote": "precisely emplaced and aligned prior to launch",
+      "impliesFireWhileMoving": false,
+      "doesNotProve": "Tiempos y cargas de cada M903/MSE actual."
+    },
+    {
+      "id": "tor-m1-short-halt",
+      "variant": "Tor-M1 descrito por APA",
+      "claim": "Detecta/selecciona en marcha y dispara desde parada corta.",
+      "sourceRefs": [
+        "M19"
+      ],
+      "shortQuote": "detects and selects air targets on the move and fires missiles at them from short halts",
+      "impliesFireWhileMoving": false,
+      "doesNotProve": "Comportamiento o condición de Tor-M2/9M338."
+    }
+  ],
+  "catalogCoverage": [
+    {
+      "catalogId": "patriot",
+      "configuration": "PAC-3 MSE / MPQ-65",
+      "terrestrialScope": true,
+      "profile": {
+        "stowSeconds": null,
+        "deploySeconds": null,
+        "roadAverageKph": null,
+        "offRoadAverageKph": null,
+        "radarColdStartSeconds": null,
+        "observeWhileMoving": null,
+        "fireWhileMoving": null,
+        "fireFromShortHalt": null
+      },
+      "sourceRefs": [
+        "M09"
+      ],
+      "blockedReason": "Sin plazos de batería/M903 ni velocidad media.",
+      "runtimeEnabled": false
+    },
+    {
+      "catalogId": "patriot2",
+      "configuration": "GEM-T / MPQ-65",
+      "terrestrialScope": true,
+      "profile": {
+        "stowSeconds": null,
+        "deploySeconds": null,
+        "roadAverageKph": null,
+        "offRoadAverageKph": null,
+        "radarColdStartSeconds": null,
+        "observeWhileMoving": null,
+        "fireWhileMoving": null,
+        "fireFromShortHalt": null
+      },
+      "sourceRefs": [
+        "M09"
+      ],
+      "blockedReason": "Sin plazos de configuración GEM-T actual.",
+      "runtimeEnabled": false
+    },
+    {
+      "catalogId": "sampt",
+      "configuration": "Aster 30 B1 / Arabel",
+      "terrestrialScope": true,
+      "profile": {
+        "stowSeconds": null,
+        "deploySeconds": null,
+        "roadAverageKph": null,
+        "offRoadAverageKph": null,
+        "radarColdStartSeconds": null,
+        "observeWhileMoving": null,
+        "fireWhileMoving": null,
+        "fireFromShortHalt": null
+      },
+      "sourceRefs": [
+        "M10"
+      ],
+      "blockedReason": "Descripción cualitativa; URL de fabricante ahora NG.",
+      "runtimeEnabled": false
+    },
+    {
+      "catalogId": "irist",
+      "configuration": "IRIS-T SLM / TRML-4D",
+      "terrestrialScope": true,
+      "profile": {
+        "stowSeconds": null,
+        "deploySeconds": null,
+        "roadAverageKph": null,
+        "offRoadAverageKph": null,
+        "radarColdStartSeconds": null,
+        "observeWhileMoving": null,
+        "fireWhileMoving": null,
+        "fireFromShortHalt": null
+      },
+      "sourceRefs": [
+        "M01",
+        "M11",
+        "M12"
+      ],
+      "blockedReason": "Intervalo radar disponible; faltan lanzador/CTOC y media de batería.",
+      "runtimeEnabled": false
+    },
+    {
+      "catalogId": "nasams",
+      "configuration": "AMRAAM / MPQ-64",
+      "terrestrialScope": true,
+      "profile": {
+        "stowSeconds": null,
+        "deploySeconds": null,
+        "roadAverageKph": null,
+        "offRoadAverageKph": null,
+        "radarColdStartSeconds": null,
+        "observeWhileMoving": null,
+        "fireWhileMoving": null,
+        "fireFromShortHalt": null
+      },
+      "sourceRefs": [
+        "M13",
+        "M14"
+      ],
+      "blockedReason": "Elementos distribuidos; versión del lanzador no fijada.",
+      "runtimeEnabled": false
+    },
+    {
+      "catalogId": "s300",
+      "configuration": "PT/PS / torre 40V6",
+      "terrestrialScope": true,
+      "profile": {
+        "stowSeconds": null,
+        "deploySeconds": null,
+        "roadAverageKph": null,
+        "offRoadAverageKph": null,
+        "radarColdStartSeconds": null,
+        "observeWhileMoving": null,
+        "fireWhileMoving": null,
+        "fireFromShortHalt": null
+      },
+      "sourceRefs": [
+        "M04",
+        "M05",
+        "M08"
+      ],
+      "blockedReason": "Identificador mezcla configuraciones; no sumar 5 min y torre como dato probado.",
+      "runtimeEnabled": false
+    },
+    {
+      "catalogId": "buk",
+      "configuration": "Buk-M1 / 9S35 y 9S18M1",
+      "terrestrialScope": true,
+      "profile": {
+        "stowSeconds": null,
+        "deploySeconds": null,
+        "roadAverageKph": null,
+        "offRoadAverageKph": null,
+        "radarColdStartSeconds": null,
+        "observeWhileMoving": null,
+        "fireWhileMoving": null,
+        "fireFromShortHalt": null
+      },
+      "sourceRefs": [
+        "M06",
+        "M07"
+      ],
+      "blockedReason": "Nominal M1 disponible; sin media de marcha ni desglose.",
+      "runtimeEnabled": false
+    },
+    {
+      "catalogId": "gepard",
+      "configuration": "Gepard sin versión",
+      "terrestrialScope": true,
+      "profile": {
+        "stowSeconds": null,
+        "deploySeconds": null,
+        "roadAverageKph": null,
+        "offRoadAverageKph": null,
+        "radarColdStartSeconds": null,
+        "observeWhileMoving": null,
+        "fireWhileMoving": null,
+        "fireFromShortHalt": null
+      },
+      "sourceRefs": [
+        "M15"
+      ],
+      "blockedReason": "Velocidad publicada no media; detección/tiro en marcha no confirmados.",
+      "runtimeEnabled": false
+    },
+    {
+      "catalogId": "mfg",
+      "configuration": "Grupo móvil genérico",
+      "terrestrialScope": true,
+      "profile": {
+        "stowSeconds": null,
+        "deploySeconds": null,
+        "roadAverageKph": null,
+        "offRoadAverageKph": null,
+        "radarColdStartSeconds": null,
+        "observeWhileMoving": null,
+        "fireWhileMoving": null,
+        "fireFromShortHalt": null
+      },
+      "sourceRefs": [],
+      "blockedReason": "No fija vehículo, montaje ni dotación.",
+      "runtimeEnabled": false
+    },
+    {
+      "catalogId": "manpads",
+      "configuration": "Stinger / Igla",
+      "terrestrialScope": true,
+      "profile": {
+        "stowSeconds": null,
+        "deploySeconds": null,
+        "roadAverageKph": null,
+        "offRoadAverageKph": null,
+        "radarColdStartSeconds": null,
+        "observeWhileMoving": null,
+        "fireWhileMoving": null,
+        "fireFromShortHalt": null
+      },
+      "sourceRefs": [
+        "M03"
+      ],
+      "blockedReason": "MANPADS genérico mezcla armas y formas de transporte.",
+      "runtimeEnabled": false
+    },
+    {
+      "catalogId": "intdrone",
+      "configuration": "Tipo Sting",
+      "terrestrialScope": true,
+      "profile": {
+        "stowSeconds": null,
+        "deploySeconds": null,
+        "roadAverageKph": null,
+        "offRoadAverageKph": null,
+        "radarColdStartSeconds": null,
+        "observeWhileMoving": null,
+        "fireWhileMoving": null,
+        "fireFromShortHalt": null
+      },
+      "sourceRefs": [],
+      "blockedReason": "Velocidad interceptor no es velocidad de traslado de estación.",
+      "runtimeEnabled": false
+    },
+    {
+      "catalogId": "hawk",
+      "configuration": "I-Hawk Fase III",
+      "terrestrialScope": true,
+      "profile": {
+        "stowSeconds": null,
+        "deploySeconds": null,
+        "roadAverageKph": null,
+        "offRoadAverageKph": null,
+        "radarColdStartSeconds": null,
+        "observeWhileMoving": null,
+        "fireWhileMoving": null,
+        "fireFromShortHalt": null
+      },
+      "sourceRefs": [],
+      "blockedReason": "Falta secuencia de radares/control/PU; URL candidata redirige a Hawkei.",
+      "runtimeEnabled": false
+    },
+    {
+      "catalogId": "s125",
+      "configuration": "Pechora / Newa-SC",
+      "terrestrialScope": true,
+      "profile": {
+        "stowSeconds": null,
+        "deploySeconds": null,
+        "roadAverageKph": null,
+        "offRoadAverageKph": null,
+        "radarColdStartSeconds": null,
+        "observeWhileMoving": null,
+        "fireWhileMoving": null,
+        "fireFromShortHalt": null
+      },
+      "sourceRefs": [
+        "M16"
+      ],
+      "blockedReason": "Modernizaciones mezcladas; no inferir traslado desde legado.",
+      "runtimeEnabled": false
+    },
+    {
+      "catalogId": "s200",
+      "configuration": "S-200V / 5N62",
+      "terrestrialScope": true,
+      "profile": {
+        "stowSeconds": null,
+        "deploySeconds": null,
+        "roadAverageKph": null,
+        "offRoadAverageKph": null,
+        "radarColdStartSeconds": null,
+        "observeWhileMoving": null,
+        "fireWhileMoving": null,
+        "fireFromShortHalt": null
+      },
+      "sourceRefs": [
+        "M17"
+      ],
+      "blockedReason": "24 h de ficha sin alcance por configuración/manual.",
+      "runtimeEnabled": false
+    },
+    {
+      "catalogId": "pantsir",
+      "configuration": "Pantsir-S1",
+      "terrestrialScope": true,
+      "profile": {
+        "stowSeconds": null,
+        "deploySeconds": null,
+        "roadAverageKph": null,
+        "offRoadAverageKph": null,
+        "radarColdStartSeconds": null,
+        "observeWhileMoving": null,
+        "fireWhileMoving": null,
+        "fireFromShortHalt": null
+      },
+      "sourceRefs": [
+        "M18"
+      ],
+      "blockedReason": "Chasis/versión sin fijar; prototipo no establece capacidad de producción.",
+      "runtimeEnabled": false
+    },
+    {
+      "catalogId": "tor",
+      "configuration": "Tor-M2 / 16x9M338",
+      "terrestrialScope": true,
+      "profile": {
+        "stowSeconds": null,
+        "deploySeconds": null,
+        "roadAverageKph": null,
+        "offRoadAverageKph": null,
+        "radarColdStartSeconds": null,
+        "observeWhileMoving": null,
+        "fireWhileMoving": null,
+        "fireFromShortHalt": null
+      },
+      "sourceRefs": [
+        "M19",
+        "M20"
+      ],
+      "blockedReason": "Datos Tor-M1 y Tor-M2E no transferibles.",
+      "runtimeEnabled": false
+    },
+    {
+      "catalogId": "s400",
+      "configuration": "48N6DM / 92N6 en torre",
+      "terrestrialScope": true,
+      "profile": {
+        "stowSeconds": null,
+        "deploySeconds": null,
+        "roadAverageKph": null,
+        "offRoadAverageKph": null,
+        "radarColdStartSeconds": null,
+        "observeWhileMoving": null,
+        "fireWhileMoving": null,
+        "fireFromShortHalt": null
+      },
+      "sourceRefs": [
+        "M08",
+        "M21"
+      ],
+      "blockedReason": "Faltan fases de configuración completa con torre.",
+      "runtimeEnabled": false
+    },
+    {
+      "catalogId": "ewr",
+      "configuration": "36D6 / ST-68UM",
+      "terrestrialScope": true,
+      "profile": {
+        "stowSeconds": null,
+        "deploySeconds": null,
+        "roadAverageKph": null,
+        "offRoadAverageKph": null,
+        "radarColdStartSeconds": null,
+        "observeWhileMoving": null,
+        "fireWhileMoving": null,
+        "fireFromShortHalt": null
+      },
+      "sourceRefs": [
+        "M22"
+      ],
+      "blockedReason": "36D6M de referencia no equivale al identificador mixto.",
+      "runtimeEnabled": false
+    },
+    {
+      "catalogId": "p18",
+      "configuration": "P-18 / P-18MR",
+      "terrestrialScope": true,
+      "profile": {
+        "stowSeconds": null,
+        "deploySeconds": null,
+        "roadAverageKph": null,
+        "offRoadAverageKph": null,
+        "radarColdStartSeconds": null,
+        "observeWhileMoving": null,
+        "fireWhileMoving": null,
+        "fireFromShortHalt": null
+      },
+      "sourceRefs": [
+        "M22"
+      ],
+      "blockedReason": "No confundir MR18, P-18MR y 80K6T.",
+      "runtimeEnabled": false
+    },
+    {
+      "catalogId": "acoustic",
+      "configuration": "Sky Fortress",
+      "terrestrialScope": true,
+      "profile": {
+        "stowSeconds": null,
+        "deploySeconds": null,
+        "roadAverageKph": null,
+        "offRoadAverageKph": null,
+        "radarColdStartSeconds": null,
+        "observeWhileMoving": null,
+        "fireWhileMoving": null,
+        "fireFromShortHalt": null
+      },
+      "sourceRefs": [],
+      "blockedReason": "Sin preparación/sincronización del nodo documentadas.",
+      "runtimeEnabled": false
+    },
+    {
+      "catalogId": "aew_s340",
+      "configuration": "ASC 890 / Erieye",
+      "terrestrialScope": false,
+      "profile": {
+        "stowSeconds": null,
+        "deploySeconds": null,
+        "roadAverageKph": null,
+        "offRoadAverageKph": null,
+        "radarColdStartSeconds": null,
+        "observeWhileMoving": null,
+        "fireWhileMoving": null,
+        "fireFromShortHalt": null
+      },
+      "sourceRefs": [],
+      "blockedReason": "Fuera de traslados terrestres; arranque radar no encontrado.",
+      "runtimeEnabled": false
+    },
+    {
+      "catalogId": "aew_a50",
+      "configuration": "A-50U / Shmel-M",
+      "terrestrialScope": false,
+      "profile": {
+        "stowSeconds": null,
+        "deploySeconds": null,
+        "roadAverageKph": null,
+        "offRoadAverageKph": null,
+        "radarColdStartSeconds": null,
+        "observeWhileMoving": null,
+        "fireWhileMoving": null,
+        "fireFromShortHalt": null
+      },
+      "sourceRefs": [],
+      "blockedReason": "Fuera de traslados terrestres; arranque radar no encontrado.",
+      "runtimeEnabled": false
+    }
+  ],
+  "accessAttempts": [
+    {
+      "id": "apa-s300",
+      "requestedUrl": "https://www.ausairpower.net/APA-S-300P.html",
+      "status": "failed",
+      "error": "HTTP Error 404: Not Found",
+      "contentReviewed": false,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "roe-pantsir",
+      "requestedUrl": "https://roe.ru/en/production/air-defence-systems/air-defense-systems-and-mounts/pantsir-s1/",
+      "status": "failed",
+      "error": "HTTP Error 503: Service Unavailable",
+      "contentReviewed": false,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "roe-tor",
+      "requestedUrl": "https://roe.ru/en/production/air-defence-systems/air-defense-systems-and-mounts/tor-m2e/",
+      "status": "failed",
+      "error": "HTTP Error 503: Service Unavailable",
+      "contentReviewed": false,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "diehl",
+      "requestedUrl": "https://www.diehl.com/defence/en/products/ground-based-air-defence/iris-t-slm/",
+      "status": "failed",
+      "error": "HTTP Error 404: Not Found",
+      "contentReviewed": false,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "rheinmetall",
+      "requestedUrl": "https://www.rheinmetall.com/en/products/air-defence/air-defence-systems/gepard",
+      "status": "failed",
+      "error": "HTTP Error 404: Not Found",
+      "contentReviewed": false,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "rt-36d6",
+      "requestedUrl": "https://www.radartutorial.eu/19.kartei/11.ancient/karte060.en.html",
+      "status": "failed",
+      "error": "HTTP Error 404: Not Found",
+      "contentReviewed": false,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "rt-sentinel",
+      "requestedUrl": "https://www.radartutorial.eu/19.kartei/02.surv/karte014.en.html",
+      "status": "failed",
+      "error": "HTTP Error 404: Not Found",
+      "contentReviewed": false,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "diehl-product",
+      "requestedUrl": "https://www.diehl.com/defence/en/products/ground-based-air-defence/",
+      "status": "failed",
+      "error": "HTTP Error 404: Not Found",
+      "contentReviewed": false,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "knds-gepard",
+      "requestedUrl": "https://www.knds.de/en/systems-products/tracked-vehicles/gepard/",
+      "status": "failed",
+      "error": "HTTP Error 503: Service Unavailable",
+      "contentReviewed": false,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "iskra-36d6",
+      "requestedUrl": "https://iskra.zp.ua/index.php?option=com_content&view=article&id=54&Itemid=74&lang=en",
+      "status": "failed",
+      "error": "HTTP Error 404: Not Found",
+      "contentReviewed": false,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "ukro-36d6",
+      "requestedUrl": "https://ukroboronprom.com.ua/en/product/radar-36d6",
+      "finalUrl": "https://ukroboronprom.com.ua/",
+      "bytes": 236095,
+      "mime": "text/html; charset=UTF-8",
+      "sha256": "a6f97d98e67ccfa524bff46cfa69b09363dfaec644ae2d9c2198e53041eabb30",
+      "retrievedUtc": "2026-10-06T01:10:45.856049+00:00",
+      "status": "ok",
+      "contentReviewed": true,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "roe-s400",
+      "requestedUrl": "https://roe.ru/en/production/air-defence-systems/air-defense-systems-and-mounts/s-400-triumf/",
+      "status": "failed",
+      "error": "HTTP Error 503: Service Unavailable",
+      "contentReviewed": false,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "bundeswehr-gepard",
+      "requestedUrl": "https://www.bundeswehr.de/de/ausruestung-technik-bundeswehr/landsysteme-bundeswehr/flugabwehrkanonenpanzer-gepard",
+      "status": "failed",
+      "error": "HTTP Error 404: Not Found",
+      "contentReviewed": false,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "knds-current",
+      "requestedUrl": "https://knds.com/en/products/systems/gepard",
+      "status": "failed",
+      "error": "HTTP Error 503: Service Unavailable",
+      "contentReviewed": false,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "sentinel-date",
+      "requestedUrl": "https://date.army.gov.au/equipment/mpq-64-sentinel-radar",
+      "status": "failed",
+      "error": "HTTP Error 503: Service Unavailable",
+      "contentReviewed": false,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "eurosam",
+      "requestedUrl": "https://eurosam.com/ground-based-air-defense/",
+      "status": "failed",
+      "error": "HTTP Error 404: Not Found",
+      "contentReviewed": false,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "pantsir-ar",
+      "requestedUrl": "https://www.armyrecognition.com/military-products/army/air-defense-systems/air-defense-vehicles/pantsir-s1",
+      "status": "failed",
+      "error": "HTTP Error 404: Not Found",
+      "contentReviewed": false,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "knds-fr",
+      "requestedUrl": "https://knds.com/fr/produits/systemes/gepard",
+      "status": "failed",
+      "error": "HTTP Error 503: Service Unavailable",
+      "contentReviewed": false,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "stinger-fm",
+      "requestedUrl": "https://www.bits.de/NRANEU/others/amd-us-archive/fm44-18-1%2894%29.pdf",
+      "status": "failed",
+      "error": "HTTP Error 404: Not Found",
+      "contentReviewed": false,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "iskra-home",
+      "requestedUrl": "https://iskra.zp.ua/",
+      "finalUrl": "https://iskra.zp.ua/",
+      "bytes": 10574,
+      "mime": "text/html; charset=utf-8",
+      "sha256": "a227c63ad9d04ed81604c6eacb70f17d3ea1686d3f17615305d32a64b71a9f61",
+      "retrievedUtc": "2026-10-06T01:12:27.399505+00:00",
+      "status": "ok",
+      "contentReviewed": true,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "radionix-home",
+      "requestedUrl": "https://radionix.com.ua/",
+      "status": "failed",
+      "error": "<urlopen error Tunnel connection failed: 403 Forbidden>",
+      "contentReviewed": false,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "roe-domain-pantsir",
+      "requestedUrl": "https://www.roe.ru/en/products/air-defence-systems/air-defense-systems-and-mounts/pantsir-s1/",
+      "status": "failed",
+      "error": "HTTP Error 503: Service Unavailable",
+      "contentReviewed": false,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "roe-domain-tor",
+      "requestedUrl": "https://www.roe.ru/en/products/air-defence-systems/air-defense-systems-and-mounts/tor-m2e/",
+      "status": "failed",
+      "error": "HTTP Error 503: Service Unavailable",
+      "contentReviewed": false,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "mbda-sampt",
+      "requestedUrl": "https://www.mbda-systems.com/product/aster-30-sampt/",
+      "finalUrl": "https://www.mbda-systems.com/products/area-protection/aster-family/sampt-ng",
+      "bytes": 370792,
+      "mime": "text/html; charset=UTF-8",
+      "sha256": "a1ca8ec699d976fe46487609dde38f1148aefd17d9de27fba2e92830b82a07ab",
+      "retrievedUtc": "2026-10-06T01:14:09.290487+00:00",
+      "status": "ok",
+      "contentReviewed": true,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "hawk-at",
+      "requestedUrl": "https://www.army-technology.com/projects/hawk/",
+      "finalUrl": "https://www.army-technology.com/projects/hawkei/",
+      "bytes": 263083,
+      "mime": "text/html; charset=UTF-8",
+      "sha256": "25aa5e7f969f68be9b29185de0954b515d315e9b7ec8fd525c0088b966320786",
+      "retrievedUtc": "2026-10-06T01:14:07.524477+00:00",
+      "status": "ok",
+      "contentReviewed": true,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "pantsir-kbp",
+      "requestedUrl": "https://www.kbptula.ru/en/productions/air-defense-weapon-systems/pantsir-s1",
+      "status": "failed",
+      "error": "<urlopen error Tunnel connection failed: 403 Forbidden>",
+      "contentReviewed": false,
+      "supportsRequestedConfiguration": false
+    },
+    {
+      "id": "gepard-primary",
+      "requestedUrl": "https://www.knds.com/en/products/systems/gepard",
+      "status": "failed",
+      "error": "HTTP Error 503: Service Unavailable",
+      "contentReviewed": false,
+      "supportsRequestedConfiguration": false
+    }
+  ]
+}
