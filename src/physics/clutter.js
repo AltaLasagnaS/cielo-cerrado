@@ -110,7 +110,9 @@ export function clutterRcs(r, ux, uy, uz, rr, agl, x, y, wx) {
     }
   }
   // lluvia o nieve: llenan el haz hasta RAIN_TOP; el blanco está dentro si vuela debajo
-  const rain = wx?.rain || 0, snow = wx?.snow || 0, zt = Math.max(0, surf(x, y)) + Math.max(0, agl);
+  // rainAt: la lluvia en el lugar del blanco cuando el clima es por zonas (sim/weather-now.js#wxPath);
+  // rain es la del camino, que atenúa
+  const rain = (wx?.rainAt ?? wx?.rain) || 0, snow = wx?.snow || 0, zt = Math.max(0, surf(x, y)) + Math.max(0, agl);
   if ((rain > 0 || snow > 0) && zt < RAIN_TOP) {
     const fill = Math.min(1, RAIN_TOP / Math.max(1, R * thEl));
     out.rain = (rainEta(rain, lambda) + snowEta(snow, lambda)) * VOL_INT * dR * R * R * thAz * thEl * fill / improvement(r, M.rainSv);

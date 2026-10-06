@@ -59,6 +59,11 @@ function click(g) {
     if (!m.a || m.b) { m.a = p; m.b = null; } else m.b = p;
     updateModebar(); return;
   }
+  if (S.mode === 'placeWx') {   // zona de clima: el click es el centro (sim/weather-now.js#wxAt)
+    if (S.started) { toast('Reiniciá la simulación para editar el escenario.'); return; }
+    (S.wxZones || (S.wxZones = [])).push({ x: +wx.toFixed(2), y: +wy.toFixed(2), r: 10, weather: S.placeType });
+    setMode('select'); return;
+  }
   if (S.mode === 'relocate') {   // traslado: cada click agrega un punto de la ruta
     if (S.relocate && S.relocate.pts.length < 50) S.relocate.pts.push([+wx.toFixed(2), +wy.toFixed(2)]);
     updateModebar(); return;

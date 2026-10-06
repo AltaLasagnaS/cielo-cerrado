@@ -23,7 +23,7 @@ import { hooks } from './hooks.js';
 import { log, event, label, uLabel, pista } from './log.js';
 import { recReset, recUnit, recObj } from './replay.js';
 import { ewStep } from './ew.js';
-import { wxNow, wxReset, wxStep } from './weather-now.js';
+import { wxNow, wxReset, wxStep, wxPath } from './weather-now.js';
 import { noteSeen, noteObs, emitting, isEmitter, noteFix } from './contacts.js';
 import { mobStep } from './mobility.js';
 
@@ -99,7 +99,7 @@ export function step(dt) {
     if (!emitting(u, t)) continue;   // control de emisiones: un radar apagado no ve (ni se delata)
     if (t < u.nextScan) continue; u.nextScan = t + d.radar.scan;
     if (isEmitter(d.radar)) { u.emitFrom ??= t; noteFix(u, t); }   // desde acá el atacante lo puede ubicar por su emisión
-    const r = d.radar, uz = antZ(u), wx = wxNow();
+    const r = d.radar, uz = antZ(u), wx0 = wxNow(), zoned = S.wxZones?.length > 0;
     // capacidad de seguimiento (radar.tracks): pistas abiertas + falsos blancos DRFM; una pista nueva no
     // entra si está lleno (las abiertas se mantienen)
     const keep = r.scan * 2 + 0.6, cap = r.tracks ?? Infinity, fake = falseTracks(u, S.jamsLive);
@@ -109,6 +109,7 @@ export function step(dt) {
     for (const th of S.threats) {
       if (!th.alive || !th.p) continue; const p = th.p;
       const dx = p.x - u.x, dy = p.y - u.y, dh = Math.hypot(dx, dy);
+      const wx = zoned ? wxPath(u.x, u.y, p.x, p.y) : wx0;   // clima por zonas: el del camino de este eco
       let ok = false;
       if (r.band === 'ACU') { ok = th.cls === 'dron' && dh <= detR(u, th, 0, 1, wx) && (p.z - surf(p.x, p.y)) <= (r.altMax || 3000); }
       else {
@@ -254,7 +255,7 @@ function solveFor(u, th, t, c2) {
     // con pista ajena (C2 integrada), su radar tiene que cubrir el punto de encuentro: sector y alcance
     if (remote) {
       const az = azOf(sol.p.x - u.x, sol.p.y - u.y), dk = Math.hypot(sol.p.x - u.x, sol.p.y - u.y, (sol.p.z - antZ(u)) / 1000);
-      if (!inSector(u, az) || dk > detR(u, th, jamJ(u, az, S.jamsLive), 1, wxNow())) return null;
+      if (!inSector(u, az) || dk > detR(u, th, jamJ(u, az, S.jamsLive), 1, wxPath(u.x, u.y, sol.p.x, sol.p.y))) return null;
     }
   }
   return { sol, remote };

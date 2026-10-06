@@ -2,7 +2,7 @@
 // ---------------- DIBUJO ----------------
 // Redibuja todo el mapa en cada cuadro: relieve, cobertura, grilla, anillos de alcance, sectores,
 // "strobes" de interferencia, rutas, jammers, unidades, impactos, amenazas, interceptores y explosiones.
-import { THREATS, JAMMERS, DEFENSES, TARGET_TYPES, D, sideOf } from '../data/index.js';
+import { THREATS, JAMMERS, DEFENSES, TARGET_TYPES, WEATHER, D, sideOf } from '../data/index.js';
 import { azOf, clamp } from '../util/math.js';
 import { MAP } from '../physics/terrain.js';
 import { jamJ, horizon } from '../physics/radar.js';
@@ -41,6 +41,14 @@ export function draw() {
   drawScale(w, h);
   // puntos altos (capa de lectura del relieve)
   if (S.relief === 'peaks') drawPeaks(ctx, toS, w, h);
+  // zonas de clima (sim/weather-now.js#wxAt): las ven los dos bandos
+  for (const z of S.wxZones || []) {
+    const W = WEATHER[z.weather]; if (!W) continue;
+    const [sx, sy] = toS(z.x, z.y), col = WX_COLOR[z.weather] || '200,210,220';
+    ctx.fillStyle = `rgba(${col},.16)`; ctx.strokeStyle = `rgba(${col},.6)`; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+    ctx.beginPath(); ctx.arc(sx, sy, z.r * V.s, 0, 7); ctx.fill(); ctx.stroke(); ctx.setLineDash([]);
+    ctx.font = '600 11px "IBM Plex Sans", sans-serif'; ctx.fillStyle = `rgba(${col},.95)`; ctx.fillText(W.name.split(' (')[0], sx - 24, sy + 4);
+  }
   // lugares
   ctx.font = '600 12px "IBM Plex Sans", sans-serif';
   for (const p of MAP.places || []) { const [sx, sy] = toS(p[1], p[2]); ctx.fillStyle = 'rgba(10,15,22,.75)'; ctx.fillRect(sx - 2, sy - 2, 4, 4); ctx.fillStyle = 'rgba(235,240,245,.85)'; ctx.fillText(p[0], sx + 5, sy + 4); }
@@ -282,3 +290,6 @@ function segIndex(route, x, y) {
   }
   return best;
 }
+
+/** Color (r,g,b) de cada zona de clima en el mapa. */
+const WX_COLOR = { despejado: '230,200,90', nubes: '170,180,195', lluvia: '90,150,230', tormenta: '120,110,220', nieve: '235,240,250', niebla: '185,190,200' };

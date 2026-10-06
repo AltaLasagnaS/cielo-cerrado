@@ -88,6 +88,7 @@ export function applyScenario(sc) {
   S.gateways = (sc.rules?.gateways || []).filter(k => GATEWAYS[k]);   // pasarelas entre redes: sin dato, ninguna
   S.tod = TIMES_OF_DAY[sc.rules?.tod] ? sc.rules.tod : TOD_DEFAULT;   // momento del día: sin dato, noche
   S.wxPlan = (sc.rules?.wxPlan || []).filter(c => WEATHER[c.weather]).map(c => ({ t: c.t, weather: c.weather }));   // cambios de tiempo
+  S.wxZones = (sc.rules?.wxZones || []).filter(z => WEATHER[z.weather]).map(z => ({ x: z.x, y: z.y, r: z.r, weather: z.weather }));   // zonas de clima: sin dato, ninguna
   S.ignoreDecoys = !!sc.rules?.ignoreDecoys;   // el clima es del escenario: sin dato, despejado
   S.fireRange = sc.rules?.fireRange ?? 1;   // doctrina de alcance del escenario: sin dato, todo el alcance
   S.scen = sc;

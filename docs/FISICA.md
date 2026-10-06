@@ -113,6 +113,16 @@ L (`rainKm`) es el largo máximo del camino dentro de la lluvia: las celdas de l
 
 **Cambios de tiempo durante la noche** (`S.wxPlan`, "Después cambia a…" en Defensa → Clima, `rules.wxPlan` = hasta 10 cambios `{ t (s), weather }`): a la hora indicada el clima vigente pasa al nuevo estado y el registro lo anota (`sim/weather-now.js`). El clima elegido del escenario no se pisa.
 
+**Clima por zonas** (`S.wxZones`, Defensa → Clima → "Zonas de clima", `rules.wxZones` = hasta 20 círculos `{ x, y, r (km), weather }`): celdas donde el tiempo es distinto del general (una tormenta de 15 km, un banco de niebla, un claro). En un punto manda la última zona que lo contiene; afuera, el clima de fondo (con sus cambios de `wxPlan`). Para cada eco, el motor arma el clima del **camino** entre el sensor y el blanco (`sim/weather-now.js#wxPath`):
+- **Atenuación por lluvia:** la que más atenúa (lluvia × km) entre la de fondo, sobre el tramo del camino que no está en ninguna zona y hasta su `rainKm`, y la de cada zona que el camino cruza, sobre el largo de la cuerda (`physics/weather.js#chordKm`), hasta el `rainKm` de esa zona.
+- **Óptica y techo de nubes:** lo peor entre el lugar del sensor y el del blanco. La niebla o la lluvia en cualquiera de las dos puntas tapan la vista.
+- **Acústica:** la del lugar del sensor.
+- **Clutter de lluvia, nieve, niebla y mar:** los del lugar del blanco, donde está la celda de resolución (`wx.rainAt`).
+
+Sin zonas, `wxPath` devuelve el clima de fondo: las corridas no cambian. Simplificaciones:
+- Zonas superpuestas suman su largo como si no se pisaran.
+- El mapa de cobertura sigue mostrando el clima de fondo; la detección durante la corrida sí usa las zonas.
+
 **No se modela:** el efecto del clima sobre los buscadores IR de los misiles, ni nieve húmeda (que sí atenúa).
 
 ### Sensores no radar
@@ -520,7 +530,7 @@ Es un modelo de juego: no representa estructuras, incendios, penetración ni sub
 |---|---|---|
 | RCS con tres aspectos | Sin aspecto arriba/abajo ni detalle angular fino | Tabla por ángulo (como el "3D radar splat" de CMO PE) |
 | Clutter de suelo, mar y lluvia | Celda de resolución, Billingsley (suelo), NRL 2012 (mar por estado), Barton/Marshall–Palmer (lluvia), factor de mejora MTI/PD por clase, notch por velocidad radial | Mejora sub-clutter, PRF y resolución publicadas por radar; velocidad media de la lluvia con el viento; clutter discreto |
-| Clima simple | Lluvia (ITU-R P.838-3) y su clutter, estado del mar, techo de nubes y factores ópticos/acústicos fijos por escenario | Día y noche, clima que cambia durante el escenario |
+| Clima simple | Lluvia (ITU-R P.838-3) y su clutter, estado del mar, techo de nubes y factores ópticos/acústicos fijos por escenario | Día y noche, clima que cambia durante el escenario, clima por zonas |
 | Recarga de batería completa | Recarga toda la batería de una vez (`sam.reloadS`) desde su reserva; los tiempos son estimaciones | Recarga por lanzador; vehículos de recarga como unidades |
 | Swerling lento 1/3, integración no coherente opcional | Catálogo aún usa la aproximación de un pulso: faltan datos de integración por modo/radar; sin casos 2 y 4 | Datos de N con fuente/UNC; integración coherente y ruido correlacionado; Swerling 2/4 cuando haya evidencia de fluctuación pulso a pulso |
 | Interceptor en línea recta a velocidad media | Energía resumida en dos factores (alcance según el aspecto y Pk según la fracción del alcance); el tiempo de vuelo sigue siendo r / vInt | Perfil de velocidad (motor y planeo) y límite de g (paso B de la propuesta) |
