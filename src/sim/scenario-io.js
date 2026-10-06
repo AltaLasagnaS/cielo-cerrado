@@ -45,7 +45,7 @@ export function exportScenario(now = new Date()) {
   return {
     format: FORMAT, version: VERSION, saved: now.toISOString(),
     map: mapRef(),
-    rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather, tod: S.tod, wxPlan: S.wxPlan.map(c => ({ ...c })), gateways: [...S.gateways], wind: { ...S.wind }, ignoreDecoys: S.ignoreDecoys, fireRange: S.fireRange },
+    rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather, tod: S.tod, wxPlan: S.wxPlan.map(c => ({ ...c })), wxZones: (S.wxZones || []).map(z => ({ ...z })), gateways: [...S.gateways], wind: { ...S.wind }, ignoreDecoys: S.ignoreDecoys, fireRange: S.fireRange },
     scenario: S.scen ? { base: baseKey(S.scen), ...pick(S.scen, META_KEYS) } : null,
     setup: {
       objs: s.objs.map(g => pick(g, OBJ_KEYS)),
@@ -212,6 +212,16 @@ export function validateScenario(raw) {
       return { t: num(w + '.t', c.t, 0, 86400), weather: c.weather };
     }).filter(Boolean).sort((a, b) => a.t - b.t);
   }
+  if (r.wxZones !== undefined) {
+    if (!Array.isArray(r.wxZones) || r.wxZones.length > 20) err('rules.wxZones: tiene que ser una lista de hasta 20 zonas { x, y, r, weather } (km y clima).');
+    else rules.wxZones = r.wxZones.map((z, i) => {
+      const w = `rules.wxZones[${i}]`;
+      if (!z || typeof z !== 'object') { err(w + ': tiene que ser { x, y, r, weather }.'); return null; }
+      if (!WEATHER[z.weather]) err(`${w}.weather: "${String(z.weather)}" no es un clima válido (${Object.keys(WEATHER).join(', ')}).`);
+      pos(w, z.x, z.y);
+      return { x: z.x, y: z.y, r: num(w + '.r', z.r, 0.5, 300), weather: z.weather };
+    }).filter(Boolean);
+  }
   if (r.weather !== undefined && !WEATHER[r.weather]) err(`rules.weather: "${String(r.weather)}" no es un clima válido (${Object.keys(WEATHER).join(', ')}).`);
   if (r.c2 !== undefined && !C2_LEVELS[r.c2]) err(`rules.c2: "${String(r.c2)}" no es un nivel de mando y control válido (${Object.keys(C2_LEVELS).join(', ')}).`);
   if (r.doctrine !== undefined && !DOCTRINES.includes(r.doctrine)) err(`rules.doctrine: "${String(r.doctrine)}" no es ${DOCTRINES.join(' ni ')}.`);
@@ -280,6 +290,7 @@ export function loadScenarioData(data) {
   S.tod = data.rules.tod || 'noche';
   S.gateways = data.rules.gateways || [];
   S.wxPlan = data.rules.wxPlan || [];
+  S.wxZones = data.rules.wxZones || [];
   S.ignoreDecoys = !!data.rules.ignoreDecoys;
   S.fireRange = data.rules.fireRange ?? 1;
   if (data.rules.doctrine) S.doctrine = data.rules.doctrine;

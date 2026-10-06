@@ -5,7 +5,7 @@
 //   route    trazar la ruta de una salva
 // Regla: nada se crea con un click. El click propone una posición (S.preview) y recién
 // "Confirmar" (o Enter) crea la unidad; "Cancelar" (o Esc) descarta la propuesta.
-import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES } from '../data/index.js';
+import { DEFENSES, THREATS, JAMMERS, TARGET_TYPES, WEATHER } from '../data/index.js';
 import { esc } from '../util/format.js';
 import { isOffmap } from '../physics/kinematics.js';
 import { surf } from '../physics/terrain.js';
@@ -60,6 +60,8 @@ export function updateModebar() {
     ok = confirmPlacement; cancel = cancelPlacement; cancelTxt = 'Cancelar';
   } else if (P) {
     html = `Tocá el mapa donde quieras ubicar <b>${esc(P.name(S.placeType))}</b>; vas a poder confirmar o cancelar.`;
+  } else if (S.mode === 'placeWx') {
+    html = `Tocá el mapa donde va el centro de la zona de <b>${esc(WEATHER[S.placeType]?.name ?? '')}</b> (radio inicial 10 km; se cambia en Defensa → Clima).`;
   } else if (S.mode === 'relocate') {
     const r = S.relocate, n = r?.pts.length ?? 0, u = r && S.units.find(v => v.id === r.id), vmax = u ? mobData(u)?.vmax : null;
     html = n ? `Ruta de <b>${n} punto${n > 1 ? 's' : ''}</b>: el último es el destino. Tocá más puntos o confirmá.` : 'Tocá el mapa para marcar la <b>ruta del traslado</b> (el último punto es el destino).';

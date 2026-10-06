@@ -155,6 +155,20 @@ try {
   assert.equal(await page.evaluate(id => window.__S.units.find(v => v.id === id).mob?.phase, mv), 'stow', 'se repliega');
   assert.match(await page.locator('#modebar').textContent(), /se repliega/);
   await page.evaluate(async id => { const { DEFENSES } = await import('/data/index.js'); delete DEFENSES[window.__S.units.find(v => v.id === id).type].mob; window.__dbg.loadScenario('mb_noche'); }, mv);
+  // zonas de clima (sim/weather-now.js): se agregan desde Defensa → Clima tocando el mapa, se editan y se quitan
+  await page.evaluate(() => { window.__dbg.loadScenario('mb_noche'); });
+  if (await page.locator('#modal').isVisible()) await page.locator('#sheet .x').click();
+  await page.locator('[data-tab="def"]').click();
+  await page.selectOption('#optZw', 'niebla');
+  await page.click('#optZadd');
+  const zc = await page.evaluate(async () => { const { toS } = await import('/render/view.js'); const r = document.querySelector('canvas').getBoundingClientRect(); const [a, b] = toS(40, 60); return [r.left + a, r.top + b]; });
+  await page.mouse.click(zc[0], zc[1]);
+  const z = await page.evaluate(() => window.__S.wxZones);
+  assert.equal(z.length, 1); assert.equal(z[0].weather, 'niebla'); assert.ok(Math.abs(z[0].x - 40) < 1 && Math.abs(z[0].y - 60) < 1, JSON.stringify(z));
+  await page.fill('[data-zr="0"]', '25'); await page.locator('[data-zr="0"]').dispatchEvent('change');
+  assert.equal(await page.evaluate(() => window.__S.wxZones[0].r), 25);
+  await page.click('[data-zx="0"]');
+  assert.equal(await page.evaluate(() => window.__S.wxZones.length), 0, 'se quita');
   // campaña (lógica de Codex, experimentos/catalogo-presupuesto): asignar, pedir y cargar munición, jugar la
   // guardia en el mapa y llegar al parte de cierre y a la guardia siguiente
   page.on('dialog', d => d.accept());
@@ -208,5 +222,5 @@ try {
   await page.click('#cNext');
   assert.match(await page.locator('#sheet').innerText(), /Tercera guardia/i, 'con "Tres guardias" llega a la tercera');
   assert.deepEqual(errors, []);
-  console.log('Interfaz: valores numéricos, atajos, Monte Carlo, Academia de pulsos, regla, selección múltiple y por rectángulo, traslado, campaña OK');
+  console.log('Interfaz: valores numéricos, atajos, Monte Carlo, Academia de pulsos, regla, selección múltiple y por rectángulo, traslado, zonas de clima, campaña OK');
 } finally { await browser.close(); }

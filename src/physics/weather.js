@@ -91,3 +91,18 @@ export function fogGamma(band, lwc) {
  * agua (convención del radar) Ze = Zes − 6,5 dB. η = π⁵·0,93·Ze·10⁻¹⁸ / λ⁴.
  */
 export const snowEta = (s, lambda) => (s > 0 ? Math.pow(Math.PI, 5) * 0.93 * 1780 * Math.pow(s, 2.23) * Math.pow(10, -0.65) * 1e-18 / Math.pow(lambda, 4) : 0);
+
+/**
+ * Largo (km) del tramo del segmento (ax, ay)–(bx, by) que queda dentro del círculo de centro (cx, cy) y
+ * radio r (km). Lo usa el clima por zonas (sim/weather-now.js#wxPath): una celda de lluvia atenúa solo el
+ * pedazo del camino del radar que la atraviesa.
+ */
+export function chordKm(ax, ay, bx, by, cx, cy, r) {
+  const dx = bx - ax, dy = by - ay, L = Math.hypot(dx, dy);
+  if (L === 0) return 0;
+  const ux = dx / L, uy = dy / L, fx = ax - cx, fy = ay - cy;
+  const b = fx * ux + fy * uy, c = fx * fx + fy * fy - r * r, disc = b * b - c;
+  if (disc <= 0) return 0;
+  const sq = Math.sqrt(disc), t0 = Math.max(0, -b - sq), t1 = Math.min(L, -b + sq);
+  return Math.max(0, t1 - t0);
+}

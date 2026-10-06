@@ -3404,6 +3404,10 @@ table.t.mc td.pc{white-space:nowrap}
       /** @type {any[]} */
       []
     ),
+    wxZones: (
+      /** @type {any[]} */
+      []
+    ),
     gateways: (
       /** @type {any[]} */
       []
@@ -3675,6 +3679,15 @@ table.t.mc td.pc{white-space:nowrap}
     return cloudKl(f) * lwc;
   }
   var snowEta = (s, lambda) => s > 0 ? Math.pow(Math.PI, 5) * 0.93 * 1780 * Math.pow(s, 2.23) * Math.pow(10, -0.65) * 1e-18 / Math.pow(lambda, 4) : 0;
+  function chordKm(ax, ay, bx, by, cx, cy, r) {
+    const dx = bx - ax, dy = by - ay, L = Math.hypot(dx, dy);
+    if (L === 0) return 0;
+    const ux = dx / L, uy = dy / L, fx = ax - cx, fy = ay - cy;
+    const b = fx * ux + fy * uy, c = fx * fx + fy * fy - r * r, disc = b * b - c;
+    if (disc <= 0) return 0;
+    const sq = Math.sqrt(disc), t0 = Math.max(0, -b - sq), t1 = Math.min(L, -b + sq);
+    return Math.max(0, t1 - t0);
+  }
 
   // src/physics/pulse-integration.js
   var PFA = 1e-6;
@@ -4006,7 +4019,7 @@ table.t.mc td.pc{white-space:nowrap}
         out.surface = s0 * A * g2 / improvement(r, sea ? M.seaSv : M.landSv);
       }
     }
-    const rain = wx?.rain || 0, snow = wx?.snow || 0, zt = Math.max(0, surf(x, y)) + Math.max(0, agl);
+    const rain = (wx?.rainAt ?? wx?.rain) || 0, snow = wx?.snow || 0, zt = Math.max(0, surf(x, y)) + Math.max(0, agl);
     if ((rain > 0 || snow > 0) && zt < RAIN_TOP) {
       const fill = Math.min(1, RAIN_TOP / Math.max(1, R * thEl));
       out.rain = (rainEta(rain, lambda) + snowEta(snow, lambda)) * VOL_INT * dR * R * R * thAz * thEl * fill / improvement(r, M.rainSv);
@@ -4900,9 +4913,43 @@ table.t.mc td.pc{white-space:nowrap}
   }
 
   // src/sim/weather-now.js
+  var withTod = (W2) => S.tod === "dia" ? { ...W2, opt: W2.opt * ENV.modelo.optDay } : W2;
   function wxNow() {
-    const W2 = WEATHER[S.wxLive ?? S.weather] || WEATHER.despejado;
-    return S.tod === "dia" ? { ...W2, opt: W2.opt * ENV.modelo.optDay } : W2;
+    return withTod(WEATHER[S.wxLive ?? S.weather] || WEATHER.despejado);
+  }
+  var zones = () => (S.wxZones || []).filter((z) => WEATHER[z.weather]);
+  function wxAt(x, y) {
+    let W2 = null;
+    for (const z of zones()) if (Math.hypot(x - z.x, y - z.y) <= z.r) W2 = WEATHER[z.weather];
+    return W2 ? withTod(W2) : wxNow();
+  }
+  function wxPath(ax, ay, bx, by) {
+    const zs = zones();
+    if (!zs.length) return wxNow();
+    const base = wxNow(), atS = wxAt(ax, ay), atT = wxAt(bx, by);
+    const L = Math.hypot(bx - ax, by - ay);
+    let inZones = 0;
+    for (const z of zs) inZones += chordKm(ax, ay, bx, by, z.x, z.y, z.r);
+    let rain = base.rain || 0, rainKm = rain ? Math.min(base.rainKm, Math.max(0, L - inZones)) : 0;
+    for (const z of zs) {
+      const W2 = WEATHER[z.weather];
+      if (!W2.rain) continue;
+      const km = Math.min(W2.rainKm || Infinity, chordKm(ax, ay, bx, by, z.x, z.y, z.r));
+      if (km > 0 && W2.rain * km > rain * rainKm) {
+        rain = W2.rain;
+        rainKm = km;
+      }
+    }
+    const ceil = [atS.ceiling, atT.ceiling].filter((c) => c != null);
+    return {
+      ...atT,
+      rain: rainKm > 0 ? rain : 0,
+      rainKm,
+      rainAt: atT.rain || 0,
+      opt: Math.min(atS.opt, atT.opt),
+      ceiling: ceil.length ? Math.min(...ceil) : null,
+      acu: atS.acu
+    };
   }
   function wxReset() {
     S.wxLive = S.weather;
@@ -5145,7 +5192,7 @@ table.t.mc td.pc{white-space:nowrap}
         u.emitFrom ?? (u.emitFrom = t);
         noteFix(u, t);
       }
-      const r = d.radar, uz = antZ(u), wx = wxNow();
+      const r = d.radar, uz = antZ(u), wx0 = wxNow(), zoned = S.wxZones?.length > 0;
       const keep4 = r.scan * 2 + 0.6, cap = r.tracks ?? Infinity, fake = falseTracks(u, S.jamsLive);
       u.fake = fake;
       let held = 0;
@@ -5156,6 +5203,7 @@ table.t.mc td.pc{white-space:nowrap}
         if (!th.alive || !th.p) continue;
         const p = th.p;
         const dx = p.x - u.x, dy = p.y - u.y, dh = Math.hypot(dx, dy);
+        const wx = zoned ? wxPath(u.x, u.y, p.x, p.y) : wx0;
         let ok = false;
         if (r.band === "ACU") {
           ok = th.cls === "dron" && dh <= detR(u, th, 0, 1, wx) && p.z - surf(p.x, p.y) <= (r.altMax || 3e3);
@@ -5353,7 +5401,7 @@ table.t.mc td.pc{white-space:nowrap}
       if (!los(u.x, u.y, antZ(u), sol.p.x, sol.p.y, sol.p.z)) return null;
       if (remote) {
         const az = azOf(sol.p.x - u.x, sol.p.y - u.y), dk = Math.hypot(sol.p.x - u.x, sol.p.y - u.y, (sol.p.z - antZ(u)) / 1e3);
-        if (!inSector(u, az) || dk > detR(u, th, jamJ(u, az, S.jamsLive), 1, wxNow())) return null;
+        if (!inSector(u, az) || dk > detR(u, th, jamJ(u, az, S.jamsLive), 1, wxPath(u.x, u.y, sol.p.x, sol.p.y))) return null;
       }
     }
     return { sol, remote };
@@ -5680,6 +5728,7 @@ table.t.mc td.pc{white-space:nowrap}
     S.gateways = (sc2.rules?.gateways || []).filter((k) => GATEWAYS[k]);
     S.tod = TIMES_OF_DAY[sc2.rules?.tod] ? sc2.rules.tod : TOD_DEFAULT;
     S.wxPlan = (sc2.rules?.wxPlan || []).filter((c) => WEATHER[c.weather]).map((c) => ({ t: c.t, weather: c.weather }));
+    S.wxZones = (sc2.rules?.wxZones || []).filter((z) => WEATHER[z.weather]).map((z) => ({ x: z.x, y: z.y, r: z.r, weather: z.weather }));
     S.ignoreDecoys = !!sc2.rules?.ignoreDecoys;
     S.fireRange = sc2.rules?.fireRange ?? 1;
     S.scen = sc2;
@@ -5933,6 +5982,23 @@ table.t.mc td.pc{white-space:nowrap}
     }
     drawScale(w, h);
     if (S.relief === "peaks") drawPeaks(ctx, toS, w, h);
+    for (const z of S.wxZones || []) {
+      const W2 = WEATHER[z.weather];
+      if (!W2) continue;
+      const [sx, sy] = toS(z.x, z.y), col = WX_COLOR[z.weather] || "200,210,220";
+      ctx.fillStyle = `rgba(${col},.16)`;
+      ctx.strokeStyle = `rgba(${col},.6)`;
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath();
+      ctx.arc(sx, sy, z.r * V.s, 0, 7);
+      ctx.fill();
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = '600 11px "IBM Plex Sans", sans-serif';
+      ctx.fillStyle = `rgba(${col},.95)`;
+      ctx.fillText(W2.name.split(" (")[0], sx - 24, sy + 4);
+    }
     ctx.font = '600 12px "IBM Plex Sans", sans-serif';
     for (const p of MAP.places || []) {
       const [sx, sy] = toS(p[1], p[2]);
@@ -6465,6 +6531,7 @@ table.t.mc td.pc{white-space:nowrap}
     }
     return best;
   }
+  var WX_COLOR = { despejado: "230,200,90", nubes: "170,180,195", lluvia: "90,150,230", tormenta: "120,110,220", nieve: "235,240,250", niebla: "185,190,200" };
 
   // src/render/view.js
   var cv = (
@@ -8711,7 +8778,7 @@ table.t.mc td.pc{white-space:nowrap}
       group: "Radar y bandas",
       title: "Clima: lluvia, nubes y niebla",
       body: () => `<p>El tiempo no afecta igual a todos los sensores. La <b>lluvia</b> absorbe y dispersa las microondas, tanto más cuanto más alta es la frecuencia: un radar en banda S o L casi no la nota, uno en X la siente y uno en Ku pierde mucho alcance en una tormenta. Por eso los radares de alerta usan bandas bajas y los de guiado (X, Ku) sufren más.</p><p>Los sensores <b>ópticos e infrarrojos</b> (los grupos móviles con ametralladoras y cámaras térmicas, los MANPADS) son los más castigados: la lluvia o la niebla les achican el alcance a una fracción y las <b>nubes</b> les tapan todo lo que vuela por encima, aunque se escuche el motor. La red <b>acústica</b> oye menos con lluvia y viento.</p>`,
-      engine: () => `<p>El clima se elige en la pestaña Defensa (${code("S.weather")}) y queda fijo todo el escenario. La atenuación del radar sale de la Rec. ITU-R P.838-3: ${code("γ = k · R^α")} dB/km, con k y α según la frecuencia de cada banda (${code("BANDS[b].ghz")}), sobre un camino de lluvia de hasta ${code("rainKm")}. El alcance resuelve ${code("R = R0 · 10^(−γ·min(R, L)/20)")}. Con lluvia de 4 mm/h, γ por banda: ${["S", "C", "X", "Ku"].map((b) => b + " " + rainGamma(b, 4).toFixed(3)).join(" · ")} dB/km.</p>
+      engine: () => `<p>El clima se elige en la pestaña Defensa (${code("S.weather")}); puede cambiar a una hora (${code("S.wxPlan")}) y tener zonas distintas, como una celda de tormenta o un banco de niebla (${code("S.wxZones")}): una celda de lluvia atenúa solo el tramo del camino del radar que la cruza. La atenuación del radar sale de la Rec. ITU-R P.838-3: ${code("γ = k · R^α")} dB/km, con k y α según la frecuencia de cada banda (${code("BANDS[b].ghz")}), sobre un camino de lluvia de hasta ${code("rainKm")}. El alcance resuelve ${code("R = R0 · 10^(−γ·min(R, L)/20)")}. Con lluvia de 4 mm/h, γ por banda: ${["S", "C", "X", "Ku"].map((b) => b + " " + rainGamma(b, 4).toFixed(3)).join(" · ")} dB/km.</p>
       <div class="tblwrap"><table class="t"><thead><tr><th>Clima</th><th>Lluvia</th><th>Óptico/IR</th><th>Techo para ópticos</th><th>Acústico</th></tr></thead><tbody>${Object.values(WEATHER).map((W2) => `<tr><td>${esc(W2.name)}</td><td>${W2.rain ? W2.rain + " mm/h en " + W2.rainKm + " km" : "—"}</td><td>×${W2.opt}</td><td>${W2.ceiling != null ? W2.ceiling + " m" : "—"}</td><td>×${W2.acu}</td></tr>`).join("")}</tbody></table></div>
       <p>Los factores ópticos y acústicos son estimaciones de juego (el manual de CMO dice que la lluvia deja lo visual en 1–5% y degrada mucho el IR). El <b>viento</b> (${code("S.wind")}) cambia la velocidad sobre el suelo de drones y misiles de crucero en cada tramo de su ruta: ${code("Vg = W·u + √(v² − (W×u)²)")} (corrigen la deriva). Con 10 m/s de frente, un Shahed tarda un 24% más y un Kalibr un 4%. No se modela el día y la noche. La lluvia y el mar también devuelven eco (clutter): ver Detección.</p>`
     },
@@ -10434,6 +10501,8 @@ table.t.mc td.pc{white-space:nowrap}
       cancelTxt = "Cancelar";
     } else if (P) {
       html = `Tocá el mapa donde quieras ubicar <b>${esc(P.name(S.placeType))}</b>; vas a poder confirmar o cancelar.`;
+    } else if (S.mode === "placeWx") {
+      html = `Tocá el mapa donde va el centro de la zona de <b>${esc(WEATHER[S.placeType]?.name ?? "")}</b> (radio inicial 10 km; se cambia en Defensa → Clima).`;
     } else if (S.mode === "relocate") {
       const r = S.relocate, n2 = r?.pts.length ?? 0, u = r && S.units.find((v) => v.id === r.id), vmax = u ? mobData(u)?.vmax : null;
       html = n2 ? `Ruta de <b>${n2} punto${n2 > 1 ? "s" : ""}</b>: el último es el destino. Tocá más puntos o confirmá.` : "Tocá el mapa para marcar la <b>ruta del traslado</b> (el último punto es el destino).";
@@ -10540,6 +10609,10 @@ table.t.mc td.pc{white-space:nowrap}
       <div class="field" title="El tiempo puede cambiar durante la noche: a los minutos indicados pasa al estado elegido (por ejemplo, entra una tormenta)."><label for="optWx2">Después cambia a</label><select id="optWx2" class="sel"><option value="">(no cambia)</option>${Object.entries(WEATHER).map(([k, W2]) => `<option value="${k}" ${S.wxPlan[0]?.weather === k ? "selected" : ""}>${esc(W2.name)}</option>`).join("")}</select></div>
       <div class="field"><label for="optWxT">A los (minutos)</label><input id="optWxT" class="inp" type="number" min="1" max="600" value="${Math.round((S.wxPlan[0]?.t ?? 1800) / 60)}"></div>
       <div class="field" title="Viento en superficie (a 10 m), igual en todo el mapa; arriba sopla más (≈1,9 veces a 1.000 m). Los drones y misiles de crucero vuelan a su velocidad respecto del aire: con viento de frente tardan más y con viento de cola llegan antes. A un Shahed (≈185 km/h) le pesa mucho; a un misil de crucero, poco. No afecta a balísticos ni planeadoras."><label for="optWind">Viento ${infoBtn("clima")}</label><span class="val" id="windVal">${windTxt()}</span><input type="range" id="optWind" min="0" max="30" step="1" value="${S.wind.v}"></div>
+      <h4 title="Celdas donde el tiempo es distinto del general (una tormenta de 15 km, un banco de niebla, un claro). Adentro manda la zona: la lluvia atenúa el radar solo en el tramo del camino que la cruza; la niebla o las nubes en el lugar del sensor o del blanco tapan la óptica.">Zonas de clima</h4>
+      ${(S.wxZones || []).map((z, i) => `<div class="row wxz"><select class="sel" data-zw="${i}" aria-label="Clima de la zona ${i + 1}">${Object.entries(WEATHER).map(([k, W2]) => `<option value="${k}" ${z.weather === k ? "selected" : ""}>${esc(W2.name)}</option>`).join("")}</select><input class="inp" type="number" min="0.5" max="300" step="0.5" style="width:64px" data-zr="${i}" value="${z.r}" aria-label="Radio de la zona ${i + 1} (km)"> km <button class="btn sm" data-zx="${i}" aria-label="Quitar la zona ${i + 1}">✕</button></div>`).join("") || '<p class="hint">Ninguna: el tiempo es el mismo en todo el mapa.</p>'}
+      <div class="row"><select id="optZw" class="sel" aria-label="Clima de la zona nueva">${Object.entries(WEATHER).map(([k, W2]) => `<option value="${k}" ${k === "tormenta" ? "selected" : ""}>${esc(W2.name)}</option>`).join("")}</select><button class="btn sm" id="optZadd">Ubicar zona en el mapa</button></div>
+      <p class="hint">El mapa de cobertura sigue mostrando el tiempo general; la detección durante la corrida sí usa las zonas.</p>
       <div class="field"><label for="optWindFrom">Sopla desde</label><select id="optWindFrom" class="sel">${WIND_DIRS.map(([n2, a]) => `<option value="${a}" ${S.wind.from === a ? "selected" : ""}>${n2} (${a}°)</option>`).join("")}</select></div>
     </div>
     <div class="grp"><h3>Cobertura de radar ${infoBtn("horizon")} ${infoBtn("los")}</h3>
@@ -10631,6 +10704,42 @@ table.t.mc td.pc{white-space:nowrap}
         return;
       }
       setPlan();
+    };
+    const zLock = () => {
+      if (!S.started) return false;
+      toast("Reiniciá para cambiar las zonas de clima.");
+      renderDef();
+      return true;
+    };
+    for (const s of el.querySelectorAll("[data-zw]")) s.onchange = (e) => {
+      if (zLock()) return;
+      S.wxZones[+e.target.dataset.zw].weather = e.target.value;
+      draw();
+    };
+    for (const s of el.querySelectorAll("[data-zr]")) s.onchange = (e) => {
+      if (zLock()) return;
+      const v = +e.target.value;
+      if (!(v >= 0.5 && v <= 300)) {
+        toast("El radio va de 0,5 a 300 km.");
+        renderDef();
+        return;
+      }
+      S.wxZones[+e.target.dataset.zr].r = v;
+      draw();
+    };
+    for (const b of el.querySelectorAll("[data-zx]")) b.onclick = () => {
+      if (zLock()) return;
+      S.wxZones.splice(+b.dataset.zx, 1);
+      renderDef();
+      draw();
+    };
+    $("#optZadd").onclick = () => {
+      if (zLock()) return;
+      if ((S.wxZones || []).length >= 20) {
+        toast("Hasta 20 zonas de clima.");
+        return;
+      }
+      setMode("placeWx", $("#optZw").value);
     };
     const windLock = (e, v) => {
       if (!S.started) return false;
@@ -10779,6 +10888,15 @@ table.t.mc td.pc{white-space:nowrap}
         m.b = null;
       } else m.b = p;
       updateModebar();
+      return;
+    }
+    if (S.mode === "placeWx") {
+      if (S.started) {
+        toast("Reiniciá la simulación para editar el escenario.");
+        return;
+      }
+      (S.wxZones || (S.wxZones = [])).push({ x: +wx.toFixed(2), y: +wy.toFixed(2), r: 10, weather: S.placeType });
+      setMode("select");
       return;
     }
     if (S.mode === "relocate") {
@@ -11092,7 +11210,7 @@ table.t.mc td.pc{white-space:nowrap}
       version: VERSION,
       saved: now.toISOString(),
       map: mapRef(),
-      rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather, tod: S.tod, wxPlan: S.wxPlan.map((c) => ({ ...c })), gateways: [...S.gateways], wind: { ...S.wind }, ignoreDecoys: S.ignoreDecoys, fireRange: S.fireRange },
+      rules: { c2: S.c2, doctrine: S.doctrine, weather: S.weather, tod: S.tod, wxPlan: S.wxPlan.map((c) => ({ ...c })), wxZones: (S.wxZones || []).map((z) => ({ ...z })), gateways: [...S.gateways], wind: { ...S.wind }, ignoreDecoys: S.ignoreDecoys, fireRange: S.fireRange },
       scenario: S.scen ? { base: baseKey(S.scen), ...pick(S.scen, META_KEYS) } : null,
       setup: {
         objs: s.objs.map((g) => pick(g, OBJ_KEYS)),
@@ -11336,6 +11454,19 @@ table.t.mc td.pc{white-space:nowrap}
         return { t: num2(w + ".t", c.t, 0, 86400), weather: c.weather };
       }).filter(Boolean).sort((a, b) => a.t - b.t);
     }
+    if (r.wxZones !== void 0) {
+      if (!Array.isArray(r.wxZones) || r.wxZones.length > 20) err("rules.wxZones: tiene que ser una lista de hasta 20 zonas { x, y, r, weather } (km y clima).");
+      else rules.wxZones = r.wxZones.map((z, i) => {
+        const w = `rules.wxZones[${i}]`;
+        if (!z || typeof z !== "object") {
+          err(w + ": tiene que ser { x, y, r, weather }.");
+          return null;
+        }
+        if (!WEATHER[z.weather]) err(`${w}.weather: "${String(z.weather)}" no es un clima válido (${Object.keys(WEATHER).join(", ")}).`);
+        pos(w, z.x, z.y);
+        return { x: z.x, y: z.y, r: num2(w + ".r", z.r, 0.5, 300), weather: z.weather };
+      }).filter(Boolean);
+    }
     if (r.weather !== void 0 && !WEATHER[r.weather]) err(`rules.weather: "${String(r.weather)}" no es un clima válido (${Object.keys(WEATHER).join(", ")}).`);
     if (r.c2 !== void 0 && !C2_LEVELS[r.c2]) err(`rules.c2: "${String(r.c2)}" no es un nivel de mando y control válido (${Object.keys(C2_LEVELS).join(", ")}).`);
     if (r.doctrine !== void 0 && !DOCTRINES.includes(r.doctrine)) err(`rules.doctrine: "${String(r.doctrine)}" no es ${DOCTRINES.join(" ni ")}.`);
@@ -11409,6 +11540,7 @@ table.t.mc td.pc{white-space:nowrap}
     S.tod = data.rules.tod || "noche";
     S.gateways = data.rules.gateways || [];
     S.wxPlan = data.rules.wxPlan || [];
+    S.wxZones = data.rules.wxZones || [];
     S.ignoreDecoys = !!data.rules.ignoreDecoys;
     S.fireRange = data.rules.fireRange ?? 1;
     if (data.rules.doctrine) S.doctrine = data.rules.doctrine;

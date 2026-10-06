@@ -7,6 +7,12 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 ## [Sin publicar]
 
 ### Agregado
+- **Clima por zonas** (Defensa → Clima → "Zonas de clima"; `rules.wxZones`; docs/FISICA.md §2): círculos donde el tiempo es distinto del general, como una celda de tormenta, un banco de niebla o un claro. Se ubican tocando el mapa y se dibujan en él.
+  - La lluvia de una zona atenúa el radar solo en el tramo del camino que la cruza.
+  - La niebla o las nubes en el lugar del sensor o del blanco tapan la óptica.
+  - El eco de lluvia (clutter) es el del lugar del blanco.
+  - Sin zonas, no cambia la simulación.
+  - El mapa de cobertura sigue mostrando el clima general.
 - **Movilidad, primera parte** (`sim/mobility.js`, docs/FISICA.md §12):
   - Una defensa se traslada en tres fases: replegando, en tránsito y desplegando. Mientras dura no detecta, no emite, no dispara ni recarga.
   - Los traslados se programan en el escenario (`defs[].moves`) o se ordenan desde el mapa durante la partida: botón **Trasladar** en la ficha de la unidad, se marca la ruta tocando el mapa, se escribe la velocidad de marcha y se confirma. Si no se puede (sin datos, con misiles en vuelo, en la campaña), la ficha dice por qué.
