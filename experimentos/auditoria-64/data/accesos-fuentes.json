@@ -1,0 +1,31 @@
+[
+  {
+    "name": "missilestrikes",
+    "url": "https://missilestrikes.com/guide/lessons-from-ukraine-air-defense/",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "name": "nv-link16",
+    "url": "https://english.nv.ua/nation/ukraine-integrates-into-nato-s-aviation-system-defense-ministry-says-50518462.html",
+    "status": 200,
+    "bytes": 85522
+  },
+  {
+    "name": "defenceua-link16",
+    "url": "https://en.defence-ua.com/weapon_and_tech/ukrainian_patriots_f_16s_and_mirages_to_join_natos_military_wi_fi_network_via_link_16_integration-14708.html",
+    "status": 200,
+    "bytes": 42352
+  },
+  {
+    "name": "crs-nasams",
+    "url": "https://www.everycrsreport.com/reports/IF12230.html",
+    "status": 200,
+    "bytes": 276114
+  },
+  {
+    "name": "kongsberg",
+    "url": "https://www.kongsberg.com/kda/what-we-do/defence-and-security/integrated-air-and-missile-defence/nasams-air-defence-system/",
+    "status": 200,
+    "bytes": 200121
+  }
+]

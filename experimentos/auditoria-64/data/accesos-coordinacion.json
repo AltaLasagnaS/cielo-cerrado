@@ -1,0 +1,137 @@
+{
+  "consultedOn": "2026-10-05",
+  "note": "HTTP exitoso sólo indica acceso; las conclusiones se limitan a los pasajes leídos en coordinacion-blancos.md. Archivos completos no redistribuidos.",
+  "requests": [
+    {
+      "id": "jseries",
+      "url": "https://en.wikipedia.org/wiki/TADIL-J",
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "bytes": 137746,
+      "final": "https://en.wikipedia.org/wiki/TADIL-J"
+    },
+    {
+      "id": "kyivpost",
+      "url": "https://www.kyivpost.com/post/30149",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 119183,
+      "final": "https://www.kyivpost.com/post/30149"
+    },
+    {
+      "id": "virazh",
+      "url": "https://ukrainesarmsmonitor.substack.com/p/combat-software-in-the-service-of",
+      "error": "<urlopen error Tunnel connection failed: 403 Forbidden>"
+    },
+    {
+      "id": "rubryka",
+      "url": "https://rubryka.com/en/article/seven-seconds-to-air-defense-maps/",
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "bytes": 204411,
+      "final": "https://rubryka.com/en/article/seven-seconds-to-air-defense-maps/"
+    },
+    {
+      "id": "drones",
+      "url": "https://www.defensenews.com/global/europe/2026/03/05/novel-interceptor-drones-bend-air-defense-economics-in-ukraines-favor/",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 214462,
+      "final": "https://www.defensenews.com/global/europe/2026/03/05/novel-interceptor-drones-bend-air-defense-economics-in-ukraines-favor/"
+    },
+    {
+      "id": "ukrinform",
+      "url": "https://www.ukrinform.net/amp/rubric-ato/4097519-interceptor-drones-shot-down-over-70-of-shahed-drones-over-kyiv-in-feb-syrskyi.html",
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "bytes": 24711,
+      "final": "https://www.ukrinform.net/amp/rubric-ato/4097519-interceptor-drones-shot-down-over-70-of-shahed-drones-over-kyiv-in-feb-syrskyi.html"
+    },
+    {
+      "id": "army",
+      "url": "https://armypubs.army.mil/epubs/DR_pubs/DR_a/ARN35404-FM_3-01-000-WEB-1.pdf",
+      "error": "HTTP Error 503: Service Unavailable"
+    },
+    {
+      "id": "jp301",
+      "url": "https://www.jcs.mil/Portals/36/Documents/Doctrine/pubs/jp3_01.pdf",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "id": "fm301",
+      "url": "https://irp.fas.org/doddir/army/fm3-01.pdf",
+      "status": 202,
+      "pdf": false,
+      "bytes": 0
+    },
+    {
+      "id": "linkprimer",
+      "url": "https://www.bits.de/NRANEU/others/amd-us-archive/Link16.pdf",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "id": "airspace",
+      "url": "https://www.jcs.mil/Portals/36/Documents/Doctrine/pubs/jp3_52.pdf",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "id": "link",
+      "url": "https://en.wikipedia.org/wiki/Link_16",
+      "status": 200,
+      "bytes": 118120,
+      "pdf": false
+    },
+    {
+      "id": "airandspace",
+      "url": "https://www.airandspaceforces.com/ukraine-acoustic-sensors-russian-drones/",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "id": "doctrine",
+      "url": "https://www.bits.de/NRANEU/others/amd-us-archive/fm3-01%2811%29.pdf",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "id": "marines",
+      "url": "https://www.marines.mil/Portals/1/Publications/MCWP%203-25%20Control%20of%20Aircraft%20and%20Missiles.pdf",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "id": "guide",
+      "url": "https://www.globalsecurity.org/military/library/policy/army/fm/6-24-8/tadilj.pdf",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "id": "jcsmanual",
+      "url": "https://www.jcs.mil/Portals/36/Documents/Doctrine/training/jid/cjcsm6520.01b_link16.pdf",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "id": "dsto",
+      "url": "https://willrobertson.id.au/resources/wireshark/DSTO-TN-1257.pdf",
+      "status": 200,
+      "bytes": 833086,
+      "pdf": true,
+      "sha256": "c8c015869565a74e61acb0a227a73c3f0432522ae5864d25e8266b6ea4d51bcd"
+    },
+    {
+      "id": "siso",
+      "url": "https://cdn.ymaws.com/www.sisostandards.org/resource/resmgr/standards_products/siso-std-002-2021_link_16.pdf",
+      "status": 200,
+      "bytes": 3103921,
+      "pdf": true,
+      "sha256": "6b7136da82f78978e52a8c496bf50860b3a674760da5ccfaf17e06b3e71d2165"
+    },
+    {
+      "id": "dticguide",
+      "url": "https://apps.dtic.mil/sti/pdfs/ADA404334.pdf",
+      "error": "<urlopen error Tunnel connection failed: 403 Forbidden>"
+    },
+    {
+      "name": "kongsberg",
+      "url": "https://www.kongsberg.com/kda/what-we-do/defence-and-security/integrated-air-and-missile-defence/nasams-air-defence-system/",
+      "status": 200,
+      "bytes": 200121
+    }
+  ]
+}
