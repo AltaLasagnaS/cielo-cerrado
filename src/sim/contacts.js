@@ -51,9 +51,36 @@ export function contactOf(th, t) {
  * No dice si está viva, dañada ni cuánta munición le queda.
  */
 export function attackerKnows(u, t) {
+  if (attackerPos(u, t)) return true;
   if (u.emitFrom != null && u.emitFrom <= t) return true;
   return u.revealed != null && u.revealed <= t;
 }
+
+/**
+ * Anota que el atacante ubicó a u en t en su posición actual (emitió o disparó). Solo agrega una entrada
+ * cuando la posición cambió: una unidad que se trasladó (sim/mobility.js) vuelve a quedar ubicada recién
+ * cuando emite o dispara desde el lugar nuevo.
+ */
+export function noteFix(u, t) {
+  const f = u.fixes || (u.fixes = []), l = f[f.length - 1];
+  if (!l || l.x !== u.x || l.y !== u.y) f.push({ t, x: u.x, y: u.y });
+}
+
+/** Dónde cree el atacante que está u en t (su última ubicación conocida), o null si no la ubicó. */
+export function attackerPos(u, t) {
+  let p = null; for (const f of u.fixes || []) if (f.t <= t) p = f;
+  return p;
+}
+
+/** u como la ve el atacante en t: en su última ubicación conocida, o null si no la ubicó. */
+export function asAttackerSees(u, t) {
+  if (!attackerKnows(u, t)) return null;
+  const p = attackerPos(u, t);
+  return p ? { ...u, x: p.x, y: p.y } : u;
+}
+
+/** Fase del traslado de u (sim/mobility.js) para mostrar, o null. En la repetición es el nombre. */
+export const mobPhaseOf = u => typeof u.mob === 'string' ? u.mob : u.mob?.phase ?? null;
 
 /** ¿El sensor r emite? (los acústicos y ópticos escuchan o miran: son pasivos). */
 export const isEmitter = r => !!r && r.band !== 'ACU' && r.band !== 'OPT';
@@ -68,6 +95,7 @@ export const EMCON = { siempre: 'Emite siempre', alerta: 'Se enciende con la pri
  * pasivos (acústicos, ópticos) no emiten y no se apagan.
  */
 export function emitting(u, t) {
+  if (u.mob) return false;   // trasladándose (sim/mobility.js): radar plegado
   const m = u.emcon; if (!m || m === 'siempre' || !isEmitter(D(u).radar)) return true;
   if (m === 'silencio') return false;
   if (u.c2 === 'desconectada') return false;   // aislada: no le llegan alertas

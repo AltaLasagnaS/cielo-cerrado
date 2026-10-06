@@ -10,7 +10,8 @@ import { surf } from '../physics/terrain.js';
 import { isOffmap, posAt } from '../physics/kinematics.js';
 import { profileOf, distAt } from '../physics/interceptor.js';
 import { S } from '../sim/state.js';
-import { contactOf, attackerKnows } from '../sim/contacts.js';
+import { contactOf, asAttackerSees, mobPhaseOf } from '../sim/contacts.js';
+import { MOB_PHASE } from '../sim/mobility.js';
 import { hooks } from '../sim/hooks.js';
 import { frameAt } from '../sim/replay.js';
 import { cv, ctx, dpr, V, toS } from './view.js';
@@ -43,7 +44,7 @@ export function draw() {
   // lugares
   ctx.font = '600 12px "IBM Plex Sans", sans-serif';
   for (const p of MAP.places || []) { const [sx, sy] = toS(p[1], p[2]); ctx.fillStyle = 'rgba(10,15,22,.75)'; ctx.fillRect(sx - 2, sy - 2, 4, 4); ctx.fillStyle = 'rgba(235,240,245,.85)'; ctx.fillText(p[0], sx + 5, sy + 4); }
-  const units = (R ? R.units : S.started ? S.units : S.setup.defs).filter(u => !av || attackerKnows(u, tNow));
+  const units = (R ? R.units : S.started ? S.units : S.setup.defs).map(u => av ? asAttackerSees(u, tNow) : u).filter(u => !!u);   // el atacante, donde la ubicó
   const jams = S.started ? S.jamsLive : S.setup.jams;
   // anillos de alcance y sectores
   for (const u of units) {
@@ -101,7 +102,8 @@ export function draw() {
     if (S.started && !dead && !av && (u.dmgRadar || u.dmgLauncher)) { ctx.strokeStyle = '#e6a53c'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(sx, sy, 12, 0, 7); ctx.stroke(); }   // dañada
     if (dead) { ctx.strokeStyle = '#ff5b4d'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(sx - 7, sy - 7); ctx.lineTo(sx + 7, sy + 7); ctx.moveTo(sx + 7, sy - 7); ctx.lineTo(sx - 7, sy + 7); ctx.stroke(); }
     const ammo = S.started && d.sam && u.alive && !av ? ' ' + u.magLeft : '';
-    labelAt(sx, sy, (u.name || d.short) + ammo, dead ? '#6b7888' : '#e6eef6');
+    const ph = !av && !dead ? mobPhaseOf(u) : null;   // trasladándose: fuera de servicio
+    labelAt(sx, sy, (u.name || d.short) + ammo + (ph ? ' · ' + MOB_PHASE[ph] : ''), dead ? '#6b7888' : ph ? '#e6a53c' : '#e6eef6');
   }
   // posición propuesta, pendiente de confirmar
   if (S.preview) drawPreview(S.preview);

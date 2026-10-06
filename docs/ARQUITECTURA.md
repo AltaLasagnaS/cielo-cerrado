@@ -144,6 +144,14 @@ Con el selector en **Vista del atacante**, durante la corrida el mapa muestra su
 
 **Registro, resultados y objetivos por bando** (`sim/log.js`): cada mensaje lleva quién puede saberlo (`who`: `'def'`, `'atk'` o `'all'`) y, si la defensa lo cuenta distinto, su versión (`alt`, que nombra la amenaza como `pista #N (clasificación)`, sin el tipo real). `logFor(entradas, vista)` filtra. La defensa ve sus detecciones, disparos, derribos, recargas, daños propios e impactos; el atacante, lo de sus armas (señuelos, GNSS, CRPA); los dos, el inicio, el clima y el resumen final. El panel de resultados muestra a cada bando solo sus números (el defensor no sabe cuántas armas se lanzaron ni cuáles eran señuelos; el atacante no sabe cuántas llegaron) y la lista de objetivos del atacante dice "sin evaluar". **El debrief muestra toda la verdad a propósito**: es el análisis posterior de la noche, para aprender qué pasó. La decisión de la defensa al repartir blancos usa su estimación de la Pk (`calcPk(..., est = true)`: última posición vista, velocidad medida, sin saber si el blanco va a estar en su maniobra terminal).
 
+## Movilidad (`sim/mobility.js`)
+
+Una defensa se traslada en tres fases: replegando, en tránsito y desplegando. Mientras dura no detecta, no dispara ni recarga (docs/FISICA.md §12).
+- **Cómo se ordena:** con `orderMove(u, pts)` o con traslados programados en el escenario (`defs[].moves`, que `mobStep` ordena a su hora).
+- **Datos:** los tiempos y la velocidad salen de la ficha (`D(u).mob`, que se carga desde `UNC`). Sin datos no hay traslado.
+- **Repetición:** `recUnit` anota la posición y la fase. Durante el tránsito anota cada 5 s, así la repetición dibuja el trayecto.
+- **Vista del atacante:** `contacts.js#asAttackerSees` muestra cada unidad en su última ubicación conocida (`u.fixes`), no donde está.
+
 ## Campaña (`ui/campaign.js`)
 
 Botón **Campaña** (arriba): la campaña experimental de Odesa, con la lógica de Codex en `experimentos/catalogo-presupuesto/` (PR #61; guía en su `docs/OPERACIONES-Y-CAMPANA.md`). `lib/operations.mjs` lleva la campaña (etapas, presupuesto, pedidos con plazo, reparaciones, continuidad, guardado) y `lib/logistics.mjs` el **libro de recursos, la única autoridad de munición**. `ui/campaign.js` es la pantalla: asignación inicial, preparación (pedir, esperar, cargar, reparar), parte de cierre y continuar, más descargar y cargar la partida. La guardia se juega en el mapa del juego en vista del defensor: `lib/port-combat.mjs` arma el escenario y el bucle (`ui/loop.js`) llama a su paso (`campaignStep`) en lugar de `engine.step`, para que cada disparo, recarga y daño se asiente en el libro. El motor no cambia.

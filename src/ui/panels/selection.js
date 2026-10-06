@@ -13,7 +13,8 @@ import { targetName } from '../../sim/setup.js';
 import { warheadKg, directDamage } from '../../physics/damage.js';
 import { $, isDefenderView, isAttackerView } from '../dom.js';
 import { draw } from '../../render/draw.js';
-import { contactOf, attackerKnows, isEmitter, EMCON } from '../../sim/contacts.js';
+import { contactOf, attackerKnows, asAttackerSees, isEmitter, EMCON, mobPhaseOf } from '../../sim/contacts.js';
+import { MOB_PHASE } from '../../sim/mobility.js';
 import { schedCov } from '../coverage.js';
 import { openFicha } from '../fichas.js';
 import { renderAtk, removeObj } from './attack.js';
@@ -90,11 +91,11 @@ export function renderSel(live) {
     if (S.started && !S.replay && isAttackerView()) {
       if (!attackerKnows(u, S.t)) { S.sel = null; return renderSel(); }   // una selección previa no la delata
       // vista del atacante: dónde está y qué es (catálogo), no su estado, munición ni enlaces
-      el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(d.short)}</b><dl class="kv"><dt>Posición</dt><dd>${u.x.toFixed(1)}, ${u.y.toFixed(1)} km</dd>${r && r.band !== 'ACU' && r.band !== 'OPT' ? `<dt>Radar</dt><dd>${esc(r.name)} · ${r.band}</dd>` : ''}${d.sam ? `<dt>Alcance (catálogo)</dt><dd>${d.sam.maxR} km</dd>` : ''}<dt>Estado</dt><dd>desconocido</dd></dl><p class="hint">Vista del atacante: ${u.emitFrom != null && u.emitFrom <= S.t ? 'ubicada por su emisión de radar' : 'ubicada al disparar'}. No se sabe si está dañada ni cuánta munición le queda.</p>`;
+      el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(d.short)}</b><dl class="kv"><dt>Última posición conocida</dt><dd>${(asAttackerSees(u, S.t) ?? u).x.toFixed(1)}, ${(asAttackerSees(u, S.t) ?? u).y.toFixed(1)} km</dd>${r && r.band !== 'ACU' && r.band !== 'OPT' ? `<dt>Radar</dt><dd>${esc(r.name)} · ${r.band}</dd>` : ''}${d.sam ? `<dt>Alcance (catálogo)</dt><dd>${d.sam.maxR} km</dd>` : ''}<dt>Estado</dt><dd>desconocido</dd></dl><p class="hint">Vista del atacante: ${u.emitFrom != null && u.emitFrom <= S.t ? 'ubicada por su emisión de radar' : 'ubicada al disparar'}. No se sabe si está dañada ni cuánta munición le queda.</p>`;
       return;
     }
     let html = `<h3>Selección</h3><div class="row" style="justify-content:space-between"><b style="font-size:15px">${esc(u.name)}</b><span class="chip ${d.side === 'RU' ? 'ru' : 'ua'}">${esc(d.short)}</span></div>
-      <dl class="kv"><dt>Posición</dt><dd>${u.x.toFixed(1)}, ${u.y.toFixed(1)} km</dd><dt>Lat/Lon</dt><dd>${ll[0].toFixed(3)}°, ${ll[1].toFixed(3)}°</dd><dt>Terreno</dt><dd>${ground} m</dd>`;
+      <dl class="kv"><dt>Posición</dt><dd>${u.x.toFixed(1)}, ${u.y.toFixed(1)} km</dd>${S.started && mobPhaseOf(u) ? `<dt>Traslado</dt><dd>${MOB_PHASE[mobPhaseOf(u)]}: no detecta ni dispara</dd>` : ''}<dt>Lat/Lon</dt><dd>${ll[0].toFixed(3)}°, ${ll[1].toFixed(3)}°</dd><dt>Terreno</dt><dd>${ground} m</dd>`;
     if (r && r.band !== 'ACU') { const hor = horizon(antZ(u) - (d.kind === 'aew' ? 0 : ground), 50); html += `<dt>Radar</dt><dd>${esc(r.name)} · ${r.band}</dd><dt>Horizonte vs blanco a 50 m</dt><dd>${hor.toFixed(0)} km</dd>`; }
     if (d.sam) html += `<dt>Alcance</dt><dd>${d.sam.maxR} km${d.sam.maxRtbm ? ' (TBM ' + d.sam.maxRtbm + ')' : ''}</dd><dt>Guiado</dt><dd>${d.sam.guid}</dd>`;
     const links = datalinksOf(d).map(k => DATALINKS[k].name).join(', ');

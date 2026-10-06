@@ -11,6 +11,7 @@ import { profileOf, timeTo } from '../physics/interceptor.js';
 import { S } from './state.js';
 import { log, uLabel } from './log.js';
 import { recUnit } from './replay.js';
+import { noteFix } from './contacts.js';
 
 /** Cada cuánto (s) se recalculan las marcaciones y los disparos home-on-jam. */
 export const EW_DT = 5;
@@ -19,7 +20,7 @@ export const EW_DT = 5;
 function strobes(j) {
   const JJ = JAMMERS[j.type], out = [];
   for (const u of S.units) {
-    const r = D(u).radar; if (!u.alive || !r || r.band === 'ACU' || r.band === 'OPT') continue;
+    const r = D(u).radar; if (!u.alive || u.mob || !r || r.band === 'ACU' || r.band === 'OPT') continue;
     if (JJ.side !== 'both' && sideOf(u) === JJ.side) continue;
     // un DRFM no mete ruido, pero emite cuando el haz lo ilumina: se lo marca por su copia (lóbulo principal)
     const p = jamPos(j), J = j.mode === 'drfm' ? (JJ.bands.includes(r.band) ? Math.max(0, drfmJ(u, j) ?? 0) : 0) : jamJ(u, azOf(p[0] - u.x, p[1] - u.y), [j]);
@@ -62,7 +63,7 @@ export function ewStep(t) {
       if (!sm?.hoj || u.dmgLauncher || u.magLeft <= 0 || u.reloadUntil !== null) continue;
       const p = jamPos(j), d = Math.hypot(p[0] - u.x, p[1] - u.y, (p[2] - antZ(u)) / 1000);
       if (d > sm.maxR || p[2] > sm.altMax) continue;
-      u.magLeft--; u.active++; recUnit(u); S.stats.shots++; S.stats.defCost += sm.cost; u.revealed ??= t;
+      u.magLeft--; u.active++; recUnit(u); S.stats.shots++; S.stats.defCost += sm.cost; u.revealed ??= t; noteFix(u, t);
       S.hoj.push({ u, j, tH: t + timeTo(profileOf(sm), d * 1000) });
       j.hojBusy = true;
       log('l', uLabel(u) + ' dispara un misil home-on-jam contra el ' + JJ.short + ' a ' + d.toFixed(0) + ' km.', 'def');

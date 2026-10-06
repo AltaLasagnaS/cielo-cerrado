@@ -10,7 +10,7 @@ import { isOffmap, speedAt } from '../physics/kinematics.js';
 import { relativeRelief, slopeAt, terrainClass, RELIEF_RADIUS_KM } from '../physics/terrain-analysis.js';
 import { S } from '../sim/state.js';
 import { label, uLabel } from '../sim/log.js';
-import { contactOf, attackerKnows } from '../sim/contacts.js';
+import { contactOf, asAttackerSees } from '../sim/contacts.js';
 import { cv, V, toS, toW, fitView } from '../render/view.js';
 import { $, isDefenderView, isAttackerView } from './dom.js';
 import { schedCov } from './coverage.js';
@@ -34,7 +34,7 @@ export function hitTest(sx, sy) {
     }
   }
   const av = S.started && !S.replay && isAttackerView();   // vista del atacante: no se tocan las defensas que no conoce
-  for (const u of units) { if (av && !attackerKnows(u, S.t)) continue; const [a, b] = toS(u.x, u.y); if (Math.hypot(a - sx, b - sy) < 11) return { kind: 'def', id: u.id }; }
+  for (const u0 of units) { const u = av ? asAttackerSees(u0, S.t) : u0; if (!u) continue; const [a, b] = toS(u.x, u.y); if (Math.hypot(a - sx, b - sy) < 11) return { kind: 'def', id: u.id }; }
   for (const j of jams) { const [a, b] = toS(j.x, j.y); if (Math.hypot(a - sx, b - sy) < 11) return { kind: 'jam', id: j.id }; }
   for (const g of objs) { const [a, b] = toS(g.x, g.y); if (Math.hypot(a - sx, b - sy) < 11) return { kind: 'obj', id: g.id }; }
   if (!S.started) for (const sv of S.setup.salvos) { for (let i = 1; i < sv.pts.length; i++) { const [a, b] = toS(...sv.pts[i - 1]), [c2, d2] = toS(...sv.pts[i]); if (segDist(sx, sy, a, b, c2, d2) < 6) return { kind: 'salvo', id: sv.id }; } }
