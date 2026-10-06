@@ -4920,9 +4920,10 @@ table.t.mc td.pc{white-space:nowrap}
 
   // src/sim/mobility.js
   var MOB_PHASE = { stow: "replegando", move: "en tránsito", deploy: "desplegando" };
+  var finite = (v, lo) => typeof v === "number" && Number.isFinite(v) && v >= lo;
   function mobData(u) {
     const m = D(u).mob;
-    return m && m.stowS >= 0 && m.deployS >= 0 && m.vmax > 0 ? m : null;
+    return m && finite(m.stowS, 0) && finite(m.deployS, 0) && finite(m.vmax, 1e-9) ? m : null;
   }
   function cantMove(u) {
     if (!u.alive) return "está destruida";
@@ -4949,7 +4950,7 @@ table.t.mc td.pc{white-space:nowrap}
     const why = cantMove(u);
     if (why) return why;
     if (!Array.isArray(pts) || !pts.length) return "la ruta está vacía";
-    if (!(kmh2 > 0)) return "falta la velocidad de marcha";
+    if (!finite(kmh2, 1e-9)) return "falta la velocidad de marcha";
     const m = (
       /** @type {any} */
       mobData(u)
@@ -4961,44 +4962,51 @@ table.t.mc td.pc{white-space:nowrap}
     log("l", `${u.name} se repliega para trasladarse ${L.toFixed(1)} km a ${Math.round(v)} km/h (listo en ${Math.round((u.mob.tReady - t) / 60)} min).`, "def");
     return null;
   }
+  function advance(u, t) {
+    const m = u.mob;
+    if (!m) return false;
+    if (m.phase === "stow" && t >= m.tMove) {
+      m.phase = "move";
+      recUnit(u);
+    }
+    if (m.phase === "move") {
+      const [x, y] = along(m.route, Math.min(m.km, (Math.min(t, m.tDeploy) - m.tMove) / 3600 * m.kmh));
+      u.x = x;
+      u.y = y;
+      if (t - (m.rec ?? -1e9) >= 5) {
+        m.rec = t;
+        recUnit(u);
+      }
+      if (t >= m.tDeploy) {
+        const end = m.route[m.route.length - 1];
+        u.x = end[0];
+        u.y = end[1];
+        m.phase = "deploy";
+        recUnit(u);
+      }
+    }
+    if (m.phase === "deploy" && t >= m.tReady) {
+      u.freeAt = m.tReady;
+      u.mob = null;
+      u.nextScan = t;
+      recUnit(u);
+      log("l", `${u.name} queda desplegada en su nueva posición.`, "def");
+      return true;
+    }
+    return false;
+  }
   function mobStep(t) {
     for (const u of S.units) {
       if (!u.alive) {
         if (u.mob) u.mob = null;
         continue;
       }
-      const plan = u.moves;
-      if (plan && plan.length && plan[0].t <= t && !u.mob) {
-        const mv = plan.shift(), why = orderMove(u, mv.pts, mv.kmh, mv.t);
+      for (let k = 0; k < 25; k++) {
+        advance(u, t);
+        const plan = u.moves;
+        if (u.mob || !plan || !plan.length || plan[0].t > t) break;
+        const mv = plan.shift(), why = orderMove(u, mv.pts, mv.kmh, Math.max(mv.t, u.freeAt ?? -Infinity));
         if (why) log("w", `${u.name} no puede cumplir el traslado programado: ${why}.`, "def");
-      }
-      const m = u.mob;
-      if (!m) continue;
-      if (m.phase === "stow" && t >= m.tMove) {
-        m.phase = "move";
-        recUnit(u);
-      }
-      if (m.phase === "move") {
-        const [x, y] = along(m.route, Math.min(m.km, (Math.min(t, m.tDeploy) - m.tMove) / 3600 * m.kmh));
-        u.x = x;
-        u.y = y;
-        if (t - (m.rec ?? -1e9) >= 5) {
-          m.rec = t;
-          recUnit(u);
-        }
-        if (t >= m.tDeploy) {
-          const end = m.route[m.route.length - 1];
-          u.x = end[0];
-          u.y = end[1];
-          m.phase = "deploy";
-          recUnit(u);
-        }
-      }
-      if (m.phase === "deploy" && t >= m.tReady) {
-        u.mob = null;
-        u.nextScan = t;
-        recUnit(u);
-        log("l", `${u.name} queda desplegada en su nueva posición.`, "def");
       }
     }
   }
@@ -8104,7 +8112,7 @@ table.t.mc td.pc{white-space:nowrap}
       } while (state.commands.some((row) => row.commandId === value));
       return value;
     }
-    function advance(state, missionSeconds) {
+    function advance2(state, missionSeconds) {
       const atSeconds = addSeconds(originSeconds, seconds(missionSeconds, "tiempo de misión"));
       if (atSeconds < state.clockSeconds) throw Error("Reloj de misión retrocede");
       if (atSeconds === state.clockSeconds) return state;
@@ -8119,7 +8127,7 @@ table.t.mc td.pc{white-space:nowrap}
         return current3;
       }
       if (current3.phase !== "active") throw Error("La sesión de combate terminó");
-      let next2 = advance(current3, request.missionSeconds);
+      let next2 = advance2(current3, request.missionSeconds);
       next2 = applyCampaignCommand(next2, command2);
       current3 = next2;
       return current3;
@@ -8139,7 +8147,7 @@ table.t.mc td.pc{white-space:nowrap}
       advance(request) {
         exact4(request, ["missionSeconds"], "Reloj");
         if (current3.phase !== "active") throw Error("La sesión de combate terminó");
-        const next2 = advance(current3, request.missionSeconds);
+        const next2 = advance2(current3, request.missionSeconds);
         current3 = next2;
         return current3;
       },

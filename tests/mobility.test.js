@@ -45,6 +45,34 @@ test('las tres fases terminan en instantes fijos y la posición avanza a la velo
   assert.equal(MOB_PHASE.move, 'en tránsito');
 });
 
+test('un hueco en los datos (null, ausente, NaN, Infinity, texto) impide el traslado: no es un cero', () => {
+  setupOne(); setRandom(seeded(1)); startSim(); setRandom(null);
+  const u = S.units[0];
+  for (const bad of [null, undefined, NaN, Infinity, '300', -1])
+    for (const k of ['stowS', 'deployS', 'vmax']) {
+      DEFENSES.nasams.mob = { ...FIX, [k]: bad };
+      assert.match(cantMove(u), /no hay datos/, `${k} = ${String(bad)}`);
+    }
+  DEFENSES.nasams.mob = { ...FIX };
+  for (const bad of [null, NaN, Infinity, '40', 0]) assert.match(orderMove(u, [[56, 50]], /** @type {any} */ (bad)), /falta la velocidad/, String(bad));
+});
+
+test('una orden programada mientras se trasladaba espera a que quede libre (sin marcha retroactiva), con pasos cortos o largos', () => {
+  const plan = () => [{ t: 0, kmh: 36, pts: [[51, 50]] }, { t: 5, kmh: 36, pts: [[52, 50]] }];   // 1 km a 36 km/h = 100 s cada uno
+  const run = dt => {
+    DEFENSES.nasams.mob = { stowS: 0, deployS: 0, vmax: 60 };
+    setupOne(); setRandom(seeded(1)); startSim(); setRandom(null);
+    const u = S.units[0]; u.moves = plan(); const xs = {};
+    while (S.t < 260) { step(dt); for (const T of [101, 150, 200, 250]) if (Math.abs(S.t - T) < 1e-9) xs[T] = u.x; }
+    return xs;
+  };
+  const fine = run(0.25), coarse = run(50);
+  assert.ok(Math.abs(fine[101] - 51.01) < 1e-9, 'a 1 s de empezar la segunda orden: ' + fine[101]);
+  assert.ok(Math.abs(fine[150] - 51.5) < 1e-9, 'la segunda empezó al quedar libre (t = 100), no en t = 5: ' + fine[150]);
+  assert.equal(fine[200], 52); assert.equal(fine[250], 52);
+  for (const T of [150, 200, 250]) assert.ok(Math.abs(fine[T] - coarse[T]) < 1e-9, `t = ${T}: igual con pasos de 0,25 s y de 50 s (${fine[T]} / ${coarse[T]})`);
+});
+
 test('la marcha la elige quien ordena, con tope en la velocidad máxima de la ficha', () => {
   DEFENSES.nasams.mob = { ...FIX };
   setupOne(); setRandom(seeded(1)); startSim(); setRandom(null);

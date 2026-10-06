@@ -19,10 +19,13 @@ export const MOB_PHASE = { stow: 'replegando', move: 'en tránsito', deploy: 'de
 /** ¿La unidad está fuera de servicio por un traslado (en cualquiera de sus fases)? */
 export const moving = u => !!u.mob;
 
-/** Datos de movilidad completos de la ficha de u, o null. */
+/** ¿v es un número finito ≥ lo? (sin coerción: null, '', '5' o Infinity no cuentan como dato) */
+const finite = (v, lo) => typeof v === 'number' && Number.isFinite(v) && v >= lo;
+
+/** Datos de movilidad completos de la ficha de u, o null (un hueco null de la investigación no es un cero). */
 export function mobData(u) {
   const m = D(u).mob;
-  return m && m.stowS >= 0 && m.deployS >= 0 && m.vmax > 0 ? m : null;
+  return m && finite(m.stowS, 0) && finite(m.deployS, 0) && finite(m.vmax, 1e-9) ? m : null;
 }
 
 /** Por qué u no puede empezar un traslado ahora, o null si puede. */
@@ -55,7 +58,7 @@ function along(pts, d) {
 export function orderMove(u, pts, kmh, t = S.t) {
   const why = cantMove(u); if (why) return why;
   if (!Array.isArray(pts) || !pts.length) return 'la ruta está vacía';
-  if (!(kmh > 0)) return 'falta la velocidad de marcha';
+  if (!finite(kmh, 1e-9)) return 'falta la velocidad de marcha';
   const m = /** @type {any} */ (mobData(u)), route = [[u.x, u.y], ...pts.map(p => [+p[0], +p[1]])], v = Math.min(kmh, m.vmax);
   const L = routeKm(route), tMove = t + m.stowS, tDeploy = tMove + L / v * 3600;
   u.mob = { phase: 'stow', route, km: L, kmh: v, tMove, tDeploy, tReady: tDeploy + m.deployS };
@@ -65,26 +68,39 @@ export function orderMove(u, pts, kmh, t = S.t) {
   return null;
 }
 
-/** Avanza los traslados en curso y da las órdenes programadas por el escenario (u.moves). */
+/** Avanza el traslado de u hasta t. → true si terminó en este paso. */
+function advance(u, t) {
+  const m = u.mob; if (!m) return false;
+  if (m.phase === 'stow' && t >= m.tMove) { m.phase = 'move'; recUnit(u); }
+  if (m.phase === 'move') {
+    const [x, y] = along(m.route, Math.min(m.km, (Math.min(t, m.tDeploy) - m.tMove) / 3600 * m.kmh));
+    u.x = x; u.y = y;
+    if (t - (m.rec ?? -1e9) >= 5) { m.rec = t; recUnit(u); }   // la repetición dibuja el trayecto
+    if (t >= m.tDeploy) { const end = m.route[m.route.length - 1]; u.x = end[0]; u.y = end[1]; m.phase = 'deploy'; recUnit(u); }
+  }
+  if (m.phase === 'deploy' && t >= m.tReady) {
+    u.freeAt = m.tReady; u.mob = null; u.nextScan = t; recUnit(u);
+    log('l', `${u.name} queda desplegada en su nueva posición.`, 'def');
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Avanza los traslados en curso y da las órdenes programadas por el escenario (u.moves). Una orden
+ * programada mientras la unidad todavía se trasladaba espera: empieza cuando la unidad queda libre
+ * (u.freeAt), nunca antes, así que no cuenta marcha hecha mientras estaba ocupada. Con un paso largo
+ * pueden encadenarse varias órdenes en el mismo paso; los instantes son los mismos que con pasos cortos.
+ */
 export function mobStep(t) {
   for (const u of S.units) {
     if (!u.alive) { if (u.mob) u.mob = null; continue; }
-    const plan = u.moves;
-    if (plan && plan.length && plan[0].t <= t && !u.mob) {
-      const mv = plan.shift(), why = orderMove(u, mv.pts, mv.kmh, mv.t);
+    for (let k = 0; k < 25; k++) {
+      advance(u, t);
+      const plan = u.moves;
+      if (u.mob || !plan || !plan.length || plan[0].t > t) break;
+      const mv = plan.shift(), why = orderMove(u, mv.pts, mv.kmh, Math.max(mv.t, u.freeAt ?? -Infinity));
       if (why) log('w', `${u.name} no puede cumplir el traslado programado: ${why}.`, 'def');
-    }
-    const m = u.mob; if (!m) continue;
-    if (m.phase === 'stow' && t >= m.tMove) { m.phase = 'move'; recUnit(u); }
-    if (m.phase === 'move') {
-      const [x, y] = along(m.route, Math.min(m.km, (Math.min(t, m.tDeploy) - m.tMove) / 3600 * m.kmh));
-      u.x = x; u.y = y;
-      if (t - (m.rec ?? -1e9) >= 5) { m.rec = t; recUnit(u); }   // la repetición dibuja el trayecto
-      if (t >= m.tDeploy) { const end = m.route[m.route.length - 1]; u.x = end[0]; u.y = end[1]; m.phase = 'deploy'; recUnit(u); }
-    }
-    if (m.phase === 'deploy' && t >= m.tReady) {
-      u.mob = null; u.nextScan = t; recUnit(u);
-      log('l', `${u.name} queda desplegada en su nueva posición.`, 'def');
     }
   }
 }
