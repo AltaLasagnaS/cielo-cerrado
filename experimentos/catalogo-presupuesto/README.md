@@ -55,6 +55,8 @@ Cada evento lleva bando e ID. Repetir exactamente un comando no duplica compras 
 
 ## Diseño y entrega
 
+La [vista previa de menú y tutorial](docs/MENU-Y-TUTORIAL.md) está en `demo/menu.html`. Permite completar un entrenamiento de recursos en seis pasos con guardado y continuidad, sin cambiar la interfaz activa del juego.
+
 Ver las [fichas](docs/FICHAS.md), el [diseño de briefing/campaña](docs/BRIEFING-CAMPANA.md) y la [guía de integración](docs/INTEGRACION.md).
 
 La [revisión de fuentes de juegos](docs/FUENTES-DE-JUEGOS.md) conserva trece fichas de misiles, referencias de sensores/lanzadores y una consulta de CWDB 512, con unidades, procedencia y contradicciones pendientes.

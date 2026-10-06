@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cielo Cerrado · inicio experimental</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui,sans-serif; background:#101923; color:#e6edf3; }
+    * { box-sizing:border-box; } [hidden] { display:none!important; }
+    body { max-width:1100px; margin:auto; padding:24px 18px 60px; line-height:1.6; }
+    h1 { color:#f2bd63; margin-bottom:0; font-size:clamp(1.6rem,5vw,2.5rem); } h2 { margin-top:0; }
+    .muted { color:#b6c7d5; } .notice { border-left:3px solid #f2bd63; padding-left:14px; }
+    nav,.controls { display:flex; flex-wrap:wrap; gap:8px; margin:20px 0; }
+    button,input,textarea,select { font:inherit; background:#22374a; color:inherit; border:1px solid #6b8599; border-radius:6px; padding:10px 14px; }
+    button { cursor:pointer; } button:disabled { opacity:.45; cursor:default; }
+    button[aria-pressed=true],button:hover:not(:disabled) { border-color:#f2bd63; background:#31465b; }
+    :focus-visible { outline:3px solid #f2bd63; outline-offset:3px; } a { color:#a9d3ff; }
+    section,.card { background:#192733; border:1px solid #3a5061; border-radius:12px; padding:22px; margin:16px 0; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr)); gap:16px; }
+    .card { margin:0; } #status { min-height:1.7em; color:#9ee4bd; } #status.error { color:#ffb6a8; }
+    .stats { display:flex; gap:20px; flex-wrap:wrap; font-variant-numeric:tabular-nums; }
+    ol li { margin:8px 0; } li[aria-current=step] { color:#f2bd63; font-weight:700; }
+    input[type=number] { width:100px; } textarea { display:block; width:100%; min-height:130px; margin:12px 0; }
+    table { width:100%; table-layout:fixed; border-collapse:collapse; } th,td { padding:10px 5px; text-align:left; border-bottom:1px solid #3a5061; overflow-wrap:anywhere; }
+    .controls>* { max-width:100%; } section,.card { min-width:0; overflow-wrap:anywhere; }
+    #reference-list { padding-left:22px; } #reference-list li { margin:16px 0; }
+    body.large-text { font-size:1.15rem; } body.high-contrast { color:#fff; } body.high-contrast .muted { color:#e7edf3; }
+    @media(max-width:500px) { body{padding:14px 10px;} section,.card{padding:16px;} nav button{flex:1 0 42%;} }
+  </style>
+</head>
+<body>
+  <header><h1>Cielo Cerrado</h1><p class="muted">Escenarios, conocimiento y decisiones con recursos limitados.</p>
+    <p class="notice">Vista previa del menú y entrenamiento de recursos. Los créditos, el equipo y el ejercicio son ficticios.</p></header>
+  <nav aria-label="Secciones">
+    <button data-page="home" aria-pressed="true">Inicio</button><button data-page="scenarios" aria-pressed="false">Escenarios</button>
+    <button data-page="campaign" aria-pressed="false">Campaña</button><button data-page="tutorial" aria-pressed="false">Tutorial</button>
+    <button data-page="reference" aria-pressed="false">Biblioteca</button><button data-page="settings" aria-pressed="false">Ajustes</button>
+  </nav>
+  <main>
+    <section id="page-home" aria-labelledby="heading-home"><h2 id="heading-home" tabindex="-1">Elegí por dónde empezar</h2>
+      <div class="grid"><article class="card"><h3>Un escenario</h3><p>Leé el briefing, elegí una perspectiva y prepará el mapa.</p><button data-go="scenarios">Ver escenarios</button></article>
+      <article class="card"><h3>Aprender haciendo</h3><p>Practicá compra, preparación, consumo y continuidad de recursos en seis pasos.</p><button data-go="tutorial">Empezar tutorial</button></article>
+      <article class="card"><h3>Conocer los sistemas</h3><p>Consultá las variantes y el estado de su evidencia.</p><button data-go="reference">Abrir biblioteca</button></article></div>
+    </section>
+    <section id="page-scenarios" hidden aria-labelledby="heading-scenarios"><h2 id="heading-scenarios" tabindex="-1">Escenarios</h2>
+      <p>El simulador permite elegir el escenario, leer su briefing y editar la preparación antes de iniciar.</p>
+      <p>Incluye escenarios sobre Kiev, Járkov, Odesa, Gotemburgo y Monterey. Los escenarios son aproximaciones documentadas, no reconstrucciones exactas.</p>
+      <a id="open-simulator" href="../../../index.html">Abrir el simulador y elegir escenario</a>
+    </section>
+    <section id="page-campaign" hidden aria-labelledby="heading-campaign"><h2 id="heading-campaign" tabindex="-1">Campaña</h2>
+      <p>La campaña de Odesa tiene dos guardias con presupuesto, preparación, munición y daños que continúan entre escenarios.</p>
+      <p class="notice">En el juego, elegí Campaña para asignar medios, pedir y cargar munición y comenzar la guardia. El entrenamiento de esta página permite practicar la continuidad de recursos.</p>
+      <a id="open-campaign" href="../../../index.html">Abrir el juego</a>
+      <button data-go="tutorial">Practicar continuidad de recursos</button>
+    </section>
+    <section id="page-tutorial" hidden aria-labelledby="heading-tutorial"><h2 id="heading-tutorial" tabindex="-1">Entrenamiento de recursos</h2>
+      <p id="lesson-progress"></p><ol id="lesson-list"></ol>
+      <article class="card"><h3 id="lesson-title"></h3><p id="lesson-instruction"></p><p id="lesson-explanation" class="muted"></p>
+        <p class="stats"><span>Saldo: <strong id="training-balance"></strong> créditos</span><span>Estado: <strong id="training-phase"></strong></span></p>
+        <table><caption>Consumibles propios</caption><thead><tr><th>Reserva</th><th>Preparados</th><th>Consumidos</th></tr></thead><tbody><tr><td id="training-reserve"></td><td id="training-ready"></td><td id="training-consumed"></td></tr></tbody></table>
+        <div class="controls"><label for="training-quantity">Cantidad</label><input id="training-quantity" type="number" min="1" max="4" step="1" value="2">
+          <button data-action="buy">Reservar paquete</button><button data-action="load">Preparar</button><button data-action="activate">Iniciar ejercicio</button>
+          <button data-action="consume">Consumir</button><button data-action="finish">Terminar etapa</button><button data-action="begin-mission">Siguiente preparación</button></div>
+        <p id="status" role="status" aria-live="polite"></p>
+      </article>
+      <div class="controls"><button id="training-reset">Reiniciar entrenamiento</button><button id="training-save">Generar guardado</button><button id="training-restore">Restaurar guardado</button></div>
+      <label for="training-saved">Guardado del entrenamiento</label><textarea id="training-saved" spellcheck="false"></textarea>
+      <p class="muted">El guardado conserva el paso y los recursos. Cambiar de sección no reinicia el ejercicio.</p>
+    </section>
+    <section id="page-reference" hidden aria-labelledby="heading-reference"><h2 id="heading-reference" tabindex="-1">Biblioteca de variantes</h2>
+      <p>Estas fichas son candidatos de investigación. Una identidad documentada no certifica todos sus parámetros ni habilita una unidad nueva en el juego.</p>
+      <label for="reference-family">Familia</label><select id="reference-family"><option value="all">Todas</option><option value="patriot">Patriot</option><option value="nasams">NASAMS</option><option value="s300p">S-300P</option></select>
+      <ul id="reference-list"></ul>
+    </section>
+    <section id="page-settings" hidden aria-labelledby="heading-settings"><h2 id="heading-settings" tabindex="-1">Lectura</h2>
+      <p>Estos ajustes cambian la presentación de esta vista previa.</p>
+      <p><label><input type="checkbox" id="large-text"> Texto más grande</label></p><p><label><input type="checkbox" id="high-contrast"> Texto con mayor contraste</label></p>
+    </section>
+  </main>
+  <script type="module" src="./menu.mjs"></script>
+</body>
+</html>
