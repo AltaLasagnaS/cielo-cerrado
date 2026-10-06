@@ -9,6 +9,7 @@
 // dispara, no recarga y no publica en la red. La ruta la da el escenario o el jugador (no hay red vial).
 // Todo corre en tiempo simulado: cada fase termina en un instante fijo, sin importar el tamaño del paso.
 import { D } from '../data/index.js';
+import { MAP } from '../physics/terrain.js';
 import { S } from './state.js';
 import { log } from './log.js';
 import { recUnit } from './replay.js';
@@ -58,6 +59,10 @@ function along(pts, d) {
 export function orderMove(u, pts, kmh, t = S.t) {
   const why = cantMove(u); if (why) return why;
   if (!Array.isArray(pts) || !pts.length) return 'la ruta está vacía';
+  if (pts.length > 50) return 'la ruta tiene más de 50 puntos';
+  // cada punto: dos números finitos dentro del mapa (la orden del mapa no pasa por scenario-io)
+  for (const p of pts) if (!Array.isArray(p) || p.length !== 2 || !finite(p[0], 0) || !finite(p[1], 0) || p[0] > MAP.wKm || p[1] > MAP.hKm) return 'la ruta sale del mapa';
+  if (!finite(t, 0)) return 'el instante de la orden no es válido';
   if (!finite(kmh, 1e-9)) return 'falta la velocidad de marcha';
   const m = /** @type {any} */ (mobData(u)), route = [[u.x, u.y], ...pts.map(p => [+p[0], +p[1]])], v = Math.min(kmh, m.vmax);
   const L = routeKm(route), tMove = t + m.stowS, tDeploy = tMove + L / v * 3600;

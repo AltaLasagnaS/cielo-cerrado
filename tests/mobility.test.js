@@ -20,7 +20,7 @@ const saved = DEFENSES.nasams.mob;
 after(() => { if (saved === undefined) delete DEFENSES.nasams.mob; else DEFENSES.nasams.mob = saved; });
 
 const until = T => { while (S.t < T - 1e-9) step(0.25); };
-function setupOne() { setMap(flatMap(200, 200, 200)); clearSetup(); return addDef('nasams', 50, 50, { name: 'N-1' }); }
+function setupOne() { setMap(flatMap(1000, 1000, 200)); clearSetup(); return addDef('nasams', 50, 50, { name: 'N-1' }); }   // mapa de 200 × 200 km
 
 test('sin datos de despliegue y repliegue la unidad no se puede mover (no se inventa un valor)', () => {
   delete DEFENSES.nasams.mob;
@@ -45,7 +45,7 @@ test('las tres fases terminan en instantes fijos y la posición avanza a la velo
   assert.equal(MOB_PHASE.move, 'en tránsito');
 });
 
-test('un hueco en los datos (null, ausente, NaN, Infinity, texto) impide el traslado: no es un cero', () => {
+test('un hueco en los datos (null, ausente, NaN, Infinity, texto) impide el traslado: no es un cero; una ruta inválida o fuera del mapa, tampoco', () => {
   setupOne(); setRandom(seeded(1)); startSim(); setRandom(null);
   const u = S.units[0];
   for (const bad of [null, undefined, NaN, Infinity, '300', -1])
@@ -54,6 +54,10 @@ test('un hueco en los datos (null, ausente, NaN, Infinity, texto) impide el tras
       assert.match(cantMove(u), /no hay datos/, `${k} = ${String(bad)}`);
     }
   DEFENSES.nasams.mob = { ...FIX };
+  for (const bad of [[[-1, 50]], [[50, 201]], [[]], [[50]], [[NaN, 50]], [['50', 50]], [null], Array(51).fill([60, 60])])
+    assert.match(orderMove(u, /** @type {any} */ (bad), 36), /sale del mapa|más de 50/, JSON.stringify(bad));
+  assert.match(orderMove(u, [[56, 50]], 36, NaN), /instante/);
+  assert.ok(!u.mob, 'ninguna de esas órdenes empezó');
   for (const bad of [null, NaN, Infinity, '40', 0]) assert.match(orderMove(u, [[56, 50]], /** @type {any} */ (bad)), /falta la velocidad/, String(bad));
 });
 
