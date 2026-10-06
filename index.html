@@ -3508,6 +3508,10 @@ table.t.mc td.pc{white-space:nowrap}
       /** @type {any} */
       null
     ),
+    relocate: (
+      /** @type {any} */
+      null
+    ),
     box: (
       /** @type {any} */
       null
@@ -6086,6 +6090,29 @@ table.t.mc td.pc{white-space:nowrap}
       const ph = !av && !dead ? mobPhaseOf(u) : null;
       labelAt(sx, sy, (u.name || d.short) + ammo + (ph ? " · " + MOB_PHASE[ph] : ""), dead ? "#6b7888" : ph ? "#e6a53c" : "#e6eef6");
     }
+    if (!av) {
+      const paths2 = [];
+      if (S.mode === "relocate" && S.relocate) {
+        const u = S.units.find((v) => v.id === S.relocate.id);
+        if (u) paths2.push([[u.x, u.y], ...S.relocate.pts]);
+      }
+      if (!R) {
+        for (const u of S.units) if (u.alive && u.mob && typeof u.mob === "object") paths2.push([[u.x, u.y], ...u.mob.route.slice(1).filter((p, i) => u.mob.phase !== "move" || i >= segIndex(u.mob.route, u.x, u.y))]);
+      }
+      ctx.strokeStyle = "#e6a53c";
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([6, 4]);
+      for (const p of paths2) {
+        ctx.beginPath();
+        p.forEach(([x, y], i) => {
+          const [a, b] = toS(x, y);
+          if (i) ctx.lineTo(a, b);
+          else ctx.moveTo(a, b);
+        });
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+    }
     if (S.preview) drawPreview(S.preview);
     for (const im of R ? R.impacts : S.impacts) {
       const [sx, sy] = toS(im.x, im.y);
@@ -6413,6 +6440,19 @@ table.t.mc td.pc{white-space:nowrap}
     ctx.restore();
     const name = p.mode === "placeDef" ? DEFENSES[p.type].short : p.mode === "placeJam" ? JAMMERS[p.type].short : TARGET_TYPES[p.type].name;
     labelAt(sx, sy + 16, "¿" + name + " aquí? · " + Math.round(surf(p.x, p.y)) + " m", "#f2d48a");
+  }
+  function segIndex(route, x, y) {
+    let best = 0, bd = Infinity;
+    for (let i = 1; i < route.length; i++) {
+      const [ax, ay] = route[i - 1], [bx, by] = route[i], L2 = (bx - ax) ** 2 + (by - ay) ** 2;
+      const k = L2 ? Math.max(0, Math.min(1, ((x - ax) * (bx - ax) + (y - ay) * (by - ay)) / L2)) : 0;
+      const d = Math.hypot(ax + (bx - ax) * k - x, ay + (by - ay) * k - y);
+      if (d < bd) {
+        bd = d;
+        best = i - 1;
+      }
+    }
+    return best;
   }
 
   // src/render/view.js
@@ -9887,9 +9927,16 @@ table.t.mc td.pc{white-space:nowrap}
         if (d.sam) html += `<div class="field" title="Los radares de tiro aprenden a distinguir señuelos con el tiempo de seguimiento; la decisión usa esa clasificación, que a veces se equivoca."><label for="sDec">Pistas clasificadas como señuelo</label><select id="sDec" class="sel"><option value="" ${!u.decoyDoc ? "selected" : ""}>Como la regla general (${S.ignoreDecoys ? "no tirarles" : "tirarles"})</option><option value="ignorar" ${u.decoyDoc === "ignorar" ? "selected" : ""}>No tirarles</option><option value="tirar" ${u.decoyDoc === "tirar" ? "selected" : ""}>Tirarles igual</option></select></div>`;
         if (d.sam) html += `<label class="check"><input type="checkbox" id="sNoD" ${u.noDrones ? "checked" : ""}> No gastar en drones (reservar para misiles)</label><div class="field"><label for="sMag">Munición disponible</label><input id="sMag" class="inp" type="number" min="1" max="200" value="${u.mag}"></div><div class="field"><label for="sRes">Reserva para recargar (${Math.round(d.sam.reloadS / 60)} min por recarga)</label><input id="sRes" class="inp" type="number" min="0" max="500" value="${u.reserve ?? 0}"></div><div class="field"><label for="sSal">Interceptores por blanco</label><input id="sSal" class="inp" type="number" min="1" max="4" value="${u.salvo}"></div>`;
       }
-      html += `<div class="row"><button class="btn sm" id="sInfo">Ficha</button>${ed ? '<button class="btn sm danger" id="sDel">Eliminar</button>' : ""}</div>`;
+      const canOrder = S.started && !S.replay && u.alive && !mobPhaseOf(u);
+      const why = canOrder ? campaignBattle() ? "en la campaña todavía no hay traslados" : cantMove(u) : null;
+      html += `<div class="row"><button class="btn sm" id="sInfo">Ficha</button>${ed ? '<button class="btn sm danger" id="sDel">Eliminar</button>' : ""}${canOrder && !why ? '<button class="btn sm" id="sMove" title="Replegar, viajar por la ruta que marques y desplegar. Mientras tanto no detecta ni dispara.">Trasladar</button>' : ""}</div>`;
+      if (canOrder && why) html += `<p class="hint">No se puede trasladar: ${esc(why)}.</p>`;
       el.innerHTML = html;
       $("#sInfo").onclick = () => openFicha("def", u.type);
+      if ($("#sMove")) $("#sMove").onclick = () => {
+        S.relocate = { id: u.id, pts: [] };
+        setMode("relocate");
+      };
       if (ed) {
         const bind = (id2, k, cov) => {
           const i = $(id2);
@@ -10323,6 +10370,7 @@ table.t.mc td.pc{white-space:nowrap}
     S.placeType = type || null;
     S.preview = null;
     if (m !== "route") S.route = null;
+    if (m !== "relocate") S.relocate = null;
     if (m !== "measure") S.measure = null;
     updateModebar();
     renderTabs();
@@ -10368,6 +10416,11 @@ table.t.mc td.pc{white-space:nowrap}
       cancelTxt = "Cancelar";
     } else if (P) {
       html = `Tocá el mapa donde quieras ubicar <b>${esc(P.name(S.placeType))}</b>; vas a poder confirmar o cancelar.`;
+    } else if (S.mode === "relocate") {
+      const n2 = S.relocate?.pts.length ?? 0;
+      html = n2 ? `Ruta de <b>${n2} punto${n2 > 1 ? "s" : ""}</b>: el último es el destino. Tocá más puntos o confirmá.` : "Tocá el mapa para marcar la <b>ruta del traslado</b> (el último punto es el destino).";
+      if (n2) ok = finishRelocate;
+      cancelTxt = "Cancelar";
     } else if (S.mode === "measure") {
       const m = S.measure;
       if (m?.a && m.b) {
@@ -10408,6 +10461,14 @@ table.t.mc td.pc{white-space:nowrap}
     renderAtk();
     renderSel();
     schedCov();
+  }
+  function finishRelocate() {
+    const r = S.relocate, u = r && S.units.find((v) => v.id === r.id);
+    if (!u || !r.pts.length) return;
+    const why = orderMove(u, r.pts);
+    setMode("select");
+    renderSel();
+    toast(why ? "No se puede trasladar: " + why + "." : `${u.name} se repliega para trasladarse.`);
   }
   var toastT = null;
   function toast(m) {
@@ -10693,6 +10754,11 @@ table.t.mc td.pc{white-space:nowrap}
       updateModebar();
       return;
     }
+    if (S.mode === "relocate") {
+      if (S.relocate && S.relocate.pts.length < 50) S.relocate.pts.push([+wx.toFixed(2), +wy.toFixed(2)]);
+      updateModebar();
+      return;
+    }
     if (S.mode === "route") {
       const T = THREATS[S.atk.type];
       if (isOffmap(T) && S.route.pts.length >= 2) return;
@@ -10861,6 +10927,7 @@ table.t.mc td.pc{white-space:nowrap}
       if (e.key === "Enter") {
         if (S.preview) confirmPlacement();
         else if (S.mode === "route") finishRoute();
+        else if (S.mode === "relocate") finishRelocate();
       }
       if (e.key === " ") {
         e.preventDefault();

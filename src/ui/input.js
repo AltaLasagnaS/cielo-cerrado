@@ -15,7 +15,7 @@ import { cv, V, toS, toW, fitView } from '../render/view.js';
 import { $, isDefenderView, isAttackerView } from './dom.js';
 import { schedCov } from './coverage.js';
 import { togglePlay } from './controls.js';
-import { setMode, updateModebar, finishRoute, toast, proposePlacement, confirmPlacement, cancelPlacement } from './modes.js';
+import { setMode, updateModebar, finishRoute, finishRelocate, toast, proposePlacement, confirmPlacement, cancelPlacement } from './modes.js';
 import { closeModal } from './fichas.js';
 import { renderSel, deleteSelected } from './panels/selection.js';
 
@@ -57,6 +57,10 @@ function click(g) {
   if (S.mode === 'measure') {   // regla: primer punto, segundo punto; un tercero empieza otra medición
     const p = [+wx.toFixed(3), +wy.toFixed(3)], m = S.measure || (S.measure = { a: null, b: null });
     if (!m.a || m.b) { m.a = p; m.b = null; } else m.b = p;
+    updateModebar(); return;
+  }
+  if (S.mode === 'relocate') {   // traslado: cada click agrega un punto de la ruta
+    if (S.relocate && S.relocate.pts.length < 50) S.relocate.pts.push([+wx.toFixed(2), +wy.toFixed(2)]);
     updateModebar(); return;
   }
   if (S.mode === 'route') {
@@ -150,7 +154,7 @@ document.addEventListener('keydown', e => {
   if (/** @type {HTMLElement} */ (e.target).closest?.('input,select,textarea,[contenteditable]:not([contenteditable="false"]),[role="textbox"]')) return;
   if (e.key === 'Delete') { if (deleteSelected()) e.preventDefault(); return; }
   if (e.key === 'Escape') { if (S.preview) cancelPlacement(); else { if (S.multi.length) { S.multi = []; renderSel(); } setMode('select'); } }
-  if (e.key === 'Enter') { if (S.preview) confirmPlacement(); else if (S.mode === 'route') finishRoute(); }
+  if (e.key === 'Enter') { if (S.preview) confirmPlacement(); else if (S.mode === 'route') finishRoute(); else if (S.mode === 'relocate') finishRelocate(); }
   if (e.key === ' ') { e.preventDefault(); togglePlay(); }
   if (e.key === 'm' || e.key === 'M') setMode(S.mode === 'measure' ? 'select' : 'measure');
 });

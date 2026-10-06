@@ -14,7 +14,9 @@ import { warheadKg, directDamage } from '../../physics/damage.js';
 import { $, isDefenderView, isAttackerView } from '../dom.js';
 import { draw } from '../../render/draw.js';
 import { contactOf, attackerKnows, asAttackerSees, isEmitter, EMCON, mobPhaseOf } from '../../sim/contacts.js';
-import { MOB_PHASE } from '../../sim/mobility.js';
+import { MOB_PHASE, cantMove } from '../../sim/mobility.js';
+import { campaignBattle } from '../campaign.js';
+import { setMode } from '../modes.js';
 import { schedCov } from '../coverage.js';
 import { openFicha } from '../fichas.js';
 import { renderAtk, removeObj } from './attack.js';
@@ -123,9 +125,14 @@ export function renderSel(live) {
       if (d.sam) html += `<div class="field" title="Los radares de tiro aprenden a distinguir señuelos con el tiempo de seguimiento; la decisión usa esa clasificación, que a veces se equivoca."><label for="sDec">Pistas clasificadas como señuelo</label><select id="sDec" class="sel"><option value="" ${!u.decoyDoc ? 'selected' : ''}>Como la regla general (${S.ignoreDecoys ? 'no tirarles' : 'tirarles'})</option><option value="ignorar" ${u.decoyDoc === 'ignorar' ? 'selected' : ''}>No tirarles</option><option value="tirar" ${u.decoyDoc === 'tirar' ? 'selected' : ''}>Tirarles igual</option></select></div>`;
       if (d.sam) html += `<label class="check"><input type="checkbox" id="sNoD" ${u.noDrones ? 'checked' : ''}> No gastar en drones (reservar para misiles)</label><div class="field"><label for="sMag">Munición disponible</label><input id="sMag" class="inp" type="number" min="1" max="200" value="${u.mag}"></div><div class="field"><label for="sRes">Reserva para recargar (${Math.round(d.sam.reloadS / 60)} min por recarga)</label><input id="sRes" class="inp" type="number" min="0" max="500" value="${u.reserve ?? 0}"></div><div class="field"><label for="sSal">Interceptores por blanco</label><input id="sSal" class="inp" type="number" min="1" max="4" value="${u.salvo}"></div>`;
     }
-    html += `<div class="row"><button class="btn sm" id="sInfo">Ficha</button>${ed ? '<button class="btn sm danger" id="sDel">Eliminar</button>' : ''}</div>`;
+    // traslado durante la partida (sim/mobility.js): repliega, viaja por la ruta que se marque y despliega
+    const canOrder = S.started && !S.replay && u.alive && !mobPhaseOf(u);
+    const why = canOrder ? (campaignBattle() ? 'en la campaña todavía no hay traslados' : cantMove(u)) : null;
+    html += `<div class="row"><button class="btn sm" id="sInfo">Ficha</button>${ed ? '<button class="btn sm danger" id="sDel">Eliminar</button>' : ''}${canOrder && !why ? '<button class="btn sm" id="sMove" title="Replegar, viajar por la ruta que marques y desplegar. Mientras tanto no detecta ni dispara.">Trasladar</button>' : ''}</div>`;
+    if (canOrder && why) html += `<p class="hint">No se puede trasladar: ${esc(why)}.</p>`;
     el.innerHTML = html;
     $('#sInfo').onclick = () => openFicha('def', u.type);
+    if ($('#sMove')) $('#sMove').onclick = () => { S.relocate = { id: u.id, pts: [] }; setMode('relocate'); };
     if (ed) {
       const bind = (id, k, cov) => { const i = $(id); bindNumber(i, () => u[k], value => { u[k] = value; const v = i.parentElement.querySelector('.val'); if (v) v.textContent = u[k] + (k === 'az' ? '°' : ' m'); if (cov) schedCov(); }, { integer: ['mag', 'reserve', 'salvo'].includes(k) }); };
       bind('#sMast', 'mast', 1); bind('#sAlt', 'alt', 1); bind('#sAz', 'az', 1); bind('#sMag', 'mag'); bind('#sRes', 'reserve'); bind('#sSal', 'salvo');

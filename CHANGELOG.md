@@ -9,7 +9,7 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 ### Agregado
 - **Movilidad, primera parte** (`sim/mobility.js`, docs/FISICA.md §12):
   - Una defensa se traslada en tres fases: replegando, en tránsito y desplegando. Mientras dura no detecta, no emite, no dispara ni recarga.
-  - Los traslados se programan en el escenario (`defs[].moves`).
+  - Los traslados se programan en el escenario (`defs[].moves`) o se ordenan desde el mapa durante la partida: botón **Trasladar** en la ficha de la unidad, se marca la ruta tocando el mapa y se confirma. Si no se puede (sin datos, con misiles en vuelo, en la campaña), la ficha dice por qué.
   - El atacante sigue viendo la unidad donde la ubicó hasta que vuelve a emitir o disparar.
   - Un ataque planeado contra su posición vieja ya no la destruye si se fue.
   - Los tiempos y la velocidad salen de la ficha. **Ningún sistema los tiene todavía**: están pedidos a Codex en #62, y sin datos la unidad no se mueve.

@@ -105,6 +105,15 @@ export function draw() {
     const ph = !av && !dead ? mobPhaseOf(u) : null;   // trasladándose: fuera de servicio
     labelAt(sx, sy, (u.name || d.short) + ammo + (ph ? ' · ' + MOB_PHASE[ph] : ''), dead ? '#6b7888' : ph ? '#e6a53c' : '#e6eef6');
   }
+  // traslados: el que se está marcando y el resto del trayecto de los que están en camino (no en la vista del atacante)
+  if (!av) {
+    const paths = [];
+    if (S.mode === 'relocate' && S.relocate) { const u = S.units.find(v => v.id === S.relocate.id); if (u) paths.push([[u.x, u.y], ...S.relocate.pts]); }
+    if (!R) for (const u of S.units) if (u.alive && u.mob && typeof u.mob === 'object') paths.push([[u.x, u.y], ...u.mob.route.slice(1).filter((/** @type {number[]} */ p, /** @type {number} */ i) => u.mob.phase !== 'move' || i >= segIndex(u.mob.route, u.x, u.y))]);
+    ctx.strokeStyle = '#e6a53c'; ctx.lineWidth = 1.5; ctx.setLineDash([6, 4]);
+    for (const p of paths) { ctx.beginPath(); p.forEach(([x, y], i) => { const [a, b] = toS(x, y); if (i) ctx.lineTo(a, b); else ctx.moveTo(a, b); }); ctx.stroke(); }
+    ctx.setLineDash([]);
+  }
   // posición propuesta, pendiente de confirmar
   if (S.preview) drawPreview(S.preview);
   // impactos
@@ -260,4 +269,16 @@ function drawPreview(p) {
   ctx.restore();
   const name = p.mode === 'placeDef' ? DEFENSES[p.type].short : p.mode === 'placeJam' ? JAMMERS[p.type].short : TARGET_TYPES[p.type].name;
   labelAt(sx, sy + 16, '¿' + name + ' aquí? · ' + Math.round(surf(p.x, p.y)) + ' m', '#f2d48a');
+}
+
+/** Índice (en route.slice(1)) del próximo punto de la ruta para quien está en (x, y) sobre ella. */
+function segIndex(route, x, y) {
+  let best = 0, bd = Infinity;
+  for (let i = 1; i < route.length; i++) {
+    const [ax, ay] = route[i - 1], [bx, by] = route[i], L2 = (bx - ax) ** 2 + (by - ay) ** 2;
+    const k = L2 ? Math.max(0, Math.min(1, ((x - ax) * (bx - ax) + (y - ay) * (by - ay)) / L2)) : 0;
+    const d = Math.hypot(ax + (bx - ax) * k - x, ay + (by - ay) * k - y);
+    if (d < bd) { bd = d; best = i - 1; }
+  }
+  return best;
 }
