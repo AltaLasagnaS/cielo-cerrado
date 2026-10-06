@@ -131,6 +131,30 @@ try {
   assert.ok(box.want >= 2, 'el rectángulo de prueba abarca varias defensas: ' + box.want);
   assert.equal(await page.evaluate(() => window.__S.multi.length), box.want, 'selecciona las defensas de adentro');
   assert.equal(await page.evaluate(() => window.__S.box), null, 'y borra el rectángulo');
+  // traslado durante la partida (sim/mobility.js): sin datos no se ofrece; con datos (de prueba) se marca la
+  // ruta tocando el mapa, se confirma y la unidad se repliega
+  await page.evaluate(() => { window.__dbg.loadScenario('mb_noche'); window.__dbg.startSim(); });
+  const mv = await page.evaluate(() => { const u = window.__S.units.find(v => v.alive); window.__S.sel = { kind: 'def', id: u.id }; window.__dbg.renderAll(); return u.id; });
+  assert.match(await page.locator('#selCard').innerText(), /No se puede trasladar: no hay datos de despliegue/);
+  await page.evaluate(async id => { const { DEFENSES } = await import('/data/index.js'); const u = window.__S.units.find(v => v.id === id); DEFENSES[u.type].mob = { stowS: 60, deployS: 60, vmax: 60 }; window.__dbg.renderAll(); }, mv);
+  // la ficha no se reemplaza si no cambió (el refresco periódico la dejaba imposible de tocar en máquinas lentas)
+  const stable = await page.evaluate(() => new Promise(res => { const b = document.querySelector('#sMove'); setTimeout(() => res(!!b && b.isConnected), 600); }));
+  assert.ok(stable, 'el botón Trasladar sigue siendo el mismo después de varios refrescos');
+  await page.click('#sMove');
+  const dest = await page.evaluate(async id => {
+    const { toS } = await import('/render/view.js'); const r = document.querySelector('canvas').getBoundingClientRect(), u = window.__S.units.find(v => v.id === id);
+    const [c, d] = toS(u.x - 5, u.y + 2); return [r.left + c, r.top + d];   // 5 km hacia adentro del mapa
+  }, mv);
+  await page.mouse.click(dest[0], dest[1]);
+  assert.match(await page.locator('#modebar').textContent(), /Ruta de 1 punto/);
+  await page.click('#mbOk');
+  assert.match(await page.locator('#modebar').textContent(), /velocidad de marcha/, 'sin velocidad no ordena');
+  await page.waitForSelector('#mbKmh', { timeout: 4000 });
+  await page.fill('#mbKmh', '40');
+  await page.click('#mbOk');
+  assert.equal(await page.evaluate(id => window.__S.units.find(v => v.id === id).mob?.phase, mv), 'stow', 'se repliega');
+  assert.match(await page.locator('#modebar').textContent(), /se repliega/);
+  await page.evaluate(async id => { const { DEFENSES } = await import('/data/index.js'); delete DEFENSES[window.__S.units.find(v => v.id === id).type].mob; window.__dbg.loadScenario('mb_noche'); }, mv);
   // campaña (lógica de Codex, experimentos/catalogo-presupuesto): asignar, pedir y cargar munición, jugar la
   // guardia en el mapa y llegar al parte de cierre y a la guardia siguiente
   page.on('dialog', d => d.accept());
@@ -184,5 +208,5 @@ try {
   await page.click('#cNext');
   assert.match(await page.locator('#sheet').innerText(), /Tercera guardia/i, 'con "Tres guardias" llega a la tercera');
   assert.deepEqual(errors, []);
-  console.log('Interfaz: valores numéricos, atajos, Monte Carlo, Academia de pulsos, regla, selección múltiple y por rectángulo, campaña OK');
+  console.log('Interfaz: valores numéricos, atajos, Monte Carlo, Academia de pulsos, regla, selección múltiple y por rectángulo, traslado, campaña OK');
 } finally { await browser.close(); }

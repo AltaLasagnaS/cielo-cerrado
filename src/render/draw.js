@@ -10,7 +10,8 @@ import { surf } from '../physics/terrain.js';
 import { isOffmap, posAt } from '../physics/kinematics.js';
 import { profileOf, distAt } from '../physics/interceptor.js';
 import { S } from '../sim/state.js';
-import { contactOf, attackerKnows } from '../sim/contacts.js';
+import { contactOf, asAttackerSees, mobPhaseOf } from '../sim/contacts.js';
+import { MOB_PHASE } from '../sim/mobility.js';
 import { hooks } from '../sim/hooks.js';
 import { frameAt } from '../sim/replay.js';
 import { cv, ctx, dpr, V, toS } from './view.js';
@@ -43,7 +44,7 @@ export function draw() {
   // lugares
   ctx.font = '600 12px "IBM Plex Sans", sans-serif';
   for (const p of MAP.places || []) { const [sx, sy] = toS(p[1], p[2]); ctx.fillStyle = 'rgba(10,15,22,.75)'; ctx.fillRect(sx - 2, sy - 2, 4, 4); ctx.fillStyle = 'rgba(235,240,245,.85)'; ctx.fillText(p[0], sx + 5, sy + 4); }
-  const units = (R ? R.units : S.started ? S.units : S.setup.defs).filter(u => !av || attackerKnows(u, tNow));
+  const units = (R ? R.units : S.started ? S.units : S.setup.defs).map(u => av ? asAttackerSees(u, tNow) : u).filter(u => !!u);   // el atacante, donde la ubicó
   const jams = S.started ? S.jamsLive : S.setup.jams;
   // anillos de alcance y sectores
   for (const u of units) {
@@ -101,7 +102,17 @@ export function draw() {
     if (S.started && !dead && !av && (u.dmgRadar || u.dmgLauncher)) { ctx.strokeStyle = '#e6a53c'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(sx, sy, 12, 0, 7); ctx.stroke(); }   // dañada
     if (dead) { ctx.strokeStyle = '#ff5b4d'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(sx - 7, sy - 7); ctx.lineTo(sx + 7, sy + 7); ctx.moveTo(sx + 7, sy - 7); ctx.lineTo(sx - 7, sy + 7); ctx.stroke(); }
     const ammo = S.started && d.sam && u.alive && !av ? ' ' + u.magLeft : '';
-    labelAt(sx, sy, (u.name || d.short) + ammo, dead ? '#6b7888' : '#e6eef6');
+    const ph = !av && !dead ? mobPhaseOf(u) : null;   // trasladándose: fuera de servicio
+    labelAt(sx, sy, (u.name || d.short) + ammo + (ph ? ' · ' + MOB_PHASE[ph] : ''), dead ? '#6b7888' : ph ? '#e6a53c' : '#e6eef6');
+  }
+  // traslados: el que se está marcando y el resto del trayecto de los que están en camino (no en la vista del atacante)
+  if (!av) {
+    const paths = [];
+    if (S.mode === 'relocate' && S.relocate) { const u = S.units.find(v => v.id === S.relocate.id); if (u) paths.push([[u.x, u.y], ...S.relocate.pts]); }
+    if (!R) for (const u of S.units) if (u.alive && u.mob && typeof u.mob === 'object') paths.push([[u.x, u.y], ...u.mob.route.slice(1).filter((/** @type {number[]} */ p, /** @type {number} */ i) => u.mob.phase !== 'move' || i >= segIndex(u.mob.route, u.x, u.y))]);
+    ctx.strokeStyle = '#e6a53c'; ctx.lineWidth = 1.5; ctx.setLineDash([6, 4]);
+    for (const p of paths) { ctx.beginPath(); p.forEach(([x, y], i) => { const [a, b] = toS(x, y); if (i) ctx.lineTo(a, b); else ctx.moveTo(a, b); }); ctx.stroke(); }
+    ctx.setLineDash([]);
   }
   // posición propuesta, pendiente de confirmar
   if (S.preview) drawPreview(S.preview);
@@ -258,4 +269,16 @@ function drawPreview(p) {
   ctx.restore();
   const name = p.mode === 'placeDef' ? DEFENSES[p.type].short : p.mode === 'placeJam' ? JAMMERS[p.type].short : TARGET_TYPES[p.type].name;
   labelAt(sx, sy + 16, '¿' + name + ' aquí? · ' + Math.round(surf(p.x, p.y)) + ' m', '#f2d48a');
+}
+
+/** Índice (en route.slice(1)) del próximo punto de la ruta para quien está en (x, y) sobre ella. */
+function segIndex(route, x, y) {
+  let best = 0, bd = Infinity;
+  for (let i = 1; i < route.length; i++) {
+    const [ax, ay] = route[i - 1], [bx, by] = route[i], L2 = (bx - ax) ** 2 + (by - ay) ** 2;
+    const k = L2 ? Math.max(0, Math.min(1, ((x - ax) * (bx - ax) + (y - ay) * (by - ay)) / L2)) : 0;
+    const d = Math.hypot(ax + (bx - ax) * k - x, ay + (by - ay) * k - y);
+    if (d < bd) { bd = d; best = i - 1; }
+  }
+  return best;
 }

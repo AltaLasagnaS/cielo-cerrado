@@ -1686,6 +1686,9 @@ table.t.mc td.pc{white-space:nowrap}
     windAlpha: ["Exponente del viento con la altura (ley de potencia)", ""],
     windTop: ["Altura hasta la que crece el viento", "m"],
     optDay: ["Alcance óptico de día respecto de la noche", "×"],
+    "mob.stowS": ["Tiempo de repliegue (orden de marcha)", "s"],
+    "mob.deployS": ["Tiempo de despliegue (emplazamiento)", "s"],
+    "mob.vmax": ["Velocidad máxima en ruta (del vehículo más lento de la unidad)", "km/h"],
     gwLag: ["Demora agregada por la pasarela", "s"],
     gwPk: ["Pk de un disparo con pista que pasó por la pasarela (factor)", "×"],
     alt: ["Altitud de patrulla", "m"],
@@ -3505,6 +3508,10 @@ table.t.mc td.pc{white-space:nowrap}
       /** @type {any} */
       null
     ),
+    relocate: (
+      /** @type {any} */
+      null
+    ),
     box: (
       /** @type {any} */
       null
@@ -4198,9 +4205,9 @@ table.t.mc td.pc{white-space:nowrap}
   function groundSpeed(v, ux, uy, wind) {
     if (!wind || !(wind.v > 0)) return v;
     const a = wind.from * Math.PI / 180, wx = -wind.v * Math.sin(a), wy = wind.v * Math.cos(a);
-    const along = wx * ux + wy * uy, cross = wx * uy - wy * ux;
+    const along2 = wx * ux + wy * uy, cross = wx * uy - wy * ux;
     if (cross * cross >= v * v) return 0.1 * v;
-    return Math.max(0.1 * v, along + Math.sqrt(v * v - cross * cross));
+    return Math.max(0.1 * v, along2 + Math.sqrt(v * v - cross * cross));
   }
   function buildThreat(sv, k, tLaunch, wind = null) {
     const T = THREATS[sv.type];
@@ -4701,7 +4708,7 @@ table.t.mc td.pc{white-space:nowrap}
     S.rec = { ints: [], units: [], objs: [], log: [] };
   }
   function recUnit(u) {
-    S.rec?.units.push({ t: S.t, id: u.id, alive: u.alive, dmgRadar: u.dmgRadar, dmgLauncher: u.dmgLauncher, magLeft: u.magLeft });
+    S.rec?.units.push({ t: S.t, id: u.id, alive: u.alive, dmgRadar: u.dmgRadar, dmgLauncher: u.dmgLauncher, magLeft: u.magLeft, x: u.x, y: u.y, mob: u.mob?.phase ?? null });
   }
   function recObj(g) {
     S.rec?.objs.push({ t: S.t, id: g.id, hp: g.hp, status: g.status, hits: g.hits });
@@ -4733,7 +4740,8 @@ table.t.mc td.pc{white-space:nowrap}
       threats.push({ ...th, p, trail: trailAt(th, T), alive: true, lastNet: T });
     }
     const ints = S.rec.ints.filter((it) => it.tL <= T && T < it.tH).map((it) => ({ ...it, done: false }));
-    const units = stateAt(S.setup.defs.map((d) => ({ ...d, alive: true, dmgRadar: false, dmgLauncher: false, magLeft: d.mag })), S.rec.units, T);
+    const known2 = new Map(S.units.map((u) => [u.id, { emitFrom: u.emitFrom, revealed: u.revealed, fixes: u.fixes }]));
+    const units = stateAt(S.setup.defs.map((d) => ({ ...d, ...known2.get(d.id), alive: true, dmgRadar: false, dmgLauncher: false, magLeft: d.mag, mob: null })), S.rec.units, T);
     const objs = stateAt(S.setup.objs.map((g) => ({ ...g, hp: g.maxHp, status: "operational", hits: 0 })), S.rec.objs, T);
     const impacts = S.impacts.filter((im) => (im.t ?? 0) <= T);
     const log2 = S.rec.log.filter((l) => l.t <= T);
@@ -4758,13 +4766,75 @@ table.t.mc td.pc{white-space:nowrap}
     return Math.hypot(d1 * a.sigma * r, d2 * b.sigma * r) / sin;
   }
 
+  // src/sim/contacts.js
+  var TRACK_AGE = 12;
+  var LOST_AGE = 90;
+  function noteSeen(th, t, by) {
+    const p = th.p;
+    if (!p) return;
+    if (th.seen && t - th.seen.t > 0.5) th.seenPrev = th.seen;
+    th.seen = { x: p.x, y: p.y, z: p.z, t, by };
+  }
+  function noteObs(th, key2, t) {
+    const p = th.p;
+    if (!p) return;
+    const m = th.obs || (th.obs = {}), o = m[key2] || (m[key2] = { s: null, q: null });
+    if (o.s && t - o.s.t > 0.5) o.q = o.s;
+    o.s = { x: p.x, y: p.y, z: p.z, t };
+  }
+  function contactOf(th, t) {
+    const s = th.seen;
+    if (!s) return null;
+    const age = t - s.t;
+    if (age < 0 || age > LOST_AGE) return null;
+    const q = th.seenPrev, dt = q ? s.t - q.t : 0;
+    const vx = dt > 0 ? (s.x - q.x) / dt : 0, vy = dt > 0 ? (s.y - q.y) / dt : 0, vz = dt > 0 ? (s.z - q.z) / dt : 0;
+    const lost = age > TRACK_AGE || !th.alive;
+    const k = lost ? 0 : age;
+    return { x: s.x + vx * k, y: s.y + vy * k, z: s.z + vz * k, vx, vy, v: Math.hypot(vx, vy) * 1e3, age, lost, by: s.by };
+  }
+  function attackerKnows(u, t) {
+    if (attackerPos(u, t)) return true;
+    if (u.emitFrom != null && u.emitFrom <= t) return true;
+    return u.revealed != null && u.revealed <= t;
+  }
+  function noteFix(u, t) {
+    const f = u.fixes || (u.fixes = []), l = f[f.length - 1];
+    if (!l || l.x !== u.x || l.y !== u.y) f.push({ t, x: u.x, y: u.y });
+  }
+  function attackerPos(u, t) {
+    let p = null;
+    for (const f of u.fixes || []) if (f.t <= t) p = f;
+    return p;
+  }
+  function asAttackerSees(u, t) {
+    if (!attackerKnows(u, t)) return null;
+    const p = attackerPos(u, t);
+    return p ? { ...u, x: p.x, y: p.y } : u;
+  }
+  var mobPhaseOf = (u) => typeof u.mob === "string" ? u.mob : u.mob?.phase ?? null;
+  var isEmitter = (r) => !!r && r.band !== "ACU" && r.band !== "OPT";
+  var EMCON = { siempre: "Emite siempre", alerta: "Se enciende con la primera alerta de la red", silencio: "En silencio (solo pistas de la red)" };
+  function emitting(u, t) {
+    if (u.mob) return false;
+    const m = u.emcon;
+    if (!m || m === "siempre" || !isEmitter(D(u).radar)) return true;
+    if (m === "silencio") return false;
+    if (u.c2 === "desconectada") return false;
+    const cp = u.cp || "";
+    return S.threats.some((th) => {
+      const c = cp ? th.cueCp?.[cp] : th.cueFirst;
+      return c != null && c <= t;
+    });
+  }
+
   // src/sim/ew.js
   var EW_DT = 5;
   function strobes(j) {
     const JJ = JAMMERS[j.type], out = [];
     for (const u of S.units) {
       const r = D(u).radar;
-      if (!u.alive || !r || r.band === "ACU" || r.band === "OPT") continue;
+      if (!u.alive || u.mob || !r || r.band === "ACU" || r.band === "OPT") continue;
       if (JJ.side !== "both" && sideOf(u) === JJ.side) continue;
       const p = jamPos(j), J = j.mode === "drfm" ? JJ.bands.includes(r.band) ? Math.max(0, drfmJ(u, j) ?? 0) : 0 : jamJ(u, azOf(p[0] - u.x, p[1] - u.y), [j]);
       if (J >= STROBE_J) out.push({ u, x: u.x, y: u.y, sigma: bearingSigma(BANDS[r.band].bw, J), J });
@@ -4820,6 +4890,7 @@ table.t.mc td.pc{white-space:nowrap}
         S.stats.shots++;
         S.stats.defCost += sm.cost;
         u.revealed ?? (u.revealed = t);
+        noteFix(u, t);
         S.hoj.push({ u, j, tH: t + timeTo(profileOf(sm), d * 1e3) });
         j.hojBusy = true;
         log("l", uLabel(u) + " dispara un misil home-on-jam contra el " + JJ.short + " a " + d.toFixed(0) + " km.", "def");
@@ -4847,54 +4918,105 @@ table.t.mc td.pc{white-space:nowrap}
     }
   }
 
-  // src/sim/contacts.js
-  var TRACK_AGE = 12;
-  var LOST_AGE = 90;
-  function noteSeen(th, t, by) {
-    const p = th.p;
-    if (!p) return;
-    if (th.seen && t - th.seen.t > 0.5) th.seenPrev = th.seen;
-    th.seen = { x: p.x, y: p.y, z: p.z, t, by };
+  // src/sim/mobility.js
+  var MOB_PHASE = { stow: "replegando", move: "en tránsito", deploy: "desplegando" };
+  var finite = (v, lo) => typeof v === "number" && Number.isFinite(v) && v >= lo;
+  function mobData(u) {
+    const m = D(u).mob;
+    return m && finite(m.stowS, 0) && finite(m.deployS, 0) && finite(m.vmax, 1e-9) ? m : null;
   }
-  function noteObs(th, key2, t) {
-    const p = th.p;
-    if (!p) return;
-    const m = th.obs || (th.obs = {}), o = m[key2] || (m[key2] = { s: null, q: null });
-    if (o.s && t - o.s.t > 0.5) o.q = o.s;
-    o.s = { x: p.x, y: p.y, z: p.z, t };
+  function cantMove(u) {
+    if (!u.alive) return "está destruida";
+    if (D(u).kind === "aew") return "es una plataforma aérea";
+    if (!mobData(u)) return "no hay datos de despliegue y repliegue para " + D(u).short;
+    if (u.mob) return "ya se está trasladando";
+    if (u.active > 0) return "tiene misiles en vuelo que guía";
+    return null;
   }
-  function contactOf(th, t) {
-    const s = th.seen;
-    if (!s) return null;
-    const age = t - s.t;
-    if (age < 0 || age > LOST_AGE) return null;
-    const q = th.seenPrev, dt = q ? s.t - q.t : 0;
-    const vx = dt > 0 ? (s.x - q.x) / dt : 0, vy = dt > 0 ? (s.y - q.y) / dt : 0, vz = dt > 0 ? (s.z - q.z) / dt : 0;
-    const lost = age > TRACK_AGE || !th.alive;
-    const k = lost ? 0 : age;
-    return { x: s.x + vx * k, y: s.y + vy * k, z: s.z + vz * k, vx, vy, v: Math.hypot(vx, vy) * 1e3, age, lost, by: s.by };
+  var routeKm = (pts) => {
+    let L = 0;
+    for (let i = 1; i < pts.length; i++) L += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+    return L;
+  };
+  function along(pts, d) {
+    for (let i = 1; i < pts.length; i++) {
+      const [ax, ay] = pts[i - 1], [bx, by] = pts[i], L = Math.hypot(bx - ax, by - ay);
+      if (d <= L && L > 0) return [ax + (bx - ax) * d / L, ay + (by - ay) * d / L];
+      d -= L;
+    }
+    return pts[pts.length - 1];
   }
-  function attackerKnows(u, t) {
-    if (u.emitFrom != null && u.emitFrom <= t) return true;
-    return u.revealed != null && u.revealed <= t;
+  function orderMove(u, pts, kmh2, t = S.t) {
+    const why = cantMove(u);
+    if (why) return why;
+    if (!Array.isArray(pts) || !pts.length) return "la ruta está vacía";
+    if (pts.length > 50) return "la ruta tiene más de 50 puntos";
+    for (const p of pts) if (!Array.isArray(p) || p.length !== 2 || !finite(p[0], 0) || !finite(p[1], 0) || p[0] > MAP.wKm || p[1] > MAP.hKm) return "la ruta sale del mapa";
+    if (!finite(t, 0)) return "el instante de la orden no es válido";
+    if (!finite(kmh2, 1e-9)) return "falta la velocidad de marcha";
+    const m = (
+      /** @type {any} */
+      mobData(u)
+    ), route = [[u.x, u.y], ...pts.map((p) => [+p[0], +p[1]])], v = Math.min(kmh2, m.vmax);
+    const L = routeKm(route), tMove = t + m.stowS, tDeploy = tMove + L / v * 3600;
+    u.mob = { phase: "stow", route, km: L, kmh: v, tMove, tDeploy, tReady: tDeploy + m.deployS };
+    u.reloadUntil = null;
+    recUnit(u);
+    log("l", `${u.name} se repliega para trasladarse ${L.toFixed(1)} km a ${Math.round(v)} km/h (listo en ${Math.round((u.mob.tReady - t) / 60)} min).`, "def");
+    return null;
   }
-  var isEmitter = (r) => !!r && r.band !== "ACU" && r.band !== "OPT";
-  var EMCON = { siempre: "Emite siempre", alerta: "Se enciende con la primera alerta de la red", silencio: "En silencio (solo pistas de la red)" };
-  function emitting(u, t) {
-    const m = u.emcon;
-    if (!m || m === "siempre" || !isEmitter(D(u).radar)) return true;
-    if (m === "silencio") return false;
-    if (u.c2 === "desconectada") return false;
-    const cp = u.cp || "";
-    return S.threats.some((th) => {
-      const c = cp ? th.cueCp?.[cp] : th.cueFirst;
-      return c != null && c <= t;
-    });
+  function advance(u, t) {
+    const m = u.mob;
+    if (!m) return false;
+    if (m.phase === "stow" && t >= m.tMove) {
+      m.phase = "move";
+      recUnit(u);
+    }
+    if (m.phase === "move") {
+      const [x, y] = along(m.route, Math.min(m.km, (Math.min(t, m.tDeploy) - m.tMove) / 3600 * m.kmh));
+      u.x = x;
+      u.y = y;
+      if (t - (m.rec ?? -1e9) >= 5) {
+        m.rec = t;
+        recUnit(u);
+      }
+      if (t >= m.tDeploy) {
+        const end = m.route[m.route.length - 1];
+        u.x = end[0];
+        u.y = end[1];
+        m.phase = "deploy";
+        recUnit(u);
+      }
+    }
+    if (m.phase === "deploy" && t >= m.tReady) {
+      u.freeAt = m.tReady;
+      u.mob = null;
+      u.nextScan = t;
+      recUnit(u);
+      log("l", `${u.name} queda desplegada en su nueva posición.`, "def");
+      return true;
+    }
+    return false;
+  }
+  function mobStep(t) {
+    for (const u of S.units) {
+      if (!u.alive) {
+        if (u.mob) u.mob = null;
+        continue;
+      }
+      for (let k = 0; k < 25; k++) {
+        advance(u, t);
+        const plan = u.moves;
+        if (u.mob || !plan || !plan.length || plan[0].t > t) break;
+        const mv = plan.shift(), why = orderMove(u, mv.pts, mv.kmh, Math.max(mv.t, u.freeAt ?? -Infinity));
+        if (why) log("w", `${u.name} no puede cumplir el traslado programado: ${why}.`, "def");
+      }
+    }
   }
 
   // src/sim/engine.js
   function startSim() {
-    S.units = S.setup.defs.map((d) => ({ ...d, alive: true, hp: d.hp ?? UNIT_TARGET.hp, dmgRadar: !!d.dmgRadar, dmgLauncher: !!d.dmgLauncher, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
+    S.units = S.setup.defs.map((d) => ({ ...d, moves: d.moves ? structuredClone(d.moves) : void 0, mob: null, alive: true, hp: d.hp ?? UNIT_TARGET.hp, dmgRadar: !!d.dmgRadar, dmgLauncher: !!d.dmgLauncher, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
     S.jamsLive = S.setup.jams.map((j) => ({ ...j, _losMap: {}, hp: UNIT_TARGET.hp }));
     S.hoj = [];
     S.ewNext = 0;
@@ -4954,6 +5076,7 @@ table.t.mc td.pc{white-space:nowrap}
     const t = S.t + dt;
     S.t = t;
     wxStep(t);
+    mobStep(t);
     while (S.pending.length && S.pending[0].tLaunch <= t) {
       const th = S.pending.shift();
       th.alive = true;
@@ -5012,13 +5135,16 @@ table.t.mc td.pc{white-space:nowrap}
       }
     }
     for (const u of S.units) {
-      if (!u.alive) continue;
+      if (!u.alive || u.mob) continue;
       const d = D(u);
       if (!d.radar) continue;
       if (!emitting(u, t)) continue;
       if (t < u.nextScan) continue;
       u.nextScan = t + d.radar.scan;
-      if (isEmitter(d.radar)) u.emitFrom ?? (u.emitFrom = t);
+      if (isEmitter(d.radar)) {
+        u.emitFrom ?? (u.emitFrom = t);
+        noteFix(u, t);
+      }
       const r = d.radar, uz = antZ(u), wx = wxNow();
       const keep4 = r.scan * 2 + 0.6, cap = r.tracks ?? Infinity, fake = falseTracks(u, S.jamsLive);
       u.fake = fake;
@@ -5107,7 +5233,7 @@ table.t.mc td.pc{white-space:nowrap}
       }
     }
     for (const u of S.units) {
-      if (!u.alive || !D(u).sam) continue;
+      if (!u.alive || !D(u).sam || u.mob) continue;
       if (u.reloadUntil !== null && t >= u.reloadUntil) {
         const n2 = Math.min(u.mag, u.reserveLeft);
         u.magLeft += n2;
@@ -5136,7 +5262,7 @@ table.t.mc td.pc{white-space:nowrap}
       log("x", it.shot + " de " + uLabel(it.u) + " aborta: " + label(it.th) + " bajó de su piso de enfrentamiento.", "def", it.shot + " de " + uLabel(it.u) + " aborta: la " + pista(it.th) + " bajó de su piso de enfrentamiento.");
     }
     for (const u of S.units) {
-      if (!u.alive || !D(u).sam || u.dmgLauncher || u.magLeft <= 0) continue;
+      if (!u.alive || !D(u).sam || u.mob || u.dmgLauncher || u.magLeft <= 0) continue;
       if (t < u.nextEval) continue;
       u.nextEval = t + 1;
       engage(u, t);
@@ -5303,6 +5429,7 @@ table.t.mc td.pc{white-space:nowrap}
         S.stats.defCost += sm.cost;
         recUnit(u);
         u.revealed ?? (u.revealed = t);
+        noteFix(u, t);
         S.stats.byUnit[uLabel(u)] = (S.stats.byUnit[uLabel(u)] || 0) + 1;
       }
       event("Primer interceptor lanzado: " + uLabel(u) + " contra " + label(th), "firstShot");
@@ -5327,6 +5454,7 @@ table.t.mc td.pc{white-space:nowrap}
       S.stats.defCost += sm.cost;
       recUnit(u);
       u.revealed ?? (u.revealed = t);
+      noteFix(u, t);
     }
     log("w", uLabel(u) + " dispara " + n2 + "× " + sm.shot + " contra un falso blanco (engaño DRFM).", "def", uLabel(u) + " dispara " + n2 + "× " + sm.shot + " contra una pista.");
     if (u.magLeft === 0) log("w", uLabel(u) + " se queda sin munición.", "def");
@@ -5369,7 +5497,7 @@ table.t.mc td.pc{white-space:nowrap}
       S.fx.push({ x, y, rt: performance.now(), c: "#ff5b4d", big: true });
       let msg = label(th) + " impacta en el blanco", alt = "Impacto" + (th.firstDet === null ? " de un arma no detectada" : " de la " + pista(th));
       if (th.targetUnit) {
-        const u = S.units.find((v) => v.id === th.targetUnit && v.alive);
+        const u = S.units.find((v) => v.id === th.targetUnit && v.alive && (v.x === tg[0] && v.y === tg[1] || Math.hypot(v.x - x, v.y - y) * 1e3 <= (th.T.hitR || (th.cls === "dron" ? 20 : 50))));
         if (u) {
           u.alive = false;
           recUnit(u);
@@ -5813,7 +5941,7 @@ table.t.mc td.pc{white-space:nowrap}
       ctx.fillStyle = "rgba(235,240,245,.85)";
       ctx.fillText(p[0], sx + 5, sy + 4);
     }
-    const units = (R ? R.units : S.started ? S.units : S.setup.defs).filter((u) => !av || attackerKnows(u, tNow));
+    const units = (R ? R.units : S.started ? S.units : S.setup.defs).map((u) => av ? asAttackerSees(u, tNow) : u).filter((u) => !!u);
     const jams = S.started ? S.jamsLive : S.setup.jams;
     for (const u of units) {
       const d = D(u);
@@ -5970,7 +6098,31 @@ table.t.mc td.pc{white-space:nowrap}
         ctx.stroke();
       }
       const ammo = S.started && d.sam && u.alive && !av ? " " + u.magLeft : "";
-      labelAt(sx, sy, (u.name || d.short) + ammo, dead ? "#6b7888" : "#e6eef6");
+      const ph = !av && !dead ? mobPhaseOf(u) : null;
+      labelAt(sx, sy, (u.name || d.short) + ammo + (ph ? " · " + MOB_PHASE[ph] : ""), dead ? "#6b7888" : ph ? "#e6a53c" : "#e6eef6");
+    }
+    if (!av) {
+      const paths2 = [];
+      if (S.mode === "relocate" && S.relocate) {
+        const u = S.units.find((v) => v.id === S.relocate.id);
+        if (u) paths2.push([[u.x, u.y], ...S.relocate.pts]);
+      }
+      if (!R) {
+        for (const u of S.units) if (u.alive && u.mob && typeof u.mob === "object") paths2.push([[u.x, u.y], ...u.mob.route.slice(1).filter((p, i) => u.mob.phase !== "move" || i >= segIndex(u.mob.route, u.x, u.y))]);
+      }
+      ctx.strokeStyle = "#e6a53c";
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([6, 4]);
+      for (const p of paths2) {
+        ctx.beginPath();
+        p.forEach(([x, y], i) => {
+          const [a, b] = toS(x, y);
+          if (i) ctx.lineTo(a, b);
+          else ctx.moveTo(a, b);
+        });
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
     }
     if (S.preview) drawPreview(S.preview);
     for (const im of R ? R.impacts : S.impacts) {
@@ -6299,6 +6451,19 @@ table.t.mc td.pc{white-space:nowrap}
     ctx.restore();
     const name = p.mode === "placeDef" ? DEFENSES[p.type].short : p.mode === "placeJam" ? JAMMERS[p.type].short : TARGET_TYPES[p.type].name;
     labelAt(sx, sy + 16, "¿" + name + " aquí? · " + Math.round(surf(p.x, p.y)) + " m", "#f2d48a");
+  }
+  function segIndex(route, x, y) {
+    let best = 0, bd = Infinity;
+    for (let i = 1; i < route.length; i++) {
+      const [ax, ay] = route[i - 1], [bx, by] = route[i], L2 = (bx - ax) ** 2 + (by - ay) ** 2;
+      const k = L2 ? Math.max(0, Math.min(1, ((x - ax) * (bx - ax) + (y - ay) * (by - ay)) / L2)) : 0;
+      const d = Math.hypot(ax + (bx - ax) * k - x, ay + (by - ay) * k - y);
+      if (d < bd) {
+        bd = d;
+        best = i - 1;
+      }
+    }
+    return best;
   }
 
   // src/render/view.js
@@ -7950,7 +8115,7 @@ table.t.mc td.pc{white-space:nowrap}
       } while (state.commands.some((row) => row.commandId === value));
       return value;
     }
-    function advance(state, missionSeconds) {
+    function advance2(state, missionSeconds) {
       const atSeconds = addSeconds(originSeconds, seconds(missionSeconds, "tiempo de misión"));
       if (atSeconds < state.clockSeconds) throw Error("Reloj de misión retrocede");
       if (atSeconds === state.clockSeconds) return state;
@@ -7965,7 +8130,7 @@ table.t.mc td.pc{white-space:nowrap}
         return current3;
       }
       if (current3.phase !== "active") throw Error("La sesión de combate terminó");
-      let next2 = advance(current3, request.missionSeconds);
+      let next2 = advance2(current3, request.missionSeconds);
       next2 = applyCampaignCommand(next2, command2);
       current3 = next2;
       return current3;
@@ -7985,7 +8150,7 @@ table.t.mc td.pc{white-space:nowrap}
       advance(request) {
         exact4(request, ["missionSeconds"], "Reloj");
         if (current3.phase !== "active") throw Error("La sesión de combate terminó");
-        const next2 = advance(current3, request.missionSeconds);
+        const next2 = advance2(current3, request.missionSeconds);
         current3 = next2;
         return current3;
       },
@@ -9714,6 +9879,10 @@ table.t.mc td.pc{white-space:nowrap}
     };
     return true;
   }
+  var lastDef = { html: "", node: (
+    /** @type {Element | null} */
+    null
+  ) };
   function renderSel(live) {
     const el = $("#selCard");
     const sel = S.sel;
@@ -9738,11 +9907,11 @@ table.t.mc td.pc{white-space:nowrap}
           S.sel = null;
           return renderSel();
         }
-        el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(d.short)}</b><dl class="kv"><dt>Posición</dt><dd>${u.x.toFixed(1)}, ${u.y.toFixed(1)} km</dd>${r && r.band !== "ACU" && r.band !== "OPT" ? `<dt>Radar</dt><dd>${esc(r.name)} · ${r.band}</dd>` : ""}${d.sam ? `<dt>Alcance (catálogo)</dt><dd>${d.sam.maxR} km</dd>` : ""}<dt>Estado</dt><dd>desconocido</dd></dl><p class="hint">Vista del atacante: ${u.emitFrom != null && u.emitFrom <= S.t ? "ubicada por su emisión de radar" : "ubicada al disparar"}. No se sabe si está dañada ni cuánta munición le queda.</p>`;
+        el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(d.short)}</b><dl class="kv"><dt>Última posición conocida</dt><dd>${(asAttackerSees(u, S.t) ?? u).x.toFixed(1)}, ${(asAttackerSees(u, S.t) ?? u).y.toFixed(1)} km</dd>${r && r.band !== "ACU" && r.band !== "OPT" ? `<dt>Radar</dt><dd>${esc(r.name)} · ${r.band}</dd>` : ""}${d.sam ? `<dt>Alcance (catálogo)</dt><dd>${d.sam.maxR} km</dd>` : ""}<dt>Estado</dt><dd>desconocido</dd></dl><p class="hint">Vista del atacante: ${u.emitFrom != null && u.emitFrom <= S.t ? "ubicada por su emisión de radar" : "ubicada al disparar"}. No se sabe si está dañada ni cuánta munición le queda.</p>`;
         return;
       }
       let html = `<h3>Selección</h3><div class="row" style="justify-content:space-between"><b style="font-size:15px">${esc(u.name)}</b><span class="chip ${d.side === "RU" ? "ru" : "ua"}">${esc(d.short)}</span></div>
-      <dl class="kv"><dt>Posición</dt><dd>${u.x.toFixed(1)}, ${u.y.toFixed(1)} km</dd><dt>Lat/Lon</dt><dd>${ll[0].toFixed(3)}°, ${ll[1].toFixed(3)}°</dd><dt>Terreno</dt><dd>${ground} m</dd>`;
+      <dl class="kv"><dt>Posición</dt><dd>${u.x.toFixed(1)}, ${u.y.toFixed(1)} km</dd>${S.started && mobPhaseOf(u) ? `<dt>Traslado</dt><dd>${MOB_PHASE[mobPhaseOf(u)]}: no detecta ni dispara</dd>` : ""}<dt>Lat/Lon</dt><dd>${ll[0].toFixed(3)}°, ${ll[1].toFixed(3)}°</dd><dt>Terreno</dt><dd>${ground} m</dd>`;
       if (r && r.band !== "ACU") {
         const hor = horizon(antZ(u) - (d.kind === "aew" ? 0 : ground), 50);
         html += `<dt>Radar</dt><dd>${esc(r.name)} · ${r.band}</dd><dt>Horizonte vs blanco a 50 m</dt><dd>${hor.toFixed(0)} km</dd>`;
@@ -9773,9 +9942,19 @@ table.t.mc td.pc{white-space:nowrap}
         if (d.sam) html += `<div class="field" title="Los radares de tiro aprenden a distinguir señuelos con el tiempo de seguimiento; la decisión usa esa clasificación, que a veces se equivoca."><label for="sDec">Pistas clasificadas como señuelo</label><select id="sDec" class="sel"><option value="" ${!u.decoyDoc ? "selected" : ""}>Como la regla general (${S.ignoreDecoys ? "no tirarles" : "tirarles"})</option><option value="ignorar" ${u.decoyDoc === "ignorar" ? "selected" : ""}>No tirarles</option><option value="tirar" ${u.decoyDoc === "tirar" ? "selected" : ""}>Tirarles igual</option></select></div>`;
         if (d.sam) html += `<label class="check"><input type="checkbox" id="sNoD" ${u.noDrones ? "checked" : ""}> No gastar en drones (reservar para misiles)</label><div class="field"><label for="sMag">Munición disponible</label><input id="sMag" class="inp" type="number" min="1" max="200" value="${u.mag}"></div><div class="field"><label for="sRes">Reserva para recargar (${Math.round(d.sam.reloadS / 60)} min por recarga)</label><input id="sRes" class="inp" type="number" min="0" max="500" value="${u.reserve ?? 0}"></div><div class="field"><label for="sSal">Interceptores por blanco</label><input id="sSal" class="inp" type="number" min="1" max="4" value="${u.salvo}"></div>`;
       }
-      html += `<div class="row"><button class="btn sm" id="sInfo">Ficha</button>${ed ? '<button class="btn sm danger" id="sDel">Eliminar</button>' : ""}</div>`;
+      const canOrder = S.started && !S.replay && u.alive && !mobPhaseOf(u);
+      const why = canOrder ? campaignBattle() ? "en la campaña todavía no hay traslados" : cantMove(u) : null;
+      html += `<div class="row"><button class="btn sm" id="sInfo">Ficha</button>${ed ? '<button class="btn sm danger" id="sDel">Eliminar</button>' : ""}${canOrder && !why ? '<button class="btn sm" id="sMove" title="Replegar, viajar por la ruta que marques y desplegar. Mientras tanto no detecta ni dispara.">Trasladar</button>' : ""}</div>`;
+      if (canOrder && why) html += `<p class="hint">No se puede trasladar: ${esc(why)}.</p>`;
+      if (live && lastDef.node && el.firstElementChild === lastDef.node && lastDef.html === html) return;
       el.innerHTML = html;
+      lastDef.html = html;
+      lastDef.node = el.firstElementChild;
       $("#sInfo").onclick = () => openFicha("def", u.type);
+      if ($("#sMove")) $("#sMove").onclick = () => {
+        S.relocate = { id: u.id, pts: [] };
+        setMode("relocate");
+      };
       if (ed) {
         const bind = (id2, k, cov) => {
           const i = $(id2);
@@ -10209,6 +10388,7 @@ table.t.mc td.pc{white-space:nowrap}
     S.placeType = type || null;
     S.preview = null;
     if (m !== "route") S.route = null;
+    if (m !== "relocate") S.relocate = null;
     if (m !== "measure") S.measure = null;
     updateModebar();
     renderTabs();
@@ -10254,6 +10434,12 @@ table.t.mc td.pc{white-space:nowrap}
       cancelTxt = "Cancelar";
     } else if (P) {
       html = `Tocá el mapa donde quieras ubicar <b>${esc(P.name(S.placeType))}</b>; vas a poder confirmar o cancelar.`;
+    } else if (S.mode === "relocate") {
+      const r = S.relocate, n2 = r?.pts.length ?? 0, u = r && S.units.find((v) => v.id === r.id), vmax = u ? mobData(u)?.vmax : null;
+      html = n2 ? `Ruta de <b>${n2} punto${n2 > 1 ? "s" : ""}</b>: el último es el destino. Tocá más puntos o confirmá.` : "Tocá el mapa para marcar la <b>ruta del traslado</b> (el último punto es el destino).";
+      html += ` <label class="dim" for="mbKmh">Marcha</label> <input id="mbKmh" class="inp" type="number" min="1" max="${vmax ?? ""}" step="1" style="width:70px" placeholder="km/h" value="${r?.kmh ?? ""}" title="Velocidad de marcha que ordenás, en km/h (máximo ${vmax ?? "?"} km/h, la del vehículo más lento)"> <span class="dim">km/h (máx ${vmax ?? "?"})</span>`;
+      if (n2) ok = finishRelocate;
+      cancelTxt = "Cancelar";
     } else if (S.mode === "measure") {
       const m = S.measure;
       if (m?.a && m.b) {
@@ -10281,6 +10467,10 @@ table.t.mc td.pc{white-space:nowrap}
     }
     mb.innerHTML = html + (ok ? ' <button class="btn sm pri" id="mbOk">Confirmar</button>' : "") + ` <button class="btn sm" id="mbX">${cancelTxt}</button>`;
     $("#mbX").onclick = cancel;
+    const kIn = $("#mbKmh");
+    if (kIn) kIn.oninput = () => {
+      if (S.relocate) S.relocate.kmh = +kIn.value || null;
+    };
     if (ok) $("#mbOk").onclick = ok;
   }
   function finishRoute() {
@@ -10294,6 +10484,18 @@ table.t.mc td.pc{white-space:nowrap}
     renderAtk();
     renderSel();
     schedCov();
+  }
+  function finishRelocate() {
+    const r = S.relocate, u = r && S.units.find((v) => v.id === r.id);
+    if (!u || !r.pts.length) return;
+    if (!(r.kmh > 0)) {
+      toast("Escribí la velocidad de marcha (km/h).");
+      return;
+    }
+    const why = orderMove(u, r.pts, r.kmh);
+    setMode("select");
+    renderSel();
+    toast(why ? "No se puede trasladar: " + why + "." : `${u.name} se repliega para trasladarse.`);
   }
   var toastT = null;
   function toast(m) {
@@ -10530,8 +10732,9 @@ table.t.mc td.pc{white-space:nowrap}
       }
     }
     const av = S.started && !S.replay && isAttackerView();
-    for (const u of units) {
-      if (av && !attackerKnows(u, S.t)) continue;
+    for (const u0 of units) {
+      const u = av ? asAttackerSees(u0, S.t) : u0;
+      if (!u) continue;
       const [a, b] = toS(u.x, u.y);
       if (Math.hypot(a - sx, b - sy) < 11) return { kind: "def", id: u.id };
     }
@@ -10575,6 +10778,11 @@ table.t.mc td.pc{white-space:nowrap}
         m.a = p;
         m.b = null;
       } else m.b = p;
+      updateModebar();
+      return;
+    }
+    if (S.mode === "relocate") {
+      if (S.relocate && S.relocate.pts.length < 50) S.relocate.pts.push([+wx.toFixed(2), +wy.toFixed(2)]);
       updateModebar();
       return;
     }
@@ -10746,6 +10954,7 @@ table.t.mc td.pc{white-space:nowrap}
       if (e.key === "Enter") {
         if (S.preview) confirmPlacement();
         else if (S.mode === "route") finishRoute();
+        else if (S.mode === "relocate") finishRelocate();
       }
       if (e.key === " ") {
         e.preventDefault();
@@ -10867,7 +11076,7 @@ table.t.mc td.pc{white-space:nowrap}
     return r;
   };
   var OBJ_KEYS = ["id", "type", "x", "y", "name", "short", "maxHp", "desc", "cp", "hpNow"];
-  var DEF_KEYS = ["id", "type", "x", "y", "name", "az", "mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2", "cp", "decoyDoc", "owner", "emcon", "hp", "dmgRadar", "dmgLauncher"];
+  var DEF_KEYS = ["id", "type", "x", "y", "name", "az", "mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2", "cp", "decoyDoc", "owner", "emcon", "hp", "dmgRadar", "dmgLauncher", "moves"];
   var SALVO_KEYS = ["id", "type", "count", "interval", "tStart", "sync", "tArrive", "agl", "launchDist", "maneuver", "decoys", "link", "crpa", "pts", "targetUnit", "targetObj"];
   var JAM_KEYS = ["id", "type", "x", "y", "alt", "on", "mode", "target"];
   var META_KEYS = ["name", "player", "time", "description", "forces", "conditions", "rulesText", "goals", "success", "failure"];
@@ -11002,6 +11211,24 @@ table.t.mc td.pc{white-space:nowrap}
       pos(w, g.x, g.y);
       return { id: id2(w, g.id), type: g.type, x: g.x, y: g.y, name: str(w + " · name", g.name, 120, false), short: str(w + " · short", g.short, 60), maxHp: num2(w + " · maxHp", g.maxHp, 1, 1e5, { opt: true }), desc: str(w + " · desc", g.desc, 1e3), cp: str(w + " · cp", g.cp, 20) || void 0, hpNow: num2(w + " · hpNow", g.hpNow, 0, 1e5, { opt: true }) };
     });
+    const movesOf = (w, mv) => {
+      if (mv === void 0) return void 0;
+      if (!Array.isArray(mv) || mv.length > 20) {
+        err(`${w} · moves: tiene que ser una lista de hasta 20 traslados.`);
+        return void 0;
+      }
+      let last3 = -1;
+      return mv.map((m2, k) => {
+        const ww = `${w}, traslado ${k + 1}`, t = num2(ww + " · t", m2?.t, 0, 86400), kmh2 = num2(ww + " · kmh (velocidad de marcha)", m2?.kmh, 1, 200);
+        if (t != null && t < last3) err(`${ww}: los traslados van en orden de tiempo.`);
+        last3 = t ?? last3;
+        if (!Array.isArray(m2?.pts) || m2.pts.length < 1 || m2.pts.length > 50) {
+          err(`${ww}: la ruta ("pts") necesita entre 1 y 50 puntos.`);
+          return null;
+        }
+        return { t, kmh: kmh2, pts: m2.pts.map((p, j) => Array.isArray(p) && pos(`${ww}, punto ${j + 1}`, p[0], p[1]) ? [p[0], p[1]] : null) };
+      });
+    };
     const defs = list4("defs", setup.defs).map((u, i) => {
       const w = `Defensa ${i + 1}${typeof u.name === "string" ? " (" + u.name + ")" : ""}`;
       if (!DEFENSES[u.type]) {
@@ -11030,7 +11257,8 @@ table.t.mc td.pc{white-space:nowrap}
         dmgRadar: bool(w + " · dmgRadar", u.dmgRadar),
         dmgLauncher: bool(w + " · dmgLauncher", u.dmgLauncher),
         emcon: u.emcon === void 0 ? void 0 : ["siempre", "alerta", "silencio"].includes(u.emcon) ? u.emcon : (err(`${w} · emcon: "${String(u.emcon)}" no es "siempre", "alerta" ni "silencio".`), void 0),
-        c2: u.c2 === void 0 ? void 0 : C2_LEVELS[u.c2] ? u.c2 : (err(`${w} · c2: "${String(u.c2)}" no es un nivel de C2 válido (${Object.keys(C2_LEVELS).join(", ")}).`), void 0)
+        c2: u.c2 === void 0 ? void 0 : C2_LEVELS[u.c2] ? u.c2 : (err(`${w} · c2: "${String(u.c2)}" no es un nivel de C2 válido (${Object.keys(C2_LEVELS).join(", ")}).`), void 0),
+        moves: movesOf(w, u.moves)
       };
     });
     const objIds = new Set(objs.filter(Boolean).map((g) => g.id)), defIds = new Set(defs.filter(Boolean).map((u) => u.id));
@@ -11163,6 +11391,7 @@ table.t.mc td.pc{white-space:nowrap}
     for (const d of data.setup.defs) {
       const u = addDef(d.type, d.x, d.y, { name: d.name, az: d.az });
       for (const k of ["mast", "alt", "mag", "salvo", "noDrones", "link", "reserve", "c2", "cp", "decoyDoc", "owner", "emcon", "hp", "dmgRadar", "dmgLauncher"]) if (d[k] !== void 0) u[k] = d[k];
+      if (d.moves) u.moves = structuredClone(d.moves);
       defId.set(d.id, u.id);
     }
     for (const sv of data.setup.salvos) {

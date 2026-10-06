@@ -24,11 +24,12 @@ import { log, event, label, uLabel, pista } from './log.js';
 import { recReset, recUnit, recObj } from './replay.js';
 import { ewStep } from './ew.js';
 import { wxNow, wxReset, wxStep } from './weather-now.js';
-import { noteSeen, noteObs, emitting, isEmitter } from './contacts.js';
+import { noteSeen, noteObs, emitting, isEmitter, noteFix } from './contacts.js';
+import { mobStep } from './mobility.js';
 
 /** Arma la corrida a partir de S.setup: copia unidades y jammers y programa todos los lanzamientos. */
 export function startSim() {
-  S.units = S.setup.defs.map(d => ({ ...d, alive: true, hp: d.hp ?? UNIT_TARGET.hp, dmgRadar: !!d.dmgRadar, dmgLauncher: !!d.dmgLauncher, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
+  S.units = S.setup.defs.map(d => ({ ...d, moves: d.moves ? structuredClone(d.moves) : undefined, mob: null, alive: true, hp: d.hp ?? UNIT_TARGET.hp, dmgRadar: !!d.dmgRadar, dmgLauncher: !!d.dmgLauncher, magLeft: d.mag, reserveLeft: d.reserve ?? 0, reloadUntil: null, nextScan: rnd() * 2, avail: {}, active: 0, nextEval: 0 }));
   S.jamsLive = S.setup.jams.map(j => ({ ...j, _losMap: {}, hp: UNIT_TARGET.hp })); S.hoj = []; S.ewNext = 0; wxReset();
   S.objs = S.setup.objs.map(g => { const hp = g.hpNow ?? g.maxHp; return { ...g, hp, status: targetStatus(hp, g.maxHp), hits: 0, dmgBy: {} }; });
   S.threats = []; S.ints = []; S.fx = []; S.impacts = []; S.stats = newStats(); S.log = []; S.events = []; S.arrivals = [];
@@ -50,6 +51,7 @@ export function resetState() { S.rec = null; S.replay = null; S.autoPhase = 'cal
 export function step(dt) {
   const t = S.t + dt; S.t = t;
   wxStep(t);
+  mobStep(t);   // traslados de unidades (sim/mobility.js)
   // lanzamientos
   while (S.pending.length && S.pending[0].tLaunch <= t) {
     const th = S.pending.shift(); th.alive = true; S.threats.push(th);
@@ -93,10 +95,10 @@ export function step(dt) {
   }
   // sensores
   for (const u of S.units) {
-    if (!u.alive) continue; const d = D(u); if (!d.radar) continue;
+    if (!u.alive || u.mob) continue; const d = D(u); if (!d.radar) continue;   // trasladándose no detecta
     if (!emitting(u, t)) continue;   // control de emisiones: un radar apagado no ve (ni se delata)
     if (t < u.nextScan) continue; u.nextScan = t + d.radar.scan;
-    if (isEmitter(d.radar)) u.emitFrom ??= t;   // desde acá el atacante lo puede ubicar por su emisión
+    if (isEmitter(d.radar)) { u.emitFrom ??= t; noteFix(u, t); }   // desde acá el atacante lo puede ubicar por su emisión
     const r = d.radar, uz = antZ(u), wx = wxNow();
     // capacidad de seguimiento (radar.tracks): pistas abiertas + falsos blancos DRFM; una pista nueva no
     // entra si está lleno (las abiertas se mantienen)
@@ -157,7 +159,7 @@ export function step(dt) {
   // recarga: una batería vacía con reserva recarga en sam.reloadS; si hay depósitos de munición en el
   // mapa, necesita uno en pie a menos de RESUPPLY_KM (destruirlos corta la recarga)
   for (const u of S.units) {
-    if (!u.alive || !D(u).sam) continue;
+    if (!u.alive || !D(u).sam || u.mob) continue;   // trasladándose no recarga
     if (u.reloadUntil !== null && t >= u.reloadUntil) {
       const n = Math.min(u.mag, u.reserveLeft); u.magLeft += n; u.reserveLeft -= n; u.reloadUntil = null; S.stats.reloads++; recUnit(u);
       log('l', uLabel(u) + ' termina de recargar: ' + n + ' listos, quedan ' + u.reserveLeft + ' en reserva.', 'def');
@@ -180,7 +182,7 @@ export function step(dt) {
   }
   // enfrentamientos (cada 1 s simulado por unidad)
   for (const u of S.units) {
-    if (!u.alive || !D(u).sam || u.dmgLauncher || u.magLeft <= 0) continue;
+    if (!u.alive || !D(u).sam || u.mob || u.dmgLauncher || u.magLeft <= 0) continue;
     if (t < u.nextEval) continue; u.nextEval = t + 1;
     engage(u, t);
   }
@@ -342,7 +344,7 @@ export function engage(u, t) {
     for (let k = 0; k < n; k++) {
       const it = { u, th, x0: u.x, y0: u.y, px: sol.p.x, py: sol.p.y, tL: t + k * 0.6, tH: t + sol.tau + k * 0.6, shot: sm.shot, done: false, remote, c2, f: sol.f, kin: sol.f > 0 ? sol.r / sol.f : null, gw: remote ? (netPk(u, th, t, c2, S.gateways) || 1) : 1 };
       S.ints.push(it); (th.fly = th.fly || []).push(it);
-      S.rec?.ints.push(it); u.magLeft--; u.active++; S.stats.shots++; S.stats.defCost += sm.cost; recUnit(u); u.revealed ??= t;   // el lanzamiento la delata (vista del atacante)
+      S.rec?.ints.push(it); u.magLeft--; u.active++; S.stats.shots++; S.stats.defCost += sm.cost; recUnit(u); u.revealed ??= t; noteFix(u, t);   // el lanzamiento la delata (vista del atacante)
       S.stats.byUnit[uLabel(u)] = (S.stats.byUnit[uLabel(u)] || 0) + 1;
     }
     event('Primer interceptor lanzado: ' + uLabel(u) + ' contra ' + label(th), 'firstShot');
@@ -358,7 +360,7 @@ function phantomShot(u, t) {
   const a = (u.az || 0) * Math.PI / 180, r = sm.maxR * 0.6, tau = timeTo(profileOf(sm), r * 1000);
   for (let k = 0; k < n; k++) {
     const it = { u, th: null, phantom: true, x0: u.x, y0: u.y, px: u.x + Math.sin(a) * r, py: u.y - Math.cos(a) * r, tL: t + k * 0.6, tH: t + tau + k * 0.6, shot: sm.shot, done: false };
-    S.ints.push(it); S.rec?.ints.push(it); u.magLeft--; u.active++; S.stats.shots++; S.stats.defCost += sm.cost; recUnit(u); u.revealed ??= t;
+    S.ints.push(it); S.rec?.ints.push(it); u.magLeft--; u.active++; S.stats.shots++; S.stats.defCost += sm.cost; recUnit(u); u.revealed ??= t; noteFix(u, t);
   }
   log('w', uLabel(u) + ' dispara ' + n + '× ' + sm.shot + ' contra un falso blanco (engaño DRFM).', 'def', uLabel(u) + ' dispara ' + n + '× ' + sm.shot + ' contra una pista.');
   if (u.magLeft === 0) log('w', uLabel(u) + ' se queda sin munición.', 'def');
@@ -391,7 +393,9 @@ export function impact(th) {
     S.stats.hits++; S.impacts.push({ x, y, k: 'hit', t: S.t });
     S.fx.push({ x, y, rt: performance.now(), c: '#ff5b4d', big: true });
     let msg = label(th) + ' impacta en el blanco', alt = 'Impacto' + (th.firstDet === null ? ' de un arma no detectada' : ' de la ' + pista(th));
-    if (th.targetUnit) { const u = S.units.find(v => v.id === th.targetUnit && v.alive); if (u) { u.alive = false; recUnit(u); S.stats.lost++; msg += ' y destruye ' + uLabel(u); alt += ': ' + uLabel(u) + ' destruida'; hooks.onUnitLost(); event(uLabel(u) + ' destruida por ' + label(th), 'lost:' + u.id); } }
+    // contra una unidad: se apuntó a donde estaba al planear el ataque; si se trasladó (sim/mobility.js),
+    // el impacto la destruye solo si sigue dentro del radio de acierto
+    if (th.targetUnit) { const u = S.units.find(v => v.id === th.targetUnit && v.alive && ((v.x === tg[0] && v.y === tg[1]) || Math.hypot(v.x - x, v.y - y) * 1000 <= (th.T.hitR || (th.cls === 'dron' ? 20 : 50)))); if (u) { u.alive = false; recUnit(u); S.stats.lost++; msg += ' y destruye ' + uLabel(u); alt += ': ' + uLabel(u) + ' destruida'; hooks.onUnitLost(); event(uLabel(u) + ' destruida por ' + label(th), 'lost:' + u.id); } }
     log('x', msg + dtxt + '.', 'def', alt + dtxt + '.');
   } else {
     S.stats.misses++; S.impacts.push({ x, y, k: 'miss', t: S.t });

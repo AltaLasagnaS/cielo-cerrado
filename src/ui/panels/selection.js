@@ -13,7 +13,10 @@ import { targetName } from '../../sim/setup.js';
 import { warheadKg, directDamage } from '../../physics/damage.js';
 import { $, isDefenderView, isAttackerView } from '../dom.js';
 import { draw } from '../../render/draw.js';
-import { contactOf, attackerKnows, isEmitter, EMCON } from '../../sim/contacts.js';
+import { contactOf, attackerKnows, asAttackerSees, isEmitter, EMCON, mobPhaseOf } from '../../sim/contacts.js';
+import { MOB_PHASE, cantMove } from '../../sim/mobility.js';
+import { campaignBattle } from '../campaign.js';
+import { setMode } from '../modes.js';
 import { schedCov } from '../coverage.js';
 import { openFicha } from '../fichas.js';
 import { renderAtk, removeObj } from './attack.js';
@@ -78,6 +81,9 @@ function renderMulti(el) {
   return true;
 }
 
+/** Último contenido de la ficha de una defensa (ver renderSel). */
+const lastDef = { html: '', node: /** @type {Element | null} */ (null) };
+
 export function renderSel(live) {
   const el = $('#selCard'); const sel = S.sel;
   if (S.multi.length && !S.started && renderMulti(el)) return;
@@ -90,11 +96,11 @@ export function renderSel(live) {
     if (S.started && !S.replay && isAttackerView()) {
       if (!attackerKnows(u, S.t)) { S.sel = null; return renderSel(); }   // una selección previa no la delata
       // vista del atacante: dónde está y qué es (catálogo), no su estado, munición ni enlaces
-      el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(d.short)}</b><dl class="kv"><dt>Posición</dt><dd>${u.x.toFixed(1)}, ${u.y.toFixed(1)} km</dd>${r && r.band !== 'ACU' && r.band !== 'OPT' ? `<dt>Radar</dt><dd>${esc(r.name)} · ${r.band}</dd>` : ''}${d.sam ? `<dt>Alcance (catálogo)</dt><dd>${d.sam.maxR} km</dd>` : ''}<dt>Estado</dt><dd>desconocido</dd></dl><p class="hint">Vista del atacante: ${u.emitFrom != null && u.emitFrom <= S.t ? 'ubicada por su emisión de radar' : 'ubicada al disparar'}. No se sabe si está dañada ni cuánta munición le queda.</p>`;
+      el.innerHTML = `<h3>Selección</h3><b style="font-size:15px">${esc(d.short)}</b><dl class="kv"><dt>Última posición conocida</dt><dd>${(asAttackerSees(u, S.t) ?? u).x.toFixed(1)}, ${(asAttackerSees(u, S.t) ?? u).y.toFixed(1)} km</dd>${r && r.band !== 'ACU' && r.band !== 'OPT' ? `<dt>Radar</dt><dd>${esc(r.name)} · ${r.band}</dd>` : ''}${d.sam ? `<dt>Alcance (catálogo)</dt><dd>${d.sam.maxR} km</dd>` : ''}<dt>Estado</dt><dd>desconocido</dd></dl><p class="hint">Vista del atacante: ${u.emitFrom != null && u.emitFrom <= S.t ? 'ubicada por su emisión de radar' : 'ubicada al disparar'}. No se sabe si está dañada ni cuánta munición le queda.</p>`;
       return;
     }
     let html = `<h3>Selección</h3><div class="row" style="justify-content:space-between"><b style="font-size:15px">${esc(u.name)}</b><span class="chip ${d.side === 'RU' ? 'ru' : 'ua'}">${esc(d.short)}</span></div>
-      <dl class="kv"><dt>Posición</dt><dd>${u.x.toFixed(1)}, ${u.y.toFixed(1)} km</dd><dt>Lat/Lon</dt><dd>${ll[0].toFixed(3)}°, ${ll[1].toFixed(3)}°</dd><dt>Terreno</dt><dd>${ground} m</dd>`;
+      <dl class="kv"><dt>Posición</dt><dd>${u.x.toFixed(1)}, ${u.y.toFixed(1)} km</dd>${S.started && mobPhaseOf(u) ? `<dt>Traslado</dt><dd>${MOB_PHASE[mobPhaseOf(u)]}: no detecta ni dispara</dd>` : ''}<dt>Lat/Lon</dt><dd>${ll[0].toFixed(3)}°, ${ll[1].toFixed(3)}°</dd><dt>Terreno</dt><dd>${ground} m</dd>`;
     if (r && r.band !== 'ACU') { const hor = horizon(antZ(u) - (d.kind === 'aew' ? 0 : ground), 50); html += `<dt>Radar</dt><dd>${esc(r.name)} · ${r.band}</dd><dt>Horizonte vs blanco a 50 m</dt><dd>${hor.toFixed(0)} km</dd>`; }
     if (d.sam) html += `<dt>Alcance</dt><dd>${d.sam.maxR} km${d.sam.maxRtbm ? ' (TBM ' + d.sam.maxRtbm + ')' : ''}</dd><dt>Guiado</dt><dd>${d.sam.guid}</dd>`;
     const links = datalinksOf(d).map(k => DATALINKS[k].name).join(', ');
@@ -122,9 +128,18 @@ export function renderSel(live) {
       if (d.sam) html += `<div class="field" title="Los radares de tiro aprenden a distinguir señuelos con el tiempo de seguimiento; la decisión usa esa clasificación, que a veces se equivoca."><label for="sDec">Pistas clasificadas como señuelo</label><select id="sDec" class="sel"><option value="" ${!u.decoyDoc ? 'selected' : ''}>Como la regla general (${S.ignoreDecoys ? 'no tirarles' : 'tirarles'})</option><option value="ignorar" ${u.decoyDoc === 'ignorar' ? 'selected' : ''}>No tirarles</option><option value="tirar" ${u.decoyDoc === 'tirar' ? 'selected' : ''}>Tirarles igual</option></select></div>`;
       if (d.sam) html += `<label class="check"><input type="checkbox" id="sNoD" ${u.noDrones ? 'checked' : ''}> No gastar en drones (reservar para misiles)</label><div class="field"><label for="sMag">Munición disponible</label><input id="sMag" class="inp" type="number" min="1" max="200" value="${u.mag}"></div><div class="field"><label for="sRes">Reserva para recargar (${Math.round(d.sam.reloadS / 60)} min por recarga)</label><input id="sRes" class="inp" type="number" min="0" max="500" value="${u.reserve ?? 0}"></div><div class="field"><label for="sSal">Interceptores por blanco</label><input id="sSal" class="inp" type="number" min="1" max="4" value="${u.salvo}"></div>`;
     }
-    html += `<div class="row"><button class="btn sm" id="sInfo">Ficha</button>${ed ? '<button class="btn sm danger" id="sDel">Eliminar</button>' : ''}</div>`;
-    el.innerHTML = html;
+    // traslado durante la partida (sim/mobility.js): repliega, viaja por la ruta que se marque y despliega
+    const canOrder = S.started && !S.replay && u.alive && !mobPhaseOf(u);
+    const why = canOrder ? (campaignBattle() ? 'en la campaña todavía no hay traslados' : cantMove(u)) : null;
+    html += `<div class="row"><button class="btn sm" id="sInfo">Ficha</button>${ed ? '<button class="btn sm danger" id="sDel">Eliminar</button>' : ''}${canOrder && !why ? '<button class="btn sm" id="sMove" title="Replegar, viajar por la ruta que marques y desplegar. Mientras tanto no detecta ni dispara.">Trasladar</button>' : ''}</div>`;
+    if (canOrder && why) html += `<p class="hint">No se puede trasladar: ${esc(why)}.</p>`;
+    // el refresco periódico (live) no reemplaza la ficha si no cambió: un botón que se reemplaza a cada
+    // rato se vuelve difícil de tocar
+    // (la marca es el primer nodo que dejó: si otra vista reescribió la tarjeta, ya no coincide)
+    if (live && lastDef.node && el.firstElementChild === lastDef.node && lastDef.html === html) return;
+    el.innerHTML = html; lastDef.html = html; lastDef.node = el.firstElementChild;
     $('#sInfo').onclick = () => openFicha('def', u.type);
+    if ($('#sMove')) $('#sMove').onclick = () => { S.relocate = { id: u.id, pts: [] }; setMode('relocate'); };
     if (ed) {
       const bind = (id, k, cov) => { const i = $(id); bindNumber(i, () => u[k], value => { u[k] = value; const v = i.parentElement.querySelector('.val'); if (v) v.textContent = u[k] + (k === 'az' ? '°' : ' m'); if (cov) schedCov(); }, { integer: ['mag', 'reserve', 'salvo'].includes(k) }); };
       bind('#sMast', 'mast', 1); bind('#sAlt', 'alt', 1); bind('#sAz', 'az', 1); bind('#sMag', 'mag'); bind('#sRes', 'reserve'); bind('#sSal', 'salvo');

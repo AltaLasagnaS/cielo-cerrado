@@ -19,7 +19,7 @@ export const S = {
   // eventos clave para la línea de tiempo del debrief y detalle de cada arma que llegó al blanco
   events: /** @type {any[]} */ ([]), arrivals: /** @type {any[]} */ ([]),
   // interfaz: selección, modo de edición, ruta en trazado y salva en preparación
-  sel: /** @type {any} */ (null), multi: /** @type {any[]} */ ([]), mode: 'select', placeType: /** @type {any} */ (null), route: /** @type {any} */ (null), atk: /** @type {any} */ (null), measure: /** @type {any} */ (null), box: /** @type {any} */ (null),
+  sel: /** @type {any} */ (null), multi: /** @type {any[]} */ ([]), mode: 'select', placeType: /** @type {any} */ (null), route: /** @type {any} */ (null), atk: /** @type {any} */ (null), measure: /** @type {any} */ (null), relocate: /** @type {any} */ (null), box: /** @type {any} */ (null),
   // última cobertura calculada (grilla y % del mapa cubierto)
   _cov: /** @type {any} */ (null), covStat: /** @type {any} */ (null)
 };

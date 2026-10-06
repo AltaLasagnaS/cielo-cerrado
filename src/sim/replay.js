@@ -16,7 +16,7 @@ import { posAt } from '../physics/kinematics.js';
 export function recReset() { S.rec = { ints: [], units: [], objs: [], log: [] }; }
 
 /** Anota el estado de una unidad después de un cambio (disparo, recarga, daño o pérdida). */
-export function recUnit(u) { S.rec?.units.push({ t: S.t, id: u.id, alive: u.alive, dmgRadar: u.dmgRadar, dmgLauncher: u.dmgLauncher, magLeft: u.magLeft }); }
+export function recUnit(u) { S.rec?.units.push({ t: S.t, id: u.id, alive: u.alive, dmgRadar: u.dmgRadar, dmgLauncher: u.dmgLauncher, magLeft: u.magLeft, x: u.x, y: u.y, mob: u.mob?.phase ?? null }); }
 
 /** Anota el estado de un objetivo después de recibir daño. */
 export function recObj(g) { S.rec?.objs.push({ t: S.t, id: g.id, hp: g.hp, status: g.status, hits: g.hits }); }
@@ -52,7 +52,9 @@ export function frameAt(T) {
     threats.push({ ...th, p, trail: trailAt(th, T), alive: true, lastNet: T });
   }
   const ints = S.rec.ints.filter(it => it.tL <= T && T < it.tH).map(it => ({ ...it, done: false }));
-  const units = stateAt(S.setup.defs.map(d => ({ ...d, alive: true, dmgRadar: false, dmgLauncher: false, magLeft: d.mag })), S.rec.units, T);
+  // lo que el atacante supo de cada unidad (contacts.js#attackerPos) va con sus instantes: sirve para cualquier T
+  const known = new Map(S.units.map(u => [u.id, { emitFrom: u.emitFrom, revealed: u.revealed, fixes: u.fixes }]));
+  const units = stateAt(S.setup.defs.map(d => ({ ...d, ...known.get(d.id), alive: true, dmgRadar: false, dmgLauncher: false, magLeft: d.mag, mob: null })), S.rec.units, T);
   const objs = stateAt(S.setup.objs.map(g => ({ ...g, hp: g.maxHp, status: 'operational', hits: 0 })), S.rec.objs, T);
   const impacts = S.impacts.filter(im => (im.t ?? 0) <= T);
   const log = S.rec.log.filter(l => l.t <= T);
