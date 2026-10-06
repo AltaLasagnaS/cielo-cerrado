@@ -1,6 +1,6 @@
 # Paquete paralelo: catálogo y asignación de recursos
 
-Trabajo en una carpeta experimental independiente. No cambia `src/`, escenarios ni golden. Incluye contratos puros y un puente opcional que ejecuta dos guardias con el motor actual. La campaña es jugable en su pantalla experimental; la integración al menú principal sigue pendiente de Claude.
+Contratos de componentes, recursos y campaña, conservados en una carpeta independiente. El juego nativo los importa desde #68 para ejecutar dos guardias de Odesa con el motor actual y un libro único de recursos; también sigue disponible la demo independiente. Las variantes de referencia no se habilitan automáticamente ni cambian las golden. Desde #69 el menú ofrece elegir dos o tres guardias (la tercera es la definición opcional de esta carpeta).
 
 ## Qué está implementado
 
@@ -14,7 +14,7 @@ Trabajo en una carpeta experimental independiente. No cambia `src/`, escenarios 
 - Inventario físico por componente, munición tipada y cargas completas explícitas: conserva existencias, disparos y pérdidas, y exige componentes de lanzamiento operativos. Ver [el contrato](docs/COMPONENTES-E-INVENTARIO.md).
 - Evidencia separada para GEM-T, PAC-3 CRI/MSE y S-300PT/PT-1KD/PS: capacidades desconocidas siguen como `null`. Ver [el relevo de variantes](docs/RELEVO-DATOS-2026-10-05.md).
 - Contrato de [logística y continuidad](docs/LOGISTICA-Y-CONTINUIDAD.md), con fondos, pedidos, traslado en tránsito, reparación con repuestos y plazos, y conservación entre misiones. La [demo de navegador](demo/logistics.html) usa exclusivamente datos ficticios.
-- [Adaptador ejecutable de misión](docs/ADAPTADOR-MISION.md): asignaciones explícitas, consultas/disparos/recargas tipados y reloj de 0,25 s sin truncarlo. Conexión al motor aún pendiente de Claude.
+- [Adaptador ejecutable de misión](docs/ADAPTADOR-MISION.md): asignaciones explícitas, consultas/disparos/recargas tipados y reloj de 0,25 s sin truncarlo; conectado al combate nativo por #68.
 - Pruebas sin dependencias y demostración ejecutable en Node.
 - [Operaciones y campaña de Odesa](docs/OPERACIONES-Y-CAMPANA.md): etapas, restricciones de medios, ofertas, daño, reportes y guardado; puente ejecutable al motor y contrato para `missionReport` v1 del #64.
 
@@ -43,7 +43,7 @@ Ninguna configuración nueva está habilitada en el simulador. Los parámetros f
 
 Las configuraciones son candidatos de investigación; la compatibilidad familiar no prueba la composición, disponibilidad nacional, fecha, carga mixta ni empleo remoto de una batería concreta.
 
-El prototipo de presupuesto no es una pantalla del menú principal. El contrato de componentes registra consecuencias autorizadas por el motor; no calcula daño. La extensión logística agenda traslados, entregas y reparación con plazos explícitos, sin simular trayectos, personal ni severidad de averías. El puente experimental ya conecta un único inventario a combates del motor; la integración nativa y su interfaz siguen pendientes.
+El prototipo contable y la demo independiente conservan sus pantallas. El juego tiene su propia pantalla Campaña, que usa el mismo libro logístico, sin duplicar existencias. El contrato de componentes registra consecuencias autorizadas por el motor; no calcula daño. La extensión logística agenda traslados, entregas y reparación con plazos explícitos, sin simular trayectos, personal ni severidad de averías. La integración nativa funciona para dos o tres guardias (selección en el menú desde #69); faltan campaña atacante y restauración del mundo a mitad del combate. Los controles que alteraban una guardia (Q05) quedan bloqueados desde #69, con prueba de regresión.
 
 Las cotizaciones se congelan al crear el plan. Los montos son enteros: `credits` identifica créditos ficticios; `USD-2025-minor`, por ejemplo, indica unidades monetarias menores con moneda/año, no permite mezclar ni convertir monedas. La exigencia de referencias es una comprobación de metadatos, no una auditoría automática de veracidad de precios.
 

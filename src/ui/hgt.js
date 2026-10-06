@@ -11,10 +11,12 @@ import { schedCov } from './coverage.js';
 import { toast } from './modes.js';
 import { renderAll } from './panels/index.js';
 import { renderLog } from './panels/results.js';
+import { campaignBlocks } from './campaign.js';
 
 export function initHgtImport() {
   $('#hgt').onchange = async e => {
     const f = e.target.files[0]; if (!f) return; e.target.value = '';
+    if (campaignBlocks('cargar relieve')) return;
     const tile = parseHgtName(f.name);
     if (!tile) { toast('El nombre del archivo tiene que ser tipo N50E030.hgt'); return; }
     const res = hgtToMap(await f.arrayBuffer(), tile, f.name);

@@ -11,6 +11,7 @@ import { resetSim } from './app.js';
 import { openModal, closeModal } from './fichas.js';
 import { toast } from './modes.js';
 import { renderAll } from './panels/index.js';
+import { campaignBlocks } from './campaign.js';
 
 const RUNS = [10, 20, 50, 100];
 const SIDE = { ataque: 'Ataque', defensa: 'Defensa' };
@@ -18,6 +19,7 @@ let last = { runs: 20, sample: true, seed: 1 };
 
 /** Ventana de configuración. */
 export function openMonteCarlo() {
+  if (campaignBlocks('Monte Carlo')) return;
   if (!S.setup.salvos.length) { toast('Agregá al menos un ataque en la pestaña Ataque.'); return; }
   openModal(`<header><div><span class="chip">${esc(S.scen?.name || 'Escenario libre')}</span><h2>Monte Carlo</h2></div><button class="btn x">Cerrar</button></header><div class="bd">
     <p>Corre <b>la misma situación</b> muchas veces con semillas distintas y muestra qué tan probable es cada resultado. Una sola corrida puede ser suerte; cien corridas muestran la tendencia.</p>
@@ -37,6 +39,7 @@ export function openMonteCarlo() {
 
 /** Corre la serie con barra de progreso y al final abre el debrief Monte Carlo. */
 function run(opts) {
+  if (campaignBlocks('Monte Carlo')) return;
   resetSim();
   const mc = createMonteCarlo(opts), t0 = performance.now();
   openModal(`<header><h2>Monte Carlo en curso</h2></header><div class="bd">

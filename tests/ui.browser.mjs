@@ -134,7 +134,7 @@ try {
   // campaña (lógica de Codex, experimentos/catalogo-presupuesto): asignar, pedir y cargar munición, jugar la
   // guardia en el mapa y llegar al parte de cierre y a la guardia siguiente
   page.on('dialog', d => d.accept());
-  await page.click('#campBtn'); await page.click('#cCreate');
+  await page.click('#campBtn'); await page.selectOption('#cLen', '3'); await page.click('#cCreate');
   assert.match(await page.locator('#sheet').innerText(), /Preparar la guardia/i);
   const camp = await page.$$eval('[data-order]', bs => bs.map(b => /** @type {HTMLElement} */ (b).dataset.order));
   for (const id of camp) { await page.fill('#cq-' + id, '2'); await page.click(`[data-order="${id}"]`); }
@@ -143,10 +143,46 @@ try {
   while (await page.$('#cWait:not([disabled])')) await page.click('#cWait');
   await page.click('#cStart');
   assert.equal(await page.locator('#view').inputValue(), 'def', 'la guardia se juega en vista del defensor');
+  // durante la guardia no se puede ver la verdad, cambiar de escenario o de relieve, ni correr Monte Carlo;
+  // el botón principal solo pausa y sigue
+  await page.selectOption('#view', 'all');
+  assert.equal(await page.locator('#view').inputValue(), 'def', 'la vista completa queda bloqueada en la guardia');
+  await page.click('#mcBtn');
+  assert.equal(await page.locator('#modal').isHidden(), true, 'Monte Carlo no se abre en la guardia');
+  const world = () => page.evaluate(() => JSON.stringify([window.__S.scen?.name, window.__S.started, window.__S.t, window.__S.setup]));
+  await page.evaluate(() => { window.__S.running = false; });   // en pausa, para que el reloj no se mueva
+  const w0 = await world();
+  // un escenario válido (el mismo exportado) tampoco entra: lo que importa es que no resetee el mundo
+  const scenJson = await page.evaluate(async () => JSON.stringify((await import('/sim/scenario-io.js')).exportScenario()));
+  await page.setInputFiles('#loadScen', { name: 'otro.json', mimeType: 'application/json', buffer: Buffer.from(scenJson) });
+  await page.waitForTimeout(100);
+  assert.equal(await world(), w0, 'no se carga otro escenario');
+  assert.equal(await page.evaluate(() => window.__dbg.loadFromObject({}).ok), false, 'ni por código');
+  assert.equal(await page.locator('#modal').isHidden(), true, 'ni se abre la ventana de errores');
+  await page.setInputFiles('#hgt', { name: 'N46E030.hgt', mimeType: 'application/octet-stream', buffer: Buffer.alloc(8) });
+  assert.equal(await world(), w0, 'no se carga otro relieve');
+  // borde (prueba de Codex en #69): sin amenazas vivas ni por llegar, en guardia el botón dice "Seguir"
+  // y no arma una corrida nueva
+  const edge = await page.evaluate(async () => {
+    const { togglePlay, updatePlay } = await import('/ui/controls.js'), S = window.__S, keep = [S.pending, S.threats, S.running];
+    S.running = false; S.pending = []; S.threats = []; updatePlay();
+    const label = document.querySelector('#play')?.textContent; togglePlay(); const out = [label, S.running, S.started];
+    [S.pending, S.threats, S.running] = keep; updatePlay(); return out;
+  });
+  assert.deepEqual(edge, ['▶ Seguir', true, true], 'en guardia el botón nunca es "Nueva corrida"');
+  const run0 = await page.evaluate(() => window.__S.running);
+  await page.click('#play');
+  assert.deepEqual(await page.evaluate(() => [window.__S.running, window.__S.started]), [!run0, true], 'el botón pausa sin reiniciar');
+  await page.click('#play');
   await page.evaluate(() => { let k = 0; while (window.__dbg.campaignStep() && k < 40000) k++; });
   assert.match(await page.locator('#sheet').innerText(), /Parte de cierre/i);
   await page.click('#cNext');
   assert.match(await page.locator('#sheet').innerText(), /Segunda guardia/i, 'la campaña sigue con la guardia siguiente');
+  // la tercera guardia (opcional, de Codex): se juega con lo que quedó, sin recargar
+  await page.click('#cStart');
+  await page.evaluate(() => { let k = 0; while (window.__dbg.campaignStep() && k < 40000) k++; });
+  await page.click('#cNext');
+  assert.match(await page.locator('#sheet').innerText(), /Tercera guardia/i, 'con "Tres guardias" llega a la tercera');
   assert.deepEqual(errors, []);
   console.log('Interfaz: valores numéricos, atajos, Monte Carlo, Academia de pulsos, regla, selección múltiple y por rectángulo, campaña OK');
 } finally { await browser.close(); }

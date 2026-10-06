@@ -1,6 +1,6 @@
 # Estado y relevo: leer primero
 
-Registro original: 4 de octubre de 2026, base `9cafba0`. Reconciliado el 5 de octubre contra `main` `0a77102` (merge #59), #61 experimental y continuación de perspectivas #64. #42 incorporó el perfil del interceptor y #43 el paquete experimental; #47 corrigió Kiev/solveTd y #49 la UX chica. Los estados de documentos en `archivo/` son históricos, no estados actuales.
+Registro original: 4 de octubre de 2026, base `9cafba0`. Reconciliado el 5 de octubre contra `main` `f0428e4` (merge #68, que incluye #61 y su integración de campaña). #64 ya incorporó perspectivas y tiro observado; #42 incorporó el perfil del interceptor y #43 el paquete experimental; #47 corrigió Kiev/solveTd y #49 la UX chica. Los estados de documentos en `archivo/` son históricos, no estados actuales.
 
 ## Qué pidió el usuario
 
@@ -21,7 +21,7 @@ Conservar todo lo conversado y el trabajo previo, mantener la estructura del pro
 - [VERIFICACION.md](VERIFICACION.md): pruebas ejecutadas y límites concretos de lo comprobado.
 - [MENSAJE-PARA-CLAUDE.md](MENSAJE-PARA-CLAUDE.md): relevo listo para copiar, no enviado automáticamente.
 - [COMPONENTES-E-INVENTARIO.md](COMPONENTES-E-INVENTARIO.md): contrato ejecutable de munición tipada, dependencias y pérdidas.
-- [LOGISTICA-Y-CONTINUIDAD.md](LOGISTICA-Y-CONTINUIDAD.md): plazos, recursos, tránsito, reparación y demo nuevos, sin integración al juego.
+- [LOGISTICA-Y-CONTINUIDAD.md](LOGISTICA-Y-CONTINUIDAD.md): contrato de plazos, recursos, tránsito y reparación; integrado a la campaña nativa en #68.
 - [AUTONOMIA-2026-10-05.md](AUTONOMIA-2026-10-05.md): autorización de coordinación directa, entregas y dependencias actuales.
 - `archivo/`: contrato, matriz y entrega externos originales preservados, con advertencia histórica.
 
@@ -30,14 +30,14 @@ Conservar todo lo conversado y el trabajo previo, mantener la estructura del pro
 | Área | Qué hay | Qué NO hay todavía |
 |---|---|---|
 | Catálogo | Referencias, fuentes y validadores; diez candidatos deshabilitados | Nuevas configuraciones activas o prestaciones/precios certificados |
-| Presupuesto | Libro inicial y nueva autoridad logística con compras/plazos/cancelación declarada; una sola munición física | Pantalla económica conectada al combate, precios reales certificados |
-| Componentes/logística | Inventario tipado por depósito/lanzador, cargas explícitas, daño autorizado, tránsito, entregas, reparación con fondos/repuestos | Variantes nuevas activas, cálculo físico propio, trayectos geográficos, severidad de averías o autoridad del motor integrada |
-| Continuidad | Misiones experimentales conservan equipos/daño/munición/ofertas/fondos/repuestos/trabajos y reloj, con replay | Campaña jugable, objetivos progresivos, cambio de escenario o inteligencia persistente por bando |
-| Briefing propio | Proyección de preparación con recursos del libro y reportes autorizados fechados | Niebla de guerra del motor, IA limitada, contactos vivos ni debrief de combate |
-| Pedidos de interfaz | Delete/enteros/explicación C2, regla, track, doctrina, Shift+clic, rótulos y C2 individual en main (#59) | Menú/tutorial, selección por rectángulo y auditoría de conocimiento por bando; continuación de perspectivas en #64 |
+| Presupuesto | Pantalla de campaña nativa con asignación, compras/plazos/cancelación; libro único conectado al combate (#68) | Precios reales certificados (controles de campaña Q05 cerrados en #69) |
+| Componentes/logística | Inventario tipado por depósito/lanzador, cargas explícitas, daño autorizado, tránsito, entregas, reparación con fondos/repuestos; puente conectado al controlador nativo | Variantes nuevas activas, trayectos geográficos y severidad de averías documentada |
+| Continuidad | Dos guardias nativas con daño/munición/ofertas/fondos/repuestos/trabajos, posiciones, reloj e informes persistentes; guardado estratégico con replay | Campaña atacante (la tercera guardia ya se elige en el menú desde #69) y restauración del mundo durante combate |
+| Briefing propio | Preparación, recursos y reportes fechados; contactos en combate y parte propio, perspectivas/tiro observado (#64/#68) | BDA incierto y política de revelación del resultado para la campaña atacante; auditoría de aislamiento completa |
+| Pedidos de interfaz | Delete/enteros/explicación C2, regla, track, doctrina, selección múltiple/rectángulo, rótulos y C2 individual en main | Menú/tutorial experimental #66 pendiente de integración (controles de campaña Q05 cerrados en #69) |
 | Física | `solveTd` corregido en main; investigación independiente #54–58. No se modifica desde esta entrega | Validación completa de todos los supuestos; los datos desconocidos no se completan artificialmente |
 
-Todo lo ejecutable de esta entrega vive en `experimentos/catalogo-presupuesto/`. No se importa desde `src/` y no cambia resultados, escenarios, golden o archivos generados del juego.
+La lógica de recursos sigue en `experimentos/catalogo-presupuesto/`; desde #68 `src/ui/campaign.js` importa sus módulos directamente, sin copiarlos. La extensión de tres guardias agrega una definición opcional y pruebas; no modifica los ataques del catálogo ni las golden. Su documentación está en `docs/investigacion/tercera-guardia-odesa.md` desde la raíz del repositorio.
 
 ## Reparto conservador mientras no haya nuevo acuerdo
 
@@ -45,14 +45,14 @@ Claude conserva `ROADMAP.md`, `src/`, física/simulación, catálogo activo, inc
 
 Codex trabaja en esta carpeta experimental: documentos originales, fuentes/fichas, contratos, presupuesto, continuidad y sus pruebas. No editar el mismo archivo porque una rama sea distinta: eso evita algunos conflictos de Git, no conflictos semánticos.
 
-Una integración futura exige designar un único responsable para cada archivo compartido. No copiar la carpeta experimental entera al motor ni habilitar todos sus candidatos.
+Cada ampliación exige designar un único responsable para los archivos compartidos. No copiar la carpeta experimental entera al motor ni habilitar todos sus candidatos. Los bugs de controles de campaña se entregaron a Claude por [GitHub](https://github.com/AltaLasagnaS/cielo-cerrado/issues/62#issuecomment-6002465534); su integración conserva `src/ui/`.
 
 ## Siguiente entrega segura
 
-1. Revisar estos contratos con el panorama conocido por bando que implemente Claude.
+1. Revisar conocimiento por bando (los controles de campaña Q05 quedaron cerrados en #69 con prueba de regresión).
 2. Completar una configuración del catálogo por vez, sin tocar consumidores hasta tener evidencia suficiente.
-3. Mantener el reparto confirmado: Claude conecta el adaptador a `src/` después de actualizar #61; Codex continúa datos y menú/tutorial en experimentos. Regla/track/doctrina/Shift+clic ya están en main.
-4. Integrar una sola misión con briefing y recursos; después persistencia de componentes, logística e inteligencia para campaña.
+3. Mantener el reparto confirmado: Claude integró la selección de dos/tres guardias en `src/` (#69); Codex entrega definición/pruebas aparte y actualiza #63/#65/#66/#67 contra main.
+4. Continuar variantes verificadas, movilidad y campaña atacante; presupuesto/logística/persistencia de dos guardias ya funcionan en la pantalla nativa.
 
 ## Cómo retomar sin perder contexto
 

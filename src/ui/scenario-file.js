@@ -14,6 +14,7 @@ import { openModal } from './fichas.js';
 import { toast } from './modes.js';
 import { renderAll } from './panels/index.js';
 import { renderLog } from './panels/results.js';
+import { campaignBlocks } from './campaign.js';
 
 /** Tamaño máximo del archivo (los escenarios ocupan unos pocos KB). */
 const MAX_BYTES = 2 * 1024 * 1024;
@@ -42,6 +43,7 @@ export function saveScenario() {
 
 /** Valida y despliega un escenario leído de un archivo. Devuelve el resultado de la validación. */
 export function loadFromObject(raw, fileName = 'archivo') {
+  if (campaignBlocks('cargar un escenario')) return { ok: false, errors: ['Hay una guardia de campaña en curso.'], warnings: [], data: null };
   const res = validateScenario(raw);
   if (!res.ok) { showErrors(fileName, res.errors); return res; }
   const { data } = res; if (!data || !data.map) return res;
