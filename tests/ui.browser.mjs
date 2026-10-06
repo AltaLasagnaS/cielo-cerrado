@@ -143,7 +143,7 @@ try {
   await page.click('#sMove');
   const dest = await page.evaluate(async id => {
     const { toS } = await import('/render/view.js'); const r = document.querySelector('canvas').getBoundingClientRect(), u = window.__S.units.find(v => v.id === id);
-    const [a, b] = toS(u.x, u.y); return [r.left + a + 40, r.top + b + 10];
+    const [c, d] = toS(u.x - 5, u.y + 2); return [r.left + c, r.top + d];   // 5 km hacia adentro del mapa
   }, mv);
   await page.mouse.click(dest[0], dest[1]);
   assert.match(await page.locator('#modebar').textContent(), /Ruta de 1 punto/);
