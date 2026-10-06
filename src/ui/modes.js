@@ -12,7 +12,7 @@ import { surf } from '../physics/terrain.js';
 import { terrainClass } from '../physics/terrain-analysis.js';
 import { S } from '../sim/state.js';
 import { addDef, addJam, addObj, addSalvo } from '../sim/setup.js';
-import { orderMove } from '../sim/mobility.js';
+import { orderMove, mobData } from '../sim/mobility.js';
 import { draw, measureOf } from '../render/draw.js';
 import { $ } from './dom.js';
 import { schedCov } from './coverage.js';
@@ -61,8 +61,10 @@ export function updateModebar() {
   } else if (P) {
     html = `Tocá el mapa donde quieras ubicar <b>${esc(P.name(S.placeType))}</b>; vas a poder confirmar o cancelar.`;
   } else if (S.mode === 'relocate') {
-    const n = S.relocate?.pts.length ?? 0;
+    const r = S.relocate, n = r?.pts.length ?? 0, u = r && S.units.find(v => v.id === r.id), vmax = u ? mobData(u)?.vmax : null;
     html = n ? `Ruta de <b>${n} punto${n > 1 ? 's' : ''}</b>: el último es el destino. Tocá más puntos o confirmá.` : 'Tocá el mapa para marcar la <b>ruta del traslado</b> (el último punto es el destino).';
+    // la velocidad de marcha la decide quien ordena (no es una prestación publicada); tope: la de la ficha
+    html += ` <label class="dim" for="mbKmh">Marcha</label> <input id="mbKmh" class="inp" type="number" min="1" max="${vmax ?? ''}" step="1" style="width:70px" placeholder="km/h" value="${r?.kmh ?? ''}" title="Velocidad de marcha que ordenás, en km/h (máximo ${vmax ?? '?'} km/h, la del vehículo más lento)"> <span class="dim">km/h (máx ${vmax ?? '?'})</span>`;
     if (n) ok = finishRelocate;
     cancelTxt = 'Cancelar';
   } else if (S.mode === 'measure') {
@@ -81,6 +83,7 @@ export function updateModebar() {
   }
   mb.innerHTML = html + (ok ? ' <button class="btn sm pri" id="mbOk">Confirmar</button>' : '') + ` <button class="btn sm" id="mbX">${cancelTxt}</button>`;
   $('#mbX').onclick = cancel;
+  const kIn = $('#mbKmh'); if (kIn) kIn.oninput = () => { if (S.relocate) S.relocate.kmh = +kIn.value || null; };
   if (ok) $('#mbOk').onclick = ok;
 }
 
@@ -94,7 +97,8 @@ export function finishRoute() {
 /** Ordena el traslado marcado (sim/mobility.js); si no se puede, avisa por qué. */
 export function finishRelocate() {
   const r = S.relocate, u = r && S.units.find(v => v.id === r.id); if (!u || !r.pts.length) return;
-  const why = orderMove(u, r.pts);
+  if (!(r.kmh > 0)) { toast('Escribí la velocidad de marcha (km/h).'); return; }
+  const why = orderMove(u, r.pts, r.kmh);
   setMode('select'); renderSel();
   toast(why ? 'No se puede trasladar: ' + why + '.' : `${u.name} se repliega para trasladarse.`);
 }

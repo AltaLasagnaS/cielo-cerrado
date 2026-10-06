@@ -9,10 +9,10 @@ Cuando un cambio **altera los resultados de la simulación** (física o datos), 
 ### Agregado
 - **Movilidad, primera parte** (`sim/mobility.js`, docs/FISICA.md §12):
   - Una defensa se traslada en tres fases: replegando, en tránsito y desplegando. Mientras dura no detecta, no emite, no dispara ni recarga.
-  - Los traslados se programan en el escenario (`defs[].moves`) o se ordenan desde el mapa durante la partida: botón **Trasladar** en la ficha de la unidad, se marca la ruta tocando el mapa y se confirma. Si no se puede (sin datos, con misiles en vuelo, en la campaña), la ficha dice por qué.
+  - Los traslados se programan en el escenario (`defs[].moves`) o se ordenan desde el mapa durante la partida: botón **Trasladar** en la ficha de la unidad, se marca la ruta tocando el mapa, se escribe la velocidad de marcha y se confirma. Si no se puede (sin datos, con misiles en vuelo, en la campaña), la ficha dice por qué.
   - El atacante sigue viendo la unidad donde la ubicó hasta que vuelve a emitir o disparar.
   - Un ataque planeado contra su posición vieja ya no la destruye si se fue.
-  - Los tiempos y la velocidad salen de la ficha. **Ningún sistema los tiene todavía**: están pedidos a Codex en #62, y sin datos la unidad no se mueve.
+  - La velocidad de marcha la elige quien ordena, con tope en la velocidad máxima de la ficha. Los tiempos y esa velocidad máxima salen de la ficha. **Ningún sistema los tiene todavía**: están pedidos a Codex en #62, y sin datos la unidad no se mueve.
   - Sin traslados no cambia la simulación (las golden no cambian).
 - **Campaña de tres guardias** (selector "Duración" en la ventana de Campaña): la continuación opcional de Codex (`data/port-campaign-extended.mjs`) agrega una tercera guardia 24 h después de la segunda, con lo que quede: sin refuerzos, munición ni reparaciones extra. Prueba de navegador hasta la tercera guardia. No cambia la simulación.
 - **Tercera guardia opcional de Odesa** (`experimentos/catalogo-presupuesto/data/port-campaign-extended.mjs`): definición separada que reutiliza el escenario de los puertos y conserva daños, saldo, stock y límites de suministro tras la segunda guardia. No cambia la campaña de dos guardias que crea el menú. Verificación de tres combates con el motor real y de carga/descarga desde la pantalla nativa; reglas hipotéticas documentadas en `docs/investigacion/tercera-guardia-odesa.md`.

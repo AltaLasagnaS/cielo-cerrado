@@ -22,7 +22,7 @@ export const PL = {
   landDb: ['Clutter de suelo rasante (σ°F⁴ mediano)', 'dB'], reliefDb: ['Variación del clutter de suelo con el relieve', '± dB'], res: ['Resolución en distancia típica', 'm'], ruK: ['Alcance sin ambigüedad del MTI (× R1)', '×'],
   mtiCap: ['Techo del factor de mejora MTI', 'dB'], pdCap: ['Factor de mejora pulso-Doppler', 'dB'], landSv: ['Dispersión de velocidad del clutter de suelo', 'm/s'], seaSv: ['Dispersión de velocidad del clutter de mar', 'm/s'], rainSv: ['Dispersión de velocidad del clutter de lluvia', 'm/s'],
   windAlpha: ['Exponente del viento con la altura (ley de potencia)', ''], windTop: ['Altura hasta la que crece el viento', 'm'], optDay: ['Alcance óptico de día respecto de la noche', '×'],
-  'mob.stowS': ['Tiempo de repliegue (orden de marcha)', 's'], 'mob.deployS': ['Tiempo de despliegue (emplazamiento)', 's'], 'mob.kmh': ['Velocidad de marcha por la ruta', 'km/h'],
+  'mob.stowS': ['Tiempo de repliegue (orden de marcha)', 's'], 'mob.deployS': ['Tiempo de despliegue (emplazamiento)', 's'], 'mob.vmax': ['Velocidad máxima en ruta (del vehículo más lento de la unidad)', 'km/h'],
   gwLag: ['Demora agregada por la pasarela', 's'], gwPk: ['Pk de un disparo con pista que pasó por la pasarela (factor)', '×'],
   alt: ['Altitud de patrulla', 'm'], remotePk: ['Pk de un disparo con pista de red (factor)', '×'], radius: ['Radio de efecto', 'km'], spoofKm: ['Desvío típico por engaño GNSS', 'km'], P: ['Potencia relativa (juego)', '']
 };

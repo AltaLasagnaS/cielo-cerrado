@@ -1688,7 +1688,7 @@ table.t.mc td.pc{white-space:nowrap}
     optDay: ["Alcance óptico de día respecto de la noche", "×"],
     "mob.stowS": ["Tiempo de repliegue (orden de marcha)", "s"],
     "mob.deployS": ["Tiempo de despliegue (emplazamiento)", "s"],
-    "mob.kmh": ["Velocidad de marcha por la ruta", "km/h"],
+    "mob.vmax": ["Velocidad máxima en ruta (del vehículo más lento de la unidad)", "km/h"],
     gwLag: ["Demora agregada por la pasarela", "s"],
     gwPk: ["Pk de un disparo con pista que pasó por la pasarela (factor)", "×"],
     alt: ["Altitud de patrulla", "m"],
@@ -4922,7 +4922,7 @@ table.t.mc td.pc{white-space:nowrap}
   var MOB_PHASE = { stow: "replegando", move: "en tránsito", deploy: "desplegando" };
   function mobData(u) {
     const m = D(u).mob;
-    return m && m.stowS >= 0 && m.deployS >= 0 && m.kmh > 0 ? m : null;
+    return m && m.stowS >= 0 && m.deployS >= 0 && m.vmax > 0 ? m : null;
   }
   function cantMove(u) {
     if (!u.alive) return "está destruida";
@@ -4945,19 +4945,20 @@ table.t.mc td.pc{white-space:nowrap}
     }
     return pts[pts.length - 1];
   }
-  function orderMove(u, pts, t = S.t) {
+  function orderMove(u, pts, kmh2, t = S.t) {
     const why = cantMove(u);
     if (why) return why;
     if (!Array.isArray(pts) || !pts.length) return "la ruta está vacía";
+    if (!(kmh2 > 0)) return "falta la velocidad de marcha";
     const m = (
       /** @type {any} */
       mobData(u)
-    ), route = [[u.x, u.y], ...pts.map((p) => [+p[0], +p[1]])];
-    const L = routeKm(route), tMove = t + m.stowS, tDeploy = tMove + L / m.kmh * 3600;
-    u.mob = { phase: "stow", route, km: L, tMove, tDeploy, tReady: tDeploy + m.deployS };
+    ), route = [[u.x, u.y], ...pts.map((p) => [+p[0], +p[1]])], v = Math.min(kmh2, m.vmax);
+    const L = routeKm(route), tMove = t + m.stowS, tDeploy = tMove + L / v * 3600;
+    u.mob = { phase: "stow", route, km: L, kmh: v, tMove, tDeploy, tReady: tDeploy + m.deployS };
     u.reloadUntil = null;
     recUnit(u);
-    log("l", `${u.name} se repliega para trasladarse ${L.toFixed(1)} km (listo en ${Math.round((u.mob.tReady - t) / 60)} min).`, "def");
+    log("l", `${u.name} se repliega para trasladarse ${L.toFixed(1)} km a ${Math.round(v)} km/h (listo en ${Math.round((u.mob.tReady - t) / 60)} min).`, "def");
     return null;
   }
   function mobStep(t) {
@@ -4968,7 +4969,7 @@ table.t.mc td.pc{white-space:nowrap}
       }
       const plan = u.moves;
       if (plan && plan.length && plan[0].t <= t && !u.mob) {
-        const mv = plan.shift(), why = orderMove(u, mv.pts, mv.t);
+        const mv = plan.shift(), why = orderMove(u, mv.pts, mv.kmh, mv.t);
         if (why) log("w", `${u.name} no puede cumplir el traslado programado: ${why}.`, "def");
       }
       const m = u.mob;
@@ -4978,8 +4979,7 @@ table.t.mc td.pc{white-space:nowrap}
         recUnit(u);
       }
       if (m.phase === "move") {
-        const [x, y] = along(m.route, Math.min(m.km, (Math.min(t, m.tDeploy) - m.tMove) / 3600 * /** @type {any} */
-        mobData(u).kmh));
+        const [x, y] = along(m.route, Math.min(m.km, (Math.min(t, m.tDeploy) - m.tMove) / 3600 * m.kmh));
         u.x = x;
         u.y = y;
         if (t - (m.rec ?? -1e9) >= 5) {
@@ -10417,8 +10417,9 @@ table.t.mc td.pc{white-space:nowrap}
     } else if (P) {
       html = `Tocá el mapa donde quieras ubicar <b>${esc(P.name(S.placeType))}</b>; vas a poder confirmar o cancelar.`;
     } else if (S.mode === "relocate") {
-      const n2 = S.relocate?.pts.length ?? 0;
+      const r = S.relocate, n2 = r?.pts.length ?? 0, u = r && S.units.find((v) => v.id === r.id), vmax = u ? mobData(u)?.vmax : null;
       html = n2 ? `Ruta de <b>${n2} punto${n2 > 1 ? "s" : ""}</b>: el último es el destino. Tocá más puntos o confirmá.` : "Tocá el mapa para marcar la <b>ruta del traslado</b> (el último punto es el destino).";
+      html += ` <label class="dim" for="mbKmh">Marcha</label> <input id="mbKmh" class="inp" type="number" min="1" max="${vmax ?? ""}" step="1" style="width:70px" placeholder="km/h" value="${r?.kmh ?? ""}" title="Velocidad de marcha que ordenás, en km/h (máximo ${vmax ?? "?"} km/h, la del vehículo más lento)"> <span class="dim">km/h (máx ${vmax ?? "?"})</span>`;
       if (n2) ok = finishRelocate;
       cancelTxt = "Cancelar";
     } else if (S.mode === "measure") {
@@ -10448,6 +10449,10 @@ table.t.mc td.pc{white-space:nowrap}
     }
     mb.innerHTML = html + (ok ? ' <button class="btn sm pri" id="mbOk">Confirmar</button>' : "") + ` <button class="btn sm" id="mbX">${cancelTxt}</button>`;
     $("#mbX").onclick = cancel;
+    const kIn = $("#mbKmh");
+    if (kIn) kIn.oninput = () => {
+      if (S.relocate) S.relocate.kmh = +kIn.value || null;
+    };
     if (ok) $("#mbOk").onclick = ok;
   }
   function finishRoute() {
@@ -10465,7 +10470,11 @@ table.t.mc td.pc{white-space:nowrap}
   function finishRelocate() {
     const r = S.relocate, u = r && S.units.find((v) => v.id === r.id);
     if (!u || !r.pts.length) return;
-    const why = orderMove(u, r.pts);
+    if (!(r.kmh > 0)) {
+      toast("Escribí la velocidad de marcha (km/h).");
+      return;
+    }
+    const why = orderMove(u, r.pts, r.kmh);
     setMode("select");
     renderSel();
     toast(why ? "No se puede trasladar: " + why + "." : `${u.name} se repliega para trasladarse.`);
@@ -11192,14 +11201,14 @@ table.t.mc td.pc{white-space:nowrap}
       }
       let last3 = -1;
       return mv.map((m2, k) => {
-        const ww = `${w}, traslado ${k + 1}`, t = num2(ww + " · t", m2?.t, 0, 86400);
+        const ww = `${w}, traslado ${k + 1}`, t = num2(ww + " · t", m2?.t, 0, 86400), kmh2 = num2(ww + " · kmh (velocidad de marcha)", m2?.kmh, 1, 200);
         if (t != null && t < last3) err(`${ww}: los traslados van en orden de tiempo.`);
         last3 = t ?? last3;
         if (!Array.isArray(m2?.pts) || m2.pts.length < 1 || m2.pts.length > 50) {
           err(`${ww}: la ruta ("pts") necesita entre 1 y 50 puntos.`);
           return null;
         }
-        return { t, pts: m2.pts.map((p, j) => Array.isArray(p) && pos(`${ww}, punto ${j + 1}`, p[0], p[1]) ? [p[0], p[1]] : null) };
+        return { t, kmh: kmh2, pts: m2.pts.map((p, j) => Array.isArray(p) && pos(`${ww}, punto ${j + 1}`, p[0], p[1]) ? [p[0], p[1]] : null) };
       });
     };
     const defs = list4("defs", setup.defs).map((u, i) => {

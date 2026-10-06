@@ -129,16 +129,16 @@ export function validateScenario(raw) {
     pos(w, g.x, g.y);
     return { id: id(w, g.id), type: g.type, x: g.x, y: g.y, name: str(w + ' · name', g.name, 120, false), short: str(w + ' · short', g.short, 60), maxHp: num(w + ' · maxHp', g.maxHp, 1, 100000, { opt: true }), desc: str(w + ' · desc', g.desc, 1000), cp: str(w + ' · cp', g.cp, 20) || undefined, hpNow: num(w + ' · hpNow', g.hpNow, 0, 100000, { opt: true }) };
   });
-  // traslados programados de una defensa (sim/mobility.js): [{ t (s), pts: [[x, y], …] }], en orden
+  // traslados programados de una defensa (sim/mobility.js): [{ t (s), kmh (marcha), pts: [[x, y], …] }], en orden
   const movesOf = (w, mv) => {
     if (mv === undefined) return undefined;
     if (!Array.isArray(mv) || mv.length > 20) { err(`${w} · moves: tiene que ser una lista de hasta 20 traslados.`); return undefined; }
     let last = -1;
     return mv.map((m, k) => {
-      const ww = `${w}, traslado ${k + 1}`, t = num(ww + ' · t', m?.t, 0, 86400);
+      const ww = `${w}, traslado ${k + 1}`, t = num(ww + ' · t', m?.t, 0, 86400), kmh = num(ww + ' · kmh (velocidad de marcha)', m?.kmh, 1, 200);
       if (t != null && t < last) err(`${ww}: los traslados van en orden de tiempo.`); last = t ?? last;
       if (!Array.isArray(m?.pts) || m.pts.length < 1 || m.pts.length > 50) { err(`${ww}: la ruta ("pts") necesita entre 1 y 50 puntos.`); return null; }
-      return { t, pts: m.pts.map((p, j) => Array.isArray(p) && pos(`${ww}, punto ${j + 1}`, p[0], p[1]) ? [p[0], p[1]] : null) };
+      return { t, kmh, pts: m.pts.map((p, j) => Array.isArray(p) && pos(`${ww}, punto ${j + 1}`, p[0], p[1]) ? [p[0], p[1]] : null) };
     });
   };
   // defensas

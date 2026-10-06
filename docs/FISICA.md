@@ -537,7 +537,7 @@ Cada mejora cambia resultados. Antes de mergearla: correr las pruebas, revisar l
 `sim/mobility.js`. Una defensa terrestre se traslada en tres fases explícitas (etapa 5 del plan de Codex, [PLAN-MAESTRO.md](../experimentos/catalogo-presupuesto/docs/PLAN-MAESTRO.md) §6):
 
 1. **Replegando** durante `mob.stowS` (orden de marcha: plegar radar y lanzadores).
-2. **En tránsito** por la ruta, a `mob.kmh`. La ruta la da el escenario (`defs[].moves`, lista de `{ t, pts }`) o el jugador: el relieve SRTM no trae red vial, así que no se calcula un camino.
+2. **En tránsito** por la ruta, a la velocidad de marcha que elige quien da la orden (escenario o jugador), con tope en `mob.vmax`, la velocidad máxima en ruta del vehículo más lento de la unidad. La velocidad media de un convoy no es una prestación publicada (observación de Codex en #72), así que es una decisión del ejercicio y no un dato del catálogo. La ruta la da el escenario (`defs[].moves`, lista de `{ t, kmh, pts }`) o el jugador: el relieve SRTM no trae red vial, así que no se calcula un camino.
 3. **Desplegando** durante `mob.deployS` (emplazamiento, nivelación, encendido).
 
 **Qué cambia mientras dura el traslado:**
@@ -550,4 +550,4 @@ Cada mejora cambia resultados. Antes de mergearla: correr las pruebas, revisar l
 - Ubica la unidad donde la vio emitir o disparar. Si se trasladó, la sigue viendo en el lugar viejo hasta que vuelve a emitir o disparar desde el nuevo.
 - Un ataque planeado contra una unidad (`targetUnit`) apunta a donde estaba. El impacto la destruye solo si sigue dentro del radio de acierto. Si estaba cerca, igual puede recibir daño por la explosión (§10).
 
-**Sin datos no hay traslado.** Los tiempos y la velocidad viven en `UNC.def[tipo]` (`mob.stowS`, `mob.deployS`, `mob.kmh`) con fuentes. Un sistema sin esos datos no se puede mover: la interfaz lo dice y no se usa ningún valor por defecto. Detectar o disparar en movimiento, o con parada corta, queda para cuando haya datos por sistema (pedido a Codex en #62).
+**Sin datos no hay traslado.** Los tiempos y la velocidad máxima viven en `UNC.def[tipo]` (`mob.stowS`, `mob.deployS`, `mob.vmax`) con fuentes. Un sistema sin esos datos no se puede mover: la interfaz lo dice y no se usa ningún valor por defecto. Detectar o disparar en movimiento, o con parada corta, queda para cuando haya datos por sistema (pedido a Codex en #62).

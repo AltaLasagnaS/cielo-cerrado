@@ -15,7 +15,7 @@ import { validateScenario, exportScenario } from '../src/sim/scenario-io.js';
 import { clearSetup, runCurrent, useMap } from './helpers.js';
 
 // datos de prueba (no son del catálogo: la ficha real todavía no tiene movilidad)
-const FIX = { stowS: 300, deployS: 600, kmh: 36 };
+const FIX = { stowS: 300, deployS: 600, vmax: 60 };
 const saved = DEFENSES.nasams.mob;
 after(() => { if (saved === undefined) delete DEFENSES.nasams.mob; else DEFENSES.nasams.mob = saved; });
 
@@ -27,7 +27,7 @@ test('sin datos de despliegue y repliegue la unidad no se puede mover (no se inv
   setupOne(); setRandom(seeded(1)); startSim(); setRandom(null);
   const u = S.units[0];
   assert.match(cantMove(u), /no hay datos de despliegue/);
-  assert.match(orderMove(u, [[60, 50]]), /no hay datos/);
+  assert.match(orderMove(u, [[60, 50]], 36), /no hay datos/);
   assert.ok(!u.mob);
 });
 
@@ -35,7 +35,7 @@ test('las tres fases terminan en instantes fijos y la posición avanza a la velo
   DEFENSES.nasams.mob = { ...FIX };
   setupOne(); setRandom(seeded(1)); startSim();
   const u = S.units[0];
-  assert.equal(orderMove(u, [[56, 50]]), null);   // 6 km a 36 km/h = 600 s
+  assert.equal(orderMove(u, [[56, 50]], 36), null);   // 6 km a 36 km/h = 600 s
   until(299); assert.equal(u.mob.phase, 'stow'); assert.equal(u.x, 50);
   until(600); assert.equal(u.mob.phase, 'move'); assert.ok(Math.abs(u.x - 53) < 1e-9, 'a la mitad del tramo: ' + u.x);
   until(900); assert.equal(u.mob.phase, 'deploy'); assert.equal(u.x, 56);
@@ -45,12 +45,22 @@ test('las tres fases terminan en instantes fijos y la posición avanza a la velo
   assert.equal(MOB_PHASE.move, 'en tránsito');
 });
 
+test('la marcha la elige quien ordena, con tope en la velocidad máxima de la ficha', () => {
+  DEFENSES.nasams.mob = { ...FIX };
+  setupOne(); setRandom(seeded(1)); startSim(); setRandom(null);
+  const u = S.units[0];
+  assert.match(orderMove(u, [[56, 50]]), /falta la velocidad de marcha/);
+  assert.equal(orderMove(u, [[56, 50]], 500), null);
+  assert.equal(u.mob.kmh, 60, 'no supera la velocidad máxima');
+  assert.equal(u.mob.tDeploy - u.mob.tMove, 6 / 60 * 3600);
+});
+
 test('no se traslada con misiles en vuelo ni dos veces a la vez', () => {
   DEFENSES.nasams.mob = { ...FIX };
   setupOne(); setRandom(seeded(1)); startSim(); setRandom(null);
   const u = S.units[0];
   u.active = 1; assert.match(cantMove(u), /misiles en vuelo/);
-  u.active = 0; assert.equal(orderMove(u, [[60, 50]]), null);
+  u.active = 0; assert.equal(orderMove(u, [[60, 50]], 36), null);
   assert.match(cantMove(u), /ya se está trasladando/);
 });
 
@@ -60,10 +70,10 @@ function droneOver(target) { addSalvo({ type: 'shahed', count: 1, tStart: 0, pts
 test('trasladándose no detecta ni dispara', () => {
   DEFENSES.nasams.mob = { ...FIX };
   setupOne(); droneOver({});
-  const run = move => runCurrent(3, move ? s => { s.units[0].moves = [{ t: 0, pts: [[51, 50]] }]; } : null);
+  const run = move => runCurrent(3, move ? s => { s.units[0].moves = [{ t: 0, kmh: 36, pts: [[51, 50]] }]; } : null);
   const still = run(false), shotsStill = still.stats.shots, detStill = still.threats[0].firstDet;
   assert.ok(shotsStill > 0 && detStill != null, 'quieta, la batería lo ve y le tira');
-  DEFENSES.nasams.mob = { stowS: 300, deployS: 7200, kmh: 36 };   // queda desplegando toda la corrida
+  DEFENSES.nasams.mob = { stowS: 300, deployS: 7200, vmax: 60 };   // queda desplegando toda la corrida
   setupOne(); droneOver({});
   const moved = run(true);
   assert.equal(moved.threats[0].det[moved.units[0].id], undefined, 'su radar no lo vio');
@@ -75,7 +85,7 @@ test('el atacante la sigue viendo donde la ubicó hasta que emite desde el lugar
   setupOne(); setRandom(seeded(1)); startSim();
   const u = S.units[0];
   until(10); assert.equal(asAttackerSees(u, S.t).x, 50, 'emitió: el atacante la ubicó');
-  orderMove(u, [[56, 50]]);
+  orderMove(u, [[56, 50]], 36);
   until(1200); assert.equal(asAttackerSees(u, S.t).x, 50, 'en el destino, pero sin emitir todavía');
   until(1520); assert.equal(asAttackerSees(u, S.t).x, 56, 'emitió desde el lugar nuevo');
   assert.equal(asAttackerSees(u, 1200).x, 50, 'la historia se conserva (repetición)');
@@ -87,7 +97,7 @@ test('un ataque planeado contra su posición vieja no la destruye si se fue', ()
   const strike = move => {
     DEFENSES.nasams.mob = { ...FIX };
     setupOne(); addSalvo({ type: 'kalibr', count: 1, tStart: 0, pts: [[50, 199], [50, 60], [50, 50]], targetUnit: 'N-1' });
-    return runCurrent(7, s => { s.units[0].emcon = 'silencio'; if (move) s.units[0].moves = [{ t: 0, pts: [[53, 50]] }]; });
+    return runCurrent(7, s => { s.units[0].emcon = 'silencio'; if (move) s.units[0].moves = [{ t: 0, kmh: 36, pts: [[53, 50]] }]; });
   };
   const still = strike(false);
   assert.equal(still.units[0].alive, false, 'quieta: el impacto la destruye');
@@ -98,13 +108,13 @@ test('un ataque planeado contra su posición vieja no la destruye si se fue', ()
 
 test('scenario-io: los traslados programados se validan y viajan con la defensa', () => {
   useMap('odesa'); clearSetup();
-  const u = addDef('nasams', 50, 50, { name: 'N-1' }); u.moves = [{ t: 60, pts: [[55, 50], [55, 55]] }];
+  const u = addDef('nasams', 50, 50, { name: 'N-1' }); u.moves = [{ t: 60, kmh: 30, pts: [[55, 50], [55, 55]] }];
   const ok = JSON.parse(JSON.stringify(exportScenario()));
   const r = validateScenario(ok);
   assert.ok(r.ok, JSON.stringify(r.errors));
-  assert.deepEqual(r.data.setup.defs[0].moves, [{ t: 60, pts: [[55, 50], [55, 55]] }]);
-  ok.setup.defs[0].moves = [{ t: 60, pts: [] }, { t: 10, pts: [[1, 1]] }];
+  assert.deepEqual(r.data.setup.defs[0].moves, [{ t: 60, kmh: 30, pts: [[55, 50], [55, 55]] }]);
+  ok.setup.defs[0].moves = [{ t: 60, kmh: 30, pts: [] }, { t: 10, pts: [[1, 1]] }];
   const bad = validateScenario(ok);
   assert.equal(bad.ok, false);
-  assert.ok(bad.errors.some(e => /entre 1 y 50 puntos/.test(e)) && bad.errors.some(e => /orden de tiempo/.test(e)), bad.errors.join(' | '));
+  assert.ok(bad.errors.some(e => /entre 1 y 50 puntos/.test(e)) && bad.errors.some(e => /orden de tiempo/.test(e)) && bad.errors.some(e => /velocidad de marcha/.test(e)), bad.errors.join(' | '));
 });

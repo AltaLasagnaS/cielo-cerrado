@@ -148,7 +148,7 @@ Con el selector en **Vista del atacante**, durante la corrida el mapa muestra su
 
 Una defensa se traslada en tres fases: replegando, en tránsito y desplegando. Mientras dura no detecta, no dispara ni recarga (docs/FISICA.md §12).
 - **Cómo se ordena:** con `orderMove(u, pts)` o con traslados programados en el escenario (`defs[].moves`, que `mobStep` ordena a su hora).
-- **Datos:** los tiempos y la velocidad salen de la ficha (`D(u).mob`, que se carga desde `UNC`). Sin datos no hay traslado.
+- **Datos:** los tiempos y la velocidad máxima salen de la ficha (`D(u).mob`, que se carga desde `UNC`). Sin datos no hay traslado. La velocidad de marcha va en cada orden (`orderMove(u, pts, kmh)`, `moves[].kmh`), con ese tope.
 - **Repetición:** `recUnit` anota la posición y la fase. Durante el tránsito anota cada 5 s, así la repetición dibuja el trayecto.
 - **Vista del atacante:** `contacts.js#asAttackerSees` muestra cada unidad en su última ubicación conocida (`u.fixes`), no donde está.
 

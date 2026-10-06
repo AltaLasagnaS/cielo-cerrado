@@ -1,9 +1,11 @@
 // @ts-check
 // ---------------- MOVILIDAD ----------------
 // Traslado de una unidad terrestre en fases explícitas (etapa 5 del plan de Codex, docs/FISICA.md §12):
-//   operativa → replegando (mob.stowS) → en tránsito (ruta a mob.kmh) → desplegando (mob.deployS) → operativa.
-// Los tiempos y la velocidad salen de la ficha (D(u).mob, con incertidumbre en UNC); sin esos datos la
-// unidad no se puede mover: no se inventa un valor. Mientras no está desplegada no detecta, no emite, no
+//   operativa → replegando (mob.stowS) → en tránsito → desplegando (mob.deployS) → operativa.
+// Los tiempos y la velocidad máxima en ruta (mob.vmax, la del vehículo más lento de la unidad) salen de la
+// ficha (D(u).mob, con incertidumbre en UNC); sin esos datos la unidad no se puede mover: no se inventa un
+// valor. La velocidad de marcha la elige quien da la orden (escenario o jugador), con tope en mob.vmax: la
+// velocidad media de un convoy no es una prestación publicada (Codex, #72). Mientras no está desplegada no detecta, no emite, no
 // dispara, no recarga y no publica en la red. La ruta la da el escenario o el jugador (no hay red vial).
 // Todo corre en tiempo simulado: cada fase termina en un instante fijo, sin importar el tamaño del paso.
 import { D } from '../data/index.js';
@@ -20,7 +22,7 @@ export const moving = u => !!u.mob;
 /** Datos de movilidad completos de la ficha de u, o null. */
 export function mobData(u) {
   const m = D(u).mob;
-  return m && m.stowS >= 0 && m.deployS >= 0 && m.kmh > 0 ? m : null;
+  return m && m.stowS >= 0 && m.deployS >= 0 && m.vmax > 0 ? m : null;
 }
 
 /** Por qué u no puede empezar un traslado ahora, o null si puede. */
@@ -47,18 +49,19 @@ function along(pts, d) {
 }
 
 /**
- * Ordena a u trasladarse por los puntos pts (km; el último es el destino) desde el instante t.
- * → null si empezó, o el motivo por el que no puede.
+ * Ordena a u trasladarse por los puntos pts (km; el último es el destino) a kmh de marcha (con tope en la
+ * velocidad máxima de su ficha) desde el instante t. → null si empezó, o el motivo por el que no puede.
  */
-export function orderMove(u, pts, t = S.t) {
+export function orderMove(u, pts, kmh, t = S.t) {
   const why = cantMove(u); if (why) return why;
   if (!Array.isArray(pts) || !pts.length) return 'la ruta está vacía';
-  const m = /** @type {any} */ (mobData(u)), route = [[u.x, u.y], ...pts.map(p => [+p[0], +p[1]])];
-  const L = routeKm(route), tMove = t + m.stowS, tDeploy = tMove + L / m.kmh * 3600;
-  u.mob = { phase: 'stow', route, km: L, tMove, tDeploy, tReady: tDeploy + m.deployS };
+  if (!(kmh > 0)) return 'falta la velocidad de marcha';
+  const m = /** @type {any} */ (mobData(u)), route = [[u.x, u.y], ...pts.map(p => [+p[0], +p[1]])], v = Math.min(kmh, m.vmax);
+  const L = routeKm(route), tMove = t + m.stowS, tDeploy = tMove + L / v * 3600;
+  u.mob = { phase: 'stow', route, km: L, kmh: v, tMove, tDeploy, tReady: tDeploy + m.deployS };
   u.reloadUntil = null;   // una recarga en curso se interrumpe: la munición que faltaba sigue en reserva
   recUnit(u);
-  log('l', `${u.name} se repliega para trasladarse ${L.toFixed(1)} km (listo en ${Math.round((u.mob.tReady - t) / 60)} min).`, 'def');
+  log('l', `${u.name} se repliega para trasladarse ${L.toFixed(1)} km a ${Math.round(v)} km/h (listo en ${Math.round((u.mob.tReady - t) / 60)} min).`, 'def');
   return null;
 }
 
@@ -68,13 +71,13 @@ export function mobStep(t) {
     if (!u.alive) { if (u.mob) u.mob = null; continue; }
     const plan = u.moves;
     if (plan && plan.length && plan[0].t <= t && !u.mob) {
-      const mv = plan.shift(), why = orderMove(u, mv.pts, mv.t);
+      const mv = plan.shift(), why = orderMove(u, mv.pts, mv.kmh, mv.t);
       if (why) log('w', `${u.name} no puede cumplir el traslado programado: ${why}.`, 'def');
     }
     const m = u.mob; if (!m) continue;
     if (m.phase === 'stow' && t >= m.tMove) { m.phase = 'move'; recUnit(u); }
     if (m.phase === 'move') {
-      const [x, y] = along(m.route, Math.min(m.km, (Math.min(t, m.tDeploy) - m.tMove) / 3600 * /** @type {any} */ (mobData(u)).kmh));
+      const [x, y] = along(m.route, Math.min(m.km, (Math.min(t, m.tDeploy) - m.tMove) / 3600 * m.kmh));
       u.x = x; u.y = y;
       if (t - (m.rec ?? -1e9) >= 5) { m.rec = t; recUnit(u); }   // la repetición dibuja el trayecto
       if (t >= m.tDeploy) { const end = m.route[m.route.length - 1]; u.x = end[0]; u.y = end[1]; m.phase = 'deploy'; recUnit(u); }

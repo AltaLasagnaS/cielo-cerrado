@@ -28,7 +28,7 @@ Propuesta detallada, con orden, dificultad, datos y pruebas: [docs/investigacion
 - Niebla de guerra más estricta: ver **Perspectivas por bando**.
 - **Campaña experimental de Odesa en el juego** (botón Campaña; lógica de Codex en `experimentos/catalogo-presupuesto/`): dos o tres guardias con presupuesto, munición pedida y cargada con plazos, daño y munición que se arrastran, guardado entre guardias. Falta: más misiones y campaña del atacante (Codex), configuraciones y precios con evidencia, traslados por el mapa, reporte de daño incierto para el atacante y restaurar una guardia a mitad de camino.
 - **Movilidad, segunda parte** (etapa 5 del plan de Codex). Ya está el mecanismo de traslado, programable desde el escenario o desde el mapa durante la partida (`sim/mobility.js`). Falta:
-  - Los tiempos de repliegue y despliegue y la velocidad de cada sistema (*espera datos*, pedidos a Codex en #62).
+  - Los tiempos de repliegue y despliegue y la velocidad máxima en ruta de cada sistema (*espera datos*, pedidos a Codex en #62).
   - Detectar o disparar en movimiento cuando esté documentado.
   - Traslados en la campaña.
 - Corredor del mar Negro, segunda parte: barcos que navegan por el corredor (ya están los barcos amarrados como objetivo y el escenario `od_corredor`). *Espera movilidad* (etapa 5 del plan de Codex).

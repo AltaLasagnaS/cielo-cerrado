@@ -136,7 +136,7 @@ try {
   await page.evaluate(() => { window.__dbg.loadScenario('mb_noche'); window.__dbg.startSim(); });
   const mv = await page.evaluate(() => { const u = window.__S.units.find(v => v.alive); window.__S.sel = { kind: 'def', id: u.id }; window.__dbg.renderAll(); return u.id; });
   assert.match(await page.locator('#selCard').innerText(), /No se puede trasladar: no hay datos de despliegue/);
-  await page.evaluate(async id => { const { DEFENSES } = await import('/data/index.js'); const u = window.__S.units.find(v => v.id === id); DEFENSES[u.type].mob = { stowS: 60, deployS: 60, kmh: 40 }; window.__dbg.renderAll(); }, mv);
+  await page.evaluate(async id => { const { DEFENSES } = await import('/data/index.js'); const u = window.__S.units.find(v => v.id === id); DEFENSES[u.type].mob = { stowS: 60, deployS: 60, vmax: 60 }; window.__dbg.renderAll(); }, mv);
   await page.click('#sMove');
   const dest = await page.evaluate(async id => {
     const { toS } = await import('/render/view.js'); const r = document.querySelector('canvas').getBoundingClientRect(), u = window.__S.units.find(v => v.id === id);
@@ -144,6 +144,10 @@ try {
   }, mv);
   await page.mouse.click(dest[0], dest[1]);
   assert.match(await page.locator('#modebar').textContent(), /Ruta de 1 punto/);
+  await page.click('#mbOk');
+  assert.match(await page.locator('#modebar').textContent(), /velocidad de marcha/, 'sin velocidad no ordena');
+  await page.waitForSelector('#mbKmh', { timeout: 4000 });
+  await page.fill('#mbKmh', '40');
   await page.click('#mbOk');
   assert.equal(await page.evaluate(id => window.__S.units.find(v => v.id === id).mob?.phase, mv), 'stow', 'se repliega');
   assert.match(await page.locator('#modebar').textContent(), /se repliega/);
