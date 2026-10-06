@@ -9868,6 +9868,10 @@ table.t.mc td.pc{white-space:nowrap}
     };
     return true;
   }
+  var lastDef = { html: "", node: (
+    /** @type {Element | null} */
+    null
+  ) };
   function renderSel(live) {
     const el = $("#selCard");
     const sel = S.sel;
@@ -9931,7 +9935,10 @@ table.t.mc td.pc{white-space:nowrap}
       const why = canOrder ? campaignBattle() ? "en la campaña todavía no hay traslados" : cantMove(u) : null;
       html += `<div class="row"><button class="btn sm" id="sInfo">Ficha</button>${ed ? '<button class="btn sm danger" id="sDel">Eliminar</button>' : ""}${canOrder && !why ? '<button class="btn sm" id="sMove" title="Replegar, viajar por la ruta que marques y desplegar. Mientras tanto no detecta ni dispara.">Trasladar</button>' : ""}</div>`;
       if (canOrder && why) html += `<p class="hint">No se puede trasladar: ${esc(why)}.</p>`;
+      if (live && lastDef.node && el.firstElementChild === lastDef.node && lastDef.html === html) return;
       el.innerHTML = html;
+      lastDef.html = html;
+      lastDef.node = el.firstElementChild;
       $("#sInfo").onclick = () => openFicha("def", u.type);
       if ($("#sMove")) $("#sMove").onclick = () => {
         S.relocate = { id: u.id, pts: [] };

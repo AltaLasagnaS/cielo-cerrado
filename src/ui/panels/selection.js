@@ -81,6 +81,9 @@ function renderMulti(el) {
   return true;
 }
 
+/** Último contenido de la ficha de una defensa (ver renderSel). */
+const lastDef = { html: '', node: /** @type {Element | null} */ (null) };
+
 export function renderSel(live) {
   const el = $('#selCard'); const sel = S.sel;
   if (S.multi.length && !S.started && renderMulti(el)) return;
@@ -130,7 +133,11 @@ export function renderSel(live) {
     const why = canOrder ? (campaignBattle() ? 'en la campaña todavía no hay traslados' : cantMove(u)) : null;
     html += `<div class="row"><button class="btn sm" id="sInfo">Ficha</button>${ed ? '<button class="btn sm danger" id="sDel">Eliminar</button>' : ''}${canOrder && !why ? '<button class="btn sm" id="sMove" title="Replegar, viajar por la ruta que marques y desplegar. Mientras tanto no detecta ni dispara.">Trasladar</button>' : ''}</div>`;
     if (canOrder && why) html += `<p class="hint">No se puede trasladar: ${esc(why)}.</p>`;
-    el.innerHTML = html;
+    // el refresco periódico (live) no reemplaza la ficha si no cambió: un botón que se reemplaza a cada
+    // rato se vuelve difícil de tocar
+    // (la marca es el primer nodo que dejó: si otra vista reescribió la tarjeta, ya no coincide)
+    if (live && lastDef.node && el.firstElementChild === lastDef.node && lastDef.html === html) return;
+    el.innerHTML = html; lastDef.html = html; lastDef.node = el.firstElementChild;
     $('#sInfo').onclick = () => openFicha('def', u.type);
     if ($('#sMove')) $('#sMove').onclick = () => { S.relocate = { id: u.id, pts: [] }; setMode('relocate'); };
     if (ed) {

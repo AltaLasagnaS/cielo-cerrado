@@ -137,6 +137,9 @@ try {
   const mv = await page.evaluate(() => { const u = window.__S.units.find(v => v.alive); window.__S.sel = { kind: 'def', id: u.id }; window.__dbg.renderAll(); return u.id; });
   assert.match(await page.locator('#selCard').innerText(), /No se puede trasladar: no hay datos de despliegue/);
   await page.evaluate(async id => { const { DEFENSES } = await import('/data/index.js'); const u = window.__S.units.find(v => v.id === id); DEFENSES[u.type].mob = { stowS: 60, deployS: 60, vmax: 60 }; window.__dbg.renderAll(); }, mv);
+  // la ficha no se reemplaza si no cambió (el refresco periódico la dejaba imposible de tocar en máquinas lentas)
+  const stable = await page.evaluate(() => new Promise(res => { const b = document.querySelector('#sMove'); setTimeout(() => res(!!b && b.isConnected), 600); }));
+  assert.ok(stable, 'el botón Trasladar sigue siendo el mismo después de varios refrescos');
   await page.click('#sMove');
   const dest = await page.evaluate(async id => {
     const { toS } = await import('/render/view.js'); const r = document.querySelector('canvas').getBoundingClientRect(), u = window.__S.units.find(v => v.id === id);
