@@ -1,0 +1,4424 @@
+{
+  "format": "cielo-cerrado/db3k-selected-review",
+  "version": 1,
+  "reviewedOn": "2026-10-05",
+  "builds": [
+    {
+      "buildLabel": 496,
+      "versionBasis": "supplied-filename",
+      "verifiedInternalBuild": null,
+      "file": "DB3K_496.db3",
+      "sha256": "da256f20e501d15977ecf0de7666f8f3af050524db349d0aa82b6d8db63b1a9b",
+      "role": "game-database",
+      "confidence": "medium-low",
+      "counts": {
+        "DataWeapon": 3954,
+        "DataMount": 3510,
+        "DataSensor": 6667
+      },
+      "records": [
+        {
+          "table": "DataWeapon",
+          "componentId": 642,
+          "present": true,
+          "rawFields": {
+            "ID": 642,
+            "Name": "MIM-104E Patriot PAC-2 GEM+",
+            "Comments": "2004",
+            "BurnoutTime": null,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 55.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 24384.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [
+            "BurnoutTime"
+          ],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [],
+          "weaponCodes": [
+            {
+              "CodeID": 1001,
+              "Description": "Illuminate at Launch"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 9999,
+              "Description": "Flight Profile - Level Cruise Flight"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 1150,
+          "present": true,
+          "rawFields": {
+            "ID": 1150,
+            "Name": "MIM-104F Patriot PAC-3 ERINT",
+            "Comments": "2007",
+            "BurnoutTime": null,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 40.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 24384.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [
+            "BurnoutTime"
+          ],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 1715,
+              "Name": "Active Radar Seeker",
+              "RadarHorizontalBeamwidth": 1.0,
+              "RadarVerticalBeamwidth": 1.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1101,
+              "Description": "Home On Jam (HOJ)"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 6133,
+              "Description": "Attitude Control - Combined"
+            },
+            {
+              "CodeID": 9999,
+              "Description": "Flight Profile - Level Cruise Flight"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 3207,
+          "present": true,
+          "rawFields": {
+            "ID": 3207,
+            "Name": "MIM-104F Patriot PAC-3 MSE",
+            "Comments": "2018",
+            "BurnoutTime": null,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 60.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 24384.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [
+            "BurnoutTime"
+          ],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 1715,
+              "Name": "Active Radar Seeker",
+              "RadarHorizontalBeamwidth": 1.0,
+              "RadarVerticalBeamwidth": 1.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1101,
+              "Description": "Home On Jam (HOJ)"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 6133,
+              "Description": "Attitude Control - Combined"
+            },
+            {
+              "CodeID": 9999,
+              "Description": "Flight Profile - Level Cruise Flight"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 403,
+          "present": true,
+          "rawFields": {
+            "ID": 403,
+            "Name": "SA-10a Grumble [5V55K]",
+            "Comments": "1980, S-300PT",
+            "BurnoutTime": null,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 25.0,
+            "TargetAltitudeMin": 24.3,
+            "TargetAltitudeMax": 27432.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [
+            "BurnoutTime"
+          ],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 5943,
+              "Name": "SARH Seeker",
+              "RadarHorizontalBeamwidth": 0.0,
+              "RadarVerticalBeamwidth": 0.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1001,
+              "Description": "Illuminate at Launch"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 1156,
+          "present": true,
+          "rawFields": {
+            "ID": 1156,
+            "Name": "SA-10a Grumble [5V55KD]",
+            "Comments": "1982, S-300PT-1",
+            "BurnoutTime": null,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 40.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 27432.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [
+            "BurnoutTime"
+          ],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [],
+          "weaponCodes": [
+            {
+              "CodeID": 1001,
+              "Description": "Illuminate at Launch"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 1831,
+          "present": true,
+          "rawFields": {
+            "ID": 1831,
+            "Name": "SA-10b Grumble [5V55R]",
+            "Comments": "1984, S-300PS",
+            "BurnoutTime": null,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 40.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 27432.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [
+            "BurnoutTime"
+          ],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [],
+          "weaponCodes": [
+            {
+              "CodeID": 1001,
+              "Description": "Illuminate at Launch"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 652,
+          "present": true,
+          "rawFields": {
+            "ID": 652,
+            "Name": "SA-11 Gadfly [9M38]",
+            "Comments": "1984, 9K37 Buk",
+            "BurnoutTime": null,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 20.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 14020.8,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [
+            "BurnoutTime"
+          ],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 4144,
+              "Name": "SARH Seeker",
+              "RadarHorizontalBeamwidth": 0.0,
+              "RadarVerticalBeamwidth": 0.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1002,
+              "Description": "Terminal Illumination"
+            },
+            {
+              "CodeID": 1003,
+              "Description": "Supports Buddy Illumination"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 1147,
+          "present": true,
+          "rawFields": {
+            "ID": 1147,
+            "Name": "SA-11 Gadfly [9M38M1]",
+            "Comments": "1986, 9K37 Buk-M1",
+            "BurnoutTime": null,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 25.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 14020.8,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [
+            "BurnoutTime"
+          ],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 4144,
+              "Name": "SARH Seeker",
+              "RadarHorizontalBeamwidth": 0.0,
+              "RadarVerticalBeamwidth": 0.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1002,
+              "Description": "Terminal Illumination"
+            },
+            {
+              "CodeID": 1003,
+              "Description": "Supports Buddy Illumination"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 2970,
+          "present": true,
+          "rawFields": {
+            "ID": 2970,
+            "Name": "SA-27 Grizzly [9M317M]",
+            "Comments": "2018, 9K37M3 Buk-M3",
+            "BurnoutTime": null,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 38.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 22860.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [
+            "BurnoutTime"
+          ],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 4148,
+              "Name": "SARH Seeker",
+              "RadarHorizontalBeamwidth": 0.0,
+              "RadarVerticalBeamwidth": 0.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1002,
+              "Description": "Terminal Illumination"
+            },
+            {
+              "CodeID": 1003,
+              "Description": "Supports Buddy Illumination"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 598,
+          "present": true,
+          "rawFields": {
+            "ID": 598,
+            "Name": "MIM-120B NASAMS [AMRAAM]",
+            "Comments": "1996",
+            "BurnoutTime": null,
+            "AirRangeMin": 1.0,
+            "AirRangeMax": 16.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 9753.6,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [
+            "BurnoutTime"
+          ],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 1031,
+              "Name": "Active Radar Seeker",
+              "RadarHorizontalBeamwidth": 1.0,
+              "RadarVerticalBeamwidth": 1.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1101,
+              "Description": "Home On Jam (HOJ)"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 9999,
+              "Description": "Flight Profile - Level Cruise Flight"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 2771,
+          "present": true,
+          "rawFields": {
+            "ID": 2771,
+            "Name": "MIM-120C-7 NASAMS II [AMRAAM]",
+            "Comments": "-",
+            "BurnoutTime": null,
+            "AirRangeMin": 1.0,
+            "AirRangeMax": 20.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 10972.8,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [
+            "BurnoutTime"
+          ],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 2131,
+              "Name": "Active Radar Seeker",
+              "RadarHorizontalBeamwidth": 1.0,
+              "RadarVerticalBeamwidth": 1.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1101,
+              "Description": "Home On Jam (HOJ)"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 9999,
+              "Description": "Flight Profile - Level Cruise Flight"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 2891,
+          "present": true,
+          "rawFields": {
+            "ID": 2891,
+            "Name": "IRIS-T SLS",
+            "Comments": "2017, Surface Launched, Short-Range",
+            "BurnoutTime": null,
+            "AirRangeMin": 0.2,
+            "AirRangeMax": 6.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 6096.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [
+            "BurnoutTime"
+          ],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 4070,
+              "Name": "IIR Seeker",
+              "RadarHorizontalBeamwidth": 0.0,
+              "RadarVerticalBeamwidth": 0.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 2004,
+              "Description": "Anti-Air Dogfight (High Off-Boresight)"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 6102,
+              "Description": "Weapon - INS w/ GNSS Navigation"
+            },
+            {
+              "CodeID": 6140,
+              "Description": "Uses GPS"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 4041,
+          "present": true,
+          "rawFields": {
+            "ID": 4041,
+            "Name": "IRIS-T SLM",
+            "Comments": "2017, Surface Launched, Medium-Range",
+            "BurnoutTime": null,
+            "AirRangeMin": 0.2,
+            "AirRangeMax": 20.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 6096.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [
+            "BurnoutTime"
+          ],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 4070,
+              "Name": "IIR Seeker",
+              "RadarHorizontalBeamwidth": 0.0,
+              "RadarVerticalBeamwidth": 0.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 2004,
+              "Description": "Anti-Air Dogfight (High Off-Boresight)"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 6102,
+              "Description": "Weapon - INS w/ GNSS Navigation"
+            },
+            {
+              "CodeID": 6140,
+              "Description": "Uses GPS"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 681,
+          "present": true,
+          "rawFields": {
+            "ID": 681,
+            "Name": "Aster 30 Blk 1",
+            "Comments": "2010+, ABM",
+            "BurnoutTime": null,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 60.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 19812.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [
+            "BurnoutTime"
+          ],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 1826,
+              "Name": "Active Radar Seeker",
+              "RadarHorizontalBeamwidth": 1.0,
+              "RadarVerticalBeamwidth": 1.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1101,
+              "Description": "Home On Jam (HOJ)"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 6133,
+              "Description": "Attitude Control - Combined"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 388,
+          "present": true,
+          "rawFields": {
+            "ID": 388,
+            "Name": "Patriot M901",
+            "Comments": "1997, PAC-2 GEM",
+            "Capacity": 4,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 3194,
+              "weaponId": 994,
+              "weaponName": "MIM-104D Patriot PAC-2 GEM",
+              "DefaultLoad": 4,
+              "MaxLoad": 4,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 816,
+          "present": true,
+          "rawFields": {
+            "ID": 816,
+            "Name": "Patriot M901",
+            "Comments": "2004, PAC-2 GEM+",
+            "Capacity": 4,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 1003,
+              "weaponId": 642,
+              "weaponName": "MIM-104E Patriot PAC-2 GEM+",
+              "DefaultLoad": 4,
+              "MaxLoad": 4,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 963,
+          "present": true,
+          "rawFields": {
+            "ID": 963,
+            "Name": "Patriot M901",
+            "Comments": "2007, PAC-3 ERINT, 16x Rnds",
+            "Capacity": 16,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 999,
+              "weaponId": 1150,
+              "weaponName": "MIM-104F Patriot PAC-3 ERINT",
+              "DefaultLoad": 16,
+              "MaxLoad": 16,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 2759,
+          "present": true,
+          "rawFields": {
+            "ID": 2759,
+            "Name": "Patriot M901",
+            "Comments": "2016, PAC-3 MSE, 8x Rnds",
+            "Capacity": 16,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 7951,
+              "weaponId": 3207,
+              "weaponName": "MIM-104F Patriot PAC-3 MSE",
+              "DefaultLoad": 8,
+              "MaxLoad": 8,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 2760,
+          "present": true,
+          "rawFields": {
+            "ID": 2760,
+            "Name": "Patriot M901",
+            "Comments": "2016, PAC-3 MSE, 12x Rnds",
+            "Capacity": 12,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 7952,
+              "weaponId": 3207,
+              "weaponName": "MIM-104F Patriot PAC-3 MSE",
+              "DefaultLoad": 12,
+              "MaxLoad": 12,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 2761,
+          "present": true,
+          "rawFields": {
+            "ID": 2761,
+            "Name": "Patriot M901",
+            "Comments": "2016, PAC-3 ERINT/MSE, 14x Rnds",
+            "Capacity": 14,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 7955,
+              "weaponId": 3207,
+              "weaponName": "MIM-104F Patriot PAC-3 MSE",
+              "DefaultLoad": 6,
+              "MaxLoad": 6,
+              "Multiple": 1
+            },
+            {
+              "ComponentNumber": 2,
+              "recordId": 7222,
+              "weaponId": 1150,
+              "weaponName": "MIM-104F Patriot PAC-3 ERINT",
+              "DefaultLoad": 8,
+              "MaxLoad": 8,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 1658,
+          "present": true,
+          "rawFields": {
+            "ID": 1658,
+            "Name": "SA-10a Grumble [5P85T] TEL",
+            "Comments": "1980, S-300PT, 5V55K",
+            "Capacity": 4,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 2585,
+              "weaponId": 403,
+              "weaponName": "SA-10a Grumble [5V55K]",
+              "DefaultLoad": 4,
+              "MaxLoad": 4,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 936,
+          "present": true,
+          "rawFields": {
+            "ID": 936,
+            "Name": "SA-10a Grumble [5P85T] TEL",
+            "Comments": "1982, S-300PT-1, 5V55KD",
+            "Capacity": 4,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 987,
+              "weaponId": 1156,
+              "weaponName": "SA-10a Grumble [5V55KD]",
+              "DefaultLoad": 4,
+              "MaxLoad": 4,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 318,
+          "present": true,
+          "rawFields": {
+            "ID": 318,
+            "Name": "SA-10b Grumble [5P85S] TEL",
+            "Comments": "1985, S-300PS, 5V55R",
+            "Capacity": 4,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 2083,
+              "weaponId": 1831,
+              "weaponName": "SA-10b Grumble [5V55R]",
+              "DefaultLoad": 4,
+              "MaxLoad": 4,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataSensor",
+          "componentId": 984,
+          "present": true,
+          "rawFields": {
+            "ID": 984,
+            "Name": "AN/MPQ-53",
+            "Comments": "-",
+            "ScanInterval": 2,
+            "RadarPRF": 800,
+            "RadarPulseWidth": 0.4,
+            "RadarPeakPower": 100000.0,
+            "RadarHorizontalBeamwidth": 1.7,
+            "RadarVerticalBeamwidth": 1.7,
+            "MaxContactsAir": 100,
+            "MaxContactsIlluminate": 9,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null
+        },
+        {
+          "table": "DataSensor",
+          "componentId": 2498,
+          "present": true,
+          "rawFields": {
+            "ID": 2498,
+            "Name": "AN/MPQ-65",
+            "Comments": "AN/MPQ-53(V) PAC-3",
+            "ScanInterval": 2,
+            "RadarPRF": 800,
+            "RadarPulseWidth": 0.4,
+            "RadarPeakPower": 200000.0,
+            "RadarHorizontalBeamwidth": 1.7,
+            "RadarVerticalBeamwidth": 1.7,
+            "MaxContactsAir": 100,
+            "MaxContactsIlluminate": 9,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null
+        },
+        {
+          "table": "DataSensor",
+          "componentId": 395,
+          "present": true,
+          "rawFields": {
+            "ID": 395,
+            "Name": "AN/MPQ-64 Sentinel",
+            "Comments": "1994",
+            "ScanInterval": 2,
+            "RadarPRF": 2000,
+            "RadarPulseWidth": 0.2,
+            "RadarPeakPower": 25000.0,
+            "RadarHorizontalBeamwidth": 2.0,
+            "RadarVerticalBeamwidth": 1.8,
+            "MaxContactsAir": 0,
+            "MaxContactsIlluminate": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null
+        },
+        {
+          "table": "DataSensor",
+          "componentId": 975,
+          "present": true,
+          "rawFields": {
+            "ID": 975,
+            "Name": "Low Blow [SNR-125]",
+            "Comments": "-",
+            "ScanInterval": 1,
+            "RadarPRF": 0,
+            "RadarPulseWidth": 0.0,
+            "RadarPeakPower": 0.0,
+            "RadarHorizontalBeamwidth": 0.0,
+            "RadarVerticalBeamwidth": 0.0,
+            "MaxContactsAir": 6,
+            "MaxContactsIlluminate": 1,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null
+        },
+        {
+          "table": "DataSensor",
+          "componentId": 974,
+          "present": true,
+          "rawFields": {
+            "ID": 974,
+            "Name": "Flap Lid B [5N63S]",
+            "Comments": "SA-10b, 12x TEL",
+            "ScanInterval": 2,
+            "RadarPRF": 900,
+            "RadarPulseWidth": 0.5,
+            "RadarPeakPower": 81000.0,
+            "RadarHorizontalBeamwidth": 1.6,
+            "RadarVerticalBeamwidth": 1.6,
+            "MaxContactsAir": 0,
+            "MaxContactsIlluminate": 6,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null
+        },
+        {
+          "table": "DataSensor",
+          "componentId": 632,
+          "present": true,
+          "rawFields": {
+            "ID": 632,
+            "Name": "Tin Shield B [5N59S/36D6]",
+            "Comments": "ST-68UM",
+            "ScanInterval": 6,
+            "RadarPRF": 360,
+            "RadarPulseWidth": 1.2,
+            "RadarPeakPower": 350000.0,
+            "RadarHorizontalBeamwidth": 2.1,
+            "RadarVerticalBeamwidth": 2.1,
+            "MaxContactsAir": 127,
+            "MaxContactsIlluminate": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null
+        }
+      ]
+    },
+    {
+      "buildLabel": 512,
+      "versionBasis": "supplied-filename",
+      "verifiedInternalBuild": null,
+      "file": "DB3K_512.db3",
+      "sha256": "5c031d24a7efe3dff05c3b0b4f6fa596b00fe8e334c4b150c7f479622275a787",
+      "role": "game-database",
+      "confidence": "medium-low",
+      "counts": {
+        "DataWeapon": 4419,
+        "DataMount": 4115,
+        "DataSensor": 7227
+      },
+      "records": [
+        {
+          "table": "DataWeapon",
+          "componentId": 642,
+          "present": true,
+          "rawFields": {
+            "ID": 642,
+            "Name": "MIM-104E Patriot PAC-2 GEM+",
+            "Comments": "2004",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 55.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 24384.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [],
+          "weaponCodes": [
+            {
+              "CodeID": 1001,
+              "Description": "Illuminate at Launch"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 9999,
+              "Description": "Flight Profile - Level Cruise Flight"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 1150,
+          "present": true,
+          "rawFields": {
+            "ID": 1150,
+            "Name": "MIM-104F Patriot PAC-3 ERINT",
+            "Comments": "2007",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 40.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 24384.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 1715,
+              "Name": "Active Radar Seeker",
+              "RadarHorizontalBeamwidth": 1.0,
+              "RadarVerticalBeamwidth": 1.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1101,
+              "Description": "Home On Jam (HOJ)"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 6133,
+              "Description": "Attitude Control - Combined"
+            },
+            {
+              "CodeID": 9999,
+              "Description": "Flight Profile - Level Cruise Flight"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 3207,
+          "present": true,
+          "rawFields": {
+            "ID": 3207,
+            "Name": "MIM-104F Patriot PAC-3 MSE",
+            "Comments": "2018",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 60.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 24384.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 1715,
+              "Name": "Active Radar Seeker",
+              "RadarHorizontalBeamwidth": 1.0,
+              "RadarVerticalBeamwidth": 1.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1101,
+              "Description": "Home On Jam (HOJ)"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 6133,
+              "Description": "Attitude Control - Combined"
+            },
+            {
+              "CodeID": 9999,
+              "Description": "Flight Profile - Level Cruise Flight"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 403,
+          "present": true,
+          "rawFields": {
+            "ID": 403,
+            "Name": "SA-10a Grumble [5V55K]",
+            "Comments": "1980, S-300PT",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 25.0,
+            "TargetAltitudeMin": 24.3,
+            "TargetAltitudeMax": 27432.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 5943,
+              "Name": "SARH Seeker",
+              "RadarHorizontalBeamwidth": 0.0,
+              "RadarVerticalBeamwidth": 0.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1001,
+              "Description": "Illuminate at Launch"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 1156,
+          "present": true,
+          "rawFields": {
+            "ID": 1156,
+            "Name": "SA-10a Grumble [5V55KD]",
+            "Comments": "1982, S-300PT-1",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 40.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 27432.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [],
+          "weaponCodes": [
+            {
+              "CodeID": 1001,
+              "Description": "Illuminate at Launch"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 1831,
+          "present": true,
+          "rawFields": {
+            "ID": 1831,
+            "Name": "SA-10b Grumble [5V55R]",
+            "Comments": "1984, S-300PS",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 40.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 27432.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [],
+          "weaponCodes": [
+            {
+              "CodeID": 1001,
+              "Description": "Illuminate at Launch"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 652,
+          "present": true,
+          "rawFields": {
+            "ID": 652,
+            "Name": "SA-11 Gadfly [9M38]",
+            "Comments": "1984, 9K37 Buk",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 20.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 14020.8,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 4144,
+              "Name": "SARH Seeker",
+              "RadarHorizontalBeamwidth": 0.0,
+              "RadarVerticalBeamwidth": 0.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1002,
+              "Description": "Terminal Illumination"
+            },
+            {
+              "CodeID": 1003,
+              "Description": "Supports Buddy Illumination"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 1147,
+          "present": true,
+          "rawFields": {
+            "ID": 1147,
+            "Name": "SA-11 Gadfly [9M38M1]",
+            "Comments": "1986, 9K37 Buk-M1",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 25.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 14020.8,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 4144,
+              "Name": "SARH Seeker",
+              "RadarHorizontalBeamwidth": 0.0,
+              "RadarVerticalBeamwidth": 0.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1002,
+              "Description": "Terminal Illumination"
+            },
+            {
+              "CodeID": 1003,
+              "Description": "Supports Buddy Illumination"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 2970,
+          "present": true,
+          "rawFields": {
+            "ID": 2970,
+            "Name": "SA-27 Grizzly [9M317M]",
+            "Comments": "2018, 9K37M3 Buk-M3",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 38.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 22860.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 4148,
+              "Name": "SARH Seeker",
+              "RadarHorizontalBeamwidth": 0.0,
+              "RadarVerticalBeamwidth": 0.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1002,
+              "Description": "Terminal Illumination"
+            },
+            {
+              "CodeID": 1003,
+              "Description": "Supports Buddy Illumination"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 598,
+          "present": true,
+          "rawFields": {
+            "ID": 598,
+            "Name": "MIM-120B NASAMS [AMRAAM]",
+            "Comments": "1996",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 1.0,
+            "AirRangeMax": 16.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 9753.6,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 1031,
+              "Name": "Active Radar Seeker",
+              "RadarHorizontalBeamwidth": 1.0,
+              "RadarVerticalBeamwidth": 1.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1101,
+              "Description": "Home On Jam (HOJ)"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 9999,
+              "Description": "Flight Profile - Level Cruise Flight"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 2771,
+          "present": true,
+          "rawFields": {
+            "ID": 2771,
+            "Name": "MIM-120C-7 NASAMS II [AMRAAM]",
+            "Comments": "-",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 1.0,
+            "AirRangeMax": 20.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 10972.8,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 2131,
+              "Name": "Active Radar Seeker",
+              "RadarHorizontalBeamwidth": 1.0,
+              "RadarVerticalBeamwidth": 1.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1101,
+              "Description": "Home On Jam (HOJ)"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 9999,
+              "Description": "Flight Profile - Level Cruise Flight"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 2891,
+          "present": true,
+          "rawFields": {
+            "ID": 2891,
+            "Name": "IRIS-T SLS",
+            "Comments": "2017, Surface Launched, Short-Range",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 0.2,
+            "AirRangeMax": 6.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 6096.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 4070,
+              "Name": "IIR Seeker",
+              "RadarHorizontalBeamwidth": 0.0,
+              "RadarVerticalBeamwidth": 0.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 2004,
+              "Description": "Anti-Air Dogfight (High Off-Boresight)"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 6102,
+              "Description": "Weapon - INS w/ GNSS Navigation"
+            },
+            {
+              "CodeID": 6140,
+              "Description": "Uses GPS"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 4041,
+          "present": true,
+          "rawFields": {
+            "ID": 4041,
+            "Name": "IRIS-T SLM",
+            "Comments": "2017, Surface Launched, Medium-Range",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 0.2,
+            "AirRangeMax": 21.6,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 6096.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 4070,
+              "Name": "IIR Seeker",
+              "RadarHorizontalBeamwidth": 0.0,
+              "RadarVerticalBeamwidth": 0.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 2004,
+              "Description": "Anti-Air Dogfight (High Off-Boresight)"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 6102,
+              "Description": "Weapon - INS w/ GNSS Navigation"
+            },
+            {
+              "CodeID": 6140,
+              "Description": "Uses GPS"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 681,
+          "present": true,
+          "rawFields": {
+            "ID": 681,
+            "Name": "Aster 30 Blk 1",
+            "Comments": "2010+, ABM",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 60.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 19812.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 1826,
+              "Name": "Active Radar Seeker",
+              "RadarHorizontalBeamwidth": 1.0,
+              "RadarVerticalBeamwidth": 1.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1101,
+              "Description": "Home On Jam (HOJ)"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 4012,
+              "Description": "Multi-Stage Missile"
+            },
+            {
+              "CodeID": 6133,
+              "Description": "Attitude Control - Combined"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 388,
+          "present": true,
+          "rawFields": {
+            "ID": 388,
+            "Name": "Patriot M901",
+            "Comments": "1997, PAC-2 GEM",
+            "Capacity": 4,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 3194,
+              "weaponId": 994,
+              "weaponName": "MIM-104D Patriot PAC-2 GEM",
+              "DefaultLoad": 4,
+              "MaxLoad": 4,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 816,
+          "present": true,
+          "rawFields": {
+            "ID": 816,
+            "Name": "Patriot M901",
+            "Comments": "2004, PAC-2 GEM+",
+            "Capacity": 4,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 1003,
+              "weaponId": 642,
+              "weaponName": "MIM-104E Patriot PAC-2 GEM+",
+              "DefaultLoad": 4,
+              "MaxLoad": 4,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 963,
+          "present": true,
+          "rawFields": {
+            "ID": 963,
+            "Name": "Patriot M901",
+            "Comments": "2007, PAC-3 ERINT, 16x Rnds",
+            "Capacity": 16,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 999,
+              "weaponId": 1150,
+              "weaponName": "MIM-104F Patriot PAC-3 ERINT",
+              "DefaultLoad": 16,
+              "MaxLoad": 16,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 2759,
+          "present": true,
+          "rawFields": {
+            "ID": 2759,
+            "Name": "Patriot M901",
+            "Comments": "2016, PAC-3 MSE, 8x Rnds",
+            "Capacity": 16,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 7951,
+              "weaponId": 3207,
+              "weaponName": "MIM-104F Patriot PAC-3 MSE",
+              "DefaultLoad": 8,
+              "MaxLoad": 8,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 2760,
+          "present": true,
+          "rawFields": {
+            "ID": 2760,
+            "Name": "Patriot M901",
+            "Comments": "2016, PAC-3 MSE, 12x Rnds",
+            "Capacity": 12,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 7952,
+              "weaponId": 3207,
+              "weaponName": "MIM-104F Patriot PAC-3 MSE",
+              "DefaultLoad": 12,
+              "MaxLoad": 12,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 2761,
+          "present": true,
+          "rawFields": {
+            "ID": 2761,
+            "Name": "Patriot M901",
+            "Comments": "2016, PAC-3 ERINT/MSE, 14x Rnds",
+            "Capacity": 14,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 7955,
+              "weaponId": 3207,
+              "weaponName": "MIM-104F Patriot PAC-3 MSE",
+              "DefaultLoad": 6,
+              "MaxLoad": 6,
+              "Multiple": 1
+            },
+            {
+              "ComponentNumber": 2,
+              "recordId": 7222,
+              "weaponId": 1150,
+              "weaponName": "MIM-104F Patriot PAC-3 ERINT",
+              "DefaultLoad": 8,
+              "MaxLoad": 8,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 1658,
+          "present": true,
+          "rawFields": {
+            "ID": 1658,
+            "Name": "SA-10a Grumble [5P85T] TEL",
+            "Comments": "1980, S-300PT, 5V55K",
+            "Capacity": 4,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 2585,
+              "weaponId": 403,
+              "weaponName": "SA-10a Grumble [5V55K]",
+              "DefaultLoad": 4,
+              "MaxLoad": 4,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 936,
+          "present": true,
+          "rawFields": {
+            "ID": 936,
+            "Name": "SA-10a Grumble [5P85T] TEL",
+            "Comments": "1982, S-300PT-1, 5V55KD",
+            "Capacity": 4,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 987,
+              "weaponId": 1156,
+              "weaponName": "SA-10a Grumble [5V55KD]",
+              "DefaultLoad": 4,
+              "MaxLoad": 4,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 318,
+          "present": true,
+          "rawFields": {
+            "ID": 318,
+            "Name": "SA-10b Grumble [5P85S] TEL",
+            "Comments": "1985, S-300PS, 5V55R",
+            "Capacity": 4,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 2083,
+              "weaponId": 1831,
+              "weaponName": "SA-10b Grumble [5V55R]",
+              "DefaultLoad": 4,
+              "MaxLoad": 4,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataSensor",
+          "componentId": 984,
+          "present": true,
+          "rawFields": {
+            "ID": 984,
+            "Name": "AN/MPQ-53",
+            "Comments": "-",
+            "ScanInterval": 2,
+            "RadarPRF": 800,
+            "RadarPulseWidth": 0.4,
+            "RadarPeakPower": 100000.0,
+            "RadarHorizontalBeamwidth": 1.7,
+            "RadarVerticalBeamwidth": 1.7,
+            "MaxContactsAir": 100,
+            "MaxContactsIlluminate": 9,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null
+        },
+        {
+          "table": "DataSensor",
+          "componentId": 2498,
+          "present": true,
+          "rawFields": {
+            "ID": 2498,
+            "Name": "AN/MPQ-65",
+            "Comments": "AN/MPQ-53(V) PAC-3",
+            "ScanInterval": 2,
+            "RadarPRF": 800,
+            "RadarPulseWidth": 0.4,
+            "RadarPeakPower": 200000.0,
+            "RadarHorizontalBeamwidth": 1.7,
+            "RadarVerticalBeamwidth": 1.7,
+            "MaxContactsAir": 100,
+            "MaxContactsIlluminate": 9,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null
+        },
+        {
+          "table": "DataSensor",
+          "componentId": 395,
+          "present": true,
+          "rawFields": {
+            "ID": 395,
+            "Name": "AN/MPQ-64 Sentinel",
+            "Comments": "1994",
+            "ScanInterval": 2,
+            "RadarPRF": 2000,
+            "RadarPulseWidth": 0.2,
+            "RadarPeakPower": 25000.0,
+            "RadarHorizontalBeamwidth": 2.0,
+            "RadarVerticalBeamwidth": 1.8,
+            "MaxContactsAir": 0,
+            "MaxContactsIlluminate": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null
+        },
+        {
+          "table": "DataSensor",
+          "componentId": 975,
+          "present": true,
+          "rawFields": {
+            "ID": 975,
+            "Name": "Low Blow [SNR-125]",
+            "Comments": "-",
+            "ScanInterval": 1,
+            "RadarPRF": 0,
+            "RadarPulseWidth": 0.0,
+            "RadarPeakPower": 0.0,
+            "RadarHorizontalBeamwidth": 0.0,
+            "RadarVerticalBeamwidth": 0.0,
+            "MaxContactsAir": 6,
+            "MaxContactsIlluminate": 1,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null
+        },
+        {
+          "table": "DataSensor",
+          "componentId": 974,
+          "present": true,
+          "rawFields": {
+            "ID": 974,
+            "Name": "Flap Lid B [5N63S]",
+            "Comments": "SA-10b, 12x TEL",
+            "ScanInterval": 2,
+            "RadarPRF": 900,
+            "RadarPulseWidth": 0.5,
+            "RadarPeakPower": 81000.0,
+            "RadarHorizontalBeamwidth": 1.6,
+            "RadarVerticalBeamwidth": 1.6,
+            "MaxContactsAir": 0,
+            "MaxContactsIlluminate": 6,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null
+        },
+        {
+          "table": "DataSensor",
+          "componentId": 632,
+          "present": true,
+          "rawFields": {
+            "ID": 632,
+            "Name": "Tin Shield B [5N59S/36D6]",
+            "Comments": "ST-68UM",
+            "ScanInterval": 6,
+            "RadarPRF": 360,
+            "RadarPulseWidth": 1.2,
+            "RadarPeakPower": 350000.0,
+            "RadarHorizontalBeamwidth": 2.1,
+            "RadarVerticalBeamwidth": 2.1,
+            "MaxContactsAir": 127,
+            "MaxContactsIlluminate": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null
+        }
+      ]
+    },
+    {
+      "buildLabel": 514,
+      "versionBasis": "supplied-filename",
+      "verifiedInternalBuild": null,
+      "file": "DB3K_514.db3",
+      "sha256": "fab65fb141dd7e6f97d448f851fbdd7577de206c7eb044f68c6f9c041b30f754",
+      "role": "game-database",
+      "confidence": "medium-low",
+      "counts": {
+        "DataWeapon": 4449,
+        "DataMount": 4154,
+        "DataSensor": 7251
+      },
+      "records": [
+        {
+          "table": "DataWeapon",
+          "componentId": 642,
+          "present": true,
+          "rawFields": {
+            "ID": 642,
+            "Name": "MIM-104E Patriot PAC-2 GEM+",
+            "Comments": "2004",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 55.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 24384.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [],
+          "weaponCodes": [
+            {
+              "CodeID": 1001,
+              "Description": "Illuminate at Launch"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 9999,
+              "Description": "Flight Profile - Level Cruise Flight"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 1150,
+          "present": true,
+          "rawFields": {
+            "ID": 1150,
+            "Name": "MIM-104F Patriot PAC-3 ERINT",
+            "Comments": "2007",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 40.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 24384.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 1715,
+              "Name": "Active Radar Seeker",
+              "RadarHorizontalBeamwidth": 1.0,
+              "RadarVerticalBeamwidth": 1.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1101,
+              "Description": "Home On Jam (HOJ)"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 6133,
+              "Description": "Attitude Control - Combined"
+            },
+            {
+              "CodeID": 9999,
+              "Description": "Flight Profile - Level Cruise Flight"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 3207,
+          "present": true,
+          "rawFields": {
+            "ID": 3207,
+            "Name": "MIM-104F Patriot PAC-3 MSE",
+            "Comments": "2018",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 60.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 24384.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 1715,
+              "Name": "Active Radar Seeker",
+              "RadarHorizontalBeamwidth": 1.0,
+              "RadarVerticalBeamwidth": 1.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1101,
+              "Description": "Home On Jam (HOJ)"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 6133,
+              "Description": "Attitude Control - Combined"
+            },
+            {
+              "CodeID": 9999,
+              "Description": "Flight Profile - Level Cruise Flight"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 403,
+          "present": true,
+          "rawFields": {
+            "ID": 403,
+            "Name": "SA-10a Grumble [5V55K]",
+            "Comments": "1980, S-300PT",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 25.0,
+            "TargetAltitudeMin": 24.3,
+            "TargetAltitudeMax": 27432.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 5943,
+              "Name": "SARH Seeker",
+              "RadarHorizontalBeamwidth": 0.0,
+              "RadarVerticalBeamwidth": 0.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1001,
+              "Description": "Illuminate at Launch"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 1156,
+          "present": true,
+          "rawFields": {
+            "ID": 1156,
+            "Name": "SA-10a Grumble [5V55KD]",
+            "Comments": "1982, S-300PT-1",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 40.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 27432.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [],
+          "weaponCodes": [
+            {
+              "CodeID": 1001,
+              "Description": "Illuminate at Launch"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 1831,
+          "present": true,
+          "rawFields": {
+            "ID": 1831,
+            "Name": "SA-10b Grumble [5V55R]",
+            "Comments": "1984, S-300PS",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 40.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 27432.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [],
+          "weaponCodes": [
+            {
+              "CodeID": 1001,
+              "Description": "Illuminate at Launch"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 652,
+          "present": true,
+          "rawFields": {
+            "ID": 652,
+            "Name": "SA-11 Gadfly [9M38]",
+            "Comments": "1984, 9K37 Buk",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 20.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 14020.8,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 4144,
+              "Name": "SARH Seeker",
+              "RadarHorizontalBeamwidth": 0.0,
+              "RadarVerticalBeamwidth": 0.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1002,
+              "Description": "Terminal Illumination"
+            },
+            {
+              "CodeID": 1003,
+              "Description": "Supports Buddy Illumination"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 1147,
+          "present": true,
+          "rawFields": {
+            "ID": 1147,
+            "Name": "SA-11 Gadfly [9M38M1]",
+            "Comments": "1986, 9K37 Buk-M1",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 25.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 14020.8,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 4144,
+              "Name": "SARH Seeker",
+              "RadarHorizontalBeamwidth": 0.0,
+              "RadarVerticalBeamwidth": 0.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1002,
+              "Description": "Terminal Illumination"
+            },
+            {
+              "CodeID": 1003,
+              "Description": "Supports Buddy Illumination"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 2970,
+          "present": true,
+          "rawFields": {
+            "ID": 2970,
+            "Name": "SA-27 Grizzly [9M317M]",
+            "Comments": "2018, 9K37M3 Buk-M3",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 38.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 22860.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 4148,
+              "Name": "SARH Seeker",
+              "RadarHorizontalBeamwidth": 0.0,
+              "RadarVerticalBeamwidth": 0.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1002,
+              "Description": "Terminal Illumination"
+            },
+            {
+              "CodeID": 1003,
+              "Description": "Supports Buddy Illumination"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 598,
+          "present": true,
+          "rawFields": {
+            "ID": 598,
+            "Name": "MIM-120B NASAMS [AMRAAM]",
+            "Comments": "1996",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 1.0,
+            "AirRangeMax": 16.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 9753.6,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 1031,
+              "Name": "Active Radar Seeker",
+              "RadarHorizontalBeamwidth": 1.0,
+              "RadarVerticalBeamwidth": 1.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1101,
+              "Description": "Home On Jam (HOJ)"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 9999,
+              "Description": "Flight Profile - Level Cruise Flight"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 2771,
+          "present": true,
+          "rawFields": {
+            "ID": 2771,
+            "Name": "MIM-120C-7 NASAMS II [AMRAAM]",
+            "Comments": "-",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 1.0,
+            "AirRangeMax": 20.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 10972.8,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 2131,
+              "Name": "Active Radar Seeker",
+              "RadarHorizontalBeamwidth": 1.0,
+              "RadarVerticalBeamwidth": 1.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1101,
+              "Description": "Home On Jam (HOJ)"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 9999,
+              "Description": "Flight Profile - Level Cruise Flight"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 2891,
+          "present": true,
+          "rawFields": {
+            "ID": 2891,
+            "Name": "IRIS-T SLS",
+            "Comments": "2017, Surface Launched, Short-Range",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 0.2,
+            "AirRangeMax": 6.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 6096.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 4070,
+              "Name": "IIR Seeker",
+              "RadarHorizontalBeamwidth": 0.0,
+              "RadarVerticalBeamwidth": 0.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 2004,
+              "Description": "Anti-Air Dogfight (High Off-Boresight)"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 6102,
+              "Description": "Weapon - INS w/ GNSS Navigation"
+            },
+            {
+              "CodeID": 6140,
+              "Description": "Uses GPS"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 4041,
+          "present": true,
+          "rawFields": {
+            "ID": 4041,
+            "Name": "IRIS-T SLM",
+            "Comments": "2017, Surface Launched, Medium-Range",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 0.2,
+            "AirRangeMax": 21.6,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 6096.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 4070,
+              "Name": "IIR Seeker",
+              "RadarHorizontalBeamwidth": 0.0,
+              "RadarVerticalBeamwidth": 0.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 2004,
+              "Description": "Anti-Air Dogfight (High Off-Boresight)"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 6102,
+              "Description": "Weapon - INS w/ GNSS Navigation"
+            },
+            {
+              "CodeID": 6140,
+              "Description": "Uses GPS"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 681,
+          "present": true,
+          "rawFields": {
+            "ID": 681,
+            "Name": "Aster 30 Blk 1",
+            "Comments": "2010+, ABM",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 60.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 19812.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 1826,
+              "Name": "Active Radar Seeker",
+              "RadarHorizontalBeamwidth": 1.0,
+              "RadarVerticalBeamwidth": 1.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1101,
+              "Description": "Home On Jam (HOJ)"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 4012,
+              "Description": "Multi-Stage Missile"
+            },
+            {
+              "CodeID": 6133,
+              "Description": "Attitude Control - Combined"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 388,
+          "present": true,
+          "rawFields": {
+            "ID": 388,
+            "Name": "Patriot M901",
+            "Comments": "1997, PAC-2 GEM",
+            "Capacity": 4,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 3194,
+              "weaponId": 994,
+              "weaponName": "MIM-104D Patriot PAC-2 GEM",
+              "DefaultLoad": 4,
+              "MaxLoad": 4,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 816,
+          "present": true,
+          "rawFields": {
+            "ID": 816,
+            "Name": "Patriot M901",
+            "Comments": "2004, PAC-2 GEM+",
+            "Capacity": 4,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 1003,
+              "weaponId": 642,
+              "weaponName": "MIM-104E Patriot PAC-2 GEM+",
+              "DefaultLoad": 4,
+              "MaxLoad": 4,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 963,
+          "present": true,
+          "rawFields": {
+            "ID": 963,
+            "Name": "Patriot M901",
+            "Comments": "2007, PAC-3 ERINT, 16x Rnds",
+            "Capacity": 16,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 999,
+              "weaponId": 1150,
+              "weaponName": "MIM-104F Patriot PAC-3 ERINT",
+              "DefaultLoad": 16,
+              "MaxLoad": 16,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 2759,
+          "present": true,
+          "rawFields": {
+            "ID": 2759,
+            "Name": "Patriot M901",
+            "Comments": "2016, PAC-3 MSE, 8x Rnds",
+            "Capacity": 16,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 7951,
+              "weaponId": 3207,
+              "weaponName": "MIM-104F Patriot PAC-3 MSE",
+              "DefaultLoad": 8,
+              "MaxLoad": 8,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 2760,
+          "present": true,
+          "rawFields": {
+            "ID": 2760,
+            "Name": "Patriot M901",
+            "Comments": "2016, PAC-3 MSE, 12x Rnds",
+            "Capacity": 12,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 7952,
+              "weaponId": 3207,
+              "weaponName": "MIM-104F Patriot PAC-3 MSE",
+              "DefaultLoad": 12,
+              "MaxLoad": 12,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 2761,
+          "present": true,
+          "rawFields": {
+            "ID": 2761,
+            "Name": "Patriot M901",
+            "Comments": "2016, PAC-3 ERINT/MSE, 14x Rnds",
+            "Capacity": 14,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 7955,
+              "weaponId": 3207,
+              "weaponName": "MIM-104F Patriot PAC-3 MSE",
+              "DefaultLoad": 6,
+              "MaxLoad": 6,
+              "Multiple": 1
+            },
+            {
+              "ComponentNumber": 2,
+              "recordId": 7222,
+              "weaponId": 1150,
+              "weaponName": "MIM-104F Patriot PAC-3 ERINT",
+              "DefaultLoad": 8,
+              "MaxLoad": 8,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 1658,
+          "present": true,
+          "rawFields": {
+            "ID": 1658,
+            "Name": "SA-10a Grumble [5P85T] TEL",
+            "Comments": "1980, S-300PT, 5V55K",
+            "Capacity": 4,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 2585,
+              "weaponId": 403,
+              "weaponName": "SA-10a Grumble [5V55K]",
+              "DefaultLoad": 4,
+              "MaxLoad": 4,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 936,
+          "present": true,
+          "rawFields": {
+            "ID": 936,
+            "Name": "SA-10a Grumble [5P85T] TEL",
+            "Comments": "1982, S-300PT-1, 5V55KD",
+            "Capacity": 4,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 987,
+              "weaponId": 1156,
+              "weaponName": "SA-10a Grumble [5V55KD]",
+              "DefaultLoad": 4,
+              "MaxLoad": 4,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 318,
+          "present": true,
+          "rawFields": {
+            "ID": 318,
+            "Name": "SA-10b Grumble [5P85S] TEL",
+            "Comments": "1985, S-300PS, 5V55R",
+            "Capacity": 4,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 2083,
+              "weaponId": 1831,
+              "weaponName": "SA-10b Grumble [5V55R]",
+              "DefaultLoad": 4,
+              "MaxLoad": 4,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataSensor",
+          "componentId": 984,
+          "present": true,
+          "rawFields": {
+            "ID": 984,
+            "Name": "AN/MPQ-53",
+            "Comments": "-",
+            "ScanInterval": 2,
+            "RadarPRF": 800,
+            "RadarPulseWidth": 0.4,
+            "RadarPeakPower": 100000.0,
+            "RadarHorizontalBeamwidth": 1.7,
+            "RadarVerticalBeamwidth": 1.7,
+            "MaxContactsAir": 100,
+            "MaxContactsIlluminate": 9,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null
+        },
+        {
+          "table": "DataSensor",
+          "componentId": 2498,
+          "present": true,
+          "rawFields": {
+            "ID": 2498,
+            "Name": "AN/MPQ-65",
+            "Comments": "AN/MPQ-53(V) PAC-3",
+            "ScanInterval": 2,
+            "RadarPRF": 800,
+            "RadarPulseWidth": 0.4,
+            "RadarPeakPower": 200000.0,
+            "RadarHorizontalBeamwidth": 1.7,
+            "RadarVerticalBeamwidth": 1.7,
+            "MaxContactsAir": 100,
+            "MaxContactsIlluminate": 9,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null
+        },
+        {
+          "table": "DataSensor",
+          "componentId": 395,
+          "present": true,
+          "rawFields": {
+            "ID": 395,
+            "Name": "AN/MPQ-64 Sentinel",
+            "Comments": "1994",
+            "ScanInterval": 2,
+            "RadarPRF": 2000,
+            "RadarPulseWidth": 0.2,
+            "RadarPeakPower": 25000.0,
+            "RadarHorizontalBeamwidth": 2.0,
+            "RadarVerticalBeamwidth": 1.8,
+            "MaxContactsAir": 0,
+            "MaxContactsIlluminate": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null
+        },
+        {
+          "table": "DataSensor",
+          "componentId": 975,
+          "present": true,
+          "rawFields": {
+            "ID": 975,
+            "Name": "Low Blow [SNR-125]",
+            "Comments": "-",
+            "ScanInterval": 1,
+            "RadarPRF": 0,
+            "RadarPulseWidth": 0.0,
+            "RadarPeakPower": 0.0,
+            "RadarHorizontalBeamwidth": 0.0,
+            "RadarVerticalBeamwidth": 0.0,
+            "MaxContactsAir": 6,
+            "MaxContactsIlluminate": 1,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null
+        },
+        {
+          "table": "DataSensor",
+          "componentId": 974,
+          "present": true,
+          "rawFields": {
+            "ID": 974,
+            "Name": "Flap Lid B [5N63S]",
+            "Comments": "SA-10b, 12x TEL",
+            "ScanInterval": 2,
+            "RadarPRF": 900,
+            "RadarPulseWidth": 0.5,
+            "RadarPeakPower": 81000.0,
+            "RadarHorizontalBeamwidth": 1.6,
+            "RadarVerticalBeamwidth": 1.6,
+            "MaxContactsAir": 0,
+            "MaxContactsIlluminate": 6,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null
+        },
+        {
+          "table": "DataSensor",
+          "componentId": 632,
+          "present": true,
+          "rawFields": {
+            "ID": 632,
+            "Name": "Tin Shield B [5N59S/36D6]",
+            "Comments": "ST-68UM",
+            "ScanInterval": 6,
+            "RadarPRF": 360,
+            "RadarPulseWidth": 1.2,
+            "RadarPeakPower": 350000.0,
+            "RadarHorizontalBeamwidth": 2.1,
+            "RadarVerticalBeamwidth": 2.1,
+            "MaxContactsAir": 127,
+            "MaxContactsIlluminate": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null
+        }
+      ]
+    },
+    {
+      "buildLabel": 515,
+      "versionBasis": "supplied-filename",
+      "verifiedInternalBuild": null,
+      "file": "DB3K_515.db3",
+      "sha256": "1c0064407ae75d88d32efc63968a3d02017308cb73d7a4e8bd15cb6550a61e29",
+      "role": "game-database",
+      "confidence": "medium-low",
+      "counts": {
+        "DataWeapon": 4472,
+        "DataMount": 4190,
+        "DataSensor": 7304
+      },
+      "records": [
+        {
+          "table": "DataWeapon",
+          "componentId": 642,
+          "present": true,
+          "rawFields": {
+            "ID": 642,
+            "Name": "MIM-104E Patriot PAC-2 GEM+",
+            "Comments": "2004",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 55.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 24384.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [],
+          "weaponCodes": [
+            {
+              "CodeID": 1001,
+              "Description": "Illuminate at Launch"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 9999,
+              "Description": "Flight Profile - Level Cruise Flight"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 1150,
+          "present": true,
+          "rawFields": {
+            "ID": 1150,
+            "Name": "MIM-104F Patriot PAC-3 ERINT",
+            "Comments": "2007",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 40.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 24384.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 1715,
+              "Name": "Active Radar Seeker",
+              "RadarHorizontalBeamwidth": 1.0,
+              "RadarVerticalBeamwidth": 1.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1101,
+              "Description": "Home On Jam (HOJ)"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 6133,
+              "Description": "Attitude Control - Combined"
+            },
+            {
+              "CodeID": 9999,
+              "Description": "Flight Profile - Level Cruise Flight"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 3207,
+          "present": true,
+          "rawFields": {
+            "ID": 3207,
+            "Name": "MIM-104F Patriot PAC-3 MSE",
+            "Comments": "2018",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 60.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 24384.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 1715,
+              "Name": "Active Radar Seeker",
+              "RadarHorizontalBeamwidth": 1.0,
+              "RadarVerticalBeamwidth": 1.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1101,
+              "Description": "Home On Jam (HOJ)"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 6133,
+              "Description": "Attitude Control - Combined"
+            },
+            {
+              "CodeID": 9999,
+              "Description": "Flight Profile - Level Cruise Flight"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 403,
+          "present": true,
+          "rawFields": {
+            "ID": 403,
+            "Name": "SA-10a Grumble [5V55K]",
+            "Comments": "1980, S-300PT",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 25.0,
+            "TargetAltitudeMin": 24.3,
+            "TargetAltitudeMax": 27432.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 5943,
+              "Name": "SARH Seeker",
+              "RadarHorizontalBeamwidth": 0.0,
+              "RadarVerticalBeamwidth": 0.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1001,
+              "Description": "Illuminate at Launch"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 1156,
+          "present": true,
+          "rawFields": {
+            "ID": 1156,
+            "Name": "SA-10a Grumble [5V55KD]",
+            "Comments": "1982, S-300PT-1",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 40.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 27432.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [],
+          "weaponCodes": [
+            {
+              "CodeID": 1001,
+              "Description": "Illuminate at Launch"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 1831,
+          "present": true,
+          "rawFields": {
+            "ID": 1831,
+            "Name": "SA-10b Grumble [5V55R]",
+            "Comments": "1984, S-300PS",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 40.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 27432.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [],
+          "weaponCodes": [
+            {
+              "CodeID": 1001,
+              "Description": "Illuminate at Launch"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 652,
+          "present": true,
+          "rawFields": {
+            "ID": 652,
+            "Name": "SA-11 Gadfly [9M38]",
+            "Comments": "1984, 9K37 Buk",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 20.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 14020.8,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 4144,
+              "Name": "SARH Seeker",
+              "RadarHorizontalBeamwidth": 0.0,
+              "RadarVerticalBeamwidth": 0.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1002,
+              "Description": "Terminal Illumination"
+            },
+            {
+              "CodeID": 1003,
+              "Description": "Supports Buddy Illumination"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 1147,
+          "present": true,
+          "rawFields": {
+            "ID": 1147,
+            "Name": "SA-11 Gadfly [9M38M1]",
+            "Comments": "1986, 9K37 Buk-M1",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 25.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 14020.8,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 4144,
+              "Name": "SARH Seeker",
+              "RadarHorizontalBeamwidth": 0.0,
+              "RadarVerticalBeamwidth": 0.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1002,
+              "Description": "Terminal Illumination"
+            },
+            {
+              "CodeID": 1003,
+              "Description": "Supports Buddy Illumination"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 2970,
+          "present": true,
+          "rawFields": {
+            "ID": 2970,
+            "Name": "SA-27 Grizzly [9M317M]",
+            "Comments": "2018, 9K37M3 Buk-M3",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 38.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 22860.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 4148,
+              "Name": "SARH Seeker",
+              "RadarHorizontalBeamwidth": 0.0,
+              "RadarVerticalBeamwidth": 0.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1002,
+              "Description": "Terminal Illumination"
+            },
+            {
+              "CodeID": 1003,
+              "Description": "Supports Buddy Illumination"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 598,
+          "present": true,
+          "rawFields": {
+            "ID": 598,
+            "Name": "MIM-120B NASAMS [AMRAAM]",
+            "Comments": "1996",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 1.0,
+            "AirRangeMax": 16.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 9753.6,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 1031,
+              "Name": "Active Radar Seeker",
+              "RadarHorizontalBeamwidth": 1.0,
+              "RadarVerticalBeamwidth": 1.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1101,
+              "Description": "Home On Jam (HOJ)"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 9999,
+              "Description": "Flight Profile - Level Cruise Flight"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 2771,
+          "present": true,
+          "rawFields": {
+            "ID": 2771,
+            "Name": "MIM-120C-7 NASAMS II [AMRAAM]",
+            "Comments": "-",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 1.0,
+            "AirRangeMax": 20.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 10972.8,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 2131,
+              "Name": "Active Radar Seeker",
+              "RadarHorizontalBeamwidth": 1.0,
+              "RadarVerticalBeamwidth": 1.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1101,
+              "Description": "Home On Jam (HOJ)"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 9999,
+              "Description": "Flight Profile - Level Cruise Flight"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 2891,
+          "present": true,
+          "rawFields": {
+            "ID": 2891,
+            "Name": "IRIS-T SLS",
+            "Comments": "2017, Surface Launched, Short-Range",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 0.2,
+            "AirRangeMax": 6.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 6096.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 4070,
+              "Name": "IIR Seeker",
+              "RadarHorizontalBeamwidth": 0.0,
+              "RadarVerticalBeamwidth": 0.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 2004,
+              "Description": "Anti-Air Dogfight (High Off-Boresight)"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 6102,
+              "Description": "Weapon - INS w/ GNSS Navigation"
+            },
+            {
+              "CodeID": 6140,
+              "Description": "Uses GPS"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 4041,
+          "present": true,
+          "rawFields": {
+            "ID": 4041,
+            "Name": "IRIS-T SLM",
+            "Comments": "2017, Surface Launched, Medium-Range",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 0.2,
+            "AirRangeMax": 21.6,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 6096.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 4070,
+              "Name": "IIR Seeker",
+              "RadarHorizontalBeamwidth": 0.0,
+              "RadarVerticalBeamwidth": 0.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 2004,
+              "Description": "Anti-Air Dogfight (High Off-Boresight)"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 6102,
+              "Description": "Weapon - INS w/ GNSS Navigation"
+            },
+            {
+              "CodeID": 6140,
+              "Description": "Uses GPS"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataWeapon",
+          "componentId": 681,
+          "present": true,
+          "rawFields": {
+            "ID": 681,
+            "Name": "Aster 30 Blk 1",
+            "Comments": "2010+, ABM",
+            "BurnoutTime": 0.0,
+            "AirRangeMin": 2.0,
+            "AirRangeMax": 60.0,
+            "TargetAltitudeMin": 9.1,
+            "TargetAltitudeMax": 19812.0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "seekerSensors": [
+            {
+              "ID": 1826,
+              "Name": "Active Radar Seeker",
+              "RadarHorizontalBeamwidth": 1.0,
+              "RadarVerticalBeamwidth": 1.0
+            }
+          ],
+          "weaponCodes": [
+            {
+              "CodeID": 1101,
+              "Description": "Home On Jam (HOJ)"
+            },
+            {
+              "CodeID": 2003,
+              "Description": "Anti-Air All-Aspect"
+            },
+            {
+              "CodeID": 2006,
+              "Description": "Capable vs Seaskimmer"
+            },
+            {
+              "CodeID": 4012,
+              "Description": "Multi-Stage Missile"
+            },
+            {
+              "CodeID": 6133,
+              "Description": "Attitude Control - Combined"
+            }
+          ],
+          "seekerGimbalDegrees": null,
+          "terminalLateralAccelerationMps2": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 388,
+          "present": true,
+          "rawFields": {
+            "ID": 388,
+            "Name": "Patriot M901",
+            "Comments": "1997, PAC-2 GEM",
+            "Capacity": 4,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 3194,
+              "weaponId": 994,
+              "weaponName": "MIM-104D Patriot PAC-2 GEM",
+              "DefaultLoad": 4,
+              "MaxLoad": 4,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 816,
+          "present": true,
+          "rawFields": {
+            "ID": 816,
+            "Name": "Patriot M901",
+            "Comments": "2004, PAC-2 GEM+",
+            "Capacity": 4,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 1003,
+              "weaponId": 642,
+              "weaponName": "MIM-104E Patriot PAC-2 GEM+",
+              "DefaultLoad": 4,
+              "MaxLoad": 4,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 963,
+          "present": true,
+          "rawFields": {
+            "ID": 963,
+            "Name": "Patriot M901",
+            "Comments": "2007, PAC-3 ERINT, 16x Rnds",
+            "Capacity": 16,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 999,
+              "weaponId": 1150,
+              "weaponName": "MIM-104F Patriot PAC-3 ERINT",
+              "DefaultLoad": 16,
+              "MaxLoad": 16,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 2759,
+          "present": true,
+          "rawFields": {
+            "ID": 2759,
+            "Name": "Patriot M901",
+            "Comments": "2016, PAC-3 MSE, 8x Rnds",
+            "Capacity": 16,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 7951,
+              "weaponId": 3207,
+              "weaponName": "MIM-104F Patriot PAC-3 MSE",
+              "DefaultLoad": 8,
+              "MaxLoad": 8,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 2760,
+          "present": true,
+          "rawFields": {
+            "ID": 2760,
+            "Name": "Patriot M901",
+            "Comments": "2016, PAC-3 MSE, 12x Rnds",
+            "Capacity": 12,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 7952,
+              "weaponId": 3207,
+              "weaponName": "MIM-104F Patriot PAC-3 MSE",
+              "DefaultLoad": 12,
+              "MaxLoad": 12,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 2761,
+          "present": true,
+          "rawFields": {
+            "ID": 2761,
+            "Name": "Patriot M901",
+            "Comments": "2016, PAC-3 ERINT/MSE, 14x Rnds",
+            "Capacity": 14,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 7955,
+              "weaponId": 3207,
+              "weaponName": "MIM-104F Patriot PAC-3 MSE",
+              "DefaultLoad": 6,
+              "MaxLoad": 6,
+              "Multiple": 1
+            },
+            {
+              "ComponentNumber": 2,
+              "recordId": 7222,
+              "weaponId": 1150,
+              "weaponName": "MIM-104F Patriot PAC-3 ERINT",
+              "DefaultLoad": 8,
+              "MaxLoad": 8,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 1658,
+          "present": true,
+          "rawFields": {
+            "ID": 1658,
+            "Name": "SA-10a Grumble [5P85T] TEL",
+            "Comments": "1980, S-300PT, 5V55K",
+            "Capacity": 4,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 2585,
+              "weaponId": 403,
+              "weaponName": "SA-10a Grumble [5V55K]",
+              "DefaultLoad": 4,
+              "MaxLoad": 4,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 936,
+          "present": true,
+          "rawFields": {
+            "ID": 936,
+            "Name": "SA-10a Grumble [5P85T] TEL",
+            "Comments": "1982, S-300PT-1, 5V55KD",
+            "Capacity": 4,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 987,
+              "weaponId": 1156,
+              "weaponName": "SA-10a Grumble [5V55KD]",
+              "DefaultLoad": 4,
+              "MaxLoad": 4,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataMount",
+          "componentId": 318,
+          "present": true,
+          "rawFields": {
+            "ID": 318,
+            "Name": "SA-10b Grumble [5P85S] TEL",
+            "Comments": "1985, S-300PS, 5V55R",
+            "Capacity": 4,
+            "MagazineCapacity": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null,
+          "weaponRecords": [
+            {
+              "ComponentNumber": 1,
+              "recordId": 2083,
+              "weaponId": 1831,
+              "weaponName": "SA-10b Grumble [5V55R]",
+              "DefaultLoad": 4,
+              "MaxLoad": 4,
+              "Multiple": 1
+            }
+          ],
+          "realLauncherCompatibility": null
+        },
+        {
+          "table": "DataSensor",
+          "componentId": 984,
+          "present": true,
+          "rawFields": {
+            "ID": 984,
+            "Name": "AN/MPQ-53",
+            "Comments": "-",
+            "ScanInterval": 2,
+            "RadarPRF": 800,
+            "RadarPulseWidth": 0.4,
+            "RadarPeakPower": 100000.0,
+            "RadarHorizontalBeamwidth": 1.7,
+            "RadarVerticalBeamwidth": 1.7,
+            "MaxContactsAir": 100,
+            "MaxContactsIlluminate": 9,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null
+        },
+        {
+          "table": "DataSensor",
+          "componentId": 2498,
+          "present": true,
+          "rawFields": {
+            "ID": 2498,
+            "Name": "AN/MPQ-65",
+            "Comments": "AN/MPQ-53(V) PAC-3",
+            "ScanInterval": 2,
+            "RadarPRF": 800,
+            "RadarPulseWidth": 0.4,
+            "RadarPeakPower": 200000.0,
+            "RadarHorizontalBeamwidth": 1.7,
+            "RadarVerticalBeamwidth": 1.7,
+            "MaxContactsAir": 100,
+            "MaxContactsIlluminate": 9,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null
+        },
+        {
+          "table": "DataSensor",
+          "componentId": 395,
+          "present": true,
+          "rawFields": {
+            "ID": 395,
+            "Name": "AN/MPQ-64 Sentinel",
+            "Comments": "1994",
+            "ScanInterval": 2,
+            "RadarPRF": 2000,
+            "RadarPulseWidth": 0.2,
+            "RadarPeakPower": 25000.0,
+            "RadarHorizontalBeamwidth": 2.0,
+            "RadarVerticalBeamwidth": 1.8,
+            "MaxContactsAir": 0,
+            "MaxContactsIlluminate": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null
+        },
+        {
+          "table": "DataSensor",
+          "componentId": 975,
+          "present": true,
+          "rawFields": {
+            "ID": 975,
+            "Name": "Low Blow [SNR-125]",
+            "Comments": "-",
+            "ScanInterval": 1,
+            "RadarPRF": 0,
+            "RadarPulseWidth": 0.0,
+            "RadarPeakPower": 0.0,
+            "RadarHorizontalBeamwidth": 0.0,
+            "RadarVerticalBeamwidth": 0.0,
+            "MaxContactsAir": 6,
+            "MaxContactsIlluminate": 1,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null
+        },
+        {
+          "table": "DataSensor",
+          "componentId": 974,
+          "present": true,
+          "rawFields": {
+            "ID": 974,
+            "Name": "Flap Lid B [5N63S]",
+            "Comments": "SA-10b, 12x TEL",
+            "ScanInterval": 2,
+            "RadarPRF": 900,
+            "RadarPulseWidth": 0.5,
+            "RadarPeakPower": 81000.0,
+            "RadarHorizontalBeamwidth": 1.6,
+            "RadarVerticalBeamwidth": 1.6,
+            "MaxContactsAir": 0,
+            "MaxContactsIlluminate": 6,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null
+        },
+        {
+          "table": "DataSensor",
+          "componentId": 632,
+          "present": true,
+          "rawFields": {
+            "ID": 632,
+            "Name": "Tin Shield B [5N59S/36D6]",
+            "Comments": "ST-68UM",
+            "ScanInterval": 6,
+            "RadarPRF": 360,
+            "RadarPulseWidth": 1.2,
+            "RadarPeakPower": 350000.0,
+            "RadarHorizontalBeamwidth": 2.1,
+            "RadarVerticalBeamwidth": 2.1,
+            "MaxContactsAir": 127,
+            "MaxContactsIlluminate": 0,
+            "Hypothetical": 0,
+            "Deprecated": 0
+          },
+          "missingColumns": [],
+          "runtimeEnabled": false,
+          "normalizedPhysicalParameters": null
+        }
+      ]
+    }
+  ],
+  "differences": [
+    {
+      "fromBuild": 496,
+      "toBuild": 512,
+      "table": "DataWeapon",
+      "componentId": 642,
+      "sameLabel": true,
+      "changedFields": [
+        "missingColumns",
+        "rawFields"
+      ],
+      "note": "Cambio de registro del juego; mismo nombre no prueba equivalencia física."
+    },
+    {
+      "fromBuild": 496,
+      "toBuild": 512,
+      "table": "DataWeapon",
+      "componentId": 1150,
+      "sameLabel": true,
+      "changedFields": [
+        "missingColumns",
+        "rawFields"
+      ],
+      "note": "Cambio de registro del juego; mismo nombre no prueba equivalencia física."
+    },
+    {
+      "fromBuild": 496,
+      "toBuild": 512,
+      "table": "DataWeapon",
+      "componentId": 3207,
+      "sameLabel": true,
+      "changedFields": [
+        "missingColumns",
+        "rawFields"
+      ],
+      "note": "Cambio de registro del juego; mismo nombre no prueba equivalencia física."
+    },
+    {
+      "fromBuild": 496,
+      "toBuild": 512,
+      "table": "DataWeapon",
+      "componentId": 403,
+      "sameLabel": true,
+      "changedFields": [
+        "missingColumns",
+        "rawFields"
+      ],
+      "note": "Cambio de registro del juego; mismo nombre no prueba equivalencia física."
+    },
+    {
+      "fromBuild": 496,
+      "toBuild": 512,
+      "table": "DataWeapon",
+      "componentId": 1156,
+      "sameLabel": true,
+      "changedFields": [
+        "missingColumns",
+        "rawFields"
+      ],
+      "note": "Cambio de registro del juego; mismo nombre no prueba equivalencia física."
+    },
+    {
+      "fromBuild": 496,
+      "toBuild": 512,
+      "table": "DataWeapon",
+      "componentId": 1831,
+      "sameLabel": true,
+      "changedFields": [
+        "missingColumns",
+        "rawFields"
+      ],
+      "note": "Cambio de registro del juego; mismo nombre no prueba equivalencia física."
+    },
+    {
+      "fromBuild": 496,
+      "toBuild": 512,
+      "table": "DataWeapon",
+      "componentId": 652,
+      "sameLabel": true,
+      "changedFields": [
+        "missingColumns",
+        "rawFields"
+      ],
+      "note": "Cambio de registro del juego; mismo nombre no prueba equivalencia física."
+    },
+    {
+      "fromBuild": 496,
+      "toBuild": 512,
+      "table": "DataWeapon",
+      "componentId": 1147,
+      "sameLabel": true,
+      "changedFields": [
+        "missingColumns",
+        "rawFields"
+      ],
+      "note": "Cambio de registro del juego; mismo nombre no prueba equivalencia física."
+    },
+    {
+      "fromBuild": 496,
+      "toBuild": 512,
+      "table": "DataWeapon",
+      "componentId": 2970,
+      "sameLabel": true,
+      "changedFields": [
+        "missingColumns",
+        "rawFields"
+      ],
+      "note": "Cambio de registro del juego; mismo nombre no prueba equivalencia física."
+    },
+    {
+      "fromBuild": 496,
+      "toBuild": 512,
+      "table": "DataWeapon",
+      "componentId": 598,
+      "sameLabel": true,
+      "changedFields": [
+        "missingColumns",
+        "rawFields"
+      ],
+      "note": "Cambio de registro del juego; mismo nombre no prueba equivalencia física."
+    },
+    {
+      "fromBuild": 496,
+      "toBuild": 512,
+      "table": "DataWeapon",
+      "componentId": 2771,
+      "sameLabel": true,
+      "changedFields": [
+        "missingColumns",
+        "rawFields"
+      ],
+      "note": "Cambio de registro del juego; mismo nombre no prueba equivalencia física."
+    },
+    {
+      "fromBuild": 496,
+      "toBuild": 512,
+      "table": "DataWeapon",
+      "componentId": 2891,
+      "sameLabel": true,
+      "changedFields": [
+        "missingColumns",
+        "rawFields"
+      ],
+      "note": "Cambio de registro del juego; mismo nombre no prueba equivalencia física."
+    },
+    {
+      "fromBuild": 496,
+      "toBuild": 512,
+      "table": "DataWeapon",
+      "componentId": 4041,
+      "sameLabel": true,
+      "changedFields": [
+        "missingColumns",
+        "rawFields"
+      ],
+      "note": "Cambio de registro del juego; mismo nombre no prueba equivalencia física."
+    },
+    {
+      "fromBuild": 496,
+      "toBuild": 512,
+      "table": "DataWeapon",
+      "componentId": 681,
+      "sameLabel": true,
+      "changedFields": [
+        "missingColumns",
+        "rawFields",
+        "weaponCodes"
+      ],
+      "note": "Cambio de registro del juego; mismo nombre no prueba equivalencia física."
+    }
+  ],
+  "units": "Raw game fields: units/meaning require independent field-specific verification.",
+  "runtimeEnabled": false
+}

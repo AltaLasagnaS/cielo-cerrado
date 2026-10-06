@@ -4,6 +4,8 @@ Contratos de componentes, recursos y campaña, conservados en una carpeta indepe
 
 ## Qué está implementado
 
+La [ampliación de variantes y radares](docs/AMPLIACION-VARIANTES-Y-RADARES.md) añade una selección comparada de 20 armas, 21 montajes y 17 sensores en cuatro builds DB3K. Conserva datos crudos y contradicciones (Pantsir incluye cañones; RBS 70 no hereda el seeker SALH del juego). Incluye recuperación de `DBInfo.dat` (207 entradas XML) y contraste de hashes; el registro es anterior a las bases modernas enviadas.
+
 - Catálogo de referencia normalizado: tres familias, diez entradas de munición (una es un marcador legado sin variante identificada), nueve componentes y diez candidatos de configuración.
 - Registro de evidencia y fuentes. Diferencia documentación primaria/secundaria, índices de juego, estimación legada y desconocimiento. No atribuye evidencia a páginas bloqueadas.
 - Validación de IDs, referencias, unidades, fuentes, niveles de evidencia y habilitación accidental.
@@ -54,6 +56,8 @@ Cada evento lleva bando e ID. Repetir exactamente un comando no duplica compras 
 ## Diseño y entrega
 
 Ver las [fichas](docs/FICHAS.md), el [diseño de briefing/campaña](docs/BRIEFING-CAMPANA.md) y la [guía de integración](docs/INTEGRACION.md).
+
+La [revisión de fuentes de juegos](docs/FUENTES-DE-JUEGOS.md) conserva trece fichas de misiles, referencias de sensores/lanzadores y una consulta de CWDB 512, con unidades, procedencia y contradicciones pendientes.
 
 Para retomar todo lo hablado: [estado e índice de continuidad](docs/ESTADO-Y-RELEVO.md), [plan maestro](docs/PLAN-MAESTRO.md), [decisiones](docs/DECISIONES.md) y [pendientes](docs/PENDIENTES.md). Se preservaron también las referencias y los documentos externos originales, distinguiendo sus estados históricos.
 
