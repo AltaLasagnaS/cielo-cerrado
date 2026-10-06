@@ -1,0 +1,67 @@
+{
+  "format": "cielo-cerrado/dbinfo-recovery-review",
+  "version": 1,
+  "reviewedOn": "2026-10-05",
+  "sourceSha256": "6d29f1bee13b4f4f6cca3447524a79e8fc80c733397d2bce9ce1b080f96f64c5",
+  "cipher": "AES-256-CBC",
+  "padding": "PKCS7",
+  "encoding": "base64",
+  "keyDerivation": {
+    "algorithm": "PBKDF2-HMAC-SHA1",
+    "iterations": 1000,
+    "keyBytes": 32
+  },
+  "plaintextRecovered": true,
+  "plaintextBytes": 44671,
+  "plaintextSha256": "7eaa64bf7ac246adc87c4ae5dfec114be0793f5e33c6561526a80412dc0e1b37",
+  "xmlRoot": "DBFiles",
+  "records": 207,
+  "countsByDBID": {
+    "1": 140,
+    "2": 65,
+    "3": 2
+  },
+  "comparisons": [
+    {
+      "file": "DB3K_496.db3",
+      "sha1": "0512e27f11561bdd39b6aa189d792d115ca03f51",
+      "sha256": "da256f20e501d15977ecf0de7666f8f3af050524db349d0aa82b6d8db63b1a9b",
+      "hashMatches": [],
+      "sameFilenameRows": [],
+      "verifiedByThisManifest": false
+    },
+    {
+      "file": "DB3K_512.db3",
+      "sha1": "57334daf25e33862c175b267a67b3b66b3ff82c7",
+      "sha256": "5c031d24a7efe3dff05c3b0b4f6fa596b00fe8e334c4b150c7f479622275a787",
+      "hashMatches": [],
+      "sameFilenameRows": [],
+      "verifiedByThisManifest": false
+    },
+    {
+      "file": "DB3K_514.db3",
+      "sha1": "2fe4bc37289e9a7cafe2c36bc2e80627d3c1b8f7",
+      "sha256": "fab65fb141dd7e6f97d448f851fbdd7577de206c7eb044f68c6f9c041b30f754",
+      "hashMatches": [],
+      "sameFilenameRows": [],
+      "verifiedByThisManifest": false
+    },
+    {
+      "file": "DB3K_515.db3",
+      "sha1": "e67bf455a6c97c6e2c7ac83379e8ccb66ac4d69d",
+      "sha256": "1c0064407ae75d88d32efc63968a3d02017308cb73d7a4e8bd15cb6550a61e29",
+      "hashMatches": [],
+      "sameFilenameRows": [],
+      "verifiedByThisManifest": false
+    },
+    {
+      "file": "CWDB_512.db3",
+      "sha1": "9fcee9e9c2b82a67c1e5361c54158688b4d54b58",
+      "sha256": "4a4ba98ecad165268b4df488b50099b77fb6b3759fd0e70839a922ae22ea2ce4",
+      "hashMatches": [],
+      "sameFilenameRows": [],
+      "verifiedByThisManifest": false
+    }
+  ],
+  "scope": "Registro de archivos, nombres y hashes. Supported es la marca del registro del juego, no prueba de capacidad física ni compatibilidad de armas."
+}
