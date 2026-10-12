@@ -19,6 +19,13 @@ una pregunta de diseño que no se presenta como fallo confirmado.
 | Diagnóstico Chromium independiente | Reproducciones en fuente y bundle; detalle y conteos en `evidence/browser.json`; salida 2 |
 | Rendimiento | 10/100/1.000 amenazas; 80 pasos por tamaño; cobertura 100²/250²; temporizador/dibujo en interfaz |
 
+[La segunda tanda](ROUND2.md) añade 4 casos de campaña (3 controles válidos,
+1 violación) y 14 comprobaciones Chromium (4 controles sin errores JavaScript,
+10 violaciones de cinco conductas en fuente/bundle). No hubo errores del
+diagnóstico. Incluye cinco mediciones por tamaño hasta 3.000 amenazas, después
+de calentamiento. Se repitieron `npm run check` y las 116 pruebas experimentales:
+mantienen los resultados de la tabla. La evidencia original queda intacta.
+
 Los checks normales verdes demuestran estabilidad de sus casos, no ausencia de
 las interacciones que esta carpeta reproduce. El workflow de la nueva PR puede
 estar verde mientras este diagnóstico conserva violaciones explícitas. No se
@@ -141,19 +148,22 @@ midieron móviles, todos los climas, duración máxima de historia o cien unidad
 
 Actualización: [ROUND2.md](ROUND2.md) ya comprueba contabilidad de HOJ/DRFM con
 recarga, bloqueo del cierre en pantalla nativa, tooltip de objetivo e invalidación
-por radar dañado/jammer destruido. Amplía los puntos siguientes sin certificar
+por radar dañado/jammer destruido y cobertura histórica. Amplía los puntos siguientes sin certificar
 todas sus combinaciones.
 
 1. Cuando el usuario entregue el PR de Claude, fijar su SHA y ejecutar estos
    casos contra esa copia sin editarla. Clasificar resuelto/persiste/incompatible
    y verificar que los controles válidos siguen funcionando.
-2. Revisar contabilidad y finalización en campaña con HOJ/falsos blancos/recargas
-   reales: el control sin lanzadores no cierra esa interacción.
-3. Revisar tooltip y estado histórico de cobertura después del cuadro común.
-   Se verificaron selección, hit-test y cobertura operativa; no cada tooltip ni
-   toda invalidación visual de movilidad/daño.
-4. Repetir mediciones y probar respuesta con cargas mayores de forma acotada
-   antes de fijar límites globales o introducir workers.
+2. Tras la corrección de cierre, repetir el caso de pantalla nativa y los
+   controles de gasto/recarga. Ya fueron ejecutados; que su contabilidad pase
+   hoy no certifica todas las combinaciones ni el guardado durante combate,
+   que sigue pendiente como funcionalidad.
+3. Contrastar tooltip y cobertura histórica después del cuadro común. Ya se
+   comprobaron sus violaciones; quedan otros tipos de tooltip y toda
+   invalidación visual de movilidad histórica.
+4. Ampliar duración y mezcla de escenarios antes de fijar límites globales o
+   introducir workers. Ya se añadieron calentamiento y mediciones repetidas
+   hasta 3.000 amenazas; no se midió un máximo seguro.
 
 No se reabren los tres errores de #72 ya corregidos. No se expandió catálogo,
 activaron pasarelas/perfiles ni corrigió el motor en esta rama. La movilidad en

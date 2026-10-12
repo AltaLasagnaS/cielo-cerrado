@@ -16,6 +16,21 @@ Las violaciones amplían **F05, F07 y F10** del adjunto. No se aplicaron fixes a
 motor; los ejecutables conservan salida 2 cuando encuentran esas violaciones.
 Salida 1 significa fallo de ejecución/fixture, también en los procesos hijos.
 
+Localizadores en la misma base de producción **9560c77**:
+
+| Caso | Prioridad | Funciones a contrastar |
+|---|---|---|
+| `campaign-hoj-ui-progress`, `native-campaign-hoj-progress` | P1 | `src/sim/engine.js#step`, `src/ui/loop.js#loop` y `experimentos/catalogo-presupuesto/lib/port-combat.mjs#step/ended` |
+| `historical-objective-tooltip` | P2 | `src/ui/input.js#showTip/hitTest` y `src/sim/replay.js#frameAt` |
+| `partial-radar-damage-coverage-invalidation` | P2 | `src/sim/engine.js#damageUnits`, `src/ui/coverage.js#schedCov/computeCov` |
+| `jammer-loss-coverage-invalidation` | P2 | `src/sim/engine.js#damageJammers`, `src/ui/coverage.js#schedCov/computeCov` |
+| `historical-coverage-time` | P2 | `src/ui/coverage.js#computeCov`, `src/sim/replay.js#frameAt` |
+
+Los comandos al final repiten los casos; los JSON registran los SHA concretos
+de cada ejecución, además de hashes. Los pasos, estímulos y controles se
+detallan a continuación. No se trasladan estas conclusiones a un main posterior
+sin ejecutar nuevamente contra ese commit.
+
 ## Finalización de campaña, ahora comprobada en la pantalla nativa
 
 Se usa el puente real y se carga la operación por el input **Cargar partida**.
