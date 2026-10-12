@@ -1,0 +1,202 @@
+{
+  "provenance": {
+    "targetSha": "9560c772543abcd0c0c7e75bdc9c47c0fb0d6bc5",
+    "node": "v24.19.0",
+    "platform": "linux 6.18.44",
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "logicalCpus": 5,
+    "ramBytes": 35743784960,
+    "sources": {
+      "src/sim/engine.js": "5758ab7afd14fd36ccff3058e977eb54778304257a2580f739b24602604902a1",
+      "src/sim/ew.js": "c0a9d47e4cd2147a6e6c31082ddec5ef79ead59c67fc94b777c4534e94d22a52",
+      "src/sim/replay.js": "04981b6532c4f40d6e4581524d7fd01ff6caf3a12bc7b232996f4c0ec7240822",
+      "src/sim/contacts.js": "9c2a3432c75fcf8d9690397a9b009073416d272d56c4279b13d53e492185f3b7",
+      "src/sim/scenario-io.js": "1235b3f2d5f7f7635dec50d92892b603aee1d881d3c9998a1d14f1d0aceb0768",
+      "src/physics/engagement.js": "7565faf1d29656d08d4e881bb0f192633733c1292e6bce933dab95d1a5ca2fdb",
+      "src/physics/coverage.js": "e9c84208096d74cfbf6e9e754112face636599b8eee095ca904b072cecff293a",
+      "src/render/draw.js": "e46aaedfc63b63036da94f471456a06653a7d89bbcbfe8410e2991a9b43e4dc6"
+    }
+  },
+  "chromium": "151.0.7922.173",
+  "summary": {
+    "HOLDS": 2,
+    "VIOLATED": 9,
+    "ERROR": 0
+  },
+  "cases": [
+    {
+      "id": "paused-hidden-route",
+      "audit": "F09",
+      "mode": "source",
+      "expected": "Pausar vista defensora no dibuja planes de ataque ocultos.",
+      "holds": false,
+      "observed": {
+        "runningRouteLabels": [],
+        "pausedRouteLabels": [
+          "Shahed"
+        ],
+        "runningRouteStrokes": 0,
+        "pausedRouteStrokes": 1
+      },
+      "status": "VIOLATED"
+    },
+    {
+      "id": "unobserved-jammer-label",
+      "audit": "F09",
+      "mode": "source",
+      "expected": "Interferidor enemigo sin fix ni observación no revela identidad/posición exactas.",
+      "holds": false,
+      "observed": {
+        "fix": null,
+        "canvasLabels": [
+          "Jammer aéreo"
+        ],
+        "expectedHiddenLabel": "Jammer aéreo"
+      },
+      "status": "VIOLATED"
+    },
+    {
+      "id": "coverage-operational-label",
+      "audit": "F10",
+      "mode": "source",
+      "expected": "La ejecución excluye sensores indisponibles o etiqueta explícitamente capacidad potencial.",
+      "holds": false,
+      "observed": {
+        "silentCells": 40340,
+        "movingCells": 40340,
+        "hint": "Turquesa: al menos un sensor ve un Shahed a 50 m sobre el terreno (más intenso = 2+ sensores). Oscuro: hueco de cobertura. Cubierto: 16% del mapa."
+      },
+      "status": "VIOLATED"
+    },
+    {
+      "id": "historical-selection",
+      "audit": "F07",
+      "mode": "source",
+      "expected": "La ficha en replay T=5 usa posición de T=5 (40,40), no final (60,40).",
+      "holds": false,
+      "observed": {
+        "panel": "Selección__AUDIT_UNIT__NASAMS\n      Posición60.0, 40.0 kmLat/Lon36.819°, -121.694°Terreno0 mRadarAN/MPQ-64 Sentinel · XHorizonte vs blanco a 50 m37 kmAlcance35 kmGuiadoactivoEnlace técnico de pistasLink 16 / MIDSCoordinación C2 (general)Coordinada (imagen común)Munición1/18 · reserva 12En vuelo0/6EstadoOperativaFicha"
+      },
+      "status": "VIOLATED"
+    },
+    {
+      "id": "historical-hit-test",
+      "audit": "F07",
+      "mode": "source",
+      "expected": "Hit testing encuentra la unidad donde el cuadro histórico la dibuja.",
+      "holds": false,
+      "observed": {
+        "historicalHit": null,
+        "finalHit": {
+          "kind": "def",
+          "id": 25
+        },
+        "wantedId": 25
+      },
+      "status": "VIOLATED"
+    },
+    {
+      "id": "ui-thread-measurement",
+      "mode": "source",
+      "status": "MEASURED",
+      "observed": {
+        "count": 1000,
+        "steps": 80,
+        "simulatedSeconds": 20,
+        "synchronousMs": 144.5,
+        "drawMs": 2.199999988079071,
+        "timerDelayMs": 179.90000000596046,
+        "maxStepMs": 8.099999994039536,
+        "note": "Bloque sintético de 80 pasos sin ceder, no flujo Auto/Monte Carlo. Mide retraso de temporizador en hilo UI; no define presupuesto seguro."
+      }
+    },
+    {
+      "id": "javascript-errors",
+      "mode": "source",
+      "status": "HOLDS",
+      "observed": {
+        "errors": [],
+        "blockedExternalOrigins": []
+      }
+    },
+    {
+      "id": "paused-hidden-route",
+      "audit": "F09",
+      "mode": "standalone-http",
+      "expected": "Pausar vista defensora no dibuja planes de ataque ocultos.",
+      "holds": false,
+      "observed": {
+        "runningRouteLabels": [],
+        "pausedRouteLabels": [
+          "Shahed"
+        ],
+        "runningRouteStrokes": 0,
+        "pausedRouteStrokes": 1
+      },
+      "status": "VIOLATED"
+    },
+    {
+      "id": "unobserved-jammer-label",
+      "audit": "F09",
+      "mode": "standalone-http",
+      "expected": "Interferidor enemigo sin fix ni observación no revela identidad/posición exactas.",
+      "holds": false,
+      "observed": {
+        "fix": null,
+        "canvasLabels": [
+          "Jammer aéreo"
+        ],
+        "expectedHiddenLabel": "Jammer aéreo"
+      },
+      "status": "VIOLATED"
+    },
+    {
+      "id": "coverage-operational-label",
+      "audit": "F10",
+      "mode": "standalone-http",
+      "expected": "La ejecución excluye sensores indisponibles o etiqueta explícitamente capacidad potencial.",
+      "holds": false,
+      "observed": {
+        "silentCells": 40340,
+        "movingCells": 40340,
+        "hint": "Turquesa: al menos un sensor ve un Shahed a 50 m sobre el terreno (más intenso = 2+ sensores). Oscuro: hueco de cobertura. Cubierto: 16% del mapa."
+      },
+      "status": "VIOLATED"
+    },
+    {
+      "id": "historical-selection",
+      "audit": "F07",
+      "mode": "standalone-http",
+      "expected": "La ficha en replay T=5 usa posición de T=5 (40,40), no final (60,40).",
+      "holds": false,
+      "observed": {
+        "panel": "Selección__AUDIT_UNIT__NASAMS\n      Posición60.0, 40.0 kmLat/Lon36.819°, -121.694°Terreno0 mRadarAN/MPQ-64 Sentinel · XHorizonte vs blanco a 50 m37 kmAlcance35 kmGuiadoactivoEnlace técnico de pistasLink 16 / MIDSCoordinación C2 (general)Coordinada (imagen común)Munición1/18 · reserva 12En vuelo0/6EstadoOperativaFicha"
+      },
+      "status": "VIOLATED"
+    },
+    {
+      "id": "ui-thread-measurement",
+      "mode": "standalone-http",
+      "status": "MEASURED",
+      "observed": {
+        "count": 1000,
+        "steps": 80,
+        "simulatedSeconds": 20,
+        "synchronousMs": 95.2000000178814,
+        "drawMs": 2.2000000178813934,
+        "timerDelayMs": 130,
+        "maxStepMs": 8.799999982118607,
+        "note": "Bloque sintético de 80 pasos sin ceder, no flujo Auto/Monte Carlo. Mide retraso de temporizador en hilo UI; no define presupuesto seguro."
+      }
+    },
+    {
+      "id": "javascript-errors",
+      "mode": "standalone-http",
+      "status": "HOLDS",
+      "observed": {
+        "errors": [],
+        "blockedExternalOrigins": []
+      }
+    }
+  ]
+}

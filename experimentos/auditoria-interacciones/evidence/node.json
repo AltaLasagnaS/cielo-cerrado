@@ -1,0 +1,924 @@
+{
+  "provenance": {
+    "targetSha": "9560c772543abcd0c0c7e75bdc9c47c0fb0d6bc5",
+    "node": "v24.19.0",
+    "platform": "linux 6.18.44",
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "logicalCpus": 5,
+    "ramBytes": 35743784960,
+    "sources": {
+      "src/sim/engine.js": "5758ab7afd14fd36ccff3058e977eb54778304257a2580f739b24602604902a1",
+      "src/sim/ew.js": "c0a9d47e4cd2147a6e6c31082ddec5ef79ead59c67fc94b777c4534e94d22a52",
+      "src/sim/replay.js": "04981b6532c4f40d6e4581524d7fd01ff6caf3a12bc7b232996f4c0ec7240822",
+      "src/sim/contacts.js": "9c2a3432c75fcf8d9690397a9b009073416d272d56c4279b13d53e492185f3b7",
+      "src/sim/scenario-io.js": "1235b3f2d5f7f7635dec50d92892b603aee1d881d3c9998a1d14f1d0aceb0768",
+      "src/physics/engagement.js": "7565faf1d29656d08d4e881bb0f192633733c1292e6bce933dab95d1a5ca2fdb",
+      "src/physics/coverage.js": "e9c84208096d74cfbf6e9e754112face636599b8eee095ca904b072cecff293a",
+      "src/render/draw.js": "e46aaedfc63b63036da94f471456a06653a7d89bbcbfe8410e2991a9b43e4dc6"
+    }
+  },
+  "summary": {
+    "HOLDS": 11,
+    "VIOLATED": 26,
+    "DESIGN_REVIEW": 1,
+    "ERROR": 0
+  },
+  "cases": [
+    {
+      "id": "replay-initial-damage",
+      "audit": "F06",
+      "priority": "P2",
+      "location": "src/sim/replay.js#frameAt",
+      "expected": "Replay(0) conserva el daño y HP iniciales.",
+      "holds": false,
+      "observed": {
+        "live": {
+          "radar": true,
+          "unitHp": 120,
+          "objectiveHp": 300
+        },
+        "historical": {
+          "radar": false,
+          "unitHp": 120,
+          "objectiveHp": 800
+        }
+      },
+      "status": "VIOLATED",
+      "milliseconds": 3.8123919999999885
+    },
+    {
+      "id": "replay-partial-hp",
+      "audit": "F06",
+      "priority": "P2",
+      "location": "src/sim/engine.js#damageUnits; src/sim/replay.js#recUnit",
+      "expected": "Replay reproduce HP tras daño que no pierde componentes.",
+      "holds": false,
+      "observed": {
+        "liveHp": 286,
+        "historicalHp": null,
+        "events": 0
+      },
+      "status": "VIOLATED",
+      "milliseconds": 2.855839000000003
+    },
+    {
+      "id": "replay-reserve",
+      "audit": "N01",
+      "priority": "P2",
+      "location": "src/sim/replay.js#recUnit",
+      "expected": "La reserva histórica no se pierde al reconstruir.",
+      "holds": false,
+      "observed": {
+        "expectedReserve": 3,
+        "reconstructedReserve": null
+      },
+      "status": "VIOLATED",
+      "milliseconds": 1.431670000000011
+    },
+    {
+      "id": "replay-jammer",
+      "audit": "F07",
+      "priority": "P2",
+      "location": "src/sim/replay.js#frameAt; src/sim/engine.js#damageJammers",
+      "expected": "El cuadro histórico contiene el estado del jammer antes/después del daño.",
+      "holds": false,
+      "observed": {
+        "frameKeys": [
+          "t",
+          "threats",
+          "ints",
+          "units",
+          "objs",
+          "impacts",
+          "log"
+        ],
+        "actualDead": true,
+        "before": null,
+        "after": null
+      },
+      "status": "VIOLATED",
+      "milliseconds": 1.5947260000000085
+    },
+    {
+      "id": "same-observations",
+      "audit": "F08",
+      "priority": "P1",
+      "location": "src/sim/contacts.js#contactOf",
+      "expected": "Mismas observaciones dan el mismo contacto hasta un nuevo reporte.",
+      "holds": false,
+      "observed": {
+        "aliveWorld": {
+          "x": 3,
+          "y": 1,
+          "z": 50,
+          "vx": 1,
+          "vy": 0,
+          "v": 1000,
+          "age": 1,
+          "lost": false,
+          "by": 1
+        },
+        "deadWorld": {
+          "x": 2,
+          "y": 1,
+          "z": 50,
+          "vx": 1,
+          "vy": 0,
+          "v": 1000,
+          "age": 1,
+          "lost": true,
+          "by": 1
+        }
+      },
+      "status": "VIOLATED",
+      "milliseconds": 0.08981599999999901
+    },
+    {
+      "id": "delegation-launcher",
+      "audit": "F01",
+      "priority": "P1",
+      "location": "src/sim/engine.js#engage/reaches",
+      "expected": "Una capa indisponible no debe suprimir al NASAMS capaz de intervenir.",
+      "holds": false,
+      "observed": {
+        "mode": "launcher",
+        "control": {
+          "shots": 1,
+          "killed": 1,
+          "hits": 0,
+          "nasamsShots": 1,
+          "gepardShots": 0,
+          "end": 75.75
+        },
+        "pair": {
+          "shots": 0,
+          "killed": 0,
+          "hits": 1,
+          "nasamsShots": 0,
+          "gepardShots": 0,
+          "end": 588.25
+        }
+      },
+      "status": "VIOLATED",
+      "milliseconds": 46.84534599999999
+    },
+    {
+      "id": "delegation-moving",
+      "audit": "F01",
+      "priority": "P1",
+      "location": "src/sim/engine.js#engage/reaches",
+      "expected": "Una capa indisponible no debe suprimir al NASAMS capaz de intervenir.",
+      "holds": false,
+      "observed": {
+        "mode": "moving",
+        "control": {
+          "shots": 1,
+          "killed": 1,
+          "hits": 0,
+          "nasamsShots": 1,
+          "gepardShots": 0,
+          "end": 75.75
+        },
+        "pair": {
+          "shots": 0,
+          "killed": 0,
+          "hits": 1,
+          "nasamsShots": 0,
+          "gepardShots": 0,
+          "end": 588.25
+        }
+      },
+      "status": "VIOLATED",
+      "milliseconds": 32.629969
+    },
+    {
+      "id": "delegation-channels",
+      "audit": "F01",
+      "priority": "P1",
+      "location": "src/sim/engine.js#engage/reaches",
+      "expected": "Una capa indisponible no debe suprimir al NASAMS capaz de intervenir.",
+      "holds": false,
+      "observed": {
+        "mode": "channels",
+        "control": {
+          "shots": 1,
+          "killed": 1,
+          "hits": 0,
+          "nasamsShots": 1,
+          "gepardShots": 0,
+          "end": 75.75
+        },
+        "pair": {
+          "shots": 0,
+          "killed": 0,
+          "hits": 1,
+          "nasamsShots": 0,
+          "gepardShots": 0,
+          "end": 588.25
+        }
+      },
+      "status": "VIOLATED",
+      "milliseconds": 21.07348299999998
+    },
+    {
+      "id": "delegation-blind",
+      "audit": "F01",
+      "priority": "P1",
+      "location": "src/sim/engine.js#engage/reaches",
+      "expected": "Una capa indisponible no debe suprimir al NASAMS capaz de intervenir.",
+      "holds": false,
+      "observed": {
+        "mode": "blind",
+        "control": {
+          "shots": 1,
+          "killed": 1,
+          "hits": 0,
+          "nasamsShots": 1,
+          "gepardShots": 0,
+          "end": 75.75
+        },
+        "pair": {
+          "shots": 0,
+          "killed": 0,
+          "hits": 1,
+          "nasamsShots": 0,
+          "gepardShots": 0,
+          "end": 588.25
+        }
+      },
+      "status": "VIOLATED",
+      "milliseconds": 24.140314999999987
+    },
+    {
+      "id": "delegation-isolated",
+      "audit": "F01",
+      "priority": "P1",
+      "location": "src/sim/engine.js#engage/reaches",
+      "expected": "Una capa indisponible no debe suprimir al NASAMS capaz de intervenir.",
+      "holds": true,
+      "observed": {
+        "mode": "isolated",
+        "control": {
+          "shots": 1,
+          "killed": 1,
+          "hits": 0,
+          "nasamsShots": 1,
+          "gepardShots": 0,
+          "end": 75.75
+        },
+        "pair": {
+          "shots": 1,
+          "killed": 1,
+          "hits": 0,
+          "nasamsShots": 1,
+          "gepardShots": 0,
+          "end": 73.75
+        }
+      },
+      "status": "HOLDS",
+      "milliseconds": 18.709367000000015
+    },
+    {
+      "id": "delegation-noAmmo",
+      "audit": "F01",
+      "priority": "P1",
+      "location": "src/sim/engine.js#engage/reaches",
+      "expected": "Una capa indisponible no debe suprimir al NASAMS capaz de intervenir.",
+      "holds": true,
+      "observed": {
+        "mode": "noAmmo",
+        "control": {
+          "shots": 1,
+          "killed": 1,
+          "hits": 0,
+          "nasamsShots": 1,
+          "gepardShots": 0,
+          "end": 75.75
+        },
+        "pair": {
+          "shots": 1,
+          "killed": 1,
+          "hits": 0,
+          "nasamsShots": 1,
+          "gepardShots": 0,
+          "end": 73.75
+        }
+      },
+      "status": "HOLDS",
+      "milliseconds": 5.6234540000000095
+    },
+    {
+      "id": "delegation-dead",
+      "audit": "F01",
+      "priority": "P1",
+      "location": "src/sim/engine.js#engage/reaches",
+      "expected": "Una capa indisponible no debe suprimir al NASAMS capaz de intervenir.",
+      "holds": true,
+      "observed": {
+        "mode": "dead",
+        "control": {
+          "shots": 1,
+          "killed": 1,
+          "hits": 0,
+          "nasamsShots": 1,
+          "gepardShots": 0,
+          "end": 75.75
+        },
+        "pair": {
+          "shots": 1,
+          "killed": 1,
+          "hits": 0,
+          "nasamsShots": 1,
+          "gepardShots": 0,
+          "end": 73.75
+        }
+      },
+      "status": "HOLDS",
+      "milliseconds": 12.016819999999996
+    },
+    {
+      "id": "delegation-operational-control",
+      "audit": "F01-control",
+      "priority": "CONTROL",
+      "location": "src/sim/engine.js#engage",
+      "expected": "La capa barata operativa conserva su intervención.",
+      "holds": true,
+      "observed": {
+        "shots": 2,
+        "killed": 1,
+        "hits": 0,
+        "nasamsShots": 0,
+        "gepardShots": 2,
+        "end": 514.75
+      },
+      "status": "HOLDS",
+      "milliseconds": 22.47820299999998
+    },
+    {
+      "id": "targetunit-damage-equivalence",
+      "audit": "F02",
+      "priority": "P1",
+      "location": "src/sim/engine.js#impact/damageUnits",
+      "expected": "Designación no cambia HP ni supervivencia de una explosión equivalente.",
+      "holds": false,
+      "observed": {
+        "coordinates": {
+          "hp": 286,
+          "alive": true,
+          "explosion": {
+            "x": 40.00000030279544,
+            "y": 40.00000002229741,
+            "k": "hit",
+            "t": 0
+          }
+        },
+        "targetUnit": {
+          "hp": 300,
+          "alive": false,
+          "explosion": {
+            "x": 40.00000030279544,
+            "y": 40.00000002229741,
+            "k": "hit",
+            "t": 0
+          }
+        },
+        "calculatedDamage": 14.399999999999999
+      },
+      "status": "VIOLATED",
+      "milliseconds": 4.348521000000005
+    },
+    {
+      "id": "silent-radar-guide",
+      "audit": "F03",
+      "priority": "P1",
+      "location": "src/sim/engine.js#solveFor; physics/engagement.js#trackOK",
+      "expected": "TVM no se emplea sin emisión necesaria ni encendido registrado.",
+      "holds": false,
+      "observed": {
+        "shots": 2,
+        "emitFrom": null,
+        "emitting": false,
+        "killed": 1
+      },
+      "status": "VIOLATED",
+      "milliseconds": 2.955458999999962
+    },
+    {
+      "id": "guide-silence-during-flight",
+      "audit": "F03-extensión",
+      "priority": "P1",
+      "location": "src/sim/engine.js#step/resolución de interceptores",
+      "expected": "Apagar guía requerida durante vuelo impide continuar sin reactivación explícita.",
+      "holds": false,
+      "observed": {
+        "disabledAt": 14.25,
+        "killed": 1,
+        "emittingAtEnd": false,
+        "shots": 2
+      },
+      "status": "VIOLATED",
+      "milliseconds": 2.536557000000016
+    },
+    {
+      "id": "guidance-class-s300",
+      "audit": "F03-matriz",
+      "priority": "P1",
+      "location": "physics/engagement.js#trackOK; sim/engine.js#solveFor",
+      "expected": "Emisiones respetan la clase: activo/IR admite pista compatible; TVM/SARH/mando exige guía; cañón exige observación propia.",
+      "holds": false,
+      "observed": {
+        "type": "s300",
+        "control": {
+          "guide": "TVM",
+          "shots": 2,
+          "emissionRegistered": true,
+          "detectorShotCount": 0
+        },
+        "silent": {
+          "guide": "TVM",
+          "shots": 2,
+          "emissionRegistered": false,
+          "detectorShotCount": 0
+        },
+        "remoteAllowed": false
+      },
+      "status": "VIOLATED",
+      "milliseconds": 5.759320000000002
+    },
+    {
+      "id": "guidance-class-buk",
+      "audit": "F03-matriz",
+      "priority": "P1",
+      "location": "physics/engagement.js#trackOK; sim/engine.js#solveFor",
+      "expected": "Emisiones respetan la clase: activo/IR admite pista compatible; TVM/SARH/mando exige guía; cañón exige observación propia.",
+      "holds": false,
+      "observed": {
+        "type": "buk",
+        "control": {
+          "guide": "SARH",
+          "shots": 2,
+          "emissionRegistered": true,
+          "detectorShotCount": 0
+        },
+        "silent": {
+          "guide": "SARH",
+          "shots": 2,
+          "emissionRegistered": false,
+          "detectorShotCount": 0
+        },
+        "remoteAllowed": false
+      },
+      "status": "VIOLATED",
+      "milliseconds": 15.427391
+    },
+    {
+      "id": "guidance-class-s125",
+      "audit": "F03-matriz",
+      "priority": "P1",
+      "location": "physics/engagement.js#trackOK; sim/engine.js#solveFor",
+      "expected": "Emisiones respetan la clase: activo/IR admite pista compatible; TVM/SARH/mando exige guía; cañón exige observación propia.",
+      "holds": false,
+      "observed": {
+        "type": "s125",
+        "control": {
+          "guide": "mando",
+          "shots": 1,
+          "emissionRegistered": true,
+          "detectorShotCount": 0
+        },
+        "silent": {
+          "guide": "mando",
+          "shots": 3,
+          "emissionRegistered": false,
+          "detectorShotCount": 0
+        },
+        "remoteAllowed": false
+      },
+      "status": "VIOLATED",
+      "milliseconds": 15.367245000000025
+    },
+    {
+      "id": "guidance-class-nasams",
+      "audit": "F03-matriz",
+      "priority": "P1",
+      "location": "physics/engagement.js#trackOK; sim/engine.js#solveFor",
+      "expected": "Emisiones respetan la clase: activo/IR admite pista compatible; TVM/SARH/mando exige guía; cañón exige observación propia.",
+      "holds": true,
+      "observed": {
+        "type": "nasams",
+        "control": {
+          "guide": "activo",
+          "shots": 1,
+          "emissionRegistered": true,
+          "detectorShotCount": 0
+        },
+        "silent": {
+          "guide": "activo",
+          "shots": 1,
+          "emissionRegistered": false,
+          "detectorShotCount": 0
+        },
+        "remoteAllowed": true
+      },
+      "status": "HOLDS",
+      "milliseconds": 3.511757999999986
+    },
+    {
+      "id": "guidance-class-irist",
+      "audit": "F03-matriz",
+      "priority": "P1",
+      "location": "physics/engagement.js#trackOK; sim/engine.js#solveFor",
+      "expected": "Emisiones respetan la clase: activo/IR admite pista compatible; TVM/SARH/mando exige guía; cañón exige observación propia.",
+      "holds": true,
+      "observed": {
+        "type": "irist",
+        "control": {
+          "guide": "IR",
+          "shots": 1,
+          "emissionRegistered": true,
+          "detectorShotCount": 0
+        },
+        "silent": {
+          "guide": "IR",
+          "shots": 1,
+          "emissionRegistered": false,
+          "detectorShotCount": 0
+        },
+        "remoteAllowed": true
+      },
+      "status": "HOLDS",
+      "milliseconds": 4.375390999999979
+    },
+    {
+      "id": "guidance-class-gepard",
+      "audit": "F03-matriz",
+      "priority": "P1",
+      "location": "physics/engagement.js#trackOK; sim/engine.js#solveFor",
+      "expected": "Emisiones respetan la clase: activo/IR admite pista compatible; TVM/SARH/mando exige guía; cañón exige observación propia.",
+      "holds": true,
+      "observed": {
+        "type": "gepard",
+        "control": {
+          "guide": "cañón",
+          "shots": 1,
+          "emissionRegistered": true,
+          "detectorShotCount": 0
+        },
+        "silent": {
+          "guide": "cañón",
+          "shots": 0,
+          "emissionRegistered": false,
+          "detectorShotCount": 0
+        },
+        "remoteAllowed": false
+      },
+      "status": "HOLDS",
+      "milliseconds": 12.49532099999999
+    },
+    {
+      "id": "gun-projectile-after-launcher-loss",
+      "audit": "N04",
+      "priority": "P1",
+      "location": "src/sim/engine.js#resolución de interceptores; physics/engagement.js#RADAR_GUID",
+      "expected": "Una ráfaga ya disparada y no guiada no depende de la supervivencia posterior del lanzador.",
+      "holds": false,
+      "observed": {
+        "alive": {
+          "killed": 1,
+          "shots": 1,
+          "launch": 4.25,
+          "arrival": 6.25,
+          "guidanceLog": []
+        },
+        "destroyedAfterFiring": {
+          "killed": 0,
+          "shots": 1,
+          "launch": 4.25,
+          "arrival": 6.25,
+          "guidanceLog": [
+            "ráfaga 35 mm de Gepard-1 pierde la guía: su batería fue destruida."
+          ]
+        }
+      },
+      "status": "VIOLATED",
+      "milliseconds": 3.1267970000000105
+    },
+    {
+      "id": "hoj-channel-capacity",
+      "audit": "F04",
+      "priority": "P1",
+      "location": "src/sim/ew.js#ewStep",
+      "expected": "HOJ no supera canales ya ocupados.",
+      "holds": false,
+      "observed": {
+        "shots": 1,
+        "channels": [
+          {
+            "active": 7,
+            "limit": 6
+          },
+          {
+            "active": 6,
+            "limit": 6
+          }
+        ]
+      },
+      "status": "VIOLATED",
+      "milliseconds": 1.5884960000000206
+    },
+    {
+      "id": "hoj-pending-completion",
+      "audit": "F05",
+      "priority": "P1",
+      "location": "src/sim/engine.js#step",
+      "expected": "Una corrida sigue activa mientras HOJ válido está en vuelo.",
+      "holds": false,
+      "observed": {
+        "t": 0.25,
+        "arrival": 24.58717975353517,
+        "running": false,
+        "done": false
+      },
+      "status": "VIOLATED",
+      "milliseconds": 1.2502059999999915
+    },
+    {
+      "id": "hoj-montecarlo-completion",
+      "audit": "F05-extensión",
+      "priority": "P1",
+      "location": "src/sim/montecarlo.js#ended",
+      "expected": "MC no termina antes de la llegada del HOJ que lanzó en esa misma preparación/semilla.",
+      "holds": false,
+      "observed": {
+        "earliestHojArrival": 24.83717975353517,
+        "normalEndIncludingEffects": 25,
+        "mcEnd": 2,
+        "mcShots": 1
+      },
+      "status": "VIOLATED",
+      "milliseconds": 2.612421999999981
+    },
+    {
+      "id": "replay-hoj-flight",
+      "audit": "F07",
+      "priority": "P2",
+      "location": "src/sim/replay.js#frameAt",
+      "expected": "Replay muestra el interceptor HOJ pendiente.",
+      "holds": false,
+      "observed": {
+        "liveHoj": 1,
+        "replayInts": 0,
+        "replayHoj": null
+      },
+      "status": "VIOLATED",
+      "milliseconds": 1.375945999999999
+    },
+    {
+      "id": "ew-silence-localization",
+      "audit": "N02",
+      "priority": "P1",
+      "location": "src/sim/ew.js#strobes",
+      "expected": "Si emisión es necesaria, debe registrarse; distinguir recepción pasiva deliberada.",
+      "holds": false,
+      "observed": {
+        "hoj": 1,
+        "fix": {
+          "t": 0,
+          "err": 0.034603517337976154
+        },
+        "emissions": [
+          {
+            "emitting": false,
+            "emitFrom": null
+          },
+          {
+            "emitting": false,
+            "emitFrom": null
+          }
+        ]
+      },
+      "designQuestion": "La recepción pasiva puede ser intencional: revisar contrato antes de declarar esto bug.",
+      "status": "DESIGN_REVIEW",
+      "milliseconds": 1.4484860000000026
+    },
+    {
+      "id": "coverage-silent-moving",
+      "audit": "F10",
+      "priority": "P2",
+      "location": "src/physics/coverage.js#coverageGrid",
+      "expected": "Cobertura operacional excluye radar sin emitir/trasladándose, o se etiqueta como potencial.",
+      "holds": false,
+      "observed": {
+        "silentCells": 10000,
+        "movingCells": 10000,
+        "emitting": false
+      },
+      "status": "VIOLATED",
+      "milliseconds": 23.872645999999975
+    },
+    {
+      "id": "json-own-catalog-keys",
+      "audit": "F11",
+      "priority": "P2",
+      "location": "src/sim/scenario-io.js#validateScenario",
+      "expected": "Los tipos heredados del prototipo se rechazan.",
+      "holds": false,
+      "observed": [
+        {
+          "type": "constructor",
+          "accepted": true,
+          "errors": []
+        },
+        {
+          "type": "toString",
+          "accepted": true,
+          "errors": []
+        },
+        {
+          "type": "__proto__",
+          "accepted": true,
+          "errors": []
+        }
+      ],
+      "status": "VIOLATED",
+      "milliseconds": 10.145025999999973
+    },
+    {
+      "id": "json-hp-over-max",
+      "audit": "F11",
+      "priority": "P2",
+      "location": "src/sim/scenario-io.js#validateScenario/loadScenarioData",
+      "expected": "HP mayor al máximo se rechaza explícitamente.",
+      "holds": false,
+      "observed": {
+        "accepted": true,
+        "requested": 99999,
+        "loaded": 800,
+        "errors": []
+      },
+      "status": "VIOLATED",
+      "milliseconds": 2.9012969999999996
+    },
+    {
+      "id": "json-invalid-atomic",
+      "audit": "F11-control",
+      "priority": "CONTROL",
+      "location": "src/sim/scenario-io.js#validateScenario",
+      "expected": "Rechazo de referencia rota no muta preparación.",
+      "holds": true,
+      "observed": {
+        "accepted": false,
+        "unchanged": true,
+        "errors": [
+          "Salva 1 (shahed): apunta al objetivo con id 123456, que no está en el archivo."
+        ]
+      },
+      "status": "HOLDS",
+      "milliseconds": 2.5635480000000257
+    },
+    {
+      "id": "json-degenerate-route",
+      "audit": "F11",
+      "priority": "P2",
+      "location": "src/sim/scenario-io.js#validateScenario",
+      "expected": "Ruta de longitud cero se rechaza, no crea vuelos inválidos.",
+      "holds": false,
+      "observed": {
+        "accepted": true,
+        "errors": []
+      },
+      "status": "VIOLATED",
+      "milliseconds": 2.511589000000015
+    },
+    {
+      "id": "json-degenerate-flight-consumer",
+      "audit": "N03/F11",
+      "priority": "P2",
+      "location": "src/sim/scenario-io.js → src/physics/kinematics.js → sim/engine.js",
+      "expected": "Un JSON aceptado no produce fecha de vuelo NaN al ser consumido.",
+      "holds": true,
+      "observed": {
+        "accepted": true,
+        "finiteFlight": true,
+        "flightSeconds": 0
+      },
+      "status": "HOLDS",
+      "milliseconds": 3.070381999999995
+    },
+    {
+      "id": "json-aggregate-work",
+      "audit": "F11",
+      "priority": "P2",
+      "location": "src/sim/scenario-io.js#validateScenario",
+      "expected": "El validador identifica costo total, no solo límites por lista.",
+      "holds": false,
+      "observed": {
+        "accepted": true,
+        "totalThreats": 250000,
+        "errors": [],
+        "note": "No se ejecutan 250000 amenazas. No se propone aquí un límite seguro arbitrario."
+      },
+      "status": "VIOLATED",
+      "milliseconds": 4.167206999999962
+    },
+    {
+      "id": "campaign-ci-dependencies",
+      "audit": "F12",
+      "priority": "P2",
+      "location": ".github/workflows/catalogo-presupuesto.yml",
+      "expected": "CI experimental se activa al cambiar dependencias de producción.",
+      "holds": false,
+      "observed": {
+        "paths": [
+          "experimentos/catalogo-presupuesto/**",
+          ".github/workflows/catalogo-presupuesto.yml",
+          "experimentos/catalogo-presupuesto/**",
+          ".github/workflows/catalogo-presupuesto.yml"
+        ]
+      },
+      "kind": "static-workflow-inspection",
+      "status": "VIOLATED",
+      "milliseconds": 0.2394909999999868
+    },
+    {
+      "id": "mission-mc-equivalence-control",
+      "audit": "F12-control",
+      "priority": "CONTROL",
+      "location": "src/sim/montecarlo.js#runBatch",
+      "expected": "Sin muestreo, misión y MC coinciden en reglas/semilla equivalentes.",
+      "holds": true,
+      "observed": {
+        "live": {
+          "shots": 1,
+          "killed": 1,
+          "hits": 0,
+          "nasamsShots": 1,
+          "gepardShots": 0,
+          "end": 75.75
+        },
+        "mc": {
+          "shots": 1,
+          "killed": 1,
+          "hits": 0,
+          "end": 75.75
+        }
+      },
+      "status": "HOLDS",
+      "milliseconds": 5.548111000000006
+    },
+    {
+      "id": "campaign-mission-equivalence-control",
+      "audit": "F12-control",
+      "priority": "CONTROL",
+      "location": "experimentos/catalogo-presupuesto/lib/port-combat.mjs",
+      "expected": "Puente y misión normal coinciden con mismos medios, reglas y semilla; no se compara contra defensa distinta.",
+      "holds": true,
+      "observed": {
+        "campaign": {
+          "shots": 0,
+          "hits": 27,
+          "killed": 0,
+          "damage": 2500,
+          "objectives": [
+            {
+              "name": "Terminal de granos de Chornomorsk",
+              "hp": 0
+            },
+            {
+              "name": "Puerto de Odesa",
+              "hp": 0
+            },
+            {
+              "name": "Centro de Odesa",
+              "hp": 2500
+            }
+          ]
+        },
+        "normal": {
+          "shots": 0,
+          "hits": 27,
+          "killed": 0,
+          "damage": 2500,
+          "objectives": [
+            {
+              "name": "Terminal de granos de Chornomorsk",
+              "hp": 0
+            },
+            {
+              "name": "Puerto de Odesa",
+              "hp": 0
+            },
+            {
+              "name": "Centro de Odesa",
+              "hp": 2500
+            }
+          ]
+        },
+        "stockExpended": 0,
+        "note": "Control sin lanzadores: evita introducir recargas distintas y aisla el puente/daño/fin."
+      },
+      "status": "HOLDS",
+      "milliseconds": 129.76030400000008
+    }
+  ]
+}

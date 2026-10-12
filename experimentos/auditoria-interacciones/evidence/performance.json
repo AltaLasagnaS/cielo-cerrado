@@ -1,0 +1,77 @@
+{
+  "provenance": {
+    "targetSha": "9560c772543abcd0c0c7e75bdc9c47c0fb0d6bc5",
+    "node": "v24.19.0",
+    "platform": "linux 6.18.44",
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "logicalCpus": 5,
+    "ramBytes": 35743784960,
+    "sources": {
+      "src/sim/engine.js": "5758ab7afd14fd36ccff3058e977eb54778304257a2580f739b24602604902a1",
+      "src/sim/ew.js": "c0a9d47e4cd2147a6e6c31082ddec5ef79ead59c67fc94b777c4534e94d22a52",
+      "src/sim/replay.js": "04981b6532c4f40d6e4581524d7fd01ff6caf3a12bc7b232996f4c0ec7240822",
+      "src/sim/contacts.js": "9c2a3432c75fcf8d9690397a9b009073416d272d56c4279b13d53e492185f3b7",
+      "src/sim/scenario-io.js": "1235b3f2d5f7f7635dec50d92892b603aee1d881d3c9998a1d14f1d0aceb0768",
+      "src/physics/engagement.js": "7565faf1d29656d08d4e881bb0f192633733c1292e6bce933dab95d1a5ca2fdb",
+      "src/physics/coverage.js": "e9c84208096d74cfbf6e9e754112face636599b8eee095ca904b072cecff293a",
+      "src/render/draw.js": "e46aaedfc63b63036da94f471456a06653a7d89bbcbfe8410e2991a9b43e4dc6"
+    }
+  },
+  "method": "Una ejecución local por tamaño, valores probables, semilla 7, 80 pasos de 0,25 s. Incluye barridos; no representa 250000 amenazas ni un límite seguro. Heap no es memoria retenida: GC/JIT pueden alterar diferencias.",
+  "steps": [
+    {
+      "count": 10,
+      "steps": 80,
+      "simulationSeconds": 20,
+      "initializationMs": 0.7643029999999982,
+      "stepMedianMs": 0.03904899999999145,
+      "stepP95Ms": 0.31152999999999054,
+      "stepMaxMs": 3.2564840000000004,
+      "heapDeltaBytes": 1033120,
+      "recordedEvents": 11,
+      "historyProjectionJsonBytes": 9566
+    },
+    {
+      "count": 100,
+      "steps": 80,
+      "simulationSeconds": 20,
+      "initializationMs": 0.3490069999999861,
+      "stepMedianMs": 0.1303269999999941,
+      "stepP95Ms": 1.3788610000000006,
+      "stepMaxMs": 2.614325000000008,
+      "heapDeltaBytes": -705744,
+      "recordedEvents": 119,
+      "historyProjectionJsonBytes": 106573
+    },
+    {
+      "count": 1000,
+      "steps": 80,
+      "simulationSeconds": 20,
+      "initializationMs": 1.7621989999999954,
+      "stepMedianMs": 0.5980720000000019,
+      "stepP95Ms": 4.134387000000004,
+      "stepMaxMs": 5.307727999999997,
+      "heapDeltaBytes": 11757600,
+      "recordedEvents": 136,
+      "historyProjectionJsonBytes": 412866
+    }
+  ],
+  "coverage": [
+    {
+      "W": 100,
+      "H": 100,
+      "cellMetres": 200,
+      "units": 1,
+      "milliseconds": 4.620350999999999,
+      "allocatedGridBytes": 10000
+    },
+    {
+      "W": 250,
+      "H": 250,
+      "cellMetres": 200,
+      "units": 1,
+      "milliseconds": 3.3289729999999906,
+      "allocatedGridBytes": 62500
+    }
+  ]
+}

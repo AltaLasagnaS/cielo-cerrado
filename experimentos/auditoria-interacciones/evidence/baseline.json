@@ -1,0 +1,38 @@
+{
+  "baseSha": "9560c772543abcd0c0c7e75bdc9c47c0fb0d6bc5",
+  "branch": "codex/auditoria-interacciones",
+  "auditDateBuenosAires": "2026-10-12",
+  "exclusiveFolder": "experimentos/auditoria-interacciones/",
+  "inputFile": "Auditoria-Cielo-Cerrado.md",
+  "inputSha256": "44e2fbac31d7b55fcc2a3dc583d3a4038f70dd6e020a3b512b72e428a63a6739",
+  "checks": {
+    "npm run check": {
+      "passed": 247,
+      "skipped": 1,
+      "failed": 0
+    },
+    "experimental Node": {
+      "passed": 116,
+      "failed": 0
+    },
+    "existing browser": {
+      "native": "passed",
+      "ux": "passed",
+      "standaloneChecks": 9,
+      "standaloneTransport": "HTTP loopback, not file://"
+    },
+    "independent Node": {
+      "HOLDS": 11,
+      "VIOLATED": 26,
+      "DESIGN_REVIEW": 1,
+      "ERROR": 0
+    },
+    "independent browser": {
+      "HOLDS": 2,
+      "VIOLATED": 9,
+      "ERROR": 0
+    }
+  },
+  "productionModified": false,
+  "claudeCorrectionPrReviewed": false
+}
