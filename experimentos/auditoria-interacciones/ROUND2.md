@@ -8,8 +8,8 @@ una rama de correcciones de Claude.
 ## Resultado
 
 - Campaña: **4 casos**, 1 violación y 3 controles válidos, sin errores.
-- Chromium: **12 comprobaciones**, 8 violaciones y 4 controles sin errores JS;
-  cuatro conductas contrastadas en fuente y bundle HTTP. No son ocho bugs nuevos.
+- Chromium: **14 comprobaciones**, 10 violaciones y 4 controles sin errores JS;
+  cinco conductas contrastadas en fuente y bundle HTTP. No son diez bugs nuevos.
 - Rendimiento: calentamiento y cinco ejecuciones por tamaño, hasta 3.000 amenazas.
 
 Las violaciones amplían **F05, F07 y F10** del adjunto. No se aplicaron fixes al
@@ -110,6 +110,12 @@ resuelve estos dos casos:** el daño y la desaparición de ruido modifican tambi
 la capacidad potencial. Propuesta: evento de cambio relevante, recálculo
 agrupado y consumidores históricos separados, sin calcular toda la capa en cada
 frame.
+
+También se consulta cobertura con replay en **T=0,25**, antes del daño. Aunque el
+radar aún estaba sano entonces, la capa devuelve **19.674 celdas** del radar
+dañado final en lugar de las **40.340** del control anterior. Recalcular al mover
+el slider no alcanza si el cálculo sigue leyendo las unidades finales: necesita
+el cuadro histórico, junto con sus condiciones ambientales relevantes.
 
 ## Rendimiento repetido
 

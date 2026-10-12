@@ -1,6 +1,6 @@
 {
   "provenance": {
-    "targetSha": "626547bf5ed4641c4614dc0158855244a2bc9984",
+    "targetSha": "daa1c636cb7339ef3f21789b9d0eff3d874ff40a",
     "node": "v24.19.0",
     "platform": "linux 6.18.44",
     "cpu": "AMD EPYC 9V74 80-Core Processor",
@@ -20,7 +20,7 @@
   "transport": "fuente y bundle HTTP local, no file://",
   "summary": {
     "HOLDS": 4,
-    "VIOLATED": 8,
+    "VIOLATED": 10,
     "ERROR": 0
   },
   "cases": [
@@ -76,6 +76,19 @@
         "hp": 105,
         "alive": true,
         "damagedRadar": true
+      }
+    },
+    {
+      "id": "historical-coverage-time",
+      "mode": "source",
+      "audit": "F07/F10-histórico",
+      "status": "VIOLATED",
+      "expected": "El radar estaba sano antes del impacto; cobertura histórica debe coincidir con control previo.",
+      "observed": {
+        "historyTime": 0.25,
+        "finalTime": 5,
+        "cells": 19674,
+        "expectedHealthyCells": 40340
       }
     },
     {
@@ -151,6 +164,19 @@
         "hp": 105,
         "alive": true,
         "damagedRadar": true
+      }
+    },
+    {
+      "id": "historical-coverage-time",
+      "mode": "standalone-http",
+      "audit": "F07/F10-histórico",
+      "status": "VIOLATED",
+      "expected": "El radar estaba sano antes del impacto; cobertura histórica debe coincidir con control previo.",
+      "observed": {
+        "historyTime": 0.25,
+        "finalTime": 5,
+        "cells": 19674,
+        "expectedHealthyCells": 40340
       }
     },
     {

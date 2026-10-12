@@ -91,6 +91,13 @@ try {
     },damageDistance);
     assert(covariance.afterManual<covariance.before,'control debe reducir cobertura geométrica');
     cases.push({id:'partial-radar-damage-coverage-invalidation',mode,audit:'F10-extensión',status:covariance.afterAutomatic===covariance.afterManual?'HOLDS':'VIOLATED',observed:covariance});
+    const historicalCoverage=await covPage.evaluate(()=>{
+      const S=window.__S;S.replay={t:0.25};window.__dbg.computeCov();
+      return {historyTime:S.replay.t,finalTime:S.t,cells:S._cov.reduce((n,v)=>n+(v>0),0)};
+    });
+    cases.push({id:'historical-coverage-time',mode,audit:'F07/F10-histórico',status:historicalCoverage.cells===covariance.before?'HOLDS':'VIOLATED',
+      expected:'El radar estaba sano antes del impacto; cobertura histórica debe coincidir con control previo.',
+      observed:{...historicalCoverage,expectedHealthyCells:covariance.before}});
     const jammerCov=await covPage.evaluate(async ()=>{
       const S=window.__S,dbg=window.__dbg;dbg.resetSim();dbg.flat();S.setup={defs:[],objs:[],jams:[],salvos:[]};
       dbg.addDef('nasams',40,40,{mag:0,reserve:0});dbg.addJam('krasukha4',40,35);
