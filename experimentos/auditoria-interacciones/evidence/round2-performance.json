@@ -1,0 +1,182 @@
+{
+  "provenance": {
+    "targetSha": "626547bf5ed4641c4614dc0158855244a2bc9984",
+    "node": "v24.19.0",
+    "platform": "linux 6.18.44",
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "logicalCpus": 5,
+    "ramBytes": 35743784960,
+    "sources": {
+      "src/sim/engine.js": "5758ab7afd14fd36ccff3058e977eb54778304257a2580f739b24602604902a1",
+      "src/sim/ew.js": "c0a9d47e4cd2147a6e6c31082ddec5ef79ead59c67fc94b777c4534e94d22a52",
+      "src/sim/replay.js": "04981b6532c4f40d6e4581524d7fd01ff6caf3a12bc7b232996f4c0ec7240822",
+      "src/sim/contacts.js": "9c2a3432c75fcf8d9690397a9b009073416d272d56c4279b13d53e492185f3b7",
+      "src/sim/scenario-io.js": "1235b3f2d5f7f7635dec50d92892b603aee1d881d3c9998a1d14f1d0aceb0768",
+      "src/physics/engagement.js": "7565faf1d29656d08d4e881bb0f192633733c1292e6bce933dab95d1a5ca2fdb",
+      "src/physics/coverage.js": "e9c84208096d74cfbf6e9e754112face636599b8eee095ca904b072cecff293a",
+      "src/render/draw.js": "e46aaedfc63b63036da94f471456a06653a7d89bbcbfe8410e2991a9b43e4dc6"
+    }
+  },
+  "method": "Un calentamiento y cinco ejecuciones por tamaño; mismos dos sensores, mapa plano, semilla 7 y 40 pasos de 0,25 s. Tamaño mayor acotado a 3000. Heap incluye GC/JIT; no memoria retenida ni umbral seguro.",
+  "measurements": [
+    {
+      "count": 100,
+      "samples": [
+        {
+          "initializationMs": 0.3248399999999947,
+          "steps": 40,
+          "simulationSeconds": 10,
+          "medianStepMs": 0.10953499999999394,
+          "p95StepMs": 1.2985489999999942,
+          "maxStepMs": 2.3643069999999966,
+          "heapUsedBytes": 21666288
+        },
+        {
+          "initializationMs": 0.20632200000000012,
+          "steps": 40,
+          "simulationSeconds": 10,
+          "medianStepMs": 0.055893999999995,
+          "p95StepMs": 0.6996859999999856,
+          "maxStepMs": 0.8443439999999782,
+          "heapUsedBytes": 23705584
+        },
+        {
+          "initializationMs": 0.20380700000001184,
+          "steps": 40,
+          "simulationSeconds": 10,
+          "medianStepMs": 0.035594000000003234,
+          "p95StepMs": 0.6238610000000051,
+          "maxStepMs": 0.6247430000000236,
+          "heapUsedBytes": 24988168
+        },
+        {
+          "initializationMs": 0.18304599999999027,
+          "steps": 40,
+          "simulationSeconds": 10,
+          "medianStepMs": 0.0357140000000129,
+          "p95StepMs": 0.7393150000000048,
+          "maxStepMs": 1.1347020000000043,
+          "heapUsedBytes": 19818120
+        },
+        {
+          "initializationMs": 0.1696059999999875,
+          "steps": 40,
+          "simulationSeconds": 10,
+          "medianStepMs": 0.03738599999999792,
+          "p95StepMs": 0.6435410000000275,
+          "maxStepMs": 3.1297320000000184,
+          "heapUsedBytes": 23319856
+        }
+      ],
+      "medianOfStepMediansMs": 0.03738599999999792,
+      "medianOfP95Ms": 0.6996859999999856,
+      "largestStepMs": 3.1297320000000184
+    },
+    {
+      "count": 1000,
+      "samples": [
+        {
+          "initializationMs": 2.603798000000012,
+          "steps": 40,
+          "simulationSeconds": 10,
+          "medianStepMs": 0.5168600000000083,
+          "p95StepMs": 2.410547000000008,
+          "maxStepMs": 4.065112999999997,
+          "heapUsedBytes": 62666784
+        },
+        {
+          "initializationMs": 0.6280470000000378,
+          "steps": 40,
+          "simulationSeconds": 10,
+          "medianStepMs": 0.29555600000003324,
+          "p95StepMs": 3.3562730000000442,
+          "maxStepMs": 4.509853999999962,
+          "heapUsedBytes": 45423112
+        },
+        {
+          "initializationMs": 0.8281089999999836,
+          "steps": 40,
+          "simulationSeconds": 10,
+          "medianStepMs": 0.25003800000001775,
+          "p95StepMs": 2.1799290000000155,
+          "maxStepMs": 2.594633999999985,
+          "heapUsedBytes": 56279704
+        },
+        {
+          "initializationMs": 0.8710340000000087,
+          "steps": 40,
+          "simulationSeconds": 10,
+          "medianStepMs": 0.2511090000000422,
+          "p95StepMs": 1.8336570000000165,
+          "maxStepMs": 2.619090999999969,
+          "heapUsedBytes": 67548960
+        },
+        {
+          "initializationMs": 0.7822900000000459,
+          "steps": 40,
+          "simulationSeconds": 10,
+          "medianStepMs": 0.24626200000000154,
+          "p95StepMs": 2.468693999999971,
+          "maxStepMs": 3.3630640000000085,
+          "heapUsedBytes": 46680896
+        }
+      ],
+      "medianOfStepMediansMs": 0.2511090000000422,
+      "medianOfP95Ms": 2.410547000000008,
+      "largestStepMs": 4.509853999999962
+    },
+    {
+      "count": 3000,
+      "samples": [
+        {
+          "initializationMs": 2.7237289999999916,
+          "steps": 40,
+          "simulationSeconds": 10,
+          "medianStepMs": 0.9379350000000386,
+          "p95StepMs": 4.699369999999988,
+          "maxStepMs": 9.899826000000019,
+          "heapUsedBytes": 69411776
+        },
+        {
+          "initializationMs": 3.1897519999999986,
+          "steps": 40,
+          "simulationSeconds": 10,
+          "medianStepMs": 1.4431869999999662,
+          "p95StepMs": 5.137260000000083,
+          "maxStepMs": 8.562738999999965,
+          "heapUsedBytes": 66287784
+        },
+        {
+          "initializationMs": 2.8341259999999693,
+          "steps": 40,
+          "simulationSeconds": 10,
+          "medianStepMs": 0.7209780000000592,
+          "p95StepMs": 4.36736899999994,
+          "maxStepMs": 10.593541999999957,
+          "heapUsedBytes": 124302096
+        },
+        {
+          "initializationMs": 2.2267200000000003,
+          "steps": 40,
+          "simulationSeconds": 10,
+          "medianStepMs": 0.7114839999999276,
+          "p95StepMs": 4.164553000000069,
+          "maxStepMs": 4.545568000000003,
+          "heapUsedBytes": 120947184
+        },
+        {
+          "initializationMs": 2.6838689999999588,
+          "steps": 40,
+          "simulationSeconds": 10,
+          "medianStepMs": 0.7160099999999829,
+          "p95StepMs": 3.051503000000025,
+          "maxStepMs": 4.442052000000103,
+          "heapUsedBytes": 115229112
+        }
+      ],
+      "medianOfStepMediansMs": 0.7209780000000592,
+      "medianOfP95Ms": 4.36736899999994,
+      "largestStepMs": 10.593541999999957
+    }
+  ]
+}
