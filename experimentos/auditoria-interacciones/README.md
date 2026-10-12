@@ -9,6 +9,8 @@ generados, workflows ni la rama de Claude. Los fixtures sólo alteran estado de
 la corrida en memoria; no habilitan perfiles de movilidad ni armas nuevas.
 
 - [Informe y criterios de corrección](INFORME.md).
+- [Segunda tanda: campaña, tooltip e invalidación](ROUND2.md), con ejecutables
+  separados y evidencia adicional; conserva intacta la primera tanda.
 - [Resultados Node](evidence/node.json), [navegador](evidence/browser.json) y
   [mediciones](evidence/performance.json).
 - [Base, checks e identidad del adjunto](evidence/baseline.json).

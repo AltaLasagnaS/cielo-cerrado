@@ -139,6 +139,11 @@ midieron móviles, todos los climas, duración máxima de historia o cien unidad
 
 ## Pendientes de esta auditoría
 
+Actualización: [ROUND2.md](ROUND2.md) ya comprueba contabilidad de HOJ/DRFM con
+recarga, bloqueo del cierre en pantalla nativa, tooltip de objetivo e invalidación
+por radar dañado/jammer destruido. Amplía los puntos siguientes sin certificar
+todas sus combinaciones.
+
 1. Cuando el usuario entregue el PR de Claude, fijar su SHA y ejecutar estos
    casos contra esa copia sin editarla. Clasificar resuelto/persiste/incompatible
    y verificar que los controles válidos siguen funcionando.

@@ -1,0 +1,178 @@
+{
+  "provenance": {
+    "targetSha": "626547bf5ed4641c4614dc0158855244a2bc9984",
+    "node": "v24.19.0",
+    "platform": "linux 6.18.44",
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "logicalCpus": 5,
+    "ramBytes": 35743784960,
+    "sources": {
+      "src/sim/engine.js": "5758ab7afd14fd36ccff3058e977eb54778304257a2580f739b24602604902a1",
+      "src/sim/ew.js": "c0a9d47e4cd2147a6e6c31082ddec5ef79ead59c67fc94b777c4534e94d22a52",
+      "src/sim/replay.js": "04981b6532c4f40d6e4581524d7fd01ff6caf3a12bc7b232996f4c0ec7240822",
+      "src/sim/contacts.js": "9c2a3432c75fcf8d9690397a9b009073416d272d56c4279b13d53e492185f3b7",
+      "src/sim/scenario-io.js": "1235b3f2d5f7f7635dec50d92892b603aee1d881d3c9998a1d14f1d0aceb0768",
+      "src/physics/engagement.js": "7565faf1d29656d08d4e881bb0f192633733c1292e6bce933dab95d1a5ca2fdb",
+      "src/physics/coverage.js": "e9c84208096d74cfbf6e9e754112face636599b8eee095ca904b072cecff293a",
+      "src/render/draw.js": "e46aaedfc63b63036da94f471456a06653a7d89bbcbfe8410e2991a9b43e4dc6"
+    }
+  },
+  "transport": "fuente y bundle HTTP local, no file://",
+  "summary": {
+    "HOLDS": 4,
+    "VIOLATED": 8,
+    "ERROR": 0
+  },
+  "cases": [
+    {
+      "id": "native-campaign-hoj-progress",
+      "mode": "source",
+      "audit": "F05-campaña",
+      "status": "VIOLATED",
+      "observed": {
+        "initial": {
+          "more": true,
+          "running": false,
+          "t": 0.25,
+          "pendingHoj": 1,
+          "arrival": 24.814588757209602
+        },
+        "afterFrames": {
+          "t": 0.25,
+          "running": false,
+          "pendingHoj": 1
+        }
+      }
+    },
+    {
+      "id": "historical-objective-tooltip",
+      "mode": "source",
+      "audit": "F07-extensión",
+      "status": "VIOLATED",
+      "expected": "A T=5 el objetivo tenía 800 HP; fue destruido a T=10.",
+      "observed": {
+        "tip": "OBJETIVO: OBJETIVO-HISTÓRICO\nDepósito de combustible\nHP 0 / 800 · Destruido",
+        "historyTime": 5,
+        "finalTime": 20
+      }
+    },
+    {
+      "id": "round2-browser-errors",
+      "mode": "source",
+      "status": "HOLDS",
+      "observed": {
+        "errors": []
+      }
+    },
+    {
+      "id": "partial-radar-damage-coverage-invalidation",
+      "mode": "source",
+      "audit": "F10-extensión",
+      "status": "VIOLATED",
+      "observed": {
+        "before": 40340,
+        "afterAutomatic": 40340,
+        "afterManual": 19674,
+        "hp": 105,
+        "alive": true,
+        "damagedRadar": true
+      }
+    },
+    {
+      "id": "jammer-loss-coverage-invalidation",
+      "mode": "source",
+      "audit": "F10-extensión",
+      "status": "VIOLATED",
+      "observed": {
+        "before": 17198,
+        "afterAutomatic": 17198,
+        "afterManual": 40340,
+        "jammerDead": true,
+        "unitHp": 300
+      }
+    },
+    {
+      "id": "coverage-browser-errors",
+      "mode": "source",
+      "status": "HOLDS",
+      "observed": {
+        "errors": []
+      }
+    },
+    {
+      "id": "native-campaign-hoj-progress",
+      "mode": "standalone-http",
+      "audit": "F05-campaña",
+      "status": "VIOLATED",
+      "observed": {
+        "initial": {
+          "more": true,
+          "running": false,
+          "t": 0.25,
+          "pendingHoj": 1,
+          "arrival": 24.814588757209602
+        },
+        "afterFrames": {
+          "t": 0.25,
+          "running": false,
+          "pendingHoj": 1
+        }
+      }
+    },
+    {
+      "id": "historical-objective-tooltip",
+      "mode": "standalone-http",
+      "audit": "F07-extensión",
+      "status": "VIOLATED",
+      "expected": "A T=5 el objetivo tenía 800 HP; fue destruido a T=10.",
+      "observed": {
+        "tip": "OBJETIVO: OBJETIVO-HISTÓRICO\nDepósito de combustible\nHP 0 / 800 · Destruido",
+        "historyTime": 5,
+        "finalTime": 20
+      }
+    },
+    {
+      "id": "round2-browser-errors",
+      "mode": "standalone-http",
+      "status": "HOLDS",
+      "observed": {
+        "errors": []
+      }
+    },
+    {
+      "id": "partial-radar-damage-coverage-invalidation",
+      "mode": "standalone-http",
+      "audit": "F10-extensión",
+      "status": "VIOLATED",
+      "observed": {
+        "before": 40340,
+        "afterAutomatic": 40340,
+        "afterManual": 19674,
+        "hp": 105,
+        "alive": true,
+        "damagedRadar": true
+      }
+    },
+    {
+      "id": "jammer-loss-coverage-invalidation",
+      "mode": "standalone-http",
+      "audit": "F10-extensión",
+      "status": "VIOLATED",
+      "observed": {
+        "before": 17198,
+        "afterAutomatic": 17198,
+        "afterManual": 40340,
+        "jammerDead": true,
+        "unitHp": 300
+      }
+    },
+    {
+      "id": "coverage-browser-errors",
+      "mode": "standalone-http",
+      "status": "HOLDS",
+      "observed": {
+        "errors": []
+      }
+    }
+  ]
+}
